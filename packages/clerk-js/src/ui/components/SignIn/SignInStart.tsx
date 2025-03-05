@@ -35,8 +35,7 @@ const useAutoFillPasskey = () => {
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
-  const { userSettings } = useEnvironment();
-  const { passkeySettings, attributes } = userSettings;
+  const { attributes, passkeySettings } = useEnvironment().userSettings;
 
   useEffect(() => {
     async function runAutofillPasskey() {
@@ -49,7 +48,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
+    if (passkeySettings?.allow_autofill && attributes?.passkey?.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -59,11 +58,11 @@ const useAutoFillPasskey = () => {
   };
 };
 
-export function _SignInStart(): JSX.Element {
+function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
-  const { displayConfig, userSettings } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment() ?? {};
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
@@ -94,10 +93,6 @@ export function _SignInStart(): JSX.Element {
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
 
-  const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
-  const web3FirstFactors = userSettings.web3FirstFactors;
-  const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
-  const passwordBasedInstance = userSettings.instanceIsPasswordBased;
   const { currentIdentifier, nextIdentifier } = getIdentifierControlDisplayValues(
     identifierAttributes,
     identifierAttribute,
@@ -119,7 +114,8 @@ export function _SignInStart(): JSX.Element {
     [ctx.initialValues],
   );
 
-  const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
+  const hasSocialOrWeb3Buttons =
+    !!userSettings.authenticatableSocialStrategies?.length || !!userSettings.web3FirstFactors?.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
@@ -263,12 +259,12 @@ export function _SignInStart(): JSX.Element {
      * FAPI will return an error when password is submitted but the user's email matches requires enterprise sso authentication.
      * We need to strip password from the create request, and reconstruct it later.
      */
-    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
+    if (!hasPassword || userSettings.enterpriseSSO?.enabled) {
       fields = fields.filter(f => f.name !== 'password');
     }
     return {
       ...buildRequest(fields),
-      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' }),
+      ...(hasPassword && !userSettings.enterpriseSSO?.enabled && { strategy: 'password' }),
     } as SignInCreateParams;
   };
 
@@ -277,7 +273,7 @@ export function _SignInStart(): JSX.Element {
     fields: Array<FormControlState<string>>,
   ) => {
     return signInCreatePromise.then(signInResource => {
-      if (!userSettings.enterpriseSSO.enabled) {
+      if (!userSettings.enterpriseSSO?.enabled) {
         return signInResource;
       }
       /**
@@ -364,7 +360,7 @@ export function _SignInStart(): JSX.Element {
     } else if (isCombinedFlow && accountDoesNotExistError) {
       const attribute = getSignUpAttributeFromIdentifier(identifierField);
 
-      if (userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
+      if (userSettings.signUp?.mode === SIGN_UP_MODES.WAITLIST) {
         const waitlistUrl = clerk.buildWaitlistUrl(
           attribute === 'emailAddress'
             ? {
@@ -390,10 +386,10 @@ export function _SignInStart(): JSX.Element {
         identifierValue: identifierField.value,
         navigate,
         organizationTicket,
-        signUpMode: userSettings.signUp.mode,
+        signUpMode: userSettings.signUp?.mode || SIGN_UP_MODES.PUBLIC,
         redirectUrl,
         redirectUrlComplete,
-        passwordEnabled: userSettings.attributes.password.required,
+        passwordEnabled: Boolean(userSettings.attributes?.password?.required),
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -460,7 +456,7 @@ export function _SignInStart(): JSX.Element {
                   enableOAuthProviders
                 />
               )}
-              {standardFormAttributes.length ? (
+              {userSettings.enabledFirstFactorIdentifiers?.length ? (
                 <Form.Root
                   onSubmit={handleFirstPartySubmit}
                   gap={8}
@@ -475,14 +471,16 @@ export function _SignInStart(): JSX.Element {
                         autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
                       />
                     </Form.ControlRow>
-                    <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                    <InstantPasswordRow
+                      field={userSettings.instanceIsPasswordBased ? instantPasswordField : undefined}
+                    />
                   </Col>
                   <Form.SubmitButton hasArrow />
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.attributes.passkey.enabled &&
-              userSettings.passkeySettings.show_sign_in_button &&
+            {userSettings.attributes?.passkey?.enabled &&
+              userSettings.passkeySettings?.show_sign_in_button &&
               isWebSupported && (
                 <Card.Action elementId={'usePasskey'}>
                   <Card.ActionLink
@@ -494,7 +492,7 @@ export function _SignInStart(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
-          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
+          {userSettings.signUp?.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
             <Card.Action elementId='signIn'>
               <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
               <Card.ActionLink
@@ -503,7 +501,7 @@ export function _SignInStart(): JSX.Element {
               />
             </Card.Action>
           )}
-          {userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST && (
+          {userSettings.signUp?.mode === SIGN_UP_MODES.WAITLIST && (
             <Card.Action elementId='signIn'>
               <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText__join_waitlist')} />
               <Card.ActionLink
@@ -568,4 +566,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));

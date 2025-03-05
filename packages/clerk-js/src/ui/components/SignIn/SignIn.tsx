@@ -4,7 +4,6 @@ import React from 'react';
 
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
@@ -154,16 +153,22 @@ const usePreloadSignUp = (enabled = false) =>
 
 function SignInRoot() {
   const signInContext = useSignInContext();
+
   const normalizedSignUpContext = {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
-    ssoCallbackUrl: signInContext.ssoCallbackUrl,
-    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
+    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     signInUrl: signInContext.signInUrl,
+    ssoCallbackUrl: signInContext.ssoCallbackUrl,
     unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
-  } as SignUpContextType;
+  };
+
+  /**
+   * Preload Sign Up when in Combined Flow.
+   */
+  usePreloadSignUp(signInContext.isCombinedFlow);
 
   /**
    * Preload Sign Up when in Combined Flow.
@@ -171,6 +176,7 @@ function SignInRoot() {
   usePreloadSignUp(signInContext.isCombinedFlow);
 
   return (
+    /* @ts-expect-error: FIXME */
     <SignUpContext.Provider value={normalizedSignUpContext}>
       <SignInRoutes />
     </SignUpContext.Provider>

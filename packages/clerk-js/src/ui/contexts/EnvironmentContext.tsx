@@ -10,14 +10,13 @@ interface EnvironmentProviderProps {
   value: EnvironmentResource;
 }
 
-function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
+export function EnvironmentProvider({ children, value }: EnvironmentProviderProps): JSX.Element {
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;
 }
 
-function useEnvironment(): EnvironmentResource {
+export function useEnvironment() {
   const context = React.useContext(EnvironmentContext);
   assertContextExists(context, 'EnvironmentProvider');
+
   return context;
 }
-
-export { EnvironmentProvider, useEnvironment };

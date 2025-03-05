@@ -76,7 +76,7 @@ function handleDashboardUrlParsing(url: string) {
   };
 }
 
-const _KeylessPrompt = (_props: KeylessPromptProps) => {
+const KeylessPromptComponent = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -87,9 +87,9 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
   }, [isSignedIn]);
 
   const environment = useRevalidateEnvironment();
-  const claimed = Boolean(environment.authConfig.claimedAt);
+  const claimed = Boolean(environment.authConfig?.claimedAt);
   const success = typeof _props.onDismiss === 'function' && claimed;
-  const appName = environment.displayConfig.applicationName;
+  const appName = environment.displayConfig?.applicationName;
 
   const isForcedExpanded = claimed || success || isExpanded;
   const claimUrlToDashboard = useMemo(() => {
@@ -598,7 +598,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
 export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
-    <_KeylessPrompt {...props} />
+    <KeylessPromptComponent {...props} />
   </InternalThemeProvider>
 );
 

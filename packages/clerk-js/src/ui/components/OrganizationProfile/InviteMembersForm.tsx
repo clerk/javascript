@@ -225,7 +225,7 @@ const useDefaultRole = () => {
   const { options } = useFetchRoles();
   const { organizationSettings } = useEnvironment();
 
-  let defaultRole = organizationSettings.domains.defaultRole;
+  let defaultRole = organizationSettings.domains?.defaultRole;
 
   if (!defaultRole && options?.length === 1) {
     defaultRole = options[0].value;

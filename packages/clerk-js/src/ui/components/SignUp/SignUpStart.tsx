@@ -28,7 +28,7 @@ import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpStart(): JSX.Element {
+function SignUpStartComponent(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -40,10 +40,11 @@ function _SignUpStart(): JSX.Element {
   const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
+
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+    getInitialActiveIdentifier(attributes, userSettings.signUp?.progressive),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
@@ -265,7 +266,7 @@ function _SignUpStart(): JSX.Element {
     return <LoadingCard />;
   }
 
-  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
+  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp) ?? false;
   const visibleFields = Object.entries(fields).filter(([_, opts]) => showOptionalFields || opts?.required);
   const shouldShowForm = showFormFields(userSettings) && visibleFields.length > 0;
 
@@ -346,4 +347,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(SignUpStartComponent));

@@ -25,7 +25,7 @@ import {
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpContinue() {
+function SignUpContinueInternal() {
   const card = useCardState();
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -42,9 +42,9 @@ function _SignUpContinue() {
   const signUp = useCoreSignUp();
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const isCombinedFlow = !!(_isCombinedFlow && !!isWithinSignInContext);
-  const isProgressiveSignUp = userSettings.signUp.progressive;
+  const isProgressiveSignUp = userSettings.signUp?.progressive;
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+    getInitialActiveIdentifier(attributes, userSettings.signUp?.progressive),
   );
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
@@ -180,7 +180,7 @@ function _SignUpContinue() {
       .finally(() => card.setIdle());
   };
 
-  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
+  const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp) ?? false;
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
 
   const headerTitle = !onlyLegalConsentMissing
@@ -242,4 +242,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withCardStateProvider(_SignUpContinue);
+export const SignUpContinue = withCardStateProvider(SignUpContinueInternal);
