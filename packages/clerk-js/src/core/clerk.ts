@@ -1978,7 +1978,7 @@ export class Clerk implements ClerkInterface {
 
         await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
           const rethrow = (e: any) => {
-            if (envFailed) {
+            if (envFailed && this.__internal_resiliency) {
               return;
             }
             throw e;
