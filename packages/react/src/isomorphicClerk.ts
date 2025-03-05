@@ -92,8 +92,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__experimental_commerce'
-  | '__internal_setComponentNavigationContext'
+  | '__internal_setComponentNavigate'
 > & {
   client: ClientResource | undefined;
   __experimental_commerce: __experimental_CommerceNamespace | undefined;

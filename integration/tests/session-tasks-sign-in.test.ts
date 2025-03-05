@@ -1,45 +1,37 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { Application } from '../models/application';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
-  'session tasks after sign-in flow @nextjs',
-  ({ app }) => {
-    test.describe.configure({ mode: 'serial' });
+test.describe('session tasks after sign-in flow @nextjs', () => {
+  test.describe.configure({ mode: 'serial' });
+  let app: Application;
+  let fakeUser: FakeUser;
 
     let fakeUser: FakeUser;
 
-    test.beforeAll(async () => {
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
-      await u.services.users.createBapiUser(fakeUser);
-    });
+    const m = createTestUtils({ app });
+    fakeUser = m.services.users.createFakeUser();
+    await m.services.users.createBapiUser(fakeUser);
+  });
 
     test.afterAll(async () => {
       await fakeUser.deleteIfExists();
       await app.teardown();
     });
 
-    test.fixme('on after sign-in, navigates to task', async () => {
-      // todo
-    });
+  test('navigate to task on after sign-in', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
 
-    test.fixme('redirects back to task when accessing root sign in component', async () => {
-      // todo
-    });
-
-    test.fixme('redirects to after sign-in url when accessing root sign in component with a active session', {
-      // todo
-    });
-
-    test.fixme('redirects to after sign-in url once resolving task', () => {
-      // todo
-    });
-
-    test.fixme('without a session, does not allow to access task component', async () => {
-      // todo
-    });
-  },
-);
+    await expect(u.page.getByRole('button', { name: /create organization/i })).toBeVisible();
+    expect(page.url()).toContain('add-organization');
+  });
+});

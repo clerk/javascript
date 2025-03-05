@@ -427,19 +427,11 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Registers the internal navigation context from UI components in order to
-   * be triggered from `Clerk` methods
+   * Registers an internal navigate function for UI components in order to be triggered
+   * from `Clerk`
    * @internal
    */
-  __internal_setComponentNavigationContext: (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => () => void;
+  __internal_setComponentNavigate: (navigate: (to: string) => Promise<unknown>) => void;
 
   /**
    * Set the active session and organization explicitly.

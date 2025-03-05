@@ -44,7 +44,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -964,11 +963,6 @@ export class Clerk implements ClerkInterface {
 
     let newSession = session === undefined ? this.session : session;
 
-    if (newSession?.status === 'pending') {
-      await this.#handlePendingSession(newSession);
-      return;
-    }
-
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
@@ -1056,21 +1050,38 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: PendingSessionResource) => {
-    if (!session.currentTask || !this.environment) {
+  #handlePendingSession = async (session: SignedInSessionResource) => {
+    if (!this.environment) {
       return;
     }
 
-    if (session?.lastActiveToken) {
+    if (session.lastActiveToken) {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    if (this.#internalComponentNavigate) {
-      // Handles navigation for UI components
-      await this.#internalComponentNavigate(session.currentTask.__internal_getPath());
-    } else {
-      // Handles navigation for custom flows
-      await this.navigate(session.currentTask.__internal_getUrl(this.#options, this.environment));
+    // Handles multi-session scenario when switching from `active`
+    // to `pending`
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      await this.#touchCurrentSession(session);
+      session = this.#getSessionFromClient(session.id) ?? session;
+    }
+
+    // Syncs __session and __client_uat, in case the `pending` session
+    // has expired, it needs to trigger a sign-out
+    const token = await session.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    if (session.currentTask) {
+      await navigateToTask(session.currentTask, {
+        isInternalNavigation: !!this.#internalComponentNavigate,
+        navigate: this.#internalComponentNavigate ?? this.navigate,
+        options: this.#options,
+        environment: this.environment,
+      });
+
+      this.#internalComponentNavigate = null;
     }
 
     this.#setAccessors(session);
@@ -1104,12 +1115,8 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigate = (navigate: (to: string) => Promise<unknown>): UnsubscribeCallback => {
+  public __internal_setComponentNavigate = (navigate: (to: string) => Promise<unknown>) => {
     this.#internalComponentNavigate = navigate;
-    const unsubscribe = () => {
-      this.#internalComponentNavigate = null;
-    };
-    return unsubscribe;
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
