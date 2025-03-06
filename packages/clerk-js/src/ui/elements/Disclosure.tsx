@@ -1,7 +1,7 @@
 import { useFloating, useMergeRefs, useTransitionStyles } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
+import { Box, descriptors, Icon, SimpleButtonBase, useAppearance } from '../customizables';
 import { transitionTiming } from '../foundations/transitions';
 import { useFirstRender } from '../hooks';
 import { ChevronDown } from '../icons';
@@ -83,9 +83,9 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
   }
 
   return (
-    <SimpleButton
+    <SimpleButtonBase
       ref={ref}
-      elementDescriptor={descriptors.disclosureTrigger}
+      elementDescriptor={[descriptors.disclosureTrigger]}
       variant='unstyled'
       onClick={context.onToggle}
       aria-expanded={context.isOpen}
@@ -108,7 +108,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         sx={{ rotate: context.isOpen ? '180deg' : '0', transformOrigin: '50%' }}
         aria-hidden
       />
-    </SimpleButton>
+    </SimpleButtonBase>
   );
 });
 

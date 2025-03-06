@@ -23,6 +23,7 @@ export const Button = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitiv
 export const SimpleButton = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.SimpleButton)), {
   defaultDescriptor: descriptors.button,
 });
+export const SimpleButtonBase = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.SimpleButton)));
 
 export const Heading = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Heading)));
 export const Link = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Link)));
