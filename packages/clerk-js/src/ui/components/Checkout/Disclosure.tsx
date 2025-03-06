@@ -2,6 +2,7 @@ import { useFloating, useMergeRefs, useTransitionStyles } from '@floating-ui/rea
 import * as React from 'react';
 
 import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../../customizables';
+import { transitionTiming } from '../../foundations/transitions';
 import { useFirstRender } from '../../hooks';
 import { ChevronDown } from '../../icons';
 import { common } from '../../styledSystem';
@@ -147,14 +148,10 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       display: 'grid',
       gridTemplateRows: '0fr',
       transitionProperty: 'grid-template-rows',
-      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionTimingFunction: transitionTiming.slowBezier,
     },
-    duration: animations
-      ? {
-          open: 250,
-          close: 200,
-        }
-      : undefined,
+    // transitionDuration.slower
+    duration: animations ? 280 : undefined,
   });
 
   if (!isMounted) {
