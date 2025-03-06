@@ -218,6 +218,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'pricingTable',
 
+  'segmentedControlRoot',
+  'segmentedControlButton',
+
   'alert',
   'alertIcon',
   'alertText',

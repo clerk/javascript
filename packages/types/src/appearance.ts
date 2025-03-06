@@ -235,6 +235,9 @@ export type ElementsConfig = {
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
 
+  segmentedControlRoot: WithOptions;
+  segmentedControlButton: WithOptions;
+
   avatarBox: WithOptions;
   avatarImage: WithOptions;
   avatarImageActions: WithOptions;

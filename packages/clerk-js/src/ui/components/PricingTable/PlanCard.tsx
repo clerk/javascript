@@ -13,7 +13,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Avatar } from '../../elements';
+import { Avatar, SegmentedControl } from '../../elements';
 import { Check, InformationCircle } from '../../icons';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
@@ -188,14 +188,14 @@ export function PlanCard(props: PlanCardProps) {
               marginTop: t.space.$3,
             })}
           >
-            <SegmentedControl
-              selected={period}
-              setSelected={setPeriod}
-              options={[
-                { label: 'Monthly', value: 'month' },
-                { label: 'Annually', value: 'annual' },
-              ]}
-            />
+            <SegmentedControl.Root
+              aria-label='Set pay period'
+              value={period}
+              onChange={setPeriod}
+            >
+              <SegmentedControl.Button value='month'>Monthly</SegmentedControl.Button>
+              <SegmentedControl.Button value='annual'>Annually</SegmentedControl.Button>
+            </SegmentedControl.Root>
           </Box>
         ) : null}
       </Box>
@@ -277,48 +277,3 @@ function ReversibleContainer(props: React.PropsWithChildren<{ reverse?: boolean 
   const { children, reverse } = props;
   return <>{reverse ? React.Children.toArray(children).reverse() : children}</>;
 }
-
-type SegmentedControlOption = {
-  label: string;
-  value: string;
-};
-type SegmentedControlProps = {
-  selected?: string;
-  setSelected?: (k: string) => void;
-  options: SegmentedControlOption[];
-};
-
-const SegmentedControl = ({ selected, setSelected, options }: SegmentedControlProps) => {
-  return (
-    <Flex
-      sx={t => ({
-        backgroundColor: t.colors.$neutralAlpha50,
-        borderRadius: t.radii.$md,
-        boxShadow:
-          '0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 0px 1px rgba(0, 0, 0, 0.06)',
-      })}
-    >
-      {options.map(option => (
-        <Button
-          key={option.value}
-          variant='unstyled'
-          textVariant='caption'
-          focusRing={false}
-          onClick={() => setSelected && setSelected(option.value)}
-          sx={t => ({
-            padding: `${t.space.$1} ${t.space.$2x5}`,
-            backgroundColor: option.value === selected ? t.colors.$colorBackground : 'transparent',
-            borderRadius: t.radii.$md,
-            boxShadow:
-              option.value === selected
-                ? `0px 0px 0px 1px var(--color-Generated-Border, rgba(0, 0, 0, 0.06)), 0px 1px 2px 0px rgba(25, 28, 33, 0.06), 0px 0px 2px 0px rgba(0, 0, 0, 0.08)`
-                : 'none',
-            color: option.value === selected ? t.colors.$colorText : t.colors.$colorTextSecondary,
-          })}
-        >
-          {option.label}
-        </Button>
-      ))}
-    </Flex>
-  );
-};
