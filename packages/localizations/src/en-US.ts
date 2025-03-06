@@ -286,6 +286,7 @@ export const enUS: LocalizationResource = {
     passkey: {
       subtitle: 'Using your passkey confirms it’s you. Your device may ask for your fingerprint, face, or screen lock.',
       title: 'Use your passkey',
+      blockButton__passkey: 'Use your passkey',
     },
     emailCode: {
       formTitle: 'Verification code',
