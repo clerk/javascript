@@ -51,6 +51,7 @@ export function PlanCard(props: PlanCardProps) {
         boxShadow: t.shadows.$cardBoxShadow,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
+        textAlign: 'left',
       })}
     >
       <Box
