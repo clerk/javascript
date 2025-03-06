@@ -80,6 +80,7 @@ export type {
   SMSMessageJSON,
   UserJSON,
   VerificationJSON,
+  WaitlistEntryJSON,
   Web3WalletJSON,
   DeletedObjectJSON,
   PaginatedResponseJSON,
@@ -126,6 +127,7 @@ export type {
   SessionWebhookEvent,
   SMSWebhookEvent,
   UserWebhookEvent,
+  WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
 } from './api/resources/Webhooks';

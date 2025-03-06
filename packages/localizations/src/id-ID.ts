@@ -130,6 +130,7 @@ export const idID: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Undang',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Hapus anggota',
         tableHeader__actions: undefined,
@@ -869,6 +870,7 @@ export const idID: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

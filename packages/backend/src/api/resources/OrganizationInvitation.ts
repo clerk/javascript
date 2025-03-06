@@ -2,6 +2,12 @@ import type { OrganizationInvitationStatus, OrganizationMembershipRole } from '.
 import type { OrganizationInvitationJSON } from './JSON';
 
 export class OrganizationInvitation {
+  private _raw: OrganizationInvitationJSON | null = null;
+
+  public get raw(): OrganizationInvitationJSON | null {
+    return this._raw;
+  }
+
   constructor(
     readonly id: string,
     readonly emailAddress: string,
@@ -15,7 +21,7 @@ export class OrganizationInvitation {
   ) {}
 
   static fromJSON(data: OrganizationInvitationJSON) {
-    return new OrganizationInvitation(
+    const res = new OrganizationInvitation(
       data.id,
       data.email_address,
       data.role,
@@ -26,5 +32,7 @@ export class OrganizationInvitation {
       data.public_metadata,
       data.private_metadata,
     );
+    res._raw = data;
+    return res;
   }
 }

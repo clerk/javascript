@@ -878,6 +878,7 @@ export const beBY: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Выдаліць passkey',
         menuAction__rename: 'Перайменаваць passkey',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
