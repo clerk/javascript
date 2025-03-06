@@ -58,6 +58,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$neutralAlpha100,
             background: t.colors.$colorBackground,
+            isolation: 'isolate',
           })}
         >
           {children}
@@ -97,6 +98,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         justifyContent: 'space-between',
         padding: t.sizes.$3,
         color: t.colors.$colorText,
+        zIndex: 2,
       })}
     >
       {children}
@@ -137,17 +139,20 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const { isMounted, styles: transitionStyles } = useTransitionStyles(floatingContext, {
     initial: {
       gridTemplateRows: '0fr',
+      opacity: 0,
     },
     open: {
       gridTemplateRows: '1fr',
+      opacity: 1,
     },
     close: {
       gridTemplateRows: '0fr',
+      opacity: 0,
     },
     common: {
       display: 'grid',
       gridTemplateRows: '0fr',
-      transitionProperty: 'grid-template-rows',
+      transitionProperty: 'grid-template-rows opacity',
       transitionTimingFunction: transitionTiming.slowBezier,
     },
     // transitionDuration.slower
@@ -176,6 +181,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
         ),
+        zIndex: 1,
       })}
     >
       <Box
