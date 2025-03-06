@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
   backButton: 'กลับ',
+  badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__primary: 'หลัก',
@@ -23,6 +24,14 @@ export const thTH: LocalizationResource = {
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -662,6 +671,14 @@ export const thTH: LocalizationResource = {
       title: 'เพิ่มการยืนยันรหัสสำรอง',
       title__codelist: 'รหัสสำรอง',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'เลือกผู้ให้บริการเพื่อเชื่อมต่อบัญชีของคุณ',
       formHint__noAccounts: 'ไม่มีผู้ให้บริการบัญชีภายนอกที่ใช้งานได้',
@@ -766,6 +783,7 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
+      billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
       title: 'บัญชี',
@@ -863,6 +881,7 @@ export const thTH: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'ลบ',
         menuAction__rename: 'เปลี่ยนชื่อ',
+        primaryButton: undefined,
         title: 'พาสคีย์',
       },
       passwordSection: {

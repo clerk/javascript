@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
   backButton: 'الرجوع',
+  badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
   badge__primary: 'الرئيسي',
@@ -23,6 +24,14 @@ export const arSA: LocalizationResource = {
   badge__unverified: 'لم يتم التحقق منه',
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -662,6 +671,14 @@ export const arSA: LocalizationResource = {
       title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
       title__codelist: 'رموز النسخ الأحتياطي',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'أختر موفر خدمة لتوصيل حسابك',
       formHint__noAccounts: 'لا يوجد موفرين خدمة لتوصيل حسابك',
@@ -765,6 +782,7 @@ export const arSA: LocalizationResource = {
     mobileButton__menu: 'القائمة',
     navbar: {
       account: 'الملف الشخصي',
+      billing: undefined,
       description: 'إدارة معلومات ملفك الشخصي.',
       security: 'حماية',
       title: 'الملف الشخصي',
@@ -863,6 +881,7 @@ export const arSA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'إزالة',
         menuAction__rename: 'إعادة تسمية',
+        primaryButton: undefined,
         title: 'مفاتيح المرور',
       },
       passwordSection: {

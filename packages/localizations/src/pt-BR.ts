@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
   backButton: 'Voltar',
+  badge__currentPlan: undefined,
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__primary: 'Principal',
@@ -23,6 +24,14 @@ export const ptBR: LocalizationResource = {
   badge__unverified: 'Não verificado',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {
@@ -669,6 +678,14 @@ export const ptBR: LocalizationResource = {
       title: 'Adicionar código de backup para verificação',
       title__codelist: 'Códigos de backup',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Selecione um provedor para conectar à sua conta.',
       formHint__noAccounts: 'Não há provedores de conta externos disponíveis.',
@@ -778,6 +795,7 @@ export const ptBR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gerencie seus dados de perfil.',
       security: 'Segurança',
       title: 'Conta',
@@ -877,6 +895,7 @@ export const ptBR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover',
         menuAction__rename: 'Renomear',
+        primaryButton: undefined,
         title: 'Chaves de acesso',
       },
       passwordSection: {

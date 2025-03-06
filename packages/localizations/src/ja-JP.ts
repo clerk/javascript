@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
   backButton: '戻る',
+  badge__currentPlan: undefined,
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
   badge__primary: 'プライマリ',
@@ -23,6 +24,14 @@ export const jaJP: LocalizationResource = {
   badge__unverified: '未確認',
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {
@@ -663,6 +672,14 @@ export const jaJP: LocalizationResource = {
       title: 'バックアップコードの追加',
       title__codelist: 'バックアップコード',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'アカウントを連携するプロバイダを選択してください。',
       formHint__noAccounts: '利用可能な外部アカウントプロバイダはありません。',
@@ -767,6 +784,7 @@ export const jaJP: LocalizationResource = {
     mobileButton__menu: 'メニュー',
     navbar: {
       account: 'プロファイル',
+      billing: undefined,
       description: 'アカウント情報管理',
       security: 'セキュリティ',
       title: 'アカウント',
@@ -865,6 +883,7 @@ export const jaJP: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

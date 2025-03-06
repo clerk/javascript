@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
   backButton: 'Späť',
+  badge__currentPlan: undefined,
   badge__default: 'Predvolené',
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
   badge__primary: 'Hlavný',
@@ -23,6 +24,14 @@ export const skSK: LocalizationResource = {
   badge__unverified: 'Nepotvrdené',
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -661,6 +670,14 @@ export const skSK: LocalizationResource = {
       title: 'Pridať overovanie pomocou záložných kódov',
       title__codelist: 'Záložné kódy',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovateľa pre pripojenie vášho účtu.',
       formHint__noAccounts: 'Nie sú k dispozícii žiadni dostupní externí poskytovatelia účtov.',
@@ -768,6 +785,7 @@ export const skSK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -866,6 +884,7 @@ export const skSK: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

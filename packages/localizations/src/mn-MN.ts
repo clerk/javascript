@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
   backButton: 'Буцах',
+  badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
   badge__primary: 'Үндсэн',
@@ -23,6 +24,14 @@ export const mnMN: LocalizationResource = {
   badge__unverified: 'Баталгаажаагүй',
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -665,6 +674,14 @@ export const mnMN: LocalizationResource = {
       title: 'Нөөц кодын баталгаажуулалтыг нэмэх',
       title__codelist: 'Нөөц кодууд',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Бүртгэлээ холбох үйлчилгээ үзүүлэгчээ сонгоно уу.',
       formHint__noAccounts: 'Боломжтой гадны бүртгэлийн үйлчилгээ үзүүлэгч байхгүй байна.',
@@ -772,6 +789,7 @@ export const mnMN: LocalizationResource = {
     mobileButton__menu: 'Цэс',
     navbar: {
       account: 'Профайл',
+      billing: undefined,
       description: 'Бүртгэлийнхээ мэдээллийг удирдана уу.',
       security: 'Аюулгүй байдал',
       title: 'Бүртгэл',
@@ -871,6 +889,7 @@ export const mnMN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

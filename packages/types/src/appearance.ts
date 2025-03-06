@@ -320,6 +320,27 @@ export type ElementsConfig = {
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
+  pricingTable: WithOptions;
+  planCard: WithOptions<string>;
+  planCardDefault: WithOptions;
+  planCardCompact: WithOptions;
+  planCardHeader: WithOptions;
+  planCardAvatarContainer: WithOptions;
+  planCardAvatar: WithOptions;
+  planCardTitle: WithOptions;
+  planCardDescription: WithOptions;
+  planCardFeatures: WithOptions;
+  planCardFeaturesList: WithOptions;
+  planCardFeaturesListItem: WithOptions<string>;
+  planCardAction: WithOptions;
+  planCardPeriodToggle: WithOptions;
+  planCardFeeContainer: WithOptions;
+  planCardFee: WithOptions;
+  planCardFeePeriod: WithOptions;
+  planCardFeePeriodNotice: WithOptions;
+  planCardFeePeriodNoticeInner: WithOptions;
+  planCardFeePeriodNoticeLabel: WithOptions;
+
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
   alertText: WithOptions<AlertId>;

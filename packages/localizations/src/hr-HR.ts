@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
   backButton: 'Natrag',
+  badge__currentPlan: undefined,
   badge__default: 'Zadano',
   badge__otherImpersonatorDevice: 'Drugi uređaj za oponašanje',
   badge__primary: 'Primarno',
@@ -23,6 +24,14 @@ export const hrHR: LocalizationResource = {
   badge__unverified: 'Nepotvrđeno',
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'kreiraj organizaciju',
     invitePage: {
@@ -129,6 +138,7 @@ export const hrHR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozovi',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -669,6 +679,14 @@ export const hrHR: LocalizationResource = {
       title: 'Dodaj verifikaciju rezervnim kodom',
       title__codelist: 'Rezervni kodovi',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Odaberite pružatelja usluge za povezivanje vašeg računa.',
       formHint__noAccounts: 'Nema dostupnih vanjskih pružatelja računa.',
@@ -775,6 +793,7 @@ export const hrHR: LocalizationResource = {
     mobileButton__menu: 'Izbornik',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljajte informacijama vašeg računa.',
       security: 'Sigurnost',
       title: 'Račun',
@@ -874,6 +893,7 @@ export const hrHR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Pristupni ključevi',
       },
       passwordSection: {

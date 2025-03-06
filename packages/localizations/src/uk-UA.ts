@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'За замовчуванням',
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
   badge__primary: 'Основний',
@@ -23,6 +24,14 @@ export const ukUA: LocalizationResource = {
   badge__unverified: 'Неперевірений',
   badge__userDevice: 'Пристрій користувача',
   badge__you: 'Ви',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Створити організацію',
     invitePage: {
@@ -661,6 +670,14 @@ export const ukUA: LocalizationResource = {
       title: 'Додати резервний код підтвердження',
       title__codelist: 'Резервні коди',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Виберіть провайдера для підключення вашого акаунта.',
       formHint__noAccounts: 'Немає доступних провайдерів зовнішніх акаунтів.',
@@ -769,6 +786,7 @@ export const ukUA: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -867,6 +885,7 @@ export const ukUA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

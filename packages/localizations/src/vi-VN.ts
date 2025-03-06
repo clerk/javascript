@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
   backButton: 'Quay lại',
+  badge__currentPlan: undefined,
   badge__default: 'Mặc định',
   badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
   badge__primary: 'Chính',
@@ -23,6 +24,14 @@ export const viVN: LocalizationResource = {
   badge__unverified: 'Chưa xác minh',
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
@@ -662,6 +671,14 @@ export const viVN: LocalizationResource = {
       title: 'Thêm mã xác thực sao lưu',
       title__codelist: 'Các mã sao lưu',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Chọn một nhà cung cấp để kết nối tài khoản của bạn.',
       formHint__noAccounts: 'Không có nhà cung cấp tài khoản bên ngoài khả dụng.',
@@ -769,6 +786,7 @@ export const viVN: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -867,6 +885,7 @@ export const viVN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

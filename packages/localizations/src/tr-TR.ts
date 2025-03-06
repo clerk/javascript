@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
   backButton: 'Geri',
+  badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Diğer taklitçi cihaz',
   badge__primary: 'Birincil',
@@ -23,6 +24,14 @@ export const trTR: LocalizationResource = {
   badge__unverified: 'Doğrulanmamış',
   badge__userDevice: 'Kullanıcı cihazı',
   badge__you: 'Siz',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -666,6 +675,14 @@ export const trTR: LocalizationResource = {
       title: 'Yedekleme kodu doğrulaması ekle',
       title__codelist: 'Yedekleme kodları',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Yeni bir hesap bağlamak için bir sağlayıcı seçiniz.',
       formHint__noAccounts: 'Kullanılabilir bir sağlayıcı yok.',
@@ -773,6 +790,7 @@ export const trTR: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hesap bilgilerinizi yönetin.',
       security: 'Güvenlik',
       title: 'Hesap',
@@ -871,6 +889,7 @@ export const trTR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Kaldır',
         menuAction__rename: 'Yeniden Adlandır',
+        primaryButton: undefined,
         title: 'Geçiş Anahtarları',
       },
       passwordSection: {

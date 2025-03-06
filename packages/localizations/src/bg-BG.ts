@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
   badge__primary: 'Основен',
@@ -23,6 +24,14 @@ export const bgBG: LocalizationResource = {
   badge__unverified: 'Непотвърден',
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {
@@ -661,6 +670,14 @@ export const bgBG: LocalizationResource = {
       title: 'Добавяне на резервен код за потвърждение',
       title__codelist: 'Резервни кодове',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Изберете доставчик, за да свържете вашия профил.',
       formHint__noAccounts: 'Няма налични външни акаунт доставчици.',
@@ -769,6 +786,7 @@ export const bgBG: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Управлявайте информацията в профила си.',
       security: 'Security',
       title: 'Профил',
@@ -868,6 +886,7 @@ export const bgBG: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

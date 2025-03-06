@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
   backButton: 'Powrót',
+  badge__currentPlan: undefined,
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
   badge__primary: 'Podstawowy',
@@ -23,6 +24,14 @@ export const plPL: LocalizationResource = {
   badge__unverified: 'Niezweryfikowany',
   badge__userDevice: 'Urządzenie użytkownika',
   badge__you: 'Ty',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',
     invitePage: {
@@ -668,6 +677,14 @@ export const plPL: LocalizationResource = {
       title: 'Dodaj weryfikację kodem zapasowym',
       title__codelist: 'Kody zapasowe',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Wybierz dostawcę, aby połączyć konto.',
       formHint__noAccounts: 'Nie ma dostępnych zewnętrznych dostawców kont.',
@@ -777,6 +794,7 @@ export const plPL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Zarządzaj danymi konta.',
       security: 'Bezpieczeństwo',
       title: 'Konto',
@@ -875,6 +893,7 @@ export const plPL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Usuń',
         menuAction__rename: 'Zmień nazwę',
+        primaryButton: undefined,
         title: 'Klucze dostępu',
       },
       passwordSection: {

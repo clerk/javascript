@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
   backButton: 'Til baka',
+  badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
@@ -23,6 +24,14 @@ export const isIS: LocalizationResource = {
   badge__unverified: 'Óstaðfest',
   badge__userDevice: 'Notendatæki',
   badge__you: 'Þú',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Stofna samtök',
     invitePage: {
@@ -668,6 +677,14 @@ export const isIS: LocalizationResource = {
       title: 'Bæta við öryggiskóða staðfestingu',
       title__codelist: 'Öryggiskóðar',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Veldu þjónustuaðila til að tengja reikninginn þinn.',
       formHint__noAccounts: 'Engir tiltækir ytri reikningsþjónustuaðilar.',
@@ -776,6 +793,7 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
+      billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',
       title: 'Reikningur',
@@ -876,6 +894,7 @@ export const isIS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjarlægja',
         menuAction__rename: 'Endurnefna',
+        primaryButton: undefined,
         title: 'Lyklar',
       },
       passwordSection: {

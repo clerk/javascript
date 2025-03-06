@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   backButton: 'Retour',
+  badge__currentPlan: undefined,
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
@@ -23,6 +24,14 @@ export const frFR: LocalizationResource = {
   badge__unverified: 'Non vérifié',
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {
@@ -670,6 +679,14 @@ export const frFR: LocalizationResource = {
       title: 'Ajouter la vérification du code de récupération',
       title__codelist: 'Codes de récupération',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Sélectionnez un fournisseur pour connecter votre compte.',
       formHint__noAccounts: "Aucun fournisseur de compte externe n'est disponible.",
@@ -778,6 +795,7 @@ export const frFR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Compte',
+      billing: undefined,
       description: 'Gérer votre compte.',
       security: 'Sécurité',
       title: 'Profil',
@@ -878,6 +896,7 @@ export const frFR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Supprimer',
         menuAction__rename: 'Renommer',
+        primaryButton: undefined,
         title: 'Clés de sécurité',
       },
       passwordSection: {

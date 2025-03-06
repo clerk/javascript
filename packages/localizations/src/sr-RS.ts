@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
   backButton: 'Nazad',
+  badge__currentPlan: undefined,
   badge__default: 'Podrazumevano',
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
   badge__primary: 'Primarni',
@@ -23,6 +24,14 @@ export const srRS: LocalizationResource = {
   badge__unverified: 'Nepotvrđen',
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Kreiraj organizaciju',
     invitePage: {
@@ -664,6 +673,14 @@ export const srRS: LocalizationResource = {
       title: 'Dodaj verifikaciju rezervnim kodom',
       title__codelist: 'Rezervni kodovi',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Izaberi provajdera da povežeš svoj nalog.',
       formHint__noAccounts: 'Nema dostupnih spoljnih provajdera naloga.',
@@ -770,6 +787,7 @@ export const srRS: LocalizationResource = {
     mobileButton__menu: 'Meni',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljaj informacijama svog naloga.',
       security: 'Sigurnost',
       title: 'Nalog',
@@ -869,6 +887,7 @@ export const srRS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Ključevi za prolaz',
       },
       passwordSection: {

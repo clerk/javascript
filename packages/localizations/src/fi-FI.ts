@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
   backButton: 'Takaisin',
+  badge__currentPlan: undefined,
   badge__default: 'Oletus',
   badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
   badge__primary: 'Ensisijainen',
@@ -23,6 +24,14 @@ export const fiFI: LocalizationResource = {
   badge__unverified: 'Vahvistamaton',
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
     invitePage: {
@@ -665,6 +674,14 @@ export const fiFI: LocalizationResource = {
       title: 'Lisää varakoodin vahvistus',
       title__codelist: 'Varakoodit',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Valitse palveluntarjoaja yhdistääksesi tilisi.',
       formHint__noAccounts: 'Ulkoisia tilintarjoajia ei ole saatavilla.',
@@ -773,6 +790,7 @@ export const fiFI: LocalizationResource = {
     mobileButton__menu: 'Valikko',
     navbar: {
       account: 'Profiili',
+      billing: undefined,
       description: 'Hallitse tilisi tietoja',
       security: 'Turvallisuus',
       title: 'Tili',
@@ -873,6 +891,7 @@ export const fiFI: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Poista',
         menuAction__rename: 'Nimeä uudelleen',
+        primaryButton: undefined,
         title: 'Pääsyavaimet',
       },
       passwordSection: {

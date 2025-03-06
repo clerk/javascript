@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   backButton: 'Vissza',
+  badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
   badge__primary: 'Elsődleges',
@@ -23,6 +24,14 @@ export const huHU: LocalizationResource = {
   badge__unverified: 'Nem ellenőrzött',
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Szervezet létrehozása',
     invitePage: {
@@ -665,6 +674,14 @@ export const huHU: LocalizationResource = {
       title: 'Tartalék kód megerősítés hozzáadása',
       title__codelist: 'Tartalék kódok',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Válassz egy szolgáltatót, amit összekötsz a fiókoddal.',
       formHint__noAccounts: 'Nincs elérhető külső fiók szolgáltató.',
@@ -774,6 +791,7 @@ export const huHU: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Fiók információk kezelése',
       security: 'Biztonság',
       title: 'Fiók',
@@ -873,6 +891,7 @@ export const huHU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eltávolítás',
         menuAction__rename: 'Átnevezés',
+        primaryButton: undefined,
         title: 'Passkey-k',
       },
       passwordSection: {

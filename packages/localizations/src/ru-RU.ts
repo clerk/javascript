@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__primary: 'Основной',
@@ -23,6 +24,14 @@ export const ruRU: LocalizationResource = {
   badge__unverified: 'Неверифицированный',
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Создать организацию',
     invitePage: {
@@ -678,6 +687,14 @@ export const ruRU: LocalizationResource = {
       title: 'Добавить резервный код подтверждения',
       title__codelist: 'Резервные коды',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Выберите провайдера для подключения вашей учетной записи.',
       formHint__noAccounts: 'Нет доступных провайдеров внешних учетных записей.',
@@ -787,6 +804,7 @@ export const ruRU: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профиль',
+      billing: undefined,
       description: 'Управление информацией вашей учетной записи.',
       security: 'Безопасность',
       title: 'Учетная запись',
@@ -887,6 +905,7 @@ export const ruRU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Удалить',
         menuAction__rename: 'Переименовать',
+        primaryButton: undefined,
         title: 'Ключи доступа',
       },
       passwordSection: {

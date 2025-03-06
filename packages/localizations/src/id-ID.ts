@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   backButton: 'Kembali',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
   badge__primary: 'Utama',
@@ -23,6 +24,14 @@ export const idID: LocalizationResource = {
   badge__unverified: 'Belum diverifikasi',
   badge__userDevice: 'Perangkat pengguna',
   badge__you: 'Anda',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {
@@ -130,6 +139,7 @@ export const idID: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Undang',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Hapus anggota',
         tableHeader__actions: undefined,
@@ -673,6 +683,14 @@ export const idID: LocalizationResource = {
       title: 'Tambah verifikasi kode cadangan',
       title__codelist: 'Kode cadangan',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Pilih penyedia untuk menghubungkan akun Anda.',
       formHint__noAccounts: 'Tidak ada penyedia akun eksternal yang tersedia.',
@@ -772,6 +790,7 @@ export const idID: LocalizationResource = {
     mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',
       title: 'Akun',
@@ -869,6 +888,7 @@ export const idID: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

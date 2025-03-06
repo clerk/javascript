@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
   badge__primary: '主要',
@@ -23,6 +24,14 @@ export const zhTW: LocalizationResource = {
   badge__unverified: '未驗證',
   badge__userDevice: '用戶設備',
   badge__you: '您',
+  commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   createOrganization: {
     formButtonSubmit: '創建組織',
     invitePage: {
@@ -654,6 +663,14 @@ export const zhTW: LocalizationResource = {
       title: '添加備份代碼驗證',
       title__codelist: '備份代碼',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: '選擇一個供應商來連接您的帳戶。',
       formHint__noAccounts: '沒有可用的外部帳戶供應商。',
@@ -754,6 +771,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -851,6 +869,7 @@ export const zhTW: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
