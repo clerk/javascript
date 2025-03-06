@@ -1,5 +1,14 @@
 # @clerk/agent-toolkit
 
+## 0.0.6
+
+### Patch Changes
+
+- Add tools to manage organizations and invitations ([#5291](https://github.com/clerk/javascript/pull/5291)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`67f1743aa1e0705d89ee6b532007f2686929240b`](https://github.com/clerk/javascript/commit/67f1743aa1e0705d89ee6b532007f2686929240b)]:
+  - @clerk/backend@1.25.1
+
 ## 0.0.5
 
 ### Patch Changes

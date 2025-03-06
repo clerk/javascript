@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.25.1
+
+### Patch Changes
+
+- Add .raw property to `Invitation`, `Organization`, `OrganizationInvitation` and `OrganizationMembership` ([#5291](https://github.com/clerk/javascript/pull/5291)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.25.0
 
 ### Minor Changes
