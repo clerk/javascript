@@ -2,7 +2,9 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_TASK_PATHS } from '../../../core/resources/SessionTask';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
+import { withRedirectToSignInIfNoTasksAvailable } from '../../common';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
 import {
@@ -15,8 +17,10 @@ import {
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { SessionTask } from '../SessionTask';
 import {
   LazySignUpContinue,
+  LazySignUpSessionTask,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -132,12 +136,27 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpContinue />
               </Route>
             </Route>
+            {SESSION_TASK_PATHS.map(path => (
+              <Route
+                path={path}
+                key={path}
+              >
+                <LazySignUpSessionTask />
+              </Route>
+            ))}
             <Route index>
               <LazySignUpStart />
             </Route>
           </Route>
         )}
-
+        {SESSION_TASK_PATHS.map(path => (
+          <Route
+            path={path}
+            key={path}
+          >
+            <SignInSessionTask />
+          </Route>
+        ))}
         <Route index>
           <SignInStart />
         </Route>
@@ -209,3 +228,5 @@ export const SignInModal = (props: SignInModalProps): JSX.Element => {
     </Route>
   );
 };
+
+const SignInSessionTask = withRedirectToSignInIfNoTasksAvailable(SessionTask);

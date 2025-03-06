@@ -14,6 +14,10 @@ export const noUserExists: ComponentGuard = clerk => {
   return !clerk.user;
 };
 
+export const noSessionTaskExists: ComponentGuard = clerk => {
+  return !clerk.session?.currentTask;
+};
+
 export const noOrganizationExists: ComponentGuard = clerk => {
   return !clerk.organization;
 };

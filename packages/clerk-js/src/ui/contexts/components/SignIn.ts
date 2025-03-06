@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -21,6 +21,7 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  tasksUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
@@ -111,6 +112,24 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  const tasksUrl = clerk.session?.currentTask
+    ? buildRedirectUrl({
+        routing: ctx.routing,
+        baseUrl: signInUrl,
+        path: ctx.path,
+        endpoint: clerk.session?.currentTask.__internal_getPath(),
+        authQueryString: null,
+      })
+    : null;
+
+  useEffect(() => {
+    const unsubscribe = clerk.__internal_setComponentNavigate((path: string) => navigate(`../${path}`));
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
@@ -122,6 +141,7 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    tasksUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
