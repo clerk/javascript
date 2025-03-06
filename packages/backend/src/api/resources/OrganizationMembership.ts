@@ -3,6 +3,12 @@ import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
 
 export class OrganizationMembership {
+  private _raw: OrganizationMembershipJSON | null = null;
+
+  public get raw(): OrganizationMembershipJSON | null {
+    return this._raw;
+  }
+
   constructor(
     readonly id: string,
     readonly role: OrganizationMembershipRole,
@@ -16,7 +22,7 @@ export class OrganizationMembership {
   ) {}
 
   static fromJSON(data: OrganizationMembershipJSON) {
-    return new OrganizationMembership(
+    const res = new OrganizationMembership(
       data.id,
       data.role,
       data.permissions,
@@ -27,6 +33,8 @@ export class OrganizationMembership {
       Organization.fromJSON(data.organization),
       OrganizationMembershipPublicUserData.fromJSON(data.public_user_data),
     );
+    res._raw = data;
+    return res;
   }
 }
 
