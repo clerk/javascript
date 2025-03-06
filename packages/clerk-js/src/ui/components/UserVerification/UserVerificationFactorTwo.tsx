@@ -69,7 +69,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   if (showAllStrategies && hasAlternativeStrategies) {
     return (
       <UVFactorTwoAlternativeMethods
-        supportedSecondFactors={secondFactorsExcludingCurrent}
+        supportedSecondFactors={secondFactorsExcludingCurrent || null}
         onBackLinkClick={toggleAllStrategies}
         onFactorSelected={selectFactor}
       />
