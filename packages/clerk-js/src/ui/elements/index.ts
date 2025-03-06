@@ -12,6 +12,7 @@ export * from './ClipboardInput';
 export * from './CodeControl';
 export * from './contexts';
 export * from './DevModeNotice';
+export * from './Disclosure';
 export * from './Divider';
 export * from './ErrorCard';
 export * from './Form';

@@ -1,12 +1,12 @@
 import { useFloating, useMergeRefs, useTransitionStyles } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../../customizables';
-import { transitionTiming } from '../../foundations/transitions';
-import { useFirstRender } from '../../hooks';
-import { ChevronDown } from '../../icons';
-import { common } from '../../styledSystem';
-import { colors } from '../../utils';
+import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
+import { transitionTiming } from '../foundations/transitions';
+import { useFirstRender } from '../hooks';
+import { ChevronDown } from '../icons';
+import { common } from '../styledSystem';
+import { colors } from '../utils';
 
 /* -------------------------------------------------------------------------------------------------
  * Disclosure Context
@@ -54,10 +54,8 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
           sx={t => ({
             width: '100%',
             borderRadius: t.radii.$lg,
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-            background: t.colors.$colorBackground,
+            boxShadow: `inset 0 0 0 1px ${t.colors.$neutralAlpha100}`,
+            backgroundColor: t.colors.$colorBackground,
             isolation: 'isolate',
           })}
         >
@@ -98,6 +96,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         justifyContent: 'space-between',
         padding: t.sizes.$3,
         color: t.colors.$colorText,
+        borderRadius: t.radii.$lg,
         zIndex: 2,
       })}
     >
@@ -170,13 +169,10 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       elementDescriptor={descriptors.disclosureContentRoot}
       id={id}
       sx={t => ({
-        backgroundColor: t.colors.$colorBackground,
         borderRadius: 'inherit',
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
-        marginInline: `calc(${t.borderWidths.$normal} * -1)`,
-        marginBlockEnd: `calc(${t.borderWidths.$normal} * -1)`,
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -189,14 +185,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
         sx={{
           overflow: 'hidden',
           minHeight: 0,
-          borderRadius: 'inherit',
         }}
       >
         <Box
           elementDescriptor={descriptors.disclosureContentInner}
           sx={t => ({
             padding: t.space.$3,
-            borderRadius: 'inherit',
           })}
         >
           {children}
