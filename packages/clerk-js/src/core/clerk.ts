@@ -238,6 +238,10 @@ export class Clerk implements ClerkInterface {
     return this.#loaded;
   }
 
+  get __internal_resiliency(): boolean {
+    return this.#options.experimental?.resiliency ?? false;
+  }
+
   get isSatellite(): boolean {
     if (inBrowser()) {
       return handleValueOrFn(this.#options.isSatellite, new URL(window.location.href), false);
@@ -1113,6 +1117,7 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(this.environment.displayConfig.userProfileUrl);
   }
 
+  // TODO: Removed since Core 2
   public buildHomeUrl(): string {
     if (!this.environment || !this.environment.displayConfig) {
       return '';
@@ -1137,10 +1142,10 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
-    if (!this.environment || !this.environment.displayConfig) {
+    if (!this.__internal_resiliency && (!this.environment || !this.environment.displayConfig)) {
       return '';
     }
-    const waitlistUrl = this.#options['waitlistUrl'] || this.environment.displayConfig.waitlistUrl;
+    const waitlistUrl = this.#options['waitlistUrl'] || this.environment?.displayConfig.waitlistUrl;
     const initValues = new URLSearchParams(options?.initialValues || {});
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
@@ -1315,7 +1320,7 @@ export class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.loaded || !this.environment || !this.client) {
+    if (!this.loaded || !this.client) {
       return;
     }
     const { signIn: _signIn, signUp: _signUp } = this.client;
@@ -1347,11 +1352,11 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
-    if (!this.loaded || !this.environment || !this.client) {
+    if (!this.loaded || (!this.environment && !this.__internal_resiliency) || !this.client) {
       return;
     }
 
-    const { displayConfig } = this.environment;
+    const displayConfig = this.environment?.displayConfig;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
     const su = {
@@ -1373,23 +1378,22 @@ export class Clerk implements ClerkInterface {
 
     const makeNavigate = (to: string) => () => navigate(to);
 
-    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
-
-    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig?.signInUrl || '');
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig?.signUpUrl || '');
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||
-        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
+        buildURL({ base: displayConfig?.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
     );
 
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl ||
-        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+        buildURL({ base: displayConfig?.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
     const navigateToResetPassword = makeNavigate(
       params.resetPasswordUrl ||
-        buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
+        buildURL({ base: displayConfig?.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
@@ -1398,7 +1402,7 @@ export class Clerk implements ClerkInterface {
       params.continueSignUpUrl ||
         buildURL(
           {
-            base: displayConfig.signUpUrl,
+            base: displayConfig?.signUpUrl,
             hashPath: '/continue',
           },
           { stringify: true },
@@ -1416,14 +1420,14 @@ export class Clerk implements ClerkInterface {
           params.verifyEmailAddressUrl ||
           buildURL(
             {
-              base: displayConfig.signUpUrl,
+              base: displayConfig?.signUpUrl,
               hashPath: '/verify-email-address',
             },
             { stringify: true },
           ),
         verifyPhonePath:
           params.verifyPhoneNumberUrl ||
-          buildURL({ base: displayConfig.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
+          buildURL({ base: displayConfig?.signUpUrl, hashPath: '/verify-phone-number' }, { stringify: true }),
         navigate,
       });
     };
@@ -1549,7 +1553,7 @@ export class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    if (!this.loaded || !this.environment || !this.client) {
+    if (!this.loaded || (!this.environment && !this.__internal_resiliency) || !this.client) {
       return;
     }
     const { signIn, signUp } = this.client;
@@ -1663,7 +1667,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (!this.client || !this.environment) {
+    if (!this.client || !(this.__internal_resiliency ? this.loaded : this.environment)) {
       return;
     }
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
@@ -1939,6 +1943,7 @@ export class Clerk implements ClerkInterface {
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
+    let envFailed = false;
 
     let retries = 0;
     while (retries < 2) {
@@ -1949,6 +1954,10 @@ export class Clerk implements ClerkInterface {
           .fetch({ touch: shouldTouchEnv })
           .then(res => {
             this.updateEnvironment(res);
+          })
+          .catch(e => {
+            envFailed = true;
+            throw e;
           });
 
         const initClient = () => {
@@ -1968,13 +1977,20 @@ export class Clerk implements ClerkInterface {
         };
 
         await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
+          const rethrow = (e: any) => {
+            if (envFailed && this.__internal_resiliency) {
+              return;
+            }
+            throw e;
+          };
+
           // limit the changes for this specific error for now
           if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-            await initEnvironmentPromise;
+            await initEnvironmentPromise.catch(rethrow);
             initComponents();
             await initClient();
           } else {
-            throw e;
+            rethrow(e);
           }
         });
 
@@ -2190,11 +2206,11 @@ export class Clerk implements ClerkInterface {
     options: RedirectOptions,
     _initValues?: Record<string, string>,
   ): string => {
-    if (!key || !this.loaded || !this.environment || !this.environment.displayConfig) {
+    if (!key || !this.loaded) {
       return '';
     }
 
-    let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
+    let signInOrUpUrl = this.#options[key] || this.environment?.displayConfig[key] || '';
     if (this.#isCombinedSignInOrUpFlow()) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
       signInOrUpUrl = this.#options.signInUrl!;
