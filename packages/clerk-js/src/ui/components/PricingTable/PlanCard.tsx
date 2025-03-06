@@ -139,7 +139,8 @@ export function PlanCard(props: PlanCardProps) {
                   gridTemplateRows: period === 'annual' ? '1fr' : '0fr',
                   transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
                 })}
-                aria-hidden={period === 'annual' ? 'false' : 'true'}
+                // @ts-ignore - Needed until React 19 support
+                inert={period !== 'annual' ? 'true' : undefined}
               >
                 <Box
                   elementDescriptor={descriptors.planCardFeePeriodNoticeInner}
