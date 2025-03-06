@@ -1392,7 +1392,7 @@ export class Clerk implements ClerkInterface {
     console.log(JSON.stringify({ su, si }));
     if (window.opener && window.opener.location.origin === window.location.origin) {
       window.opener.postMessage(
-        { destination: window.location.href, metadata: JSON.stringify({ su, si }) },
+        { return_url: window.location.href, metadata: JSON.stringify({ su, si }) },
         window.location.origin,
       );
       window.close();
@@ -1768,8 +1768,12 @@ export class Clerk implements ClerkInterface {
 
     const { redirectUrl } = params;
 
+    const redirectUrlWithForceRedirectUrl = new URL(redirectUrl);
+    redirectUrlWithForceRedirectUrl.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
+    redirectUrlWithForceRedirectUrl.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
+
     const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
-    const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?destination=${encodeURIComponent(redirectUrl)}`;
+    const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl.toString())}`;
 
     const messageHandler = async (event: MessageEvent) => {
       if (event.origin !== `https://${accountPortalDomain}`) return;
@@ -1783,10 +1787,10 @@ export class Clerk implements ClerkInterface {
           redirectUrl: params.redirectUrlComplete,
         });
         shouldRemoveListener = true;
-      } else if (event.data.destination) {
-        console.log(`navigating to ${event.data.destination}`);
+      } else if (event.data.return_url) {
+        console.log(`navigating to ${event.data.return_url}`);
         console.log(event.data.metadata);
-        this.navigate(event.data.destination);
+        this.navigate(event.data.return_url);
         shouldRemoveListener = true;
       }
 
