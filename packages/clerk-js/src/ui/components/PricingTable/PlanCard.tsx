@@ -139,7 +139,7 @@ export function PlanCard(props: PlanCardProps) {
                   gridTemplateRows: period === 'annual' ? '1fr' : '0fr',
                   transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
                 })}
-                aria-hidden={period === 'monthly' ? 'true' : 'false'}
+                aria-hidden={period === 'annual' ? 'false' : 'true'}
               >
                 <Box
                   elementDescriptor={descriptors.planCardFeePeriodNoticeInner}
@@ -238,6 +238,7 @@ export function PlanCard(props: PlanCardProps) {
                       icon={Check}
                       colorScheme='neutral'
                       size='sm'
+                      aria-hidden
                     />
                     <Text colorScheme='body'>{feature.description || feature.name}</Text>
                   </Flex>
