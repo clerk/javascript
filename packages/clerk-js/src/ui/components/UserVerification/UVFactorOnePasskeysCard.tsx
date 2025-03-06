@@ -1,6 +1,4 @@
-import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { useClerk, useSession } from '@clerk/shared/react';
-import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type { SessionVerificationResource } from '@clerk/types';
 import React, { useEffect } from 'react';
 
@@ -23,16 +21,7 @@ export const UVFactorOnePasskeysCard = (props: UVFactorOnePasskeysCard) => {
 
   const card = useCardState();
 
-  const isWebAuthnSupported = __internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
-
   const prepare = async () => {
-    // TODO: This should be moved when checking if we will show the strategy
-    if (!isWebAuthnSupported()) {
-      throw new ClerkWebAuthnError('Passkeys are not supported', {
-        code: 'passkey_not_supported',
-      });
-    }
-
     const response = await session?.prepareFirstFactorVerification({ strategy: 'passkey' });
 
     if (response) {
@@ -83,7 +72,7 @@ export const UVFactorOnePasskeysCard = (props: UVFactorOnePasskeysCard) => {
                   e.preventDefault();
                   handlePasskeysAttempt();
                 }}
-                localizationKey={'Use your passkeys'}
+                localizationKey={localizationKeys('reverification.passkey.blockButton__passkey')}
                 hasArrow
               />
               <Card.Action elementId='alternativeMethods'>

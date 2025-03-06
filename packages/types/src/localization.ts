@@ -349,6 +349,7 @@ type _LocalizationResource = {
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
     };
     alternativeMethods: {
       title: LocalizationValue;
