@@ -59,7 +59,7 @@ function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier
 export function determineStartingSignInFactor(
   firstFactors: SignInFactor[] | null,
   identifier: string | null,
-  preferredSignInStrategy: PreferredSignInStrategy,
+  preferredSignInStrategy?: PreferredSignInStrategy,
 ): SignInFactor | null | undefined {
   if (!firstFactors || firstFactors.length === 0) {
     return null;

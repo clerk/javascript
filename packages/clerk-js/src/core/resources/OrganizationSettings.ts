@@ -8,32 +8,44 @@ import type {
 import { BaseResource } from './internal';
 
 export class OrganizationSettings extends BaseResource implements OrganizationSettingsResource {
-  enabled!: boolean;
-  maxAllowedMemberships!: number;
-  actions!: {
-    adminDelete: boolean;
-  };
-  domains!: {
+  actions: { adminDelete: boolean } = { adminDelete: false };
+  domains: {
     enabled: boolean;
     enrollmentModes: OrganizationEnrollmentMode[];
     defaultRole: string | null;
+  } = {
+    enabled: false,
+    enrollmentModes: [],
+    defaultRole: null,
   };
+  enabled: boolean = false;
+  maxAllowedMemberships: number = 0;
 
-  public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot) {
+  public constructor(data?: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null) {
     super();
-    this.fromJSON(data);
+    if (data) {
+      this.fromJSON(data);
+    }
   }
 
   protected fromJSON(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null): this {
-    const { enabled = false, max_allowed_memberships = 0, actions, domains } = data || {};
-    this.enabled = enabled;
-    this.maxAllowedMemberships = max_allowed_memberships;
-    this.actions = { adminDelete: actions?.admin_delete || false };
-    this.domains = {
-      enabled: domains?.enabled || false,
-      enrollmentModes: domains?.enrollment_modes || [],
-      defaultRole: domains?.default_role || null,
-    };
+    if (!data) {
+      return this;
+    }
+
+    if (data.actions) {
+      this.actions.adminDelete = data.actions.admin_delete ?? this.actions.adminDelete;
+    }
+
+    if (data.domains) {
+      this.domains.enabled = data.domains.enabled ?? this.domains.enabled;
+      this.domains.enrollmentModes = data.domains.enrollment_modes ?? this.domains.enrollmentModes;
+      this.domains.defaultRole = data.domains.default_role ?? this.domains.defaultRole;
+    }
+
+    this.enabled = data.enabled ?? this.enabled;
+    this.maxAllowedMemberships = data.max_allowed_memberships ?? this.maxAllowedMemberships;
+
     return this;
   }
 

@@ -136,7 +136,7 @@ const OrganizationDomainsSection = () => {
     return null;
   }
 
-  if (!organizationSettings.domains.enabled) {
+  if (!organizationSettings.domains?.enabled) {
     return null;
   }
 
