@@ -1,9 +1,20 @@
 import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
-import { Badge, Box, Button, descriptors, Flex, Heading, Icon, localizationKeys, Text } from '../../customizables';
+import {
+  Badge,
+  Box,
+  Button,
+  descriptors,
+  Flex,
+  Heading,
+  Icon,
+  localizationKeys,
+  Span,
+  Text,
+} from '../../customizables';
 import { Avatar } from '../../elements';
-import { Check } from '../../icons';
+import { Check, InformationCircle } from '../../icons';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
@@ -90,10 +101,11 @@ export function PlanCard(props: PlanCardProps) {
         ) : null}
         <Flex
           elementDescriptor={descriptors.planCardFeeContainer}
-          gap={2}
           align='center'
+          wrap='wrap'
           sx={t => ({
             marginTop: isCompact ? t.space.$2 : t.space.$3,
+            columnGap: t.space.$1x5,
           })}
         >
           {plan.hasBaseFee ? (
@@ -119,6 +131,44 @@ export function PlanCard(props: PlanCardProps) {
                 })}
                 localizationKey={localizationKeys('commerce_month')}
               />
+              <Box
+                elementDescriptor={descriptors.planCardFeePeriodNotice}
+                sx={t => ({
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateRows: period === 'annual' ? '1fr' : '0fr',
+                  transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+                })}
+                aria-hidden={period === 'monthly' ? 'true' : 'false'}
+              >
+                <Box
+                  elementDescriptor={descriptors.planCardFeePeriodNoticeInner}
+                  sx={{
+                    overflow: 'hidden',
+                    minHeight: 0,
+                  }}
+                >
+                  <Text
+                    elementDescriptor={descriptors.planCardFeePeriodNoticeLabel}
+                    variant='caption'
+                    colorScheme='secondary'
+                    sx={t => ({
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      columnGap: t.space.$1,
+                    })}
+                  >
+                    <Icon
+                      icon={InformationCircle}
+                      colorScheme='neutral'
+                      size='sm'
+                      aria-hidden
+                    />{' '}
+                    <Span localizationKey={localizationKeys('commerce_billedAnnually')} />
+                  </Text>
+                </Box>
+              </Box>
             </>
           ) : (
             <Text

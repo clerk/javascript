@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
   backButton: 'Tillbaka',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
   badge__primary: 'Primär',
@@ -23,6 +24,12 @@ export const svSE: LocalizationResource = {
   badge__unverified: 'Overifierad',
   badge__userDevice: 'Användarens enhet',
   badge__you: 'Du',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {
@@ -666,6 +673,14 @@ export const svSE: LocalizationResource = {
       title: 'Lägg till backupkodverifiering',
       title__codelist: 'Backupkoder',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Välj en leverantör för att ansluta ditt konto.',
       formHint__noAccounts: 'Det finns inga tillgängliga externa kontoleverantörer.',
@@ -772,6 +787,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',
       title: 'Konto',
@@ -871,6 +887,7 @@ export const svSE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ta bort',
         menuAction__rename: 'Byt namn',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

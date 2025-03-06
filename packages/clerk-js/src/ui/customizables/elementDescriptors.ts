@@ -211,6 +211,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'planCardFeeContainer',
   'planCardFee',
   'planCardFeePeriod',
+  'planCardFeePeriodNotice',
+  'planCardFeePeriodNoticeInner',
+  'planCardFeePeriodNoticeLabel',
 
   'pricingTable',
 

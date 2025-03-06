@@ -103,6 +103,7 @@ type _LocalizationResource = {
   commerce_getStarted: LocalizationValue;
   commerce_manageMembership: LocalizationValue;
   commerce_switchPlan: LocalizationValue;
+  commerce_billedAnnually: LocalizationValue;
   signUp: {
     start: {
       title: LocalizationValue;

@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   backButton: 'Înapoi',
+  badge__currentPlan: undefined,
   badge__default: 'Implicit',
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
   badge__primary: 'Principală',
@@ -23,6 +24,12 @@ export const roRO: LocalizationResource = {
   badge__unverified: 'Nedeclarat',
   badge__userDevice: 'Dispozitiv de utilizator',
   badge__you: 'Tu',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Creați o organizație',
     invitePage: {
@@ -668,6 +675,14 @@ export const roRO: LocalizationResource = {
       title: 'Adăugați verificarea codului de rezervă',
       title__codelist: 'Coduri de rezervă',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Selectați un furnizor pentru a vă conecta contul.',
       formHint__noAccounts: 'Nu există furnizori de conturi externe disponibili.',
@@ -778,6 +793,7 @@ export const roRO: LocalizationResource = {
     mobileButton__menu: 'Meniu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -878,6 +894,7 @@ export const roRO: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

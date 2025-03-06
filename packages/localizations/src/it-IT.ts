@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
   backButton: 'Indietro',
+  badge__currentPlan: undefined,
   badge__default: 'Predefinito',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__primary: 'Primario',
@@ -23,6 +24,12 @@ export const itIT: LocalizationResource = {
   badge__unverified: 'Non verificato',
   badge__userDevice: 'Dispositivo utente',
   badge__you: 'Tu',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {
@@ -665,6 +672,14 @@ export const itIT: LocalizationResource = {
       title: 'Aggiungi verifica codici backup',
       title__codelist: 'Codici di backup',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Seleziona un provider per collegare il tuo account.',
       formHint__noAccounts: 'Non ci sono provider esterni disponibili.',
@@ -773,6 +788,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profilo',
+      billing: undefined,
       description: 'Gestisci il tuo account.',
       security: 'Sicurezza',
       title: 'Account',
@@ -873,6 +889,7 @@ export const itIT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Rimuovi chiave di accesso',
         menuAction__rename: 'Rinomina chiave di accesso',
+        primaryButton: undefined,
         title: 'Gestisci le tue chiavi di accesso',
       },
       passwordSection: {

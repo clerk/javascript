@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const esES: LocalizationResource = {
   locale: 'es-ES',
   backButton: 'Atrás',
+  badge__currentPlan: undefined,
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
@@ -23,6 +24,12 @@ export const esES: LocalizationResource = {
   badge__unverified: 'No confirmado',
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -667,6 +674,14 @@ export const esES: LocalizationResource = {
       title: 'Agregar verificación de código de respaldo',
       title__codelist: 'Códigos de respaldo',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Seleccione un proveedor para conectar su cuenta.',
       formHint__noAccounts: 'No hay proveedores de cuentas externas disponibles.',
@@ -776,6 +791,7 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -875,6 +891,7 @@ export const esES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar Clave de Acceso',
         menuAction__rename: 'Renombrar Clave de Acceso',
+        primaryButton: undefined,
         title: 'Sección de Claves de Acceso',
       },
       passwordSection: {

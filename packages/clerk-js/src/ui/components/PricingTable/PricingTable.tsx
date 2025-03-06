@@ -35,14 +35,19 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
     <InternalThemeProvider>
       <Box
         elementDescriptor={descriptors.pricingTable}
-        sx={{
+        sx={t => ({
+          '--grid-min-size': isCompact ? '11.75rem' : '20rem',
+          '--grid-max-columns': 'infinity',
+          '--grid-gap': t.space.$4,
+          '--max-column-width': '100% / var(--grid-max-columns, infinity) - var(--grid-gap)',
+          '--column-width': 'max(var(--max-column-width), min(var(--grid-min-size, 10rem), 100%))',
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${isCompact ? '11.75rem' : '20rem'}), 1fr))`,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
+          gap: `var(--grid-gap-vertical, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
           alignItems: 'start',
-          gap: '1rem',
           width: '100%',
           minWidth: '0',
-        }}
+        })}
       >
         {plans?.map(plan => (
           <PlanCard

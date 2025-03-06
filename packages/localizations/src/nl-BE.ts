@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
   backButton: 'Terug',
+  badge__currentPlan: undefined,
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
   badge__primary: 'Primair',
@@ -23,6 +24,12 @@ export const nlBE: LocalizationResource = {
   badge__unverified: 'Ongeverifieerd',
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -129,6 +136,7 @@ export const nlBE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Uitnodigen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Verwijder lid',
         tableHeader__actions: 'Acties',
@@ -662,6 +670,14 @@ export const nlBE: LocalizationResource = {
       title: 'Voeg backup code verificatie toe',
       title__codelist: 'Backup codes',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Kies een provider om je account te verbinden.',
       formHint__noAccounts: 'Er zijn geen beschikbare externe accountproviders.',
@@ -768,6 +784,7 @@ export const nlBE: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
+      billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',
       title: 'Account',
@@ -866,6 +883,7 @@ export const nlBE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

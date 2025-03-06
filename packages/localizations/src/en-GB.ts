@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
   backButton: 'Back',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -23,6 +24,12 @@ export const enGB: LocalizationResource = {
   badge__unverified: 'Unverified',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {
@@ -130,6 +137,7 @@ export const enGB: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -671,6 +679,14 @@ export const enGB: LocalizationResource = {
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
       formHint__noAccounts: 'There are no available external account providers.',
@@ -778,6 +794,7 @@ export const enGB: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -877,6 +894,7 @@ export const enGB: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

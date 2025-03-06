@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
   backButton: '돌아가기',
+  badge__currentPlan: undefined,
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
   badge__primary: '기본',
@@ -23,6 +24,12 @@ export const koKR: LocalizationResource = {
   badge__unverified: '미확인',
   badge__userDevice: '사용자 장치',
   badge__you: '당신',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: '조직 만들기',
     invitePage: {
@@ -657,6 +664,14 @@ export const koKR: LocalizationResource = {
       title: '백업 코드 인증 추가',
       title__codelist: '백업 코드',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: '계정을 연결할 제공자를 선택하세요',
       formHint__noAccounts: '사용 가능한 외부 계정 제공자가 없습니다.',
@@ -759,6 +774,7 @@ export const koKR: LocalizationResource = {
     mobileButton__menu: '메뉴',
     navbar: {
       account: '프로필',
+      billing: undefined,
       description: '계정 정보를 관리하세요.',
       security: '보안',
       title: '계정',
@@ -856,6 +872,7 @@ export const koKR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

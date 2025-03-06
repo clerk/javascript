@@ -3,6 +3,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   backButton: 'Back',
+  badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -11,7 +12,12 @@ export const enUS: LocalizationResource = {
   badge__unverified: 'Unverified',
   badge__userDevice: 'User device',
   badge__you: 'You',
-  badge__currentPlan: 'Current Plan',
+  commerce_billedAnnually: 'Billed annually',
+  commerce_free: 'Free',
+  commerce_getStarted: 'Get started',
+  commerce_manageMembership: 'Manage membership',
+  commerce_month: 'Month',
+  commerce_switchPlan: 'Switch to this plan',
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -87,11 +93,6 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
-  commerce_month: 'Month',
-  commerce_free: 'Free',
-  commerce_getStarted: 'Get started',
-  commerce_manageMembership: 'Manage membership',
-  commerce_switchPlan: 'Switch to this plan',
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
@@ -667,12 +668,12 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
-      title: 'Billing & Payments',
       start: {
-        headerTitle__plans: 'Plans',
         headerTitle__invoices: 'Invoices',
         headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__plans: 'Plans',
       },
+      title: 'Billing & Payments',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
@@ -781,9 +782,9 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',
-      billing: 'Billing',
       title: 'Account',
     },
     passkeyScreen: {
@@ -879,9 +880,9 @@ export const enUS: LocalizationResource = {
         },
       },
       passkeysSection: {
-        primaryButton: 'Add a passkey',
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: 'Add a passkey',
         title: 'Passkeys',
       },
       passwordSection: {

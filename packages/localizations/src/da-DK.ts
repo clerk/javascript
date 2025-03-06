@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
   backButton: 'Tilbage',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
   badge__primary: 'Primær',
@@ -23,6 +24,12 @@ export const daDK: LocalizationResource = {
   badge__unverified: 'Ikke verificeret',
   badge__userDevice: 'Brugerenhed',
   badge__you: 'Dig',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
@@ -662,6 +669,14 @@ export const daDK: LocalizationResource = {
       title: 'Tilføj bekræftelse af backup-kode',
       title__codelist: 'Backup-koder',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Vælg en udbyder for at forbinde din konto.',
       formHint__noAccounts: 'Der er ingen tilgængelige eksterne kontoudbydere.',
@@ -769,6 +784,7 @@ export const daDK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Administrer dine kontooplysninger.',
       security: 'Sikkerhed',
       title: 'Konto',
@@ -868,6 +884,7 @@ export const daDK: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjern adgangsnøgle',
         menuAction__rename: 'Omdøb adgangsnøgle',
+        primaryButton: undefined,
         title: 'Adgangsnøgler',
       },
       passwordSection: {

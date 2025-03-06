@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   backButton: 'Πίσω',
+  badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
   badge__primary: 'Κύριο',
@@ -23,6 +24,12 @@ export const elGR: LocalizationResource = {
   badge__unverified: 'Μη επαληθευμένο',
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
     invitePage: {
@@ -670,6 +677,14 @@ export const elGR: LocalizationResource = {
       title: 'Προσθήκη επαλήθευσης με εφεδρικούς κωδικούς',
       title__codelist: 'Εφεδρικοί κωδικοί',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Επιλέξτε έναν πάροχο για να συνδέσετε τον λογαριασμό σας.',
       formHint__noAccounts: 'Δεν υπάρχουν διαθέσιμοι πάροχοι εξωτερικών λογαριασμών.',
@@ -779,6 +794,7 @@ export const elGR: LocalizationResource = {
     mobileButton__menu: 'Μενού',
     navbar: {
       account: 'Προφίλ',
+      billing: undefined,
       description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
       security: 'Ασφάλεια',
       title: 'Λογαριασμός',
@@ -879,6 +895,7 @@ export const elGR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

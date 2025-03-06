@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   backButton: 'Enrere',
+  badge__currentPlan: undefined,
   badge__default: 'Per defecte',
   badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
   badge__primary: 'Principal',
@@ -23,6 +24,12 @@ export const caES: LocalizationResource = {
   badge__unverified: 'No verificat',
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {
@@ -129,6 +136,7 @@ export const caES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convida',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Elimina membre',
         tableHeader__actions: undefined,
@@ -664,6 +672,14 @@ export const caES: LocalizationResource = {
       title: 'Afegeix verificació amb codi de seguretat',
       title__codelist: 'Codis de seguretat',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Selecciona un proveïdor per connectar el teu compte.',
       formHint__noAccounts: 'No hi ha proveïdors de comptes externs disponibles.',
@@ -774,6 +790,7 @@ export const caES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la informació del teu compte.',
       security: 'Seguretat',
       title: 'Compte',
@@ -874,6 +891,7 @@ export const caES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

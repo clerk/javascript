@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
   backButton: 'Zpět',
+  badge__currentPlan: undefined,
   badge__default: 'Výchozí',
   badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
   badge__primary: 'Hlavní',
@@ -23,6 +24,12 @@ export const csCZ: LocalizationResource = {
   badge__unverified: 'Nepotvrzené',
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Vytvořit organizaci',
     invitePage: {
@@ -661,6 +668,14 @@ export const csCZ: LocalizationResource = {
       title: 'Přidat ověřování pomocí záložních kódů',
       title__codelist: 'Záložní kódy',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovatele pro připojení vašeho účtu.',
       formHint__noAccounts: 'Nejsou k dispozici žádní dostupní externí poskytovatelé účtů.',
@@ -768,6 +783,7 @@ export const csCZ: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Spravujte své údaje.',
       security: 'Zabezpečení',
       title: 'Účet',
@@ -866,6 +882,7 @@ export const csCZ: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Odstranit',
         menuAction__rename: 'Přejmenovat',
+        primaryButton: undefined,
         title: 'Správa klíčů',
       },
       passwordSection: {

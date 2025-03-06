@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   backButton: 'Zurück',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
@@ -23,6 +24,12 @@ export const deDE: LocalizationResource = {
   badge__unverified: 'Unbestätigt',
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -675,6 +682,14 @@ export const deDE: LocalizationResource = {
       title: 'Backup-Code-Verifizierung hinzufügen',
       title__codelist: 'Sicherungscodes',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Wählen Sie einen Anbieter aus, um Ihr Konto zu verbinden.',
       formHint__noAccounts: 'Es sind keine externen Kontoanbieter verfügbar.',
@@ -784,6 +799,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
       title: 'Benutzerkonto',
@@ -883,6 +899,7 @@ export const deDE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Entfernen',
         menuAction__rename: 'Umbenennen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

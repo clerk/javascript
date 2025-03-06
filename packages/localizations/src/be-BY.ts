@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'Па-змаўчанні',
   badge__otherImpersonatorDevice: 'Іншая прылада',
   badge__primary: 'Асноўная',
@@ -23,6 +24,12 @@ export const beBY: LocalizationResource = {
   badge__unverified: 'Не верыфікавана',
   badge__userDevice: 'Карыстальніцкая прылада',
   badge__you: 'Вы',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Стварыць арганізацыю',
     invitePage: {
@@ -670,6 +677,14 @@ export const beBY: LocalizationResource = {
       title: 'Дадаць рэзервовы код пацверджання',
       title__codelist: 'Рэзервовы коды',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Выберыце правайдара для падключэння вашага ўліковага запісу.',
       formHint__noAccounts: 'Няма даступных правайдараў знешніх уліковых запісаў.',
@@ -779,6 +794,7 @@ export const beBY: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профіль',
+      billing: undefined,
       description: 'Кіруйце інфармацыяй аб вашым уліковым запісе.',
       security: 'Бяспека',
       title: 'Уліковы запіс',
@@ -878,6 +894,7 @@ export const beBY: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Выдаліць passkey',
         menuAction__rename: 'Перайменаваць passkey',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

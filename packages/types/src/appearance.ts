@@ -337,6 +337,9 @@ export type ElementsConfig = {
   planCardFeeContainer: WithOptions;
   planCardFee: WithOptions;
   planCardFeePeriod: WithOptions;
+  planCardFeePeriodNotice: WithOptions;
+  planCardFeePeriodNoticeInner: WithOptions;
+  planCardFeePeriodNoticeLabel: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;

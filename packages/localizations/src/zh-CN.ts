@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默认',
   badge__otherImpersonatorDevice: '其他模拟器设备',
   badge__primary: '主要',
@@ -23,6 +24,12 @@ export const zhCN: LocalizationResource = {
   badge__unverified: '未验证',
   badge__userDevice: '用户设备',
   badge__you: '您',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: '创建组织',
     invitePage: {
@@ -647,6 +654,14 @@ export const zhCN: LocalizationResource = {
       title: '添加备份代码验证',
       title__codelist: '备份代码',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: '选择一个供应商来连接您的账户。',
       formHint__noAccounts: '没有可用的外部账户供应商。',
@@ -745,6 +760,7 @@ export const zhCN: LocalizationResource = {
     mobileButton__menu: '菜单',
     navbar: {
       account: '账户',
+      billing: undefined,
       description: '管理您的账户。',
       security: '安全',
       title: '账户',
@@ -841,6 +857,7 @@ export const zhCN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

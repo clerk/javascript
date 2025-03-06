@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
   backButton: 'Tilbake',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annen imitators enhet',
   badge__primary: 'Primær',
@@ -23,6 +24,12 @@ export const nbNO: LocalizationResource = {
   badge__unverified: 'Ikke verifisert',
   badge__userDevice: 'Brukerens enhet',
   badge__you: 'Du',
+  commerce_billedAnnually: undefined,
+  commerce_free: undefined,
+  commerce_getStarted: undefined,
+  commerce_manageMembership: undefined,
+  commerce_month: undefined,
+  commerce_switchPlan: undefined,
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {
@@ -664,6 +671,14 @@ export const nbNO: LocalizationResource = {
       title: 'Legg til sikkerhetskopieringskodeverifisering',
       title__codelist: 'Sikkerhetskoder',
     },
+    billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     connectedAccountPage: {
       formHint: 'Velg en tilbyder for å koble til kontoen din.',
       formHint__noAccounts: 'Det er ingen tilgjengelige eksterne konto-tilbydere.',
@@ -772,6 +787,7 @@ export const nbNO: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Administrer kontoinformasjonen din.',
       security: 'Sikkerhet',
       title: 'Konto',
@@ -870,6 +886,7 @@ export const nbNO: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
