@@ -97,7 +97,7 @@ const app = document.getElementById('app') as HTMLDivElement;
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
-  element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
 function mountOpenSignInButton(element: HTMLDivElement, props) {
