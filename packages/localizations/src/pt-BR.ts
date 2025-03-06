@@ -877,6 +877,7 @@ export const ptBR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover',
         menuAction__rename: 'Renomear',
+        primaryButton: undefined,
         title: 'Chaves de acesso',
       },
       passwordSection: {

@@ -17,7 +17,7 @@ import {
   Text,
   useAppearance,
 } from '../customizables';
-import { useEnabledThirdPartyProviders, useResizeObserver } from '../hooks';
+import { useEnabledThirdPartyProviders } from '../hooks';
 import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils';
 import { useCardState } from './contexts';
@@ -46,7 +46,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
-  const [firstStrategyRef, firstElementRect] = useResizeObserver();
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
@@ -58,6 +57,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   }
 
   const strategyRows = distributeStrategiesIntoRows([...strategies], MAX_STRATEGIES_PER_ROW);
+  const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -95,7 +95,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           key={row.join('-')}
           elementDescriptor={descriptors.socialButtons}
           gap={2}
-          sx={{
+          sx={t => ({
             justifyContent: 'center',
             [mqu.sm]: {
               gridTemplateColumns: 'repeat(1, 1fr)',
@@ -103,10 +103,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             gridTemplateColumns:
               strategies.length < 1
                 ? `repeat(1, 1fr)`
-                : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
-          }}
+                : `repeat(${row.length}, ${
+                    rowIndex === 0
+                      ? `1fr`
+                      : // Calculate the width of each button based on the width of the buttons within the first row.
+                        // t.sizes.$2 is used here to represent the gap defined on the Grid component.
+                        `calc((100% - (${strategyRowOneLength} - 1) * ${t.sizes.$2}) / ${strategyRowOneLength})`
+                  })`,
+          })}
         >
-          {row.map((strategy, strategyIndex) => {
+          {row.map(strategy => {
             const label =
               strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? `Continue with ${strategyToDisplayData[strategy].name}`
@@ -120,13 +126,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 : localizationKeys('socialButtonsBlockButtonManyInView', {
                     provider: strategyToDisplayData[strategy].name,
                   });
-
-            // When strategies break into 2 rows or more, use the first item of the first
-            // row as reference for the width of the buttons in the second row and beyond
-            const ref =
-              strategies.length > MAX_STRATEGIES_PER_ROW && rowIndex === 0 && strategyIndex === 0
-                ? firstStrategyRef
-                : null;
 
             const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
               <Image
@@ -151,7 +150,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               <ButtonElement
                 key={strategy}
                 id={strategyToDisplayData[strategy].id}
-                ref={ref}
                 onClick={startOauth(strategy)}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
