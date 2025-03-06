@@ -876,6 +876,7 @@ export const esMX: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar',
         menuAction__rename: 'Renombrar',
+        primaryButton: undefined,
         title: 'Llaves de acceso',
       },
       passwordSection: {

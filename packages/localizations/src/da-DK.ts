@@ -868,6 +868,7 @@ export const daDK: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjern adgangsnøgle',
         menuAction__rename: 'Omdøb adgangsnøgle',
+        primaryButton: undefined,
         title: 'Adgangsnøgler',
       },
       passwordSection: {

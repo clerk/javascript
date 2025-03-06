@@ -869,6 +869,7 @@ export const srRS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Ključevi za prolaz',
       },
       passwordSection: {

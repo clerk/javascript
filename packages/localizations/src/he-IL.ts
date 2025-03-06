@@ -850,6 +850,7 @@ export const heIL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'הגדר סיסמה',
         menuAction__rename: 'עדכן סיסמה',
+        primaryButton: undefined,
         title: 'סיסמה',
       },
       passwordSection: {

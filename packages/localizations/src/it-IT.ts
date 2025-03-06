@@ -873,6 +873,7 @@ export const itIT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Rimuovi chiave di accesso',
         menuAction__rename: 'Rinomina chiave di accesso',
+        primaryButton: undefined,
         title: 'Gestisci le tue chiavi di accesso',
       },
       passwordSection: {

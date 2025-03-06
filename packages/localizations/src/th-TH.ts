@@ -863,6 +863,7 @@ export const thTH: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'ลบ',
         menuAction__rename: 'เปลี่ยนชื่อ',
+        primaryButton: undefined,
         title: 'พาสคีย์',
       },
       passwordSection: {
