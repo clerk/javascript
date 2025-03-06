@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.11.1
+
+### Patch Changes
+
+- Add `userProfile.start.passkeysSection.primaryButton` as `undefined` to all locales. ([#5281](https://github.com/clerk/javascript/pull/5281)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.11.0
 
 ### Minor Changes
