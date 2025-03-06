@@ -1,3 +1,5 @@
+import { isRequiresAssertionError, isRequiresCaptchaError } from '@clerk/shared/error';
+
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
 import type { Clerk } from './resources/internal';
 import { Client, isClerkAPIResponseError } from './resources/internal';
@@ -31,7 +33,7 @@ export class FraudProtection {
         throw e;
       }
 
-      if (e.errors[0]?.code !== 'requires_captcha') {
+      if (!isRequiresAssertionError(e) && !isRequiresCaptchaError(e)) {
         throw e;
       }
 
@@ -47,7 +49,15 @@ export class FraudProtection {
       let resolve: any;
       this.inflightException = new Promise<unknown>(r => (resolve = r));
 
-      const captchaParams = await this.managedChallenge(clerk);
+      let captchaParams: any = {};
+      if (isRequiresCaptchaError(e)) {
+        captchaParams = await this.managedChallenge(clerk);
+      } else if (isRequiresAssertionError(e) && !!clerk.__internal_assertDevice) {
+        if (!clerk?.client?.id) {
+          throw new Error('Client ID is required to assert device');
+        }
+        captchaParams = await clerk.__internal_assertDevice(clerk?.client?.id);
+      }
 
       try {
         await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);

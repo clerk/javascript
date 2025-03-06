@@ -616,6 +616,8 @@ export interface Clerk {
    * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
    **/
   __internal_reloadInitialResources: () => Promise<void>;
+
+  __internal_assertDevice?: ((client_id: string) => Promise<any>) | undefined;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

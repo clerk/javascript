@@ -13,6 +13,20 @@ export interface IStorage {
   get: (key: string) => Promise<string | null>;
 }
 
+type DeviceAttestationIOS = {
+  packageName: string;
+};
+
+type DeviceAttestationAndroid = {
+  packageName: string;
+  cloudProjectId: string;
+};
+
+type DeviceAttestation = {
+  ios?: DeviceAttestationIOS;
+  android?: DeviceAttestationAndroid;
+};
+
 export type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
@@ -35,4 +49,5 @@ export type BuildClerkOptions = {
     isAutoFillSupported: () => Promise<boolean>;
   };
   __experimental_resourceCache?: () => IStorage;
+  deviceAttestation?: DeviceAttestation;
 };

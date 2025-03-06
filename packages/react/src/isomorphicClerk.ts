@@ -86,7 +86,11 @@ type WithVoidReturnFunctions<T> = {
 
 type IsomorphicLoadedClerk = Without<
   WithVoidReturnFunctions<LoadedClerk>,
-  'client' | '__internal_addNavigationListener' | '__internal_getCachedResources' | '__internal_reloadInitialResources'
+  | 'client'
+  | '__internal_addNavigationListener'
+  | '__internal_getCachedResources'
+  | '__internal_reloadInitialResources'
+  | '__internal_assertDevice'
 > & {
   client: ClientResource | undefined;
 };
