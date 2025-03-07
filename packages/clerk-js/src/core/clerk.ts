@@ -101,6 +101,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { usageByUIComponents } from '../utils/detect-ui-caller';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
@@ -323,6 +324,9 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      isTriggeredByUI: () => {
+        return usageByUIComponents.get();
+      },
       proxyUrl: this.proxyUrl,
     });
     // This line is used for the piggy-backing mechanism
@@ -375,6 +379,8 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
+
+    console.log('EHEHEH', usageByUIComponents.get());
 
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
@@ -1027,6 +1033,7 @@ export class Clerk implements ClerkInterface {
     const unsubscribe = () => {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
+    console.log('too unsubscribe', unsubscribe);
     return unsubscribe;
   };
 

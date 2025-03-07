@@ -13,6 +13,7 @@ export type FapiRequestInit = RequestInit & {
   path?: string;
   search?: ConstructorParameters<typeof URLSearchParams>[0];
   sessionId?: string;
+  uiTriggered?: boolean;
   rotatingTokenNonce?: string;
   pathPrefix?: string;
   url?: URL;
@@ -67,6 +68,7 @@ type FapiClientOptions = {
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  isTriggeredByUI: () => boolean;
   isSatellite?: boolean;
 };
 
@@ -102,7 +104,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     return true;
   }
 
-  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
+  function buildQueryString({
+    method,
+    path,
+    sessionId,
+    search,
+    rotatingTokenNonce,
+    uiTriggered,
+  }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
@@ -128,6 +137,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
     if (path && !unauthorizedPathPrefixes.some(p => path.startsWith(p)) && sessionId) {
       searchParams.append('_clerk_session_id', sessionId);
+    }
+
+    if (uiTriggered) {
+      searchParams.append('_clerk_ui_triggered', 'true');
     }
 
     // TODO: extract to generic helper
@@ -191,6 +204,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       ...requestInit,
       // TODO: Pass these values to the FAPI client instead of calculating them on the spot
       sessionId: options.getSessionId(),
+      uiTriggered: options.isTriggeredByUI(),
     });
 
     // Normalize requestInit.headers

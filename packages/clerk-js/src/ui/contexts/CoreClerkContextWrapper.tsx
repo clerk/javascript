@@ -8,6 +8,7 @@ import {
 import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
 import React from 'react';
 
+import { makeUICaller } from '../../utils/detect-ui-caller';
 import { assertClerkSingletonExists } from './utils';
 
 type CoreClerkContextWrapperProps = {
@@ -35,10 +36,11 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   }, []);
 
   const { client, session, user, organization } = state;
-  const clerkCtx = React.useMemo(() => ({ value: clerk }), []);
-  const clientCtx = React.useMemo(() => ({ value: client }), [client]);
-  const sessionCtx = React.useMemo(() => ({ value: session }), [session]);
-  const userCtx = React.useMemo(() => ({ value: user }), [user]);
+  const clerkCtx = React.useMemo(() => ({ value: makeUICaller(clerk) }), []);
+  const clientCtx = React.useMemo(() => ({ value: makeUICaller(client) }), [client]);
+  const sessionCtx = React.useMemo(() => ({ value: makeUICaller(session) }), [session]);
+  const userCtx = React.useMemo(() => ({ value: makeUICaller(user) }), [user]);
+
   const organizationCtx = React.useMemo(
     () => ({
       value: { organization: organization },
