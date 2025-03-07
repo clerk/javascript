@@ -12,9 +12,12 @@ import {
   localizationKeys,
   Span,
   Text,
+  useAppearance,
 } from '../../customizables';
 import { Avatar, SegmentedControl } from '../../elements';
+import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
+import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
@@ -33,6 +36,14 @@ export function PlanCard(props: PlanCardProps) {
   const totalFeatures = plan.features.length;
   const hasFeatures = totalFeatures > 0;
   const isActivePlan = plan.isActiveForPayer;
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
+    transition:
+      appearanceAnimations && !prefersReducedMotion
+        ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
+        : 'none',
+  });
   return (
     <Box
       key={plan.id}
@@ -134,12 +145,14 @@ export function PlanCard(props: PlanCardProps) {
               />
               <Box
                 elementDescriptor={descriptors.planCardFeePeriodNotice}
-                sx={t => ({
-                  width: '100%',
-                  display: 'grid',
-                  gridTemplateRows: period === 'annual' ? '1fr' : '0fr',
-                  transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-                })}
+                sx={[
+                  _ => ({
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateRows: period === 'annual' ? '1fr' : '0fr',
+                  }),
+                  planCardFeePeriodNoticeAnimation,
+                ]}
                 // @ts-ignore - Needed until React 19 support
                 inert={period !== 'annual' ? 'true' : undefined}
               >

@@ -1,7 +1,9 @@
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton } from '../customizables';
+import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
+import { usePrefersReducedMotion } from '../hooks';
 import { ChevronDown } from '../icons';
+import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
 import { colors } from '../utils';
 
@@ -113,7 +115,6 @@ Trigger.displayName = 'Disclosure.Trigger';
 
 /* -------------------------------------------------------------------------------------------------
  * Disclosure.Content
- * TODO: get animations working
  * -----------------------------------------------------------------------------------------------*/
 
 interface ContentProps {
@@ -126,27 +127,30 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     throw new Error('Disclosure.Content must be used within Disclosure.Root');
   }
   const { isOpen, id } = context;
-
-  if (!isOpen) {
-    return null;
-  }
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const animation: ThemableCssProp = t => ({
+    transition:
+      appearanceAnimations && !prefersReducedMotion
+        ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
+        : 'none',
+  });
 
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.disclosureContentRoot}
       id={id}
-      sx={t => ({
-        borderRadius: 'inherit',
-        borderWidth: t.borderWidths.$normal,
-        borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
-        zIndex: 1,
-      })}
+      sx={[
+        _ => ({
+          display: 'grid',
+          gridTemplateRows: isOpen ? '1fr' : '0fr',
+          zIndex: 1,
+        }),
+        animation,
+      ]}
+      // @ts-ignore - Needed until React 19 support
+      inert={isOpen ? undefined : 'true'}
     >
       <Box
         elementDescriptor={descriptors.disclosureContentInner}
@@ -159,6 +163,14 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           elementDescriptor={descriptors.disclosureContent}
           sx={t => ({
             padding: t.space.$3,
+            borderRadius: t.radii.$lg,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha100,
+            background: common.mergedColorsBackground(
+              colors.setAlpha(t.colors.$colorBackground, 1),
+              t.colors.$neutralAlpha50,
+            ),
           })}
         >
           {children}
