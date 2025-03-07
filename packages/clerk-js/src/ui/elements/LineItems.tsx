@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
+import { common } from '../styledSystem';
 
 /* -------------------------------------------------------------------------------------------------
  * LineItems.Root
@@ -85,16 +86,16 @@ function Title({ children, description }: TitleProps) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
   }
   const { variant } = context;
+  const textVariant = variant === 'primary' ? 'subtitle' : 'caption';
   return (
     <Dt
       elementDescriptor={descriptors.lineItemsTitle}
       elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
         display: 'grid',
-        fontWeight: t.fontWeights.$medium,
-        fontSize: variant === 'primary' ? t.fontSizes.$md : t.fontSizes.$sm,
         color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
         marginTop: variant !== 'primary' ? t.space.$0x25 : undefined,
+        ...common.textVariants(t)[textVariant],
       })}
     >
       {children}
@@ -159,22 +160,27 @@ function Description({ children, prefix, suffix }: DescriptionProps) {
             elementDescriptor={descriptors.lineItemsDescriptionPrefix}
             sx={t => ({
               color: t.colors.$colorTextSecondary,
-              fontSize: t.fontSizes.$sm,
-              fontWeight: t.fontWeights.$medium,
+              ...common.textVariants(t).caption,
             })}
           >
             {prefix}
           </Span>
         ) : null}
-        <Span elementDescriptor={descriptors.lineItemsDescriptionText}>{children}</Span>
+        <Span
+          elementDescriptor={descriptors.lineItemsDescriptionText}
+          sx={t => ({
+            ...common.textVariants(t).body,
+          })}
+        >
+          {children}
+        </Span>
       </Span>
       {suffix ? (
         <Span
           elementDescriptor={descriptors.lineItemsDescriptionSuffix}
           sx={t => ({
             color: t.colors.$colorTextSecondary,
-            fontSize: t.fontSizes.$sm,
-            fontWeight: t.fontWeights.$medium,
+            ...common.textVariants(t).caption,
           })}
         >
           {suffix}
