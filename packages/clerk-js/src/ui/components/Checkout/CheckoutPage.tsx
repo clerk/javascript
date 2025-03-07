@@ -143,7 +143,7 @@ const CheckoutPlanRows = ({
   return (
     <LineItems.Root>
       <LineItems.Group>
-        <LineItems.Title description='Description goes here'>{plan.name}</LineItems.Title>
+        <LineItems.Title>{plan.name}</LineItems.Title>
         <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
           {plan.currencySymbol}
           {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
