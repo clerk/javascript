@@ -2,6 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
+import { ClerkAPIResponseError } from '../../../../core/resources';
 import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
@@ -492,6 +493,58 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+  });
+
+  describe('Submitting form via instant password autofill', () => {
+    const ERROR_CODES = ['strategy_for_user_invalid', 'form_password_incorrect', 'form_password_pwned'];
+    ERROR_CODES.forEach(code => {
+      it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword({ required: true });
+        });
+
+        const errJSON = {
+          code,
+          long_message: '',
+          message: '',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.create.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        const { userEvent, container } = render(<SignInStart />, { wrapper });
+
+        const emailField = screen.getByLabelText(/email address/i);
+        await userEvent.type(emailField, 'hello@clerk.com');
+
+        // We can't find the instantPasswordField in the screen so we must query it by id
+        const instantPasswordField = container.querySelector('#password-field') as Element;
+        expect(instantPasswordField).not.toBeNull();
+        fireEvent.change(instantPasswordField, { target: { value: 'some-password' } });
+
+        const form = container.querySelector('form') as Element;
+        expect(instantPasswordField).not.toBeNull();
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+          expect(fixtures.signIn.create).toHaveBeenCalledWith({
+            identifier: 'hello@clerk.com',
+            password: 'some-password',
+            strategy: 'password',
+          });
+
+          expect(fixtures.signIn.create).toHaveBeenCalledWith({
+            identifier: 'hello@clerk.com',
+          });
+        });
+      });
     });
   });
 });
