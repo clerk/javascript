@@ -275,14 +275,14 @@ importers:
         specifier: ^2.0.6
         version: 2.2.3
       typedoc:
-        specifier: 0.27.7
-        version: 0.27.7(typescript@5.6.3)
+        specifier: 0.27.9
+        version: 0.27.9(typescript@5.6.3)
       typedoc-plugin-markdown:
         specifier: 4.4.2
-        version: 4.4.2(typedoc@0.27.7(typescript@5.6.3))
+        version: 4.4.2(typedoc@0.27.9(typescript@5.6.3))
       typedoc-plugin-replace-text:
         specifier: 4.1.0
-        version: 4.1.0(typedoc@0.27.7(typescript@5.6.3))
+        version: 4.1.0(typedoc@0.27.9(typescript@5.6.3))
       typescript:
         specifier: catalog:repo
         version: 5.6.3
@@ -2937,7 +2937,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -13269,12 +13269,12 @@ packages:
     peerDependencies:
       typedoc: 0.26.x || 0.27.x
 
-  typedoc@0.27.7:
-    resolution: {integrity: sha512-K/JaUPX18+61W3VXek1cWC5gwmuLvYTOXJzBvD9W7jFvbPnefRnCHQCEPw7MSNrP/Hj7JJrhZtDDLKdcYm6ucg==}
+  typedoc@0.27.9:
+    resolution: {integrity: sha512-/z585740YHURLl9DN2jCWe6OW7zKYm6VoQ93H0sxZ1cwHQEQrUn5BJrEnkWhfzUdyO+BLGjnKUZ9iz9hKloFDw==}
     engines: {node: '>= 18'}
     hasBin: true
     peerDependencies:
-      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x
+      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x
 
   typescript-eslint@8.21.0:
     resolution: {integrity: sha512-txEKYY4XMKwPXxNkN8+AxAdX6iIJAPiJbHE/FpQccs/sxw8Lf26kqwC3cn0xkHlW8kEbLhkhCsjWuMveaY9Rxw==}
@@ -30159,15 +30159,15 @@ snapshots:
       typed-array-buffer: 1.0.3
       typed-array-byte-offset: 1.0.4
 
-  typedoc-plugin-markdown@4.4.2(typedoc@0.27.7(typescript@5.6.3)):
+  typedoc-plugin-markdown@4.4.2(typedoc@0.27.9(typescript@5.6.3)):
     dependencies:
-      typedoc: 0.27.7(typescript@5.6.3)
+      typedoc: 0.27.9(typescript@5.6.3)
 
-  typedoc-plugin-replace-text@4.1.0(typedoc@0.27.7(typescript@5.6.3)):
+  typedoc-plugin-replace-text@4.1.0(typedoc@0.27.9(typescript@5.6.3)):
     dependencies:
-      typedoc: 0.27.7(typescript@5.6.3)
+      typedoc: 0.27.9(typescript@5.6.3)
 
-  typedoc@0.27.7(typescript@5.6.3):
+  typedoc@0.27.9(typescript@5.6.3):
     dependencies:
       '@gerrit0/mini-shiki': 1.27.2
       lunr: 2.3.9
