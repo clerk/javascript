@@ -157,6 +157,10 @@ export type ElementsConfig = {
   lineItemsGroup: WithOptions;
   lineItemsTitle: WithOptions<'primary' | 'secondary'>;
   lineItemsDescription: WithOptions<'primary' | 'secondary'>;
+  lineItemsDescriptionInner: WithOptions;
+  lineItemsDescriptionNote: WithOptions;
+  lineItemsDescriptionPrefix: WithOptions;
+  lineItemsDescriptionText: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;

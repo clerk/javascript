@@ -37,6 +37,7 @@ interface GroupProps {
 function Group({ children, borderTop = false }: GroupProps) {
   return (
     <Box
+      elementDescriptor={descriptors.lineItemsGroup}
       sx={t => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -122,6 +123,7 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
       })}
     >
       <Span
+        elementDescriptor={descriptors.lineItemsDescriptionInner}
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
@@ -131,6 +133,7 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
       >
         {prefix ? (
           <Span
+            elementDescriptor={descriptors.lineItemsDescriptionPrefix}
             sx={t => ({
               color: t.colors.$colorTextSecondary,
               fontSize: t.fontSizes.$sm,
@@ -140,6 +143,7 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
           </Span>
         ) : null}
         <Span
+          elementDescriptor={descriptors.lineItemsDescriptionText}
           sx={t => ({
             fontWeight: weight === 'normal' ? t.fontWeights.$normal : t.fontWeights.$medium,
           })}
@@ -147,7 +151,7 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
           {children}
         </Span>
       </Span>
-      {note ? <Span>{note}</Span> : null}
+      {note ? <Span elementDescriptor={descriptors.lineItemsDescriptionNote}>{note}</Span> : null}
     </Dd>
   );
 }
