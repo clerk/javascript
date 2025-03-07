@@ -23,35 +23,31 @@ function Root({ children }: RootProps) {
 }
 
 /* -------------------------------------------------------------------------------------------------
- * LineItems.Divider
- * -----------------------------------------------------------------------------------------------*/
-
-function Divider() {
-  return (
-    <Box
-      elementDescriptor={descriptors.lineItemsDivider}
-      as='hr'
-      sx={t => ({
-        borderColor: t.colors.$neutralAlpha100,
-      })}
-    />
-  );
-}
-
-/* -------------------------------------------------------------------------------------------------
  * LineItems.Group
  * -----------------------------------------------------------------------------------------------*/
 
 interface GroupProps {
   children: React.ReactNode;
+  /**
+   * @default `false`
+   */
+  borderTop?: boolean;
 }
 
-function Group({ children }: GroupProps) {
+function Group({ children, borderTop = false }: GroupProps) {
   return (
     <Box
-      sx={_ => ({
+      sx={t => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        ...(borderTop
+          ? {
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+              paddingTop: t.space.$2,
+            }
+          : {}),
       })}
     >
       {children}
@@ -158,7 +154,6 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
 
 export const LineItems = {
   Root,
-  Divider,
   Group,
   Title,
   Description,

@@ -149,8 +149,7 @@ const CheckoutPlanRows = ({
           {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
         </LineItems.Description>
       </LineItems.Group>
-      <LineItems.Divider />
-      <LineItems.Group>
+      <LineItems.Group borderTop>
         <LineItems.Title colorScheme='secondary'>Subtotal</LineItems.Title>
         <LineItems.Description>
           {totals.subtotal.currencySymbol}
@@ -164,8 +163,7 @@ const CheckoutPlanRows = ({
           {totals.taxTotal.amountFormatted}
         </LineItems.Description>
       </LineItems.Group>
-      <LineItems.Divider />
-      <LineItems.Group>
+      <LineItems.Group borderTop>
         <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
         <LineItems.Description>
           {totals.totalDueNow
