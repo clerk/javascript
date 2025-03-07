@@ -37,7 +37,7 @@ type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
   const { onSuccess, onReset } = props;
   const { user } = useUser();
-  const [updatePasswordWithReverification] = useReverification(
+  const { action: updatePasswordWithReverification } = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
 
