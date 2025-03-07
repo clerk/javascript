@@ -54,7 +54,7 @@ const isSignedInStatus = (status: string): status is SignedInSessionResource['st
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
-  const [revokeSession] = useReverification(session.revoke.bind(session));
+  const { action: revokeSession } = useReverification(session.revoke.bind(session));
 
   const revoke = async () => {
     if (isCurrent || !session) {

@@ -17,7 +17,7 @@ type RemoveFormProps = FormProps & {
 export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps) => {
   const { title, messageLine1, messageLine2, deleteResource, onSuccess, onReset } = props;
   const card = useCardState();
-  const [deleteWithReverification] = useReverification(deleteResource);
+  const { action: deleteWithReverification } = useReverification(deleteResource);
 
   const handleSubmit = async () => {
     try {

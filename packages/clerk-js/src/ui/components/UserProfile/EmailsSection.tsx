@@ -111,7 +111,7 @@ const EmailMenu = ({ email }: { email: EmailAddressResource }) => {
   const emailId = email.id;
   const isPrimary = user?.primaryEmailAddressId === emailId;
   const isVerified = email.verification.status === 'verified';
-  const [setPrimary] = useReverification(() => {
+  const { action: setPrimary } = useReverification(() => {
     return user?.update({ primaryEmailAddressId: emailId });
   });
 
