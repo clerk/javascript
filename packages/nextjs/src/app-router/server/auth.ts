@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { EntityTypes, RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -11,6 +12,16 @@ import { createProtect } from '../../server/protect';
 import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
+
+// This generic allows the types to show up in autocomplete
+// We also need to redefine the types here because they don't show up outside the factory
+type EntityTypeToAuth<T extends EntityTypes> = T extends 'user'
+  ? Auth
+  : T extends 'machine'
+    ? MachineAuth
+    : T extends 'any'
+      ? MachineAuth | Auth
+      : Auth;
 
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
@@ -27,9 +38,13 @@ type Auth = AuthObject & {
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 };
 
-export interface AuthFn {
-  (): Promise<Auth>;
+type MachineAuth = Exclude<AuthObject, SignedInAuthObject | SignedOutAuthObject> & {
+  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+};
+type AuthOptions = { entity?: EntityTypes };
 
+export interface AuthFn {
+  (options?: AuthOptions): Promise<Auth>;
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
    * - to check if a user is authenticated (signed in)
@@ -51,6 +66,11 @@ export interface AuthFn {
   protect: AuthProtect;
 }
 
+export interface MachineAuthFn {
+  (options?: AuthOptions): Promise<MachineAuth>;
+  protect: AuthProtect;
+}
+
 /**
  * The `auth()` helper returns the [`Auth`](https://clerk.com/docs/references/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](https://clerk.com/docs/references/nextjs/auth#redirect-to-sign-in) method.
  *
@@ -58,7 +78,13 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = async () => {
+// No options case
+export async function auth(): Promise<Auth>;
+// With options case
+export async function auth<T extends EntityTypes>(options: AuthOptions & { entity: T }): Promise<EntityTypeToAuth<T>>;
+// With options but no entity case
+export async function auth(options: AuthOptions): Promise<Auth>;
+export async function auth(options?: AuthOptions): Promise<Auth | MachineAuth> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -79,6 +105,7 @@ export const auth: AuthFn = async () => {
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    options,
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -105,7 +132,7 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn });
-};
+}
 
 auth.protect = async (...args: any[]) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
