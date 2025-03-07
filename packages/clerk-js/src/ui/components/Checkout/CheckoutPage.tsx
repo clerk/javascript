@@ -151,7 +151,7 @@ const CheckoutPlanRows = ({
       </LineItems.Group>
       <LineItems.Group
         borderTop
-        variant='secondary'
+        variant='tertiary'
       >
         <LineItems.Title>Subtotal</LineItems.Title>
         <LineItems.Description>

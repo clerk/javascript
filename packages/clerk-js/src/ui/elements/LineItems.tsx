@@ -145,6 +145,7 @@ function Description({ children, prefix, suffix }: DescriptionProps) {
             sx={t => ({
               color: t.colors.$colorTextSecondary,
               fontSize: t.fontSizes.$sm,
+              fontWeight: t.fontWeights.$medium,
             })}
           >
             {prefix}
@@ -158,6 +159,7 @@ function Description({ children, prefix, suffix }: DescriptionProps) {
           sx={t => ({
             color: t.colors.$colorTextSecondary,
             fontSize: t.fontSizes.$sm,
+            fontWeight: t.fontWeights.$medium,
           })}
         >
           {suffix}
