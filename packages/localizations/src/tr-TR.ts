@@ -571,8 +571,7 @@ export const trTR: LocalizationResource = {
     form_password_incorrect: 'Şifre yanlış.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
-    form_password_pwned:
-      'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
+    form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
     form_password_pwned__sign_in:
       'Bu şifre bir veri ihlalinde tespit edildi ve oturum açmak için kullanılamaz. Lütfen başka bir şifre seçin.',
     form_password_size_in_bytes_exceeded:
@@ -586,7 +585,8 @@ export const trTR: LocalizationResource = {
     organization_domain_common: 'Organizasyon alan adı çok yaygın.',
     organization_domain_exists_for_enterprise_connection: 'Kurumsal bağlantı için bu alan adı zaten mevcut.',
     organization_membership_quota_exceeded: 'Organizasyon üye kotası aşıldı.',
-    organization_minimum_permissions_needed: 'Bu işlemi gerçekleştirmek için gerekli asgari izinlere sahip olmalısınız.',
+    organization_minimum_permissions_needed:
+      'Bu işlemi gerçekleştirmek için gerekli asgari izinlere sahip olmalısınız.',
     passkey_already_exists: 'Bu hesaba zaten bir geçiş anahtarı bağlı.',
     passkey_not_supported: 'Geçiş anahtarları şu anda desteklenmiyor.',
     passkey_pa_not_supported: 'Bu platform için geçiş anahtarları desteklenmiyor.',
@@ -604,7 +604,8 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     zxcvbn: {
-      couldBeStronger: 'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
+      couldBeStronger:
+        'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
       goodPassword: 'Harika! Parolanız gerekli tüm gereksinimleri karşılıyor.',
       notEnough: 'Şifreniz yeterince güçlü değil.',
       suggestions: {
