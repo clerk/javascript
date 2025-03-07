@@ -29,14 +29,12 @@ type UseOrganizationParams = {
    * Otherwise, accepts an object with the following optional properties:
    *
    * - `enrollmentMode`: A string that filters the domains by the provided enrollment mode.
-   * - TODO
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
    * If set to `true`, all default properties will be used. Otherwise, accepts an object with the following optional properties:
    *
    * - `status`: A string that filters the membership requests by the provided status.
-   * - TODO
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
@@ -46,7 +44,6 @@ type UseOrganizationParams = {
    *
    * - `role`: An array of [`OrganizationCustomRoleKey`](/docs/references/javascript/types/organization-custom-role-key).
    * - `query`: A string that filters the memberships by the provided string.
-   * - TODO
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
@@ -55,7 +52,6 @@ type UseOrganizationParams = {
    * Otherwise, accepts an object with the following optional properties:
    *
    * - `status`: A string that filters the invitations by the provided status.
-   * - TODO
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
@@ -125,12 +121,7 @@ type UseOrganizationReturn<T extends UseOrganizationParams> =
       > | null;
     };
 
-type UseOrganization = <T extends UseOrganizationParams>(
-  /**
-   * @property invitations - asdf
-   */
-  params?: T,
-) => UseOrganizationReturn<T>;
+type UseOrganization = <T extends UseOrganizationParams>(params?: T) => UseOrganizationReturn<T>;
 
 const undefinedPaginatedResource = {
   data: undefined,

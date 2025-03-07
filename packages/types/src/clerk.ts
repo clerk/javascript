@@ -673,20 +673,6 @@ export type CustomNavigation = (to: string, options?: NavigateOptions) => Promis
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 /**
- * @inline
- */
-type Experimental = {
-  /**
-   * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
-   */
-  persistClient?: boolean;
-  /**
-   * Clerk will rethrow network errors that occur while the user is offline.
-   */
-  rethrowOfflineNetworkErrors?: boolean;
-};
-
-/**
  * Navigation options used to replace or push history changes.
  * Both `routerPush` & `routerReplace` OR none options should be passed.
  */
@@ -785,7 +771,19 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
-    experimental?: Experimental;
+    experimental?: Autocomplete<
+      {
+        /**
+         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         */
+        persistClient: boolean;
+        /**
+         * Clerk will rethrow network errors that occur while the user is offline.
+         */
+        rethrowOfflineNetworkErrors: boolean;
+      },
+      Record<string, any>
+    >;
 
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
