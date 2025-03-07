@@ -105,6 +105,7 @@ type _LocalizationResource = {
     manageMembership: LocalizationValue;
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
+    accountFunds: LocalizationValue;
   };
   signUp: {
     start: {

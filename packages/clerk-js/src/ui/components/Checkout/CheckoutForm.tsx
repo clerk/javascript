@@ -3,10 +3,10 @@ import type { CommerceCheckoutResource, CommerceMoney, CommercePaymentSourceReso
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, Col, Flex, Form, Icon, Text } from '../../customizables';
-import { Select, SelectButton, SelectOptionList } from '../../elements';
+import { Button, Col, Flex, Form, Icon, Text } from '../../customizables';
+import { Disclosure, Divider, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
-import { ArrowUpDown, ChevronDown, CreditCard } from '../../icons';
+import { ArrowUpDown, CreditCard } from '../../icons';
 
 export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
   const stripe = useStripe();
@@ -20,6 +20,7 @@ export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource 
   const { data: paymentSources } = data || { data: [] };
 
   const didExpandStripePaymentMethods = useCallback(() => {
+    return;
     setOpenAccountFundsDropDown(false);
   }, []);
 
@@ -86,42 +87,40 @@ export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource 
     >
       {paymentSources.length > 0 && (
         <>
-          <Dropdown
+          <Disclosure.Root
             open={openAccountFundsDropDown}
-            setOpen={setOpenAccountFundsDropDown}
-            title='Account Funds'
+            onOpenChange={setOpenAccountFundsDropDown}
           >
-            <Col gap={3}>
-              <PaymentSourceMethods
-                paymentSources={paymentSources}
-                totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
-                onPaymentSourceSubmit={onPaymentSourceSubmit}
-                isSubmitting={isSubmitting}
-              />
-            </Col>
-          </Dropdown>
-          <Text
-            variant='buttonSmall'
-            colorScheme='secondary'
-            sx={{ textAlign: 'center' }}
-          >
-            OR
-          </Text>
+            <Disclosure.Trigger>Account Funds</Disclosure.Trigger>
+            <Disclosure.Content>
+              <Col gap={3}>
+                <PaymentSourceMethods
+                  paymentSources={paymentSources}
+                  totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
+                  onPaymentSourceSubmit={onPaymentSourceSubmit}
+                  isSubmitting={isSubmitting}
+                />
+              </Col>
+            </Disclosure.Content>
+          </Disclosure.Root>
+          <Divider />
         </>
       )}
 
-      <Dropdown
+      <Disclosure.Root
         open={openAddNewSourceDropDown}
-        setOpen={setOpenAddNewSourceDropDown}
-        title='Add a New Payment Source'
+        onOpenChange={setOpenAddNewSourceDropDown}
       >
-        <StripePaymentMethods
-          totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
-          onStripeSubmit={onStripeSubmit}
-          onExpand={didExpandStripePaymentMethods}
-          isSubmitting={isSubmitting}
-        />
-      </Dropdown>
+        <Disclosure.Trigger>Add a New Payment Source</Disclosure.Trigger>
+        <Disclosure.Content>
+          <StripePaymentMethods
+            totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
+            onStripeSubmit={onStripeSubmit}
+            onExpand={didExpandStripePaymentMethods}
+            isSubmitting={isSubmitting}
+          />
+        </Disclosure.Content>
+      </Disclosure.Root>
     </Col>
   );
 };
@@ -300,66 +299,5 @@ const StripePaymentMethods = ({
         )}
       </Col>
     </Form>
-  );
-};
-
-const Dropdown = ({
-  open,
-  setOpen,
-  title,
-  children,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  title: string;
-  children: React.ReactNode;
-}) => {
-  return (
-    <Col
-      sx={t => ({
-        borderRadius: t.radii.$lg,
-        borderWidth: t.borderWidths.$normal,
-        borderStyle: t.borderStyles.$solid,
-        borderColor: t.colors.$neutralAlpha100,
-      })}
-    >
-      <button
-        type='button'
-        onClick={() => setOpen(!open)}
-      >
-        <Flex
-          gap={2}
-          align='center'
-          justify='between'
-          sx={t => ({
-            paddingInline: t.space.$3,
-            height: t.sizes.$10,
-          })}
-        >
-          <Text variant='buttonSmall'>{title}</Text>
-          <Icon
-            icon={ChevronDown}
-            colorScheme='neutral'
-            size='md'
-            sx={{ rotate: open ? '180deg' : '0', transformOrigin: '50%' }}
-          />
-        </Flex>
-      </button>
-
-      {open && (
-        <Box
-          sx={t => ({
-            padding: t.space.$3,
-            backgroundColor: t.colors.$neutralAlpha25,
-            borderRadius: t.radii.$lg,
-            borderTopWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-          })}
-        >
-          {children}
-        </Box>
-      )}
-    </Col>
   );
 };
