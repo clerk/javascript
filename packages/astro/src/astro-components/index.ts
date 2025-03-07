@@ -12,6 +12,7 @@ export { default as AuthenticateWithRedirectCallback } from './control/Authentic
 export { default as SignInButton } from './unstyled/SignInButton.astro';
 export { default as SignUpButton } from './unstyled/SignUpButton.astro';
 export { default as SignOutButton } from './unstyled/SignOutButton.astro';
+export { default as SignInWithMetamaskButton } from './unstyled/SignInWithMetamaskButton.astro';
 
 /**
  * UI Components
