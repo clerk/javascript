@@ -201,7 +201,7 @@ const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
   const card = useCardState();
   const { isSatellite } = useClerk();
   const { user } = useUser();
-  const [createPasskey] = useReverification(() => user?.createPasskey());
+  const { action: createPasskey } = useReverification(() => user?.createPasskey());
 
   const handleCreatePasskey = async () => {
     onClick?.();

@@ -49,7 +49,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
-  const [createPhoneNumber] = useReverification(
+  const { action: createPhoneNumber } = useReverification(
     (user: UserResource, opt: Parameters<UserResource['createPhoneNumber']>[0]) => user.createPhoneNumber(opt),
   );
 
