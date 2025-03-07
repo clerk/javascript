@@ -97,7 +97,7 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * }
  * ```
  */
-export const useUser = (): UseUserReturn => {
+export function useUser(): UseUserReturn {
   useAssertWrappedByClerkProvider('useUser');
 
   const user = useUserContext();
@@ -111,4 +111,4 @@ export const useUser = (): UseUserReturn => {
   }
 
   return { isLoaded: true, isSignedIn: true, user };
-};
+}

@@ -679,11 +679,11 @@ type Experimental = {
   /**
    * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
    */
-  persistClient: boolean;
+  persistClient?: boolean;
   /**
    * Clerk will rethrow network errors that occur while the user is offline.
    */
-  rethrowOfflineNetworkErrors: boolean;
+  rethrowOfflineNetworkErrors?: boolean;
 };
 
 /**

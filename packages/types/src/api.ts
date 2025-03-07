@@ -18,43 +18,16 @@ export interface ClerkAPIError {
    * Additional information about the error.
    */
   meta?: {
-    /**
-     * TODO: Document this.
-     */
     paramName?: string;
-    /**
-     * TODO: Document this.
-     */
     sessionId?: string;
-    /**
-     * TODO: Document this.
-     */
     emailAddresses?: string[];
-    /**
-     * TODO: Document this.
-     */
     identifiers?: string[];
-    /**
-     * TODO: Document this.
-     */
     zxcvbn?: {
-      /**
-       * TODO: Document this.
-       */
       suggestions: {
-        /**
-         * TODO: Document this.
-         */
         code: string;
-        /**
-         * TODO: Document this.
-         */
         message: string;
       }[];
     };
-    /**
-     * TODO: Document this.
-     */
     permissions?: string[];
   };
 }
