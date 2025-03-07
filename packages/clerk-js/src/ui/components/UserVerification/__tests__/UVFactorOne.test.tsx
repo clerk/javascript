@@ -135,7 +135,81 @@ describe('UserVerificationFactorOne', () => {
   });
 
   describe('Use another method', () => {
-    it.todo('should list enabled first factor methods without the current one');
+    it('should list enabled first factor methods without the current one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [
+          {
+            strategy: 'email_code',
+            emailAddressId: 'email_1',
+            safeIdentifier: 'xxx@hello.com',
+          },
+          {
+            strategy: 'email_code',
+            emailAddressId: 'email_2',
+            safeIdentifier: 'xxx+1@hello.com',
+          },
+        ],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
+
+      const { getByText, getByRole } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        getByText('Use another method');
+      });
+
+      await waitFor(() => {
+        getByText('Use another method').click();
+        expect(getByRole('button')).toHaveTextContent('Email code to xxx+1@hello.com');
+        expect(getByRole('button')).not.toHaveTextContent('Email code to xxx@hello.com');
+      });
+    });
+
+    it('can select another method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [
+          {
+            strategy: 'email_code',
+            emailAddressId: 'email_1',
+            safeIdentifier: 'xxx@hello.com',
+          },
+          {
+            strategy: 'email_code',
+            emailAddressId: 'email_2',
+            safeIdentifier: 'xxx+1@hello.com',
+          },
+        ],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
+
+      const { getByText, container } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        expect(container).toHaveTextContent('xxx@hello.com');
+        expect(container).not.toHaveTextContent('xxx+1@hello.com');
+        getByText('Use another method');
+      });
+
+      await waitFor(() => {
+        getByText('Use another method').click();
+        getByText('Email code to xxx+1@hello.com').click();
+      });
+
+      await waitFor(() => {
+        getByText('Verification required');
+        expect(container).toHaveTextContent('xxx+1@hello.com');
+      });
+    });
   });
 
   describe('Get Help', () => {

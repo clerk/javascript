@@ -5,9 +5,9 @@ import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LockClosedIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
+import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { useUserVerificationSession } from './useUserVerificationSession';
 import { withHavingTrouble } from './withHavingTrouble';
 
@@ -29,7 +29,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { data } = useUserVerificationSession();
-  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies<SessionVerificationFirstFactor>({
+  const { firstPartyFactors, hasAnyStrategy } = useReverificationAlternativeStrategies<SessionVerificationFirstFactor>({
     filterOutFactor: props?.currentFactor,
     supportedFirstFactors: data?.supportedFirstFactors,
   });

@@ -1,9 +1,10 @@
 import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { LoadingCard, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { determineStartingSignInSecondFactor } from '../SignIn/utils';
+import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
@@ -21,7 +22,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _UserVerificationFactorTwo(): JSX.Element {
+export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
@@ -35,6 +36,11 @@ export function _UserVerificationFactorTwo(): JSX.Element {
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
   const toggleAllStrategies = () => setShowAllStrategies(s => !s);
 
+  const secondFactorsExcludingCurrent = useMemo(
+    () => availableFactors?.filter(factor => !secondFactorsAreEqual(factor, currentFactor)),
+    [availableFactors, currentFactor],
+  );
+
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
@@ -44,20 +50,26 @@ export function _UserVerificationFactorTwo(): JSX.Element {
     toggleAllStrategies();
   };
 
+  const hasAlternativeStrategies = useMemo(
+    () => (secondFactorsExcludingCurrent && secondFactorsExcludingCurrent.length > 0) || false,
+    [secondFactorsExcludingCurrent],
+  );
+
   useEffect(() => {
     if (sessionVerification.status === 'needs_first_factor') {
       void navigate('../');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!currentFactor) {
     return <LoadingCard />;
   }
 
-  if (showAllStrategies) {
+  if (showAllStrategies && hasAlternativeStrategies) {
     return (
       <UVFactorTwoAlternativeMethods
-        supportedSecondFactors={sessionVerification.supportedSecondFactors}
+        supportedSecondFactors={secondFactorsExcludingCurrent || null}
         onBackLinkClick={toggleAllStrategies}
         onFactorSelected={selectFactor}
       />
@@ -72,6 +84,7 @@ export function _UserVerificationFactorTwo(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'totp':
@@ -81,6 +94,7 @@ export function _UserVerificationFactorTwo(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'backup_code':
@@ -91,5 +105,5 @@ export function _UserVerificationFactorTwo(): JSX.Element {
 }
 
 export const UserVerificationFactorTwo = withUserVerificationSessionGuard(
-  withCardStateProvider(_UserVerificationFactorTwo),
+  withCardStateProvider(UserVerificationFactorTwoComponent),
 );
