@@ -20,7 +20,6 @@ export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource 
   const { data: paymentSources } = data || { data: [] };
 
   const didExpandStripePaymentMethods = useCallback(() => {
-    return;
     setOpenAccountFundsDropDown(false);
   }, []);
 
