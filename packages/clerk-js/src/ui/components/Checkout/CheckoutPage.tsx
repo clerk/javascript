@@ -5,7 +5,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner, Text } from '../../customizables';
+import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner } from '../../customizables';
+import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
@@ -77,8 +78,8 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
             <CheckoutPlanRows
               plan={checkout.plan}
               planPeriod={checkout.planPeriod}
+              totals={checkout.totals}
             />
-            <CheckoutTotalsRows totals={checkout.totals} />
           </Col>
 
           <Elements
@@ -130,95 +131,49 @@ const CheckoutHeader = ({ title }: { title: string }) => {
   );
 };
 
-const CheckoutPlanRows = ({ plan, planPeriod }: { plan: CommercePlanResource; planPeriod: string }) => {
+const CheckoutPlanRows = ({
+  plan,
+  planPeriod,
+  totals,
+}: {
+  plan: CommercePlanResource;
+  planPeriod: string;
+  totals: CommerceTotals;
+}) => {
   return (
-    <Col
-      gap={3}
-      align='stretch'
-      sx={t => ({
-        paddingBlockEnd: t.space.$3,
-        borderBottomWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$neutralAlpha100,
-      })}
-    >
-      <Flex
-        align='baseline'
-        justify='between'
-        gap={2}
+    <LineItems.Root>
+      <LineItems.Group>
+        <LineItems.Title>{plan.name}</LineItems.Title>
+        <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
+          {plan.currencySymbol}
+          {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+        </LineItems.Description>
+      </LineItems.Group>
+      <LineItems.Group
+        borderTop
+        variant='tertiary'
       >
-        <Box>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>{plan.name}</Text>
-        </Box>
-        <Col align='end'>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-            {plan.currencySymbol}
-            {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
-          </Text>
-          <Text
-            colorScheme='secondary'
-            variant='caption'
-            sx={t => ({ lineHeight: t.lineHeights.$normal })}
-          >
-            per month{planPeriod === 'annual' ? ', times 12 months' : ''}
-          </Text>
-        </Col>
-      </Flex>
-    </Col>
-  );
-};
-
-const CheckoutTotalsRows = ({ totals }: { totals: CommerceTotals }) => {
-  return (
-    <>
-      <Col
-        gap={3}
-        align='stretch'
-        sx={t => ({
-          paddingBlockEnd: t.space.$3,
-          borderBottomWidth: t.borderWidths.$normal,
-          borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
-          color: t.colors.$colorTextSecondary,
-        })}
-      >
-        <Flex
-          align='baseline'
-          justify='between'
-          gap={2}
-        >
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Subtotal</Text>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-            {totals.subtotal.currencySymbol}
-            {totals.subtotal.amountFormatted}
-          </Text>
-        </Flex>
-        <Flex
-          align='baseline'
-          justify='between'
-          gap={2}
-        >
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>Tax</Text>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-            {totals.taxTotal.currencySymbol}
-            {totals.taxTotal.amountFormatted}
-          </Text>
-        </Flex>
-      </Col>
-      <Flex
-        align='baseline'
-        justify='between'
-        gap={2}
-      >
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-          Total{totals.totalDueNow ? ' Due Today' : ''}
-        </Text>
-        <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
+        <LineItems.Title>Subtotal</LineItems.Title>
+        <LineItems.Description>
+          {totals.subtotal.currencySymbol}
+          {totals.subtotal.amountFormatted}
+        </LineItems.Description>
+      </LineItems.Group>
+      <LineItems.Group variant='tertiary'>
+        <LineItems.Title>Tax</LineItems.Title>
+        <LineItems.Description>
+          {totals.taxTotal.currencySymbol}
+          {totals.taxTotal.amountFormatted}
+        </LineItems.Description>
+      </LineItems.Group>
+      <LineItems.Group borderTop>
+        <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
+        <LineItems.Description>
           {totals.totalDueNow
             ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
             : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`}
-        </Text>
-      </Flex>
-    </>
+        </LineItems.Description>
+      </LineItems.Group>
+    </LineItems.Root>
   );
 };

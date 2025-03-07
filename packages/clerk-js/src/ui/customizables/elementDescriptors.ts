@@ -32,6 +32,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'disclosureContentInner',
   'disclosureContent',
 
+  'lineItemsRoot',
+  'lineItemsDivider',
+  'lineItemsGroup',
+  'lineItemsTitle',
+  'lineItemsTitleDescription',
+  'lineItemsDescription',
+  'lineItemsDescriptionInner',
+  'lineItemsDescriptionSuffix',
+  'lineItemsDescriptionPrefix',
+  'lineItemsDescriptionText',
+
   'actionCard',
 
   'logoBox',
