@@ -44,10 +44,10 @@ export const createClerkToolkit = async (params: CreateClerkToolkitParams = {}):
 
   const toolMap = shallowTransform(flatTools, t => adapter(clerkClient, context, t));
 
-  return {
+  return Promise.resolve({
     ...adaptedTools,
     allTools,
     toolMap: () => toolMap,
     injectSessionClaims: injectSessionClaims(context),
-  };
+  });
 };

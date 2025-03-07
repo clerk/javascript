@@ -871,6 +871,7 @@ export const trTR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Kaldır',
         menuAction__rename: 'Yeniden Adlandır',
+        primaryButton: undefined,
         title: 'Geçiş Anahtarları',
       },
       passwordSection: {

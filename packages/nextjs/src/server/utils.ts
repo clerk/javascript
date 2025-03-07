@@ -4,13 +4,11 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
-import AES from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { canUseKeyless } from '../utils/feature-flags';
+import { AES, HmacSHA1, Utf8 } from '../vendor/crypto-es';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,
@@ -34,7 +32,7 @@ export const setRequestHeadersOnNextResponse = (
   if (!res.headers.get(OVERRIDE_HEADERS)) {
     // Emulate a user setting overrides by explicitly adding the required nextjs headers
     // https://github.com/vercel/next.js/pull/41380
-    // @ts-expect-error
+    // @ts-expect-error -- property keys does not exist on type Headers
     res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
     req.headers.forEach((val, key) => {
       res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
@@ -160,7 +158,7 @@ export function assertKey(key: string | undefined, onError: () => never): string
  * Compute a cryptographic signature from a session token and provided secret key. Used to validate that the token has not been modified when transferring between middleware and the Next.js origin.
  */
 function createTokenSignature(token: string, key: string): string {
-  return hmacSHA1(token, key).toString();
+  return HmacSHA1(token, key).toString();
 }
 
 /**
@@ -258,6 +256,6 @@ function throwInvalidEncryptionKey(): never {
 
 function decryptData(data: string, key: string) {
   const decryptedBytes = AES.decrypt(data, key);
-  const encoded = decryptedBytes.toString(encUtf8);
+  const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }

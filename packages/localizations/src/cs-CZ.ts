@@ -866,6 +866,7 @@ export const csCZ: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Odstranit',
         menuAction__rename: 'Přejmenovat',
+        primaryButton: undefined,
         title: 'Správa klíčů',
       },
       passwordSection: {

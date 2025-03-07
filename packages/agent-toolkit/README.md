@@ -35,12 +35,23 @@
 
 ## Table of Contents
 
-1. [Getting Started](#getting-started)
-2. [Public APIs](#public-apis)
-3. [Use with Vercel's AI SDK](#use-with-vercels-ai-sdk)
-4. [Use with Langchain](#use-with-langchain)
-5. [Advanced Usage](#advanced-usage)
-6. [Support](#support)
+<!-- TOC -->
+
+- [Table of Contents](#table-of-contents)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+  - [Import Paths](#import-paths)
+  - [Methods](#methods)
+- [Prerequisites](#prerequisites)
+- [Example Repository](#example-repository)
+- [Using Vercel's AI SDK](#using-vercels-ai-sdk)
+- [Using Langchain](#using-langchain)
+- [Advanced Usage](#advanced-usage)
+  - [Using a Custom `clerkClient`](#using-a-custom-clerkclient)
+- [Support](#support)
+- [Contributing](#contributing)
+- [License](#license)
+<!-- TOC -->
 
 ## Getting Started
 
@@ -48,7 +59,9 @@ Use this SDK to integrate [Clerk](https://clerk.com/?utm_source=github&utm_mediu
 
 This package exposes a subset of Clerk's functionality to agent frameworks, allowing you to build powerful agentic systems capable of managing users, user data, organizations, and more.
 
-## Public APIs
+## API Reference
+
+### Import Paths
 
 The Clerk Agent Toolkit package provides two main import paths:
 
@@ -57,22 +70,35 @@ The Clerk Agent Toolkit package provides two main import paths:
 
 The toolkit offers the same tools and core APIs across frameworks, but their public interfaces may vary slightly to align with each framework's design:
 
+### Methods
+
+**Initialization & generic helpers**:
+
 - `createClerkToolkit(options)`: Instantiates a new Clerk toolkit.
 - `toolkit.injectSessionClaims(systemPrompt)`: Injects session claims (`userId`, `sessionId`, `orgId`, etc.) into the system prompt, making them accessible to the AI model.
-- `toolkit.users()`: Provides tools for managing users.
-- `toolkit.organizations()`: Provides tools for managing organizations.
+
+**Available tools**:
+
+Currently, are only exposing a subset of Clerk Backend API functionality as tools. We plan to expand this list as we receive feedback from the community. You are welcome to open an issue or reach out to us on Discord to request additional tools.
+
+- `toolkit.users()`: Provides tools for managing users. [Details](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/src/lib/tools/users.ts).
+- `toolkit.organizations()`: Provides tools for managing organizations. [Details](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/src/lib/tools/organizations.ts).
+- `toolkit.invitations()`: Provides tools for managing invitations. [Details](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/src/lib/tools/invitations.ts).
 - `toolkit.allTools()`: Returns all available tools.
-- `toolkit.toolMap()`: **(Langchain only)** Returns an object mapping available tools, useful for calling tools by name.
+
+**Langchain-specific methods:**
+
+- `toolkit.toolMap()`: Returns an object mapping available tools, useful for calling tools by name.
 
 For more details on each tool, refer to the framework-specific directories or the [Clerk Backend API documentation](https://clerk.com/docs/reference/backend-api).
 
-### Prerequisites
+## Prerequisites
 
 - `ai-sdk`: `"^3.4.7 || ^4.0.0"`, or `langchain`: `"^0.3.6"`
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_agent_toolkit).
 - An API key for an AI model compatible with Langchain
 
-### Example Repository
+## Example Repository
 
 - [Clerk AI SDK Example](https://github.com/clerk/agent-toolkit-example)
 

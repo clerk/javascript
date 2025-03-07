@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.11.1
+
+### Patch Changes
+
+- Add `userProfile.start.passkeysSection.primaryButton` as `undefined` to all locales. ([#5281](https://github.com/clerk/javascript/pull/5281)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.11.0
+
+### Minor Changes
+
+- feat(localizations): Introduce `es-UY` localization ([#5165](https://github.com/clerk/javascript/pull/5165)) by [@maramal](https://github.com/maramal)
+
+- feat(localizations): Add a new localization file for Polish `pl-PL`. ([#5096](https://github.com/clerk/javascript/pull/5096)) by [@marceleq27](https://github.com/marceleq27)
+
+### Patch Changes
+
+- Update the translation of `userProfile.start.profileSection.primaryButton` in the `es-ES` locale. ([#5208](https://github.com/clerk/javascript/pull/5208)) by [@Martoxdlol](https://github.com/Martoxdlol)
+
+- Update translations for nl-NL ([#5272](https://github.com/clerk/javascript/pull/5272)) by [@MaartenKoller](https://github.com/MaartenKoller)
+
+  - `waitlist.start.actionLink`
+  - `waitlist.start.actionText`
+
 ## 3.10.8
 
 ### Patch Changes
