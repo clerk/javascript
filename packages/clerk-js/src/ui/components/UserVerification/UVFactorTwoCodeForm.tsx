@@ -13,6 +13,7 @@ export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlterna
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
   prepare?: () => Promise<SessionVerificationResource>;
+  showAlternativeMethods?: boolean;
 };
 
 type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
@@ -64,6 +65,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={session?.user?.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      showAlternativeMethods={props.showAlternativeMethods}
     />
   );
 };

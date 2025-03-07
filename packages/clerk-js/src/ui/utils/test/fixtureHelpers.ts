@@ -281,7 +281,10 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
     // TODO:
     ac.single_session_mode = false;
   };
-  return { withMultiSessionMode };
+  const withReverification = () => {
+    ac.reverification = true;
+  };
+  return { withMultiSessionMode, withReverification };
 };
 
 const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
