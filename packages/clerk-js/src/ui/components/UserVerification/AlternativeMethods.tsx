@@ -5,7 +5,6 @@ import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, Fingerprint, LockClosedIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
