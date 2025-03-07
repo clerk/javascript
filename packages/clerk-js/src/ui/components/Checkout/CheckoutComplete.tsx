@@ -51,27 +51,25 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
         })}
       >
         <LineItems.Root>
-          <LineItems.Group>
-            <LineItems.Title colorScheme='secondary'>Total paid</LineItems.Title>
-            <LineItems.Description colorScheme='primary'>
+          <LineItems.Group variant='secondary'>
+            <LineItems.Title>Total paid</LineItems.Title>
+            <LineItems.Description>
               {checkout.invoice
                 ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
                 : '–'}
             </LineItems.Description>
           </LineItems.Group>
-          <LineItems.Group>
-            <LineItems.Title colorScheme='secondary'>Payment method</LineItems.Title>
-            <LineItems.Description colorScheme='primary'>
+          <LineItems.Group variant='secondary'>
+            <LineItems.Title>Payment method</LineItems.Title>
+            <LineItems.Description>
               {checkout.invoice
                 ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
                 : '–'}
             </LineItems.Description>
           </LineItems.Group>
-          <LineItems.Group>
-            <LineItems.Title colorScheme='secondary'>Invoice ID</LineItems.Title>
-            <LineItems.Description colorScheme='secondary'>
-              {checkout.invoice ? checkout.invoice.id : '–'}
-            </LineItems.Description>
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title>Invoice ID</LineItems.Title>
+            <LineItems.Description>{checkout.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
           </LineItems.Group>
         </LineItems.Root>
         <Button

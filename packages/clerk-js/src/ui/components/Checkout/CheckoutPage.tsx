@@ -144,20 +144,23 @@ const CheckoutPlanRows = ({
     <LineItems.Root>
       <LineItems.Group>
         <LineItems.Title>{plan.name}</LineItems.Title>
-        <LineItems.Description note={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
+        <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
           {plan.currencySymbol}
           {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
         </LineItems.Description>
       </LineItems.Group>
-      <LineItems.Group borderTop>
-        <LineItems.Title colorScheme='secondary'>Subtotal</LineItems.Title>
+      <LineItems.Group
+        borderTop
+        variant='secondary'
+      >
+        <LineItems.Title>Subtotal</LineItems.Title>
         <LineItems.Description>
           {totals.subtotal.currencySymbol}
           {totals.subtotal.amountFormatted}
         </LineItems.Description>
       </LineItems.Group>
-      <LineItems.Group>
-        <LineItems.Title colorScheme='secondary'>Tax</LineItems.Title>
+      <LineItems.Group variant='tertiary'>
+        <LineItems.Title>Tax</LineItems.Title>
         <LineItems.Description>
           {totals.taxTotal.currencySymbol}
           {totals.taxTotal.amountFormatted}

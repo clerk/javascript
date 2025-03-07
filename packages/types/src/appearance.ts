@@ -154,13 +154,13 @@ export type ElementsConfig = {
 
   lineItemsRoot: WithOptions;
   lineItemsDivider: WithOptions;
-  lineItemsGroup: WithOptions;
-  lineItemsTitle: WithOptions<'primary' | 'secondary'>;
-  lineItemsDescription: WithOptions<'primary' | 'secondary'>;
+  lineItemsGroup: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitle: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsDescription: WithOptions<'primary' | 'secondary' | 'tertiary'>;
   lineItemsDescriptionInner: WithOptions;
-  lineItemsDescriptionNote: WithOptions;
-  lineItemsDescriptionPrefix: WithOptions;
   lineItemsDescriptionText: WithOptions;
+  lineItemsDescriptionSuffix: WithOptions;
+  lineItemsDescriptionPrefix: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;

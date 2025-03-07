@@ -38,7 +38,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'lineItemsTitle',
   'lineItemsDescription',
   'lineItemsDescriptionInner',
-  'lineItemsDescriptionNote',
+  'lineItemsDescriptionSuffix',
   'lineItemsDescriptionPrefix',
   'lineItemsDescriptionText',
 

@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
 
 /* -------------------------------------------------------------------------------------------------
@@ -26,33 +28,43 @@ function Root({ children }: RootProps) {
  * LineItems.Group
  * -----------------------------------------------------------------------------------------------*/
 
+interface GroupContextValue {
+  variant: 'primary' | 'secondary' | 'tertiary';
+}
+
+const GroupContext = React.createContext<GroupContextValue | undefined>(undefined);
+
 interface GroupProps {
   children: React.ReactNode;
   /**
    * @default `false`
    */
   borderTop?: boolean;
+  variant?: 'primary' | 'secondary' | 'tertiary';
 }
 
-function Group({ children, borderTop = false }: GroupProps) {
+function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
   return (
-    <Box
-      elementDescriptor={descriptors.lineItemsGroup}
-      sx={t => ({
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-        ...(borderTop
-          ? {
-              borderTopWidth: t.borderWidths.$normal,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-              paddingTop: t.space.$2,
-            }
-          : {}),
-      })}
-    >
-      {children}
-    </Box>
+    <GroupContext.Provider value={{ variant }}>
+      <Box
+        elementDescriptor={descriptors.lineItemsGroup}
+        elementId={descriptors.lineItemsGroup.setId(variant)}
+        sx={t => ({
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          ...(borderTop
+            ? {
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                paddingTop: t.space.$2,
+              }
+            : {}),
+        })}
+      >
+        {children}
+      </Box>
+    </GroupContext.Provider>
   );
 }
 
@@ -62,24 +74,23 @@ function Group({ children, borderTop = false }: GroupProps) {
 
 interface TitleProps {
   children: React.ReactNode;
-  /**
-   * @default `primary`
-   */
-  colorScheme?: 'primary' | 'secondary';
-  /**
-   * @default `medium`
-   */
-  weight?: 'normal' | 'medium';
 }
 
-function Title({ children, colorScheme = 'primary', weight = 'medium' }: TitleProps) {
+function Title({ children }: TitleProps) {
+  const context = React.useContext(GroupContext);
+  if (!context) {
+    throw new Error('LineItems.Title must be used within LineItems.Group');
+  }
+  const { variant } = context;
   return (
     <Dt
       elementDescriptor={descriptors.lineItemsTitle}
-      elementId={descriptors.lineItemsTitle.setId(colorScheme)}
+      elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
-        fontWeight: weight === 'normal' ? t.fontWeights.$normal : t.fontWeights.$medium,
-        color: colorScheme === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
+        fontWeight: t.fontWeights.$medium,
+        fontSize: variant === 'primary' ? t.fontSizes.$md : t.fontSizes.$sm,
+        color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
+        marginTop: variant !== 'primary' ? t.space.$0x25 : undefined,
       })}
     >
       {children}
@@ -94,32 +105,29 @@ function Title({ children, colorScheme = 'primary', weight = 'medium' }: TitlePr
 interface DescriptionProps {
   children: React.ReactNode;
   /**
-   * Render a note below the description text.
-   */
-  note?: React.ReactNode;
-  /**
    * Render a piece of text before the description text.
    */
   prefix?: React.ReactNode;
   /**
-   * @default `secondary`
+   * Render a note below the description text.
    */
-  colorScheme?: 'primary' | 'secondary';
-  /**
-   * @default `normal`
-   */
-  weight?: 'normal' | 'medium';
+  suffix?: React.ReactNode;
 }
 
-function Description({ children, colorScheme = 'secondary', weight = 'normal', note, prefix }: DescriptionProps) {
+function Description({ children, prefix, suffix }: DescriptionProps) {
+  const context = React.useContext(GroupContext);
+  if (!context) {
+    throw new Error('LineItems.Description must be used within LineItems.Group');
+  }
+  const { variant } = context;
   return (
     <Dd
       elementDescriptor={descriptors.lineItemsDescription}
-      elementId={descriptors.lineItemsDescription.setId(colorScheme)}
+      elementId={descriptors.lineItemsDescription.setId(variant)}
       sx={t => ({
         display: 'grid',
         justifyContent: 'end',
-        color: colorScheme === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
+        color: variant === 'tertiary' ? t.colors.$colorTextSecondary : t.colors.$colorText,
       })}
     >
       <Span
@@ -142,23 +150,17 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
             {prefix}
           </Span>
         ) : null}
-        <Span
-          elementDescriptor={descriptors.lineItemsDescriptionText}
-          sx={t => ({
-            fontWeight: weight === 'normal' ? t.fontWeights.$normal : t.fontWeights.$medium,
-          })}
-        >
-          {children}
-        </Span>
+        <Span elementDescriptor={descriptors.lineItemsDescriptionText}>{children}</Span>
       </Span>
-      {note ? (
+      {suffix ? (
         <Span
-          elementDescriptor={descriptors.lineItemsDescriptionNote}
+          elementDescriptor={descriptors.lineItemsDescriptionSuffix}
           sx={t => ({
+            color: t.colors.$colorTextSecondary,
             fontSize: t.fontSizes.$sm,
           })}
         >
-          {note}
+          {suffix}
         </Span>
       ) : null}
     </Dd>
