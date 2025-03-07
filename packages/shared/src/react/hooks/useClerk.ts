@@ -4,7 +4,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
 
 /**
  * > [!WARNING]
- * > This composable should only be used for advanced use cases, such as building a completely custom OAuth flow or as an escape hatch to access to the `Clerk` object.
+ * > This hook should only be used for advanced use cases, such as building a completely custom OAuth flow or as an escape hatch to access to the `Clerk` object.
  *
  * The `useClerk()` hook provides access to the [`Clerk`](https://clerk.com/docs/references/javascript/clerk) object, allowing you to build alternatives to any Clerk Component.
  *
