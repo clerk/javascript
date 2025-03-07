@@ -23,7 +23,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     sourcemap: true,
-    onSuccess: 'pnpm build:declarations',
+    dts: true,
     target: 'es2020',
     external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],
