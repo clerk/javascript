@@ -156,6 +156,7 @@ export type ElementsConfig = {
   lineItemsDivider: WithOptions;
   lineItemsGroup: WithOptions<'primary' | 'secondary' | 'tertiary'>;
   lineItemsTitle: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitleDescription: WithOptions;
   lineItemsDescription: WithOptions<'primary' | 'secondary' | 'tertiary'>;
   lineItemsDescriptionInner: WithOptions;
   lineItemsDescriptionText: WithOptions;

@@ -28,8 +28,10 @@ function Root({ children }: RootProps) {
  * LineItems.Group
  * -----------------------------------------------------------------------------------------------*/
 
+type GroupVariant = 'primary' | 'secondary' | 'tertiary';
+
 interface GroupContextValue {
-  variant: 'primary' | 'secondary' | 'tertiary';
+  variant: GroupVariant;
 }
 
 const GroupContext = React.createContext<GroupContextValue | undefined>(undefined);
@@ -40,7 +42,7 @@ interface GroupProps {
    * @default `false`
    */
   borderTop?: boolean;
-  variant?: 'primary' | 'secondary' | 'tertiary';
+  variant?: GroupVariant;
 }
 
 function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
@@ -74,9 +76,10 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
 
 interface TitleProps {
   children: React.ReactNode;
+  description?: React.ReactNode;
 }
 
-function Title({ children }: TitleProps) {
+function Title({ children, description }: TitleProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
@@ -87,6 +90,7 @@ function Title({ children }: TitleProps) {
       elementDescriptor={descriptors.lineItemsTitle}
       elementId={descriptors.lineItemsTitle.setId(variant)}
       sx={t => ({
+        display: 'grid',
         fontWeight: t.fontWeights.$medium,
         fontSize: variant === 'primary' ? t.fontSizes.$md : t.fontSizes.$sm,
         color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
@@ -94,6 +98,17 @@ function Title({ children }: TitleProps) {
       })}
     >
       {children}
+      {description ? (
+        <Span
+          elementDescriptor={descriptors.lineItemsTitleDescription}
+          sx={t => ({
+            fontSize: t.fontSizes.$sm,
+            color: t.colors.$colorTextSecondary,
+          })}
+        >
+          {description}
+        </Span>
+      ) : null}
     </Dt>
   );
 }
