@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.11.2
+
+### Patch Changes
+
+- Update Turkish translations to replace English and Portuguese phrases ([#5257](https://github.com/clerk/javascript/pull/5257)) by [@kaandok](https://github.com/kaandok)
+
+- Updated dependencies [[`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/types@4.47.1
+
 ## 3.11.1
 
 ### Patch Changes

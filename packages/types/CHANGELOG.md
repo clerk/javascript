@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.47.1
+
+### Patch Changes
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- Remove unused `experimental.combinedFlow` option. ([#5290](https://github.com/clerk/javascript/pull/5290)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.47.0
 
 ### Minor Changes

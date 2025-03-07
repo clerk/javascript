@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.55.2
+
+### Patch Changes
+
+- Removes legal consent checkbox from sign-up start card when only social or web3 strategies are enabled. ([#5289](https://github.com/clerk/javascript/pull/5289)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- When a user passes `withSignUp={false}` we should opt out of combined flow even when `signUpUrl` is undefined. ([#5286](https://github.com/clerk/javascript/pull/5286)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- fix(clerk-js): Correctly show alternative methods for user re-verification card ([#5164](https://github.com/clerk/javascript/pull/5164)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`1427c92069483f3f0880739c4ca5b418872e5d38`](https://github.com/clerk/javascript/commit/1427c92069483f3f0880739c4ca5b418872e5d38), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/types@4.47.1
+  - @clerk/localizations@3.11.2
+  - @clerk/shared@3.0.1
+
 ## 5.55.1
 
 ### Patch Changes
