@@ -11,7 +11,7 @@ import { Flex } from './Flex';
 const vars = createCssVariables('accent', 'accentHover', 'accentContrast', 'alpha', 'border');
 
 const { applyVariants, filterProps } = createVariants(
-  (theme, props: OwnProps & { colorScheme?: 'primary' | 'neutral' | 'danger' }) => {
+  (theme, props: OwnProps & { colorScheme?: 'primary' | 'secondary' | 'neutral' | 'danger' }) => {
     return {
       base: {
         margin: 0,
@@ -54,18 +54,18 @@ const { applyVariants, filterProps } = createVariants(
             [vars.accentContrast]: theme.colors.$colorTextOnPrimaryBackground,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
+          secondary: {
+            [vars.accent]: theme.colors.$colorBackground,
+            [vars.accentHover]: `color-mix(in srgb, ${vars.accent}, ${theme.colors.$neutralAlpha50})`,
+            [vars.border]: theme.colors.$primary500,
+            [vars.accentContrast]: theme.colors.$colorText,
+            [vars.alpha]: theme.colors.$neutralAlpha50,
+          },
           neutral: {
             [vars.accent]: theme.colors.$neutralAlpha600,
             [vars.accentHover]: theme.colors.$neutralAlpha700,
             [vars.border]: theme.colors.$neutralAlpha200,
             [vars.accentContrast]: theme.colors.$white,
-            [vars.alpha]: theme.colors.$neutralAlpha50,
-          },
-          light: {
-            [vars.accent]: theme.colors.$white,
-            [vars.accentHover]: theme.colors.$whiteAlpha700,
-            [vars.border]: theme.colors.$neutralAlpha200,
-            [vars.accentContrast]: theme.colors.$primary500,
             [vars.alpha]: theme.colors.$neutralAlpha50,
           },
           danger: {
@@ -101,6 +101,15 @@ const { applyVariants, filterProps } = createVariants(
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },
             '&:focus': props.hoverAsFocus ? { backgroundColor: theme.colors.$neutralAlpha50 } : undefined,
             boxShadow: theme.shadows.$outlineButtonShadow,
+          },
+          bordered: {
+            borderWidth: theme.borderWidths.$normal,
+            borderStyle: theme.borderStyles.$solid,
+            borderColor: theme.colors.$neutralAlpha100,
+            color: vars.accentContrast,
+            backgroundColor: vars.accent,
+            '&:hover': { backgroundColor: vars.accentHover },
+            '&:focus': props.hoverAsFocus ? { backgroundColor: vars.accentHover } : undefined,
           },
           ghost: {
             color: vars.accent,

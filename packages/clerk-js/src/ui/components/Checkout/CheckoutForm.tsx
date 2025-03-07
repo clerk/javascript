@@ -268,7 +268,8 @@ const StripePaymentMethods = ({
               Pay with GPay
             </Button>
             <Button
-              colorScheme='light'
+              colorScheme='secondary'
+              variant='bordered'
               size='md'
               textVariant={'buttonLarge'}
               sx={{

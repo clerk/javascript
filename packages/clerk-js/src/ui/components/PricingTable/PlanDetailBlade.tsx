@@ -223,8 +223,8 @@ const CancelFooter = ({ plan }: { plan: CommercePlanResource; handleClose: () =>
         </Col>
       ) : (
         <Button
-          variant='solid'
-          colorScheme='light'
+          variant='bordered'
+          colorScheme='secondary'
           size='sm'
           textVariant='buttonLarge'
           sx={{

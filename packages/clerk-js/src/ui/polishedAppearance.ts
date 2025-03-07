@@ -145,6 +145,16 @@ export const polishedAppearance: Appearance = {
             ].toString(),
           },
         },
+        '&[data-variant="bordered"]': {
+          borderWidth: 0,
+          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+          '&:focus': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+            ].toString(),
+          },
+        },
       },
       badge: {
         borderWidth: 0,

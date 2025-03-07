@@ -48,7 +48,7 @@ export function PlanCard(props: PlanCardProps) {
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
-        boxShadow: t.shadows.$cardBoxShadow,
+        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : undefined,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
         textAlign: 'left',
@@ -262,7 +262,9 @@ export function PlanCard(props: PlanCardProps) {
         >
           <Button
             block
-            size={isCompact ? 'xs' : 'sm'}
+            textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+            variant={isCompact ? 'bordered' : 'solid'}
+            colorScheme={isCompact ? 'secondary' : 'primary'}
             localizationKey={
               isActivePlan ? localizationKeys('commerce.manageMembership') : localizationKeys('commerce.getStarted')
             }
