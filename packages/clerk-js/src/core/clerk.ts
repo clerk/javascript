@@ -380,8 +380,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    console.log('EHEHEH', usageByUIComponents.get());
-
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
@@ -1033,7 +1031,6 @@ export class Clerk implements ClerkInterface {
     const unsubscribe = () => {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
-    console.log('too unsubscribe', unsubscribe);
     return unsubscribe;
   };
 

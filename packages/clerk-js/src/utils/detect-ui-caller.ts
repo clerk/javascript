@@ -20,6 +20,7 @@ const isThenable = (value: unknown): value is Promise<unknown> => {
 
 export const makeUICaller = <T>(resource: T): T => {
   if (!resource) return null as T;
+  // return resource
   const resourceProxy = new Proxy(resource, {
     get(target, prop) {
       // @ts-expect-error
