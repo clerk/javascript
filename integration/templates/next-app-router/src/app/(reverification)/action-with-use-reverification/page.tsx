@@ -4,7 +4,7 @@ import { useReverification } from '@clerk/nextjs';
 import { logUserIdActionReverification } from '@/app/(reverification)/actions';
 
 function Page() {
-  const [logUserWithReverification] = useReverification(logUserIdActionReverification);
+  const { action: logUserWithReverification } = useReverification(logUserIdActionReverification);
   const [pending, startTransition] = useTransition();
   const [res, setRes] = useState(null);
 

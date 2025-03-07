@@ -104,7 +104,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       })
     : window.location.href;
 
-  const [createExternalAccount] = useReverification(() =>
+  const { action: createExternalAccount } = useReverification(() =>
     user?.createExternalAccount({
       strategy: account.verification!.strategy as OAuthStrategy,
       redirectUrl,
