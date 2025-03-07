@@ -2,6 +2,7 @@ import type { CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, Flex, Icon, Text } from '../../customizables';
+import { LineItems } from '../../elements';
 import { Check } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 
@@ -49,45 +50,35 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
           borderTopColor: t.colors.$neutralAlpha100,
         })}
       >
-        <Flex
-          align='baseline'
-          justify='between'
-          gap={2}
-        >
-          <Text sx={t => ({ fontWeight: t.fontWeights.$medium })}>Total paid</Text>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-            {checkout.invoice
-              ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-              : '–'}
-          </Text>
-        </Flex>
-        <Flex
-          align='baseline'
-          justify='between'
-          gap={2}
-        >
-          <Text sx={t => ({ fontWeight: t.fontWeights.$medium })}>Payment method</Text>
-          <Text sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}>
-            {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
-          </Text>
-        </Flex>
-        <Flex
-          align='baseline'
-          justify='between'
-          gap={2}
-        >
-          <Text sx={t => ({ fontWeight: t.fontWeights.$medium })}>Invoice ID</Text>
-          <Text
-            colorScheme='secondary'
-            sx={t => ({ fontSize: '0.875rem', fontWeight: t.fontWeights.$medium })}
-          >
-            {checkout.invoice ? checkout.invoice.id : '–'}
-          </Text>
-        </Flex>
+        <LineItems.Root>
+          <LineItems.Group>
+            <LineItems.Title>Total paid</LineItems.Title>
+            <LineItems.Description colorScheme='primary'>
+              {checkout.invoice
+                ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
+                : '–'}
+            </LineItems.Description>
+          </LineItems.Group>
+          <LineItems.Group>
+            <LineItems.Title>Payment method</LineItems.Title>
+            <LineItems.Description colorScheme='primary'>
+              {checkout.invoice
+                ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
+                : '–'}
+            </LineItems.Description>
+          </LineItems.Group>
+          <LineItems.Group>
+            <LineItems.Title>Invoice ID</LineItems.Title>
+            <LineItems.Description colorScheme='primary'>
+              {checkout.invoice ? checkout.invoice.id : '–'}
+            </LineItems.Description>
+          </LineItems.Group>
+        </LineItems.Root>
         <Button
-          colorScheme={'light'}
-          size='sm'
+          colorScheme='secondary'
+          variant='bordered'
           hasArrow
+          size='sm'
           textVariant={'buttonSmall'}
           sx={t => ({
             width: '100%',
