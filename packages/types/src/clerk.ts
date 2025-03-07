@@ -61,6 +61,14 @@ export type SDKMetadata = {
   environment?: string;
 };
 
+export type LoadingStatus = {
+  DEGRADED: 'degraded';
+  ERROR: 'error';
+  LOADING: 'loading';
+  READY: 'ready';
+  UNINITIALIZED: 'uninitialized';
+};
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
@@ -104,6 +112,11 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * The current loading status of the Clerk SDK.
+   */
+  loadingStatus: LoadingStatus[keyof LoadingStatus];
 
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 

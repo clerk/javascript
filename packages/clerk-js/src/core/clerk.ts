@@ -189,6 +189,7 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #loaded = false;
+  #loadingStatus: ClerkInterface['loadingStatus'] = 'uninitialized';
 
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -236,6 +237,10 @@ export class Clerk implements ClerkInterface {
 
   get loaded(): boolean {
     return this.#loaded;
+  }
+
+  get loadingStatus() {
+    return this.#loadingStatus;
   }
 
   get isSatellite(): boolean {
