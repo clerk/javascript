@@ -151,7 +151,16 @@ function Description({ children, colorScheme = 'secondary', weight = 'normal', n
           {children}
         </Span>
       </Span>
-      {note ? <Span elementDescriptor={descriptors.lineItemsDescriptionNote}>{note}</Span> : null}
+      {note ? (
+        <Span
+          elementDescriptor={descriptors.lineItemsDescriptionNote}
+          sx={t => ({
+            fontSize: t.fontSizes.$sm,
+          })}
+        >
+          {note}
+        </Span>
+      ) : null}
     </Dd>
   );
 }
