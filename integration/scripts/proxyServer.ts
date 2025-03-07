@@ -19,6 +19,9 @@ export const createProxyServer = (opts: ProxyServerOptions) => {
   const createServer: typeof _createServer = usingSSL ? https.createServer.bind(https) : http.createServer.bind(http);
 
   return createServer(opts.ssl, (req, res) => {
+    console.log(`/n/n/n/n------------------------------------`);
+    console.log('Proxying request', req.headers.host, req.url);
+    console.log('Headers', req.headers);
     const hostHeader = req.headers.host || '';
     if (opts.targets[hostHeader]) {
       proxy.web(req, res, { target: opts.targets[hostHeader] });
@@ -26,7 +29,7 @@ export const createProxyServer = (opts: ProxyServerOptions) => {
       res.writeHead(404);
       res.end();
     }
-  }).listen(usingSSL ? 443 : 80, '127.0.0.1');
+  }).listen(usingSSL ? 8443 : 8880, '127.0.0.1');
 };
 
 export type { Server };

@@ -868,6 +868,7 @@ export const ptPT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover chave de acesso',
         menuAction__rename: 'Renomear chave de acesso',
+        primaryButton: undefined,
         title: 'Chaves de Acesso',
       },
       passwordSection: {

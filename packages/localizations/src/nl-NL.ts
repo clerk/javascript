@@ -867,6 +867,7 @@ export const nlNL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -918,8 +919,8 @@ export const nlNL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Neem deel aan de wachtlijst',
-      actionText: 'Nog geen account?',
+      actionLink: 'Inloggen',
+      actionText: 'Heb je al toegang?',
       formButton: 'Verstuur',
       subtitle: 'Je wordt toegevoegd aan de wachtlijst en op de hoogte gehouden.',
       title: 'Wachtlijst aanmelding',

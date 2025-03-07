@@ -3,11 +3,11 @@ import React, { useEffect } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
-import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
+import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
@@ -46,7 +46,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     prevCurrentFactor: undefined,
   }));
 
-  const { hasAnyStrategy } = useAlternativeStrategies({
+  const { hasAnyStrategy, hasFirstParty } = useReverificationAlternativeStrategies({
     filterOutFactor: currentFactor,
     supportedFirstFactors: availableFactors,
   });
@@ -116,6 +116,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
+          showAlternativeMethods={hasFirstParty}
         />
       );
     case 'phone_code':
@@ -125,6 +126,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
+          showAlternativeMethods={hasFirstParty}
         />
       );
     default:

@@ -878,6 +878,7 @@ export const frFR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Supprimer',
         menuAction__rename: 'Renommer',
+        primaryButton: undefined,
         title: 'Clés de sécurité',
       },
       passwordSection: {

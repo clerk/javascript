@@ -34,6 +34,7 @@ export const ObjectType = {
   SignUpAttempt: 'sign_up_attempt',
   SmsMessage: 'sms_message',
   User: 'user',
+  WaitlistEntry: 'waitlist_entry',
   Web3Wallet: 'web3_wallet',
   Token: 'token',
   TotalCount: 'total_count',
@@ -380,6 +381,17 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string | null;
   nonce?: string | null;
   message?: string | null;
+}
+
+export interface WaitlistEntryJSON extends ClerkResourceJSON {
+  created_at: number;
+  email_address: string;
+  id: string;
+  invitation: InvitationJSON | null;
+  is_locked: boolean;
+  object: typeof ObjectType.WaitlistEntry;
+  status: string;
+  updated_at: number;
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {

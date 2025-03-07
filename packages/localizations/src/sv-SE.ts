@@ -871,6 +871,7 @@ export const svSE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ta bort',
         menuAction__rename: 'Byt namn',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

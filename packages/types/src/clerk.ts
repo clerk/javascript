@@ -684,10 +684,6 @@ type Experimental = {
    * Clerk will rethrow network errors that occur while the user is offline.
    */
   rethrowOfflineNetworkErrors: boolean;
-  /**
-   * Combine the sign in and sign up flows into a single flow.
-   */
-  combinedFlow: boolean;
 };
 
 /**
