@@ -175,11 +175,34 @@ type UseReverificationResult<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 > = {
+  /**
+   * The action that will trigger the fetcher and handle the reverification flow if necessary.
+   */
   action: (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>;
+
+  /**
+   * A boolean indicating if the reverification process is in progress.
+   */
   inProgress: boolean;
+
+  /**
+   * The level of reverification required.
+   */
   level: string | undefined;
+
+  /**
+   * A function to cancel the reverification process.
+   */
   cancel: () => void;
+
+  /**
+   * A function to complete the reverification process.
+   */
   complete: () => void;
+
+  /**
+   * An error that occurred during the reverification process or from the fetcher.
+   */
   error: Error | null;
 };
 
