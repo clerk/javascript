@@ -1,4 +1,3 @@
-/// <reference types="./h3.d.ts" />
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';

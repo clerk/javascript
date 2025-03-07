@@ -102,7 +102,13 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        src: resolver.resolve('./runtime/h3.d.ts'),
+        getContents: () => `import type { AuthObject } from '@clerk/backend';
+          declare module 'h3' {
+            interface H3EventContext {
+              auth: AuthObject;
+            }
+          }
+        `,
       },
       { nitro: true },
     );
