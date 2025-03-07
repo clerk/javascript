@@ -41,6 +41,7 @@ const typedocPluginMarkdownOptions = {
   },
   fileExtension: '.mdx',
   excludeScopesInPaths: true,
+  expandObjects: true,
 };
 
 /** @type {Partial<import("typedoc-plugin-replace-text").Config>} */
