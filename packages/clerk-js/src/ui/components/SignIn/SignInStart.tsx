@@ -345,7 +345,9 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
     const alreadySignedInError: ClerkAPIError = e.errors.find(
