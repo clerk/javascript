@@ -152,6 +152,12 @@ export type ElementsConfig = {
   disclosureContentInner: WithOptions;
   disclosureContent: WithOptions;
 
+  lineItemsRoot: WithOptions;
+  lineItemsDivider: WithOptions;
+  lineItemsGroup: WithOptions;
+  lineItemsTitle: WithOptions<'primary' | 'secondary'>;
+  lineItemsDescription: WithOptions<'primary' | 'secondary'>;
+
   logoBox: WithOptions;
   logoImage: WithOptions;
 

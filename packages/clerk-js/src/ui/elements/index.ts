@@ -29,6 +29,7 @@ export * from './InformationBox';
 export * from './InputWithIcon';
 export * from './InvisibleRootBox';
 export * from './LegalConsentCheckbox';
+export * from './LineItems';
 export * from './LoadingCard';
 export * from './Menu';
 export * from './Modal';
