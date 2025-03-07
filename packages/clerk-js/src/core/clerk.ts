@@ -1780,6 +1780,14 @@ export class Clerk implements ClerkInterface {
 
       if (event.data.session) {
         console.log(`calling setActive with session ${event.data.session} adn redirectUrl ${redirectUrl}`);
+        const existingSession = this.client?.sessions.find(x => x.id === event.data.session) || null;
+        if (!existingSession) {
+          try {
+            await this.client?.reload();
+          } catch (e) {
+            console.error(e);
+          }
+        }
         await this.setActive({
           session: event.data.session,
           redirectUrl: params.redirectUrlComplete,
