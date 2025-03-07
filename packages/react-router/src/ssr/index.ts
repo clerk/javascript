@@ -8,6 +8,7 @@ export type {
   OrganizationMembershipRole,
   // Webhook event types
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
   // Resources
   AllowlistIdentifier,
