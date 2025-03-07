@@ -193,6 +193,10 @@ export type ElementsConfig = {
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
+  drawerOverlay: WithOptions;
+  drawerContent: WithOptions;
+  drawerClose: WithOptions;
+
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
   formHeaderSubtitle: WithOptions<never, ErrorState>;
