@@ -16,7 +16,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
   const { setActive } = useClerk();
-  const [deleteUserWithReverification] = useReverification(() => user?.delete());
+  const { action: deleteUserWithReverification } = useReverification(() => user?.delete());
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',

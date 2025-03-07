@@ -21,7 +21,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { user } = useUser();
   const environment = useEnvironment();
 
-  const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
+  const { action: createEmailAddress } = useReverification((email: string) => user?.createEmailAddress({ email }));
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const strategy = getEmailAddressVerificationStrategy(emailAddressRef.current, environment);
