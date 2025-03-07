@@ -1432,6 +1432,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
     | 'withSignUp'
+    | 'oauthFlow'
   >;
 
 export type SignUpButtonProps = {
