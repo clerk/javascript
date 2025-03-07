@@ -16,7 +16,6 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * @interface
  * @inline
  */
 export type UseAuthReturn =
@@ -58,7 +57,7 @@ export type UseAuthReturn =
        */
       has: CheckAuthorizationSignedOut;
       /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
+       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#sign-out).
        */
       signOut: SignOut;
       /**
@@ -131,7 +130,6 @@ export type UseSignInReturn =
     };
 
 /**
- * @interface
  * @inline
  */
 export type UseSignUpReturn =
@@ -222,7 +220,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The [`User`](https://clerk.com/docs/references/javascript/user/user) object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }
