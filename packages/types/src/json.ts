@@ -290,6 +290,7 @@ export interface SessionWithActivitiesJSON extends Omit<SessionJSON, 'user'> {
 export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
+  reverification: boolean;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {

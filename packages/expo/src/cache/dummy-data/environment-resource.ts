@@ -3,7 +3,13 @@ import type { EnvironmentJSONSnapshot } from '@clerk/types';
 export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
   object: 'environment',
   id: '',
-  auth_config: { object: 'auth_config', id: '', single_session_mode: true, claimed_at: null },
+  auth_config: {
+    object: 'auth_config',
+    id: '',
+    single_session_mode: true,
+    claimed_at: null,
+    reverification: true,
+  },
   display_config: {
     object: 'display_config',
     id: 'display_config_DUMMY_ID',

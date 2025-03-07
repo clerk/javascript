@@ -45,6 +45,11 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     return null;
   }
 
+  const {
+    userSettings: { passwordSettings },
+    authConfig: { reverification },
+  } = useEnvironment();
+
   const { session } = useSession();
   const title = user.passwordEnabled
     ? localizationKeys('userProfile.passwordPage.title__update')
@@ -52,6 +57,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   const card = useCardState();
 
   const passwordEditDisabled = user.enterpriseAccounts.some(ea => ea.active);
+  const currentPasswordRequired = user.passwordEnabled && !reverification;
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
@@ -63,10 +69,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     label: localizationKeys('formFieldLabel__currentPassword'),
     isRequired: true,
   });
-
-  const {
-    userSettings: { passwordSettings },
-  } = useEnvironment();
 
   const passwordField = useFormControl('newPassword', '', {
     type: 'password',
@@ -96,7 +98,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   const { t, locale } = useLocalizations();
 
   const canSubmit =
-    (user.passwordEnabled ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) &&
+    (currentPasswordRequired ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) &&
     passwordField.value &&
     confirmField.value;
 
@@ -118,7 +120,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
       const opts = {
         newPassword: passwordField.value,
         signOutOfOtherSessions: sessionsField.checked,
-        currentPassword: user.passwordEnabled ? currentPasswordField.value : undefined,
+        currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
       } satisfies Parameters<typeof user.updatePassword>[0];
 
       await updatePasswordWithReverification(user, [opts]);
@@ -145,7 +147,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
           value={session?.publicUserData.identifier || ''}
           style={{ display: 'none' }}
         />
-        {user.passwordEnabled && (
+        {currentPasswordRequired && (
           <Form.ControlRow elementId={currentPasswordField.id}>
             <Form.PasswordInput
               {...currentPasswordField.props}
