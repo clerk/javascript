@@ -52,7 +52,7 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
       >
         <LineItems.Root>
           <LineItems.Group>
-            <LineItems.Title>Total paid</LineItems.Title>
+            <LineItems.Title colorScheme='secondary'>Total paid</LineItems.Title>
             <LineItems.Description colorScheme='primary'>
               {checkout.invoice
                 ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
@@ -60,7 +60,7 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group>
-            <LineItems.Title>Payment method</LineItems.Title>
+            <LineItems.Title colorScheme='secondary'>Payment method</LineItems.Title>
             <LineItems.Description colorScheme='primary'>
               {checkout.invoice
                 ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
@@ -68,8 +68,8 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group>
-            <LineItems.Title>Invoice ID</LineItems.Title>
-            <LineItems.Description colorScheme='primary'>
+            <LineItems.Title colorScheme='secondary'>Invoice ID</LineItems.Title>
+            <LineItems.Description colorScheme='secondary'>
               {checkout.invoice ? checkout.invoice.id : '–'}
             </LineItems.Description>
           </LineItems.Group>
