@@ -13,6 +13,7 @@ const RouterTelemetry = () => {
   clerk.telemetry?.record(
     eventFrameworkMetadata({
       router: pagesRouter ? 'pages' : 'app',
+      ...(globalThis?.next?.version ? { nextjsVersion: globalThis.next.version } : {}),
     }),
   );
 
