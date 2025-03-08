@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
+import { preloadSessionTask, SessionTask } from 'ui/lazyModules/components';
 
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
@@ -9,16 +10,15 @@ import {
   SignInContext,
   SignUpContext,
   useSignInContext,
+  useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { SessionTask } from '../SessionTask';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import {
   LazySignUpContinue,
-  LazySignUpSessionTask,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -32,7 +32,6 @@ import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
-import { preloadSessionTask } from 'ui/lazyModules/components';
 
 function RedirectToSignIn() {
   const clerk = useClerk();
@@ -131,9 +130,11 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
-              <Route path='add-organization'>
-                <LazySignUpSessionTask task='org' />
-              </Route>
+              {signInContext.withSessionTasks && (
+                <Route path='add-organization'>
+                  <SessionTask task='org' />
+                </Route>
+              )}
               <Route index>
                 <LazySignUpContinue />
               </Route>
@@ -143,9 +144,11 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
-        <Route path='add-organization'>
-          <SessionTask task='org' />
-        </Route>
+        {signInContext.withSessionTasks && (
+          <Route path='add-organization'>
+            <SessionTask task='org' />
+          </Route>
+        )}
         <Route index>
           <SignInStart />
         </Route>
@@ -184,12 +187,7 @@ function SignInRoot() {
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
 
-  // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
   usePreloadSessionTask(signInContext.withSessionTasks);
-
-  React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, [basePath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

@@ -1075,8 +1075,8 @@ export class Clerk implements ClerkInterface {
 
     if (session.currentTask) {
       await navigateToTask(session.currentTask, {
-        isInternalNavigation: !!this.#internalComponentNavigate,
-        navigate: this.#internalComponentNavigate ?? this.navigate,
+        globalNavigate: this.navigate,
+        internalNavigate: this.#internalComponentNavigate,
         options: this.#options,
         environment: this.environment,
       });

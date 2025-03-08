@@ -143,6 +143,7 @@ export const useSignInContext = (): SignInContextType => {
     emailLinkRedirectUrl,
     ssoCallbackUrl,
     taskUrl,
+    withSessionTasks: options.experimental?.withSessionTasks,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,

@@ -143,6 +143,6 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    withSessionTasks: !!options.experimental?.withSessionTasks,
+    withSessionTasks: options.experimental?.withSessionTasks,
   };
 };
