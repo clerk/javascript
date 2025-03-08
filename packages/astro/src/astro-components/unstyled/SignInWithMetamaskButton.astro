@@ -1,0 +1,42 @@
+---
+import type { RedirectUrlProp } from '@clerk/types'
+import { addUnstyledAttributeToFirstTag } from './utils'
+
+type Props = RedirectUrlProp & { asChild?: boolean }
+
+import { generateSafeId } from '@clerk/astro/internal';
+
+const safeId = generateSafeId();
+
+const {
+  asChild,
+  redirectUrl,
+} = Astro.props
+
+let htmlElement = ''
+
+if (asChild) {
+  htmlElement = await Astro.slots.render('default')
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId)
+}
+---
+
+{
+  asChild ? (
+    <Fragment set:html={htmlElement} />
+  ) : (
+    <button data-clerk-unstyled-id={safeId}>
+      <slot>Sign in</slot>
+    </button>
+  )
+}
+
+<script is:inline define:vars={{ redirectUrl }}>
+  const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
+
+  btn.addEventListener('click', () => {
+    const clerk = window.Clerk;
+
+    void clerk?.authenticateWithMetamask({ redirectUrl: redirectUrl || undefined });
+  });
+</script>
