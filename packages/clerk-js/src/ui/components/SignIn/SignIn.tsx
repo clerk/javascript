@@ -14,7 +14,7 @@ import {
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { preloadSessionTask, SessionTask } from '../../lazyModules/components';
+import { preloadComponent, SessionTask } from '../../lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import {
   LazySignUpContinue,
@@ -163,7 +163,7 @@ const usePreloadSignUp = (enabled = false) =>
   useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
 
 const usePreloadSessionTask = (enabled = false) =>
-  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
+  useFetch(enabled ? void preloadComponent('SessionTask') : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
   const signInContext = useSignInContext();
