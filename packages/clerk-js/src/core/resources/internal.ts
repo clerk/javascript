@@ -1,6 +1,7 @@
 export type { Clerk } from '../clerk';
 export * from './Base';
 export * from './UserSettings';
+export * from './CommerceSettings';
 export * from './AuthConfig';
 export * from './Client';
 export * from './CommerceCheckout';

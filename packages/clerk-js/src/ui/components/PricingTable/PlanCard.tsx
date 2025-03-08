@@ -276,8 +276,8 @@ export function PlanCard(props: PlanCardProps) {
           <Button
             block
             textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            variant={isCompact ? 'bordered' : 'solid'}
-            colorScheme={isCompact ? 'secondary' : 'primary'}
+            variant={isActivePlan ? 'bordered' : 'solid'}
+            colorScheme={isActivePlan ? 'secondary' : 'primary'}
             localizationKey={
               isActivePlan ? localizationKeys('commerce.manageMembership') : localizationKeys('commerce.getStarted')
             }

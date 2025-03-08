@@ -1,5 +1,4 @@
 import type {
-  ClerkResourceReloadParams,
   CommerceCheckoutJSON,
   CommerceCheckoutResource,
   CommerceTotals,
@@ -10,6 +9,8 @@ import { commerceTotalsFromJSON } from '../../utils';
 import { BaseResource, CommerceInvoice, CommercePaymentSource, CommercePlan, CommerceSubscription } from './internal';
 
 export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
+  pathRoot = '/me/commerce/checkouts';
+
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
@@ -45,32 +46,10 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     return this;
   }
 
-  public async reload(params?: ClerkResourceReloadParams): Promise<this> {
-    const { rotatingTokenNonce } = params || {};
-
-    const json = (
-      await BaseResource._fetch<CommerceCheckoutJSON>(
-        {
-          path: `/me/commerce/checkouts/${this.id}`,
-          method: 'GET',
-          rotatingTokenNonce,
-        },
-        { forceUpdateClient: true },
-      )
-    )?.response as unknown as CommerceCheckoutJSON;
-
-    return this.fromJSON(json);
-  }
-
-  public async confirm(params?: ConfirmCheckoutParams): Promise<this> {
-    const json = (
-      await BaseResource._fetch<CommerceCheckoutJSON>({
-        path: `/me/commerce/checkouts/${this.id}/confirm`,
-        method: 'PATCH',
-        body: { paymentSourceId: params?.paymentSourceId } as any,
-      })
-    )?.response as unknown as CommerceCheckoutJSON;
-
-    return this.fromJSON(json);
-  }
+  confirm = (params?: ConfirmCheckoutParams): Promise<this> => {
+    return this._basePatch({
+      path: `/me/commerce/checkouts/${this.id}/confirm`,
+      body: params as any,
+    });
+  };
 }

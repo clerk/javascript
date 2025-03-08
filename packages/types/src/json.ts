@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
 import type { ActJWTClaim } from './jwt';
@@ -57,6 +58,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
+  commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;

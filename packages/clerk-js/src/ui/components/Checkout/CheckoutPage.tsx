@@ -2,9 +2,9 @@ import type { __experimental_CheckoutProps, CommercePlanResource, CommerceTotals
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useCheckoutContext } from '../../contexts';
+import { useCheckoutContext, useEnvironment } from '../../contexts';
 import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner } from '../../customizables';
 import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
@@ -12,24 +12,25 @@ import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-const COMMERCE_STRIPE_PUBLISHABLE_KEY = 'pk_test_AzTn97Yzl4y1OAnov07b5ihT00NNnE0sp7';
-
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
-  const stripePromise = useRef<Promise<Stripe | null> | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const { commerceSettings } = useEnvironment();
 
-  const { checkout, isLoading } = useCheckout({
+  const { checkout, setCheckout, isLoading } = useCheckout({
     planId,
     planPeriod,
   });
 
   useEffect(() => {
-    if (checkout) {
-      stripePromise.current = loadStripe(COMMERCE_STRIPE_PUBLISHABLE_KEY, {
-        stripeAccount: checkout.externalGatewayId,
-      });
+    if (checkout?.externalGatewayId && commerceSettings.stripePublishableKey) {
+      setStripePromise(
+        loadStripe(commerceSettings.stripePublishableKey, {
+          stripeAccount: checkout.externalGatewayId,
+        }),
+      );
     }
-  }, [checkout]);
+  }, [checkout?.externalGatewayId, commerceSettings]);
 
   return (
     <>
@@ -82,12 +83,17 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
             />
           </Col>
 
-          <Elements
-            stripe={stripePromise.current}
-            options={{ clientSecret: checkout.externalClientSecret }}
-          >
-            <CheckoutForm checkout={checkout} />
-          </Elements>
+          {stripePromise && (
+            <Elements
+              stripe={stripePromise}
+              options={{ clientSecret: checkout.externalClientSecret }}
+            >
+              <CheckoutForm
+                checkout={checkout}
+                setCheckout={setCheckout}
+              />
+            </Elements>
+          )}
         </Box>
       )}
     </>

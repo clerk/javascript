@@ -8,7 +8,13 @@ import { Disclosure, Divider, Select, SelectButton, SelectOptionList } from '../
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 
-export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
+export const CheckoutForm = ({
+  checkout,
+  setCheckout,
+}: {
+  checkout: CommerceCheckoutResource;
+  setCheckout: React.Dispatch<React.SetStateAction<CommerceCheckoutResource | undefined>>;
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const { __experimental_commerce } = useClerk();
@@ -23,11 +29,12 @@ export const CheckoutForm = ({ checkout }: { checkout: CommerceCheckoutResource 
     setOpenAccountFundsDropDown(false);
   }, []);
 
-  const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    await checkout
+  const confirmCheckout = ({ paymentSourceId }: { paymentSourceId: string }) => {
+    checkout
       .confirm({ paymentSourceId })
-      .then(() => {
+      .then(newCheckout => {
         setIsSubmitting(false);
+        setCheckout(newCheckout);
       })
       .catch(() => {
         setIsSubmitting(false);

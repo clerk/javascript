@@ -75,8 +75,8 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
         <Button
           colorScheme='secondary'
           variant='bordered'
-          hasArrow
           size='sm'
+          hasArrow
           textVariant={'buttonSmall'}
           sx={t => ({
             width: '100%',

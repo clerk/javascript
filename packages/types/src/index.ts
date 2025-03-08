@@ -7,6 +7,7 @@ export * from './backupCode';
 export * from './clerk';
 export * from './client';
 export * from './commerce';
+export * from './commerceSettings';
 export * from './deletedObject';
 export * from './displayConfig';
 export * from './emailAddress';
