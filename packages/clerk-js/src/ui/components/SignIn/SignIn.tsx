@@ -14,11 +14,10 @@ import {
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
+import { preloadSessionTask, SessionTask } from '../../lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { SessionTask } from '../SessionTask';
 import {
   LazySignUpContinue,
-  LazySignUpSessionTask,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -130,9 +129,11 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
-              <Route path='add-organization'>
-                <LazySignUpSessionTask task='org' />
-              </Route>
+              {signInContext.withSessionTasks && (
+                <Route path='add-organization'>
+                  <SessionTask task='org' />
+                </Route>
+              )}
               <Route index>
                 <LazySignUpContinue />
               </Route>
@@ -142,9 +143,11 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
-        <Route path='add-organization'>
-          <SessionTask task='org' />
-        </Route>
+        {signInContext.withSessionTasks && (
+          <Route path='add-organization'>
+            <SessionTask task='org' />
+          </Route>
+        )}
         <Route index>
           <SignInStart />
         </Route>
@@ -158,6 +161,9 @@ function SignInRoutes(): JSX.Element {
 
 const usePreloadSignUp = (enabled = false) =>
   useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
+
+const usePreloadSessionTask = (enabled = false) =>
+  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
   const signInContext = useSignInContext();
@@ -176,6 +182,8 @@ function SignInRoot() {
    * Preload Sign Up when in Combined Flow.
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
+
+  usePreloadSessionTask(signInContext.withSessionTasks);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

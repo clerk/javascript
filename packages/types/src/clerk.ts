@@ -810,6 +810,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;

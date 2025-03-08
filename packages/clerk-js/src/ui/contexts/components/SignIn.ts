@@ -32,6 +32,7 @@ export type SignInContextType = SignInCtx & {
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  withSessionTasks: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -142,6 +143,7 @@ export const useSignInContext = (): SignInContextType => {
     emailLinkRedirectUrl,
     ssoCallbackUrl,
     taskUrl,
+    withSessionTasks: options.experimental?.withSessionTasks,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,

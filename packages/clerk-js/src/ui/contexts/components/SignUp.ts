@@ -31,6 +31,7 @@ export type SignUpContextType = SignUpCtx & {
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
+  withSessionTasks: boolean;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -142,5 +143,6 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    withSessionTasks: options.experimental?.withSessionTasks,
   };
 };
