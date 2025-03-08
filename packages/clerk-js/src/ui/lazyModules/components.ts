@@ -89,7 +89,6 @@ export const KeylessPrompt = lazy(() =>
   componentImportPaths.KeylessPrompt().then(module => ({ default: module.KeylessPrompt })),
 );
 
-export const preloadSessionTask = () => import(/* webpackChunkName: "sessionTask" */ '../components/SessionTask');
 export const SessionTask = lazy(() =>
   componentImportPaths.SessionTask().then(module => ({ default: module.SessionTask })),
 );
