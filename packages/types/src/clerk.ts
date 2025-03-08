@@ -788,6 +788,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * Clerk will rethrow network errors that occur while the user is offline.
          */
         rethrowOfflineNetworkErrors: boolean;
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;

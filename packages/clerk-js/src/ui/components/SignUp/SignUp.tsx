@@ -5,13 +5,17 @@ import React from 'react';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
+import { useFetch } from '../../hooks';
+import { preloadSessionTask, SessionTask } from '../../lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { SessionTask } from '../SessionTask';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
+
+const usePreloadSessionTask = (enabled = false) =>
+  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function RedirectToSignUp() {
   const clerk = useClerk();
@@ -23,6 +27,8 @@ function RedirectToSignUp() {
 
 function SignUpRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
+
+  usePreloadSessionTask(signUpContext.withSessionTasks);
 
   return (
     <Flow.Root flow='signUp'>
@@ -75,9 +81,11 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
-        <Route path='add-organization'>
-          <SessionTask task='org' />
-        </Route>
+        {signUpContext.withSessionTasks && (
+          <Route path='add-organization'>
+            <SessionTask task='org' />
+          </Route>
+        )}
         <Route index>
           <SignUpStart />
         </Route>
@@ -122,4 +130,4 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   );
 };
 
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone, SessionTask };
+export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
