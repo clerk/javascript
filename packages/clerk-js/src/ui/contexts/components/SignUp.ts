@@ -27,7 +27,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
-  taskUrl: string | null;
+  sessionTaskUrl: string | null;
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
@@ -114,7 +114,7 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
-  const taskUrl = clerk.session?.currentTask
+  const sessionTaskUrl = clerk.session?.currentTask
     ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signUpUrl, clerk.session?.currentTask)
     : null;
 
@@ -137,7 +137,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
-    taskUrl,
+    sessionTaskUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
