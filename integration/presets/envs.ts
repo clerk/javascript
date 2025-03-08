@@ -137,6 +137,13 @@ const withSignInOrUpwithRestrictedModeFlow = withEmailCodes
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-restricted-mode').pk)
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
+const withSessionTasks = base
+  .clone()
+  .setId('withSessionTasks')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
+
 export const envs = {
   base,
   withKeyless,
@@ -157,4 +164,5 @@ export const envs = {
   withSignInOrUpFlow,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpwithRestrictedModeFlow,
+  withSessionTasks,
 } as const;

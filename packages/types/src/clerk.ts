@@ -403,6 +403,13 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
+   * Registers an internal navigate function for UI components in order to be triggered
+   * from `Clerk`
+   * @internal
+   */
+  __internal_setComponentNavigate: (navigate: (to: string) => Promise<unknown>) => void;
+
+  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -772,6 +779,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
       {
         persistClient: boolean;
         rethrowOfflineNetworkErrors: boolean;
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
