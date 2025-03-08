@@ -779,6 +779,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
       {
         persistClient: boolean;
         rethrowOfflineNetworkErrors: boolean;
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
