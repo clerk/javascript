@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
-import { preloadSessionTask, SessionTask } from 'ui/lazyModules/components';
+import { preloadComponent, SessionTask } from 'ui/lazyModules/components';
 
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
@@ -9,6 +9,7 @@ import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
+  useSignInContext,
   useSignInContext,
   useSignInContext,
   useSignUpContext,
@@ -164,7 +165,7 @@ const usePreloadSignUp = (enabled = false) =>
   useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
 
 const usePreloadSessionTask = (enabled = false) =>
-  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
+  useFetch(enabled ? void preloadComponent('SessionTask') : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
   const { __internal_setComponentNavigationContext } = useClerk();

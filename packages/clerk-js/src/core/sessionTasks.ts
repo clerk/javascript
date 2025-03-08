@@ -30,7 +30,7 @@ export function navigateToTask(
   const signUpUrl = options['signUpUrl'] || environment.displayConfig.signUpUrl;
   const isReferrerSignUpUrl = window.location.href.startsWith(signUpUrl);
 
-  const taskUrl = buildURL(
+  const sessionTaskUrl = buildURL(
     // TODO - Accept custom URL option for custom flows in order to eject out of `signInUrl/signUpUrl`
     {
       base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
@@ -39,5 +39,5 @@ export function navigateToTask(
     { stringify: true },
   );
 
-  return globalNavigate(taskUrl);
+  return globalNavigate(sessionTaskUrl);
 }
