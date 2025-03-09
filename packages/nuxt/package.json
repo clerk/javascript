@@ -69,7 +69,7 @@
     "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^3.16.0",
     "@nuxt/schema": "^3.16.0",
-    "h3": "^1.13.0"
+    "h3": "^1.15.1"
   },
   "devDependencies": {
     "nuxt": "^3.16.0",

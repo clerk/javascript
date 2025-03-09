@@ -753,7 +753,7 @@ importers:
         specifier: ^3.16.0
         version: 3.16.0
       h3:
-        specifier: ^1.13.0
+        specifier: ^1.15.1
         version: 1.15.1
     devDependencies:
       nuxt:
@@ -2880,6 +2880,7 @@ packages:
   '@faker-js/faker@8.1.0':
     resolution: {integrity: sha512-38DT60rumHfBYynif3lmtxMqMqmsOQIxQgEuPZxCk2yUYN0eqWpTACgxi0VpidvsJB8CRxCpvP7B3anK85FjtQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+    deprecated: Please update to a newer version
 
   '@fastify/ajv-compiler@4.0.1':
     resolution: {integrity: sha512-DxrBdgsjNLP0YM6W5Hd6/Fmj43S8zMKiFJYgi+Ri3htTGAowPVG/tG1wpnWLMjufEnehRivUCKZ1pLDIoZdTuw==}
