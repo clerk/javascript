@@ -113,4 +113,32 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.page.waitForAppUrl('/protected');
   });
+
+  test.describe('authenticateWithPopup', () => {
+    test('SignIn with oauthFlow=popup opens popup', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.expect.toBeSignedOut();
+
+      await u.page.getByText('Sign in button (force, popup)').click();
+
+      await u.po.signIn.waitForModal();
+
+      const popupPromise = context.waitForEvent('page');
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      const popup = await popupPromise;
+      const popupUtils = createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+
+      await popupUtils.po.signIn.setIdentifier(fakeUser.email);
+      await popupUtils.po.signIn.continue();
+      await popupUtils.po.signIn.enterTestOtpCode();
+
+      await u.page.waitForAppUrl('/protected');
+
+      await u.po.expect.toBeSignedIn();
+    });
+  });
 });
