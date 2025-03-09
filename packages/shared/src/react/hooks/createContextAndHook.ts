@@ -1,6 +1,11 @@
 'use client';
 import React from 'react';
 
+/**
+ * Assert that the context value exists, otherwise throw an error.
+ *
+ * @internal
+ */
 export function assertContextExists(contextVal: unknown, msgOrCtx: string | React.Context<any>): asserts contextVal {
   if (!contextVal) {
     throw typeof msgOrCtx === 'string' ? new Error(msgOrCtx) : new Error(`${msgOrCtx.displayName} not found`);
@@ -12,10 +17,13 @@ type ContextOf<T> = React.Context<{ value: T } | undefined>;
 type UseCtxFn<T> = () => T;
 
 /**
- * Creates and returns a Context and two hooks that return the context value.
+ * Create and return a Context and two hooks that return the context value.
  * The Context type is derived from the type passed in by the user.
- * The first hook returned guarantees that the context exists so the returned value is always CtxValue
- * The second hook makes no guarantees, so the returned value can be CtxValue | undefined
+ *
+ * The first hook returned guarantees that the context exists so the returned value is always `CtxValue`
+ * The second hook makes no guarantees, so the returned value can be `CtxValue | undefined`
+ *
+ * @internal
  */
 export const createContextAndHook = <CtxVal>(
   displayName: string,

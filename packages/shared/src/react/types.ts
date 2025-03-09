@@ -13,7 +13,7 @@ export type CacheSetter<CData = any> = (
  */
 export type PaginatedResources<T = unknown, Infinite = false> = {
   /**
-   * An array that contains the fetched data.
+   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/references/javascript/types/organization-membership) objects.
    */
   data: T[];
   /**
@@ -37,11 +37,11 @@ export type PaginatedResources<T = unknown, Infinite = false> = {
    */
   isError: boolean;
   /**
-   * A number that indicates the current page.
+   * The current page.
    */
   page: number;
   /**
-   * A number that indicates the total amount of pages. It is calculated based on `count`, `initialPage`, and `pageSize`.
+   * The total amount of pages. It is calculated based on `count`, `initialPage`, and `pageSize`.
    */
   pageCount: number;
   /**
@@ -50,11 +50,11 @@ export type PaginatedResources<T = unknown, Infinite = false> = {
   fetchPage: ValueOrSetter<number>;
   /**
    *
-   * A helper function that triggers the previous page to be loaded. This is the same as `fetchPage(page => Math.max(0, page - 1))`.
+   * A function that triggers the previous page to be loaded. This is the same as `fetchPage(page => Math.max(0, page - 1))`.
    */
   fetchPrevious: () => void;
   /**
-   * A helper function that triggers the next page to be loaded. This is the same as `fetchPage(page => Math.min(pageCount, page + 1))`.
+   * A function that triggers the next page to be loaded. This is the same as `fetchPage(page => Math.min(pageCount, page + 1))`.
    */
   fetchNext: () => void;
   /**
@@ -84,6 +84,9 @@ export type PaginatedResourcesWithDefault<T> = {
   [K in keyof PaginatedResources<T>]: PaginatedResources<T>[K] extends boolean ? false : undefined;
 };
 
+/**
+ * @interface
+ */
 export type PaginatedHookConfig<T> = T & {
   /**
    * If `true`, newly fetched data will be appended to the existing list rather than replacing it. Useful for implementing infinite scroll functionality. Defaults to `false`.
@@ -102,6 +105,9 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
   enabled?: boolean;
 }>;
 
+/**
+ * @interface
+ */
 export type PagesOrInfiniteOptions = {
   /**
    * A number that specifies which page to fetch. For example, if `initialPage` is set to 10, it will skip the first 9 pages and fetch the 10th page. Defaults to `1`.

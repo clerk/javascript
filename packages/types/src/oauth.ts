@@ -73,6 +73,8 @@ export type OAuthProvider =
 /**
  * @deprecated This utility will be dropped in the next major release.
  * You can import it from `@clerk/shared/oauth`.
+ *
+ * @hidden
  */
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -252,6 +254,8 @@ interface getOAuthProviderDataProps {
 
 /**
  * @deprecated This utility will be dropped in the next major release.
+ *
+ * @hidden
  */
 export function getOAuthProviderData({
   provider,
@@ -266,6 +270,8 @@ export function getOAuthProviderData({
 
 /**
  * @deprecated This utility will be dropped in the next major release.
+ *
+ * @hidden
  */
 export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
   return OAUTH_PROVIDERS.slice().sort((a, b) => {

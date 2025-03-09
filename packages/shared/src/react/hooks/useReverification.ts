@@ -32,6 +32,7 @@ type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { thr
 
 /**
  * The optional options object.
+ * @interface
  */
 type UseReverificationOptions = {
   /**
@@ -43,6 +44,25 @@ type UseReverificationOptions = {
    */
   throwOnCancel?: boolean;
 };
+
+/**
+ * @interface
+ */
+type UseReverificationResult<
+  Fetcher extends (...args: any[]) => Promise<any> | undefined,
+  Options extends UseReverificationOptions,
+> = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
+
+/**
+ * @interface
+ */
+type UseReverification = <
+  Fetcher extends (...args: any[]) => Promise<any> | undefined,
+  Options extends UseReverificationOptions,
+>(
+  fetcher: Fetcher,
+  options?: Options,
+) => UseReverificationResult<Fetcher, Options>;
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
@@ -113,19 +133,15 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
   return assertReverification;
 }
 
-type UseReverificationResult<
-  Fetcher extends (...args: any[]) => Promise<any> | undefined,
-  Options extends UseReverificationOptions,
-> = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
-
 /**
+ * > [!WARNING]
+ * > This feature is currently in public beta. **It is not recommended for production use.**
+ * >
+ * > Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.5.0` or later, `@clerk/clerk-react@5.17.0` or later, and `@clerk/clerk-js@5.35.0` or later.
+ *
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
  *
- * @warning
- *
- * This feature is currently in public beta. **It is not recommended for production use.**
- *
- * Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.5.0` or later, `@clerk/clerk-react@5.17.0` or later, and `@clerk/clerk-js@5.35.0` or later.
+ * @returns The `useReverification()` hook returns an array with the "enhanced" fetcher.
  *
  * @example
  * ### Handle cancellation of the reverification process
@@ -180,10 +196,7 @@ type UseReverificationResult<
  * }
  * ```
  */
-function useReverification<
-  Fetcher extends (...args: any[]) => Promise<any> | undefined,
-  Options extends UseReverificationOptions,
->(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
+export const useReverification: UseReverification = (fetcher, options) => {
   const { __internal_openReverification } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
@@ -203,6 +216,4 @@ function useReverification<
   });
 
   return handleReverification;
-}
-
-export { useReverification };
+};
