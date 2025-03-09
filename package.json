@@ -116,10 +116,10 @@
     "json5": "2.2.3",
     "jsonwebtoken": "9.0.2",
     "lint-staged": "^14.0.1",
-    "prettier": "^3.5.2",
+    "prettier": "^3.5.3",
     "prettier-plugin-packagejson": "^2.5.3",
     "prettier-plugin-tailwindcss": "^0.6.3",
-    "publint": "^0.3.6",
+    "publint": "^0.3.8",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rimraf": "6.0.1",
@@ -147,7 +147,7 @@
   "pnpm": {
     "overrides": {
       "jest": "29.7.0",
-      "jest-snapshot-prettier": "npm:prettier@^3.5.2"
+      "jest-snapshot-prettier": "npm:prettier@^3.5.3"
     },
     "patchedDependencies": {
       "yalc@1.0.0-pre.53": "patches/yalc@1.0.0-pre.53.patch"
