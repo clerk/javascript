@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 import { useFetch } from 'ui/hooks';
-import { preloadComponent, preloadSessionTask, SessionTask } from 'ui/lazyModules/components';
+import { preloadSessionTask, SessionTask } from 'ui/lazyModules/components';
 
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -15,7 +15,7 @@ import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
 
 const usePreloadSessionTask = (enabled = false) =>
-  useFetch(enabled ? void preloadComponent('SessionTask') : undefined, 'preloadComponent', { staleTime: Infinity });
+  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
 
 const usePreloadSessionTask = (enabled = false) =>
   useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
