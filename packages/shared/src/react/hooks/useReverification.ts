@@ -1,5 +1,5 @@
 import type { Clerk, SessionVerificationLevel } from '@clerk/types';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -50,17 +50,15 @@ type UseReverificationOptions = {
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
-  level: [
-    SessionVerificationLevel | undefined,
-    React.Dispatch<React.SetStateAction<SessionVerificationLevel | undefined>>,
-  ];
-  error: [Error | undefined, React.Dispatch<React.SetStateAction<Error | undefined>>];
-  inProgress: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
-  cancel: [() => void, React.Dispatch<React.SetStateAction<() => void>>];
-  complete: [() => void, React.Dispatch<React.SetStateAction<() => void>>];
 };
 
-function createReverificationHandler(params: CreateReverificationHandlerParams) {
+function useCreateReverificationHandler(params: CreateReverificationHandlerParams) {
+  const [level, setLevel] = useState<SessionVerificationLevel | null>(null);
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [complete, setComplete] = useState<() => void>(() => {});
+  const [cancel, setCancel] = useState<() => void>(() => {});
+
   function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (
@@ -77,31 +75,20 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
         const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
-        const [, setLevel] = params.level;
-        const [, setError] = params.error;
-        const [, setInProgress] = params.inProgress;
-        const [cancel, setCancel] = params.cancel;
-        const [complete, setComplete] = params.complete;
-
-        setLevel(isValidMetadata ? isValidMetadata().level : undefined);
-        setError(undefined);
+        setLevel(isValidMetadata ? isValidMetadata().level : null);
         setInProgress(true);
-        setCancel(() => {
-          return () => {
-            resolvers.reject(
-              new ClerkRuntimeError('User cancelled attempted verification', {
-                code: 'reverification_cancelled',
-              }),
-            );
-
-            setInProgress(false);
-          };
+        setComplete(() => () => {
+          resolvers.resolve(true);
+          setInProgress(false);
         });
-        setComplete(() => {
-          return () => {
-            resolvers.resolve(true);
-            setInProgress(false);
-          };
+        setCancel(() => () => {
+          resolvers.reject(
+            new ClerkRuntimeError('User cancelled attempted verification', {
+              code: 'reverification_cancelled',
+            }),
+          );
+
+          setInProgress(false);
         });
 
         if (params.defaultUI) {
@@ -146,7 +133,16 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
     }) as ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>;
   }
 
-  return assertReverification;
+  return {
+    assertReverification,
+    state: {
+      level,
+      inProgress,
+      error,
+      complete,
+      cancel,
+    },
+  };
 }
 
 type UseReverificationResult<
@@ -166,7 +162,7 @@ type UseReverificationResult<
   /**
    * The level of reverification required.
    */
-  level: SessionVerificationLevel | undefined;
+  level: SessionVerificationLevel | null;
 
   /**
    * A function to cancel the reverification process.
@@ -181,7 +177,7 @@ type UseReverificationResult<
   /**
    * An error that occurred during the reverification process or from the fetcher.
    */
-  error: Error | undefined;
+  error: Error | null;
 };
 
 /**
@@ -262,24 +258,10 @@ function useReverification<
   const clerk = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(defaultOptions);
-  const [level, setLevel] = useState<SessionVerificationLevel | undefined>(undefined);
-  const [inProgress, setInProgress] = useState<boolean>(false);
-  const [error, setError] = useState<Error | undefined>(undefined);
-  const [complete, setComplete] = useState<() => void>(() => {});
-  const [cancel, setCancel] = useState<() => void>(() => {});
-
-  const handleReverification = useMemo(() => {
-    const handler = createReverificationHandler({
-      openUIComponent: clerk.__internal_openReverification,
-      level: [level, setLevel],
-      cancel: [cancel, setCancel],
-      complete: [complete, setComplete],
-      error: [error, setError],
-      inProgress: [inProgress, setInProgress],
-      ...optionsRef.current,
-    })(fetcherRef.current);
-    return handler;
-  }, []);
+  const { assertReverification, state } = useCreateReverificationHandler({
+    openUIComponent: clerk.__internal_openReverification,
+    ...optionsRef.current,
+  });
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
@@ -288,12 +270,12 @@ function useReverification<
   });
 
   return {
-    action: handleReverification,
-    inProgress,
-    level,
-    cancel,
-    complete,
-    error,
+    action: assertReverification(fetcherRef.current),
+    inProgress: state.inProgress,
+    level: state.level,
+    error: state.error,
+    cancel: state.cancel,
+    complete: state.cancel,
   };
 }
 
