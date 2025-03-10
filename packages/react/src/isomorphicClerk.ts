@@ -90,7 +90,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__internal_setComponentNavigate'
+  | '__internal_setComponentNavigationContext'
 > & {
   client: ClientResource | undefined;
 };

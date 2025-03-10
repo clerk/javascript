@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -118,14 +118,6 @@ export const useSignUpContext = (): SignUpContextType => {
     ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signUpUrl, clerk.session?.currentTask)
     : null;
 
-  useEffect(() => {
-    clerk.__internal_setComponentNavigate((endpoint: string) =>
-      navigate(
-        buildRedirectUrl({ routing: ctx.routing, path: ctx.path, baseUrl: signUpUrl, endpoint, authQueryString }),
-      ),
-    );
-  }, []);
-
   return {
     ...ctx,
     componentName,
@@ -143,6 +135,6 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    withSessionTasks: options.experimental?.withSessionTasks,
+    withSessionTasks: !!options.experimental?.withSessionTasks,
   };
 };

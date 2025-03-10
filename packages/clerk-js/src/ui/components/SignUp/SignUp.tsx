@@ -6,7 +6,7 @@ import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowC
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { preloadComponent, SessionTask } from '../../lazyModules/components';
+import { preloadSessionTask, SessionTask } from '../../lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
@@ -15,7 +15,7 @@ import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
 
 const usePreloadSessionTask = (enabled = false) =>
-  useFetch(enabled ? void preloadComponent('SessionTask') : undefined, 'preloadComponent', { staleTime: Infinity });
+  useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function RedirectToSignUp() {
   const clerk = useClerk();

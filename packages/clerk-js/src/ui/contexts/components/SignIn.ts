@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
@@ -123,14 +123,6 @@ export const useSignInContext = (): SignInContextType => {
     ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signInUrl, clerk.session?.currentTask)
     : null;
 
-  useEffect(() => {
-    clerk.__internal_setComponentNavigate((endpoint: string) =>
-      navigate(
-        buildRedirectUrl({ routing: ctx.routing, path: ctx.path, baseUrl: signInUrl, endpoint, authQueryString }),
-      ),
-    );
-  }, []);
-
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
@@ -143,12 +135,12 @@ export const useSignInContext = (): SignInContextType => {
     emailLinkRedirectUrl,
     ssoCallbackUrl,
     sessionTaskUrl,
-    withSessionTasks: options.experimental?.withSessionTasks,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    withSessionTasks: !!options.experimental?.withSessionTasks,
   };
 };
