@@ -1,6 +1,5 @@
 import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/types';
 
-import { getHCaptchaToken } from './hcaptcha';
 import { getTunstileToken } from './turnstile';
 
 type CaptchaOptions = {
@@ -16,9 +15,5 @@ type CaptchaOptions = {
  */
 export const getCaptchaToken = (captchaOptions: CaptchaOptions) => {
   const { captchaProvider, ...captchaProviderOptions } = captchaOptions;
-  if (captchaProvider === 'hcaptcha') {
-    return getHCaptchaToken(captchaProviderOptions);
-  } else {
-    return getTunstileToken(captchaProviderOptions);
-  }
+  return getTunstileToken(captchaProviderOptions);
 };
