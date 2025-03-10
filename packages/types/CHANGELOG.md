@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.65.5
+
+### Patch Changes
+
+- Remove hCaptcha implementation ([#5317](https://github.com/clerk/javascript/pull/5317)) by [@anagstef](https://github.com/anagstef)
+
 ## 3.65.4
 
 ### Patch Changes

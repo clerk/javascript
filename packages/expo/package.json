@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.20.35",
+  "version": "0.20.36",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -39,14 +39,14 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.73.13",
-    "@clerk/clerk-react": "4.32.4",
+    "@clerk/clerk-js": "4.73.14",
+    "@clerk/clerk-react": "4.32.5",
     "@clerk/shared": "1.4.2",
     "base-64": "1.0.0",
     "react-native-url-polyfill": "2.0.0"
   },
   "devDependencies": {
-    "@clerk/types": "^3.65.4",
+    "@clerk/types": "^3.65.5",
     "@types/base-64": "^1.0.0",
     "@types/node": "^16.11.55",
     "@types/react": "*",

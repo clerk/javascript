@@ -87,7 +87,7 @@
     "swr": "2.2.0"
   },
   "devDependencies": {
-    "@clerk/types": "3.65.4",
+    "@clerk/types": "3.65.5",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "tsup": "*",
