@@ -375,6 +375,7 @@ export class Clerk implements ClerkInterface {
       } else {
         this.#loaded = await this.#loadInNonStandardBrowser();
       }
+      if (this.#loaded === false) throw new Error('Clerk failed to load');
 
       this.#status = 'ready';
     } catch (error) {
