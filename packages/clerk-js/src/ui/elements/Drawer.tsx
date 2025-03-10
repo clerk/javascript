@@ -1,6 +1,7 @@
 import type { UseDismissProps, UseFloatingOptions } from '@floating-ui/react';
 import {
   FloatingFocusManager,
+  FloatingOverlay,
   FloatingPortal,
   useClick,
   useDismiss,
@@ -119,6 +120,10 @@ function Root({
  * Drawer.Overlay
  * -----------------------------------------------------------------------------------------------*/
 
+function FloatingOverlayBackdrop() {
+  return <FloatingOverlay lockScroll />;
+}
+
 const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   const { strategy, refs, context } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
@@ -143,6 +148,7 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={mergedRefs}
+      as={strategy === 'fixed' ? FloatingOverlayBackdrop : undefined}
       elementDescriptor={descriptors.drawerBackdrop}
       style={transitionStyles}
       sx={t => ({
