@@ -111,18 +111,24 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
         dispatch({
           type: 'setComplete',
           value: () => {
-            return () => resolvers.resolve(true);
+            return () => {
+              resolvers.resolve(true);
+              dispatch({ type: 'setInProgress', value: false });
+            };
           },
         });
         dispatch({
           type: 'setCancel',
           value: () => {
-            return () =>
+            return () => {
               resolvers.reject(
                 new ClerkRuntimeError('User cancelled attempted verification', {
                   code: 'reverification_cancelled',
                 }),
               );
+
+              dispatch({ type: 'setInProgress', value: false });
+            };
           },
         });
 
