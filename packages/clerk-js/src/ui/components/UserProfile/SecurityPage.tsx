@@ -15,7 +15,7 @@ export const SecurityPage = withCardStateProvider(() => {
   const card = useCardState();
   const { user } = useUser();
   const showPassword = instanceIsPasswordBased;
-  const showPasskey = attributes.passkey.enabled;
+  const showPasskey = attributes.passkey?.enabled;
   const showMfa = getSecondFactors(attributes).length > 0;
   const showDelete = user?.deleteSelfEnabled;
 

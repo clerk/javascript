@@ -33,8 +33,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *
  * The `useSignUp()` hook can also be used to build fully custom sign-up flows, if Clerk's prebuilt components don't meet your specific needs or if you require more control over the authentication flow. Different sign-up flows include email and password, email and phone codes, email links, and multifactor (MFA). To learn more about using the `useSignUp()` hook to create custom flows, see the [custom flow guides](https://clerk.com/docs/custom-flows/overview).
  *
- * ```tsx
- * ```
+ * ```empty```
  */
 export const useSignUp = (): UseSignUpReturn => {
   useAssertWrappedByClerkProvider('useSignUp');

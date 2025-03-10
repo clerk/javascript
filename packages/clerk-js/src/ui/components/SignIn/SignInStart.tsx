@@ -49,7 +49,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
+    if (passkeySettings.allow_autofill && attributes.passkey?.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -345,7 +345,9 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
     const alreadySignedInError: ClerkAPIError = e.errors.find(
@@ -393,7 +395,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
-        passwordEnabled: userSettings.attributes.password.required,
+        passwordEnabled: userSettings.attributes.password?.required ?? false,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -481,7 +483,7 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.attributes.passkey.enabled &&
+            {userSettings.attributes.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (
                 <Card.Action elementId={'usePasskey'}>
