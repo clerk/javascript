@@ -617,7 +617,7 @@ export interface Clerk {
     | undefined;
 
   /**
-   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+   * This function is used to reload the initial resources (Environment/Client) from the Frontend API.
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
