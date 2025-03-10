@@ -77,18 +77,19 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
 
         setLevel(isValidMetadata ? isValidMetadata().level : null);
         setInProgress(true);
-        setComplete(() => () => {
-          resolvers.resolve(true);
-          setInProgress(false);
+        setComplete(() => {
+          return () => {
+            resolvers.resolve(true);
+          };
         });
-        setCancel(() => () => {
-          resolvers.reject(
-            new ClerkRuntimeError('User cancelled attempted verification', {
-              code: 'reverification_cancelled',
-            }),
-          );
-
-          setInProgress(false);
+        setCancel(() => {
+          return () => {
+            resolvers.reject(
+              new ClerkRuntimeError('User cancelled attempted verification', {
+                code: 'reverification_cancelled',
+              }),
+            );
+          };
         });
 
         if (params.defaultUI) {
@@ -99,10 +100,14 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
           params.openUIComponent?.({
             level: isValidMetadata ? isValidMetadata().level : undefined,
             afterVerification() {
-              complete();
+              resolvers.resolve(true);
             },
             afterVerificationCancelled() {
-              cancel();
+              resolvers.reject(
+                new ClerkRuntimeError('User cancelled attempted verification', {
+                  code: 'reverification_cancelled',
+                }),
+              );
             },
           });
         }
