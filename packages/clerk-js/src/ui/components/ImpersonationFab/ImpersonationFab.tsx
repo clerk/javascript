@@ -109,7 +109,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   );
 };
 
-const _ImpersonationFab = () => {
+const ImpersonationFabInternal = () => {
   const { session } = useSession();
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
@@ -249,6 +249,6 @@ const _ImpersonationFab = () => {
 
 export const ImpersonationFab = withCoreUserGuard(() => (
   <InternalThemeProvider>
-    <_ImpersonationFab />
+    <ImpersonationFabInternal />
   </InternalThemeProvider>
 ));
