@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
 import { useState } from 'react';
 
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Box, descriptors } from '../../customizables';
 import { useFetch } from '../../hooks';
@@ -89,7 +90,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         setPlanPeriod={setPlanPeriod}
         strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
         portalProps={{
-          id: mode === 'modal' ? 'profileCardScrollBox' : undefined,
+          id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
         }}
       />
     </InternalThemeProvider>

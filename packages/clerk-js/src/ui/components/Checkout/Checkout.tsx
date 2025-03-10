@@ -1,6 +1,7 @@
 import type { __experimental_CheckoutProps } from '@clerk/types';
 
 import { CheckoutDrawer } from '../../common';
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { useCheckoutContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
@@ -29,7 +30,7 @@ const AuthenticatedRoutes = withCoreUserGuard((props: __experimental_CheckoutPro
       onOpenChange={setIsOpen}
       strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
       portalProps={{
-        id: mode === 'modal' ? 'profileCardScrollBox' : undefined,
+        id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
       }}
     >
       <CheckoutContent {...props} />

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { Col, descriptors } from '../../customizables';
 import { useRouter } from '../../router';
 import { common, mqu } from '../../styledSystem';
@@ -42,7 +43,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$cardContentShadow,
       })}
-      id='profileCardScrollBox'
+      id={PROFILE_CARD_SCROLLBOX_ID}
     >
       <Col
         elementDescriptor={descriptors.pageScrollBox}
