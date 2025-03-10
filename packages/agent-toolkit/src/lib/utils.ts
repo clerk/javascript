@@ -1,4 +1,4 @@
-import type { ToolkitContext } from './types';
+import type { ToolsContext } from './types';
 
 // A helper type that maps T to a new type with every leaf replaced by R.
 type DeepTransform<T, R> =
@@ -54,7 +54,7 @@ export function shallowTransform<T extends object, R>(
   return result;
 }
 
-export const prunePrivateData = (context: ToolkitContext, o?: Record<any, any> | null) => {
+export const prunePrivateData = (context: ToolsContext, o?: Record<any, any> | null) => {
   if (context.allowPrivateMetadata) {
     return o;
   }
