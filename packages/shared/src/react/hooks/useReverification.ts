@@ -166,7 +166,7 @@ type UseReverificationResult<
   /**
    * The level of reverification required.
    */
-  level: string | undefined;
+  level: SessionVerificationLevel | undefined;
 
   /**
    * A function to cancel the reverification process.
