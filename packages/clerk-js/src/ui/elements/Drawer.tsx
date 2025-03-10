@@ -129,6 +129,7 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
     open: { opacity: 1 },
     close: { opacity: 0 },
     common: {
+      position: strategy,
       transitionProperty: 'opacity',
       transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
@@ -149,8 +150,6 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       elementDescriptor={descriptors.drawerBackdrop}
       style={transitionStyles}
       sx={t => ({
-        position: strategy,
-        inset: 0,
         backgroundColor: t.colors.$drawerBackdrop,
       })}
     />
