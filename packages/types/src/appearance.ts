@@ -210,7 +210,7 @@ export type ElementsConfig = {
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
-  drawerOverlay: WithOptions;
+  drawerBackdrop: WithOptions;
   drawerContent: WithOptions;
   drawerHeader: WithOptions;
   drawerTitle: WithOptions;

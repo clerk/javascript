@@ -142,12 +142,12 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={mergedRefs}
-      elementDescriptor={descriptors.drawerOverlay}
+      elementDescriptor={descriptors.drawerBackdrop}
       style={transitionStyles}
       sx={t => ({
         position: strategy,
         inset: 0,
-        backgroundColor: t.colors.$whiteAlpha300,
+        backgroundColor: t.colors.$drawerBackdrop,
       })}
     />
   );

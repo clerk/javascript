@@ -101,7 +101,9 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 };
 
 const CheckoutHeader = ({ title }: { title: string }) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
+  const { setIsOpen = () => {} } = useCheckoutContext();
+
+  const handleCloseDrawer = () => setIsOpen(false);
 
   return (
     <Flex
@@ -122,7 +124,7 @@ const CheckoutHeader = ({ title }: { title: string }) => {
       <Heading textVariant='h2'>{title}</Heading>
       <Button
         variant='ghost'
-        onClick={handleCloseBlade}
+        onClick={handleCloseDrawer}
         sx={t => ({
           color: t.colors.$neutralAlpha400,
           padding: t.space.$2,

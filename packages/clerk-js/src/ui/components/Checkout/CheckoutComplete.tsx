@@ -7,7 +7,9 @@ import { Check } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 
 export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutResource; sx?: ThemableCssProp }) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
+  const { setIsOpen = () => {} } = useCheckoutContext();
+
+  const handleCloseDrawer = () => setIsOpen(false);
 
   return (
     <Col
@@ -82,7 +84,7 @@ export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutR
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={handleCloseBlade}
+          onClick={handleCloseDrawer}
         >
           Continue
         </Button>

@@ -16,7 +16,7 @@ export const CheckoutContent = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
   const stripePromise = useRef<Promise<Stripe | null> | null>(null);
 
-  const { checkout, isLoading } = useCheckout({
+  const { checkout, isLoading, setCheckout } = useCheckout({
     planId,
     planPeriod,
   });
@@ -78,7 +78,10 @@ export const CheckoutContent = (props: __experimental_CheckoutProps) => {
             stripe={stripePromise.current}
             options={{ clientSecret: checkout.externalClientSecret }}
           >
-            <CheckoutForm checkout={checkout} />
+            <CheckoutForm
+              checkout={checkout}
+              setCheckout={setCheckout}
+            />
           </Elements>
         </Box>
       )}

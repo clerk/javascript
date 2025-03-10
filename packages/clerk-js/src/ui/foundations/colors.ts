@@ -40,6 +40,7 @@ export const colors = Object.freeze({
   avatarBorder: neutralAlpha.neutralAlpha200,
   avatarBackground: neutralAlpha.neutralAlpha400,
   modalBackdrop: neutralAlpha.neutralAlpha700,
+  drawerBackdrop: whiteAlpha.whiteAlpha300,
   // Themable colors
   ...neutralAlpha,
   ...whiteAlpha,
