@@ -79,7 +79,7 @@ export const useAuth: UseAuth = () => {
   const signOut: SignOut = createSignOut(clerk);
 
   const result = computed<UseAuthReturn>(() => {
-    const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = authCtx.value;
+    const { sessionId, sessionClaims, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = authCtx.value;
 
     const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
       if (!params?.permission && !params?.role) {
@@ -105,6 +105,7 @@ export const useAuth: UseAuth = () => {
         isLoaded: false,
         isSignedIn: undefined,
         sessionId,
+        sessionClaims: undefined,
         userId,
         actor: undefined,
         orgId: undefined,
@@ -121,6 +122,7 @@ export const useAuth: UseAuth = () => {
         isLoaded: true,
         isSignedIn: false,
         sessionId,
+        sessionClaims: null,
         userId,
         actor: null,
         orgId: null,
@@ -132,11 +134,12 @@ export const useAuth: UseAuth = () => {
       };
     }
 
-    if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+    if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
       return {
         isLoaded: true,
         isSignedIn: true,
         sessionId,
+        sessionClaims,
         userId,
         actor: actor || null,
         orgId,
@@ -148,11 +151,12 @@ export const useAuth: UseAuth = () => {
       };
     }
 
-    if (!!sessionId && !!userId && !orgId) {
+    if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
       return {
         isLoaded: true,
         isSignedIn: true,
         sessionId,
+        sessionClaims,
         userId,
         actor: actor || null,
         orgId: null,
