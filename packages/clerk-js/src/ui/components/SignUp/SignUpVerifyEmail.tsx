@@ -6,11 +6,7 @@ import { SignUpEmailLinkCard } from './SignUpEmailLinkCard';
 export const SignUpVerifyEmail = withCardStateProvider(() => {
   const { userSettings } = useEnvironment();
   const { attributes } = userSettings;
-  const emailLinkStrategyEnabled = attributes.email_address.verifications.includes('email_link');
+  const emailLinkStrategyEnabled = attributes.email_address?.verifications?.includes('email_link');
 
-  if (emailLinkStrategyEnabled) {
-    return <SignUpEmailLinkCard />;
-  }
-
-  return <SignUpEmailCodeCard />;
+  return emailLinkStrategyEnabled ? <SignUpEmailLinkCard /> : <SignUpEmailCodeCard />;
 });
