@@ -189,7 +189,7 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #loaded = false;
-  #loadingStatus: ClerkInterface['loadingStatus'] = 'uninitialized';
+  #status: ClerkInterface['status'] = 'uninitialized';
 
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -239,8 +239,8 @@ export class Clerk implements ClerkInterface {
     return this.#loaded;
   }
 
-  get loadingStatus() {
-    return this.#loadingStatus;
+  get status() {
+    return this.#status;
   }
 
   get isSatellite(): boolean {
@@ -337,17 +337,17 @@ export class Clerk implements ClerkInterface {
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
   public async load(options?: ClerkOptions): Promise<void> {
-    if (this.loadingStatus === 'loading') {
+    if (this.status === 'loading') {
       logger.warnOnce('Clerk is already loading. Ignoring duplicate call.');
       return;
     }
 
-    if (this.loadingStatus === 'ready') {
+    if (this.status === 'ready') {
       logger.warnOnce('Clerk is already loaded. Skipping load process.');
       return;
     }
 
-    this.#loadingStatus = 'loading';
+    this.#status = 'loading';
 
     try {
       if (this.#instanceType === 'development') {
@@ -376,9 +376,9 @@ export class Clerk implements ClerkInterface {
         this.#loaded = await this.#loadInNonStandardBrowser();
       }
 
-      this.#loadingStatus = 'ready';
+      this.#status = 'ready';
     } catch (error) {
-      this.#loadingStatus = 'error';
+      this.#status = 'error';
       throw error;
     }
   }

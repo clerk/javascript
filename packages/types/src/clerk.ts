@@ -60,13 +60,7 @@ export type SDKMetadata = {
   environment?: string;
 };
 
-export type LoadingStatus = {
-  DEGRADED: 'degraded';
-  ERROR: 'error';
-  LOADING: 'loading';
-  READY: 'ready';
-  UNINITIALIZED: 'uninitialized';
-};
+export type Status = 'degraded' | 'error' | 'loading' | 'ready' | 'uninitialized';
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
@@ -115,7 +109,7 @@ export interface Clerk {
   /**
    * The current loading status of the Clerk SDK.
    */
-  loadingStatus: LoadingStatus[keyof LoadingStatus];
+  status: Status;
 
   /**
    * @internal
