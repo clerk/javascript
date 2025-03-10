@@ -163,6 +163,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
         {closeSlot ||
           (isActivePlan && (
             <Badge
+              elementDescriptor={descriptors.planCardBadge}
               localizationKey={localizationKeys('badge__currentPlan')}
               colorScheme='secondary'
             />
