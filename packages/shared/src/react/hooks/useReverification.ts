@@ -283,9 +283,9 @@ function useReverification<
   Options extends UseReverificationOptions,
 >(fetcher: Fetcher, options?: Options): UseReverificationResult<Fetcher, Options> {
   const defaultOptions = {
-    ...options,
     defaultUI: true,
     throwOnError: true,
+    ...options,
   };
   const clerk = useClerk();
   const fetcherRef = useRef(fetcher);
