@@ -13,6 +13,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
+import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import { Box, descriptors, Flex, Heading, Icon } from '../customizables';
 import { useMotionSafe } from '../hooks';
 import { Close as CloseIcon } from '../icons';
@@ -143,11 +144,11 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
     common: {
       position: strategy,
       transitionProperty: 'opacity',
-      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionTimingFunction: transitionTiming.slowBezier,
     },
     duration: {
-      open: 250,
-      close: 200,
+      open: transitionDurationValues.slowest,
+      close: transitionDurationValues.slow,
     },
   });
 
@@ -188,12 +189,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     close: { transform: 'translateX(100%)' },
     common: {
       transitionProperty: 'transform',
-      transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      transitionTimingFunction: transitionTiming.slowBezier,
     },
     duration: isMotionSafe
       ? {
-          open: 250,
-          close: 200,
+          open: transitionDurationValues.slowest,
+          close: transitionDurationValues.slow,
         }
       : 0,
   });
