@@ -10,10 +10,10 @@ import { ArrowUpDown, CreditCard } from '../../icons';
 
 export const CheckoutForm = ({
   checkout,
-  setCheckout,
+  onCheckoutComplete,
 }: {
   checkout: CommerceCheckoutResource;
-  setCheckout: React.Dispatch<React.SetStateAction<CommerceCheckoutResource | undefined>>;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -33,8 +33,8 @@ export const CheckoutForm = ({
     checkout
       .confirm({ paymentSourceId })
       .then(newCheckout => {
+        onCheckoutComplete(newCheckout);
         setIsSubmitting(false);
-        setCheckout(newCheckout);
       })
       .catch(() => {
         setIsSubmitting(false);

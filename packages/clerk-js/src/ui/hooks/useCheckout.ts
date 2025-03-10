@@ -1,28 +1,32 @@
 import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
 export const useCheckout = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
   const { __experimental_commerce } = useClerk();
-  const [checkout, setCheckout] = useState<CommerceCheckoutResource>();
+  const [currentCheckout, setCurrentCheckout] = useState<CommerceCheckoutResource | null>(null);
 
-  const { data, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
+  const { data: initialCheckout, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
     planId,
     planPeriod,
   });
 
   useEffect(() => {
-    if (data) {
-      setCheckout(data);
+    if (initialCheckout && !currentCheckout) {
+      setCurrentCheckout(initialCheckout);
     }
-  }, [data]);
+  }, [initialCheckout, currentCheckout]);
+
+  const updateCheckout = useCallback((newCheckout: CommerceCheckoutResource) => {
+    setCurrentCheckout(newCheckout);
+  }, []);
 
   return {
-    checkout,
+    checkout: currentCheckout || initialCheckout,
+    updateCheckout,
     isLoading,
-    setCheckout,
   };
 };

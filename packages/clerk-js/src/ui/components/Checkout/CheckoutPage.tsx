@@ -17,7 +17,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const { commerceSettings } = useEnvironment();
 
-  const { checkout, setCheckout, isLoading } = useCheckout({
+  const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
     planPeriod,
   });
@@ -90,7 +90,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
             >
               <CheckoutForm
                 checkout={checkout}
-                setCheckout={setCheckout}
+                onCheckoutComplete={updateCheckout}
               />
             </Elements>
           )}
