@@ -189,6 +189,7 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #loaded = false;
+  #status: ClerkInterface['status'] = 'uninitialized';
 
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -236,6 +237,10 @@ export class Clerk implements ClerkInterface {
 
   get loaded(): boolean {
     return this.#loaded;
+  }
+
+  get status() {
+    return this.#status;
   }
 
   get isSatellite(): boolean {
@@ -331,41 +336,53 @@ export class Clerk implements ClerkInterface {
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
-  public load = async (options?: ClerkOptions): Promise<void> => {
-    if (this.loaded) {
+  public async load(options?: ClerkOptions): Promise<void> {
+    if (this.status === 'loading') {
+      logger.warnOnce('Clerk is already loading. Ignoring duplicate call.');
       return;
     }
 
-    // Log a development mode warning once
-    if (this.#instanceType === 'development') {
-      logger.warnOnce(
-        'Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview',
-      );
+    if (this.status === 'ready') {
+      logger.warnOnce('Clerk is already loaded. Skipping load process.');
+      return;
     }
 
-    this.#options = this.#initOptions(options);
+    this.#status = 'loading';
 
-    assertNoLegacyProp(this.#options);
+    try {
+      if (this.#instanceType === 'development') {
+        logger.warnOnce('Clerk is running in development mode. Usage limits apply. Do not use in production.');
+      }
 
-    if (this.#options.sdkMetadata) {
-      Clerk.sdkMetadata = this.#options.sdkMetadata;
+      this.#options = this.#initOptions(options);
+      assertNoLegacyProp(this.#options);
+
+      if (this.#options.sdkMetadata) {
+        Clerk.sdkMetadata = this.#options.sdkMetadata;
+      }
+
+      if (this.#options.telemetry !== false) {
+        this.telemetry = new TelemetryCollector({
+          clerkVersion: Clerk.version,
+          samplingRate: 1,
+          publishableKey: this.publishableKey,
+          ...this.#options.telemetry,
+        });
+      }
+
+      if (this.#options.standardBrowser) {
+        this.#loaded = await this.#loadInStandardBrowser();
+      } else {
+        this.#loaded = await this.#loadInNonStandardBrowser();
+      }
+      if (this.#loaded === false) throw new Error('Clerk failed to load');
+
+      this.#status = 'ready';
+    } catch (error) {
+      this.#status = 'error';
+      throw error;
     }
-
-    if (this.#options.telemetry !== false) {
-      this.telemetry = new TelemetryCollector({
-        clerkVersion: Clerk.version,
-        samplingRate: 1,
-        publishableKey: this.publishableKey,
-        ...this.#options.telemetry,
-      });
-    }
-
-    if (this.#options.standardBrowser) {
-      this.#loaded = await this.#loadInStandardBrowser();
-    } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
-    }
-  };
+  }
 
   #isCombinedSignInOrUpFlow(): boolean {
     return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
