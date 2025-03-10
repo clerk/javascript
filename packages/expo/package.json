@@ -43,6 +43,10 @@
     "./secure-store": {
       "types": "./dist/secure-store/index.d.ts",
       "default": "./dist/secure-store/index.js"
+    },
+    "./cache": {
+      "types": "./dist/cache/index.d.ts",
+      "default": "./dist/cache/index.js"
     }
   },
   "main": "./dist/index.js",
