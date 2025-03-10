@@ -11,6 +11,7 @@ import { useReverificationAlternativeStrategies } from './useReverificationAlter
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
+import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
@@ -27,7 +28,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _UserVerificationFactorOne(): JSX.Element | null {
+export function UserVerificationFactorOneComponent(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
   const { navigate } = useRouter();
@@ -55,7 +56,12 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
 
-  const toggleAllStrategies = hasAnyStrategy ? () => setShowAllStrategies(s => !s) : undefined;
+  const toggleAllStrategies = hasAnyStrategy
+    ? () => {
+        card.setError(undefined);
+        setShowAllStrategies(s => !s);
+      }
+    : undefined;
 
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
@@ -129,11 +135,13 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
           showAlternativeMethods={hasFirstParty}
         />
       );
+    case 'passkey':
+      return <UVFactorOnePasskeysCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     default:
       return <LoadingCard />;
   }
 }
 
 export const UserVerificationFactorOne = withUserVerificationSessionGuard(
-  withCardStateProvider(_UserVerificationFactorOne),
+  withCardStateProvider(UserVerificationFactorOneComponent),
 );
