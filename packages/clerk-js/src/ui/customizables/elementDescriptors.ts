@@ -92,6 +92,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'dividerText',
   'dividerLine',
 
+  'drawerOverlay',
+  'drawerContent',
+  'drawerHeader',
+  'drawerTitle',
+  'drawerBody',
+  'drawerFooter',
+  'drawerClose',
+
   'formHeader',
   'formHeaderTitle',
   'formHeaderSubtitle',
