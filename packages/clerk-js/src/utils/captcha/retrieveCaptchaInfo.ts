@@ -13,7 +13,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
     canUseCaptcha: _environment ? _environment.userSettings.signUp.captcha_enabled && clerk.isStandardBrowser : null,
     captchaURL: fapiClient
       .buildUrl({
-        path: captchaProvider == 'hcaptcha' ? 'hcaptcha/1/api.js' : 'cloudflare/turnstile/v0/api.js',
+        path: 'cloudflare/turnstile/v0/api.js',
         pathPrefix: '',
         search: '?render=explicit',
       })
