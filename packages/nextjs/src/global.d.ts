@@ -52,6 +52,12 @@ declare const PACKAGE_VERSION: string;
 
 declare namespace globalThis {
   // eslint-disable-next-line no-var
+  var next:
+    | {
+        version?: string;
+      }
+    | undefined;
+  // eslint-disable-next-line no-var
   var __clerk_internal_keyless_logger:
     | {
         __cache: Map<string, { expiresAt: number; data?: unknown }>;
