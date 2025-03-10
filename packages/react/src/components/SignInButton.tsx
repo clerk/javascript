@@ -15,6 +15,7 @@ export const SignInButton = withClerk(
       mode,
       initialValues,
       withSignUp,
+      oauthFlow,
       ...rest
     } = props;
     children = normalizeWithDefaultValue(children, 'Sign in');
@@ -28,6 +29,7 @@ export const SignInButton = withClerk(
         signUpForceRedirectUrl,
         initialValues,
         withSignUp,
+        oauthFlow,
       };
 
       if (mode === 'modal') {
