@@ -128,6 +128,7 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
+import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -195,6 +196,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #internalComponentNavigate: ((to: string) => Promise<unknown>) | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -914,6 +916,11 @@ export class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
+    if (session?.status === 'pending') {
+      await this.#handlePendingSession(session);
+      return;
+    }
+
     let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
@@ -1003,6 +1010,44 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
+  #handlePendingSession = async (session: SignedInSessionResource) => {
+    if (!this.environment) {
+      return;
+    }
+
+    if (session.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+    }
+
+    // Handles multi-session scenario when switching from `active`
+    // to `pending`
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      await this.#touchCurrentSession(session);
+      session = this.#getSessionFromClient(session.id) ?? session;
+    }
+
+    // Syncs __session and __client_uat, in case the `pending` session
+    // has expired, it needs to trigger a sign-out
+    const token = await session.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    if (session.currentTask) {
+      await navigateToTask(session.currentTask, {
+        globalNavigate: this.navigate,
+        internalNavigate: this.#internalComponentNavigate,
+        options: this.#options,
+        environment: this.environment,
+      });
+
+      this.#internalComponentNavigate = null;
+    }
+
+    this.#setAccessors(session);
+    this.#emit();
+  };
+
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
@@ -1028,6 +1073,10 @@ export class Clerk implements ClerkInterface {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
     return unsubscribe;
+  };
+
+  public __internal_setComponentNavigate = (navigate: (to: string) => Promise<unknown>) => {
+    this.#internalComponentNavigate = navigate;
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
