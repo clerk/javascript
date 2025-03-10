@@ -147,7 +147,7 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       transitionTimingFunction: transitionTiming.slowBezier,
     },
     duration: {
-      open: transitionDurationValues.slowest,
+      open: transitionDurationValues.slower,
       close: transitionDurationValues.slow,
     },
   });
@@ -193,7 +193,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     },
     duration: isMotionSafe
       ? {
-          open: transitionDurationValues.slowest,
+          open: transitionDurationValues.slower,
           close: transitionDurationValues.slow,
         }
       : 0,
