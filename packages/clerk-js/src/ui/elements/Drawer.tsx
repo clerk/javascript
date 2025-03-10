@@ -120,9 +120,17 @@ function Root({
  * Drawer.Overlay
  * -----------------------------------------------------------------------------------------------*/
 
-function FloatingOverlayBackdrop() {
-  return <FloatingOverlay lockScroll />;
-}
+const FloatingOverlayBackdrop = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof FloatingOverlay>>(
+  (props, ref) => {
+    return (
+      <FloatingOverlay
+        ref={ref}
+        lockScroll
+        {...props}
+      />
+    );
+  },
+);
 
 const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   const { strategy, refs, context } = useDrawerContext();
@@ -148,10 +156,11 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={mergedRefs}
-      as={strategy === 'fixed' ? FloatingOverlayBackdrop : undefined}
+      as={strategy === 'fixed' ? FloatingOverlayBackdrop : 'div'}
       elementDescriptor={descriptors.drawerBackdrop}
       style={transitionStyles}
       sx={t => ({
+        inset: 0,
         backgroundColor: t.colors.$drawerBackdrop,
       })}
     />
