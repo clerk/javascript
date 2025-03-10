@@ -53,9 +53,9 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
 };
 
 function useCreateReverificationHandler(params: CreateReverificationHandlerParams) {
-  const [level, setLevel] = useState<SessionVerificationLevel | null>(null);
+  const [level, setLevel] = useState<SessionVerificationLevel | undefined>(undefined);
   const [inProgress, setInProgress] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error | undefined>(undefined);
   const [complete, setComplete] = useState<() => void>(() => {});
   const [cancel, setCancel] = useState<() => void>(() => {});
 
@@ -167,7 +167,7 @@ type UseReverificationResult<
   /**
    * The level of reverification required.
    */
-  level: SessionVerificationLevel | null;
+  level: SessionVerificationLevel | undefined;
 
   /**
    * A function to cancel the reverification process.
@@ -182,7 +182,7 @@ type UseReverificationResult<
   /**
    * An error that occurred during the reverification process or from the fetcher.
    */
-  error: Error | null;
+  error: Error | undefined;
 };
 
 /**
