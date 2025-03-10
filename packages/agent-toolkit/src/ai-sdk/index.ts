@@ -6,6 +6,10 @@ import type { ClerkToolkitBase, CreateClerkToolkitParams } from '../lib/types';
 import { shallowTransform } from '../lib/utils';
 import { adapter } from './adapter';
 
+type AdaptedTools = {
+  [key in keyof typeof tools]: () => { [tool in keyof (typeof tools)[key]]: ReturnType<typeof adapter> };
+};
+
 export type ClerkToolkit = ClerkToolkitBase & {
   /**
    * Returns an object with all the tools from all categories in the Clerk toolkit.
@@ -16,9 +20,7 @@ export type ClerkToolkit = ClerkToolkitBase & {
    * As a result, we also recommend to use the fine-grained tool categories, for example, `toolkit.users` instead.
    */
   allTools: () => { [key in keyof typeof flatTools]: ReturnType<typeof adapter> };
-} & {
-  [key in keyof typeof tools]: () => { [tool in keyof (typeof tools)[key]]: ReturnType<typeof adapter> };
-};
+} & AdaptedTools;
 
 /**
  * Creates a Clerk toolkit with the given parameters.
@@ -34,15 +36,17 @@ export const createClerkToolkit = async (params: CreateClerkToolkitParams = {}):
       shallowTransform(toolSection, t => {
         return adapter(clerkClient, context, t);
       });
-  });
+  }) as AdaptedTools;
 
   const allTools = () => {
     return shallowTransform(flatTools, t => adapter(clerkClient, context, t));
   };
 
-  return {
+  adaptedTools.organizations();
+
+  return Promise.resolve({
     ...adaptedTools,
     allTools,
     injectSessionClaims: injectSessionClaims(context),
-  };
+  });
 };

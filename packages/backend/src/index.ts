@@ -34,6 +34,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     ...options.telemetry,
     publishableKey: opts.publishableKey,
     secretKey: opts.secretKey,
+    samplingRate: 0.1,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
   });
 

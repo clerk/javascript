@@ -2,6 +2,12 @@ import type { InvitationStatus } from './Enums';
 import type { InvitationJSON } from './JSON';
 
 export class Invitation {
+  private _raw: InvitationJSON | null = null;
+
+  public get raw(): InvitationJSON | null {
+    return this._raw;
+  }
+
   constructor(
     readonly id: string,
     readonly emailAddress: string,
@@ -14,7 +20,7 @@ export class Invitation {
   ) {}
 
   static fromJSON(data: InvitationJSON): Invitation {
-    return new Invitation(
+    const res = new Invitation(
       data.id,
       data.email_address,
       data.public_metadata,
@@ -24,5 +30,7 @@ export class Invitation {
       data.url,
       data.revoked,
     );
+    res._raw = data;
+    return res;
   }
 }
