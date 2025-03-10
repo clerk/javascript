@@ -7,7 +7,10 @@ export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
 } as const;
 
 interface NavigateToTaskOptions {
-  internalNavigate: ((to: string) => Promise<unknown>) | null;
+  componentNavigationContext: {
+    basePath: string;
+    navigate: (toURL: URL | undefined) => Promise<unknown>;
+  } | null;
   globalNavigate: (to: string) => Promise<unknown>;
   options: ClerkOptions;
   environment: EnvironmentResource;
@@ -20,10 +23,22 @@ interface NavigateToTaskOptions {
  */
 export function navigateToTask(
   task: SessionTask,
-  { internalNavigate, globalNavigate, options, environment }: NavigateToTaskOptions,
+  { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  if (internalNavigate) {
-    return internalNavigate(SESSION_TASK_ROUTE_BY_KEY['org']);
+  if (componentNavigationContext) {
+    const isHashRouting = !!new URL(window.location.href).hash;
+    const taskUrl = buildURL({
+      base: componentNavigationContext.basePath,
+      ...(isHashRouting
+        ? {
+            hashPath: SESSION_TASK_ROUTE_BY_KEY[task.key],
+          }
+        : {
+            pathname: componentNavigationContext.basePath + SESSION_TASK_ROUTE_BY_KEY[task.key],
+          }),
+    }) as URL;
+
+    return componentNavigationContext.navigate(taskUrl);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;

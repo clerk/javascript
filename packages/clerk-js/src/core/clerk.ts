@@ -200,7 +200,10 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #internalComponentNavigate: ((to: string) => Promise<unknown>) | null = null;
+  #componentNavigationContext: {
+    navigate: (toURL: URL | undefined) => Promise<unknown>;
+    basePath: string;
+  } | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1076,12 +1079,14 @@ export class Clerk implements ClerkInterface {
     if (session.currentTask) {
       await navigateToTask(session.currentTask, {
         globalNavigate: this.navigate,
-        internalNavigate: this.#internalComponentNavigate,
+        componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
       });
 
-      this.#internalComponentNavigate = null;
+      // Reset component navigation context once navigation finishes
+      // to not conflict with after sign-in / after sign-up
+      this.#componentNavigationContext = null;
     }
 
     this.#setAccessors(session);
@@ -1115,8 +1120,15 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigate = (navigate: (to: string) => Promise<unknown>) => {
-    this.#internalComponentNavigate = navigate;
+  public __internal_setComponentNavigationContext = (
+    context: {
+      navigate: (toURL: URL | undefined) => Promise<unknown>;
+      basePath: string;
+    } | null,
+  ) => {
+    this.#componentNavigationContext = context;
+
+    return () => (this.#componentNavigationContext = null);
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
