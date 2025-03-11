@@ -24,3 +24,9 @@ To fix this, make sure you have the \`clerkHandler()\` configure in you SSR entr
 
 For more info, check out the docs: https://github.com/clerk/javascript/tree/main/packages/tanstack-start#setup-clerkhandler-in-the-ssr-entrypoint,
     `);
+
+export const warnPackageRenaming = () => {
+  console.warn(
+    '[@clerk/tanstack-start] Warning: This package will be renamed to @clerk/tanstack-react-start in the next minor version. Please stay tuned for the release to update your imports accordingly.',
+  );
+};
