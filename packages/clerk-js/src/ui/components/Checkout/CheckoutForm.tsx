@@ -197,11 +197,7 @@ const PaymentSourceMethods = ({
         <Button
           type='submit'
           colorScheme='primary'
-          size='sm'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-          }}
+          block
           isLoading={isSubmitting}
         >
           Pay {totalDueNow.currencySymbol}
@@ -275,11 +271,7 @@ const StripePaymentMethods = ({
             <Button
               colorScheme='secondary'
               variant='bordered'
-              size='md'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-              }}
+              block
               onClick={() => setCollapsed(false)}
             >
               More Payment Methods
