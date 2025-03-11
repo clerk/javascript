@@ -34,23 +34,28 @@
 > This SDK is recommended for testing purposes only unless you are confident in the agent's behavior and have implemented necessary security measures such as guardrails and best practices.
 
 ## Table of Contents
-
 <!-- TOC -->
-
-- [Table of Contents](#table-of-contents)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-  - [Import Paths](#import-paths)
-  - [Methods](#methods)
-- [Prerequisites](#prerequisites)
-- [Example Repository](#example-repository)
-- [Using Vercel's AI SDK](#using-vercels-ai-sdk)
-- [Using Langchain](#using-langchain)
-- [Advanced Usage](#advanced-usage)
-  - [Using a Custom `clerkClient`](#using-a-custom-clerkclient)
-- [Support](#support)
-- [Contributing](#contributing)
-- [License](#license)
+  * [Table of Contents](#table-of-contents)
+  * [Getting Started](#getting-started)
+  * [API Reference](#api-reference)
+    * [Import Paths](#import-paths)
+    * [Methods](#methods)
+      * [Initialization & generic helpers](#initialization--generic-helpers)
+      * [Available tools](#available-tools)
+      * [Langchain-specific methods](#langchain-specific-methods)
+      * [MCP Specific Methods](#mcp-specific-methods)
+  * [Prerequisites](#prerequisites)
+  * [Example Repository](#example-repository)
+  * [Using Vercel's AI SDK](#using-vercels-ai-sdk)
+  * [Using Langchain](#using-langchain)
+  * [Model Context Protocol (MCP Server)](#model-context-protocol-mcp-server)
+    * [Running a local MCP server](#running-a-local-mcp-server)
+    * [Usage with Claude Desktop](#usage-with-claude-desktop)
+  * [Advanced Usage](#advanced-usage)
+    * [Using a Custom `clerkClient`](#using-a-custom-clerkclient)
+  * [Support](#support)
+  * [Contributing](#contributing)
+  * [License](#license)
 <!-- TOC -->
 
 ## Getting Started
@@ -67,17 +72,18 @@ The Clerk Agent Toolkit package provides two main import paths:
 
 - `@clerk/agent-toolkit/ai-sdk`: Helpers for integrating with Vercel's AI SDK.
 - `@clerk/agent-toolkit/langchain`: Helpers for integrating with Langchain.
+- `@clerk/agent-toolkit/modelcontextprotocol`: Low level helpers for integrating with the Model Context Protocol (MCP).
 
 The toolkit offers the same tools and core APIs across frameworks, but their public interfaces may vary slightly to align with each framework's design:
 
 ### Methods
 
-**Initialization & generic helpers**:
+#### Initialization & generic helpers
 
 - `createClerkToolkit(options)`: Instantiates a new Clerk toolkit.
 - `toolkit.injectSessionClaims(systemPrompt)`: Injects session claims (`userId`, `sessionId`, `orgId`, etc.) into the system prompt, making them accessible to the AI model.
 
-**Available tools**:
+#### Available tools
 
 Currently, are only exposing a subset of Clerk Backend API functionality as tools. We plan to expand this list as we receive feedback from the community. You are welcome to open an issue or reach out to us on Discord to request additional tools.
 
@@ -86,9 +92,13 @@ Currently, are only exposing a subset of Clerk Backend API functionality as tool
 - `toolkit.invitations()`: Provides tools for managing invitations. [Details](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/src/lib/tools/invitations.ts).
 - `toolkit.allTools()`: Returns all available tools.
 
-**Langchain-specific methods:**
+#### Langchain-specific methods
 
 - `toolkit.toolMap()`: Returns an object mapping available tools, useful for calling tools by name.
+
+#### MCP Specific Methods
+
+- `createClerkMcpServer()`: Instantiates a new Clerk MCP server. For more details, see 
 
 For more details on each tool, refer to the framework-specific directories or the [Clerk Backend API documentation](https://clerk.com/docs/reference/backend-api).
 
@@ -130,12 +140,12 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
-  // Optional - get the userId from the request
-  const { userId } = await auth.protect();
+  // Optional - get the auth context from the request
+  const authContext = await auth.protect();
 
   // Instantiate a new Clerk toolkit
-  // Optional - scope the toolkit to a specific user
-  const toolkit = await createClerkToolkit({ context: { userId } });
+  // Optional - scope the toolkit to this session
+  const toolkit = await createClerkToolkit({ authContext });
 
   const result = streamText({
     model: openai('gpt-4o'),
@@ -182,11 +192,12 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { prompt } = await req.json();
-  const { userId } = await auth.protect();
+  // Optional - get the auth context from the request
+  const authContext = await auth.protect();
 
   // Instantiate a new Clerk toolkit
   // Optional - scope the toolkit to a specific user
-  const toolkit = await createClerkToolkit({ context: { userId } });
+  const toolkit = await createClerkToolkit({ authContext });
 
   const model = new ChatOpenAI({ model: 'gpt-4o', temperature: 0 });
 
@@ -211,6 +222,65 @@ export async function POST(req: Request) {
   return LangChainAdapter.toDataStreamResponse(stream);
 }
 ```
+
+## Model Context Protocol (MCP Server)
+The `@clerk/agent-toolkit/modelcontextprotocol` import path provides a low-level helper for integrating with the Model Context Protocol (MCP). This is considered an advanced use case, as most users will be interested in running a local Clerk MCP server directly instead.
+
+### Running a local MCP server
+
+To run the Clerk MCP server locally using `npx`, run the following command:
+
+```shell
+// Provide the Clerk secret key as an environment variable
+CLERK_SECRET_KEY=sk_123 npx -y @clerk/agent-toolkit -p local-mcp
+
+// Alternatively, you can pass the secret key as an argument
+npx -y @clerk/agent-toolkit -p local-mcp --secret-key sk_123
+```
+
+By default, the MCP server will use all available Clerk tools as described in the [Available tools:](#available-tools) section. To limit the tools available to the server, use the `--tools` (`-t`) flag:
+
+```
+// This example assumes the CLERK_SECRET_KEY environment variable is set
+
+// Use all tools
+npx -y @clerk/agent-toolkit -p local-mcp
+npx -y @clerk/agent-toolkit -p local-mcp --tools="*"
+
+// Use only a specific tool category
+npx -y @clerk/agent-toolkit -p local-mcp --tools users
+npx -y @clerk/agent-toolkit -p local-mcp --tools "users.*"
+
+// Use multiple tool categories
+npx -y @clerk/agent-toolkit -p local-mcp --tools users organizations
+
+// Use specific tools
+npx -y @clerk/agent-toolkit -p local-mcp --tools users.getUserCount organizations.getOrganization
+```
+
+Use the `--help` flag to view additional server options.
+
+### Usage with Claude Desktop
+Add the following to your `claude_desktop_config.json` file to use the local MCP server:
+
+```json
+{
+  "mcpServers": {
+    "clerk": {
+      "command": "npx",
+      "args": [
+          "-y",
+          "@clerk/agent-toolkit",
+          "-p=local-mcp",
+          "--tools=users",
+          "--secret-key=sk_123"
+      ]
+    }
+  }
+}
+```
+
+For more information, please refer to the [Claude Desktop documentation](https://modelcontextprotocol.io/quickstart/user).
 
 ## Advanced Usage
 
