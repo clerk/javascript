@@ -360,7 +360,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
-    if (this.mode !== 'browser' || this.loaded) {
+    if (typeof window === 'undefined' || this.loaded) {
       return;
     }
 
@@ -374,11 +374,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // For more information refer to:
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
-    if (typeof window !== 'undefined') {
-      window.__clerk_publishable_key = this.#publishableKey;
-      window.__clerk_proxy_url = this.proxyUrl;
-      window.__clerk_domain = this.domain;
-    }
+    window.__clerk_publishable_key = this.#publishableKey;
+    window.__clerk_proxy_url = this.proxyUrl;
+    window.__clerk_domain = this.domain;
 
     try {
       if (this.Clerk) {
