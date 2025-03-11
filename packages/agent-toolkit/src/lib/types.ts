@@ -2,7 +2,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 
 import type { ClerkTool } from './clerk-tool';
 
-export type CreateClerkToolkitParams = {
+export type ToolkitParams = {
   /**
    * All JWT claims of the current session.
    * This is used to scope the tools of this toolkit to a specific session/ user/ organization for
@@ -24,6 +24,11 @@ export type CreateClerkToolkitParams = {
    * @default false
    */
   allowPrivateMetadata?: boolean;
+};
+
+export type ToolsContext = Partial<ToolkitParams['authContext']> & Omit<ToolkitParams, 'authContext'>;
+
+export type CreateClerkToolkitParams = ToolkitParams & {
   /**
    * The Clerk client to use for all API calls,
    * useful if you want to override the default client.
@@ -35,10 +40,7 @@ export type CreateClerkToolkitParams = {
   clerkClient?: ClerkClient;
 };
 
-export type ToolsContext = Partial<CreateClerkToolkitParams['authContext']> &
-  Omit<CreateClerkToolkitParams, 'authContext' | 'clerkClient'>;
-
-export type SdkAdapter<T> = (clerkClient: ClerkClient, params: CreateClerkToolkitParams, clerkTool: ClerkTool) => T;
+export type SdkAdapter<T> = (clerkClient: ClerkClient, params: ToolkitParams, clerkTool: ClerkTool) => T;
 
 export type ClerkToolkitBase = {
   /**

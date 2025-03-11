@@ -1,5 +1,6 @@
 import type { ClerkClient } from '@clerk/backend';
 import type { ZodObject } from 'zod';
+import { z } from 'zod';
 
 import type { CreateClerkToolkitParams, ToolsContext } from './types';
 
@@ -18,7 +19,7 @@ export interface ClerkToolParams {
   /**
    * The Zod schema for the input parameters of the tool
    */
-  parameters: ZodObject<any>;
+  parameters?: ZodObject<any>;
   /**
    * The actual implementation of the tool.
    */
@@ -27,6 +28,7 @@ export interface ClerkToolParams {
 
 export interface ClerkTool extends Omit<ClerkToolParams, 'execute'> {
   bindExecute: (clerkClient: ClerkClient, params: CreateClerkToolkitParams) => (input: any) => Promise<unknown>;
+  parameters: ZodObject<any>;
 }
 
 const trimLines = (text: string) =>
@@ -38,11 +40,13 @@ const trimLines = (text: string) =>
 
 export const ClerkTool = (_params: ClerkToolParams): ClerkTool => {
   const { execute, ...params } = _params;
-  const schemaEntries = Object.entries(params.parameters.shape);
+  const parameters = params.parameters ? params.parameters : z.object({});
+  const schemaEntries = Object.entries(parameters.shape);
+
   const args =
     schemaEntries.length === 0
       ? 'Takes no arguments'
-      : Object.entries(params.parameters.shape)
+      : schemaEntries
           .map(([key, value]) => {
             return `- ${key}: ${(value as any).description || ''}`;
           })
@@ -59,6 +63,7 @@ export const ClerkTool = (_params: ClerkToolParams): ClerkTool => {
 
   return {
     ...params,
+    parameters,
     description,
     bindExecute: (clerkClient, params) => {
       const toolContext = { ...params.authContext, allowPrivateMetadata: params.allowPrivateMetadata };
