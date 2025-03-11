@@ -57,7 +57,7 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
       });
 
       existingScript.addEventListener('error', () => {
-        reject(FAILED_TO_LOAD_ERROR);
+        reject(new Error(FAILED_TO_LOAD_ERROR));
       });
     });
   }
@@ -133,9 +133,9 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
 
 const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
   const attributes = buildClerkJsScriptAttributes(options);
-  for (const attribute in attributes) {
-    script.setAttribute(attribute, attributes[attribute]);
-  }
+  Object.entries(attributes).forEach(([key, value]) => {
+    script.setAttribute(key, value);
+  });
 };
 
 export { loadClerkJsScript, buildClerkJsScriptAttributes, clerkJsScriptUrl };

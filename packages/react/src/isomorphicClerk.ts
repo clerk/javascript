@@ -198,7 +198,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   constructor(options: IsomorphicClerkOptions) {
-    const { Clerk = null, publishableKey } = options || {};
+    const { Clerk = null, publishableKey } = options ?? {};
     this.#publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
