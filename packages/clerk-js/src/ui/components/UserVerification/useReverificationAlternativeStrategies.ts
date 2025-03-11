@@ -1,3 +1,4 @@
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor, SignInFirstFactor, SignInSecondFactor } from '@clerk/types';
 import { useMemo } from 'react';
 

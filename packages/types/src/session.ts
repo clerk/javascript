@@ -154,7 +154,7 @@ export interface SessionResource extends ClerkResource {
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
-  attemptFirstFactorPasskeyVerification: (nonce: string | null) => Promise<SessionVerificationResource>;
+  verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 

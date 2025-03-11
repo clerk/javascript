@@ -203,7 +203,18 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  attemptFirstFactorPasskeyVerification = async (nonce: string | null): Promise<SessionVerificationResource> => {
+  verifyWithPasskey = async (): Promise<SessionVerificationResource> => {
+    const prepareResponse = await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+
+    const { nonce = null } = prepareResponse.firstFactorVerification;
+
+    if (!nonce) {
+      // Throw an error if the nonce is not present
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
