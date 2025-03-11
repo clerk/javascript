@@ -4,10 +4,11 @@ import React from 'react';
 import { useFetch } from 'ui/hooks';
 import { preloadSessionTask, SessionTask } from 'ui/lazyModules/components';
 
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -34,6 +35,10 @@ function SignUpRoutes(): JSX.Element {
   const signUpContext = useSignUpContext();
 
   usePreloadSessionTask(signUpContext.withSessionTasks);
+
+  React.useEffect(() => {
+    return __internal_setComponentNavigationContext?.({ basePath, navigate });
+  }, []);
 
   return (
     <Flow.Root flow='signUp'>
@@ -87,7 +92,7 @@ function SignUpRoutes(): JSX.Element {
           </Route>
         </Route>
         {signUpContext.withSessionTasks && (
-          <Route path='add-organization'>
+          <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
             <SessionTask task='org' />
           </Route>
         )}

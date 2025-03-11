@@ -114,9 +114,12 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
-  const sessionTaskUrl = clerk.session?.currentTask
-    ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signUpUrl, clerk.session?.currentTask)
-    : null;
+  const sessionTaskUrl = buildSessionTaskRedirectUrl({
+    task: clerk.session?.currentTask,
+    path: ctx.path,
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+  });
 
   return {
     ...ctx,
