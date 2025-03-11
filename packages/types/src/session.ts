@@ -88,23 +88,48 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
   | { role?: never; permission?: never }
 >;
 
+/**
+ * The `Session` object is an abstraction over an HTTP session. It models the period of information exchange between a user and the server.
+ *
+ * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
+ *
+ * As soon as a [`User`](https://clerk.com/docs/references/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/references/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ *
+ * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/authentication/configuration/session-options#multi-session-applications).
+ *
+ * All sessions that are **expired**, **removed**, **replaced**, **ended** or **abandoned** are not considered valid.
+ *
+ * > [!NOTE]
+ * > For more information regarding the different session states, see the [guide on session management](https://clerk.com/docs/authentication/configuration/session-options).
+ */
 export interface SessionResource extends ClerkResource {
+  /**
+   * The unique identifier for the session.
+   */
   id: string;
+  /**
+   * The current state of the session.
+   */
   status: SessionStatus;
   expireAt: Date;
   abandonAt: Date;
   /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
+   * An array where each item represents the number of minutes since the last verification of a first or second factor: `[firstFactorAge, secondFactorAge]`.
    */
-  factorVerificationAge: [fistFactorAge: number, secondFactorAge: number] | null;
+  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
+  tasks: Array<SessionTask> | null;
+  /**
+   * The user associated with the session.
+   */
   user: UserResource | null;
   publicUserData: PublicUserData;
+  /**
+   * Marks the session as ended. The session will no longer be active for this `Client` and its status will become **ended**.
+   */
   end: () => Promise<SessionResource>;
   remove: () => Promise<SessionResource>;
   touch: () => Promise<SessionResource>;
@@ -130,10 +155,28 @@ export interface SessionResource extends ClerkResource {
   __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 
+/**
+ * Represents a session resource that has completed all pending tasks
+ * and authentication factors
+ */
 export interface ActiveSessionResource extends SessionResource {
   status: 'active';
   user: UserResource;
 }
+
+/**
+ * Represents a session resource that has completed sign-in but has pending tasks
+ */
+export interface PendingSessionResource extends SessionResource {
+  status: 'pending';
+  user: UserResource;
+}
+
+/**
+ * Represents session resources for users who have completed
+ * the full sign-in flow
+ */
+export type SignedInSessionResource = ActiveSessionResource | PendingSessionResource;
 
 export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
@@ -158,7 +201,15 @@ export interface SessionActivity {
   isMobile?: boolean;
 }
 
-export type SessionStatus = 'abandoned' | 'active' | 'ended' | 'expired' | 'removed' | 'replaced' | 'revoked';
+export type SessionStatus =
+  | 'abandoned'
+  | 'active'
+  | 'ended'
+  | 'expired'
+  | 'removed'
+  | 'replaced'
+  | 'revoked'
+  | 'pending';
 
 export interface PublicUserData {
   firstName: string | null;
@@ -167,6 +218,10 @@ export interface PublicUserData {
   hasImage: boolean;
   identifier: string;
   userId?: string;
+}
+
+export interface SessionTask {
+  key: 'orgs';
 }
 
 export type GetTokenOptions = {

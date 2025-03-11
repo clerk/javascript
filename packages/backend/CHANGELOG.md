@@ -1,5 +1,44 @@
 # Change Log
 
+## 1.25.1
+
+### Patch Changes
+
+- Add .raw property to `Invitation`, `Organization`, `OrganizationInvitation` and `OrganizationMembership` ([#5291](https://github.com/clerk/javascript/pull/5291)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 1.25.0
+
+### Minor Changes
+
+- Add waitlist entry types ([#5148](https://github.com/clerk/javascript/pull/5148)) by [@mackenzienolan](https://github.com/mackenzienolan)
+
+  - `WaitlistEntryJSON`
+  - `WaitlistEntryWebhookEvent`
+
+  Update `WebhookEvent` to include `WaitlistEntryWebhookEvent`
+
+### Patch Changes
+
+- Update `CreateOrganizationInvitationParams.inviterUserId` type to optional ([#5255](https://github.com/clerk/javascript/pull/5255)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Bug fix: Properly remove `Authorization` header on requests that don't require a secret key. ([#5252](https://github.com/clerk/javascript/pull/5252)) by [@panteliselef](https://github.com/panteliselef)
+
+## 1.24.3
+
+### Patch Changes
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+
+## 1.24.2
+
+### Patch Changes
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+
 ## 1.24.1
 
 ### Patch Changes

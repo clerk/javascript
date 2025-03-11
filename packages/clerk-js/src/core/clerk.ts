@@ -5,12 +5,15 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
-import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
+import {
+  eventPrebuiltComponentMounted,
+  eventPrebuiltComponentOpened,
+  TelemetryCollector,
+} from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __internal_UserVerificationModalProps,
-  ActiveSessionResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -47,6 +50,7 @@ import type {
   Resources,
   SDKMetadata,
   SetActiveParams,
+  SignedInSessionResource,
   SignInProps,
   SignInRedirectOptions,
   SignInResource,
@@ -82,7 +86,6 @@ import {
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
-  ignoreEventValue,
   inActiveBrowserTab,
   inBrowser,
   isDevAccountPortalOrigin,
@@ -127,6 +130,8 @@ import {
 } from './resources/internal';
 import { warnings } from './warnings';
 
+type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
+
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
 declare global {
@@ -163,7 +168,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public client: ClientResource | undefined;
-  public session: ActiveSessionResource | null | undefined;
+  public session: SignedInSessionResource | null | undefined;
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
@@ -286,6 +291,10 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  get isSignedIn(): boolean {
+    return !!this.session;
+  }
+
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
@@ -366,49 +375,86 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
+
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-    const handleSetActive = () => {
-      const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
-      if (signOutCallback) {
-        return this.setActive({
-          session: null,
-          beforeEmit: ignoreEventValue(signOutCallback),
-        });
+    const executeSignOut = async () => {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
+      // Notify other tabs that user is signing out.
+      eventBus.dispatch(events.UserSignOut, null);
+      // Clean up cookies
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+
+      this.#setTransitiveState();
+
+      await tracker.track(async () => {
+        if (signOutCallback) {
+          await signOutCallback();
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
+
+      if (tracker.isUnloading()) {
+        return;
       }
 
-      return this.setActive({
-        session: null,
-        redirectUrl,
-      });
+      this.#setAccessors();
+      this.#emit();
+
+      await onAfterSetActive();
     };
 
-    if (!opts.sessionId || this.client.activeSessions.length === 1) {
+    /**
+     * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
+     * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
+     * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
+     */
+    await onBeforeSetActive();
+    if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
       } else {
         await this.client.destroy();
       }
 
-      return handleSetActive();
+      await executeSignOut();
+
+      return;
     }
 
-    const session = this.client.activeSessions.find(s => s.id === opts.sessionId);
+    // Multi-session handling
+    const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
+
     await session?.remove();
+
     if (shouldSignOutCurrent) {
-      return handleSetActive();
+      await executeSignOut();
     }
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
-    // TODO: add telemetry
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'GoogleOneTap' })
       .then(controls => controls.openModal('googleOneTap', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`GoogleOneTap`, props));
   };
 
   public closeGoogleOneTap = (): void => {
@@ -429,6 +475,9 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignIn' })
       .then(controls => controls.openModal('signIn', props || {}));
+
+    const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
+    this.telemetry?.record(eventPrebuiltComponentOpened(`SignIn`, props, additionalData));
   };
 
   public closeSignIn = (): void => {
@@ -449,6 +498,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserVerification' })
       .then(controls => controls.openModal('userVerification', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened(`UserVerification`, props));
   };
 
   public __internal_closeReverification = (): void => {
@@ -483,6 +534,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignUp' })
       .then(controls => controls.openModal('signUp', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
 
   public closeSignUp = (): void => {
@@ -503,6 +556,9 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserProfile' })
       .then(controls => controls.openModal('userProfile', props || {}));
+
+    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
   };
 
   public closeUserProfile = (): void => {
@@ -531,6 +587,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'OrganizationProfile' })
       .then(controls => controls.openModal('organizationProfile', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
   };
 
   public closeOrganizationProfile = (): void => {
@@ -551,6 +609,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
   };
 
   public closeCreateOrganization = (): void => {
@@ -563,6 +623,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Waitlist' })
       .then(controls => controls.openModal('waitlist', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
 
   public closeWaitlist = (): void => {
@@ -580,12 +642,9 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(
-      eventPrebuiltComponentMounted('SignIn', {
-        ...props,
-        withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow(),
-      }),
-    );
+
+    const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignIn`, props, additionalData));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -607,7 +666,8 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(`SignUp`, props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -638,7 +698,8 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
+    const additionalData = props?.customPages?.length || 0 > 0 ? { customPages: true } : undefined;
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props, additionalData));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -793,7 +854,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
+    const additionalData = {
+      ...(props?.customMenuItems?.length || 0 > 0 ? { customItems: true } : undefined),
+      ...(props?.__experimental_asStandalone ? { standalone: true } : undefined),
+    };
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props, additionalData));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -834,7 +900,6 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    type SetActiveHook = () => void | Promise<void>;
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
@@ -846,12 +911,12 @@ export class Clerk implements ClerkInterface {
         : noop;
 
     if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as ActiveSessionResource) || null;
+      session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
     let newSession = session === undefined ? this.session : session;
 
-    // At this point, the `session` variable should contain either an `ActiveSessionResource`
+    // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
     // We now want to set the last active organization id on that session (if it exists).
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
@@ -875,21 +940,16 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    await onBeforeSetActive();
-
-    // If this.session exists, then signOut was triggered by the current tab
-    // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
-    if (shouldSignOutSession) {
-      this.#broadcastSignOutEvent();
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
+    /**
+     * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
+     */
+    await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchLastActiveSession(newSession);
+      await this.#touchCurrentSession(newSession);
       // reload session from updated client
       newSession = this.#getSessionFromClient(newSession?.id);
     }
@@ -904,40 +964,41 @@ export class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
     if (beforeEmit) {
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-      await beforeEmit(newSession);
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        this.#setTransitiveState();
+        await beforeEmit(newSession);
+      });
     }
 
     if (redirectUrl && !beforeEmit) {
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-
-      if (this.client.isEligibleForTouch()) {
-        const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-
-        await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
-      } else {
-        await this.navigate(redirectUrl);
-      }
-
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        if (!this.client) {
+          // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+          return;
+        }
+        this.#setTransitiveState();
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
     }
 
-    //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker?.isUnloading()) {
+    //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
+    if (tracker.isUnloading()) {
       return;
     }
 
     this.#setAccessors(newSession);
-
     this.#emit();
     await onAfterSetActive();
   };
@@ -1503,6 +1564,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
@@ -1514,7 +1576,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        this.#broadcastSignOutEvent();
+        eventBus.dispatch(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -1873,7 +1935,7 @@ export class Clerk implements ClerkInterface {
     this.#pageLifecycle = createPageLifecycle();
 
     this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
-    this.#setupListeners();
+    this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
@@ -1997,42 +2059,54 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  #defaultSession = (client: ClientResource): ActiveSessionResource | null => {
+  #defaultSession = (client: ClientResource): SignedInSessionResource | null => {
     if (client.lastActiveSessionId) {
-      const lastActiveSession = client.activeSessions.find(s => s.id === client.lastActiveSessionId);
-      if (lastActiveSession) {
-        return lastActiveSession;
+      const currentSession = client.signedInSessions.find(s => s.id === client.lastActiveSessionId);
+      if (currentSession) {
+        return currentSession;
       }
     }
-    const session = client.activeSessions[0];
+    const session = client.signedInSessions[0];
     return session || null;
   };
 
-  #setupListeners = (): void => {
+  #setupBrowserListeners = (): void => {
     if (!inClientSide()) {
       return;
     }
 
     this.#pageLifecycle?.onPageFocus(() => {
-      if (this.session) {
-        if (this.#touchThrottledUntil > Date.now()) {
-          return;
-        }
-        this.#touchThrottledUntil = Date.now() + 5_000;
+      if (!this.session) {
+        return;
+      }
 
-        void this.#touchLastActiveSession(this.session);
+      if (this.#touchThrottledUntil > Date.now()) {
+        return;
+      }
+      this.#touchThrottledUntil = Date.now() + 5_000;
+
+      void this.#touchCurrentSession(this.session);
+    });
+
+    /**
+     * Background tabs get notified of a signout event from active tab.
+     */
+    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
+      if (data.type === 'signout') {
+        void this.handleUnauthenticated({ broadcast: false });
       }
     });
 
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
-        void this.handleUnauthenticated();
-      }
+    /**
+     * Allow resources within the singleton to notify other tabs about a signout event (scoped to a single tab)
+     */
+    eventBus.on(events.UserSignOut, () => {
+      this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
-  #touchLastActiveSession = async (session?: ActiveSessionResource | null): Promise<void> => {
+  #touchCurrentSession = async (session?: SignedInSessionResource | null): Promise<void> => {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
@@ -2063,10 +2137,6 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #broadcastSignOutEvent = () => {
-    this.#broadcastChannel?.postMessage({ type: 'signout' });
-  };
-
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;
@@ -2081,18 +2151,14 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  #setAccessors = (session?: ActiveSessionResource | null) => {
+  #setAccessors = (session?: SignedInSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
-    this.#aliasUser();
-  };
-
-  #getSessionFromClient = (sessionId: string | undefined): ActiveSessionResource | null => {
-    return this.client?.activeSessions.find(x => x.id === sessionId) || null;
-  };
-
-  #aliasUser = () => {
     this.user = this.session ? this.session.user : null;
+  };
+
+  #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {
+    return this.client?.signedInSessions.find(x => x.id === sessionId) || null;
   };
 
   #handleImpersonationFab = () => {

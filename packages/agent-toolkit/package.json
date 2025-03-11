@@ -1,7 +1,6 @@
 {
   "name": "@clerk/agent-toolkit",
-  "version": "0.0.2",
-  "private": true,
+  "version": "0.0.6",
   "description": "Clerk Toolkit for AI Agents",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -19,11 +18,11 @@
   "exports": {
     "./langchain": {
       "types": "./dist/langchain/index.d.ts",
-      "import": "./dist/langchain/index.js"
+      "default": "./dist/langchain/index.js"
     },
     "./ai-sdk": {
       "types": "./dist/ai-sdk/index.d.ts",
-      "import": "./dist/ai-sdk/index.js"
+      "default": "./dist/ai-sdk/index.js"
     }
   },
   "files": [
@@ -34,14 +33,14 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --ignore-rules cjs-resolves-to-esm no-resolution",
+    "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "zod": "^3.24.1"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "esbuild-plugin-file-path-extensions": "^2.1.4"

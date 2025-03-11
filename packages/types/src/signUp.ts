@@ -42,7 +42,13 @@ declare global {
   }
 }
 
+/**
+ * The `SignUp` object holds the state of the current sign-up and provides helper methods to navigate and complete the sign-up process. Once a sign-up is complete, a new user is created.
+ */
 export interface SignUpResource extends ClerkResource {
+  /**
+   * The current status of the sign-up.
+   */
   status: SignUpStatus | null;
   requiredFields: SignUpField[];
   optionalFields: SignUpField[];

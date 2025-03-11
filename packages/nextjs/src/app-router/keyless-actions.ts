@@ -13,7 +13,7 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   const cookieStore = await cookies();
   const request = new Request('https://placeholder.com', { headers: await headers() });
 
-  const keyless = getKeylessCookieValue(name => cookieStore.get(name)?.value);
+  const keyless = await getKeylessCookieValue(name => cookieStore.get(name)?.value);
   const pksMatch = keyless?.publishableKey === publishableKey;
   const sksMatch = keyless?.secretKey === secretKey;
   if (pksMatch && sksMatch) {
@@ -22,7 +22,7 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   }
 
   // Set the new keys in the cookie.
-  cookieStore.set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  cookieStore.set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
@@ -64,7 +64,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
 
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
-  void (await cookies()).set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  void (await cookies()).set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: false,
     httpOnly: false,
   });

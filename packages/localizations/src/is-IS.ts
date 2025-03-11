@@ -876,6 +876,7 @@ export const isIS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjarlægja',
         menuAction__rename: 'Endurnefna',
+        primaryButton: undefined,
         title: 'Lyklar',
       },
       passwordSection: {

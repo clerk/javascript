@@ -1,5 +1,67 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- This new version introduces the following breaking changes: ([#5144](https://github.com/clerk/javascript/pull/5144)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduced a new `retry` utility function to replace the deprecated `callWithRetry`.
+  - Removed the `callWithRetry` function and its associated tests.
+  - Renamed `runWithExponentialBackOff` to `retry` for consistency.
+
+  Migration steps:
+
+  - Replace any usage of `callWithRetry` with the new `retry` function.
+  - Update import statements from:
+    ```typescript
+    import { callWithRetry } from '@clerk/shared/callWithRetry';
+    ```
+    to:
+    ```typescript
+    import { retry } from '@clerk/shared/retry';
+    ```
+  - Replace any usage of `runWithExponentialBackOff` with `retry`.
+  - Update import statements from:
+    ```typescript
+    import { runWithExponentialBackOff } from '@clerk/shared/utils';
+    ```
+    to:
+    ```typescript
+    import { retry } from '@clerk/shared/retry';
+    ```
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Update `TelemetryCollector` to throttle events after they've been sampled. ([#5236](https://github.com/clerk/javascript/pull/5236)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a)]:
+  - @clerk/types@4.47.0
+
+## 2.22.0
+
+### Minor Changes
+
+- Introduce `EmailLinkErrorCodeStatus` to support users in custom flows and mark `EmailLinkErrorCode` as deprecated. ([#5142](https://github.com/clerk/javascript/pull/5142)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```diff
+  - import { EmailLinkErrorCode } from '@clerk/nextjs/errors'
+  + import { EmailLinkErrorCodeStatus } from '@clerk/nextjs/errors'
+  ```
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Previously, the `getCurrentOrganizationMembership()` function was duplicated in both `@clerk/vue` and `@clerk/shared/react`. This change moves the function to `@clerk/shared/organization`. ([#5168](https://github.com/clerk/javascript/pull/5168)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8)]:
+  - @clerk/types@4.46.1
+
 ## 2.21.1
 
 ### Patch Changes

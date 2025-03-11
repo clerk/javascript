@@ -7,7 +7,13 @@ describe('Environment', () => {
     const environmentJSON = {
       object: 'environment',
       id: '',
-      auth_config: { object: 'auth_config', id: '', single_session_mode: true, claimed_at: null },
+      auth_config: {
+        object: 'auth_config',
+        id: '',
+        single_session_mode: true,
+        claimed_at: null,
+        reverification: true,
+      },
       display_config: {
         object: 'display_config',
         id: 'display_config_DUMMY_ID',
@@ -240,7 +246,13 @@ describe('Environment', () => {
     const environmentJSON = {
       object: 'environment',
       id: '',
-      auth_config: { object: 'auth_config', id: '', single_session_mode: true, claimed_at: null },
+      auth_config: {
+        object: 'auth_config',
+        id: '',
+        single_session_mode: true,
+        claimed_at: null,
+        reverification: true,
+      },
       display_config: {
         object: 'display_config',
         id: 'display_config_DUMMY_ID',

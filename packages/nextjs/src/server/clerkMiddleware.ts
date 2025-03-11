@@ -59,7 +59,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
 };
 
-type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
+type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -102,9 +102,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
@@ -223,8 +223,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         return returnBackFromKeylessSync(request);
       }
 
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.

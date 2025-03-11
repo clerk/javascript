@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "2.2.0",
+  "version": "2.3.2",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -37,23 +37,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js"
+      "default": "./dist/react/index.js"
     },
     "./client": {
       "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.js"
+      "default": "./dist/client/index.js"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
-      "import": "./dist/internal/index.js"
+      "default": "./dist/internal/index.js"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js"
+      "default": "./dist/server/index.js"
     },
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",
@@ -76,7 +76,7 @@
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "dev": "tsup --watch --onSuccess \"pnpm build:dts\"",
     "lint": "eslint src env.d.ts",
-    "lint:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
     "publish:local": "pnpm yalc push --replace --sig"
   },
@@ -88,7 +88,7 @@
     "nanostores": "0.11.3"
   },
   "devDependencies": {
-    "astro": "^5.2.5"
+    "astro": "^5.4.2"
   },
   "peerDependencies": {
     "astro": "^4.15.0 || ^5.0.0"

@@ -4,10 +4,10 @@ import type { SignInResource } from 'signIn';
 import type { SetActive, SignOut } from './clerk';
 import type { ActJWTClaim } from './jwt';
 import type {
-  ActiveSessionResource,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
+  SignedInSessionResource,
 } from './session';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
@@ -16,8 +16,7 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * Return values of the `useAuth()` hook
- * @interface
+ * @inline
  */
 export type UseAuthReturn =
   | {
@@ -37,6 +36,9 @@ export type UseAuthReturn =
        * The ID for the current session.
        */
       sessionId: undefined;
+      /**
+       * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+       */
       actor: undefined;
       /**
        * The ID of the user's active organization.
@@ -55,7 +57,7 @@ export type UseAuthReturn =
        */
       has: CheckAuthorizationSignedOut;
       /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
+       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#sign-out).
        */
       signOut: SignOut;
       /**
@@ -104,8 +106,7 @@ export type UseAuthReturn =
     };
 
 /**
- * Return values of the `useSignIn()` hook
- * @interface
+ * @inline
  */
 export type UseSignInReturn =
   | {
@@ -129,8 +130,7 @@ export type UseSignInReturn =
     };
 
 /**
- * Return values of the `useSignUp()` hook
- * @interface
+ * @inline
  */
 export type UseSignUpReturn =
   | {
@@ -154,8 +154,7 @@ export type UseSignUpReturn =
     };
 
 /**
- * Return values of the `useSession()` hook
- * @interface
+ * @inline
  */
 export type UseSessionReturn =
   | {
@@ -180,12 +179,11 @@ export type UseSessionReturn =
   | {
       isLoaded: true;
       isSignedIn: true;
-      session: ActiveSessionResource;
+      session: SignedInSessionResource;
     };
 
 /**
- * Return values of the `useSessionList()` hook
- * @interface
+ * @inline
  */
 export type UseSessionListReturn =
   | {
@@ -209,8 +207,7 @@ export type UseSessionListReturn =
     };
 
 /**
- * Return values of the `useUser()` hook
- * @interface
+ * @inline
  */
 export type UseUserReturn =
   | {
@@ -219,11 +216,11 @@ export type UseUserReturn =
        */
       isLoaded: false;
       /**
-       * A boolean that indicates whether a user is currently signed in.
+       * A boolean that returns `true` if the user is signed in.
        */
       isSignedIn: undefined;
       /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }

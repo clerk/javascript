@@ -31,7 +31,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ActiveSessionResource } from './session';
+import type { SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -43,27 +43,26 @@ import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 /**
- * Contains information about the SDK that the host application is using.
- * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+ * @inline
  */
 export type SDKMetadata = {
   /**
-   * The npm package name of the SDK
+   * The npm package name of the SDK.
    */
   name: string;
   /**
-   * The npm package version of the SDK
+   * The npm package version of the SDK.
    */
   version: string;
   /**
-   * Typically this will be the NODE_ENV that the SDK is currently running in
+   * Typically this will be the `NODE_ENV` that the SDK is currently running in.
    */
   environment?: string;
 };
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -105,6 +104,9 @@ export interface Clerk {
    */
   loaded: boolean;
 
+  /**
+   * @internal
+   */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   frontendApi: string;
@@ -127,11 +129,16 @@ export interface Clerk {
   /** Clerk flag for loading Clerk in a standard browser setup */
   isStandardBrowser: boolean | undefined;
 
+  /**
+   * Indicates whether the current user has a valid signed-in client session
+   */
+  isSignedIn: boolean;
+
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 
-  /** Active Session. */
-  session: ActiveSessionResource | null | undefined;
+  /** Current Session. */
+  session: SignedInSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
@@ -394,6 +401,7 @@ export interface Clerk {
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
    * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   * @internal
    */
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
@@ -602,14 +610,16 @@ export interface Clerk {
   /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   * @internal
    */
   __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
 
   /**
-   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
-   **/
+   * This function is used to reload the initial resources (Environment/Client) from the Frontend API.
+   * @internal
+   */
   __internal_reloadInitialResources: () => Promise<void>;
 }
 
@@ -679,13 +689,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     }
   | {
-      /**
-       * A function which takes the destination path as an argument and performs a "push" navigation.
-       */
       routerPush: RouterFn;
-      /**
-       * A function which takes the destination path as an argument and performs a "replace" navigation.
-       */
       routerReplace: RouterFn;
       routerDebug?: boolean;
     };
@@ -708,9 +712,9 @@ export type ClerkOptions = ClerkOptionsNavigation &
     localization?: LocalizationResource;
     polling?: boolean;
     /**
-     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
-    selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
+    selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
      * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
@@ -720,14 +724,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [FAPI `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signInUrl?: string;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     */
     signUpUrl?: string;
     /**
      * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
@@ -742,7 +748,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry)
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
       | false
@@ -758,33 +764,43 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
+     */
     waitlistUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
       {
+        /**
+         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         */
         persistClient: boolean;
+        /**
+         * Clerk will rethrow network errors that occur while the user is offline.
+         */
         rethrowOfflineNetworkErrors: boolean;
-        combinedFlow: boolean;
       },
       Record<string, any>
     >;
 
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
+     * @internal
      */
     __internal_keyless_claimKeylessApplicationUrl?: string;
 
     /**
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     * @internal
      */
     __internal_keyless_copyInstanceKeysUrl?: string;
 
     /**
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
   };
@@ -796,7 +812,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: ActiveSessionResource | null;
+  session?: SignedInSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -830,9 +846,27 @@ type NavigationType =
 
 type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
 
+/**
+ * @inline
+ */
 type RouterFn = (
+  /**
+   * The destination path
+   */
   to: string,
-  metadata?: { __internal_metadata?: RouterMetadata; windowNavigate: (to: URL | string) => void },
+  /**
+   * Optional metadata
+   */
+  metadata?: {
+    /**
+     * @internal
+     */
+    __internal_metadata?: RouterMetadata;
+    /**
+     * Provide a function to be used for navigation.
+     */
+    windowNavigate: (to: URL | string) => void;
+  },
 ) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
@@ -867,34 +901,38 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+/**
+ * The parameters for the `setActive()` method.
+ * @interface
+ */
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set as active.
-   * If `null`, the current session is deleted.
+   * The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.
    */
-  session?: ActiveSessionResource | string | null;
+  session?: SignedInSessionResource | string | null;
 
   /**
-   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
-   * If `null`, the currently active organization is removed as active.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session. If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated use the redirectUrl parameter to redirect a user
+   * @deprecated in favor of `redirectUrl`.
    *
-   * Callback run just before the active session and/or organization is set to the passed object.
-   * Can be used to hook up for pre-navigation actions.
+   * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   * The full URL or path to redirect to just before the active session and/or organization is set.
    */
   redirectUrl?: string;
 };
 
-export type SetActive = (params: SetActiveParams) => Promise<void>;
+/**
+ * @inline
+ */
+export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
