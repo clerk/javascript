@@ -410,17 +410,15 @@ export interface Clerk {
    * be triggered from `Clerk` methods
    * @internal
    */
-  __internal_setComponentNavigationContext: (
-    context: {
-      navigate: (
-        to: string,
-        options?: {
-          searchParams?: URLSearchParams;
-        },
-      ) => Promise<unknown>;
-      basePath: string;
-    } | null,
-  ) => () => void;
+  __internal_setComponentNavigationContext: (context: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  }) => () => void;
 
   /**
    * Set the active session and organization explicitly.
