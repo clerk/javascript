@@ -441,15 +441,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   public addOnLoaded = (cb: () => void) => {
-    this.eventEmitter.on('loaded', cb);
+    this.eventEmitter.once('loaded', cb);
     if (this.loaded) {
       this.eventEmitter.emit('loaded');
     }
   };
-
-  public emitLoaded() {
-    this.eventEmitter.emit('loaded');
-  }
 
   public removeOnLoaded(cb: () => void) {
     this.eventEmitter.off('loaded', cb);
@@ -524,7 +520,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.#status = 'ready';
-    this.emitLoaded();
+    this.eventEmitter.emit('loaded');
     return this.clerkjs;
   };
 
