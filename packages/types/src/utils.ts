@@ -83,6 +83,7 @@ type IsSerializable<T> = T extends Function ? false : true;
 
 /**
  * Excludes any non-serializable prop from an object
+ * @hidden
  */
 export type Serializable<T> = {
   [K in keyof T as IsSerializable<T[K]> extends true ? K : never]: T[K];

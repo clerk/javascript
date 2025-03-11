@@ -20,18 +20,15 @@ export type AfterMultiSessionSingleSignOutUrl = {
  */
 export type LegacyRedirectProps = {
   /**
-   * @deprecated This is deprecated and will be removed in a future release.
-   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   afterSignInUrl?: string | null;
   /**
-   * @deprecated This is deprecated and will be removed in a future release.
-   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   afterSignUpUrl?: string | null;
   /**
-   * @deprecated This is deprecated and will be removed in a future release.
-   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   redirectUrl?: string | null;
 };
@@ -95,38 +92,28 @@ export type RedirectUrlProp = {
 
 export type SignUpForceRedirectUrl = {
   /**
-   * Full URL or path to navigate after successful sign up.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   * @default undefined
+   * If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signUpForceRedirectUrl?: string | null;
 };
 
 export type SignUpFallbackRedirectUrl = {
   /**
-   * Full URL or path to navigate after successful sign up.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   * @default undefined
+   * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signUpFallbackRedirectUrl?: string | null;
 };
 
 export type SignInFallbackRedirectUrl = {
   /**
-   * Full URL or path to navigate after successful sign in.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   * @default undefined
+   * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInFallbackRedirectUrl?: string | null;
 };
 
 export type SignInForceRedirectUrl = {
   /**
-   * Full URL or path to navigate after successful sign in.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   * @default undefined
+   * If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInForceRedirectUrl?: string | null;
 };
