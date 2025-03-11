@@ -818,6 +818,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
         withSessionTasks: boolean;
       },
       Record<string, any>
