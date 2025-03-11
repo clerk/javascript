@@ -7,7 +7,7 @@ import { Route, Switch } from '../../router';
 import type { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
 
-const _CreateOrganization = () => {
+const CreateOrganizationInternal = () => {
   return (
     <Flow.Root flow='createOrganization'>
       <Flow.Part>
@@ -25,7 +25,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   return <CreateOrganizationPage />;
 });
 
-export const CreateOrganization = withCardStateProvider(_CreateOrganization);
+export const CreateOrganization = withCardStateProvider(CreateOrganizationInternal);
 
 export const CreateOrganizationModal = (props: CreateOrganizationModalProps): JSX.Element => {
   const createOrganizationProps: CreateOrganizationCtx = {

@@ -59,7 +59,7 @@ const useAutoFillPasskey = () => {
   };
 };
 
-export function _SignInStart(): JSX.Element {
+function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -570,4 +570,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));
