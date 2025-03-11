@@ -51,6 +51,7 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor } from './utils';
+import { EventEmitter } from './utils/EventEmitter';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;
@@ -95,6 +96,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
+  private eventEmitter = new EventEmitter();
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
@@ -439,19 +441,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   public addOnLoaded = (cb: () => void) => {
-    this.loadedListeners.push(cb);
-    /**
-     * When IsomorphicClerk is loaded execute the callback directly
-     */
+    this.eventEmitter.on('loaded', cb);
     if (this.loaded) {
-      this.emitLoaded();
+      this.eventEmitter.emit('loaded');
     }
   };
 
-  public emitLoaded = () => {
-    this.loadedListeners.forEach(cb => cb());
-    this.loadedListeners = [];
-  };
+  public emitLoaded() {
+    this.eventEmitter.emit('loaded');
+  }
+
+  public removeOnLoaded(cb: () => void) {
+    this.eventEmitter.off('loaded', cb);
+  }
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
