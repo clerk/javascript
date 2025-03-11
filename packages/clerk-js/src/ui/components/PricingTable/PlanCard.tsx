@@ -10,13 +10,14 @@ import {
   Heading,
   Icon,
   localizationKeys,
+  SimpleButton,
   Span,
   Text,
   useAppearance,
 } from '../../customizables';
 import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
-import { Check, InformationCircle } from '../../icons';
+import { Check, InformationCircle, Plus, Minus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
@@ -33,8 +34,10 @@ interface PlanCardProps {
 export function PlanCard(props: PlanCardProps) {
   const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
+  const [showAllFeatures, setShowAllFeatures] = React.useState(false);
   const totalFeatures = plan.features.length;
   const hasFeatures = totalFeatures > 0;
+  const canToggleFeatures = isCompact && totalFeatures > 3;
   const isActivePlan = plan.isActiveForPayer;
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: appearanceAnimations } = useAppearance().parsedLayout;
@@ -44,6 +47,11 @@ export function PlanCard(props: PlanCardProps) {
         ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
         : 'none',
   });
+
+  const toggleFeatures = () => {
+    setShowAllFeatures(prev => !prev);
+  };
+
   return (
     <Box
       key={plan.id}
@@ -219,6 +227,7 @@ export function PlanCard(props: PlanCardProps) {
             elementDescriptor={descriptors.planCardFeatures}
             sx={t => ({
               display: 'flex',
+              flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
               backgroundColor: t.colors.$colorBackground,
@@ -235,10 +244,9 @@ export function PlanCard(props: PlanCardProps) {
                 display: 'grid',
                 flex: '1',
                 rowGap: isCompact ? t.space.$2 : t.space.$3,
-                maskImage: isCompact && totalFeatures >= 3 ? 'linear-gradient(rgba(0,0,0,1), transparent)' : undefined,
               })}
             >
-              {plan.features.slice(0, isCompact ? 3 : plan.features.length).map(feature => (
+              {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
                 <Box
                   elementDescriptor={descriptors.planCardFeaturesListItem}
                   elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
@@ -260,6 +268,24 @@ export function PlanCard(props: PlanCardProps) {
                 </Box>
               ))}
             </Box>
+            {canToggleFeatures && (
+              <SimpleButton
+                onClick={toggleFeatures}
+                variant='link'
+                sx={t => ({
+                  marginBlockStart: t.space.$2,
+                  gap: t.space.$1,
+                })}
+              >
+                <Icon
+                  icon={showAllFeatures ? Minus : Plus}
+                  colorScheme='neutral'
+                  size='md'
+                  aria-hidden
+                />
+                {showAllFeatures ? 'Hide features' : 'See all features'}
+              </SimpleButton>
+            )}
           </Box>
         ) : null}
         <Box
