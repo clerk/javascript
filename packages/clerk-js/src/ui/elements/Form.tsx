@@ -118,7 +118,7 @@ const FormControlRow = (props: Omit<PropsOfComponent<typeof Flex>, 'elementId'> 
 
 type CommonFieldRootProps = Omit<PropsOfComponent<typeof Field.Root>, 'children' | 'elementDescriptor' | 'elementId'>;
 
-type CommonInputProps = CommonFieldRootProps & {
+export type CommonInputProps = CommonFieldRootProps & {
   isOptional?: boolean;
   actionLabel?: string | LocalizationKey;
   onActionClicked?: React.MouseEventHandler;
