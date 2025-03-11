@@ -68,9 +68,7 @@ export const CheckoutComplete = ({
           <LineItems.Group variant='secondary'>
             <LineItems.Title>Payment method</LineItems.Title>
             <LineItems.Description>
-              {checkout.invoice
-                ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-                : '–'}
+              {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
