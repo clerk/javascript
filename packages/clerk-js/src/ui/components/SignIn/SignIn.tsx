@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -15,7 +16,7 @@ import {
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { preloadSessionTask, SessionTask } from '../../lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import {
   LazySignUpContinue,
   LazySignUpSSOCallback,
@@ -130,7 +131,7 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               {signInContext.withSessionTasks && (
-                <Route path='add-organization'>
+                <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
                   <SessionTask task='org' />
                 </Route>
               )}
@@ -144,7 +145,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         {signInContext.withSessionTasks && (
-          <Route path='add-organization'>
+          <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
             <SessionTask task='org' />
           </Route>
         )}
@@ -166,6 +167,9 @@ const usePreloadSessionTask = (enabled = false) =>
   useFetch(enabled ? preloadSessionTask : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function SignInRoot() {
+  const { __internal_setComponentNavigationContext } = useClerk();
+  const { navigate, basePath } = useRouter();
+
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
     componentName: 'SignUp',
@@ -184,6 +188,10 @@ function SignInRoot() {
   usePreloadSignUp(signInContext.isCombinedFlow);
 
   usePreloadSessionTask(signInContext.withSessionTasks);
+
+  React.useEffect(() => {
+    return __internal_setComponentNavigationContext?.({ basePath, navigate });
+  }, []);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

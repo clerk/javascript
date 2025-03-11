@@ -40,7 +40,7 @@ export const BaseRouter = ({
 }: BaseRouterProps): JSX.Element => {
   // Disabling is acceptable since this is a Router component
   // eslint-disable-next-line custom-rules/no-navigate-useClerk
-  const { navigate: clerkNavigate, __internal_setComponentNavigationContext } = useClerk();
+  const { navigate: clerkNavigate } = useClerk();
 
   const [routeParts, setRouteParts] = React.useState({
     path: getPath(),
@@ -120,10 +120,6 @@ export const BaseRouter = ({
     setRouteParts({ path: toURL.pathname, queryString: toURL.search });
     return internalNavRes;
   };
-
-  React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ basePath, navigate: baseNavigate });
-  }, []);
 
   return (
     <RouteContext.Provider

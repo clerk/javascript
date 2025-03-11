@@ -3,13 +3,18 @@ import type { ClerkOptions, EnvironmentResource, SessionTask } from '@clerk/type
 import { buildURL } from '../utils';
 
 export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
-  org: '/add-organization',
+  org: 'add-organization',
 } as const;
 
 interface NavigateToTaskOptions {
   componentNavigationContext: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
     basePath: string;
-    navigate: (toURL: URL | undefined) => Promise<unknown>;
   } | null;
   globalNavigate: (to: string) => Promise<unknown>;
   options: ClerkOptions;
@@ -25,20 +30,10 @@ export function navigateToTask(
   task: SessionTask,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  if (componentNavigationContext) {
-    const isHashRouting = !!new URL(window.location.href).hash;
-    const taskUrl = buildURL({
-      base: componentNavigationContext.basePath,
-      ...(isHashRouting
-        ? {
-            hashPath: SESSION_TASK_ROUTE_BY_KEY[task.key],
-          }
-        : {
-            pathname: componentNavigationContext.basePath + SESSION_TASK_ROUTE_BY_KEY[task.key],
-          }),
-    }) as URL;
+  const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
 
-    return componentNavigationContext.navigate(taskUrl);
+  if (componentNavigationContext) {
+    return componentNavigationContext.navigate(`/${componentNavigationContext.basePath + taskRoute}`);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;
@@ -49,7 +44,7 @@ export function navigateToTask(
     // TODO - Accept custom URL option for custom flows in order to eject out of `signInUrl/signUpUrl`
     {
       base: isReferrerSignUpUrl ? signUpUrl : signInUrl,
-      hashPath: SESSION_TASK_ROUTE_BY_KEY[task.key],
+      hashPath: taskRoute,
     },
     { stringify: true },
   );

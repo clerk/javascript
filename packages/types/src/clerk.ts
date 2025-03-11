@@ -412,7 +412,12 @@ export interface Clerk {
    */
   __internal_setComponentNavigationContext: (
     context: {
-      navigate: (toURL: URL | undefined) => Promise<unknown>;
+      navigate: (
+        to: string,
+        options?: {
+          searchParams?: URLSearchParams;
+        },
+      ) => Promise<unknown>;
       basePath: string;
     } | null,
   ) => () => void;
