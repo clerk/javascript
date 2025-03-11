@@ -1018,10 +1018,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (session.lastActiveToken) {
-      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
-    }
-
     // Handles multi-session scenario when switching from `active`
     // to `pending`
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
