@@ -23,6 +23,25 @@ export class EventEmitter {
   }
 
   /**
+   * Registers a one-time listener for a specific event.
+   * The listener is automatically removed after being called once.
+   *
+   * @param event - The name of the event to listen for.
+   * @param listener - The callback function to execute when the event is emitted.
+   */
+  once(event: string, listener: (...args: any[]) => void): void {
+    const onceWrapper = (...args: any[]) => {
+      this.off(event, onceWrapper); // Remove after first execution
+      listener(...args);
+    };
+
+    // Store a reference mapping for proper removal
+    Object.defineProperty(listener, '__onceWrapper', { value: onceWrapper });
+
+    this.on(event, onceWrapper);
+  }
+
+  /**
    * Removes a specific listener from an event.
    *
    * @param event - The name of the event.
@@ -31,7 +50,8 @@ export class EventEmitter {
   off(event: string, listener: (...args: any[]) => void): void {
     const listeners = this.events.get(event);
     if (listeners) {
-      listeners.delete(listener);
+      const wrappedListener = (listener as any).__onceWrapper || listener;
+      listeners.delete(wrappedListener);
       if (listeners.size === 0) {
         this.events.delete(event);
       }

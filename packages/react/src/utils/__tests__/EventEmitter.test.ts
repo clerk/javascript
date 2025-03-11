@@ -111,4 +111,61 @@ describe('EventEmitter', () => {
     expect(cb1).not.toHaveBeenCalled();
     expect(cb2).toHaveBeenCalledTimes(1);
   });
+
+  describe('once', () => {
+    it('executes a one-time listener only once', () => {
+      const callback = vi.fn();
+      emitter.once('onceEvent', callback);
+
+      emitter.emit('onceEvent');
+      emitter.emit('onceEvent'); // Should not trigger again
+
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes arguments to a one-time listener', () => {
+      const callback = vi.fn();
+      emitter.once('onceArgsEvent', callback);
+
+      emitter.emit('onceArgsEvent', 'hello', 42);
+
+      expect(callback).toHaveBeenCalledWith('hello', 42);
+    });
+
+    it('removes a one-time listener automatically after execution', () => {
+      const callback = vi.fn();
+      emitter.once('autoRemoveEvent', callback);
+
+      emitter.emit('autoRemoveEvent');
+
+      // Emitting again should not call the callback
+      emitter.emit('autoRemoveEvent');
+
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not affect other listeners on the same event', () => {
+      const onceCallback = vi.fn();
+      const regularCallback = vi.fn();
+
+      emitter.once('mixedEvent', onceCallback);
+      emitter.on('mixedEvent', regularCallback);
+
+      emitter.emit('mixedEvent');
+      emitter.emit('mixedEvent'); // Only `regularCallback` should fire again
+
+      expect(onceCallback).toHaveBeenCalledTimes(1);
+      expect(regularCallback).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not call the one-time listener if removed before execution', () => {
+      const callback = vi.fn();
+      emitter.once('removeBeforeEvent', callback);
+
+      emitter.off('removeBeforeEvent', callback);
+      emitter.emit('removeBeforeEvent');
+
+      expect(callback).not.toHaveBeenCalled();
+    });
+  });
 });
