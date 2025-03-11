@@ -171,7 +171,7 @@ const CancelFooter = ({ plan }: { plan: __experimental_CommercePlanResource; han
   };
 
   // TODO: remove when we can hook up cancel button
-  return null;
+  // return null;
 
   return (
     <Col

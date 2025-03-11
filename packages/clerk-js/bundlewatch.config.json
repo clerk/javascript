@@ -18,6 +18,8 @@
     { "path": "./dist/userverification*.js", "maxSize": "5KB" },
     { "path": "./dist/onetap*.js", "maxSize": "1KB" },
     { "path": "./dist/waitlist*.js", "maxSize": "1.3KB" },
-    { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" }
+    { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" },
+    { "path": "./dist/pricingTable*.js", "maxSize": "3.5KB" },
+    { "path": "./dist/checkout*.js", "maxSize": "3.5KB" }
   ]
 }

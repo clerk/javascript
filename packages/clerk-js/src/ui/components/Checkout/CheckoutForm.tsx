@@ -3,14 +3,18 @@ import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
   __experimental_CommercePaymentSourceResource,
+  ClerkAPIError,
+  ClerkRuntimeError,
 } from '@clerk/types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button, Col, Flex, Form, Icon, Text } from '../../customizables';
-import { Disclosure, Divider, Select, SelectButton, SelectOptionList } from '../../elements';
+import { Alert, Disclosure, Divider, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
+import { animations } from '../../styledSystem';
+import { handleError } from '../../utils';
 
 export const CheckoutForm = ({
   checkout,
@@ -25,6 +29,7 @@ export const CheckoutForm = ({
   const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
   const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
   const { data } = useFetch(__experimental_commerce?.getPaymentSources, {});
   const { data: paymentSources } = data || { data: [] };
@@ -33,26 +38,32 @@ export const CheckoutForm = ({
     setOpenAccountFundsDropDown(false);
   }, []);
 
-  const confirmCheckout = ({ paymentSourceId }: { paymentSourceId: string }) => {
-    checkout
+  const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
+    return checkout
       .confirm({ paymentSourceId })
       .then(newCheckout => {
         onCheckoutComplete(newCheckout);
-        setIsSubmitting(false);
       })
-      .catch(() => {
-        setIsSubmitting(false);
+      .catch(error => {
+        throw error;
       });
   };
 
   const onPaymentSourceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(undefined);
 
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    return confirmCheckout({ paymentSourceId });
+    try {
+      await confirmCheckout({ paymentSourceId });
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const onStripeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,33 +72,33 @@ export const CheckoutForm = ({
       return;
     }
     setIsSubmitting(true);
+    setSubmitError(undefined);
 
-    const { setupIntent, error } = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: '', // TODO: need to figure this out
-      },
-      redirect: 'if_required',
-    });
-    if (error || !setupIntent) {
-      return console.log(error.message || 'stripe error');
+    try {
+      const { setupIntent, error } = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: '', // TODO(@COMMERCE): need to figure this out
+        },
+        redirect: 'if_required',
+      });
+      if (error) {
+        return;
+      }
+
+      const paymentSource = await __experimental_commerce.addPaymentSource({
+        gateway: 'stripe',
+        paymentMethod: 'card',
+        paymentToken: setupIntent.payment_method as string,
+      });
+
+      await confirmCheckout({ paymentSourceId: paymentSource.id });
+    } catch (error) {
+      console.log(error);
+      handleError(error, [], setSubmitError);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const { payment_method } = setupIntent;
-    if (!payment_method) {
-      return console.log('no payment method');
-    }
-
-    const paymentSource = await __experimental_commerce.addPaymentSource({
-      gateway: 'stripe',
-      paymentMethod: 'card',
-      paymentToken: payment_method as string,
-    });
-    if (!paymentSource) {
-      return console.log('no payment source');
-    }
-
-    return confirmCheckout({ paymentSourceId: paymentSource.id });
   };
 
   return (
@@ -95,6 +106,16 @@ export const CheckoutForm = ({
       gap={3}
       sx={t => ({ padding: t.space.$4 })}
     >
+      {submitError && (
+        <Alert
+          variant='danger'
+          sx={t => ({
+            animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
+          })}
+        >
+          {typeof submitError === 'string' ? submitError : submitError.message}
+        </Alert>
+      )}
       {paymentSources.length > 0 && (
         <>
           <Disclosure.Root

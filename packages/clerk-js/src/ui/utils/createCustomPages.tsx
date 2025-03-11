@@ -43,7 +43,7 @@ type GetDefaultRoutesReturnType = {
 
 type CreateCustomPagesParams = {
   customPages: CustomPage[];
-  getDefaultRoutes: () => GetDefaultRoutesReturnType;
+  getDefaultRoutes: ({ commerce }: { commerce: boolean }) => GetDefaultRoutesReturnType;
   setFirstPathToRoot: (routes: NavbarRoute[]) => NavbarRoute[];
   excludedPathsFromDuplicateWarning: string[];
 };
@@ -76,7 +76,9 @@ const createCustomPages = (
   { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
   clerk: LoadedClerk,
 ) => {
-  const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes();
+  const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
+    commerce: clerk.__internal_getOption('experimental')?.commerce,
+  });
 
   if (isDevelopmentSDK(clerk)) {
     checkForDuplicateUsageOfReorderingItems(customPages, validReorderItemLabels);
@@ -228,7 +230,7 @@ const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
   }
 };
 
-const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
+const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('userProfile.navbar.account'),
@@ -242,13 +244,15 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       icon: TickShield,
       path: 'security',
     },
-    {
+  ];
+  if (commerce) {
+    INITIAL_ROUTES.push({
       name: localizationKeys('userProfile.navbar.billing'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
       icon: CreditCard,
       path: 'billing',
-    },
-  ];
+    });
+  }
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
     profile: INITIAL_ROUTES.find(r => r.id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT) as NavbarRoute,
@@ -266,7 +270,7 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   return { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels };
 };
 
-const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
+const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
       name: localizationKeys('organizationProfile.navbar.general'),
@@ -281,6 +285,17 @@ const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       path: 'organization-members',
     },
   ];
+  if (commerce) {
+    // TODO(@COMMERCE) Uncomment when OrgProfile is ready
+    // INITIAL_ROUTES.push(
+    //   {
+    //     name: localizationKeys('userProfile.navbar.billing'),
+    //     id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+    //     icon: CreditCard,
+    //     path: 'billing',
+    //   },
+    // );
+  }
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
     'invite-members': INITIAL_ROUTES.find(r => r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS) as NavbarRoute,
