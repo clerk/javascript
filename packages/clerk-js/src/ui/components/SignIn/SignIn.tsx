@@ -190,6 +190,7 @@ function SignInRoot() {
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
 
+  // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
   usePreloadSessionTask(signInContext.withSessionTasks);
 
   React.useEffect(() => {

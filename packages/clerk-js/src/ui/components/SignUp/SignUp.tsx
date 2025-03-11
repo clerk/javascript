@@ -34,6 +34,7 @@ function SignUpRoutes(): JSX.Element {
   const { navigate, basePath } = useRouter();
   const signUpContext = useSignUpContext();
 
+  // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
   usePreloadSessionTask(signUpContext.withSessionTasks);
 
   React.useEffect(() => {
