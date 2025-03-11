@@ -36,7 +36,7 @@ export const clerkPlugin: Plugin = {
     const clerk = shallowRef<Clerk | null>(null);
 
     const resources = ref<Resources>({
-      client: {} as ClientResource,
+      client: undefined as unknown as ClientResource,
       session: undefined,
       user: undefined,
       organization: undefined,

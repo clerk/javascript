@@ -35,14 +35,14 @@ export const useSessionList: UseSessionList = () => {
   const { clerk, clientCtx } = useClerkContext();
 
   const result = computed<UseSessionListReturn>(() => {
-    if (!clientCtx.value || !clerk.value) {
+    if (!clientCtx.value) {
       return { isLoaded: false, sessions: undefined, setActive: undefined };
     }
 
     return {
       isLoaded: true,
       sessions: clientCtx.value.sessions,
-      setActive: clerk.value.setActive,
+      setActive: clerk.value!.setActive,
     };
   });
 
