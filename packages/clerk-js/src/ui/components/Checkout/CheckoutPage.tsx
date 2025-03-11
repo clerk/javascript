@@ -60,6 +60,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           justify='center'
           sx={{ width: '100%', height: '100%' }}
         >
+          {/* TODO(@COMMERCE): needs localization */}
           <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
         </Flex>
       ) : checkout.status === 'completed' ? (
@@ -147,6 +148,7 @@ const CheckoutHeader = ({ title }: { title: string }) => {
   );
 };
 
+// TODO(@COMMERCE): needs localization
 const CheckoutPlanRows = ({
   plan,
   planPeriod,

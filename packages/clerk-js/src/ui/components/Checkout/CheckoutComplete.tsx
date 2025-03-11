@@ -40,8 +40,10 @@ export const CheckoutComplete = ({
           gap={2}
           sx={{ position: 'relative' }}
         >
+          {/* TODO(@COMMERCE): needs localization */}
           <Text variant='h2'>Payment was successful!</Text>
           <Text sx={t => ({ textAlign: 'center', paddingInline: t.space.$8 })}>
+            {/* TODO(@COMMERCE): needs localization */}
             Minim adipisicing enim fugiat enim est ad nisi exercitation nisi exercitation quis culpa.
           </Text>
         </Col>
@@ -66,12 +68,14 @@ export const CheckoutComplete = ({
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
+            {/* TODO(@COMMERCE): needs localization */}
             <LineItems.Title>Payment method</LineItems.Title>
             <LineItems.Description>
               {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
+            {/* TODO(@COMMERCE): needs localization */}
             <LineItems.Title>Invoice ID</LineItems.Title>
             <LineItems.Description>{checkout.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
           </LineItems.Group>
@@ -88,6 +92,7 @@ export const CheckoutComplete = ({
           })}
           onClick={handleCloseBlade}
         >
+          {/* TODO(@COMMERCE): needs localization */}
           Continue
         </Button>
       </Col>

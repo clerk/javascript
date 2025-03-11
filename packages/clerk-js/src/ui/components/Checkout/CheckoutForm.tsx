@@ -229,6 +229,7 @@ const PaymentSourceMethods = ({
           }}
           isLoading={isSubmitting}
         >
+          {/* TODO(@COMMERCE): needs localization */}
           Pay {totalDueNow.currencySymbol}
           {totalDueNow.amountFormatted}
         </Button>
@@ -269,6 +270,7 @@ const StripePaymentMethods = ({
             color: '#222D65',
           }}
         >
+          {/* TODO(@COMMERCE): needs localization */}
           Pay with PayPal
         </Button>
         {collapsed ? (
@@ -283,6 +285,7 @@ const StripePaymentMethods = ({
                 color: 'white',
               }}
             >
+              {/* TODO(@COMMERCE): needs localization */}
               Pay with ApplePay
             </Button>
             <Button
@@ -295,6 +298,7 @@ const StripePaymentMethods = ({
                 color: 'white',
               }}
             >
+              {/* TODO(@COMMERCE): needs localization */}
               Pay with GPay
             </Button>
             <Button
@@ -307,6 +311,7 @@ const StripePaymentMethods = ({
               }}
               onClick={() => setCollapsed(false)}
             >
+              {/* TODO(@COMMERCE): needs localization */}
               More Payment Methods
             </Button>
           </>
@@ -323,6 +328,7 @@ const StripePaymentMethods = ({
               }}
               isLoading={isSubmitting}
             >
+              {/* TODO(@COMMERCE): needs localization */}
               Pay {totalDueNow.currencySymbol}
               {totalDueNow.amountFormatted}
             </Button>
