@@ -514,13 +514,14 @@ export const zhTW: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: '我同意 {{ privacyPolicyLink || link("隱私條款") }}',
+        label__onlyTermsOfService: '我同意 {{ termsOfServiceLink || link("使用條款") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          '我同意 {{ termsOfServiceLink || link("使用條款") }} and {{ privacyPolicyLink || link("隱私條款") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '請閱讀並接受條款以繼續',
+        title: '同意條款',
       },
     },
     phoneCode: {
@@ -886,7 +887,7 @@ export const zhTW: LocalizationResource = {
         title: '電話號碼',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: '更新個人資料',
         title: '個人資料',
       },
       usernameSection: {

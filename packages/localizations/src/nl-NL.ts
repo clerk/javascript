@@ -937,8 +937,8 @@ export const nlNL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Neem deel aan de wachtlijst',
-      actionText: 'Nog geen account?',
+      actionLink: 'Inloggen',
+      actionText: 'Heb je al toegang?',
       formButton: 'Verstuur',
       subtitle: 'Je wordt toegevoegd aan de wachtlijst en op de hoogte gehouden.',
       title: 'Wachtlijst aanmelding',

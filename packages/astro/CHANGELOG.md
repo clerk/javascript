@@ -1,5 +1,62 @@
 # @clerk/astro
 
+## 2.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`67f1743aa1e0705d89ee6b532007f2686929240b`](https://github.com/clerk/javascript/commit/67f1743aa1e0705d89ee6b532007f2686929240b)]:
+  - @clerk/backend@1.25.1
+
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`4fa5e27e33d229492c77e06ca4b26d552ff3d92f`](https://github.com/clerk/javascript/commit/4fa5e27e33d229492c77e06ca4b26d552ff3d92f), [`29a44b0e5c551e52915f284545699010a87e1a48`](https://github.com/clerk/javascript/commit/29a44b0e5c551e52915f284545699010a87e1a48), [`4d7761a24af5390489653923165e55cbf69a8a6d`](https://github.com/clerk/javascript/commit/4d7761a24af5390489653923165e55cbf69a8a6d)]:
+  - @clerk/backend@1.25.0
+
+## 2.3.0
+
+### Minor Changes
+
+- Introduce `protect-fallback` slot to avoid naming conflicts with Astro's server islands [`fallback` slot](https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content). ([#5196](https://github.com/clerk/javascript/pull/5196)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  When using Clerk's `<Protect>` component with `server:defer`, you can now use both slots:
+
+  - `fallback`: Default loading content
+  - `protect-fallback`: Shows when a user doesn't have the `role` or `permission` to access the protected content
+
+  Regular usage without server islands:
+
+  ```astro
+  <Protect role="admin">
+    <p slot="fallback">Not an admin</p>
+    <p>You're an admin</p>
+  </Protect>
+  ```
+
+  Example with server islands:
+
+  ```astro
+  <Protect server:defer role="admin">
+    <p slot="fallback">Loading...</p>
+    <p slot="protect-fallback">Not an admin</p>
+    <p>You're an admin</p>
+  </Protect>
+  ```
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- The [`exports` map](https://nodejs.org/api/packages.html#conditional-exports) inside `package.json` has been slightly adjusted to allow for [`require(esm)`](https://joyeecheung.github.io/blog/2024/03/18/require-esm-in-node-js/) to work correctly. The `"import"` conditions have been changed to `"default"`. ([#5188](https://github.com/clerk/javascript/pull/5188)) by [@LekoArts](https://github.com/LekoArts)
+
+  You shouldn't see any change in behavior/functionality on your end.
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/backend@1.24.3
+
 ## 2.2.1
 
 ### Patch Changes

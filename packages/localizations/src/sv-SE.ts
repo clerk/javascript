@@ -522,13 +522,14 @@ export const svSE: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Jag godkänner {{ privacyPolicyLink || link("Integritetspolicyn") }}',
+        label__onlyTermsOfService: 'Jag godkänner de {{ termsOfServiceLink || link("Allmänna villkoren") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Jag godkänner de {{ termsOfServiceLink || link("Allmänna villkoren") }} och {{ privacyPolicyLink || link("Integritetspolicyn") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Vänligen läs och godkänn villkoren för att fortsätta',
+        title: 'Juridiskt samtycke',
       },
     },
     phoneCode: {

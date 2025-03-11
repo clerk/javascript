@@ -6,6 +6,7 @@ import { BaseResource } from './internal';
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   singleSessionMode!: boolean;
   claimedAt: Date | null = null;
+  reverification!: boolean;
 
   public constructor(data: AuthConfigJSON) {
     super();
@@ -15,6 +16,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
   protected fromJSON(data: AuthConfigJSON | null): this {
     this.singleSessionMode = data ? data.single_session_mode : true;
     this.claimedAt = data?.claimed_at ? unixEpochToDate(data.claimed_at) : null;
+    this.reverification = data ? data.reverification : true;
     return this;
   }
 
@@ -24,6 +26,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
       id: this.id || '',
       single_session_mode: this.singleSessionMode,
       claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
+      reverification: this.reverification,
     };
   }
 }

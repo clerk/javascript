@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.2.0",
+  "version": "1.3.2",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -67,12 +67,12 @@
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "@clerk/vue": "workspace:^",
-    "@nuxt/kit": "^3.14.159",
-    "@nuxt/schema": "^3.14.159",
+    "@nuxt/kit": "^3.16.0",
+    "@nuxt/schema": "^3.16.0",
     "h3": "^1.13.0"
   },
   "devDependencies": {
-    "nuxt": "^3.14.159",
+    "nuxt": "^3.16.0",
     "typescript": "catalog:repo"
   },
   "engines": {
