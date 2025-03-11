@@ -1117,17 +1117,15 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigationContext = (
-    context: {
-      navigate: (
-        to: string,
-        options?: {
-          searchParams?: URLSearchParams;
-        },
-      ) => Promise<unknown>;
-      basePath: string;
-    } | null,
-  ) => {
+  public __internal_setComponentNavigationContext = (context: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  }) => {
     this.#componentNavigationContext = context;
 
     return () => (this.#componentNavigationContext = null);
