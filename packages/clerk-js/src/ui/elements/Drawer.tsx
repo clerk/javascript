@@ -17,6 +17,7 @@ import { transitionDurationValues, transitionTiming } from '../../ui/foundations
 import { Box, descriptors, Flex, Heading, Icon } from '../customizables';
 import { useMotionSafe } from '../hooks';
 import { Close as CloseIcon } from '../icons';
+import type { ThemableCssProp } from '../styledSystem';
 import { common, InternalThemeProvider } from '../styledSystem';
 import { colors } from '../utils';
 import { IconButton } from './IconButton';
@@ -249,28 +250,32 @@ Overlay.displayName = 'Drawer.Content';
 interface HeaderProps {
   title?: string;
   children?: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
-const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children }, ref) => {
+const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children, sx }, ref) => {
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerHeader}
       as='header'
-      sx={t => ({
-        display: 'flex',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
-        borderBlockEndWidth: t.borderWidths.$normal,
-        borderBlockEndStyle: t.borderStyles.$solid,
-        borderBlockEndColor: t.colors.$neutralAlpha100,
-        borderStartStartRadius: t.radii.$xl,
-        borderStartEndRadius: t.radii.$xl,
-        paddingBlock: title ? t.space.$3 : undefined,
-        paddingInline: title ? t.space.$4 : undefined,
-      })}
+      sx={[
+        t => ({
+          display: 'flex',
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 1),
+            t.colors.$neutralAlpha50,
+          ),
+          borderBlockEndWidth: t.borderWidths.$normal,
+          borderBlockEndStyle: t.borderStyles.$solid,
+          borderBlockEndColor: t.colors.$neutralAlpha100,
+          borderStartStartRadius: t.radii.$xl,
+          borderStartEndRadius: t.radii.$xl,
+          paddingBlock: title ? t.space.$3 : undefined,
+          paddingInline: title ? t.space.$4 : undefined,
+        }),
+        sx,
+      ]}
     >
       {title ? (
         <>

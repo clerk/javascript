@@ -30,6 +30,8 @@ export const PlanDetailDrawer = ({
     return null;
   }
 
+  const hasFeatures = plan.features.length > 0;
+
   return (
     <Drawer.Root
       open={open}
@@ -39,7 +41,17 @@ export const PlanDetailDrawer = ({
     >
       <Drawer.Overlay />
       <Drawer.Content>
-        <Drawer.Header>
+        <Drawer.Header
+          sx={t =>
+            !hasFeatures
+              ? {
+                  flex: 1,
+                  borderBottomWidth: 0,
+                  background: t.colors.$colorBackground,
+                }
+              : null
+          }
+        >
           <PlanCardHeader
             plan={plan}
             planPeriod={planPeriod}
@@ -47,21 +59,23 @@ export const PlanDetailDrawer = ({
             closeSlot={<Drawer.Close />}
           />
         </Drawer.Header>
-        <Drawer.Body>
-          <Box
-            sx={t => ({
-              padding: t.space.$4,
-            })}
-          >
-            <Text
-              variant='caption'
-              colorScheme='secondary'
+        {hasFeatures ? (
+          <Drawer.Body>
+            <Box
+              sx={t => ({
+                padding: t.space.$4,
+              })}
             >
-              Available features
-            </Text>
-            <PlanCardFeaturesList plan={plan} />
-          </Box>
-        </Drawer.Body>
+              <Text
+                variant='caption'
+                colorScheme='secondary'
+              >
+                Available features
+              </Text>
+              <PlanCardFeaturesList plan={plan} />
+            </Box>
+          </Drawer.Body>
+        ) : null}
         <CancelFooter
           plan={plan}
           handleClose={() => setIsOpen(false)}
