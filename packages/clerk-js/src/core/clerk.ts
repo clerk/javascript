@@ -201,7 +201,12 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: {
-    navigate: (toURL: URL | undefined) => Promise<unknown>;
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
     basePath: string;
   } | null = null;
 
@@ -1079,10 +1084,6 @@ export class Clerk implements ClerkInterface {
         options: this.#options,
         environment: this.environment,
       });
-
-      // Reset component navigation context once navigation finishes
-      // to not conflict with after sign-in / after sign-up
-      this.#componentNavigationContext = null;
     }
 
     this.#setAccessors(session);
@@ -1118,7 +1119,12 @@ export class Clerk implements ClerkInterface {
 
   public __internal_setComponentNavigationContext = (
     context: {
-      navigate: (toURL: URL | undefined) => Promise<unknown>;
+      navigate: (
+        to: string,
+        options?: {
+          searchParams?: URLSearchParams;
+        },
+      ) => Promise<unknown>;
       basePath: string;
     } | null,
   ) => {

@@ -28,18 +28,24 @@ export function buildVerificationRedirectUrl({
   });
 }
 
-export function buildSessionTaskRedirectUrl(
-  ctx: Pick<SignInContextType | SignUpContextType, 'routing' | 'path'>,
-  baseUrl: string,
-  task: SessionTask,
-) {
-  const { routing, path } = ctx;
+export function buildSessionTaskRedirectUrl({
+  routing,
+  path,
+  baseUrl,
+  task,
+}: Pick<SignInContextType | SignUpContextType, 'routing' | 'path'> & {
+  baseUrl: string;
+  task?: SessionTask;
+}) {
+  if (!task) {
+    return null;
+  }
 
   return buildRedirectUrl({
     routing,
     baseUrl,
     path,
-    endpoint: SESSION_TASK_ROUTE_BY_KEY[task.key],
+    endpoint: `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
     authQueryString: null,
   });
 }

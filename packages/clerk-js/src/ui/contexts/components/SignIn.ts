@@ -119,9 +119,12 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
-  const sessionTaskUrl = clerk.session?.currentTask
-    ? buildSessionTaskRedirectUrl({ routing: ctx.routing, path: ctx.path }, signInUrl, clerk.session?.currentTask)
-    : null;
+  const sessionTaskUrl = buildSessionTaskRedirectUrl({
+    task: clerk.session?.currentTask,
+    path: ctx.path,
+    routing: ctx.routing,
+    baseUrl: signInUrl,
+  });
 
   return {
     ...(ctx as SignInCtx),
