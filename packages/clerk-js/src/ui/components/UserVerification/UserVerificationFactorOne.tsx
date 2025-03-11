@@ -28,7 +28,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function UserVerificationFactorOneComponent(): JSX.Element | null {
+export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
   const { navigate } = useRouter();
@@ -143,5 +143,5 @@ export function UserVerificationFactorOneComponent(): JSX.Element | null {
 }
 
 export const UserVerificationFactorOne = withUserVerificationSessionGuard(
-  withCardStateProvider(UserVerificationFactorOneComponent),
+  withCardStateProvider(UserVerificationFactorOneInternal),
 );

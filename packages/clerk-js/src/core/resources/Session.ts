@@ -208,13 +208,6 @@ export class Session extends BaseResource implements SessionResource {
 
     const { nonce = null } = prepareResponse.firstFactorVerification;
 
-    if (!nonce) {
-      // Throw an error if the nonce is not present
-      throw new ClerkWebAuthnError('Passkeys are not supported', {
-        code: 'passkey_not_supported',
-      });
-    }
-
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
