@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import { useState } from 'react';
 
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
@@ -14,14 +14,14 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   const { __experimental_commerce } = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const [planPeriod, setPlanPeriod] = useState('month');
-  const [selectedPlan, setSelectedPlan] = useState<CommercePlanResource>();
+  const [selectedPlan, setSelectedPlan] = useState<__experimental_CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPlanDetail, setShowPlanDetail] = useState(false);
   const isCompact = mode === 'modal';
 
   const { data: plans } = useFetch(__experimental_commerce?.__experimental_billing.getPlans, 'commerce-plans');
 
-  const selectPlan = (plan: CommercePlanResource) => {
+  const selectPlan = (plan: __experimental_CommercePlanResource) => {
     setSelectedPlan(plan);
     if (plan.isActiveForPayer) {
       setShowPlanDetail(true);

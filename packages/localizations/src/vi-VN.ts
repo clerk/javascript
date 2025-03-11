@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Quay lại',
   badge__currentPlan: undefined,
   badge__default: 'Mặc định',
@@ -24,14 +32,6 @@ export const viVN: LocalizationResource = {
   badge__unverified: 'Chưa xác minh',
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
@@ -655,6 +655,14 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -670,14 +678,6 @@ export const viVN: LocalizationResource = {
         'Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình.',
       title: 'Thêm mã xác thực sao lưu',
       title__codelist: 'Các mã sao lưu',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Chọn một nhà cung cấp để kết nối tài khoản của bạn.',

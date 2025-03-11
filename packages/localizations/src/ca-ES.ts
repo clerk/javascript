@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Enrere',
   badge__currentPlan: undefined,
   badge__default: 'Per defecte',
@@ -24,14 +32,6 @@ export const caES: LocalizationResource = {
   badge__unverified: 'No verificat',
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {
@@ -658,6 +658,14 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -673,14 +681,6 @@ export const caES: LocalizationResource = {
         "Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació.",
       title: 'Afegeix verificació amb codi de seguretat',
       title__codelist: 'Codis de seguretat',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selecciona un proveïdor per connectar el teu compte.',

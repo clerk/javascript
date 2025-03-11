@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Geri',
   badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
@@ -24,14 +32,6 @@ export const trTR: LocalizationResource = {
   badge__unverified: 'Doğrulanmamış',
   badge__userDevice: 'Kullanıcı cihazı',
   badge__you: 'Siz',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -659,6 +659,14 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopayala',
@@ -674,14 +682,6 @@ export const trTR: LocalizationResource = {
         'Eğer Authenticator uygulamanızın olduğu cihazınıza erişiminizi kaybederseniz, bu kodlardan birini kullanarak hesabınıza giriş yapabilirsiniz.',
       title: 'Yedekleme kodu doğrulaması ekle',
       title__codelist: 'Yedekleme kodları',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Yeni bir hesap bağlamak için bir sağlayıcı seçiniz.',

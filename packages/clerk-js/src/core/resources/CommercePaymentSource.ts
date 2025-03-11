@@ -1,19 +1,25 @@
-import type { CommercePaymentSourceJSON, CommercePaymentSourceResource } from '@clerk/types';
+import type {
+  __experimental_CommercePaymentSourceJSON,
+  __experimental_CommercePaymentSourceResource,
+} from '@clerk/types';
 
 import { BaseResource } from './internal';
 
-export class CommercePaymentSource extends BaseResource implements CommercePaymentSourceResource {
+export class __experimental_CommercePaymentSource
+  extends BaseResource
+  implements __experimental_CommercePaymentSourceResource
+{
   id!: string;
   last4!: string;
   paymentMethod!: string;
   cardType!: string;
 
-  constructor(data: CommercePaymentSourceJSON) {
+  constructor(data: __experimental_CommercePaymentSourceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommercePaymentSourceJSON | null): this {
+  protected fromJSON(data: __experimental_CommercePaymentSourceJSON | null): this {
     if (!data) {
       return this;
     }

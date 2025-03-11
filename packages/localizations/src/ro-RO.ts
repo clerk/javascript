@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Înapoi',
   badge__currentPlan: undefined,
   badge__default: 'Implicit',
@@ -24,14 +32,6 @@ export const roRO: LocalizationResource = {
   badge__unverified: 'Nedeclarat',
   badge__userDevice: 'Dispozitiv de utilizator',
   badge__you: 'Tu',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Creați o organizație',
     invitePage: {
@@ -661,6 +661,14 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -676,14 +684,6 @@ export const roRO: LocalizationResource = {
         'Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare.',
       title: 'Adăugați verificarea codului de rezervă',
       title__codelist: 'Coduri de rezervă',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selectați un furnizor pentru a vă conecta contul.',

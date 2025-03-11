@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
   badge__currentPlan: undefined,
   badge__default: '默認',
@@ -24,14 +32,6 @@ export const zhTW: LocalizationResource = {
   badge__unverified: '未驗證',
   badge__userDevice: '用戶設備',
   badge__you: '您',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: '創建組織',
     invitePage: {
@@ -649,6 +649,14 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -662,14 +670,6 @@ export const zhTW: LocalizationResource = {
       successSubtitle: '如果您失去了驗證設備的訪問權限，您可以使用其中之一登入您的帳戶。',
       title: '添加備份代碼驗證',
       title__codelist: '備份代碼',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: '選擇一個供應商來連接您的帳戶。',

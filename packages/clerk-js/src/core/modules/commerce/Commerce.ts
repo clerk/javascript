@@ -1,12 +1,12 @@
 import type {
+  __experimental_AddPaymentSourceParams,
   __experimental_CommerceBillingNamespace,
   __experimental_CommerceNamespace,
-  AddPaymentSourceParams,
+  __experimental_CommercePaymentSourceJSON,
   ClerkPaginatedResponse,
-  CommercePaymentSourceJSON,
 } from '@clerk/types';
 
-import { BaseResource, CommercePaymentSource } from '../../resources/internal';
+import { __experimental_CommercePaymentSource, BaseResource } from '../../resources/internal';
 import { __experimental_CommerceBilling } from './CommerceBilling';
 
 export class __experimental_Commerce implements __experimental_CommerceNamespace {
@@ -19,15 +19,15 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
     return __experimental_Commerce._billing;
   }
 
-  addPaymentSource = async (params: AddPaymentSourceParams) => {
+  addPaymentSource = async (params: __experimental_AddPaymentSourceParams) => {
     const json = (
       await BaseResource._fetch({
         path: `/me/commerce/payment_sources`,
         method: 'POST',
         body: params as any,
       })
-    )?.response as unknown as CommercePaymentSourceJSON;
-    return new CommercePaymentSource(json);
+    )?.response as unknown as __experimental_CommercePaymentSourceJSON;
+    return new __experimental_CommercePaymentSource(json);
   };
 
   getPaymentSources = async () => {
@@ -35,10 +35,11 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
       path: `/me/commerce/payment_sources`,
       method: 'GET',
     }).then(res => {
-      const { data: paymentSources, total_count } = res as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>;
+      const { data: paymentSources, total_count } =
+        res as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;
       return {
         total_count,
-        data: paymentSources.map(paymentSource => new CommercePaymentSource(paymentSource)),
+        data: paymentSources.map(paymentSource => new __experimental_CommercePaymentSource(paymentSource)),
       };
     });
   };

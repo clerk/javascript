@@ -28,7 +28,7 @@ export const BillingPage = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.billingPage.title')}
+            localizationKey={localizationKeys('userProfile.__experimental_billingPage.title')}
             textVariant='h2'
           />
         </Header.Root>
@@ -37,9 +37,17 @@ export const BillingPage = withCardStateProvider(() => {
 
         <Tabs>
           <TabsList sx={t => ({ gap: t.space.$6 })}>
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__plans')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__paymentSources')} />
+            <Tab
+              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')}
+            />
+            <Tab
+              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
+            />
+            <Tab
+              localizationKey={localizationKeys(
+                'userProfile.__experimental_billingPage.start.headerTitle__paymentSources',
+              )}
+            />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>

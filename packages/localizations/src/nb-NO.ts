@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tilbake',
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -24,14 +32,6 @@ export const nbNO: LocalizationResource = {
   badge__unverified: 'Ikke verifisert',
   badge__userDevice: 'Brukerens enhet',
   badge__you: 'Du',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {
@@ -657,6 +657,14 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -672,14 +680,6 @@ export const nbNO: LocalizationResource = {
         'Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten.',
       title: 'Legg til sikkerhetskopieringskodeverifisering',
       title__codelist: 'Sikkerhetskoder',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Velg en tilbyder for å koble til kontoen din.',

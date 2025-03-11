@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
   badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
@@ -24,14 +32,6 @@ export const ruRU: LocalizationResource = {
   badge__unverified: 'Неверифицированный',
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Создать организацию',
     invitePage: {
@@ -671,6 +671,14 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -686,14 +694,6 @@ export const ruRU: LocalizationResource = {
         'Вы можете использовать один из этих кодов для входа в свою учетную запись, если вы потеряете доступ к своему устройству аутентификации.',
       title: 'Добавить резервный код подтверждения',
       title__codelist: 'Резервные коды',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Выберите провайдера для подключения вашей учетной записи.',

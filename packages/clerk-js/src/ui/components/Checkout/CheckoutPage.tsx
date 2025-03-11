@@ -1,8 +1,12 @@
-import type { __experimental_CheckoutProps, CommercePlanResource, CommerceTotals } from '@clerk/types';
+import type {
+  __experimental_CheckoutProps,
+  __experimental_CommercePlanResource,
+  __experimental_CommerceTotals,
+} from '@clerk/types';
 import { Elements } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext, useEnvironment } from '../../contexts';
 import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner } from '../../customizables';
@@ -14,8 +18,9 @@ import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
-  const { commerceSettings } = useEnvironment();
+  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
+  const [stripe, setStripe] = useState<Stripe | null>(null);
+  const { __experimental_commerceSettings } = useEnvironment();
 
   const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
@@ -23,14 +28,19 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   });
 
   useEffect(() => {
-    if (checkout?.externalGatewayId && commerceSettings.stripePublishableKey) {
-      setStripePromise(
-        loadStripe(commerceSettings.stripePublishableKey, {
-          stripeAccount: checkout.externalGatewayId,
-        }),
-      );
+    if (
+      !stripePromiseRef.current &&
+      checkout?.externalGatewayId &&
+      __experimental_commerceSettings.stripePublishableKey
+    ) {
+      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
+        stripeAccount: checkout.externalGatewayId,
+      });
+      void stripePromiseRef.current.then(stripeInstance => {
+        setStripe(stripeInstance);
+      });
     }
-  }, [checkout?.externalGatewayId, commerceSettings]);
+  }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
 
   return (
     <>
@@ -83,9 +93,9 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
             />
           </Col>
 
-          {stripePromise && (
+          {stripe && (
             <Elements
-              stripe={stripePromise}
+              stripe={stripe}
               options={{ clientSecret: checkout.externalClientSecret }}
             >
               <CheckoutForm
@@ -142,9 +152,9 @@ const CheckoutPlanRows = ({
   planPeriod,
   totals,
 }: {
-  plan: CommercePlanResource;
+  plan: __experimental_CommercePlanResource;
   planPeriod: string;
-  totals: CommerceTotals;
+  totals: __experimental_CommerceTotals;
 }) => {
   return (
     <LineItems.Root>

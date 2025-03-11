@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
   badge__currentPlan: undefined,
   badge__default: 'Па-змаўчанні',
@@ -24,14 +32,6 @@ export const beBY: LocalizationResource = {
   badge__unverified: 'Не верыфікавана',
   badge__userDevice: 'Карыстальніцкая прылада',
   badge__you: 'Вы',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Стварыць арганізацыю',
     invitePage: {
@@ -663,6 +663,14 @@ export const beBY: LocalizationResource = {
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скапіравана!',
       actionLabel__copy: 'Скапіраваць усё',
@@ -678,14 +686,6 @@ export const beBY: LocalizationResource = {
         'Вы можаце выкарыстоўваць адзін з гэтых кодоў для ўваходу ў свой уліковы запіс, калі вы страціце доступ да свайго аўтэнтыфікацыйнага прылады.',
       title: 'Дадаць рэзервовы код пацверджання',
       title__codelist: 'Рэзервовы коды',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Выберыце правайдара для падключэння вашага ўліковага запісу.',

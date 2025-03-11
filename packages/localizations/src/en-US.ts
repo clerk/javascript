@@ -2,6 +2,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  __experimental_commerce: {
+    billedAnnually: 'Billed annually',
+    free: 'Free',
+    getStarted: 'Get started',
+    manageMembership: 'Manage membership',
+    month: 'Month',
+    switchPlan: 'Switch to this plan',
+  },
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
@@ -12,14 +20,6 @@ export const enUS: LocalizationResource = {
   badge__unverified: 'Unverified',
   badge__userDevice: 'User device',
   badge__you: 'You',
-  commerce: {
-    billedAnnually: 'Billed annually',
-    free: 'Free',
-    getStarted: 'Get started',
-    manageMembership: 'Manage membership',
-    month: 'Month',
-    switchPlan: 'Switch to this plan',
-  },
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -653,6 +653,14 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__plans: 'Plans',
+      },
+      title: 'Billing & Payments',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -668,14 +676,6 @@ export const enUS: LocalizationResource = {
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: 'Invoices',
-        headerTitle__paymentSources: 'Payment Sources',
-        headerTitle__plans: 'Plans',
-      },
-      title: 'Billing & Payments',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',

@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Atrás',
   badge__currentPlan: undefined,
   badge__default: 'Por defecto',
@@ -24,14 +32,6 @@ export const esMX: LocalizationResource = {
   badge__unverified: 'No confirmado',
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -661,6 +661,14 @@ export const esMX: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -676,14 +684,6 @@ export const esMX: LocalizationResource = {
         'Puede usar uno de estos para iniciar sesión en su cuenta, si pierde el acceso a su dispositivo de autenticación.',
       title: 'Agregar verificación de código de respaldo',
       title__codelist: 'Códigos de respaldo',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Seleccione un proveedor para conectar su cuenta.',

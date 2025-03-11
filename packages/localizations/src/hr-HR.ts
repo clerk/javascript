@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Natrag',
   badge__currentPlan: undefined,
   badge__default: 'Zadano',
@@ -24,14 +32,6 @@ export const hrHR: LocalizationResource = {
   badge__unverified: 'Nepotvrđeno',
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'kreiraj organizaciju',
     invitePage: {
@@ -663,6 +663,14 @@ export const hrHR: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih računa',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -678,14 +686,6 @@ export const hrHR: LocalizationResource = {
         'Možete koristiti jedan od ovih za prijavu na svoj račun ako izgubite pristup svom uređaju za autentifikaciju.',
       title: 'Dodaj verifikaciju rezervnim kodom',
       title__codelist: 'Rezervni kodovi',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Odaberite pružatelja usluge za povezivanje vašeg računa.',

@@ -2,7 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
-import type { CommerceSettingsJSON } from './commerceSettings';
+import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
 import type { ActJWTClaim } from './jwt';
@@ -58,7 +58,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
-  commerce_settings: CommerceSettingsJSON;
+  commerce_settings: __experimental_CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
@@ -574,7 +574,7 @@ export interface WaitlistJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface CommerceFeatureJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceFeatureJSON extends ClerkResourceJSON {
   object: 'commerce_feature';
   id: string;
   name: string;
@@ -583,7 +583,7 @@ export interface CommerceFeatureJSON extends ClerkResourceJSON {
   avatar_url: string;
 }
 
-export interface CommercePlanJSON extends ClerkResourceJSON {
+export interface __experimental_CommercePlanJSON extends ClerkResourceJSON {
   object: 'commerce_plan';
   id: string;
   name: string;
@@ -601,19 +601,19 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   publicly_visible: boolean;
   slug: string;
   avatar_url: string;
-  features: CommerceFeatureJSON[];
+  features: __experimental_CommerceFeatureJSON[];
 }
 
-export interface CommerceProductJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceProductJSON extends ClerkResourceJSON {
   object: 'commerce_product';
   id: string;
   slug: string;
   currency: string;
   is_default: boolean;
-  plans: CommercePlanJSON[];
+  plans: __experimental_CommercePlanJSON[];
 }
 
-export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
+export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJSON {
   object: 'commerce_payment_source';
   id: string;
   last4: string;
@@ -621,7 +621,7 @@ export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   card_type: string;
 }
 
-export interface CommerceInvoiceJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
   object: 'commerce_invoice';
   id: string;
   paid_on: number;
@@ -629,42 +629,42 @@ export interface CommerceInvoiceJSON extends ClerkResourceJSON {
   payment_source_id: string;
   plan_id: string;
   status: string;
-  totals: CommerceTotalsJSON;
+  totals: __experimental_CommerceTotalsJSON;
 }
 
-export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
   payment_source_id: string;
-  plan: CommercePlanJSON;
+  plan: __experimental_CommercePlanJSON;
   plan_period: string;
   status: string;
 }
 
-export interface CommerceMoneyJSON {
+export interface __experimental_CommerceMoneyJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
   currency_symbol: string;
 }
 
-export interface CommerceTotalsJSON {
-  grand_total: CommerceMoneyJSON;
-  subtotal: CommerceMoneyJSON;
-  tax_total: CommerceMoneyJSON;
-  total_due_now?: CommerceMoneyJSON;
+export interface __experimental_CommerceTotalsJSON {
+  grand_total: __experimental_CommerceMoneyJSON;
+  subtotal: __experimental_CommerceMoneyJSON;
+  tax_total: __experimental_CommerceMoneyJSON;
+  total_due_now?: __experimental_CommerceMoneyJSON;
 }
 
-export interface CommerceCheckoutJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   object: 'commerce_checkout';
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice?: CommerceInvoiceJSON;
-  payment_source?: CommercePaymentSourceJSON;
-  plan: CommercePlanJSON;
+  invoice?: __experimental_CommerceInvoiceJSON;
+  payment_source?: __experimental_CommercePaymentSourceJSON;
+  plan: __experimental_CommercePlanJSON;
   plan_period: string;
   status: string;
-  subscription?: CommerceSubscriptionJSON;
-  totals: CommerceTotalsJSON;
+  subscription?: __experimental_CommerceSubscriptionJSON;
+  totals: __experimental_CommerceTotalsJSON;
 }

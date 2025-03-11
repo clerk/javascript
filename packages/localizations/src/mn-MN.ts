@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Буцах',
   badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
@@ -24,14 +32,6 @@ export const mnMN: LocalizationResource = {
   badge__unverified: 'Баталгаажаагүй',
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -658,6 +658,14 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -673,14 +681,6 @@ export const mnMN: LocalizationResource = {
         'Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно.',
       title: 'Нөөц кодын баталгаажуулалтыг нэмэх',
       title__codelist: 'Нөөц кодууд',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Бүртгэлээ холбох үйлчилгээ үзүүлэгчээ сонгоно уу.',

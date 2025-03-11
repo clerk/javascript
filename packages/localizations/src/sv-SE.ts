@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tillbaka',
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -24,14 +32,6 @@ export const svSE: LocalizationResource = {
   badge__unverified: 'Overifierad',
   badge__userDevice: 'Användarens enhet',
   badge__you: 'Du',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {
@@ -659,6 +659,14 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -674,14 +682,6 @@ export const svSE: LocalizationResource = {
         'Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet.',
       title: 'Lägg till backupkodverifiering',
       title__codelist: 'Backupkoder',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Välj en leverantör för att ansluta ditt konto.',

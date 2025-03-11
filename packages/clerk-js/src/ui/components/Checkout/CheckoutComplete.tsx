@@ -1,4 +1,4 @@
-import type { CommerceCheckoutResource } from '@clerk/types';
+import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, Flex, Icon, Text } from '../../customizables';
@@ -6,7 +6,13 @@ import { LineItems } from '../../elements';
 import { Check } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 
-export const CheckoutComplete = ({ checkout, sx }: { checkout: CommerceCheckoutResource; sx?: ThemableCssProp }) => {
+export const CheckoutComplete = ({
+  checkout,
+  sx,
+}: {
+  checkout: __experimental_CommerceCheckoutResource;
+  sx?: ThemableCssProp;
+}) => {
   const { handleCloseBlade = () => {} } = useCheckoutContext();
 
   return (

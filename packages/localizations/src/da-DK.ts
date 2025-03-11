@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tilbage',
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -24,14 +32,6 @@ export const daDK: LocalizationResource = {
   badge__unverified: 'Ikke verificeret',
   badge__userDevice: 'Brugerenhed',
   badge__you: 'Dig',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
@@ -655,6 +655,14 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -670,14 +678,6 @@ export const daDK: LocalizationResource = {
         'Du kan bruge en af disse til at logge ind på din konto, hvis du mister adgangen til din totrinsbekræftelse.',
       title: 'Tilføj bekræftelse af backup-kode',
       title__codelist: 'Backup-koder',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Vælg en udbyder for at forbinde din konto.',

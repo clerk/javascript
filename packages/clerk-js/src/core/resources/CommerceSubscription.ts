@@ -1,27 +1,33 @@
-import type { CommerceSubscriptionJSON, CommerceSubscriptionResource } from '@clerk/types';
+import type {
+  __experimental_CommerceSubscriptionJSON,
+  __experimental_CommerceSubscriptionResource,
+} from '@clerk/types';
 
-import { BaseResource, CommercePlan } from './internal';
+import { __experimental_CommercePlan, BaseResource } from './internal';
 
-export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
+export class __experimental_CommerceSubscription
+  extends BaseResource
+  implements __experimental_CommerceSubscriptionResource
+{
   id!: string;
   paymentSourceId!: string;
-  plan!: CommercePlan;
+  plan!: __experimental_CommercePlan;
   planPeriod!: string;
   status!: string;
 
-  constructor(data: CommerceSubscriptionJSON) {
+  constructor(data: __experimental_CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceSubscriptionJSON | null): this {
+  protected fromJSON(data: __experimental_CommerceSubscriptionJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.paymentSourceId = data.payment_source_id;
-    this.plan = new CommercePlan(data.plan);
+    this.plan = new __experimental_CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
 

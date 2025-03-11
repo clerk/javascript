@@ -1,19 +1,25 @@
-import type { CommerceSettingsJSON, CommerceSettingsJSONSnapshot, CommerceSettingsResource } from '@clerk/types';
+import type {
+  __experimental_CommerceSettingsJSON,
+  __experimental_CommerceSettingsJSONSnapshot,
+  __experimental_CommerceSettingsResource,
+} from '@clerk/types';
 
 import { BaseResource } from './internal';
 
 /**
  * @internal
  */
-export class CommerceSettings extends BaseResource implements CommerceSettingsResource {
+export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
   stripePublishableKey!: string;
 
-  public constructor(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot) {
+  public constructor(data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null): this {
+  protected fromJSON(
+    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null,
+  ): this {
     if (!data) {
       return this;
     }
@@ -21,9 +27,9 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
     return this;
   }
 
-  public __internal_toSnapshot(): CommerceSettingsJSONSnapshot {
+  public __internal_toSnapshot(): __experimental_CommerceSettingsJSONSnapshot {
     return {
       stripe_publishable_key: this.stripePublishableKey,
-    } as unknown as CommerceSettingsJSONSnapshot;
+    } as unknown as __experimental_CommerceSettingsJSONSnapshot;
   }
 }

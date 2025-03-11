@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Vissza',
   badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
@@ -24,14 +32,6 @@ export const huHU: LocalizationResource = {
   badge__unverified: 'Nem ellenőrzött',
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Szervezet létrehozása',
     invitePage: {
@@ -659,6 +659,14 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',
@@ -673,14 +681,6 @@ export const huHU: LocalizationResource = {
       successSubtitle: 'Használhatod ezeket is, hogy belépj a fiókodba, ha nem férsz hozzá a hitelesítő eszközödhöz.',
       title: 'Tartalék kód megerősítés hozzáadása',
       title__codelist: 'Tartalék kódok',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Válassz egy szolgáltatót, amit összekötsz a fiókoddal.',

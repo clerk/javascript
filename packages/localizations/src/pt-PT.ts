@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Voltar',
   badge__currentPlan: undefined,
   badge__default: 'Padrão',
@@ -24,14 +32,6 @@ export const ptPT: LocalizationResource = {
   badge__unverified: 'Não verificado',
   badge__userDevice: 'Dispositivo do utilizador',
   badge__you: 'O utilizador',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {
@@ -656,6 +656,14 @@ export const ptPT: LocalizationResource = {
     action__signOutAll: 'Terminar sessão de todas as contas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -671,14 +679,6 @@ export const ptPT: LocalizationResource = {
         'Pode usar um deles para fazer login na sua conta caso perca o acesso ao seu dispositivo de autenticação.',
       title: 'Adicionar código de backup para verificação',
       title__codelist: 'Códigos de backup',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selecione um provedor para conectar à sua conta.',

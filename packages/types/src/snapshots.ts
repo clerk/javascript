@@ -1,6 +1,6 @@
 // this file contains the types returned by the __internal_toSnapshot method of the resources
 
-import type { CommerceSettingsJSON } from './commerceSettings';
+import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
@@ -184,4 +184,4 @@ export type Web3WalletJSONSnapshot = Override<
 
 export type PublicUserDataJSONSnapshot = PublicUserDataJSON;
 
-export type CommerceSettingsJSONSnapshot = CommerceSettingsJSON;
+export type __experimental_CommerceSettingsJSONSnapshot = __experimental_CommerceSettingsJSON;

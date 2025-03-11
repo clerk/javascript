@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Terug',
   badge__currentPlan: undefined,
   badge__default: 'Standaard',
@@ -24,14 +32,6 @@ export const nlBE: LocalizationResource = {
   badge__unverified: 'Ongeverifieerd',
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -656,6 +656,14 @@ export const nlBE: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -671,14 +679,6 @@ export const nlBE: LocalizationResource = {
         'Je kunt één van deze gebruiken om in te loggen op je account als je geen toegang meer hebt tot je authenticatieapparaat.',
       title: 'Voeg backup code verificatie toe',
       title__codelist: 'Backup codes',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Kies een provider om je account te verbinden.',

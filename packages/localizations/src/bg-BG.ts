@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
   badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
@@ -24,14 +32,6 @@ export const bgBG: LocalizationResource = {
   badge__unverified: 'Непотвърден',
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {
@@ -654,6 +654,14 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -669,14 +677,6 @@ export const bgBG: LocalizationResource = {
         'Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване.',
       title: 'Добавяне на резервен код за потвърждение',
       title__codelist: 'Резервни кодове',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Изберете доставчик, за да свържете вашия профил.',

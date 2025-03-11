@@ -1,6 +1,11 @@
-import type { CommerceMoney, CommerceMoneyJSON, CommerceTotals, CommerceTotalsJSON } from '@clerk/types';
+import type {
+  __experimental_CommerceMoney,
+  __experimental_CommerceMoneyJSON,
+  __experimental_CommerceTotals,
+  __experimental_CommerceTotalsJSON,
+} from '@clerk/types';
 
-export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney => {
+export const commerceMoneyFromJSON = (data: __experimental_CommerceMoneyJSON): __experimental_CommerceMoney => {
   return {
     amount: data.amount,
     amountFormatted: data.amount_formatted,
@@ -9,7 +14,7 @@ export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney =>
   };
 };
 
-export const commerceTotalsFromJSON = (data: CommerceTotalsJSON): CommerceTotals => {
+export const commerceTotalsFromJSON = (data: __experimental_CommerceTotalsJSON): __experimental_CommerceTotals => {
   return {
     grandTotal: commerceMoneyFromJSON(data.grand_total),
     subtotal: commerceMoneyFromJSON(data.subtotal),

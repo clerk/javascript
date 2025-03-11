@@ -1,4 +1,4 @@
-import type { __experimental_PricingTableProps, CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
 import {
@@ -22,10 +22,10 @@ import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
 interface PlanCardProps {
-  plan: CommercePlanResource;
+  plan: __experimental_CommercePlanResource;
   period: string;
   setPeriod: (k: string) => void;
-  onSelect: (plan: CommercePlanResource) => void;
+  onSelect: (plan: __experimental_CommercePlanResource) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
 }
@@ -141,7 +141,7 @@ export function PlanCard(props: PlanCardProps) {
                     marginInlineEnd: t.space.$1,
                   },
                 })}
-                localizationKey={localizationKeys('commerce.month')}
+                localizationKey={localizationKeys('__experimental_commerce.month')}
               />
               <Box
                 elementDescriptor={descriptors.planCardFeePeriodNotice}
@@ -180,7 +180,7 @@ export function PlanCard(props: PlanCardProps) {
                       size='sm'
                       aria-hidden
                     />{' '}
-                    <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
+                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
                   </Text>
                 </Box>
               </Box>
@@ -189,7 +189,7 @@ export function PlanCard(props: PlanCardProps) {
             <Text
               elementDescriptor={descriptors.planCardFee}
               variant={isCompact ? 'h2' : 'h1'}
-              localizationKey={localizationKeys('commerce.free')}
+              localizationKey={localizationKeys('__experimental_commerce.free')}
               colorScheme='body'
             />
           )}
@@ -279,7 +279,9 @@ export function PlanCard(props: PlanCardProps) {
             variant={isActivePlan ? 'bordered' : 'solid'}
             colorScheme={isActivePlan ? 'secondary' : 'primary'}
             localizationKey={
-              isActivePlan ? localizationKeys('commerce.manageMembership') : localizationKeys('commerce.getStarted')
+              isActivePlan
+                ? localizationKeys('__experimental_commerce.manageMembership')
+                : localizationKeys('__experimental_commerce.getStarted')
             }
             onClick={() => onSelect(plan)}
           />

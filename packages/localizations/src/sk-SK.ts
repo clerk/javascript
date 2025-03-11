@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Späť',
   badge__currentPlan: undefined,
   badge__default: 'Predvolené',
@@ -24,14 +32,6 @@ export const skSK: LocalizationResource = {
   badge__unverified: 'Nepotvrdené',
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -654,6 +654,14 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -669,14 +677,6 @@ export const skSK: LocalizationResource = {
         'Použite jeden z týchto kódov na prihlásenie do vášho účtu, ak stratíte prístup k vášmu overovaciemu zariadeniu.',
       title: 'Pridať overovanie pomocou záložných kódov',
       title__codelist: 'Záložné kódy',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovateľa pre pripojenie vášho účtu.',

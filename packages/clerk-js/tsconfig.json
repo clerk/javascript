@@ -22,5 +22,5 @@
     "target": "ES2019",
     "useUnknownInCatchVariables": false
   },
-  "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts", "sandbox/app.ts"]
+  "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts"]
 }

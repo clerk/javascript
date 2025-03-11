@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Takaisin',
   badge__currentPlan: undefined,
   badge__default: 'Oletus',
@@ -24,14 +32,6 @@ export const fiFI: LocalizationResource = {
   badge__unverified: 'Vahvistamaton',
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
     invitePage: {
@@ -658,6 +658,14 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopioitu',
       actionLabel__copy: 'Kopioi',
@@ -673,14 +681,6 @@ export const fiFI: LocalizationResource = {
         'Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi.',
       title: 'Lisää varakoodin vahvistus',
       title__codelist: 'Varakoodit',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Valitse palveluntarjoaja yhdistääksesi tilisi.',

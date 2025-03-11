@@ -1,6 +1,6 @@
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { useUserProfileContext } from '../../contexts';
+import { useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { BillingPage } from './BillingPage';
@@ -8,6 +8,8 @@ import { SecurityPage } from './SecurityPage';
 
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
+  const { experimental } = useOptions();
+
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
@@ -46,13 +48,15 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        <Route path={isBillingPageRoot ? undefined : 'billing'}>
-          <Switch>
-            <Route index>
-              <BillingPage />
-            </Route>
-          </Switch>
-        </Route>
+        {experimental?.commerce && (
+          <Route path={isBillingPageRoot ? undefined : 'billing'}>
+            <Switch>
+              <Route index>
+                <BillingPage />
+              </Route>
+            </Switch>
+          </Route>
+        )}
       </Route>
     </Switch>
   );

@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Kembali',
   badge__currentPlan: undefined,
   badge__default: 'Default',
@@ -24,14 +32,6 @@ export const idID: LocalizationResource = {
   badge__unverified: 'Belum diverifikasi',
   badge__userDevice: 'Perangkat pengguna',
   badge__you: 'Anda',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {
@@ -667,6 +667,14 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
@@ -682,14 +690,6 @@ export const idID: LocalizationResource = {
         'Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi.',
       title: 'Tambah verifikasi kode cadangan',
       title__codelist: 'Kode cadangan',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Pilih penyedia untuk menghubungkan akun Anda.',

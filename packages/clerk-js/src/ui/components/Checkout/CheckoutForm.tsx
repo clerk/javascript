@@ -1,5 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
-import type { CommerceCheckoutResource, CommerceMoney, CommercePaymentSourceResource } from '@clerk/types';
+import type {
+  __experimental_CommerceCheckoutResource,
+  __experimental_CommerceMoney,
+  __experimental_CommercePaymentSourceResource,
+} from '@clerk/types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -12,8 +16,8 @@ export const CheckoutForm = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
+  checkout: __experimental_CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -137,14 +141,14 @@ const PaymentSourceMethods = ({
   onPaymentSourceSubmit,
   isSubmitting,
 }: {
-  totalDueNow: CommerceMoney;
-  paymentSources: CommercePaymentSourceResource[];
+  totalDueNow: __experimental_CommerceMoney;
+  paymentSources: __experimental_CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
   isSubmitting: boolean;
 }) => {
-  const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
-    paymentSources.length > 0 ? paymentSources[0] : undefined,
-  );
+  const [selectedPaymentSource, setSelectedPaymentSource] = useState<
+    __experimental_CommercePaymentSourceResource | undefined
+  >(paymentSources.length > 0 ? paymentSources[0] : undefined);
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
@@ -218,7 +222,7 @@ const StripePaymentMethods = ({
   onExpand,
   isSubmitting,
 }: {
-  totalDueNow: CommerceMoney;
+  totalDueNow: __experimental_CommerceMoney;
   onStripeSubmit: React.FormEventHandler<HTMLFormElement>;
   onExpand: () => void;
   isSubmitting: boolean;

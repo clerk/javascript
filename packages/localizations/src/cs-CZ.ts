@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Zpět',
   badge__currentPlan: undefined,
   badge__default: 'Výchozí',
@@ -24,14 +32,6 @@ export const csCZ: LocalizationResource = {
   badge__unverified: 'Nepotvrzené',
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Vytvořit organizaci',
     invitePage: {
@@ -654,6 +654,14 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -669,14 +677,6 @@ export const csCZ: LocalizationResource = {
         'Použijte jeden z těchto kódů k přihlášení do svého účtu, pokud ztratíte přístup k vašemu ověřovacímu zařízení.',
       title: 'Přidat ověřování pomocí záložních kódů',
       title__codelist: 'Záložní kódy',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovatele pro připojení vašeho účtu.',

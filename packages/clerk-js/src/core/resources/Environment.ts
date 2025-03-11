@@ -1,6 +1,6 @@
 import type {
+  __experimental_CommerceSettingsResource,
   AuthConfigResource,
-  CommerceSettingsResource,
   DisplayConfigResource,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
@@ -9,7 +9,7 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
-import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
+import { __experimental_CommerceSettings, AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
@@ -20,7 +20,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   displayConfig!: DisplayConfigResource;
   userSettings!: UserSettingsResource;
   organizationSettings!: OrganizationSettingsResource;
-  commerceSettings!: CommerceSettingsResource;
+  __experimental_commerceSettings!: __experimental_CommerceSettingsResource;
   maintenanceMode!: boolean;
 
   public static getInstance(): Environment {
@@ -62,7 +62,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
     if (data) {
       this.authConfig = new AuthConfig(data.auth_config);
-      this.commerceSettings = new CommerceSettings(data.commerce_settings);
+      this.__experimental_commerceSettings = new __experimental_CommerceSettings(data.commerce_settings);
       this.displayConfig = new DisplayConfig(data.display_config);
       this.userSettings = new UserSettings(data.user_settings);
       this.organizationSettings = new OrganizationSettings(data.organization_settings);
@@ -79,7 +79,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       display_config: this.displayConfig.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
-      commerce_settings: this.commerceSettings.__internal_toSnapshot(),
+      commerce_settings: this.__experimental_commerceSettings.__internal_toSnapshot(),
       maintenance_mode: this.maintenanceMode,
     };
   }

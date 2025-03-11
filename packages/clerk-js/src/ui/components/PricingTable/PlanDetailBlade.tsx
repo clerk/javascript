@@ -1,4 +1,4 @@
-import type { CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanResource } from '@clerk/types';
 import { useState } from 'react';
 
 import { CommerceBlade } from '../../common';
@@ -9,7 +9,7 @@ import { Close } from '../../icons';
 interface PlanDetailBladeProps {
   isOpen: boolean;
   handleClose: () => void;
-  plan?: CommercePlanResource;
+  plan?: __experimental_CommercePlanResource;
 }
 
 export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladeProps) => {
@@ -83,14 +83,14 @@ export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladePr
                     variant='caption'
                     colorScheme='secondary'
                     sx={{ textTransform: 'lowercase' }}
-                    localizationKey={localizationKeys('commerce.month')}
+                    localizationKey={localizationKeys('__experimental_commerce.month')}
                   />
                 </Flex>
               </Flex>
             ) : (
               <Text
                 variant='subtitle'
-                localizationKey={localizationKeys('commerce.free')}
+                localizationKey={localizationKeys('__experimental_commerce.free')}
               />
             )}
           </Col>
@@ -151,7 +151,7 @@ export const PlanDetailBlade = ({ isOpen, handleClose, plan }: PlanDetailBladePr
   );
 };
 
-const CancelFooter = ({ plan }: { plan: CommercePlanResource; handleClose: () => void }) => {
+const CancelFooter = ({ plan }: { plan: __experimental_CommercePlanResource; handleClose: () => void }) => {
   // const { __experimental_commerce } = useClerk();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -169,6 +169,9 @@ const CancelFooter = ({ plan }: { plan: CommercePlanResource; handleClose: () =>
     //   handleClose();
     // }).catch(() => { setHasError(true); setIsSubmitting(false); });
   };
+
+  // TODO: remove when we can hook up cancel button
+  return null;
 
   return (
     <Col

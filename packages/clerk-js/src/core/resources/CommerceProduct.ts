@@ -1,20 +1,20 @@
-import type { CommerceProductJSON, CommerceProductResource } from '@clerk/types';
+import type { __experimental_CommerceProductJSON, __experimental_CommerceProductResource } from '@clerk/types';
 
-import { BaseResource, CommercePlan } from './internal';
+import { __experimental_CommercePlan, BaseResource } from './internal';
 
-export class CommerceProduct extends BaseResource implements CommerceProductResource {
+export class __experimental_CommerceProduct extends BaseResource implements __experimental_CommerceProductResource {
   id!: string;
   slug!: string;
   currency!: string;
   isDefault!: boolean;
-  plans!: CommercePlan[];
+  plans!: __experimental_CommercePlan[];
 
-  constructor(data: CommerceProductJSON) {
+  constructor(data: __experimental_CommerceProductJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommerceProductJSON | null): this {
+  protected fromJSON(data: __experimental_CommerceProductJSON | null): this {
     if (!data) {
       return this;
     }
@@ -23,7 +23,7 @@ export class CommerceProduct extends BaseResource implements CommerceProductReso
     this.slug = data.slug;
     this.currency = data.currency;
     this.isDefault = data.is_default;
-    this.plans = data.plans.map(plan => new CommercePlan(plan));
+    this.plans = data.plans.map(plan => new __experimental_CommercePlan(plan));
 
     return this;
   }

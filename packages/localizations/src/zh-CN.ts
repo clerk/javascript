@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
   badge__currentPlan: undefined,
   badge__default: '默认',
@@ -24,14 +32,6 @@ export const zhCN: LocalizationResource = {
   badge__unverified: '未验证',
   badge__userDevice: '用户设备',
   badge__you: '您',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: '创建组织',
     invitePage: {
@@ -642,6 +642,14 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
@@ -655,14 +663,6 @@ export const zhCN: LocalizationResource = {
       successSubtitle: '如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。',
       title: '添加备份代码验证',
       title__codelist: '备份代码',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: '选择一个供应商来连接您的账户。',

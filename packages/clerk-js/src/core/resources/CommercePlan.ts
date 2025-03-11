@@ -1,8 +1,8 @@
-import type { CommercePlanJSON, CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanJSON, __experimental_CommercePlanResource } from '@clerk/types';
 
-import { BaseResource, CommerceFeature } from './internal';
+import { __experimental_CommerceFeature, BaseResource } from './internal';
 
-export class CommercePlan extends BaseResource implements CommercePlanResource {
+export class __experimental_CommercePlan extends BaseResource implements __experimental_CommercePlanResource {
   id!: string;
   name!: string;
   amount!: number;
@@ -19,14 +19,14 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   publiclyVisible!: boolean;
   slug!: string;
   avatarUrl!: string;
-  features!: CommerceFeature[];
+  features!: __experimental_CommerceFeature[];
 
-  constructor(data: CommercePlanJSON) {
+  constructor(data: __experimental_CommercePlanJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: CommercePlanJSON | null): this {
+  protected fromJSON(data: __experimental_CommercePlanJSON | null): this {
     if (!data) {
       return this;
     }
@@ -47,7 +47,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
     this.avatarUrl = data.avatar_url;
-    this.features = data.features.map(feature => new CommerceFeature(feature));
+    this.features = data.features.map(feature => new __experimental_CommerceFeature(feature));
 
     return this;
   }

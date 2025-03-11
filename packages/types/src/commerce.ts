@@ -1,35 +1,32 @@
-import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
+import type { ClerkPaginatedResponse } from './pagination';
 import type { ClerkResource } from './resource';
 
 export interface __experimental_CommerceNamespace {
   __experimental_billing: __experimental_CommerceBillingNamespace;
-  getPaymentSources: () => Promise<ClerkPaginatedResponse<CommercePaymentSourceResource>>;
-  addPaymentSource: (params: AddPaymentSourceParams) => Promise<CommercePaymentSourceResource>;
+  getPaymentSources: () => Promise<ClerkPaginatedResponse<__experimental_CommercePaymentSourceResource>>;
+  addPaymentSource: (
+    params: __experimental_AddPaymentSourceParams,
+  ) => Promise<__experimental_CommercePaymentSourceResource>;
 }
 
 export interface __experimental_CommerceBillingNamespace {
-  getProducts: (params?: GetProductsParams) => Promise<ClerkPaginatedResponse<CommerceProductResource>>;
-  getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
-  startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
+  getPlans: () => Promise<__experimental_CommercePlanResource[]>;
+  startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
 
-export type GetProductsParams = ClerkPaginationParams<{
-  subscriberType?: string;
-}>;
-
-export interface CommerceProductResource extends ClerkResource {
+export interface __experimental_CommerceProductResource extends ClerkResource {
   id: string;
   slug: string | null;
   currency: string;
   isDefault: boolean;
-  plans: CommercePlanResource[];
+  plans: __experimental_CommercePlanResource[];
 }
 
-export interface GetPlansParams {
-  productId?: string;
+export interface __experimental_GetPlansParams {
+  subscriberType?: string;
 }
 
-export interface CommercePlanResource extends ClerkResource {
+export interface __experimental_CommercePlanResource extends ClerkResource {
   id: string;
   name: string;
   amount: number;
@@ -46,10 +43,10 @@ export interface CommercePlanResource extends ClerkResource {
   publiclyVisible: boolean;
   slug: string;
   avatarUrl: string;
-  features: CommerceFeatureResource[];
+  features: __experimental_CommerceFeatureResource[];
 }
 
-export interface CommerceFeatureResource extends ClerkResource {
+export interface __experimental_CommerceFeatureResource extends ClerkResource {
   id: string;
   name: string;
   description: string;
@@ -57,71 +54,71 @@ export interface CommerceFeatureResource extends ClerkResource {
   avatarUrl: string;
 }
 
-export interface AddPaymentSourceParams {
+export interface __experimental_AddPaymentSourceParams {
   gateway: 'stripe' | 'paypal';
   paymentMethod: string;
   paymentToken: string;
 }
 
-export interface CommercePaymentSourceResource extends ClerkResource {
+export interface __experimental_CommercePaymentSourceResource extends ClerkResource {
   id: string;
   last4: string;
   paymentMethod: string;
   cardType: string;
 }
 
-export interface CommerceInvoiceResource extends ClerkResource {
+export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
   planId: string;
   paymentSourceId: string;
-  totals: CommerceTotals;
+  totals: __experimental_CommerceTotals;
   paymentDueOn: number;
   paidOn: number;
   status: string;
 }
 
-export interface CommerceSubscriptionResource extends ClerkResource {
+export interface __experimental_CommerceSubscriptionResource extends ClerkResource {
   id: string;
   paymentSourceId: string;
-  plan: CommercePlanResource;
+  plan: __experimental_CommercePlanResource;
   planPeriod: string;
   status: string;
   cancel: () => Promise<any>;
 }
 
-export interface CommerceMoney {
+export interface __experimental_CommerceMoney {
   amount: number;
   amountFormatted: string;
   currency: string;
   currencySymbol: string;
 }
 
-export interface CommerceTotals {
-  subtotal: CommerceMoney;
-  grandTotal: CommerceMoney;
-  taxTotal: CommerceMoney;
-  totalDueNow?: CommerceMoney;
+export interface __experimental_CommerceTotals {
+  subtotal: __experimental_CommerceMoney;
+  grandTotal: __experimental_CommerceMoney;
+  taxTotal: __experimental_CommerceMoney;
+  totalDueNow?: __experimental_CommerceMoney;
 }
 
-export interface CreateCheckoutParams {
+export interface __experimental_CreateCheckoutParams {
   planId: string;
   planPeriod: string;
 }
 
-export interface ConfirmCheckoutParams {
+export interface __experimental_ConfirmCheckoutParams {
   paymentSourceId?: string;
 }
 
-export interface CommerceCheckoutResource extends ClerkResource {
+export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
   externalGatewayId: string;
-  invoice?: CommerceInvoiceResource;
-  paymentSource?: CommercePaymentSourceResource;
-  plan: CommercePlanResource;
+  invoice?: __experimental_CommerceInvoiceResource;
+  paymentSource?: __experimental_CommercePaymentSourceResource;
+  plan: __experimental_CommercePlanResource;
   planPeriod: string;
   status: string;
-  totals: CommerceTotals;
-  subscription?: CommerceSubscriptionResource;
-  confirm: (params?: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
+  totals: __experimental_CommerceTotals;
+  subscription?: __experimental_CommerceSubscriptionResource;
+  confirm: (params?: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }

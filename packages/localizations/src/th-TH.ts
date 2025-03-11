@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'กลับ',
   badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
@@ -24,14 +32,6 @@ export const thTH: LocalizationResource = {
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -656,6 +656,14 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -670,14 +678,6 @@ export const thTH: LocalizationResource = {
         'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
       title: 'เพิ่มการยืนยันรหัสสำรอง',
       title__codelist: 'รหัสสำรอง',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'เลือกผู้ให้บริการเพื่อเชื่อมต่อบัญชีของคุณ',

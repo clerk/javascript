@@ -98,7 +98,7 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  commerce: {
+  __experimental_commerce: {
     month: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
@@ -647,7 +647,7 @@ type _LocalizationResource = {
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
-    billingPage: {
+    __experimental_billingPage: {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;

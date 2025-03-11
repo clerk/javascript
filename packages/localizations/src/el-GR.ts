@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Πίσω',
   badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
@@ -24,14 +32,6 @@ export const elGR: LocalizationResource = {
   badge__unverified: 'Μη επαληθευμένο',
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
     invitePage: {
@@ -663,6 +663,14 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -678,14 +686,6 @@ export const elGR: LocalizationResource = {
         'Μπορείτε να χρησιμοποιήσετε έναν από αυτούς για να συνδεθείτε στον λογαριασμό σας, εάν χάσετε την πρόσβαση στη συσκευή επαλήθευσής σας.',
       title: 'Προσθήκη επαλήθευσης με εφεδρικούς κωδικούς',
       title__codelist: 'Εφεδρικοί κωδικοί',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Επιλέξτε έναν πάροχο για να συνδέσετε τον λογαριασμό σας.',

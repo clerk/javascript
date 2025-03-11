@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'الرجوع',
   badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
@@ -24,14 +32,6 @@ export const arSA: LocalizationResource = {
   badge__unverified: 'لم يتم التحقق منه',
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -655,6 +655,14 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -670,14 +678,6 @@ export const arSA: LocalizationResource = {
         'يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك',
       title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
       title__codelist: 'رموز النسخ الأحتياطي',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'أختر موفر خدمة لتوصيل حسابك',

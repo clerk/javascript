@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '돌아가기',
   badge__currentPlan: undefined,
   badge__default: '기본값',
@@ -24,14 +32,6 @@ export const koKR: LocalizationResource = {
   badge__unverified: '미확인',
   badge__userDevice: '사용자 장치',
   badge__you: '당신',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: '조직 만들기',
     invitePage: {
@@ -651,6 +651,14 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -665,14 +673,6 @@ export const koKR: LocalizationResource = {
       successSubtitle: '인증 장치에 액세스할 수 없는 경우 이 중 하나를 사용하여 계정에 로그인할 수 있습니다.',
       title: '백업 코드 인증 추가',
       title__codelist: '백업 코드',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: '계정을 연결할 제공자를 선택하세요',

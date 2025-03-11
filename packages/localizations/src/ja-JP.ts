@@ -14,6 +14,14 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '戻る',
   badge__currentPlan: undefined,
   badge__default: 'デフォルト',
@@ -24,14 +32,6 @@ export const jaJP: LocalizationResource = {
   badge__unverified: '未確認',
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
-  commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {
@@ -657,6 +657,14 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -671,14 +679,6 @@ export const jaJP: LocalizationResource = {
       successSubtitle: '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
       title: 'バックアップコードの追加',
       title__codelist: 'バックアップコード',
-    },
-    billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'アカウントを連携するプロバイダを選択してください。',
