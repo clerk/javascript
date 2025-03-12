@@ -1,5 +1,7 @@
-import type { ToolkitContext } from './types';
+import { clerkClient } from './clerk-client';
+import type { CreateClerkToolkitParams } from './types';
 
-export const defaultToolkitContext: ToolkitContext = {
+export const defaultCreateClerkToolkitParams = {
   allowPrivateMetadata: false,
-};
+  clerkClient,
+} satisfies CreateClerkToolkitParams;
