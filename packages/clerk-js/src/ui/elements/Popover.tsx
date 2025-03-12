@@ -5,7 +5,7 @@ import React from 'react';
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
-  nodeId: string;
+  nodeId?: string;
   isOpen?: boolean;
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
   order?: Array<'reference' | 'floating' | 'content'>;
