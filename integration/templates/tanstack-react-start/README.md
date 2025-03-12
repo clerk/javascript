@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://clerk.com?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-start-quickstart" target="_blank" rel="noopener noreferrer">
+  <a href="https://clerk.com?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-react-start-quickstart" target="_blank" rel="noopener noreferrer">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="./public/light-logo.png">
       <img alt="Clerk Logo for light background" src="./public/dark-logo.png" height="64">
@@ -29,10 +29,10 @@
 
 Clerk is a developer-first authentication and user management solution. It provides pre-built components and hooks for sign-in, sign-up, user profile, and organization management. Clerk is designed to be easy to use and customize, and can be integrated into any TanStack Start application.
 
-After following the [Clerk TanStack Start quickstart](https://clerk.com/docs/quickstarts/tanstack-start?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-start-quickstart), you will have learned how to:
+After following the [Clerk TanStack Start quickstart](https://clerk.com/docs/quickstarts/tanstack-react-start?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-react-start-quickstart), you will have learned how to:
 
 - Create a new TanStack Start application
-- Install `@clerk/tanstack-start`
+- Install `@clerk/tanstack-react-start`
 - Set up your environment keys
 - Wrap your Root Component with `<ClerkProvider />`
 - Configure `clerkHandler()` in the SSR entrypoint
@@ -43,12 +43,12 @@ After following the [Clerk TanStack Start quickstart](https://clerk.com/docs/qui
 ## Running the template
 
 ```bash
-git clone https://github.com/clerk/clerk-tanstack-start-quickstart
+git clone https://github.com/clerk/clerk-tanstack-react-start-quickstart
 ```
 
 To run the example locally, you need to:
 
-1. Sign up for a Clerk account at [https://clerk.com](https://www.clerk.com?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-start-quickstart).
+1. Sign up for a Clerk account at [https://clerk.com](https://www.clerk.com?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-react-start-quickstart).
 
 2. Go to the [Clerk dashboard](https://dashboard.clerk.com) and create an application.
 
@@ -62,8 +62,8 @@ To run the example locally, you need to:
 
 To learn more about Clerk and TanStack Start, check out the following resources:
 
-- [Quickstart: Get started with TanStack Start and Clerk](https://clerk.com/docs/quickstarts/tanstack-start?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-start-quickstart)
-- [Clerk Documentation](https://clerk.com/docs?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-start-quickstart)
+- [Quickstart: Get started with TanStack Start and Clerk](https://clerk.com/docs/quickstarts/tanstack-react-start?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-react-start-quickstart)
+- [Clerk Documentation](https://clerk.com/docs?utm_source=DevRel&utm_medium=docs&utm_campaign=templates&utm_content=08-05-2023&utm_term=clerk-tanstack-react-start-quickstart)
 
 ## Found an issue or want to leave feedback
 
