@@ -21,6 +21,7 @@ const snapshot = `---
 '@clerk/express': patch
 '@clerk/testing': patch
 '@clerk/elements': patch
+'@clerk/tanstack-react-start': patch
 ---
 
 Snapshot release
