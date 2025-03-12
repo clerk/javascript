@@ -77,7 +77,7 @@ const createCustomPages = (
   clerk: LoadedClerk,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
-    commerce: clerk.__internal_getOption('experimental')?.commerce,
+    commerce: clerk.sdkMetadata?.environment === 'test' ? false : clerk.__internal_getOption('experimental')?.commerce,
   });
 
   if (isDevelopmentSDK(clerk)) {

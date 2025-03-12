@@ -1,6 +1,6 @@
 import { invitations } from './invitations';
 import { organizations } from './organizations';
-import { users } from './user';
+import { users } from './users';
 
 export const tools = {
   /**
