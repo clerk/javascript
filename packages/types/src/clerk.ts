@@ -427,6 +427,21 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
+   * Registers the internal navigation context from UI components in order to
+   * be triggered from `Clerk` methods
+   * @internal
+   */
+  __internal_setComponentNavigationContext: (context: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  }) => () => void;
+
+  /**
    * Set the active session and organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
@@ -803,6 +818,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
