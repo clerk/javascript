@@ -1,5 +1,11 @@
 # @clerk/agent-toolkit
 
+## 0.0.9
+
+### Patch Changes
+
+- Fix npx @clerk/agent-toolkit by moving `@modelcontextprotocol/sdk` in `dependencies` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 0.0.8
 
 ### Patch Changes
