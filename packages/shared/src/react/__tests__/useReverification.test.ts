@@ -28,13 +28,13 @@ type Fetcher = typeof fetcherWithHelper;
 describe('useReverification type tests', () => {
   it('allow pass through types', () => {
     type UseReverificationWithFetcher = typeof useReverification<typeof fetcher, object>;
-    type VerifiedFetcher = ReturnType<UseReverificationWithFetcher>[0];
+    type VerifiedFetcher = ReturnType<UseReverificationWithFetcher>['action'];
     expectTypeOf(fetcher).toEqualTypeOf<VerifiedFetcher>();
   });
 
   it('returned callback with clerk error excluded and possible null in case of cancelled flow', () => {
     type UseReverificationWithFetcherHelper = typeof useReverification<typeof fetcherWithHelper, object>;
-    type VerifiedFetcherHelper = ReturnType<UseReverificationWithFetcherHelper>[0];
+    type VerifiedFetcherHelper = ReturnType<UseReverificationWithFetcherHelper>['action'];
 
     expectTypeOf(fetcherWithHelper).not.toEqualTypeOf<VerifiedFetcherHelper>();
 
@@ -49,11 +49,12 @@ describe('useReverification type tests', () => {
     type UseReverificationWithFetcherHelperThrow = typeof useReverification<
       typeof fetcherWithHelper,
       {
-        throwOnCancel: true;
+        throwOnError: true;
       }
     >;
-    type VerifiedFetcherHelperThrow = ReturnType<UseReverificationWithFetcherHelperThrow>[0];
+    type VerifiedFetcherHelperThrow = ReturnType<UseReverificationWithFetcherHelperThrow>['action'];
     expectTypeOf(fetcherWithHelper).not.toEqualTypeOf<VerifiedFetcherHelperThrow>();
+    // TODO(@octoper): This should be fixed
     expectTypeOf<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>>().toEqualTypeOf<
       Awaited<ReturnType<VerifiedFetcherHelperThrow>>
     >();
