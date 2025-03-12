@@ -121,7 +121,7 @@ export abstract class BaseResource {
       // if the status is 401, we need to handle unauthenticated as we did before
       // otherwise, we are going to ignore the requires_captcha error
       // as we're going to handle it by triggering the captcha challenge
-      if (status === 401 && code !== 'requires_captcha') {
+      if (status === 401 && code !== 'requires_captcha' && code !== 'requires_assertion') {
         await BaseResource.clerk.handleUnauthenticated();
       }
 

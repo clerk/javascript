@@ -621,6 +621,8 @@ export interface Clerk {
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
+
+  __internal_assertDevice?: ((client_id: string) => Promise<any>) | undefined;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &

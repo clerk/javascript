@@ -27,6 +27,7 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_resourceCache?: BuildClerkOptions['__experimental_resourceCache'];
+  deviceAttestation?: BuildClerkOptions['deviceAttestation'];
 };
 
 const SDK_METADATA = {
@@ -42,6 +43,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
+    deviceAttestation,
     ...rest
   } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
@@ -66,6 +68,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
               tokenCache,
               __experimental_passkeys,
               __experimental_resourceCache,
+              deviceAttestation,
             })
           : null
       }

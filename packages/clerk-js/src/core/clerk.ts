@@ -1,6 +1,13 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkRuntimeError,
+  EmailLinkErrorCodeStatus,
+  is4xxError,
+  isClerkAPIResponseError,
+  isRequiresAssertionError,
+  isRequiresCaptchaError,
+} from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -199,6 +206,8 @@ export class Clerk implements ClerkInterface {
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
+
+  public __internal_assertDevice: ((client_id: string) => Promise<any>) | undefined;
 
   public __internal_createPublicCredentials:
     | ((
@@ -1969,7 +1978,7 @@ export class Clerk implements ClerkInterface {
 
         await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
           // limit the changes for this specific error for now
-          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+          if (isClerkAPIResponseError(e) && (isRequiresCaptchaError(e) || isRequiresAssertionError(e))) {
             await initEnvironmentPromise;
             initComponents();
             await initClient();
