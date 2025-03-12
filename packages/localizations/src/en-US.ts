@@ -274,6 +274,7 @@ export const enUS: LocalizationResource = {
       actionLink: 'Get help',
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
+      blockButton__passkey: 'Use your passkey',
       blockButton__emailCode: 'Email code to {{identifier}}',
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
@@ -290,6 +291,12 @@ export const enUS: LocalizationResource = {
     backupCodeMfa: {
       subtitle: 'Enter the backup code you received when setting up two-step authentication',
       title: 'Enter a backup code',
+    },
+    passkey: {
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Use your passkey',
+      blockButton__passkey: 'Use your passkey',
     },
     emailCode: {
       formTitle: 'Verification code',
