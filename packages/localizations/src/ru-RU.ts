@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__primary: 'Основной',
@@ -662,6 +671,14 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -787,6 +804,7 @@ export const ruRU: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профиль',
+      billing: undefined,
       description: 'Управление информацией вашей учетной записи.',
       security: 'Безопасность',
       title: 'Учетная запись',

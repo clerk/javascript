@@ -1,9 +1,11 @@
 import type {
   Appearance,
+  CheckoutTheme,
   CreateOrganizationTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PricingTableTheme,
   SignInTheme,
   SignUpTheme,
   UserButtonTheme,
@@ -12,6 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { __experimental_CommerceNamespace } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -145,6 +148,9 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /** Commerce Object */
+  __experimental_commerce: __experimental_CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -383,6 +389,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the Waitlist component from.
    */
   unmountWaitlist: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a pricing table component at the target element.
+   * @param targetNode Target node to mount the PricingTable component.
+   * @param props configuration parameters.
+   */
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+
+  /**
+   * Unmount a pricing table component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the PricingTable component from.
+   */
+  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -781,6 +802,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * Clerk will rethrow network errors that occur while the user is offline.
          */
         rethrowOfflineNetworkErrors: boolean;
+        commerce: boolean;
       },
       Record<string, any>
     >;
@@ -1413,6 +1435,20 @@ export type WaitlistProps = {
 };
 
 export type WaitlistModalProps = WaitlistProps;
+
+export type __experimental_PricingTableProps = {
+  appearance?: PricingTableTheme;
+  ctaPosition?: 'top' | 'bottom';
+  collapseFeatures?: boolean;
+  layout?: 'default' | 'matrix';
+};
+
+export type __experimental_CheckoutProps = {
+  appearance?: CheckoutTheme;
+  planId?: string;
+  planPeriod?: string;
+  checkoutId?: string;
+};
 
 export interface HandleEmailLinkVerificationParams {
   /**
