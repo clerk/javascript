@@ -44,6 +44,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -1009,6 +1010,11 @@ export class Clerk implements ClerkInterface {
       newSession = this.#getSessionFromClient(newSession?.id);
     }
 
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
+    }
+
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
     const token = await newSession?.getToken();
     if (!token) {
@@ -1058,7 +1064,7 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
     }
@@ -1067,7 +1073,7 @@ export class Clerk implements ClerkInterface {
     // to `pending`
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+      session = (this.#getSessionFromClient(session.id) ?? session) as PendingSessionResource;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
