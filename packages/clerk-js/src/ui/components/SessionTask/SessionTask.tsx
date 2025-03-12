@@ -5,10 +5,25 @@ import type { SessionTask } from '@clerk/types';
 import { OrganizationListContext } from '../../contexts';
 import { OrganizationList } from '../OrganizationList';
 
-const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
-  org: () => (
+interface SessionTaskProps {
+  task: SessionTask['key'];
+  redirectUrlComplete: string;
+}
+
+const ContentRegistry: Record<
+  SessionTask['key'],
+  React.ComponentType<Pick<SessionTaskProps, 'redirectUrlComplete'>>
+> = {
+  org: ({ redirectUrlComplete }) => (
     // TODO - Hide personal workspace within organization list context based on environment
-    <OrganizationListContext.Provider value={{ componentName: 'OrganizationList', hidePersonal: true }}>
+    <OrganizationListContext.Provider
+      value={{
+        componentName: 'OrganizationList',
+        hidePersonal: true,
+        afterSelectOrganizationUrl: redirectUrlComplete,
+        afterCreateOrganizationUrl: redirectUrlComplete,
+      }}
+    >
       <OrganizationList />
     </OrganizationListContext.Provider>
   ),
@@ -17,12 +32,12 @@ const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
 /**
  * @internal
  */
-export function SessionTask({ task }: { task: SessionTask['key'] }): React.ReactNode {
+export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): React.ReactNode {
   const clerk = useClerk();
 
   clerk.telemetry?.record(eventComponentMounted('SessionTask', { task }));
 
   const Content = ContentRegistry[task];
 
-  return <Content />;
+  return <Content redirectUrlComplete={redirectUrlComplete} />;
 }

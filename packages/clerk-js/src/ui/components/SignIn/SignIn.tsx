@@ -135,7 +135,10 @@ function SignInRoutes(): JSX.Element {
               </Route>
               {signInContext.withSessionTasks && (
                 <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-                  <SessionTask task='org' />
+                  <SessionTask
+                    task='org'
+                    redirectUrlComplete={signUpContext.afterSignUpUrl}
+                  />
                 </Route>
               )}
               <Route index>
@@ -149,7 +152,10 @@ function SignInRoutes(): JSX.Element {
         )}
         {signInContext.withSessionTasks && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-            <SessionTask task='org' />
+            <SessionTask
+              task='org'
+              redirectUrlComplete={signUpContext.afterSignInUrl}
+            />
           </Route>
         )}
         <Route index>

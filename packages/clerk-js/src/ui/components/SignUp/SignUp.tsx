@@ -94,7 +94,10 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         {signUpContext.withSessionTasks && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-            <SessionTask task='org' />
+            <SessionTask
+              task='org'
+              redirectUrlComplete={signUpContext.afterSignUpUrl}
+            />
           </Route>
         )}
         <Route index>
