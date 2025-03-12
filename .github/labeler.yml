@@ -43,7 +43,7 @@ remix:
   - packages/remix/**
 
 tanstack:
-  - packages/tanstack-start/**
+  - packages/tanstack-react-start/**
 
 testing:
   - packages/testing/**

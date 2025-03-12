@@ -10,17 +10,17 @@ const router = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
 const start = applicationConfig()
-  .setName('tanstack-start')
-  .useTemplate(templates['tanstack-start'])
+  .setName('tanstack-react-start')
+  .useTemplate(templates['tanstack-react-start'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
 export const tanstack = {
   start,

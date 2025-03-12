@@ -1,11 +1,17 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
+declare global {
+  interface Window {
+    __clerk_init_state?: any;
+  }
+}
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
-  'basic tests for TanStack Router @tanstack-router',
+  'basic tests for TanStack React Start @tanstack-react-start',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
@@ -50,7 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
     });
 
-    test('can sign out successfully', async ({ page, context }) => {
+    test('clerk handler has ran', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
@@ -61,17 +67,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
       await u.page.waitForAppUrl('/');
 
-      await u.po.userButton.waitForMounted();
-      await u.po.userButton.toggleTrigger();
-      await u.po.userButton.waitForPopover();
+      const clerkInitialState = await u.page.waitForFunction(() => window.__clerk_init_state);
 
-      await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
-
-      await u.po.userButton.triggerSignOut();
-
-      await u.page.waitForAppUrl('/');
-
-      await u.po.expect.toBeSignedOut();
+      expect(clerkInitialState !== undefined).toBeTruthy();
     });
   },
 );

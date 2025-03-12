@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
-import { ClerkProvider } from '@clerk/tanstack-start';
+import { ClerkProvider } from '@clerk/tanstack-react-start';
 
 export const Route = createRootRoute({
   component: RootComponent,

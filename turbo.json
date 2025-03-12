@@ -217,14 +217,14 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:tanstack-start": {
-      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-start#build", "@clerk/clerk-react#build"],
+    "//#test:integration:tanstack-react-start": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-react-start#build", "@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:tanstack-router": {
-      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-start#build", "@clerk/clerk-react#build"],
+    "//#test:integration:tanstack-react-router": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-react-start#build", "@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"

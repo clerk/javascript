@@ -6,7 +6,7 @@
     </picture>
   </a>
   <br />
-  <h1 align="center">@clerk/tanstack-start</h1>
+  <h1 align="center">@clerk/tanstack-react-start</h1>
 </p>
 
 <div align="center">
@@ -15,7 +15,7 @@
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_tanstack_start)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-[Changelog](https://github.com/clerk/javascript/blob/main/packages/tanstack-start/CHANGELOG.md)
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/tanstack-react-start/CHANGELOG.md)
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
@@ -29,7 +29,7 @@
 
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_tanstack_start) is the easiest way to add authentication and user management to your Tanstack Start application. Add sign up, sign in, and profile management to your application in minutes.
 
-> [!WARNING] > `@clerk/tanstack-start` is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
+> [!WARNING] > `@clerk/tanstack-react-start` is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
 
 ### Prerequisites
 
@@ -42,7 +42,7 @@
 ### Installation
 
 ```sh
-npm install @clerk/tanstack-start
+npm install @clerk/tanstack-react-start
 ```
 
 ## Usage
@@ -59,7 +59,7 @@ You can get these from the [API Keys](https://dashboard.clerk.com/last-active?pa
 To initialize Clerk with your TanStack Start application, you will need to make one modification to `app/routes/_root.tsx`. Wrap the children of the `RootComponent` with `<ClerkProvider/>`
 
 ```tsx
-import { ClerkProvider } from '@clerk/tanstack-start'
+import { ClerkProvider } from '@clerk/tanstack-react-start'
 import { createRootRoute } from '@tanstack/react-router'
 import { Link, Outlet, ScrollRestoration } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
@@ -112,7 +112,7 @@ You will also need to make on more modification to you SSR entrypoint (default: 
 import { createStartHandler, defaultStreamHandler } from '@tanstack/start/server';
 import { getRouterManifest } from '@tanstack/start/router-manifest';
 import { createRouter } from './router';
-import { createClerkHandler } from '@clerk/tanstack-start/server';
+import { createClerkHandler } from '@clerk/tanstack-react-start/server';
 
 const handler = createStartHandler({
   createRouter,
@@ -136,7 +136,7 @@ After those changes are made, you can use Clerk components in your routes.
 For example, in `app/routes/index.tsx`:
 
 ```tsx
-import { SignIn, SignedIn, SignedOut, UserButton } from '@clerk/tanstack-start';
+import { SignIn, SignedIn, SignedOut, UserButton } from '@clerk/tanstack-react-start';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
@@ -171,9 +171,9 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ## Security
 
-`@clerk/tanstack-start` follows good practices of security, but 100% security cannot be assured.
+`@clerk/tanstack-react-start` follows good practices of security, but 100% security cannot be assured.
 
-`@clerk/tanstack-start` is provided **"as is"** without any **warranty**. Use at your own risk.
+`@clerk/tanstack-react-start` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
@@ -181,4 +181,4 @@ _For more information and to report security issues, please refer to our [securi
 
 This project is licensed under the **MIT license**.
 
-See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/tanstack-start/LICENSE) for more information.
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/tanstack-react-start/LICENSE) for more information.
