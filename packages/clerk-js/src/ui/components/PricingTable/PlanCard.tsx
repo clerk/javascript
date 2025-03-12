@@ -16,7 +16,7 @@ import {
 } from '../../customizables';
 import { Avatar, SegmentedControl } from '../../elements';
 import { useMotionSafe } from '../../hooks';
-import { Check, InformationCircle, Plus, Minus } from '../../icons';
+import { Check, InformationCircle, Minus, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
