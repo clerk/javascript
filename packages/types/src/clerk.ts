@@ -26,6 +26,7 @@ import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
+  AuthenticateWithRedirectParams,
   LegacyRedirectProps,
   RedirectOptions,
   RedirectUrlProp,
@@ -626,6 +627,11 @@ export interface Clerk {
     params: AuthenticateWithGoogleOneTapParams,
   ) => Promise<SignInResource | SignUpResource>;
 
+  signInWithPopup: (params: AuthenticateWithRedirectParams & { popup: Window | null }) => Promise<unknown>;
+  signUpWithPopup: (
+    params: AuthenticateWithRedirectParams & { popup: Window | null; unsafeMetadata?: SignUpUnsafeMetadata },
+  ) => Promise<unknown>;
+
   /**
    * Creates an organization, adding the current user as admin.
    */
@@ -1028,6 +1034,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1140,6 +1150,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   *
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1505,6 +1519,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
     | 'withSignUp'
+    | 'oauthFlow'
   >;
 
 export type SignUpButtonProps = {

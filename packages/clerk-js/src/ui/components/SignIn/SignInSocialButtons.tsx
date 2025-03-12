@@ -10,6 +10,11 @@ import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { handleError, web3CallbackErrorHandler } from '../../utils';
 
+const POPUP_PREFERRED_ORIGINS = ['.lovable.app', '.lovableproject.com', '.webcontainer-api.io'];
+function originPrefersPopup(): boolean {
+  return POPUP_PREFERRED_ORIGINS.some(origin => window.location.origin.endsWith(origin));
+}
+
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -24,6 +29,13 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
     <SocialButtons
       {...props}
       oauthCallback={strategy => {
+        if (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup())) {
+          const popup = window.open('about:blank', '', 'width=600,height=800');
+          return clerk
+            .signInWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
+            .catch(err => handleError(err, [], card.setError));
+        }
+
         return signIn
           .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
           .catch(err => handleError(err, [], card.setError));

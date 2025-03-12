@@ -33,6 +33,7 @@ type FlowMetadata = {
     | 'passwordPwnedMethods'
     | 'havingTrouble'
     | 'ssoCallback'
+    | 'popupCallback'
     | 'popover'
     | 'complete'
     | 'accountSwitcher';
