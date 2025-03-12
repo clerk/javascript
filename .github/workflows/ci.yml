@@ -171,7 +171,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-router', 'vue', 'nuxt', 'react-router']
+        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-react-router', 'vue', 'nuxt', 'react-router']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'

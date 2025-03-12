@@ -917,7 +917,7 @@ importers:
         specifier: 0.25.0
         version: 0.25.0
 
-  packages/tanstack-start:
+  packages/tanstack-react-start:
     dependencies:
       '@clerk/backend':
         specifier: workspace:^

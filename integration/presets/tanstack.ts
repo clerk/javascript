@@ -3,8 +3,8 @@ import { templates } from '../templates';
 import { linkPackage } from './utils';
 
 const router = applicationConfig()
-  .setName('tanstack-router')
-  .useTemplate(templates['tanstack-router'])
+  .setName('tanstack-react-router')
+  .useTemplate(templates['tanstack-react-router'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
   .addScript('dev', 'pnpm dev')
