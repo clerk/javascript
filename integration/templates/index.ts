@@ -14,7 +14,7 @@ export const templates = {
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),
   'expo-web': resolve(__dirname, './expo-web'),
   'tanstack-react-start': resolve(__dirname, './tanstack-react-start'),
-  'tanstack-router': resolve(__dirname, './tanstack-router'),
+  'tanstack-react-router': resolve(__dirname, './tanstack-react-router'),
   'vue-vite': resolve(__dirname, './vue-vite'),
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
