@@ -16,4 +16,5 @@ export interface EnvironmentResource extends ClerkResource {
   onWindowLocationHost: () => boolean;
   maintenanceMode: boolean;
   __internal_toSnapshot: () => EnvironmentJSONSnapshot;
+  hasTasksEnabled: boolean;
 }

@@ -31,8 +31,7 @@ function SignUpRoutes(): JSX.Element {
   const { navigate, basePath } = useRouter();
   const signUpContext = useSignUpContext();
 
-  // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-  usePreloadSessionTask(signUpContext.withSessionTasks);
+  usePreloadSessionTask(signUpContext.hasTasksEnabled);
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ basePath, navigate });
@@ -89,7 +88,7 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
-        {signUpContext.withSessionTasks && (
+        {signUpContext.hasTasksEnabled && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
             <SessionTask task='org' />
           </Route>

@@ -79,4 +79,8 @@ export class Environment extends BaseResource implements EnvironmentResource {
       maintenance_mode: this.maintenanceMode,
     };
   }
+
+  get hasTasksEnabled() {
+    return !!this.organizationSettings.forceOrganizationSelection;
+  }
 }

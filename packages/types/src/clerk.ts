@@ -796,8 +796,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          * Clerk will rethrow network errors that occur while the user is offline.
          */
         rethrowOfflineNetworkErrors: boolean;
-        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
