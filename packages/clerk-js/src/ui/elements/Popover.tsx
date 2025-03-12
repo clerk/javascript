@@ -8,6 +8,10 @@ type PopoverProps = PropsWithChildren<{
   nodeId?: string;
   isOpen?: boolean;
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
+  /**
+   * Determines whether outside elements are inert when modal is enabled. This enables pointer modality without a backdrop.
+   * @default false
+   */
   outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
   portal?: boolean;
