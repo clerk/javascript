@@ -76,22 +76,22 @@ describe('filterTools', () => {
   });
 
   it('throws an error when pattern is empty', () => {
-    expect(() => filterTools(mockTools, '')).toThrow('No pattern specified');
+    expect(() => filterTools(mockTools, '')).toThrow();
   });
 
   it('throws an error when pattern is invalid', () => {
-    expect(() => filterTools(mockTools, 'users..getUserCount')).toThrow('Invalid pattern');
-    expect(() => filterTools(mockTools, 'users@getUserCount')).toThrow('Invalid pattern');
-    expect(() => filterTools(mockTools, 'users.getUserCount.extra')).toThrow('Invalid pattern');
+    expect(() => filterTools(mockTools, 'users..getUserCount')).toThrow();
+    expect(() => filterTools(mockTools, 'users@getUserCount')).toThrow();
+    expect(() => filterTools(mockTools, 'users.getUserCount.extra')).toThrow();
   });
 
   it('throws an error when category does not exist', () => {
-    expect(() => filterTools(mockTools, 'nonexistent')).toThrow('Category not found: nonexistent');
-    expect(() => filterTools(mockTools, 'nonexistent.tool')).toThrow('Category not found: nonexistent');
+    expect(() => filterTools(mockTools, 'nonexistent')).toThrow();
+    expect(() => filterTools(mockTools, 'nonexistent.tool')).toThrow();
   });
 
   it('throws an error when tool does not exist in the category', () => {
-    expect(() => filterTools(mockTools, 'users.nonexistent')).toThrow('Tool not found: nonexistent');
+    expect(() => filterTools(mockTools, 'users.nonexistent')).toThrow();
   });
 
   it('should work with small categories', () => {

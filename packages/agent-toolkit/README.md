@@ -34,28 +34,30 @@
 > This SDK is recommended for testing purposes only unless you are confident in the agent's behavior and have implemented necessary security measures such as guardrails and best practices.
 
 ## Table of Contents
+
 <!-- TOC -->
-  * [Table of Contents](#table-of-contents)
-  * [Getting Started](#getting-started)
-  * [API Reference](#api-reference)
-    * [Import Paths](#import-paths)
-    * [Methods](#methods)
-      * [Initialization & generic helpers](#initialization--generic-helpers)
-      * [Available tools](#available-tools)
-      * [Langchain-specific methods](#langchain-specific-methods)
-      * [MCP Specific Methods](#mcp-specific-methods)
-  * [Prerequisites](#prerequisites)
-  * [Example Repository](#example-repository)
-  * [Using Vercel's AI SDK](#using-vercels-ai-sdk)
-  * [Using Langchain](#using-langchain)
-  * [Model Context Protocol (MCP Server)](#model-context-protocol-mcp-server)
-    * [Running a local MCP server](#running-a-local-mcp-server)
-    * [Usage with Claude Desktop](#usage-with-claude-desktop)
-  * [Advanced Usage](#advanced-usage)
-    * [Using a Custom `clerkClient`](#using-a-custom-clerkclient)
-  * [Support](#support)
-  * [Contributing](#contributing)
-  * [License](#license)
+
+- [Table of Contents](#table-of-contents)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+  - [Import Paths](#import-paths)
+  - [Methods](#methods)
+    - [Initialization & generic helpers](#initialization--generic-helpers)
+    - [Available tools](#available-tools)
+    - [Langchain-specific methods](#langchain-specific-methods)
+    - [MCP Specific Methods](#mcp-specific-methods)
+- [Prerequisites](#prerequisites)
+- [Example Repository](#example-repository)
+- [Using Vercel's AI SDK](#using-vercels-ai-sdk)
+- [Using Langchain](#using-langchain)
+- [Model Context Protocol (MCP Server)](#model-context-protocol-mcp-server)
+  - [Running a local MCP server](#running-a-local-mcp-server)
+  - [Usage with Claude Desktop](#usage-with-claude-desktop)
+- [Advanced Usage](#advanced-usage)
+  - [Using a Custom `clerkClient`](#using-a-custom-clerkclient)
+- [Support](#support)
+- [Contributing](#contributing)
+- [License](#license)
 <!-- TOC -->
 
 ## Getting Started
@@ -98,7 +100,7 @@ Currently, are only exposing a subset of Clerk Backend API functionality as tool
 
 #### MCP Specific Methods
 
-- `createClerkMcpServer()`: Instantiates a new Clerk MCP server. For more details, see 
+- `createClerkMcpServer()`: Instantiates a new Clerk MCP server. For more details, see
 
 For more details on each tool, refer to the framework-specific directories or the [Clerk Backend API documentation](https://clerk.com/docs/reference/backend-api).
 
@@ -224,6 +226,7 @@ export async function POST(req: Request) {
 ```
 
 ## Model Context Protocol (MCP Server)
+
 The `@clerk/agent-toolkit/modelcontextprotocol` import path provides a low-level helper for integrating with the Model Context Protocol (MCP). This is considered an advanced use case, as most users will be interested in running a local Clerk MCP server directly instead.
 
 ### Running a local MCP server
@@ -261,6 +264,7 @@ npx -y @clerk/agent-toolkit -p local-mcp --tools users.getUserCount organization
 Use the `--help` flag to view additional server options.
 
 ### Usage with Claude Desktop
+
 Add the following to your `claude_desktop_config.json` file to use the local MCP server:
 
 ```json
@@ -268,13 +272,7 @@ Add the following to your `claude_desktop_config.json` file to use the local MCP
   "mcpServers": {
     "clerk": {
       "command": "npx",
-      "args": [
-          "-y",
-          "@clerk/agent-toolkit",
-          "-p=local-mcp",
-          "--tools=users",
-          "--secret-key=sk_123"
-      ]
+      "args": ["-y", "@clerk/agent-toolkit", "-p=local-mcp", "--tools=users", "--secret-key=sk_123"]
     }
   }
 }

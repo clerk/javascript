@@ -30,7 +30,7 @@
     }
   },
   "bin": {
-    "local-mcp": "./dist/modelcontextprotocol/server.js"
+    "local-mcp": "./dist/modelcontextprotocol/local-server.js"
   },
   "files": [
     "dist"
@@ -50,6 +50,9 @@
     "@clerk/types": "workspace:^",
     "yargs": "^17.7.2",
     "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.33"
   },
   "peerDependencies": {
     "@langchain/core": "^0.3.6",
@@ -72,8 +75,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "devDependencies": {
-    "@types/yargs": "^17.0.33"
   }
 }
