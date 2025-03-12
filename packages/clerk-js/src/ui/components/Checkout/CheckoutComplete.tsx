@@ -90,7 +90,7 @@ export const CheckoutComplete = ({
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={() => setIsOpen(false)}
+          onClick={() => setIsOpen?.(false)}
         >
           {/* TODO(@COMMERCE): needs localization */}
           Continue

@@ -22,7 +22,7 @@ export const __experimental_Checkout = (props: __experimental_CheckoutProps) => 
 };
 
 const AuthenticatedRoutes = withCoreUserGuard((props: __experimental_CheckoutProps) => {
-  const { mode = 'mounted', isOpen, setIsOpen } = useCheckoutContext();
+  const { mode = 'mounted', isOpen = false, setIsOpen = () => {} } = useCheckoutContext();
 
   return (
     <Drawer.Root
