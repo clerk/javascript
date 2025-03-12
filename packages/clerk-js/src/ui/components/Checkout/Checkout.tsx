@@ -1,8 +1,9 @@
 import type { __experimental_CheckoutProps } from '@clerk/types';
 
-import { CommerceBlade } from '../../common';
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { useCheckoutContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
+import { Drawer } from '../../elements';
 import { Route, Switch } from '../../router';
 import { CheckoutPage } from './CheckoutPage';
 
@@ -21,14 +22,24 @@ export const __experimental_Checkout = (props: __experimental_CheckoutProps) => 
 };
 
 const AuthenticatedRoutes = withCoreUserGuard((props: __experimental_CheckoutProps) => {
-  const { mode = 'mounted', isShowingBlade = false } = useCheckoutContext();
+  const { mode = 'mounted', isOpen, setIsOpen } = useCheckoutContext();
 
   return (
-    <CommerceBlade
-      isOpen={isShowingBlade}
-      isFullscreen={mode === 'mounted'}
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
+      portalProps={{
+        id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+      }}
     >
-      <CheckoutPage {...props} />
-    </CommerceBlade>
+      <Drawer.Overlay />
+      <Drawer.Content>
+        <Drawer.Header title='Checkout' />
+        <Drawer.Body>
+          <CheckoutPage {...props} />
+        </Drawer.Body>
+      </Drawer.Content>
+    </Drawer.Root>
   );
 });

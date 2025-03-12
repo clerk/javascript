@@ -13,7 +13,7 @@ export const CheckoutComplete = ({
   checkout: __experimental_CommerceCheckoutResource;
   sx?: ThemableCssProp;
 }) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
+  const { setIsOpen } = useCheckoutContext();
 
   return (
     <Col
@@ -90,7 +90,7 @@ export const CheckoutComplete = ({
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={handleCloseBlade}
+          onClick={() => setIsOpen(false)}
         >
           {/* TODO(@COMMERCE): needs localization */}
           Continue

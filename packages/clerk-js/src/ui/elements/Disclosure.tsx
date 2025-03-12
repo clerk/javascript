@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
-import { usePrefersReducedMotion } from '../hooks';
+import { Box, descriptors, Icon, SimpleButton } from '../customizables';
+import { useMotionSafe } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
@@ -127,13 +127,11 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     throw new Error('Disclosure.Content must be used within Disclosure.Root');
   }
   const { isOpen, id } = context;
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = useMotionSafe();
   const animation: ThemableCssProp = t => ({
-    transition:
-      appearanceAnimations && !prefersReducedMotion
-        ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
-        : 'none',
+    transition: isMotionSafe
+      ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
+      : 'none',
   });
 
   return (
