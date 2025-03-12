@@ -222,6 +222,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       <FloatingFocusManager
         context={context}
         modal
+        outsideElementsInert
         initialFocus={refs.floating}
       >
         <Flex
