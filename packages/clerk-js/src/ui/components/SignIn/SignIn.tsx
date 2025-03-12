@@ -192,7 +192,7 @@ function SignInRoot() {
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, []);
+  }, [basePath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

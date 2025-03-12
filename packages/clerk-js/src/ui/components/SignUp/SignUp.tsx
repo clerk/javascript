@@ -36,7 +36,7 @@ function SignUpRoutes(): JSX.Element {
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, []);
+  }, [basePath, navigate]);
 
   return (
     <Flow.Root flow='signUp'>
