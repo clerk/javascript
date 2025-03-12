@@ -35,4 +35,4 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
-export type InvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
