@@ -129,6 +129,7 @@ import {
   Waitlist,
 } from './resources/internal';
 import { warnings } from './warnings';
+import { createClientFromJwt } from './jwt-client';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -1954,7 +1955,29 @@ export class Clerk implements ClerkInterface {
         const initClient = () => {
           return Client.getOrCreateInstance()
             .fetch()
-            .then(res => this.updateClient(res));
+            .then(res => this.updateClient(res))
+            .catch(e => {
+              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+                throw e;
+              }
+
+              const jwtInCookie = this.#authService?.getSessionCookie();
+
+              if (!jwtInCookie) {
+                return null;
+              }
+
+              const localClient = createClientFromJwt(jwtInCookie);
+
+              if (!localClient) {
+                return null;
+              }
+
+              this.updateClient(localClient);
+              this.session?.getToken({ skipCache: true });
+
+              return null;
+            });
         };
 
         const initComponents = () => {
