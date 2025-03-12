@@ -326,7 +326,6 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
         display: 'grid',
         flex: '1',
         rowGap: isCompact ? t.space.$2 : t.space.$3,
-        maskImage: isCompact && totalFeatures >= 3 ? 'linear-gradient(rgba(0,0,0,1), transparent)' : undefined,
       })}
     >
       <Box
