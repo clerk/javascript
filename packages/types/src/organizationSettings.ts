@@ -8,6 +8,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   object: never;
   enabled: boolean;
   max_allowed_memberships: number;
+  force_organization_selection: boolean;
   actions: {
     admin_delete: boolean;
   };
@@ -21,6 +22,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
 export interface OrganizationSettingsResource extends ClerkResource {
   enabled: boolean;
   maxAllowedMemberships: number;
+  forceOrganizationSelection: boolean;
   actions: {
     adminDelete: boolean;
   };
