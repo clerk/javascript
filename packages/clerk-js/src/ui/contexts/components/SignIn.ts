@@ -32,7 +32,7 @@ export type SignInContextType = SignInCtx & {
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
-  withSessionTasks: boolean;
+  hasTasksEnabled: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -40,7 +40,7 @@ export const SignInContext = createContext<SignInCtx | null>(null);
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate } = useRouter();
-  const { displayConfig, userSettings } = useEnvironment();
+  const { displayConfig, userSettings, hasTasksEnabled } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
@@ -144,6 +144,6 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    withSessionTasks: !!options.experimental?.withSessionTasks,
+    hasTasksEnabled,
   };
 };
