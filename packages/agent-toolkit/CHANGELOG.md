@@ -1,5 +1,11 @@
 # @clerk/agent-toolkit
 
+## 0.0.8
+
+### Patch Changes
+
+- Correctly propagate authContext to injectSessionClaims by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 0.0.7
 
 ### Patch Changes
