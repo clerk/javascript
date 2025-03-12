@@ -332,6 +332,7 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
         flexDirection: 'column',
         flex: 1,
         overflowY: 'auto',
+        overflowX: 'hidden',
       }}
     >
       {children}
