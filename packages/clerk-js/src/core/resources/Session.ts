@@ -363,4 +363,9 @@ export class Session extends BaseResource implements SessionResource {
       return token.getRawString() || null;
     });
   }
+
+  get currentTask() {
+    const [task] = this.tasks ?? [];
+    return task;
+  }
 }
