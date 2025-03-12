@@ -30,7 +30,7 @@ export type ClerkToolkit = ClerkToolkitBase & {
  * For more details, refer to the [package's docs](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/README.md).
  */
 export const createClerkToolkit = async (params: CreateClerkToolkitParams = {}): Promise<ClerkToolkit> => {
-  const { clerkClient, ...rest } = { ...params, ...defaultCreateClerkToolkitParams };
+  const { clerkClient, ...rest } = { ...defaultCreateClerkToolkitParams, ...params };
 
   const adaptedTools = shallowTransform(tools, toolSection => {
     return () => Object.values(toolSection).map(t => adapter(clerkClient, rest, t));

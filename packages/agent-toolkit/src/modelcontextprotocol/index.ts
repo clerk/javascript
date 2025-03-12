@@ -16,6 +16,6 @@ type CreateClerkMcpServerParams = CreateClerkToolkitParams & {
  * For more details, refer to the [package's docs](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/README.md).
  */
 export const createClerkMcpServer = async (params: CreateClerkMcpServerParams = {}): Promise<ClerkMcpServer> => {
-  const { clerkClient, tools, ...rest } = { ...params, ...defaultCreateClerkToolkitParams };
+  const { clerkClient, tools, ...rest } = { ...defaultCreateClerkToolkitParams, ...params };
   return Promise.resolve(new ClerkMcpServer(clerkClient, rest, tools || Object.values(flatTools)));
 };
