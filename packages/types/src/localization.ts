@@ -346,6 +346,11 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -355,6 +360,7 @@ type _LocalizationResource = {
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
       blockButton__totp: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
       getHelp: {
         title: LocalizationValue;
