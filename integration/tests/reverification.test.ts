@@ -10,8 +10,9 @@ const utils = [
   // , 'route'
 ];
 const capitalize = (type: string) => type[0].toUpperCase() + type.slice(1);
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
-  '@nextjs require re-verification',
+  '@nextjs require @reverification',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
@@ -24,7 +25,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       fakeAdmin = m.services.users.createFakeUser();
       const admin = await m.services.users.createBapiUser(fakeAdmin);
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-      fakeViewer = m.services.users.createFakeUser();
+      fakeViewer = m.services.users.createFakeUser({
+        withPhoneNumber: true,
+      });
       const viewer = await m.services.users.createBapiUser(fakeViewer);
       await m.services.clerk.organizations.createOrganizationMembership({
         organizationId: fakeOrganization.organization.id,
@@ -38,6 +41,80 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await fakeViewer.deleteIfExists();
       await fakeAdmin.deleteIfExists();
       await app.teardown();
+    });
+
+    test('reverification prompt on adding new email address', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.po.userProfile.goTo();
+      await u.po.userProfile.waitForMounted();
+
+      await u.page.waitForFunction(async () => {
+        await window.Clerk.session.startVerification({
+          level: 'first_factor',
+        });
+      });
+
+      await u.po.userProfile.clickAddEmailAddress();
+      await u.po.userProfile.waitForSectionCardOpened('emailAddresses');
+
+      const newFakeEmail = `new-${fakeViewer.email}`;
+      await u.po.userProfile.typeEmailAddress(newFakeEmail);
+
+      await u.page.getByRole('button', { name: /^add$/i }).click();
+
+      await u.po.userVerification.waitForMounted();
+
+      await u.po.userVerification.setPassword(fakeViewer.password);
+      await u.po.userVerification.continue();
+
+      await u.po.userVerification.waitForClosed();
+
+      await u.po.userProfile.enterTestOtpCode();
+
+      await expect(
+        u.page.locator('.cl-profileSectionItem__emailAddresses').filter({
+          hasText: newFakeEmail,
+        }),
+      ).toContainText(newFakeEmail);
+    });
+
+    test('reverification prompt can be cancelled when adding email', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.po.userProfile.goTo();
+      await u.po.userProfile.waitForMounted();
+
+      await u.page.waitForFunction(async () => {
+        await window.Clerk.session.startVerification({
+          level: 'first_factor',
+        });
+      });
+
+      await u.po.userProfile.clickAddEmailAddress();
+      await u.po.userProfile.waitForSectionCardOpened('emailAddresses');
+
+      const newFakeEmail = `new2-${fakeViewer.email}`;
+      await u.po.userProfile.typeEmailAddress(newFakeEmail);
+
+      await u.page.getByRole('button', { name: /^add$/i }).click();
+
+      await u.po.userVerification.waitForMounted();
+
+      await u.po.userVerification.closeReverificationModal();
+
+      await u.po.userVerification.waitForClosed();
+      await u.po.userProfile.enterTestOtpCode();
+
+      await expect(u.page.locator('.cl-profileSectionItem__emailAddresses')).not.toContainText(newFakeEmail);
     });
 
     utils.forEach(type => {
