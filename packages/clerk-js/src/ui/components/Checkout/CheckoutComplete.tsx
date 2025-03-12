@@ -15,6 +15,12 @@ export const CheckoutComplete = ({
 }) => {
   const { setIsOpen } = useCheckoutContext();
 
+  const handleClose = () => {
+    if (setIsOpen) {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <Col
       sx={[
@@ -90,7 +96,7 @@ export const CheckoutComplete = ({
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={() => setIsOpen?.(false)}
+          onClick={handleClose}
         >
           {/* TODO(@COMMERCE): needs localization */}
           Continue
