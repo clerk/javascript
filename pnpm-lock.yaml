@@ -320,13 +320,13 @@ importers:
         specifier: ^0.3.6
         version: 0.3.39
       '@modelcontextprotocol/sdk':
-        specifier: ^1.4.1
-        version: 1.6.1
+        specifier: 1.7.0
+        version: 1.7.0
       ai:
         specifier: ^3.4.7 || ^4.0.0
         version: 4.1.34(react@18.3.1)(zod@3.24.2)
       yargs:
-        specifier: ^17.7.2
+        specifier: 17.7.2
         version: 17.7.2
       zod:
         specifier: 3.24.2
@@ -2804,7 +2804,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -3342,8 +3342,8 @@ packages:
     resolution: {integrity: sha512-stTxvLdJ2IcGOs76AnvGYAzGvx8JvQPRxC5DW0P5zdAAnhL33noqb5LKdPt3P37BKp9FzBKZHuihQI9oVqwm0g==}
     engines: {node: '>=16.13'}
 
-  '@modelcontextprotocol/sdk@1.6.1':
-    resolution: {integrity: sha512-oxzMzYCkZHMntzuyerehK3fV6A2Kwh5BD6CGEJSVDU2QNEhfLOptf2X7esQgaHZXHZY0oHmMsOtIDLP71UJXgA==}
+  '@modelcontextprotocol/sdk@1.7.0':
+    resolution: {integrity: sha512-IYPe/FLpvF3IZrd/f5p5ffmWhMc3aEMuM2wGJASDqC2Ge7qatVCdbfPx3n/5xFeb19xN0j/911M2AaFuircsWA==}
     engines: {node: '>=18'}
 
   '@module-federation/error-codes@0.8.4':
@@ -17290,7 +17290,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@modelcontextprotocol/sdk@1.6.1':
+  '@modelcontextprotocol/sdk@1.7.0':
     dependencies:
       content-type: 1.0.5
       cors: 2.8.5
