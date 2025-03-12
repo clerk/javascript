@@ -1,5 +1,11 @@
 # @clerk/agent-toolkit
 
+## 0.0.10
+
+### Patch Changes
+
+- Correctly override default params by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 0.0.9
 
 ### Patch Changes
