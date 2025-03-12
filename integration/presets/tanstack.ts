@@ -2,7 +2,7 @@ import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
 
-const router = applicationConfig()
+const reactRouter = applicationConfig()
   .setName('tanstack-react-router')
   .useTemplate(templates['tanstack-react-router'])
   .setEnvFormatter('public', key => `VITE_${key}`)
@@ -12,7 +12,7 @@ const router = applicationConfig()
   .addScript('serve', 'pnpm start')
   .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
-const start = applicationConfig()
+const reactStart = applicationConfig()
   .setName('tanstack-react-start')
   .useTemplate(templates['tanstack-react-start'])
   .setEnvFormatter('public', key => `VITE_${key}`)
@@ -23,6 +23,6 @@ const start = applicationConfig()
   .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
 export const tanstack = {
-  start,
-  router,
+  reactStart,
+  reactRouter,
 } as const;
