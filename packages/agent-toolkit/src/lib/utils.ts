@@ -1,4 +1,5 @@
-import type { ToolkitContext } from './types';
+import type { ClerkTool } from './clerk-tool';
+import type { ToolsContext } from './types';
 
 // A helper type that maps T to a new type with every leaf replaced by R.
 type DeepTransform<T, R> =
@@ -54,7 +55,7 @@ export function shallowTransform<T extends object, R>(
   return result;
 }
 
-export const prunePrivateData = (context: ToolkitContext, o?: Record<any, any> | null) => {
+export const prunePrivateData = (context: ToolsContext, o?: Record<any, any> | null) => {
   if (context.allowPrivateMetadata) {
     return o;
   }
@@ -63,4 +64,40 @@ export const prunePrivateData = (context: ToolkitContext, o?: Record<any, any> |
     delete o.private_metadata;
   }
   return o;
+};
+
+/**
+ * Filters tools based on a search pattern.
+ * The pattern can be one of the following:
+ * 1. The name of the category (e.g. "users") or the name of the category followed by .* (e.g. "users.*")
+ * 2. The name of a specific tool within a category (e.g. "users.getCount")
+ */
+export const filterTools = (tools: Record<string, Record<string, ClerkTool>>, pattern: string): ClerkTool[] => {
+  if (!pattern || pattern.length === 0) {
+    throw new Error('No pattern specified');
+  }
+
+  if (pattern === '*') {
+    return Object.values(tools).flatMap(category => Object.values(category));
+  }
+
+  const validPattern = /^[a-zA-Z0-9_]+(\.[a-zA-Z0-9_*]+)?$/;
+  if (!validPattern.test(pattern)) {
+    throw new Error('Invalid pattern');
+  }
+
+  const [category, tool] = pattern.split('.');
+  if (!category || (category && !tools[category])) {
+    throw new Error(`Tool category not found: ${category}`);
+  }
+
+  if ((category && tool === '*') || (category && !tool)) {
+    return Object.values(tools[category]);
+  }
+
+  if (category && tool && !tools[category][tool]) {
+    throw new Error(`Tool not found: ${tool}`);
+  }
+
+  return [tools[category][tool]];
 };
