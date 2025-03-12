@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/tanstack-start",
-  "version": "0.11.4",
+  "name": "@clerk/tanstack-react-start",
+  "version": "0.12.0",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
     "clerk",
