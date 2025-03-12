@@ -62,7 +62,9 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
       Component,
       sessionExistsAndSingleSessionModeEnabled,
       ({ clerk }) => signInCtx.sessionTaskUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
-      warnings.cannotRenderSignInComponentWhenSessionExists,
+      signInCtx.sessionTaskUrl
+        ? warnings.cannotRenderSignInComponentWhenTaskExists
+        : warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
 
@@ -81,7 +83,9 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
       Component,
       sessionExistsAndSingleSessionModeEnabled,
       ({ clerk }) => signUpCtx.sessionTaskUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
-      warnings.cannotRenderSignUpComponentWhenSessionExists,
+      signUpCtx.sessionTaskUrl
+        ? warnings.cannotRenderSignUpComponentWhenTaskExists
+        : warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
 
