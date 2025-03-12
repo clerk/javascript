@@ -1,7 +1,7 @@
 import type { __experimental_CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
-import { Alert, Button, Col, Flex, Heading, Text } from '../../customizables';
+import { Alert, Box, Button, Col, Flex, Heading, Text } from '../../customizables';
 import { Drawer } from '../../elements';
 import type { PlanPeriod } from './PlanCard';
 import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
@@ -60,7 +60,13 @@ export function PlanDetailDrawer({
         </Drawer.Header>
         {hasFeatures ? (
           <Drawer.Body>
-            <PlanCardFeaturesList plan={plan} />
+            <Box
+              sx={t => ({
+                padding: t.space.$4,
+              })}
+            >
+              <PlanCardFeaturesList plan={plan} />
+            </Box>
           </Drawer.Body>
         ) : null}
         <CancelFooter
