@@ -450,11 +450,11 @@ importers:
         specifier: ^0.8.1
         version: 0.8.2
       '@stripe/react-stripe-js':
-        specifier: ^3.1.1
-        version: 3.3.0(@stripe/stripe-js@5.9.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 3.1.1
+        version: 3.1.1(@stripe/stripe-js@5.6.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@stripe/stripe-js':
-        specifier: ^5.6.0
-        version: 5.9.2
+        specifier: 5.6.0
+        version: 5.6.0
       '@swc/helpers':
         specifier: ^0.5.13
         version: 0.5.15
@@ -2810,7 +2810,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -4401,15 +4401,15 @@ packages:
     peerDependencies:
       xstate: ^5.5.1
 
-  '@stripe/react-stripe-js@3.3.0':
-    resolution: {integrity: sha512-Qg4rUxhHNm8OPFuUPnzsU5eLYWhpKKMMs378f67BD7vG0RKttmeeaUDjObs83imRlSxv5L6WdDKiv3RXi/RfSw==}
+  '@stripe/react-stripe-js@3.1.1':
+    resolution: {integrity: sha512-+JzYFgUivVD7koqYV7LmLlt9edDMAwKH7XhZAHFQMo7NeRC+6D2JmQGzp9tygWerzwttwFLlExGp4rAOvD6l9g==}
     peerDependencies:
       '@stripe/stripe-js': ^1.44.1 || ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
       react: '>=16.8.0 <20.0.0'
       react-dom: '>=16.8.0 <20.0.0'
 
-  '@stripe/stripe-js@5.9.2':
-    resolution: {integrity: sha512-g8qabMEu8zoXujyebWHkeQrM6k9Dm8h22FUaMNIFFTv4GtrWBhLYphhsra/PBEcM3p+mRr/srEIj9g9RV5d0xg==}
+  '@stripe/stripe-js@5.6.0':
+    resolution: {integrity: sha512-w8CEY73X/7tw2KKlL3iOk679V9bWseE4GzNz3zlaYxcTjmcmWOathRb0emgo/QQ3eoNzmq68+2Y2gxluAv3xGw==}
     engines: {node: '>=12.16'}
 
   '@svgr/babel-plugin-add-jsx-attribute@6.5.1':
@@ -18765,14 +18765,14 @@ snapshots:
     transitivePeerDependencies:
       - ws
 
-  '@stripe/react-stripe-js@3.3.0(@stripe/stripe-js@5.9.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@stripe/react-stripe-js@3.1.1(@stripe/stripe-js@5.6.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@stripe/stripe-js': 5.9.2
+      '@stripe/stripe-js': 5.6.0
       prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@stripe/stripe-js@5.9.2': {}
+  '@stripe/stripe-js@5.6.0': {}
 
   '@svgr/babel-plugin-add-jsx-attribute@6.5.1(@babel/core@7.26.9)':
     dependencies:

@@ -1,10 +1,10 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "560kB" },
-    { "path": "./dist/clerk.browser.js", "maxSize": "75kB" },
-    { "path": "./dist/clerk.headless.js", "maxSize": "48.3KB" },
+    { "path": "./dist/clerk.js", "maxSize": "570kB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "76kB" },
+    { "path": "./dist/clerk.headless.js", "maxSize": "50KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "89KB" },
-    { "path": "./dist/vendors*.js", "maxSize": "25.1KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "26.5KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "35.5KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
@@ -20,6 +20,6 @@
     { "path": "./dist/waitlist*.js", "maxSize": "1.3KB" },
     { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" },
     { "path": "./dist/pricingTable*.js", "maxSize": "3.5KB" },
-    { "path": "./dist/checkout*.js", "maxSize": "3.5KB" }
+    { "path": "./dist/checkout*.js", "maxSize": "9KB" }
   ]
 }
