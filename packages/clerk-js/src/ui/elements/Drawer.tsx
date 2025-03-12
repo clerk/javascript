@@ -178,7 +178,6 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       ref={ref}
       style={{
         ...transitionStyles,
-        backgroundColor: 'hsla(0, 0%, 100%, 0.28)',
       }}
     />
   );
