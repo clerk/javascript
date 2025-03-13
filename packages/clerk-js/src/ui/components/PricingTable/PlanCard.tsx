@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -32,6 +33,7 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
+  const clerk = useClerk();
   const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
@@ -309,7 +311,13 @@ export function PlanCard(props: PlanCardProps) {
                 ? localizationKeys('__experimental_commerce.manageMembership')
                 : localizationKeys('__experimental_commerce.getStarted')
             }
-            onClick={() => onSelect(plan)}
+            onClick={() => {
+              if (clerk.isSignedIn) {
+                onSelect(plan);
+              } else {
+                void clerk.redirectToSignIn();
+              }
+            }}
           />
         </Box>
       </ReversibleContainer>
