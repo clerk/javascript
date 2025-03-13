@@ -27,8 +27,6 @@ export class PublicUserData implements IPublicUserData {
 
   public __internal_toSnapshot(): PublicUserDataJSONSnapshot {
     return {
-      object: 'public_user_data',
-      id: this.userId || '',
       first_name: this.firstName,
       last_name: this.lastName,
       image_url: this.imageUrl,

@@ -121,6 +121,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { createClientFromJwt } from './jwt-client';
 import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
@@ -133,7 +134,6 @@ import {
 } from './resources/internal';
 import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
-import { createClientFromJwt } from './jwt-client';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 

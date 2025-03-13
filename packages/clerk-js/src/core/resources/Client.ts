@@ -140,7 +140,6 @@ export class Client extends BaseResource implements ClientResource {
   public __internal_toSnapshot(): ClientJSONSnapshot {
     return {
       object: 'client',
-      status: null,
       id: this.id || '',
       sessions: this.sessions.map(s => s.__internal_toSnapshot()),
       sign_up: this.signUp.__internal_toSnapshot(),

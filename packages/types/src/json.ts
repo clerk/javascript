@@ -68,7 +68,6 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
 export interface ClientJSON extends ClerkResourceJSON {
   object: 'client';
   id: string;
-  status: any;
   sessions: SessionJSON[];
   sign_up: SignUpJSON | null;
   sign_in: SignInJSON | null;
@@ -238,13 +237,13 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
-  external_id: string;
-  primary_email_address_id: string;
-  primary_phone_number_id: string;
-  primary_web3_wallet_id: string;
+  external_id: string | null;
+  primary_email_address_id: string | null;
+  primary_phone_number_id: string | null;
+  primary_web3_wallet_id: string | null;
   image_url: string;
   has_image: boolean;
-  username: string;
+  username: string | null;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
@@ -259,8 +258,8 @@ export interface UserJSON extends ClerkResourceJSON {
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   profile_image_id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   totp_enabled: boolean;
   backup_code_enabled: boolean;
   two_factor_enabled: boolean;
@@ -275,7 +274,7 @@ export interface UserJSON extends ClerkResourceJSON {
   created_at: number;
 }
 
-export interface PublicUserDataJSON extends ClerkResourceJSON {
+export interface PublicUserDataJSON {
   first_name: string | null;
   last_name: string | null;
   image_url: string;
