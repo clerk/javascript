@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Natrag',
+  badge__currentPlan: undefined,
   badge__default: 'Zadano',
   badge__otherImpersonatorDevice: 'Drugi uređaj za oponašanje',
   badge__primary: 'Primarno',
@@ -654,6 +663,14 @@ export const hrHR: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih računa',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -776,6 +793,7 @@ export const hrHR: LocalizationResource = {
     mobileButton__menu: 'Izbornik',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljajte informacijama vašeg računa.',
       security: 'Sigurnost',
       title: 'Račun',

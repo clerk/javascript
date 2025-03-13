@@ -2,7 +2,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  __experimental_commerce: {
+    billedAnnually: 'Billed annually',
+    free: 'Free',
+    getStarted: 'Get started',
+    manageMembership: 'Manage membership',
+    month: 'Month',
+    switchPlan: 'Switch to this plan',
+  },
   backButton: 'Back',
+  badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -651,6 +660,14 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__plans: 'Plans',
+      },
+      title: 'Billing & Payments',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -774,6 +791,7 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',

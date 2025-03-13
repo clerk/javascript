@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tillbaka',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
   badge__primary: 'Primär',
@@ -651,6 +660,14 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -773,6 +790,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',
       title: 'Konto',

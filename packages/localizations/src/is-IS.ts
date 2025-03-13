@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Til baka',
+  badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
@@ -652,6 +661,14 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Afritað!',
       actionLabel__copy: 'Afrita allt',
@@ -776,6 +793,7 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
+      billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',
       title: 'Reikningur',

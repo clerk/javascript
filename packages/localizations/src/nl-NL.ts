@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Terug',
+  badge__currentPlan: undefined,
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
   badge__primary: 'Primair',
@@ -647,6 +656,14 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -769,6 +786,7 @@ export const nlNL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
+      billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',
       title: 'Account',
