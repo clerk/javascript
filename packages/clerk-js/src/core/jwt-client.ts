@@ -1,4 +1,12 @@
-import type { ClientJSON, TokenJSON } from '@clerk/types';
+import type {
+  ClientJSON,
+  OrganizationMembershipJSON,
+  PartialWithClerkResource,
+  PublicUserDataJSON,
+  SessionJSON,
+  TokenJSON,
+  UserJSON,
+} from '@clerk/types';
 
 import { Token } from './resources';
 import { Client } from './resources/Client';
@@ -27,123 +35,57 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
       last_active_session_id: null,
       id: 'client_init',
       sessions: [],
-      created_at: Date.now(),
-      updated_at: Date.now(),
-      cookie_expires_at: null,
-      sign_in: null,
-      sign_up: null,
-    } as ClientJSON);
+    } as unknown as ClientJSON);
   }
 
-  return Client.getOrCreateInstance({
+  const { sid, sub, org_id, org_role, org_permissions, org_slug, fva } = token.jwt.claims;
+
+  const defaultClient = {
     object: 'client',
-    last_active_session_id: token.jwt.claims.sid,
+    last_active_session_id: sid,
     id: 'client_init',
     sessions: [
       {
         object: 'session',
+        id: sid,
         status: 'active',
-        actor: null,
-        id: token.jwt.claims.sid,
-        created_at: 0,
-        updated_at: 0,
-        abandon_at: 0,
-        expire_at: 0,
-        last_active_at: Date.now(),
-        last_active_organization_id: token.jwt.claims.org_id || null,
+        last_active_organization_id: org_id ?? null,
         // @ts-expect-error - ts is not happy about `id:undefined`, but this is allowed and expected
         last_active_token: {
           id: undefined,
           object: 'token',
           jwt,
         } as TokenJSON,
-        tasks: null,
-        factor_verification_age: token.jwt.claims.fva ?? null,
+        factor_verification_age: fva ?? null,
         public_user_data: {
-          first_name: null,
-          last_name: null,
-          image_url: '',
-          has_image: false,
-          identifier: '',
-          user_id: token.jwt.claims.sub,
-        },
+          user_id: sub,
+        } as PublicUserDataJSON,
         user: {
           object: 'user',
-          id: token.jwt.claims.sub,
-          create_organization_enabled: false,
-          created_at: 0,
-          updated_at: 0,
-          public_metadata: {},
-          primary_email_address_id: null,
-          primary_phone_number_id: null,
-          primary_web3_wallet_id: null,
-          unsafe_metadata: {},
-          legal_accepted_at: null,
-          totp_enabled: false,
-          profile_image_id: '',
-          backup_code_enabled: false,
-          two_factor_enabled: false,
-          last_sign_in_at: null,
-          create_organizations_limit: null,
-          delete_self_enabled: false,
-          external_accounts: [],
-          passkeys: [],
-          email_addresses: [],
-          phone_numbers: [],
-          saml_accounts: [],
-          web3_wallets: [],
-          enterprise_accounts: [],
+          id: sub,
           organization_memberships:
-            token.jwt.claims.org_id && token.jwt.claims.org_slug && token.jwt.claims.org_role
+            org_id && org_slug && org_role
               ? [
                   {
                     object: 'organization_membership',
-                    id: token.jwt.claims.org_id,
-                    role: token.jwt.claims.org_role,
-                    permissions: token.jwt?.claims?.org_permissions ?? [],
-                    public_metadata: {},
-                    public_user_data: {
-                      first_name: null,
-                      last_name: null,
-                      image_url: '',
-                      has_image: false,
-                      identifier: '',
-                      user_id: token.jwt.claims.sub,
-                    },
-                    created_at: 0,
-                    updated_at: 0,
+                    id: org_id,
+                    role: org_role,
+                    permissions: org_permissions ?? [],
                     organization: {
                       object: 'organization',
-                      id: token.jwt.claims.org_id,
+                      id: org_id,
                       name: '',
-                      slug: token.jwt.claims.org_slug,
-                      image_url: '',
-                      has_image: false,
-                      created_at: 0,
-                      updated_at: 0,
+                      slug: org_slug,
                       members_count: 1,
-                      pending_invitations_count: 0,
-                      public_metadata: {},
                       max_allowed_memberships: 1,
-                      admin_delete_enabled: false,
                     },
-                  },
+                  } as PartialWithClerkResource<OrganizationMembershipJSON>,
                 ]
               : [],
-          external_id: null,
-          first_name: null,
-          last_name: null,
-          image_url: '',
-          has_image: false,
-          username: null,
-          password_enabled: true,
-        },
-      },
+        } as PartialWithClerkResource<UserJSON>,
+      } as PartialWithClerkResource<SessionJSON>,
     ],
-    created_at: Date.now(),
-    updated_at: Date.now(),
-    cookie_expires_at: null,
-    sign_in: null,
-    sign_up: null,
-  } as ClientJSON);
+  } as ClientJSON;
+
+  return Client.getOrCreateInstance(defaultClient);
 }
