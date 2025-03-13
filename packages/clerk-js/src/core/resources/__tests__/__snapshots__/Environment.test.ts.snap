@@ -294,7 +294,11 @@ Environment {
     "backendHost": "",
     "branded": false,
     "captchaHeartbeat": false,
-    "captchaOauthBypass": [],
+    "captchaOauthBypass": [
+      "oauth_google",
+      "oauth_microsoft",
+      "oauth_apple",
+    ],
     "captchaProvider": "turnstile",
     "captchaPublicKey": null,
     "captchaPublicKeyInvisible": null,
