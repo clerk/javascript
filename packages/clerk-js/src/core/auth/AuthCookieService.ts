@@ -59,9 +59,6 @@ export class AuthCookieService {
       this.setClientUatCookieForDevelopmentInstances();
     });
 
-    this.refreshTokenOnFocus();
-    this.startPollingForToken();
-
     this.clientUat = createClientUatCookie(cookieSuffix);
     this.sessionCookie = createSessionCookie(cookieSuffix);
     this.activeOrgCookie = createCookieHandler('clerk_active_org');
@@ -209,6 +206,11 @@ export class AuthCookieService {
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  public startPollingForSessionToken() {
+    this.refreshTokenOnFocus();
+    this.startPollingForToken();
   }
 
   public getSessionCookie() {

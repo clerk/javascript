@@ -3,7 +3,11 @@ import type { ClientJSON, TokenJSON } from '@clerk/types';
 import { Token } from './resources';
 import { Client } from './resources/Client';
 
-export function createClientFromJwt(jwt: string): Client | null {
+export function createClientFromJwt(jwt: string | undefined | null): Client | null {
+  if (!jwt) {
+    return null;
+  }
+
   // Use `Token` class to parse the JWT token
   let token;
 

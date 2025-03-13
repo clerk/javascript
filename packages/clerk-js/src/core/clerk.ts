@@ -2053,21 +2053,16 @@ export class Clerk implements ClerkInterface {
             this.updateEnvironment(res);
           });
 
-        const initClient = () => {
+        const initClient = async () => {
           return Client.getOrCreateInstance()
             .fetch()
             .then(res => this.updateClient(res))
-            .catch(e => {
+            .catch(async e => {
               if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
                 throw e;
               }
 
               const jwtInCookie = this.#authService?.getSessionCookie();
-
-              if (!jwtInCookie) {
-                return null;
-              }
-
               const localClient = createClientFromJwt(jwtInCookie);
 
               if (!localClient) {
@@ -2075,8 +2070,11 @@ export class Clerk implements ClerkInterface {
               }
 
               this.updateClient(localClient);
-              this.session?.getToken({ skipCache: true });
 
+              // Always grab a fresh token
+              await this.session?.getToken({ skipCache: true });
+
+              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
               return null;
             });
         };
@@ -2103,6 +2101,11 @@ export class Clerk implements ClerkInterface {
         });
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
+
+        /**
+         * Start polling for a session token, ONLY after the client and session have been created.
+         */
+        this.#authService.startPollingForSessionToken();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
