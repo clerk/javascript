@@ -43,7 +43,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTasks();
 
-      // Navigates to after sign-in
+      // Navigates to after sign-up
       await u.page.waitForAppUrl('/');
     });
   },

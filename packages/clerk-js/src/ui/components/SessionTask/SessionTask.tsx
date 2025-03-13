@@ -12,18 +12,16 @@ interface SessionTaskProps {
   redirectUrlComplete: string;
 }
 
-const ContentRegistry: Record<
-  SessionTask['key'],
-  React.ComponentType<Pick<SessionTaskProps, 'redirectUrlComplete'>>
-> = {
-  org: ({ redirectUrlComplete }) => (
+const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
+  org: () => (
     // TODO - Hide personal workspace within organization list context based on environment
     <OrganizationListContext.Provider
       value={{
         componentName: 'OrganizationList',
         hidePersonal: true,
-        afterSelectOrganizationUrl: redirectUrlComplete,
-        afterCreateOrganizationUrl: redirectUrlComplete,
+        skipInvitationScreen: true,
+        afterSelectOrganizationUrl: undefined,
+        afterCreateOrganizationUrl: undefined,
       }}
     >
       <OrganizationList />
@@ -39,14 +37,16 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
   const { navigate } = useRouter();
 
   useEffect(() => {
-    if (!clerk.session?.currentTask) {
-      void navigate(redirectUrlComplete);
+    if (clerk.session?.currentTask) {
+      return;
     }
+
+    void navigate(redirectUrlComplete);
   }, [clerk.session?.currentTask, navigate, redirectUrlComplete]);
 
   clerk.telemetry?.record(eventComponentMounted('SessionTask', { task }));
 
   const Content = ContentRegistry[task];
 
-  return <Content redirectUrlComplete={redirectUrlComplete} />;
+  return <Content />;
 }

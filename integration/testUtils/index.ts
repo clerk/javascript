@@ -54,7 +54,7 @@ const createExpectPageObject = ({ page }: TestArgs) => {
     },
     toHaveResolvedTasks: async () => {
       return page.waitForFunction(() => {
-        return !window.Clerk?.session.currentTask;
+        return !window.Clerk?.session?.currentTask;
       });
     },
   };
