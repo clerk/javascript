@@ -1,11 +1,11 @@
-import {
-  type ActiveSessionResource,
-  type ClientJSON,
-  type ClientJSONSnapshot,
-  type ClientResource,
-  type SignedInSessionResource,
-  type SignInResource,
-  type SignUpResource,
+import type {
+  ActiveSessionResource,
+  ClientJSON,
+  ClientJSONSnapshot,
+  ClientResource,
+  SignedInSessionResource,
+  SignInResource,
+  SignUpResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
