@@ -1,34 +1,50 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
+import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import type { FakeOrganization } from '../testUtils/organizationsService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
   'session tasks after sign-up flow @nextjs',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
-    test.afterAll(async () => {
-      await app.teardown();
-    });
+    let fakeUser: FakeUser;
+    let fakeOrganization: FakeOrganization;
 
-    test('navigate to task on after sign-up', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-      const fakeUser = u.services.users.createFakeUser({
+    test.beforeAll(() => {
+      const u = createTestUtils({ app });
+      fakeUser = u.services.users.createFakeUser({
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
       });
+      fakeOrganization = u.services.organizations.createFakeOrganization();
+    });
+
+    test.afterAll(async () => {
+      const u = createTestUtils({ app });
+      await u.services.organizations.deleteAll();
+      await fakeUser.deleteIfExists();
+      await app.teardown();
+    });
+
+    test('navigate to task on after sign-up', async ({ page, context }) => {
+      // Performs sign-up
+      const u = createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
       await u.po.signUp.signUpWithEmailAndPassword({
         email: fakeUser.email,
         password: fakeUser.password,
       });
 
-      await expect(u.page.getByRole('button', { name: /create organization/i })).toBeVisible();
-      expect(page.url()).toContain('add-organization');
+      // Resolves task
+      await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
+      await u.po.expect.toHaveResolvedTasks();
 
-      await fakeUser.deleteIfExists();
+      // Navigates to after sign-in
+      await u.page.waitForAppUrl('/');
     });
   },
 );
