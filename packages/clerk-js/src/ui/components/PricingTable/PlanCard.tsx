@@ -33,12 +33,24 @@ interface PlanCardProps {
 
 export function PlanCard(props: PlanCardProps) {
   const { plan, period, setPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const {
+    id,
+    slug,
+    name,
+    description,
+    avatarUrl,
+    features,
+    isActiveForPayer,
+    hasBaseFee,
+    currencySymbol,
+    amountFormatted,
+    annualMonthlyAmountFormatted,
+  } = plan;
   const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
-  const totalFeatures = plan.features.length;
+  const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
   const canToggleFeatures = isCompact && totalFeatures > 3;
-  const isActivePlan = plan.isActiveForPayer;
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: appearanceAnimations } = useAppearance().parsedLayout;
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
@@ -54,9 +66,9 @@ export function PlanCard(props: PlanCardProps) {
 
   return (
     <Box
-      key={plan.id}
+      key={id}
       elementDescriptor={[descriptors.planCard, isCompact ? descriptors.planCardCompact : descriptors.planCardDefault]}
-      elementId={descriptors.planCard.setId(plan.slug)}
+      elementId={descriptors.planCard.setId(slug)}
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
@@ -79,44 +91,48 @@ export function PlanCard(props: PlanCardProps) {
           padding: isCompact ? t.space.$3 : t.space.$4,
         })}
       >
-        <Flex
-          elementDescriptor={descriptors.planCardAvatarContainer}
-          align='start'
-          justify='between'
-          sx={{ width: '100%' }}
-        >
-          <Avatar
-            boxElementDescriptor={descriptors.planCardAvatar}
-            size={_ => 40}
-            title={plan.name}
-            initials={plan.name[0]}
-            rounded={false}
-            imageUrl={plan.avatarUrl}
-          />
-          {isActivePlan ? (
-            <Badge
-              localizationKey={localizationKeys('badge__currentPlan')}
-              colorScheme='secondary'
-            />
-          ) : null}
-        </Flex>
+        {avatarUrl || isActiveForPayer ? (
+          <Box
+            elementDescriptor={descriptors.planCardAvatarBadgeContainer}
+            sx={t => ({
+              display: 'flex',
+              alignItems: 'start',
+              gap: t.space.$3,
+              marginBlockEnd: t.space.$3,
+            })}
+          >
+            {avatarUrl ? (
+              <Avatar
+                boxElementDescriptor={descriptors.planCardAvatar}
+                size={_ => 40}
+                title={name}
+                initials={name[0]}
+                rounded={false}
+                imageUrl={avatarUrl}
+              />
+            ) : null}
+            {isActiveForPayer ? (
+              <Badge
+                localizationKey={localizationKeys('badge__currentPlan')}
+                colorScheme='secondary'
+              />
+            ) : null}
+          </Box>
+        ) : null}
         <Heading
           elementDescriptor={descriptors.planCardTitle}
           as='h2'
           textVariant={isCompact ? 'h3' : 'h2'}
-          sx={t => ({
-            marginTop: t.space.$3,
-          })}
         >
-          {plan.name}
+          {name}
         </Heading>
-        {!isCompact && plan.description ? (
+        {!isCompact && description ? (
           <Text
             elementDescriptor={descriptors.planCardDescription}
             variant='subtitle'
             colorScheme='secondary'
           >
-            {plan.description}
+            {description}
           </Text>
         ) : null}
         <Flex
@@ -128,15 +144,15 @@ export function PlanCard(props: PlanCardProps) {
             columnGap: t.space.$1x5,
           })}
         >
-          {plan.hasBaseFee ? (
+          {hasBaseFee ? (
             <>
               <Text
                 elementDescriptor={descriptors.planCardFee}
                 variant={isCompact ? 'h2' : 'h1'}
                 colorScheme='body'
               >
-                {plan.currencySymbol}
-                {period === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+                {currencySymbol}
+                {period === 'month' ? amountFormatted : annualMonthlyAmountFormatted}
               </Text>
               <Text
                 elementDescriptor={descriptors.planCardFeePeriod}
@@ -202,7 +218,7 @@ export function PlanCard(props: PlanCardProps) {
             />
           )}
         </Flex>
-        {plan.hasBaseFee ? (
+        {hasBaseFee ? (
           <Box
             elementDescriptor={descriptors.planCardPeriodToggle}
             sx={t => ({
@@ -246,7 +262,7 @@ export function PlanCard(props: PlanCardProps) {
                 rowGap: isCompact ? t.space.$2 : t.space.$3,
               })}
             >
-              {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
+              {features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
                 <Box
                   elementDescriptor={descriptors.planCardFeaturesListItem}
                   elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
@@ -302,10 +318,10 @@ export function PlanCard(props: PlanCardProps) {
           <Button
             block
             textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            variant={isActivePlan ? 'bordered' : 'solid'}
-            colorScheme={isActivePlan ? 'secondary' : 'primary'}
+            variant={isCompact || isActiveForPayer ? 'bordered' : 'solid'}
+            colorScheme={isCompact || isActiveForPayer ? 'secondary' : 'primary'}
             localizationKey={
-              isActivePlan
+              isActiveForPayer
                 ? localizationKeys('__experimental_commerce.manageMembership')
                 : localizationKeys('__experimental_commerce.getStarted')
             }
