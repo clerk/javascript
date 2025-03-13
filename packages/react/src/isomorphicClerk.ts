@@ -1,6 +1,8 @@
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
+  __experimental_CommerceNamespace,
+  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -86,9 +88,15 @@ type WithVoidReturnFunctions<T> = {
 
 type IsomorphicLoadedClerk = Without<
   WithVoidReturnFunctions<LoadedClerk>,
-  'client' | '__internal_addNavigationListener' | '__internal_getCachedResources' | '__internal_reloadInitialResources'
+  | 'client'
+  | '__internal_addNavigationListener'
+  | '__internal_getCachedResources'
+  | '__internal_reloadInitialResources'
+  | '__experimental_commerce'
+  | '__internal_setComponentNavigationContext'
 > & {
   client: ClientResource | undefined;
+  __experimental_commerce: __experimental_CommerceNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -115,6 +123,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps | undefined>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
+  private premountPricingTableNodes = new Map<HTMLDivElement, __experimental_PricingTableProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -517,6 +526,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountWaitlist(node, props);
     });
 
+    this.premountPricingTableNodes.forEach((props, node) => {
+      clerkjs.__experimental_mountPricingTable(node, props);
+    });
+
     this.#status = 'ready';
     this.eventEmitter.emit('loaded');
     return this.clerkjs;
@@ -582,6 +595,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       return false;
     }
+  }
+
+  get __experimental_commerce(): __experimental_CommerceNamespace | undefined {
+    return this.clerkjs?.__experimental_commerce;
   }
 
   __unstable__setEnvironment(...args: any): void {
@@ -752,6 +769,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
+    }
+  };
+
+  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_mountPricingTable(node, props);
+    } else {
+      this.premountPricingTableNodes.set(node, props);
+    }
+  };
+
+  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_unmountPricingTable(node);
+    } else {
+      this.premountPricingTableNodes.delete(node);
     }
   };
 

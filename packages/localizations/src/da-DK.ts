@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tilbage',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
   badge__primary: 'Primær',
@@ -646,6 +655,14 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -769,6 +786,7 @@ export const daDK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Administrer dine kontooplysninger.',
       security: 'Sikkerhed',
       title: 'Konto',

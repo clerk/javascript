@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Zpět',
+  badge__currentPlan: undefined,
   badge__default: 'Výchozí',
   badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
   badge__primary: 'Hlavní',
@@ -645,6 +654,14 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -768,6 +785,7 @@ export const csCZ: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Spravujte své údaje.',
       security: 'Zabezpečení',
       title: 'Účet',

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Буцах',
+  badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
   badge__primary: 'Үндсэн',
@@ -649,6 +658,14 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -772,6 +789,7 @@ export const mnMN: LocalizationResource = {
     mobileButton__menu: 'Цэс',
     navbar: {
       account: 'Профайл',
+      billing: undefined,
       description: 'Бүртгэлийнхээ мэдээллийг удирдана уу.',
       security: 'Аюулгүй байдал',
       title: 'Бүртгэл',

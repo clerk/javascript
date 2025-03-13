@@ -1,4 +1,5 @@
 import type {
+  __experimental_CommerceSettingsResource,
   AuthConfigResource,
   DisplayConfigResource,
   EnvironmentJSON,
@@ -8,19 +9,19 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
-import { AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
+import { __experimental_CommerceSettings, AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
   pathRoot = '/environment';
-  authConfig: AuthConfigResource = new AuthConfig();
-  displayConfig: DisplayConfigResource = new DisplayConfig();
-  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
-  userSettings: UserSettingsResource = new UserSettings();
-  organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
-  maintenanceMode: boolean = false;
+  authConfig!: AuthConfigResource;
+  displayConfig!: DisplayConfigResource;
+  userSettings!: UserSettingsResource;
+  organizationSettings!: OrganizationSettingsResource;
+  __experimental_commerceSettings!: __experimental_CommerceSettingsResource;
+  maintenanceMode!: boolean;
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -32,10 +33,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
 
   constructor(data: EnvironmentJSON | EnvironmentJSONSnapshot | null = null) {
     super();
-
-    if (data) {
-      this.fromJSON(data);
-    }
+    this.fromJSON(data);
   }
 
   fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
@@ -62,17 +60,14 @@ export class Environment extends BaseResource implements EnvironmentResource {
   };
 
   protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
-    if (!data) {
-      return this;
+    if (data) {
+      this.authConfig = new AuthConfig(data.auth_config);
+      this.__experimental_commerceSettings = new __experimental_CommerceSettings(data.commerce_settings);
+      this.displayConfig = new DisplayConfig(data.display_config);
+      this.userSettings = new UserSettings(data.user_settings);
+      this.organizationSettings = new OrganizationSettings(data.organization_settings);
+      this.maintenanceMode = data.maintenance_mode;
     }
-
-    this.authConfig = new AuthConfig(data.auth_config);
-    // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
-    this.userSettings = new UserSettings(data.user_settings);
-    this.organizationSettings = new OrganizationSettings(data.organization_settings);
-    this.displayConfig = new DisplayConfig(data.display_config);
-    this.maintenanceMode = data.maintenance_mode || this.maintenanceMode;
-
     return this;
   }
 
@@ -84,6 +79,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       display_config: this.displayConfig.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
+      commerce_settings: this.__experimental_commerceSettings.__internal_toSnapshot(),
       maintenance_mode: this.maintenanceMode,
     };
   }

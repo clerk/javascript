@@ -3,7 +3,7 @@ import { Card, Header, useCardState, withCardStateProvider } from '../../element
 import { useSetSessionWithTimeout } from '../../hooks/useSetSessionWithTimeout';
 import { Flex } from '../../primitives';
 
-export const _ResetPasswordSuccess = () => {
+const ResetPasswordSuccessInternal = () => {
   const card = useCardState();
   useSetSessionWithTimeout();
   return (
@@ -35,4 +35,4 @@ export const _ResetPasswordSuccess = () => {
   );
 };
 
-export const ResetPasswordSuccess = withCardStateProvider(_ResetPasswordSuccess);
+export const ResetPasswordSuccess = withCardStateProvider(ResetPasswordSuccessInternal);

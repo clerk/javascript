@@ -2,6 +2,8 @@ import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
   EmailCodeConfig,
+  PasskeyAttempt,
+  PassKeyConfig,
   PasswordAttempt,
   PhoneCodeAttempt,
   PhoneCodeConfig,
@@ -122,6 +124,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
   tasks: Array<SessionTask> | null;
+  currentTask?: SessionTask;
   /**
    * The user associated with the session.
    */
@@ -152,6 +155,7 @@ export interface SessionResource extends ClerkResource {
   attemptSecondFactorVerification: (
     params: SessionVerifyAttemptSecondFactorParams,
   ) => Promise<SessionVerificationResource>;
+  verifyWithPasskey: () => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
 }
 
@@ -170,6 +174,7 @@ export interface ActiveSessionResource extends SessionResource {
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';
   user: UserResource;
+  currentTask: SessionTask;
 }
 
 /**
@@ -221,7 +226,7 @@ export interface PublicUserData {
 }
 
 export interface SessionTask {
-  key: 'orgs';
+  key: 'org';
 }
 
 export type GetTokenOptions = {
@@ -236,8 +241,12 @@ export type SessionVerifyCreateParams = {
   level: SessionVerificationLevel;
 };
 
-export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
-export type SessionVerifyAttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt;
+export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig | PassKeyConfig;
+export type SessionVerifyAttemptFirstFactorParams =
+  | EmailCodeAttempt
+  | PhoneCodeAttempt
+  | PasswordAttempt
+  | PasskeyAttempt;
 
 export type SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 export type SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
