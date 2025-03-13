@@ -26,7 +26,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   branded: boolean = false;
   captchaHeartbeat: boolean = false;
   captchaHeartbeatIntervalMs?: number;
-  captchaOauthBypass: OAuthStrategy[] = [];
+  captchaOauthBypass: OAuthStrategy[] = ['oauth_google', 'oauth_microsoft', 'oauth_apple'];
   captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKey: string | null = null;
   captchaPublicKeyInvisible: string | null = null;
