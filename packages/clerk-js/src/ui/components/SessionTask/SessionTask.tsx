@@ -1,7 +1,9 @@
 import { useClerk } from '@clerk/shared/react/index';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionTask } from '@clerk/types';
+import { useEffect } from 'react';
 
+import { useRouter } from '../../../ui/router';
 import { OrganizationListContext } from '../../contexts';
 import { OrganizationList } from '../OrganizationList';
 
@@ -34,6 +36,13 @@ const ContentRegistry: Record<
  */
 export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): React.ReactNode {
   const clerk = useClerk();
+  const { navigate } = useRouter();
+
+  useEffect(() => {
+    if (!clerk.session?.currentTask) {
+      void navigate(redirectUrlComplete);
+    }
+  }, [clerk.session?.currentTask, navigate, redirectUrlComplete]);
 
   clerk.telemetry?.record(eventComponentMounted('SessionTask', { task }));
 
