@@ -63,7 +63,7 @@ export type UserService = {
  * Allowing 10^5 combinations should be enough entropy for e2e purposes.
  * @see https://clerk.com/docs/testing/e2e-testing#phone-numbers
  */
-function fakerPhoneNumber() {
+export function fakerPhoneNumber() {
   return `+1###55501##`.replace(/#+/g, m => faker.string.numeric(m.length));
 }
 
