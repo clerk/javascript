@@ -14,11 +14,11 @@ export class PublicUserData implements IPublicUserData {
 
   protected fromJSON(data: PublicUserDataJSON | PublicUserDataJSONSnapshot | null): this {
     if (data) {
-      this.firstName = data.first_name ?? null;
-      this.lastName = data.last_name ?? null;
-      this.imageUrl = data.image_url ?? '';
-      this.hasImage = data.has_image ?? false;
-      this.identifier = data.identifier ?? '';
+      this.firstName = data.first_name;
+      this.lastName = data.last_name;
+      this.imageUrl = data.image_url;
+      this.hasImage = data.has_image;
+      this.identifier = data.identifier;
       this.userId = data.user_id;
     }
 

@@ -41,12 +41,12 @@ export class Organization extends BaseResource implements OrganizationResource {
   slug!: string;
   imageUrl!: string;
   hasImage!: boolean;
-  publicMetadata!: OrganizationPublicMetadata;
+  publicMetadata: OrganizationPublicMetadata = {};
   adminDeleteEnabled!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
-  membersCount!: number;
-  pendingInvitationsCount!: number;
+  membersCount = 0;
+  pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
@@ -269,13 +269,13 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;
-    this.imageUrl = data.image_url ?? '';
-    this.hasImage = data.has_image ?? false;
-    this.publicMetadata = data.public_metadata ?? {};
-    this.membersCount = data.members_count ?? 0;
-    this.pendingInvitationsCount = data.pending_invitations_count ?? 0;
-    this.maxAllowedMemberships = data.max_allowed_memberships ?? 0;
-    this.adminDeleteEnabled = data.admin_delete_enabled ?? false;
+    this.imageUrl = data.image_url;
+    this.hasImage = data.has_image;
+    this.publicMetadata = data.public_metadata;
+    this.membersCount = data.members_count;
+    this.pendingInvitationsCount = data.pending_invitations_count;
+    this.maxAllowedMemberships = data.max_allowed_memberships;
+    this.adminDeleteEnabled = data.admin_delete_enabled;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;

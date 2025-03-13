@@ -69,7 +69,7 @@ export class OrganizationMembership extends BaseResource implements Organization
 
     this.id = data.id;
     this.organization = new Organization(data.organization);
-    this.publicMetadata = data.public_metadata ?? {};
+    this.publicMetadata = data.public_metadata;
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
     }
