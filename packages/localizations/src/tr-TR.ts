@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Geri',
+  badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
   badge__primary: 'Birincil',
@@ -651,6 +660,14 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopyala',
@@ -774,6 +791,7 @@ export const trTR: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hesap bilgilerinizi yönetin.',
       security: 'Güvenlik',
       title: 'Hesap',

@@ -124,6 +124,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveAt: Date;
   actor: ActJWTClaim | null;
   tasks: Array<SessionTask> | null;
+  currentTask?: SessionTask;
   /**
    * The user associated with the session.
    */
@@ -173,6 +174,7 @@ export interface ActiveSessionResource extends SessionResource {
 export interface PendingSessionResource extends SessionResource {
   status: 'pending';
   user: UserResource;
+  currentTask: SessionTask;
 }
 
 /**
@@ -224,7 +226,7 @@ export interface PublicUserData {
 }
 
 export interface SessionTask {
-  key: 'orgs';
+  key: 'org';
 }
 
 export type GetTokenOptions = {

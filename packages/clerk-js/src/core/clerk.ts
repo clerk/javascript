@@ -13,6 +13,8 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CommerceNamespace,
+  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -119,6 +121,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -128,6 +131,7 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
+import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -166,6 +170,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
+  private static _commerce: __experimental_CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -195,6 +200,15 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #componentNavigationContext: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  } | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -285,6 +299,19 @@ export class Clerk implements ClerkInterface {
 
   get isStandardBrowser(): boolean {
     return this.#options.standardBrowser || false;
+  }
+
+  get __experimental_commerce(): __experimental_CommerceNamespace {
+    if (!this.#options.experimental?.commerce) {
+      throw new Error(
+        'Clerk: commerce functionality is currently in an experimental state. To enable, pass `experimental.commerce = true`.',
+      );
+    }
+
+    if (!Clerk._commerce) {
+      Clerk._commerce = new __experimental_Commerce();
+    }
+    return Clerk._commerce;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -886,6 +913,29 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
+      controls.mountComponent({
+        name: 'PricingTable',
+        appearanceKey: 'pricingTable',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+  };
+
+  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -912,6 +962,11 @@ export class Clerk implements ClerkInterface {
 
     if (typeof session === 'string') {
       session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
+    }
+
+    if (session?.status === 'pending') {
+      await this.#handlePendingSession(session);
+      return;
     }
 
     let newSession = session === undefined ? this.session : session;
@@ -1003,6 +1058,38 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
+  #handlePendingSession = async (session: SignedInSessionResource) => {
+    if (!this.environment) {
+      return;
+    }
+
+    // Handles multi-session scenario when switching from `active`
+    // to `pending`
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      await this.#touchCurrentSession(session);
+      session = this.#getSessionFromClient(session.id) ?? session;
+    }
+
+    // Syncs __session and __client_uat, in case the `pending` session
+    // has expired, it needs to trigger a sign-out
+    const token = await session.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    if (session.currentTask) {
+      await navigateToTask(session.currentTask, {
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+        options: this.#options,
+        environment: this.environment,
+      });
+    }
+
+    this.#setAccessors(session);
+    this.#emit();
+  };
+
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
@@ -1028,6 +1115,20 @@ export class Clerk implements ClerkInterface {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
     return unsubscribe;
+  };
+
+  public __internal_setComponentNavigationContext = (context: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  }) => {
+    this.#componentNavigationContext = context;
+
+    return () => (this.#componentNavigationContext = null);
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
