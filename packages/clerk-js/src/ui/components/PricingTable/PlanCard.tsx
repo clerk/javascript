@@ -97,6 +97,7 @@ export function PlanCard(props: PlanCardProps) {
             sx={t => ({
               display: 'flex',
               alignItems: 'start',
+              justifyContent: 'space-between',
               gap: t.space.$3,
               marginBlockEnd: t.space.$3,
             })}
