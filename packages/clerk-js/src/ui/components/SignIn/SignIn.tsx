@@ -130,7 +130,7 @@ function SignInRoutes(): JSX.Element {
               >
                 <LazySignUpVerifyPhone />
               </Route>
-              {signInContext.withSessionTasks && (
+              {signInContext.hasTasksEnabled && (
                 <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
                   <SessionTask task='org' />
                 </Route>
@@ -144,7 +144,7 @@ function SignInRoutes(): JSX.Element {
             </Route>
           </Route>
         )}
-        {signInContext.withSessionTasks && (
+        {signInContext.hasTasksEnabled && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
             <SessionTask task='org' />
           </Route>
@@ -187,8 +187,7 @@ function SignInRoot() {
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
 
-  // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-  usePreloadSessionTask(signInContext.withSessionTasks);
+  usePreloadSessionTask(signInContext.hasTasksEnabled);
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ basePath, navigate });

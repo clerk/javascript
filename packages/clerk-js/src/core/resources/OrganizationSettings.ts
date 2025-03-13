@@ -10,6 +10,7 @@ import { BaseResource } from './internal';
 export class OrganizationSettings extends BaseResource implements OrganizationSettingsResource {
   enabled!: boolean;
   maxAllowedMemberships!: number;
+  forceOrganizationSelection!: boolean;
   actions!: {
     adminDelete: boolean;
   };
@@ -25,9 +26,16 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   }
 
   protected fromJSON(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null): this {
-    const { enabled = false, max_allowed_memberships = 0, actions, domains } = data || {};
+    const {
+      enabled = false,
+      max_allowed_memberships = 0,
+      force_organization_selection = false,
+      actions,
+      domains,
+    } = data || {};
     this.enabled = enabled;
     this.maxAllowedMemberships = max_allowed_memberships;
+    this.forceOrganizationSelection = force_organization_selection;
     this.actions = { adminDelete: actions?.admin_delete || false };
     this.domains = {
       enabled: domains?.enabled || false,
