@@ -144,7 +144,7 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
       sx={[
         t => ({
           inset: 0,
-          backgroundColor: t.colors.$drawerBackdrop,
+          backgroundColor: colors.setAlpha(t.colors.$colorBackground, 0.28),
         }),
         props.sx,
       ]}
