@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Powrót',
+  badge__currentPlan: undefined,
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
   badge__primary: 'Podstawowy',
@@ -658,6 +667,14 @@ export const plPL: LocalizationResource = {
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopiowane!',
       actionLabel__copy: 'Skopiuj wszystkie',
@@ -782,6 +799,7 @@ export const plPL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Zarządzaj danymi konta.',
       security: 'Bezpieczeństwo',
       title: 'Konto',

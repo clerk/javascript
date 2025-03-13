@@ -9,6 +9,9 @@ exports[`Environment __internal_toSnapshot() 1`] = `
     "reverification": true,
     "single_session_mode": true,
   },
+  "commerce_settings": {
+    "stripe_publishable_key": undefined,
+  },
   "display_config": {
     "after_create_organization_url": "",
     "after_join_waitlist_url": "",
@@ -267,6 +270,9 @@ exports[`Environment __internal_toSnapshot() 1`] = `
 
 exports[`Environment has the same initial properties 1`] = `
 Environment {
+  "__experimental_commerceSettings": __experimental_CommerceSettings {
+    "pathRoot": "",
+  },
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",

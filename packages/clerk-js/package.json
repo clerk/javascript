@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.55.1",
+  "version": "5.56.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -63,6 +63,8 @@
     "@floating-ui/react": "0.25.4",
     "@floating-ui/react-dom": "^2.0.2",
     "@formkit/auto-animate": "^0.8.1",
+    "@stripe/react-stripe-js": "3.1.1",
+    "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.13",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",

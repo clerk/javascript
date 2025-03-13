@@ -1,5 +1,34 @@
 # Change Log
 
+## 5.56.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Removes legal consent checkbox from sign-up start card when only social or web3 strategies are enabled. ([#5289](https://github.com/clerk/javascript/pull/5289)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Make use of native browser navigator locks property to avoid needing to use localstorage or cookies. ([#5156](https://github.com/clerk/javascript/pull/5156)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- When a user passes `withSignUp={false}` we should opt out of combined flow even when `signUpUrl` is undefined. ([#5286](https://github.com/clerk/javascript/pull/5286)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- fix(clerk-js): Correctly show alternative methods for user re-verification card ([#5164](https://github.com/clerk/javascript/pull/5164)) by [@octoper](https://github.com/octoper)
+
+- Remove the Primary Web3 wallet from user preview section, in the `<UserProfile/>` ([#5319](https://github.com/clerk/javascript/pull/5319)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Handle pwned password error during sign in instant password submit. ([#5298](https://github.com/clerk/javascript/pull/5298)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`1427c92069483f3f0880739c4ca5b418872e5d38`](https://github.com/clerk/javascript/commit/1427c92069483f3f0880739c4ca5b418872e5d38), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`657af338e7464162419189dde9cd6696a0622e41`](https://github.com/clerk/javascript/commit/657af338e7464162419189dde9cd6696a0622e41), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+  - @clerk/localizations@3.12.0
+
 ## 5.55.1
 
 ### Patch Changes
