@@ -2065,10 +2065,6 @@ export class Clerk implements ClerkInterface {
               const jwtInCookie = this.#authService?.getSessionCookie();
               const localClient = createClientFromJwt(jwtInCookie);
 
-              if (!localClient) {
-                return null;
-              }
-
               this.updateClient(localClient);
 
               // Always grab a fresh token

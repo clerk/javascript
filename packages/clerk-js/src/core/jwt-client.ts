@@ -3,17 +3,13 @@ import type { ClientJSON, TokenJSON } from '@clerk/types';
 import { Token } from './resources';
 import { Client } from './resources/Client';
 
-export function createClientFromJwt(jwt: string | undefined | null): Client | null {
-  if (!jwt) {
-    return null;
-  }
-
+export function createClientFromJwt(jwt: string | undefined | null): Client {
   // Use `Token` class to parse the JWT token
   let token;
 
   try {
     token = new Token({
-      jwt,
+      jwt: jwt || '',
       object: 'token',
       // @ts-expect-error - ts is not happy about it, but this is allowed
       id: undefined,
