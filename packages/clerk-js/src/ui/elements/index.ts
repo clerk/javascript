@@ -60,4 +60,3 @@ export * from './UserPreview';
 export * from './VerificationCodeCard';
 export * from './VerificationLinkCard';
 export * from './withAvatarShimmer';
-export * from './SegmentedControl';
