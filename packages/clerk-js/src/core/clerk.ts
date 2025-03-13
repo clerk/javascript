@@ -1001,6 +1001,8 @@ export class Clerk implements ClerkInterface {
      */
     await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
+    const hadTasksBeforeTouch = newSession?.status === 'pending' && newSession.currentTask;
+
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
@@ -1010,15 +1012,24 @@ export class Clerk implements ClerkInterface {
       newSession = this.#getSessionFromClient(newSession?.id);
     }
 
+    // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
+    const token = await newSession?.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    // Handles navigation to next pending tasks if /touch returns a session with pending status
     if (newSession?.status === 'pending') {
       await this.#handlePendingSession(newSession);
       return;
     }
 
-    // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    const token = await newSession?.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+    const hasResolvedTasks = hadTasksBeforeTouch && newSession?.status === 'active';
+    if (hasResolvedTasks) {
+      const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+      const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+
+      redirectUrl = referrerIsSignUpUrl ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
     }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
