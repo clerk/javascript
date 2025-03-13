@@ -3,6 +3,10 @@ import type { UserSettingsJSON } from '@clerk/types';
 import { UserSettings } from '../internal';
 
 describe('UserSettings', () => {
+  it('defaults values when instantiated with no arguments', function () {
+    expect(new UserSettings()).toMatchSnapshot();
+  });
+
   it('returns enabled web3 first factors', function () {
     const sut = new UserSettings({
       attributes: {

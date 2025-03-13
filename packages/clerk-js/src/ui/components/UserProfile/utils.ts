@@ -10,7 +10,7 @@ export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ?
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
-export function getSecondFactors(attributes: Attributes): string[] {
+export function getSecondFactors(attributes: Partial<Attributes>): string[] {
   const secondFactors: string[] = [];
 
   Object.entries(attributes).forEach(([, attr]) => {
@@ -22,7 +22,7 @@ export function getSecondFactors(attributes: Attributes): string[] {
   return secondFactors;
 }
 
-export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: UserResource): string[] {
+export function getSecondFactorsAvailableToAdd(attributes: Partial<Attributes>, user: UserResource): string[] {
   let sfs = getSecondFactors(attributes);
 
   // If user.totp_enabled, skip totp from the list of choices

@@ -10,9 +10,11 @@ import { BaseResource } from './internal';
  * @internal
  */
 export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
-  stripePublishableKey!: string;
+  stripePublishableKey: string = '';
 
-  public constructor(data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot) {
+  public constructor(
+    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null = null,
+  ) {
     super();
     this.fromJSON(data);
   }

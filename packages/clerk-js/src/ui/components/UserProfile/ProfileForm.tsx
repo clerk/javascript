@@ -21,8 +21,8 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   }
 
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
-  const showFirstName = first_name.enabled;
-  const showLastName = last_name.enabled;
+  const showFirstName = first_name?.enabled;
+  const showLastName = last_name?.enabled;
   const userFirstName = user.firstName || '';
   const userLastName = user.lastName || '';
 
@@ -30,13 +30,13 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     type: 'text',
     label: localizationKeys('formFieldLabel__firstName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__firstName'),
-    isRequired: last_name.required,
+    isRequired: last_name?.required,
   });
   const lastNameField = useFormControl('lastName', user.lastName || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__lastName'),
     placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
-    isRequired: last_name.required,
+    isRequired: last_name?.required,
   });
 
   const userInfoChanged =

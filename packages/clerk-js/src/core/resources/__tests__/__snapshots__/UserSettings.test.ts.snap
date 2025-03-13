@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserSettings defaults values when instantiated with no arguments 1`] = `
+UserSettings {
+  "actions": {},
+  "attributes": {},
+  "enterpriseSSO": {},
+  "id": undefined,
+  "passkeySettings": {},
+  "passwordSettings": {},
+  "pathRoot": "",
+  "saml": {},
+  "signIn": {},
+  "signUp": {},
+  "social": {},
+  "usernameSettings": {},
+}
+`;

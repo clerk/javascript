@@ -3,6 +3,12 @@ import type { EnvironmentJSONSnapshot } from '@clerk/types';
 import { Environment } from '../internal';
 
 describe('Environment', () => {
+  it('defaults values when instantiated without arguments', () => {
+    const environment = new Environment();
+
+    expect(environment).toMatchSnapshot();
+  });
+
   it('has the same initial properties', () => {
     const environmentJSON = {
       object: 'environment',

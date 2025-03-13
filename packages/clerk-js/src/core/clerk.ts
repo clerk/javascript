@@ -325,9 +325,6 @@ export class Clerk implements ClerkInterface {
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
-    this.#domain = options?.domain;
-    this.#proxyUrl = options?.proxyUrl;
-
     if (!key) {
       return errorThrower.throwMissingPublishableKeyError();
     }
@@ -338,8 +335,11 @@ export class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.#publishableKey = key;
+    this.#domain = options?.domain;
+    this.#proxyUrl = options?.proxyUrl;
+    this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
+    this.#publishableKey = key;
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
@@ -2052,10 +2052,9 @@ export class Clerk implements ClerkInterface {
             this.updateEnvironment(res);
           });
 
-        const initClient = () => {
-          return Client.getOrCreateInstance()
-            .fetch()
-            .then(res => this.updateClient(res));
+        const initClient = async () => {
+          const res = await Client.getOrCreateInstance().fetch();
+          this.updateClient(res);
         };
 
         const initComponents = () => {
@@ -2068,16 +2067,20 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
-          // limit the changes for this specific error for now
+        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+        if (clientResult.status === 'rejected') {
+          const e = clientResult.reason;
+
           if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-            await initEnvironmentPromise;
+            if (envResult.status === 'rejected') {
+              await initEnvironmentPromise.catch(() => {}); // Ignore failure
+            }
             initComponents();
             await initClient();
           } else {
             throw e;
           }
-        });
+        }
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 

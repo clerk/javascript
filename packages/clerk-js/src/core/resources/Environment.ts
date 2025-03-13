@@ -15,13 +15,14 @@ import { OrganizationSettings } from './OrganizationSettings';
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
+  authConfig: AuthConfigResource = new AuthConfig();
+  displayConfig: DisplayConfigResource = new DisplayConfig();
+  maintenanceMode: boolean = false;
   pathRoot = '/environment';
-  authConfig!: AuthConfigResource;
-  displayConfig!: DisplayConfigResource;
-  userSettings!: UserSettingsResource;
-  organizationSettings!: OrganizationSettingsResource;
-  __experimental_commerceSettings!: __experimental_CommerceSettingsResource;
-  maintenanceMode!: boolean;
+  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
+  userSettings: UserSettingsResource = new UserSettings();
+  organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
+  __experimental_commerceSettings: __experimental_CommerceSettingsResource = new __experimental_CommerceSettings();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -33,54 +34,56 @@ export class Environment extends BaseResource implements EnvironmentResource {
 
   constructor(data: EnvironmentJSON | EnvironmentJSONSnapshot | null = null) {
     super();
+
     this.fromJSON(data);
   }
 
-  fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
-    if (touch) {
-      return this._basePatch({});
+  protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
+    if (!data) {
+      return this;
     }
-    return this._baseGet({ fetchMaxTries });
+
+    this.authConfig = new AuthConfig(data.auth_config);
+    this.displayConfig = new DisplayConfig(data.display_config);
+    this.maintenanceMode = data.maintenance_mode ?? this.maintenanceMode;
+    this.organizationSettings = new OrganizationSettings(data.organization_settings);
+    // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
+    this.userSettings = new UserSettings(data.user_settings);
+    this.__experimental_commerceSettings = new __experimental_CommerceSettings(data.commerce_settings);
+
+    return this;
   }
 
-  isSingleSession = (): boolean => {
-    return this.authConfig.singleSessionMode;
+  fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
+    return touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
+  }
+
+  isDevelopmentOrStaging = (): boolean => {
+    return !this.isProduction();
   };
 
   isProduction = (): boolean => {
     return this.displayConfig.instanceEnvironmentType === 'production';
   };
 
-  isDevelopmentOrStaging = (): boolean => {
-    return !this.isProduction();
+  isSingleSession = (): boolean => {
+    return this.authConfig.singleSessionMode;
   };
 
   onWindowLocationHost = (): boolean => {
     return this.displayConfig.backendHost === window.location.host;
   };
 
-  protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
-    if (data) {
-      this.authConfig = new AuthConfig(data.auth_config);
-      this.__experimental_commerceSettings = new __experimental_CommerceSettings(data.commerce_settings);
-      this.displayConfig = new DisplayConfig(data.display_config);
-      this.userSettings = new UserSettings(data.user_settings);
-      this.organizationSettings = new OrganizationSettings(data.organization_settings);
-      this.maintenanceMode = data.maintenance_mode;
-    }
-    return this;
-  }
-
   public __internal_toSnapshot(): EnvironmentJSONSnapshot {
     return {
       object: 'environment',
-      id: this.id || '',
       auth_config: this.authConfig.__internal_toSnapshot(),
       display_config: this.displayConfig.__internal_toSnapshot(),
-      user_settings: this.userSettings.__internal_toSnapshot(),
-      organization_settings: this.organizationSettings.__internal_toSnapshot(),
-      commerce_settings: this.__experimental_commerceSettings.__internal_toSnapshot(),
+      id: this.id || '',
       maintenance_mode: this.maintenanceMode,
+      organization_settings: this.organizationSettings.__internal_toSnapshot(),
+      user_settings: this.userSettings.__internal_toSnapshot(),
+      commerce_settings: this.__experimental_commerceSettings.__internal_toSnapshot(),
     };
   }
 }
