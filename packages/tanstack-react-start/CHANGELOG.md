@@ -1,4 +1,4 @@
-# @clerk/tanstack-start
+# @clerk/tanstack-react-start
 
 ## 0.11.4
 

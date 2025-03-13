@@ -1,5 +1,5 @@
 {
-  "name": "@clerk/tanstack-start",
+  "name": "@clerk/tanstack-react-start",
   "version": "0.11.4",
   "description": "Clerk SDK for TanStack Start",
   "keywords": [
@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/tanstack-start"
+    "directory": "packages/tanstack-react-start"
   },
   "license": "MIT",
   "author": "Clerk",
