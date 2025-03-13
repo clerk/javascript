@@ -1,11 +1,11 @@
-import {
-  type ActiveSessionResource,
-  type ClientJSON,
-  type ClientJSONSnapshot,
-  type ClientResource,
-  type SignedInSessionResource,
-  type SignInResource,
-  type SignUpResource,
+import type {
+  ActiveSessionResource,
+  ClientJSON,
+  ClientJSONSnapshot,
+  ClientResource,
+  SignedInSessionResource,
+  SignInResource,
+  SignUpResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -127,11 +127,11 @@ export class Client extends BaseResource implements ClientResource {
       this.sessions = (data.sessions || []).map(s => new Session(s));
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
-      this.lastActiveSessionId = data.last_active_session_id;
+      this.lastActiveSessionId = data.last_active_session_id ?? null;
       this.captchaBypass = data.captcha_bypass || false;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
-      this.createdAt = unixEpochToDate(data.created_at || undefined);
-      this.updatedAt = unixEpochToDate(data.updated_at || undefined);
+      this.createdAt = unixEpochToDate(data.created_at ?? undefined);
+      this.updatedAt = unixEpochToDate(data.updated_at ?? undefined);
     }
 
     return this;
