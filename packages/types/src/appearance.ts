@@ -345,7 +345,7 @@ export type ElementsConfig = {
   planCardDefault: WithOptions;
   planCardCompact: WithOptions;
   planCardHeader: WithOptions;
-  planCardAvatarContainer: WithOptions;
+  planCardAvatarBadgeContainer: WithOptions;
   planCardAvatar: WithOptions;
   planCardTitle: WithOptions;
   planCardDescription: WithOptions;
