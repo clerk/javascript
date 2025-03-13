@@ -7,18 +7,20 @@ import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
+import { createOrganizationsService } from './organizationsService';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
+import { createSessionTaskComponentPageObject } from './sessionTaskPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
 import { createUserButtonPageObject } from './userButtonPageObject';
 import { createUserProfileComponentPageObject } from './userProfilePageObject';
-import type { FakeOrganization, FakeUser } from './usersService';
+import type { FakeUser, FakeUserOrganization } from './usersService';
 import { createUserService } from './usersService';
 import { createUserVerificationComponentPageObject } from './userVerificationPageObject';
 import { createWaitlistComponentPageObject } from './waitlistPageObject';
 
-export type { FakeUser, FakeOrganization };
+export type { FakeUser, FakeUserOrganization as FakeOrganization };
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
     apiUrl: app.env.privateVariables.get('CLERK_API_URL'),
@@ -48,6 +50,11 @@ const createExpectPageObject = ({ page }: TestArgs) => {
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
         return !!window.Clerk?.user;
+      });
+    },
+    toHaveResolvedTasks: async () => {
+      return page.waitForFunction(() => {
+        return !window.Clerk?.session.currentTask;
       });
     },
   };
@@ -82,6 +89,7 @@ export const createTestUtils = <
     email: createEmailService(),
     users: createUserService(clerkClient),
     invitations: createInvitationService(clerkClient),
+    organizations: createOrganizationsService(clerkClient),
     clerk: clerkClient,
   };
 
@@ -101,6 +109,7 @@ export const createTestUtils = <
     userButton: createUserButtonPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
+    sessionTask: createSessionTaskComponentPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     clerk: createClerkUtils(testArgs),
   };

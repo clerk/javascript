@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -89,10 +90,12 @@ function SignUpRoutes(): JSX.Element {
           </Route>
         </Route>
         {signUpContext.withSessionTasks && (
-          <SessionTask
-            task='org'
-            redirectUrlComplete={signUpContext.afterSignUpUrl}
-          />
+          <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
+            <SessionTask
+              task='org'
+              redirectUrlComplete={signUpContext.afterSignUpUrl}
+            />
+          </Route>
         )}
         <Route index>
           <SignUpStart />
