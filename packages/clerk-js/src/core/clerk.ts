@@ -1901,11 +1901,20 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    if (signInOrSignUp.createdSessionId) {
-      await this.setActive({
-        session: signInOrSignUp.createdSessionId,
-        redirectUrl,
-      });
+    switch (signInOrSignUp.status) {
+      case 'needs_second_factor':
+        await navigate('factor-two');
+        break;
+      case 'complete':
+        if (signInOrSignUp.createdSessionId) {
+          await this.setActive({
+            session: signInOrSignUp.createdSessionId,
+            redirectUrl,
+          });
+        }
+        break;
+      default:
+        return;
     }
   };
 
