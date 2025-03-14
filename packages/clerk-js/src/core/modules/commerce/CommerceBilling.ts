@@ -8,7 +8,6 @@ import type {
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
-import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import { __experimental_CommerceCheckout, __experimental_CommercePlan, BaseResource } from '../../resources/internal';
 
 export class __experimental_CommerceBilling implements __experimental_CommerceBillingNamespace {
@@ -16,7 +15,7 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     const { data: products } = (await BaseResource._fetch({
       path: `/commerce/products`,
       method: 'GET',
-      search: convertPageToOffsetSearchParams(params),
+      search: { payerType: params?.subscriberType || '' },
     })) as unknown as ClerkPaginatedResponse<__experimental_CommerceProductJSON>;
 
     const defaultProduct = products.find(product => product.is_default);

@@ -286,15 +286,12 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
     },
   ];
   if (commerce) {
-    // TODO(@COMMERCE) Uncomment when OrgProfile is ready
-    // INITIAL_ROUTES.push(
-    //   {
-    //     name: localizationKeys('userProfile.navbar.billing'),
-    //     id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
-    //     icon: CreditCard,
-    //     path: 'billing',
-    //   },
-    // );
+    INITIAL_ROUTES.push({
+      name: localizationKeys('organizationProfile.navbar.billing'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+      icon: CreditCard,
+      path: 'organization-billing',
+    });
   }
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {

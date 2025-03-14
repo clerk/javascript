@@ -14,6 +14,8 @@ export interface __experimental_CommerceBillingNamespace {
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
 
+export type __experimental_CommerceSubscriberType = 'org' | 'user';
+
 export interface __experimental_CommerceProductResource extends ClerkResource {
   id: string;
   slug: string | null;
@@ -23,7 +25,7 @@ export interface __experimental_CommerceProductResource extends ClerkResource {
 }
 
 export interface __experimental_GetPlansParams {
-  subscriberType?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
 }
 
 export interface __experimental_CommercePlanResource extends ClerkResource {

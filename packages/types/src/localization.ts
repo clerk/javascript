@@ -687,6 +687,7 @@ type _LocalizationResource = {
       description: LocalizationValue;
       general: LocalizationValue;
       members: LocalizationValue;
+      billing: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
