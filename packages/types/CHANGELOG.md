@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.48.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Improve JSDoc documentation ([#5296](https://github.com/clerk/javascript/pull/5296)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- Remove unused `experimental.combinedFlow` option. ([#5290](https://github.com/clerk/javascript/pull/5290)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.47.0
+
+### Minor Changes
+
+- Introduce the `appearance.captcha` property for the CAPTCHA widget ([#5184](https://github.com/clerk/javascript/pull/5184)) by [@anagstef](https://github.com/anagstef)
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Initialize `tasks` on `Session` resource ([#5170](https://github.com/clerk/javascript/pull/5170)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.46.1
 
 ### Patch Changes

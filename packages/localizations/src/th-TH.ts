@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'กลับ',
+  badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__primary: 'หลัก',
@@ -647,6 +656,14 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -766,6 +783,7 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
+      billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
       title: 'บัญชี',
@@ -863,6 +881,7 @@ export const thTH: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'ลบ',
         menuAction__rename: 'เปลี่ยนชื่อ',
+        primaryButton: undefined,
         title: 'พาสคีย์',
       },
       passwordSection: {

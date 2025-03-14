@@ -9,7 +9,7 @@ import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 
-function _OneTapStart(): JSX.Element | null {
+function OneTapStartInternal(): JSX.Element | null {
   const clerk = useClerk();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -87,4 +87,4 @@ function _OneTapStart(): JSX.Element | null {
   return null;
 }
 
-export const OneTapStart = withCardStateProvider(_OneTapStart);
+export const OneTapStart = withCardStateProvider(OneTapStartInternal);

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Atrás',
+  badge__currentPlan: undefined,
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
@@ -651,6 +660,14 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '¡Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -776,6 +793,7 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -875,6 +893,7 @@ export const esES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar Clave de Acceso',
         menuAction__rename: 'Renombrar Clave de Acceso',
+        primaryButton: undefined,
         title: 'Sección de Claves de Acceso',
       },
       passwordSection: {
@@ -891,7 +910,7 @@ export const esES: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: 'Guardar Cambios',
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {

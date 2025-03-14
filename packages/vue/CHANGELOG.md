@@ -1,5 +1,60 @@
 # @clerk/vue
 
+## 1.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+
+## 1.3.0
+
+### Minor Changes
+
+- Introduce `updateClerkOptions()` utility function to update Clerk options on the fly. ([#5235](https://github.com/clerk/javascript/pull/5235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```vue
+  <script setup>
+  import { updateClerkOptions } from '@clerk/vue';
+  import { dark } from '@clerk/themes';
+  import { frFR } from '@clerk/localizations';
+
+  function enableDarkTheme() {
+    updateClerkOptions({
+      appearance: {
+        baseTheme: dark,
+      },
+    });
+  }
+
+  function changeToFrench() {
+    updateClerkOptions({
+      localization: frFR,
+    });
+  }
+  </script>
+
+  <template>
+    <button @click="enableDarkTheme">Enable Dark Theme</button>
+    <button @click="changeToFrench">Change to French</button>
+  </template>
+  ```
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- The [`exports` map](https://nodejs.org/api/packages.html#conditional-exports) inside `package.json` has been slightly adjusted to allow for [`require(esm)`](https://joyeecheung.github.io/blog/2024/03/18/require-esm-in-node-js/) to work correctly. The `"import"` conditions have been changed to `"default"`. ([#5188](https://github.com/clerk/javascript/pull/5188)) by [@LekoArts](https://github.com/LekoArts)
+
+  You shouldn't see any change in behavior/functionality on your end.
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+
 ## 1.2.1
 
 ### Patch Changes

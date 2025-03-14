@@ -1,5 +1,35 @@
 # Change Log
 
+## 5.24.2
+
+### Patch Changes
+
+- Improve JSDoc documentation ([#5296](https://github.com/clerk/javascript/pull/5296)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+
+## 5.24.1
+
+### Patch Changes
+
+- Enhance RedirectToSignIn session check for compatibility with older clerk-js versions ([#5261](https://github.com/clerk/javascript/pull/5261)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.24.0
+
+### Minor Changes
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Refactors `IsomorphicClerk` types to reduce unnecessary duplication between it and `Clerk`. Also relies more on the source types from `Clerk` to ensure `IsomorphicClerk` types match. ([#5197](https://github.com/clerk/javascript/pull/5197)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+
 ## 5.23.0
 
 ### Minor Changes

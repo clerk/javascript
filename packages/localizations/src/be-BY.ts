@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'Па-змаўчанні',
   badge__otherImpersonatorDevice: 'Іншая прылада',
   badge__primary: 'Асноўная',
@@ -654,6 +663,14 @@ export const beBY: LocalizationResource = {
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скапіравана!',
       actionLabel__copy: 'Скапіраваць усё',
@@ -779,6 +796,7 @@ export const beBY: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профіль',
+      billing: undefined,
       description: 'Кіруйце інфармацыяй аб вашым уліковым запісе.',
       security: 'Бяспека',
       title: 'Уліковы запіс',
@@ -878,6 +896,7 @@ export const beBY: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Выдаліць passkey',
         menuAction__rename: 'Перайменаваць passkey',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {

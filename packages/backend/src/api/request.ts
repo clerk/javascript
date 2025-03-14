@@ -57,6 +57,7 @@ type BuildRequestOptions = {
    */
   requireSecretKey?: boolean;
 };
+
 export function buildRequest(options: BuildRequestOptions) {
   const requestFn = async <T>(requestOptions: ClerkBackendApiRequestOptions): Promise<ClerkBackendApiResponse<T>> => {
     const {
@@ -91,11 +92,14 @@ export function buildRequest(options: BuildRequestOptions) {
 
     // Build headers
     const headers: Record<string, any> = {
-      Authorization: `Bearer ${secretKey}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
       'User-Agent': userAgent,
       ...headerParams,
     };
+
+    if (secretKey) {
+      headers.Authorization = `Bearer ${secretKey}`;
+    }
 
     let res: Response | undefined;
     try {
@@ -189,8 +193,7 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 // TODO(dimkl): Will be probably be dropped in next major version
 function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
   return async (...args) => {
-    // @ts-ignore
-    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb<T>(...args);
+    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb(...args);
     if (errors) {
       // instead of passing `data: errors`, we have set the `error.errors` because
       // the errors returned from callback is already parsed and passing them as `data`

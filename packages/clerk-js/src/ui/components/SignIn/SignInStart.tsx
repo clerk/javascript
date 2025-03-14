@@ -59,7 +59,7 @@ const useAutoFillPasskey = () => {
   };
 };
 
-export function _SignInStart(): JSX.Element {
+function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -345,7 +345,9 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
     const alreadySignedInError: ClerkAPIError = e.errors.find(
@@ -568,4 +570,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));

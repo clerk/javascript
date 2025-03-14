@@ -297,4 +297,23 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
 
     await fakeAdmin.deleteIfExists();
   });
+
+  test('Update Clerk options on the fly with updateClerkOptions()', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Navigate and wait for sign-in component to load
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+
+    // Verify initial English state
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
+
+    // Change to French and verify
+    await u.page.locator('select').selectOption({ label: 'French' });
+    await expect(u.page.getByText('pour continuer vers')).toBeVisible();
+
+    // Revert to English and verify
+    await u.page.locator('select').selectOption({ label: 'English' });
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
+  });
 });

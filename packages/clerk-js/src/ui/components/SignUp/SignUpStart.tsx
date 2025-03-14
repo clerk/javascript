@@ -8,9 +8,7 @@ import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
-  Form,
   Header,
-  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -28,7 +26,7 @@ import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpStart(): JSX.Element {
+function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -320,14 +318,6 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
-            {!shouldShowForm && isLegalConsentEnabled && (
-              <Form.ControlRow elementId='legalAccepted'>
-                <LegalCheckbox
-                  {...formState.legalAccepted.props}
-                  isRequired={fields.legalAccepted?.required}
-                />
-              </Form.ControlRow>
-            )}
             {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
@@ -346,4 +336,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(SignUpStartInternal));

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'الرجوع',
+  badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
   badge__primary: 'الرئيسي',
@@ -646,6 +655,14 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -765,6 +782,7 @@ export const arSA: LocalizationResource = {
     mobileButton__menu: 'القائمة',
     navbar: {
       account: 'الملف الشخصي',
+      billing: undefined,
       description: 'إدارة معلومات ملفك الشخصي.',
       security: 'حماية',
       title: 'الملف الشخصي',
@@ -863,6 +881,7 @@ export const arSA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'إزالة',
         menuAction__rename: 'إعادة تسمية',
+        primaryButton: undefined,
         title: 'مفاتيح المرور',
       },
       passwordSection: {

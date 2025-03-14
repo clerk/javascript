@@ -16,6 +16,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationProfile',
   'organizationSwitcher',
   'waitlist',
+  'pricingTable',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -73,6 +74,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationProfile: buildComponentControls('organizationProfile'),
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
+  pricingTable: buildComponentControls('pricingTable'),
 };
 
 declare global {
@@ -95,7 +97,7 @@ const app = document.getElementById('app') as HTMLDivElement;
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
-  element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
 function mountOpenSignInButton(element: HTMLDivElement, props) {
@@ -243,6 +245,9 @@ function appearanceVariableOptions() {
         },
       });
     },
+    '/pricing-table': () => {
+      Clerk.__experimental_mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+    },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
     },
@@ -259,6 +264,7 @@ function appearanceVariableOptions() {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      experimental: { commerce: true },
     });
     renderCurrentRoute();
     updateVariables();

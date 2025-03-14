@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Vissza',
+  badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
   badge__primary: 'Elsődleges',
@@ -650,6 +659,14 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',
@@ -774,6 +791,7 @@ export const huHU: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Fiók információk kezelése',
       security: 'Biztonság',
       title: 'Fiók',
@@ -873,6 +891,7 @@ export const huHU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eltávolítás',
         menuAction__rename: 'Átnevezés',
+        primaryButton: undefined,
         title: 'Passkey-k',
       },
       passwordSection: {

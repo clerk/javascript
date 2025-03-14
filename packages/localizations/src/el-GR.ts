@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Πίσω',
+  badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
   badge__primary: 'Κύριο',
@@ -654,6 +663,14 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -779,6 +796,7 @@ export const elGR: LocalizationResource = {
     mobileButton__menu: 'Μενού',
     navbar: {
       account: 'Προφίλ',
+      billing: undefined,
       description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
       security: 'Ασφάλεια',
       title: 'Λογαριασμός',
@@ -879,6 +897,7 @@ export const elGR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

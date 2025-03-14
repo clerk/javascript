@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Nazad',
+  badge__currentPlan: undefined,
   badge__default: 'Podrazumevano',
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
   badge__primary: 'Primarni',
@@ -648,6 +657,14 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -770,6 +787,7 @@ export const srRS: LocalizationResource = {
     mobileButton__menu: 'Meni',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljaj informacijama svog naloga.',
       security: 'Sigurnost',
       title: 'Nalog',
@@ -869,6 +887,7 @@ export const srRS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Ključevi za prolaz',
       },
       passwordSection: {

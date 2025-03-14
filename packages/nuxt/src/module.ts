@@ -5,6 +5,7 @@ import {
   addImportsDir,
   addPlugin,
   addServerHandler,
+  addTypeTemplate,
   createResolver,
   defineNuxtModule,
   updateRuntimeConfig,
@@ -97,12 +98,33 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
+    // Adds TS support for `event.context.auth` in event handlers
+    addTypeTemplate(
+      {
+        filename: 'types/clerk.d.ts',
+        getContents: () => `import type { AuthObject } from '@clerk/backend';
+          declare module 'h3' {
+            interface H3EventContext {
+              auth: AuthObject;
+            }
+          }
+        `,
+      },
+      { nitro: true },
+    );
+
     // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
-    addImports({
-      name: 'createRouteMatcher',
-      from: resolver.resolve('./runtime/client'),
-    });
+    addImports([
+      {
+        name: 'createRouteMatcher',
+        from: resolver.resolve('./runtime/client'),
+      },
+      {
+        name: 'updateClerkOptions',
+        from: resolver.resolve('./runtime/client'),
+      },
+    ]);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const components: Array<keyof typeof import('@clerk/vue')> = [

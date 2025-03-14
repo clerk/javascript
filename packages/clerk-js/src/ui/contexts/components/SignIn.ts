@@ -5,7 +5,12 @@ import { createContext, useContext, useMemo } from 'react';
 import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  buildRedirectUrl,
+  buildSessionTaskRedirectUrl,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -21,11 +26,13 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  sessionTaskUrl: string | null;
   transferable: boolean;
   waitlistUrl: string;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
+  withSessionTasks: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -45,7 +52,8 @@ export const useSignInContext = (): SignInContextType => {
 
   const isCombinedFlow =
     (signUpMode !== 'restricted' &&
-      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl))) ||
+      Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl)) &&
+      context.withSignUp !== false) ||
     context.withSignUp ||
     false;
 
@@ -111,6 +119,13 @@ export const useSignInContext = (): SignInContextType => {
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
+  const sessionTaskUrl = buildSessionTaskRedirectUrl({
+    task: clerk.session?.currentTask,
+    path: ctx.path,
+    routing: ctx.routing,
+    baseUrl: signInUrl,
+  });
+
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
@@ -122,11 +137,13 @@ export const useSignInContext = (): SignInContextType => {
     afterSignUpUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    sessionTaskUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
+    withSessionTasks: !!options.experimental?.withSessionTasks,
   };
 };

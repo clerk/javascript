@@ -155,163 +155,302 @@ describe('Clerk singleton', () => {
   });
 
   describe('.setActive', () => {
-    describe.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
-      'when session has %s status',
-      status => {
-        const mockSession = {
-          id: '1',
-          remove: jest.fn(),
-          status,
-          user: {},
-          touch: jest.fn(() => Promise.resolve()),
-          getToken: jest.fn(),
-          lastActiveToken: { getRawString: () => 'mocked-token' },
+    describe('with `active` session status', () => {
+      const mockSession = {
+        id: '1',
+        remove: jest.fn(),
+        status: 'active',
+        user: {},
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+      };
+      let eventBusSpy;
+
+      beforeEach(() => {
+        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+
+        eventBusSpy?.mockRestore();
+        // cleanup global window pollution
+        (window as any).__unstable__onBeforeSetActive = null;
+        (window as any).__unstable__onAfterSetActive = null;
+      });
+
+      it('does not call session touch on signOut', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: null });
+        await waitFor(() => {
+          expect(mockSession.touch).not.toHaveBeenCalled();
+          expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
+        });
+      });
+
+      it('calls session.touch by default', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        expect(mockSession.touch).toHaveBeenCalled();
+      });
+
+      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        mockSession.getToken.mockResolvedValue('mocked-token');
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ touchSession: false });
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await waitFor(() => {
+          expect(mockSession.touch).not.toHaveBeenCalled();
+          expect(mockSession.getToken).toHaveBeenCalled();
+        });
+      });
+
+      it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        (window as any).__unstable__onBeforeSetActive = () => {
+          expect(mockSession.touch).not.toHaveBeenCalled();
         };
-        let eventBusSpy;
 
-        beforeEach(() => {
-          eventBusSpy = jest.spyOn(eventBus, 'dispatch');
-        });
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        expect(mockSession.touch).toHaveBeenCalled();
+      });
 
-        afterEach(() => {
-          mockSession.remove.mockReset();
-          mockSession.touch.mockReset();
+      it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-          eventBusSpy?.mockRestore();
-          // cleanup global window pollution
-          (window as any).__unstable__onBeforeSetActive = null;
-          (window as any).__unstable__onAfterSetActive = null;
-        });
+        (window as any).__unstable__onBeforeSetActive = () => {
+          expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+        };
 
-        it('does not call session touch on signOut', async () => {
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+      });
 
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-          await sut.setActive({ session: null });
-          await waitFor(() => {
-            expect(mockSession.touch).not.toHaveBeenCalled();
-            expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
-          });
-        });
+      it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
+        const beforeEmitMock = jest.fn();
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        it('calls session.touch by default', async () => {
-          mockSession.touch.mockReturnValue(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        (window as any).__unstable__onAfterSetActive = () => {
           expect(mockSession.touch).toHaveBeenCalled();
+          expect(beforeEmitMock).toHaveBeenCalled();
+        };
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
+      });
+
+      // TODO: @dimkl include set transitive state
+      it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
+        const mockSession2 = {
+          id: '2',
+          remove: jest.fn(),
+          status: 'active',
+          user: {},
+          touch: jest.fn(),
+          getToken: jest.fn(),
+        };
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession, mockSession2],
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        const executionOrder: string[] = [];
+        mockSession2.touch.mockImplementationOnce(() => {
+          sut.session = mockSession2 as any;
+          executionOrder.push('session.touch');
+          return Promise.resolve();
+        });
+        mockSession2.getToken.mockImplementation(() => {
+          executionOrder.push('set cookie');
+          return 'mocked-token-2';
+        });
+        const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
+          executionOrder.push('before emit');
+          return Promise.resolve();
         });
 
-        it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-          mockSession.getToken.mockResolvedValue('mocked-token');
+        await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
 
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load({ touchSession: false });
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-          await waitFor(() => {
-            expect(mockSession.touch).not.toHaveBeenCalled();
-            expect(mockSession.getToken).toHaveBeenCalled();
-          });
+        await waitFor(() => {
+          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
+          expect(mockSession2.touch).toHaveBeenCalled();
+          expect(mockSession2.getToken).toHaveBeenCalled();
+          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
+          expect(sut.session).toMatchObject(mockSession2);
+        });
+      });
+
+      // TODO: @dimkl include set transitive state
+      it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        const executionOrder: string[] = [];
+        mockSession.touch.mockImplementationOnce(() => {
+          sut.session = mockSession as any;
+          executionOrder.push('session.touch');
+          return Promise.resolve();
+        });
+        mockSession.getToken.mockImplementation(() => {
+          executionOrder.push('set cookie');
+          return 'mocked-token';
         });
 
-        it('calls __unstable__onBeforeSetActive before session.touch', async () => {
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
+          executionOrder.push('before emit');
+          return Promise.resolve();
+        });
 
-          (window as any).__unstable__onBeforeSetActive = () => {
-            expect(mockSession.touch).not.toHaveBeenCalled();
-          };
+        await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
 
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await waitFor(() => {
+          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
           expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.getToken).toHaveBeenCalled();
+          expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
+          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
+          expect(sut.session).toMatchObject(mockSession);
         });
+      });
 
-        it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      it('sets active organization by slug', async () => {
+        const mockSession2 = {
+          id: '1',
+          status,
+          user: {
+            organizationMemberships: [
+              {
+                id: 'orgmem_id',
+                organization: {
+                  id: 'org_id',
+                  slug: 'some-org-slug',
+                },
+              },
+            ],
+          },
+          touch: jest.fn(),
+          getToken: jest.fn(),
+        };
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession2] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        mockSession2.touch.mockImplementationOnce(() => {
+          sut.session = mockSession2 as any;
+          return Promise.resolve();
+        });
+        mockSession2.getToken.mockImplementation(() => 'mocked-token');
+
+        await sut.setActive({ organization: 'some-org-slug' });
+
+        await waitFor(() => {
+          expect(mockSession2.touch).toHaveBeenCalled();
+          expect(mockSession2.getToken).toHaveBeenCalled();
+          expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
+          expect(sut.session).toMatchObject(mockSession2);
+        });
+      });
+
+      it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+            isEligibleForTouch: () => true,
+            buildTouchUrl: () =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = jest.fn();
+        await sut.load();
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/redirect-url-path',
+        });
+        const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
+        expect(redirectUrl.pathname).toEqual('/v1/client/touch');
+        expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
+      });
+
+      it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+            isEligibleForTouch: () => false,
+            buildTouchUrl: () =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = jest.fn();
+        await sut.load();
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/redirect-url-path',
+        });
+        expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+      });
+
+      it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is not set', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+            cookieExpiresAt: null,
+            isEligibleForTouch: () => false,
+            buildTouchUrl: () =>
+              `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = jest.fn();
+        await sut.load();
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/redirect-url-path',
+        });
+        expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
+      });
+
+      mockNativeRuntime(() => {
+        it('calls session.touch in a non-standard browser', async () => {
           mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-          (window as any).__unstable__onBeforeSetActive = () => {
-            expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
-          };
-
           const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-        });
-
-        it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
-          const beforeEmitMock = jest.fn();
-          mockSession.touch.mockReturnValueOnce(Promise.resolve());
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-          (window as any).__unstable__onAfterSetActive = () => {
-            expect(mockSession.touch).toHaveBeenCalled();
-            expect(beforeEmitMock).toHaveBeenCalled();
-          };
-
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-          await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-        });
-
-        // TODO: @dimkl include set transitive state
-        it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
-          const mockSession2 = {
-            id: '2',
-            remove: jest.fn(),
-            status: 'active',
-            user: {},
-            touch: jest.fn(),
-            getToken: jest.fn(),
-          };
-          mockClientFetch.mockReturnValue(
-            Promise.resolve({
-              signedInSessions: [mockSession, mockSession2],
-            }),
-          );
-
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
-
-          const executionOrder: string[] = [];
-          mockSession2.touch.mockImplementationOnce(() => {
-            sut.session = mockSession2 as any;
-            executionOrder.push('session.touch');
-            return Promise.resolve();
-          });
-          mockSession2.getToken.mockImplementation(() => {
-            executionOrder.push('set cookie');
-            return 'mocked-token-2';
-          });
-          const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
-            executionOrder.push('before emit');
-            return Promise.resolve();
-          });
-
-          await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-
-          await waitFor(() => {
-            expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-            expect(mockSession2.touch).toHaveBeenCalled();
-            expect(mockSession2.getToken).toHaveBeenCalled();
-            expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
-            expect(sut.session).toMatchObject(mockSession2);
-          });
-        });
-
-        // TODO: @dimkl include set transitive state
-        it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
+          await sut.load({ standardBrowser: false });
 
           const executionOrder: string[] = [];
           mockSession.touch.mockImplementationOnce(() => {
@@ -319,11 +458,6 @@ describe('Clerk singleton', () => {
             executionOrder.push('session.touch');
             return Promise.resolve();
           });
-          mockSession.getToken.mockImplementation(() => {
-            executionOrder.push('set cookie');
-            return 'mocked-token';
-          });
-
           const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
             executionOrder.push('before emit');
             return Promise.resolve();
@@ -331,152 +465,98 @@ describe('Clerk singleton', () => {
 
           await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
 
-          await waitFor(() => {
-            expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-            expect(mockSession.touch).toHaveBeenCalled();
-            expect(mockSession.getToken).toHaveBeenCalled();
-            expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-            expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
-            expect(sut.session).toMatchObject(mockSession);
-          });
+          expect(executionOrder).toEqual(['session.touch', 'before emit']);
+          expect(mockSession.touch).toHaveBeenCalled();
+          expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
+          expect(mockSession.getToken).toHaveBeenCalled();
+          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
+          expect(sut.session).toMatchObject(mockSession);
+        });
+      });
+    });
+
+    describe('with `pending` session status', () => {
+      const mockSession = {
+        id: '1',
+        remove: jest.fn(),
+        status: 'pending',
+        user: {},
+        touch: jest.fn(() => Promise.resolve()),
+        getToken: jest.fn(),
+        lastActiveToken: { getRawString: () => 'mocked-token' },
+        tasks: [{ key: 'org' }],
+        currentTask: { key: 'org', __internal_getUrl: () => 'https://foocorp.com/add-organization' },
+      };
+      let eventBusSpy;
+
+      beforeEach(() => {
+        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+      });
+
+      afterEach(() => {
+        mockSession.remove.mockReset();
+        mockSession.touch.mockReset();
+
+        eventBusSpy?.mockRestore();
+        // cleanup global window pollution
+        (window as any).__unstable__onBeforeSetActive = null;
+        (window as any).__unstable__onAfterSetActive = null;
+      });
+
+      it('calls session.touch by default', async () => {
+        mockSession.touch.mockReturnValue(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        expect(mockSession.touch).toHaveBeenCalled();
+      });
+
+      it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
+        mockSession.touch.mockReturnValueOnce(Promise.resolve());
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        mockSession.getToken.mockResolvedValue('mocked-token');
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ touchSession: false });
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
+        await waitFor(() => {
+          expect(mockSession.touch).not.toHaveBeenCalled();
+          expect(mockSession.getToken).toHaveBeenCalled();
+        });
+      });
+
+      it('navigates to task and set accessors with touched session', async () => {
+        mockClientFetch.mockReturnValue(Promise.resolve({ sessions: [mockSession], signedInSessions: [mockSession] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        const executionOrder: string[] = [];
+        mockSession.touch.mockImplementationOnce(() => {
+          sut.session = mockSession as any;
+          executionOrder.push('session.touch');
+          return Promise.resolve();
+        });
+        mockSession.getToken.mockImplementation(() => {
+          executionOrder.push('set cookie');
+          return 'mocked-token';
+        });
+        sut.navigate = jest.fn().mockImplementationOnce(() => {
+          executionOrder.push('navigate');
+          return Promise.resolve();
         });
 
-        it('sets active organization by slug', async () => {
-          const mockSession2 = {
-            id: '1',
-            status,
-            user: {
-              organizationMemberships: [
-                {
-                  id: 'orgmem_id',
-                  organization: {
-                    id: 'org_id',
-                    slug: 'some-org-slug',
-                  },
-                },
-              ],
-            },
-            touch: jest.fn(),
-            getToken: jest.fn(),
-          };
-          mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession2] }));
-          const sut = new Clerk(productionPublishableKey);
-          await sut.load();
+        await sut.setActive({ session: mockSession.id });
 
-          mockSession2.touch.mockImplementationOnce(() => {
-            sut.session = mockSession2 as any;
-            return Promise.resolve();
-          });
-          mockSession2.getToken.mockImplementation(() => 'mocked-token');
-
-          await sut.setActive({ organization: 'some-org-slug' });
-
-          await waitFor(() => {
-            expect(mockSession2.touch).toHaveBeenCalled();
-            expect(mockSession2.getToken).toHaveBeenCalled();
-            expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-            expect(sut.session).toMatchObject(mockSession2);
-          });
+        await waitFor(() => {
+          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'navigate']);
+          expect(mockSession.touch).toHaveBeenCalled();
+          expect(mockSession.getToken).toHaveBeenCalled();
+          expect(sut.session).toMatchObject(mockSession);
         });
-
-        it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
-          mockSession.touch.mockReturnValue(Promise.resolve());
-          mockClientFetch.mockReturnValue(
-            Promise.resolve({
-              signedInSessions: [mockSession],
-              cookieExpiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-              isEligibleForTouch: () => true,
-              buildTouchUrl: () =>
-                `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
-            }),
-          );
-
-          const sut = new Clerk(productionPublishableKey);
-          sut.navigate = jest.fn();
-          await sut.load();
-          await sut.setActive({
-            session: mockSession as any as ActiveSessionResource,
-            redirectUrl: '/redirect-url-path',
-          });
-          const redirectUrl = new URL((sut.navigate as jest.Mock).mock.calls[0]);
-          expect(redirectUrl.pathname).toEqual('/v1/client/touch');
-          expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
-        });
-
-        it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is more than 8 days away', async () => {
-          mockSession.touch.mockReturnValue(Promise.resolve());
-          mockClientFetch.mockReturnValue(
-            Promise.resolve({
-              signedInSessions: [mockSession],
-              cookieExpiresAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
-              isEligibleForTouch: () => false,
-              buildTouchUrl: () =>
-                `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
-            }),
-          );
-
-          const sut = new Clerk(productionPublishableKey);
-          sut.navigate = jest.fn();
-          await sut.load();
-          await sut.setActive({
-            session: mockSession as any as ActiveSessionResource,
-            redirectUrl: '/redirect-url-path',
-          });
-          expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
-        });
-
-        it('does not redirect the user to the /v1/client/touch endpoint if the cookie_expires_at is not set', async () => {
-          mockSession.touch.mockReturnValue(Promise.resolve());
-          mockClientFetch.mockReturnValue(
-            Promise.resolve({
-              signedInSessions: [mockSession],
-              cookieExpiresAt: null,
-              isEligibleForTouch: () => false,
-              buildTouchUrl: () =>
-                `https://clerk.example.com/v1/client/touch?redirect_url=${mockWindowLocation.href}/redirect-url-path`,
-            }),
-          );
-
-          const sut = new Clerk(productionPublishableKey);
-          sut.navigate = jest.fn();
-          await sut.load();
-          await sut.setActive({
-            session: mockSession as any as ActiveSessionResource,
-            redirectUrl: '/redirect-url-path',
-          });
-          expect(sut.navigate).toHaveBeenCalledWith('/redirect-url-path');
-        });
-
-        mockNativeRuntime(() => {
-          it('calls session.touch in a non-standard browser', async () => {
-            mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-            const sut = new Clerk(productionPublishableKey);
-            await sut.load({ standardBrowser: false });
-
-            const executionOrder: string[] = [];
-            mockSession.touch.mockImplementationOnce(() => {
-              sut.session = mockSession as any;
-              executionOrder.push('session.touch');
-              return Promise.resolve();
-            });
-            const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
-              executionOrder.push('before emit');
-              return Promise.resolve();
-            });
-
-            await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
-
-            expect(executionOrder).toEqual(['session.touch', 'before emit']);
-            expect(mockSession.touch).toHaveBeenCalled();
-            expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-            expect(mockSession.getToken).toHaveBeenCalled();
-            expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
-            expect(sut.session).toMatchObject(mockSession);
-          });
-        });
-      },
-    );
+      });
+    });
   });
 
   describe('.load()', () => {
@@ -587,16 +667,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut();
       await waitFor(() => {
         expect(mockClientDestroy).not.toHaveBeenCalled();
         expect(mockClientRemoveSessions).toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({
-          session: null,
-          redirectUrl: '/',
-        });
+        expect(sut.navigate).toHaveBeenCalledWith('/');
       });
     });
 
@@ -613,17 +690,14 @@ describe('Clerk singleton', () => {
         );
 
         const sut = new Clerk(productionPublishableKey);
-        sut.setActive = jest.fn();
+        sut.navigate = jest.fn();
         await sut.load();
         await sut.signOut();
         await waitFor(() => {
           expect(mockClientDestroy).not.toHaveBeenCalled();
           expect(mockClientRemoveSessions).toHaveBeenCalled();
           expect(mockSession1.remove).not.toHaveBeenCalled();
-          expect(sut.setActive).toHaveBeenCalledWith({
-            session: null,
-            redirectUrl: '/',
-          });
+          expect(sut.navigate).toHaveBeenCalledWith('/');
         });
       },
     );
@@ -638,15 +712,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '2' });
       await waitFor(() => {
         expect(mockSession2.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).not.toHaveBeenCalledWith({
-          session: null,
-        });
+        expect(sut.navigate).not.toHaveBeenCalled();
       });
     });
 
@@ -660,16 +732,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1' });
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({
-          session: null,
-          redirectUrl: '/',
-        });
+        expect(sut.navigate).toHaveBeenCalledWith('/');
       });
     });
 
@@ -683,16 +752,13 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn();
+      sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });
       await waitFor(() => {
         expect(mockSession1.remove).toHaveBeenCalled();
         expect(mockClientDestroy).not.toHaveBeenCalled();
-        expect(sut.setActive).toHaveBeenCalledWith({
-          session: null,
-          redirectUrl: '/after-sign-out',
-        });
+        expect(sut.navigate).toHaveBeenCalledWith('/after-sign-out');
       });
     });
   });

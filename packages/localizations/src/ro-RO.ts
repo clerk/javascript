@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Înapoi',
+  badge__currentPlan: undefined,
   badge__default: 'Implicit',
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
   badge__primary: 'Principală',
@@ -652,6 +661,14 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -778,6 +795,7 @@ export const roRO: LocalizationResource = {
     mobileButton__menu: 'Meniu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -878,6 +896,7 @@ export const roRO: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

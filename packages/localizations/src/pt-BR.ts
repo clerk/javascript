@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Voltar',
+  badge__currentPlan: undefined,
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__primary: 'Principal',
@@ -653,6 +662,14 @@ export const ptBR: LocalizationResource = {
     action__signOutAll: 'Sair de todas as contas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -778,6 +795,7 @@ export const ptBR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gerencie seus dados de perfil.',
       security: 'Segurança',
       title: 'Conta',
@@ -877,6 +895,7 @@ export const ptBR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover',
         menuAction__rename: 'Renomear',
+        primaryButton: undefined,
         title: 'Chaves de acesso',
       },
       passwordSection: {

@@ -6,10 +6,10 @@ import type { SdkAdapter } from '../lib/types';
 /**
  * Converts a `ClerkTool` to an AI SDK `Tool`.
  */
-export const adapter: SdkAdapter<Tool> = (clerkClient, context, clerkTool) => {
+export const adapter: SdkAdapter<Tool> = (clerkClient, params, clerkTool) => {
   return tool({
     description: clerkTool.description,
     parameters: clerkTool.parameters,
-    execute: clerkTool.bindRunnable(clerkClient, context),
+    execute: clerkTool.bindExecute(clerkClient, params),
   });
 };

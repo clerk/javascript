@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'חזור',
+  badge__currentPlan: undefined,
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
   badge__primary: 'ראשי',
@@ -639,6 +648,14 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -754,6 +771,7 @@ export const heIL: LocalizationResource = {
     mobileButton__menu: 'תפריט',
     navbar: {
       account: 'פרופיל',
+      billing: undefined,
       description: 'נהל את פרטי החשבון שלך.',
       security: 'אבטחה',
       title: 'חשבון',
@@ -850,6 +868,7 @@ export const heIL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'הגדר סיסמה',
         menuAction__rename: 'עדכן סיסמה',
+        primaryButton: undefined,
         title: 'סיסמה',
       },
       passwordSection: {

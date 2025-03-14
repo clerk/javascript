@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
   badge__primary: '主要',
@@ -505,13 +514,14 @@ export const zhTW: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: '我同意 {{ privacyPolicyLink || link("隱私條款") }}',
+        label__onlyTermsOfService: '我同意 {{ termsOfServiceLink || link("使用條款") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          '我同意 {{ termsOfServiceLink || link("使用條款") }} and {{ privacyPolicyLink || link("隱私條款") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '請閱讀並接受條款以繼續',
+        title: '同意條款',
       },
     },
     phoneCode: {
@@ -640,6 +650,14 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -754,6 +772,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -851,6 +870,7 @@ export const zhTW: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -867,7 +887,7 @@ export const zhTW: LocalizationResource = {
         title: '電話號碼',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: '更新個人資料',
         title: '個人資料',
       },
       usernameSection: {

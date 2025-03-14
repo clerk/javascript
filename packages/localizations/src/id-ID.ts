@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Kembali',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
   badge__primary: 'Utama',
@@ -130,6 +139,7 @@ export const idID: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Undang',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Hapus anggota',
         tableHeader__actions: undefined,
@@ -657,6 +667,14 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
@@ -772,6 +790,7 @@ export const idID: LocalizationResource = {
     mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',
       title: 'Akun',
@@ -869,6 +888,7 @@ export const idID: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {

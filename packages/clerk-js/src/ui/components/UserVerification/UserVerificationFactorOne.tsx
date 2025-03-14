@@ -3,14 +3,15 @@ import React, { useEffect } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
-import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
+import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
+import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
@@ -27,7 +28,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _UserVerificationFactorOne(): JSX.Element | null {
+export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
   const { navigate } = useRouter();
@@ -46,7 +47,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     prevCurrentFactor: undefined,
   }));
 
-  const { hasAnyStrategy } = useAlternativeStrategies({
+  const { hasAnyStrategy, hasFirstParty } = useReverificationAlternativeStrategies({
     filterOutFactor: currentFactor,
     supportedFirstFactors: availableFactors,
   });
@@ -55,7 +56,12 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
 
-  const toggleAllStrategies = hasAnyStrategy ? () => setShowAllStrategies(s => !s) : undefined;
+  const toggleAllStrategies = hasAnyStrategy
+    ? () => {
+        card.setError(undefined);
+        setShowAllStrategies(s => !s);
+      }
+    : undefined;
 
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
@@ -116,6 +122,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
+          showAlternativeMethods={hasFirstParty}
         />
       );
     case 'phone_code':
@@ -125,13 +132,16 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
+          showAlternativeMethods={hasFirstParty}
         />
       );
+    case 'passkey':
+      return <UVFactorOnePasskeysCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     default:
       return <LoadingCard />;
   }
 }
 
 export const UserVerificationFactorOne = withUserVerificationSessionGuard(
-  withCardStateProvider(_UserVerificationFactorOne),
+  withCardStateProvider(UserVerificationFactorOneInternal),
 );

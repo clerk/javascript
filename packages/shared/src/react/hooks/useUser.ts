@@ -3,12 +3,12 @@ import type { UseUserReturn } from '@clerk/types';
 import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
 
 /**
- * The `useUser()` hook provides access to the current user's [`User`](https://clerk.com/docs/references/javascript/user/user) object, which contains all the data for a single user in your application and provides methods to manage their account. This hook also allows you to check if the user is signed in and if Clerk has loaded and initialized.
+ * The `useUser()` hook provides access to the current user's [`User`](https://clerk.com/docs/references/javascript/user) object, which contains all the data for a single user in your application and provides methods to manage their account. This hook also allows you to check if the user is signed in and if Clerk has loaded and initialized.
  *
  * @example
  * ### Get the current user
  *
- * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user/user) object, which contains the current user's data such as their full name. The `isLoaded` and `isSignedIn` properties are used to handle the loading state and to check if the user is signed in, respectively.
+ * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which contains the current user's data such as their full name. The `isLoaded` and `isSignedIn` properties are used to handle the loading state and to check if the user is signed in, respectively.
  *
  * ```tsx {{ filename: 'src/Example.tsx' }}
  * export default function Example() {
@@ -29,11 +29,9 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * @example
  * ### Update user data
  *
- * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user/user) object, which calls the [`update()`](https://clerk.com/docs/references/javascript/user/user#update) method to update the current user's information.
+ * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which calls the [`update()`](https://clerk.com/docs/references/javascript/user#update) method to update the current user's information.
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useUser } from '@clerk/clerk-react'
- *
  * export default function Home() {
  *   const { isLoaded, user } = useUser()
  *
@@ -64,11 +62,9 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * @example
  * ### Reload user data
  *
- * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user/user) object, which calls the [`reload()`](https://clerk.com/docs/references/javascript/user/user#reload) method to get the latest user's information.
+ * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which calls the [`reload()`](https://clerk.com/docs/references/javascript/user#reload) method to get the latest user's information.
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useUser } from '@clerk/clerk-react'
- *
  * export default function Home() {
  *   const { isLoaded, user } = useUser()
  *
