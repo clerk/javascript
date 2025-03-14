@@ -2073,7 +2073,7 @@ export class Clerk implements ClerkInterface {
 
           if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
             if (envResult.status === 'rejected') {
-              await initEnvironmentPromise.catch(() => {}); // Ignore failure
+              await initEnvironmentPromise;
             }
             initComponents();
             await initClient();
