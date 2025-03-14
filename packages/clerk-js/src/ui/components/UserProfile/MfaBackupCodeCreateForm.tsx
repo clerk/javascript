@@ -1,3 +1,4 @@
+import { isClerkRuntimeError } from '@clerk/shared/error';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/types';
 import React from 'react';
@@ -16,7 +17,7 @@ import { MfaBackupCodeList } from './MfaBackupCodeList';
 
 type MfaBackupCodeCreateFormProps = FormProps;
 export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCodeCreateFormProps) => {
-  const { onSuccess } = props;
+  const { onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
   const { action: createBackupCode } = useReverification(() => user?.createBackupCode());
@@ -29,7 +30,12 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
 
     void createBackupCode()
       .then(backupCode => setBackupCode(backupCode))
-      .catch(err => handleError(err, [], card.setError));
+      .catch(err => {
+        if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
+          return onReset();
+        }
+        handleError(err, [], card.setError);
+      });
   }, []);
 
   if (card.error) {
