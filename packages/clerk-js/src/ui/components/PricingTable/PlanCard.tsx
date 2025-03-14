@@ -381,19 +381,22 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
             elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
             key={feature.id}
             as='li'
+            sx={t => ({
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: t.space.$2,
+            })}
           >
-            <Flex
-              gap={2}
-              align='baseline'
-            >
-              <Icon
-                icon={Check}
-                colorScheme='neutral'
-                size='sm'
-                aria-hidden
-              />
-              <Text colorScheme='body'>{feature.description || feature.name}</Text>
-            </Flex>
+            <Icon
+              icon={Check}
+              colorScheme='neutral'
+              size='sm'
+              aria-hidden
+              sx={t => ({
+                transform: `translateY(${t.space.$0x25})`,
+              })}
+            />
+            <Text colorScheme='body'>{feature.description || feature.name}</Text>
           </Box>
         ))}
       </Box>
