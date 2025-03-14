@@ -28,6 +28,9 @@ export interface ClerkResourceJSON {
   object: string;
 }
 
+export type PartialWithClerkResource<T extends ClerkResourceJSON> = Omit<Partial<ClerkResourceJSON>, 'id' | 'object'> &
+  Pick<T, 'id' | 'object'>;
+
 export interface DisplayThemeJSON {
   general: {
     color: HexColor;
