@@ -10,7 +10,7 @@ import type {
   PhoneCodeSecondFactorConfig,
   TOTPAttempt,
 } from './factors';
-import type { ActJWTClaim } from './jwt';
+import type { ActClaim } from './jwtv2';
 import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -122,7 +122,7 @@ export interface SessionResource extends ClerkResource {
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
-  actor: ActJWTClaim | null;
+  actor: ActClaim | null;
   tasks: Array<SessionTask> | null;
   currentTask?: SessionTask;
   /**
@@ -190,7 +190,7 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   abandonAt: Date;
   lastActiveAt: Date;
   latestActivity: SessionActivity;
-  actor: ActJWTClaim | null;
+  actor: ActClaim | null;
 
   revoke: () => Promise<SessionWithActivitiesResource>;
 }
