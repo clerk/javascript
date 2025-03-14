@@ -147,13 +147,19 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const { plan, isCompact, planPeriod, setPlanPeriod, closeSlot } = props;
-  const { name, avatarUrl, isActiveForPayer } = plan;
+  const { name, avatarUrl, isActiveForPayer, annualMonthlyAmount } = plan;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
       : 'none',
   });
+  const getPlanFee = React.useMemo(() => {
+    if (annualMonthlyAmount <= 0) {
+      return plan.amountFormatted;
+    }
+    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+  }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
   return (
     <Box
       ref={ref}
@@ -247,7 +253,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
               colorScheme='body'
             >
               {plan.currencySymbol}
-              {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+              {getPlanFee}
             </Text>
             <Text
               elementDescriptor={descriptors.planCardFeePeriod}
@@ -262,47 +268,49 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
               })}
               localizationKey={localizationKeys('__experimental_commerce.month')}
             />
-            <Box
-              elementDescriptor={descriptors.planCardFeePeriodNotice}
-              sx={[
-                _ => ({
-                  width: '100%',
-                  display: 'grid',
-                  gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
-                }),
-                planCardFeePeriodNoticeAnimation,
-              ]}
-              // @ts-ignore - Needed until React 19 support
-              inert={planPeriod !== 'annual' ? 'true' : undefined}
-            >
+            {annualMonthlyAmount > 0 ? (
               <Box
-                elementDescriptor={descriptors.planCardFeePeriodNoticeInner}
-                sx={{
-                  overflow: 'hidden',
-                  minHeight: 0,
-                }}
-              >
-                <Text
-                  elementDescriptor={descriptors.planCardFeePeriodNoticeLabel}
-                  variant='caption'
-                  colorScheme='secondary'
-                  sx={t => ({
+                elementDescriptor={descriptors.planCardFeePeriodNotice}
+                sx={[
+                  _ => ({
                     width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    columnGap: t.space.$1,
-                  })}
+                    display: 'grid',
+                    gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
+                  }),
+                  planCardFeePeriodNoticeAnimation,
+                ]}
+                // @ts-ignore - Needed until React 19 support
+                inert={planPeriod !== 'annual' ? 'true' : undefined}
+              >
+                <Box
+                  elementDescriptor={descriptors.planCardFeePeriodNoticeInner}
+                  sx={{
+                    overflow: 'hidden',
+                    minHeight: 0,
+                  }}
                 >
-                  <Icon
-                    icon={InformationCircle}
-                    colorScheme='neutral'
-                    size='sm'
-                    aria-hidden
-                  />{' '}
-                  <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
-                </Text>
+                  <Text
+                    elementDescriptor={descriptors.planCardFeePeriodNoticeLabel}
+                    variant='caption'
+                    colorScheme='secondary'
+                    sx={t => ({
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      columnGap: t.space.$1,
+                    })}
+                  >
+                    <Icon
+                      icon={InformationCircle}
+                      colorScheme='neutral'
+                      size='sm'
+                      aria-hidden
+                    />{' '}
+                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+                  </Text>
+                </Box>
               </Box>
-            </Box>
+            ) : null}
           </>
         ) : (
           <Text
@@ -313,7 +321,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           />
         )}
       </Flex>
-      {plan.hasBaseFee ? (
+      {plan.hasBaseFee && annualMonthlyAmount > 0 ? (
         <Box
           elementDescriptor={descriptors.planCardPeriodToggle}
           sx={t => ({
