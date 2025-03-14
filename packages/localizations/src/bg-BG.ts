@@ -287,6 +287,7 @@ export const bgBG: LocalizationResource = {
       actionText: "Don't have one of these?",
       blockButton__backupCode: 'Use backup code',
       blockButton__emailCode: 'Send code to email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Login with password',
       blockButton__phoneCode: 'Send code to phone',
       blockButton__totp: 'Use authenticator app',
@@ -312,6 +313,11 @@ export const bgBG: LocalizationResource = {
       message: 'Unable to proceed. No available authentication methods.',
       subtitle: 'Something went wrong.',
       title: 'Authentication failed',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Use another method',
@@ -913,6 +919,7 @@ export const bgBG: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Премахни портфейл',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 портфейли',
         title: 'Web3 портфейли',
       },
