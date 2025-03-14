@@ -2,18 +2,20 @@ import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import { useState } from 'react';
 
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Box, descriptors } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { InternalThemeProvider } from '../../styledSystem';
 import { __experimental_Checkout } from '../Checkout';
+import type { PlanPeriod } from './PlanCard';
 import { PlanCard } from './PlanCard';
-import { PlanDetailBlade } from './PlanDetailBlade';
+import { PlanDetailDrawer } from './PlanDetailDrawer';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
   const { __experimental_commerce } = useClerk();
   const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
-  const [planPeriod, setPlanPeriod] = useState('month');
+  const [planPeriod, setPlanPeriod] = useState<PlanPeriod>('month');
   const [selectedPlan, setSelectedPlan] = useState<__experimental_CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPlanDetail, setShowPlanDetail] = useState(false);
@@ -57,8 +59,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           <PlanCard
             key={plan.id}
             plan={plan}
-            period={planPeriod}
-            setPeriod={setPlanPeriod}
+            planPeriod={planPeriod}
+            setPlanPeriod={setPlanPeriod}
             onSelect={selectPlan}
             props={props}
             isCompact={isCompact}
@@ -69,8 +71,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         value={{
           componentName: 'Checkout',
           mode,
-          isShowingBlade: showCheckout,
-          handleCloseBlade: () => setShowCheckout(false),
+          isOpen: showCheckout,
+          setIsOpen: setShowCheckout,
         }}
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
@@ -81,10 +83,16 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           />
         </div>
       </__experimental_CheckoutContext.Provider>
-      <PlanDetailBlade
+      <PlanDetailDrawer
         isOpen={showPlanDetail}
-        handleClose={() => setShowPlanDetail(false)}
+        setIsOpen={setShowPlanDetail}
         plan={selectedPlan}
+        planPeriod={planPeriod}
+        setPlanPeriod={setPlanPeriod}
+        strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
+        portalProps={{
+          id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+        }}
       />
     </InternalThemeProvider>
   );

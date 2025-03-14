@@ -14,3 +14,5 @@ export const USER_BUTTON_ITEM_ID = {
   MANAGE_ACCOUNT: 'manageAccount',
   SIGN_OUT: 'signOut',
 };
+
+export const PROFILE_CARD_SCROLLBOX_ID = 'clerk-profileCardScrollBox';
