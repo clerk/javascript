@@ -28,7 +28,7 @@ async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<
   }
 }
 
-type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnCancel: true } ? never : null) : T;
+type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnError: true } ? never : null) : T;
 
 /**
  * The `useReverification` hook options
