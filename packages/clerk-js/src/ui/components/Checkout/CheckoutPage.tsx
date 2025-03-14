@@ -9,7 +9,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Alert, Box, Flex, Spinner } from '../../customizables';
+import { Alert, Box, Spinner } from '../../customizables';
 import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { CheckoutComplete } from './CheckoutComplete';
@@ -43,34 +43,27 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   if (isLoading) {
     return (
-      <Flex
-        justify='center'
-        align='center'
+      <Spinner
         sx={{
-          flex: 1,
+          margin: 'auto',
         }}
-      >
-        <Spinner
-          sx={{
-            alignSelf: 'center',
-          }}
-        />
-      </Flex>
+      />
     );
   }
 
   if (!checkout) {
     return (
-      <Flex
-        justify='center'
-        align='center'
-        sx={{
-          flex: 1,
-        }}
-      >
+      <>
         {/* TODO(@COMMERCE): needs localization */}
-        <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
-      </Flex>
+        <Alert
+          colorScheme='danger'
+          sx={{
+            margin: 'auto',
+          }}
+        >
+          There was a problem, please try again later.
+        </Alert>
+      </>
     );
   }
 
