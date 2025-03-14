@@ -14,8 +14,9 @@ import {
 import * as React from 'react';
 
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
-import { Box, descriptors, Flex, Heading, Icon } from '../customizables';
-import { useMotionSafe, useScrollLock } from '../hooks';
+import { Box, descriptors, Flex, Heading, Icon, useAppearance } from '../customizables';
+import { usePrefersReducedMotion } from '../hooks';
+import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common, InternalThemeProvider } from '../styledSystem';
@@ -194,7 +195,9 @@ interface ContentProps {
 }
 
 const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, ref) => {
-  const isMotionSafe = useMotionSafe();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const { strategy, portalProps, refs, context, getFloatingProps } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 

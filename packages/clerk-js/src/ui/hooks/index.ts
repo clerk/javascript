@@ -10,7 +10,6 @@ export * from './useFetch';
 export * from './useInView';
 export * from './useLoadingStatus';
 export * from './useLocalStorage';
-export * from './useMotionSafe';
 export * from './useNavigateToFlowStart';
 export * from './usePassword';
 export * from './usePasswordComplexity';

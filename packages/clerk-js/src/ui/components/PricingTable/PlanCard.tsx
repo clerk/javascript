@@ -14,9 +14,10 @@ import {
   SimpleButton,
   Span,
   Text,
+  useAppearance,
 } from '../../customizables';
 import { Avatar, SegmentedControl } from '../../elements';
-import { useMotionSafe } from '../../hooks';
+import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle, Minus, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
@@ -143,9 +144,11 @@ interface PlanCardHeaderProps {
 }
 
 export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderProps>((props, ref) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const { plan, isCompact, planPeriod, setPlanPeriod, closeSlot } = props;
   const { name, avatarUrl, isActiveForPayer } = plan;
-  const isMotionSafe = useMotionSafe();
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
