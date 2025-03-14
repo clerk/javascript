@@ -164,11 +164,18 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
         <Box
           elementDescriptor={descriptors.planCardAvatarBadgeContainer}
           sx={t => ({
-            display: 'flex',
-            alignItems: 'start',
-            justifyContent: 'space-between',
-            gap: t.space.$3,
             marginBlockEnd: t.space.$3,
+            ...(!avatarUrl && !isActiveForPayer
+              ? {
+                  float: 'right',
+                }
+              : {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
+                  alignItems: 'start',
+                  justifyContent: 'space-between',
+                  gap: t.space.$3,
+                }),
           })}
         >
           {avatarUrl ? (
@@ -179,23 +186,35 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
               initials={name[0]}
               rounded={false}
               imageUrl={avatarUrl}
+              sx={{
+                gridRowStart: 1,
+              }}
             />
           ) : null}
-          {closeSlot || isActiveForPayer ? (
-            <Badge
-              localizationKey={localizationKeys('badge__currentPlan')}
-              colorScheme='secondary'
-            />
-          ) : null}
+          <ReversibleContainer reverse={avatarUrl && closeSlot ? true : false}>
+            {isActiveForPayer ? (
+              <Badge
+                localizationKey={localizationKeys('badge__currentPlan')}
+                colorScheme='secondary'
+                sx={
+                  !avatarUrl
+                    ? {
+                        justifySelf: 'start',
+                      }
+                    : {
+                        justifySelf: avatarUrl && closeSlot ? 'start' : 'end',
+                      }
+                }
+              />
+            ) : null}
+            {closeSlot}
+          </ReversibleContainer>
         </Box>
       ) : null}
       <Heading
         elementDescriptor={descriptors.planCardTitle}
         as='h2'
         textVariant={isCompact ? 'h3' : 'h2'}
-        sx={t => ({
-          marginTop: t.space.$3,
-        })}
       >
         {plan.name}
       </Heading>
