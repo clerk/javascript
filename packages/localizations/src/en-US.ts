@@ -917,6 +917,7 @@ export const enUS: LocalizationResource = {
         title: 'Username',
       },
       web3WalletsSection: {
+        detailsAction__nonPrimary: 'Set as primary',
         destructiveAction: 'Remove wallet',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
