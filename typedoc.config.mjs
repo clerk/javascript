@@ -55,6 +55,17 @@ const typedocPluginReplaceTextOptions = {
         pattern: /```empty```/,
         replace: '',
       },
+      {
+        /**
+         * In order to not render `<Tabs>` in the inline IntelliSense, the `items` prop was adjusted from `items={['item', 'item2']}` to `items='item,item2'`. It needs to be converted back so that clerk.com can render it properly.
+         */
+        pattern: /Tabs items='([^']+)'/,
+        replace: (_, match) =>
+          `Tabs items={[${match
+            .split(',')
+            .map(item => `'${item.trim()}'`)
+            .join(', ')}]}`,
+      },
     ],
   },
 };

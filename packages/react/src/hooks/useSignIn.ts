@@ -13,6 +13,9 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *
  * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/pages/SignInPage.tsx' }}
  * import { useSignIn } from '@clerk/clerk-react'
  *
@@ -27,6 +30,14 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *   return <div>The current sign-in attempt status is {signIn?.status}.</div>
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../examples/use-sign-in.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  *
  * @example
  * ### Create a custom sign-in flow with `useSignIn()`

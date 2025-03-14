@@ -12,6 +12,9 @@ type UseSession = () => UseSessionReturn;
  *
  * The following example uses the `useSession()` hook to access the `Session` object, which has the `lastActiveAt` property. The `lastActiveAt` property is a `Date` object used to show the time the session was last active.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/Home.tsx' }}
  * import { useSession } from '@clerk/clerk-react'
  *
@@ -34,6 +37,14 @@ type UseSession = () => UseSessionReturn;
  *   )
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../../examples/use-session.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  */
 export const useSession: UseSession = () => {
   useAssertWrappedByClerkProvider('useSession');

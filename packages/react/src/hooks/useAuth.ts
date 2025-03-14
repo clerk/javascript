@@ -21,6 +21,9 @@ import { createGetToken, createSignOut } from './utils';
  *
  * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
  * import { useAuth } from '@clerk/clerk-react'
  *
@@ -58,6 +61,14 @@ import { createGetToken, createSignOut } from './utils';
  *   )
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../examples/use-auth.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  */
 export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');

@@ -13,6 +13,9 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *
  * The following example uses the `useSignUp()` hook to access the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up/sign-up) object, which contains the current sign-up attempt status and methods to create a new sign-up attempt. The `isLoaded` property is used to handle the loading state.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/pages/SignUpPage.tsx' }}
  * import { useSignUp } from '@clerk/clerk-react'
  *
@@ -27,6 +30,14 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *   return <div>The current sign-up attempt status is {signUp?.status}.</div>
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../examples/use-sign-up.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  *
  * @example
  * ### Create a custom sign-up flow with `useSignUp()`

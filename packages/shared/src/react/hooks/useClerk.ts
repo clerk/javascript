@@ -14,6 +14,9 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
  *
  * The following example uses the `useClerk()` hook to access the `clerk` object. The `clerk` object is used to call the [`openSignIn()`](https://clerk.com/docs/references/javascript/clerk#sign-in) method to open the sign-in modal.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/Home.tsx' }}
  * import { useClerk } from '@clerk/clerk-react'
  *
@@ -23,6 +26,14 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
  *   return <button onClick={() => clerk.openSignIn({})}>Sign in</button>
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../../examples/use-clerk.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  */
 export const useClerk = (): LoadedClerk => {
   useAssertWrappedByClerkProvider('useClerk');

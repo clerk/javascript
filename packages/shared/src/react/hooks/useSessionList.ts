@@ -10,6 +10,9 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientCont
  *
  * The following example uses `useSessionList()` to get a list of sessions that have been registered on the client device. The `sessions` property is used to show the number of times the user has visited the page.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/Home.tsx' }}
  * import { useSessionList } from '@clerk/clerk-react'
  *
@@ -28,6 +31,14 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientCont
  *   )
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../../examples/use-session-list.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  */
 export const useSessionList = (): UseSessionListReturn => {
   useAssertWrappedByClerkProvider('useSessionList');

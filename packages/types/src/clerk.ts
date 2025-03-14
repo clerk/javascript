@@ -81,6 +81,9 @@ export type SignOutOptions = {
   redirectUrl?: string;
 };
 
+/**
+ * @inline
+ */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
 

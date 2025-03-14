@@ -36,7 +36,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
     this.partials = {
       ...superPartials,
       /**
-       * Copied from default theme / source code. This hides the return type from the output
+       * Copied from default theme / source code. This hides the return type heading over the table from the output
        * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/179a54c502b318cd4f3951e5e8b90f7f7a4752d8/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number }} options

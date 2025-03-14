@@ -13,23 +13,32 @@ export type ClerkPaginationRequest<T = object> = {
 } & T;
 
 /**
- * Pagination params in response
+ * An interface that describes the response of a method that returns a paginated list of resources.
+ *
+ * > [!TIP]
+ * > Clerk's SDKs always use `Promise<ClerkPaginatedResponse<T>>`. If the promise resolves, you will get back the properties. If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
  */
 export interface ClerkPaginatedResponse<T> {
+  /**
+   * An array that contains the fetched data.
+   */
   data: T[];
+  /**
+   * The total count of data that exist remotely.
+   */
   total_count: number;
 }
 
 /**
- * Pagination params passed in FAPI client methods
+ * @interface
  */
 export type ClerkPaginationParams<T = object> = {
   /**
-   * This is the starting point for your fetched results.
+   * A number that specifies which page to fetch. For example, if `initialPage` is set to `10`, it will skip the first 9 pages and fetch the 10th page. Defaults to `1`.
    */
   initialPage?: number;
   /**
-   * Maximum number of items returned per request.
+   * A number that specifies the maximum number of results to return per page. Defaults to `10`.
    */
   pageSize?: number;
 } & T;

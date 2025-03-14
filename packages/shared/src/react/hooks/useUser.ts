@@ -31,7 +31,12 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  *
  * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which calls the [`update()`](https://clerk.com/docs/references/javascript/user#update) method to update the current user's information.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/Home.tsx' }}
+ * import { useUser } from '@clerk/clerk-react'
+ *
  * export default function Home() {
  *   const { isLoaded, user } = useUser()
  *
@@ -58,13 +63,25 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  *   )
  * }
  * ```
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../../examples/use-user.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  *
  * @example
  * ### Reload user data
  *
  * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/references/javascript/user) object, which calls the [`reload()`](https://clerk.com/docs/references/javascript/user#reload) method to get the latest user's information.
  *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
  * ```tsx {{ filename: 'src/Home.tsx' }}
+ * import { useUser } from '@clerk/clerk-react'
+ *
  * export default function Home() {
  *   const { isLoaded, user } = useUser()
  *
@@ -96,6 +113,14 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  *   )
  * }
  * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../../examples/use-user.md#nextjs-02}
+ *
+ * </Tab>
+ * </Tabs>
  */
 export function useUser(): UseUserReturn {
   useAssertWrappedByClerkProvider('useUser');
