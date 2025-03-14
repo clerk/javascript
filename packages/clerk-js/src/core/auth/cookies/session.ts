@@ -10,6 +10,7 @@ const SESSION_COOKIE_NAME = '__session';
 export type SessionCookieHandler = {
   set: (token: string) => void;
   remove: () => void;
+  get: () => string | undefined;
 };
 
 /**
@@ -35,8 +36,11 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
     sessionCookie.set(token, { expires, sameSite, secure });
   };
 
+  const get = () => suffixedSessionCookie.get() || suffixedSessionCookie.get();
+
   return {
     set,
     remove,
+    get,
   };
 };

@@ -1,11 +1,11 @@
-import {
-  type ActiveSessionResource,
-  type ClientJSON,
-  type ClientJSONSnapshot,
-  type ClientResource,
-  type SignedInSessionResource,
-  type SignInResource,
-  type SignUpResource,
+import type {
+  ActiveSessionResource,
+  ClientJSON,
+  ClientJSONSnapshot,
+  ClientResource,
+  SignedInSessionResource,
+  SignInResource,
+  SignUpResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -140,7 +140,6 @@ export class Client extends BaseResource implements ClientResource {
   public __internal_toSnapshot(): ClientJSONSnapshot {
     return {
       object: 'client',
-      status: null,
       id: this.id || '',
       sessions: this.sessions.map(s => s.__internal_toSnapshot()),
       sign_up: this.signUp.__internal_toSnapshot(),

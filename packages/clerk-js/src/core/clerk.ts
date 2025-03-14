@@ -121,6 +121,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { createClientFromJwt } from './jwt-client';
 import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
@@ -2052,10 +2053,26 @@ export class Clerk implements ClerkInterface {
             this.updateEnvironment(res);
           });
 
-        const initClient = () => {
+        const initClient = async () => {
           return Client.getOrCreateInstance()
             .fetch()
-            .then(res => this.updateClient(res));
+            .then(res => this.updateClient(res))
+            .catch(async e => {
+              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+                throw e;
+              }
+
+              const jwtInCookie = this.#authService?.getSessionCookie();
+              const localClient = createClientFromJwt(jwtInCookie);
+
+              this.updateClient(localClient);
+
+              // Always grab a fresh token
+              await this.session?.getToken({ skipCache: true });
+
+              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
+              return null;
+            });
         };
 
         const initComponents = () => {

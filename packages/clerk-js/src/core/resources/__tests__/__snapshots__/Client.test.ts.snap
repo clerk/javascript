@@ -200,7 +200,6 @@ exports[`Client Singleton __internal_toSnapshot() 1`] = `
     },
     "web3_wallet": null,
   },
-  "status": null,
   "updated_at": 1733924546843,
 }
 `;

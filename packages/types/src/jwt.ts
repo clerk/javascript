@@ -1,4 +1,4 @@
-import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
   encoded: { header: string; payload: string; signature: string };
@@ -85,6 +85,18 @@ export interface ClerkJWTClaims {
    * Active organization role
    */
   org_role?: OrganizationCustomRoleKey;
+
+  /**
+   * Active organization permissions
+   */
+  org_permissions?: OrganizationCustomPermissionKey[];
+
+  /**
+   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
+   */
+  fva?: [fistFactorAge: number, secondFactorAge: number];
 
   /**
    * Any other JWT Claim Set member.
