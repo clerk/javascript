@@ -77,6 +77,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
               queryParams.set('createdSessionId', res.createdSessionId);
               return navigate(`../reset-password-success?${queryParams.toString()}`);
             }
+            // Nowadays, the `redirectUrl` is bypassed if the session provided is pending
+            // #handlePendingSession is earlier executed within `setActive` which navigates to the tasks flow
             return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));

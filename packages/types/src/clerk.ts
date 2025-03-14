@@ -441,6 +441,8 @@ export interface Clerk {
     basePath: string;
   }) => () => void;
 
+  completeTask: () => Promise<void>;
+
   /**
    * Set the active session and organization explicitly.
    *

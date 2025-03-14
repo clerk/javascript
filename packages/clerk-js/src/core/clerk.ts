@@ -1001,7 +1001,7 @@ export class Clerk implements ClerkInterface {
      */
     await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
-    const hadTasksBeforeTouch = newSession?.status === 'pending' && newSession.currentTask;
+    // const hadTasksBeforeTouch = newSession?.status === 'pending' && newSession.currentTask;
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -1024,13 +1024,13 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const hasResolvedTasks = hadTasksBeforeTouch && newSession?.status === 'active';
-    if (hasResolvedTasks) {
-      const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
-      const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+    // const hasResolvedTasks = hadTasksBeforeTouch && newSession?.status === 'active';
+    // if (hasResolvedTasks) {
+    //   const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+    //   const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
 
-      redirectUrl = referrerIsSignUpUrl ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
-    }
+    //   redirectUrl = referrerIsSignUpUrl ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
+    // }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
@@ -1105,6 +1105,40 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+  };
+
+  public completeTask = async () => {
+    if (!this.environment) {
+      return;
+    }
+
+    if (this.session?.currentTask) {
+      await navigateToTask(this.session.currentTask, {
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+        options: this.#options,
+        environment: this.environment,
+      });
+    }
+
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+    const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+    const redirectUrl = referrerIsSignUpUrl ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
+
+    await tracker.track(async () => {
+      if (!this.client) {
+        // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+        return;
+      }
+      this.#setTransitiveState();
+      if (this.client.isEligibleForTouch()) {
+        const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+        await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+      } else {
+        await this.navigate(redirectUrl);
+      }
+    });
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
