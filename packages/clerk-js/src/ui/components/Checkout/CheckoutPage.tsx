@@ -9,7 +9,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Alert, Col, Flex, Spinner } from '../../customizables';
+import { Alert, Box, Flex, Spinner } from '../../customizables';
 import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { CheckoutComplete } from './CheckoutComplete';
@@ -41,57 +41,70 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     }
   }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
 
+  if (isLoading) {
+    return (
+      <Flex
+        justify='center'
+        align='center'
+        sx={{
+          flex: 1,
+        }}
+      >
+        <Spinner
+          sx={{
+            alignSelf: 'center',
+          }}
+        />
+      </Flex>
+    );
+  }
+
+  if (!checkout) {
+    return (
+      <Flex
+        justify='center'
+        align='center'
+        sx={{
+          flex: 1,
+        }}
+      >
+        {/* TODO(@COMMERCE): needs localization */}
+        <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
+      </Flex>
+    );
+  }
+
+  if (checkout?.status === 'completed') {
+    return <CheckoutComplete checkout={checkout} />;
+  }
+
   return (
     <>
-      {isLoading ? (
-        <Flex
-          align='center'
-          justify='center'
-          sx={{ width: '100%', height: '100%' }}
-        >
-          <Spinner />
-        </Flex>
-      ) : !checkout ? (
-        <Flex
-          align='center'
-          justify='center'
-          sx={{ width: '100%', height: '100%' }}
-        >
-          {/* TODO(@COMMERCE): needs localization */}
-          <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
-        </Flex>
-      ) : checkout.status === 'completed' ? (
-        <CheckoutComplete checkout={checkout} />
-      ) : (
-        <>
-          <Col
-            gap={3}
-            sx={t => ({
-              padding: t.space.$4,
-              borderBottomWidth: t.borderWidths.$normal,
-              borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
-            })}
-          >
-            <CheckoutPlanRows
-              plan={checkout.plan}
-              planPeriod={checkout.planPeriod}
-              totals={checkout.totals}
-            />
-          </Col>
+      <Box
+        sx={t => ({
+          padding: t.space.$4,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$neutralAlpha100,
+        })}
+      >
+        <CheckoutPlanRows
+          plan={checkout.plan}
+          planPeriod={checkout.planPeriod}
+          totals={checkout.totals}
+        />
+      </Box>
 
-          {stripe && (
-            <Elements
-              stripe={stripe}
-              options={{ clientSecret: checkout.externalClientSecret }}
-            >
-              <CheckoutForm
-                checkout={checkout}
-                onCheckoutComplete={updateCheckout}
-              />
-            </Elements>
-          )}
-        </>
+      {stripe && (
+        <Elements
+          stripe={stripe}
+          options={{ clientSecret: checkout.externalClientSecret }}
+        >
+          <CheckoutForm
+            checkout={checkout}
+            onCheckoutComplete={updateCheckout}
+          />
+        </Elements>
       )}
     </>
   );
