@@ -168,17 +168,12 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           elementDescriptor={descriptors.planCardAvatarBadgeContainer}
           sx={t => ({
             marginBlockEnd: t.space.$3,
-            ...(!avatarUrl && !isActiveForPayer
-              ? {
-                  float: 'right',
-                }
-              : {
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, minmax(0,1fr))',
-                  alignItems: 'start',
-                  justifyContent: 'space-between',
-                  gap: t.space.$3,
-                }),
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: t.space.$3,
+            float: !avatarUrl && !isActiveForPayer ? 'right' : undefined,
           })}
         >
           {avatarUrl ? (
@@ -189,28 +184,24 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
               initials={name[0]}
               rounded={false}
               imageUrl={avatarUrl}
-              sx={{
-                gridRowStart: 1,
-              }}
             />
           ) : null}
-          <ReversibleContainer reverse={avatarUrl && closeSlot ? true : false}>
-            {isActiveForPayer ? (
-              <Badge
-                localizationKey={localizationKeys('badge__currentPlan')}
-                colorScheme='secondary'
-                sx={
-                  !avatarUrl
-                    ? {
-                        justifySelf: 'start',
-                      }
-                    : {
-                        justifySelf: avatarUrl && closeSlot ? 'start' : 'end',
-                      }
-                }
-              />
-            ) : null}
+          <ReversibleContainer reverse={!avatarUrl}>
             {closeSlot}
+            {isActiveForPayer ? (
+              <Span
+                elementDescriptor={descriptors.planCardBadgeContainer}
+                sx={{
+                  flexBasis: closeSlot && avatarUrl ? '100%' : undefined,
+                }}
+              >
+                <Badge
+                  elementDescriptor={descriptors.planCardBadge}
+                  localizationKey={localizationKeys('badge__currentPlan')}
+                  colorScheme='secondary'
+                />
+              </Span>
+            ) : null}
           </ReversibleContainer>
         </Box>
       ) : null}
