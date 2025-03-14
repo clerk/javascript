@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -37,17 +38,18 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
+  const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
-  const totalFeatures = plan.features.length;
+  const { id, slug, isActiveForPayer, features } = plan;
+  const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
-  const isActivePlan = plan.isActiveForPayer;
 
   return (
     <Box
-      key={plan.id}
+      key={id}
       elementDescriptor={[descriptors.planCard, isCompact ? descriptors.planCardCompact : descriptors.planCardDefault]}
-      elementId={descriptors.planCard.setId(plan.slug)}
+      elementId={descriptors.planCard.setId(slug)}
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
@@ -67,7 +69,7 @@ export function PlanCard(props: PlanCardProps) {
       <PlanCardHeader
         plan={plan}
         isCompact={isCompact}
-        isActivePlan={isActivePlan}
+        isActivePlan={isActiveForPayer}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
       />
@@ -106,14 +108,20 @@ export function PlanCard(props: PlanCardProps) {
           <Button
             block
             textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            variant={isCompact || isActivePlan ? 'bordered' : 'solid'}
-            colorScheme={isCompact || isActivePlan ? 'secondary' : 'primary'}
+            variant={isCompact || isActiveForPayer ? 'bordered' : 'solid'}
+            colorScheme={isCompact || isActiveForPayer ? 'secondary' : 'primary'}
             localizationKey={
-              isActivePlan
+              isActiveForPayer
                 ? localizationKeys('__experimental_commerce.manageMembership')
                 : localizationKeys('__experimental_commerce.getStarted')
             }
-            onClick={() => onSelect(plan)}
+            onClick={() => {
+              if (clerk.isSignedIn) {
+                onSelect(plan);
+              } else {
+                void clerk.redirectToSignIn();
+              }
+            }}
           />
         </Box>
       </ReversibleContainer>
@@ -135,7 +143,8 @@ interface PlanCardHeaderProps {
 }
 
 export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderProps>((props, ref) => {
-  const { plan, isCompact, isActivePlan, planPeriod, setPlanPeriod, closeSlot } = props;
+  const { plan, isCompact, planPeriod, setPlanPeriod, closeSlot } = props;
+  const { name, avatarUrl, isActiveForPayer } = plan;
   const isMotionSafe = useMotionSafe();
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -151,29 +160,35 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
         padding: isCompact ? t.space.$3 : t.space.$4,
       })}
     >
-      <Flex
-        elementDescriptor={descriptors.planCardAvatarContainer}
-        align='start'
-        justify='between'
-        sx={{ width: '100%' }}
-      >
-        <Avatar
-          boxElementDescriptor={descriptors.planCardAvatar}
-          size={_ => 40}
-          title={plan.name}
-          initials={plan.name[0]}
-          rounded={false}
-          imageUrl={plan.avatarUrl}
-        />
-        {closeSlot ||
-          (isActivePlan && (
+      {avatarUrl || isActiveForPayer || closeSlot ? (
+        <Box
+          elementDescriptor={descriptors.planCardAvatarBadgeContainer}
+          sx={t => ({
+            display: 'flex',
+            alignItems: 'start',
+            justifyContent: 'space-between',
+            gap: t.space.$3,
+            marginBlockEnd: t.space.$3,
+          })}
+        >
+          {avatarUrl ? (
+            <Avatar
+              boxElementDescriptor={descriptors.planCardAvatar}
+              size={_ => 40}
+              title={name}
+              initials={name[0]}
+              rounded={false}
+              imageUrl={avatarUrl}
+            />
+          ) : null}
+          {closeSlot || isActiveForPayer ? (
             <Badge
-              elementDescriptor={descriptors.planCardBadge}
               localizationKey={localizationKeys('badge__currentPlan')}
               colorScheme='secondary'
             />
-          ))}
-      </Flex>
+          ) : null}
+        </Box>
+      ) : null}
       <Heading
         elementDescriptor={descriptors.planCardTitle}
         as='h2'

@@ -353,7 +353,7 @@ export type ElementsConfig = {
   planCardDefault: WithOptions;
   planCardCompact: WithOptions;
   planCardHeader: WithOptions;
-  planCardAvatarContainer: WithOptions;
+  planCardAvatarBadgeContainer: WithOptions;
   planCardAvatar: WithOptions;
   planCardBadge: WithOptions;
   planCardTitle: WithOptions;
