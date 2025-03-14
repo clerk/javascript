@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/types';
 
 import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
@@ -11,6 +11,9 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
   const card = useCardState();
   const { user } = useUser();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { action: createWeb3Wallet } = useReverification((identifier: string) =>
+    user?.createWeb3Wallet({ web3Wallet: identifier }),
+  );
 
   const enabledStrategies = strategies.filter(s => s.startsWith('web3')) as Web3Strategy[];
   const connectedStrategies = user?.verifiedWeb3Wallets.map(w => w.verification.strategy) as Web3Strategy[];
@@ -30,11 +33,11 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
         throw new Error('user is not defined');
       }
 
-      let web3Wallet = await user.createWeb3Wallet({ web3Wallet: identifier });
-      web3Wallet = await web3Wallet.prepareVerification({ strategy });
-      const message = web3Wallet.verification.message as string;
+      let web3Wallet = await createWeb3Wallet(identifier);
+      web3Wallet = await web3Wallet?.prepareVerification({ strategy });
+      const message = web3Wallet?.verification.message as string;
       const signature = await generateWeb3Signature({ identifier, nonce: message, provider });
-      await web3Wallet.attemptVerification({ signature });
+      await web3Wallet?.attemptVerification({ signature });
       card.setIdle();
     } catch (err) {
       card.setIdle();
