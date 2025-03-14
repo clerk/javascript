@@ -2098,11 +2098,6 @@ export class Clerk implements ClerkInterface {
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
-        /**
-         * Start polling for a session token, ONLY after the client and session have been created.
-         */
-        this.#authService.startPollingForSessionToken();
-
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }
