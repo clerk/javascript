@@ -4,23 +4,91 @@ import type {
   __experimental_CommerceTotals,
 } from '@clerk/types';
 import { Elements } from '@stripe/react-stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext, useEnvironment } from '../../contexts';
-import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner } from '../../customizables';
+import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner, useAppearance } from '../../customizables';
 import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
+/**
+ * Parses different color format strings and normalizes them
+ * Handles conversions between:
+ * - #000 to #000
+ * - rgb(0, 0, 0) to rgb(0, 0, 0) (unchanged)
+ * - rgba(0, 0, 0, 1) to rgb(0, 0, 0) (alpha removed)
+ * - hsl(0, 0%, 0%) to hsl(0, 0%, 0%) (unchanged)
+ * - hsla(0, 0%, 0%, 1) to hsl(0, 0%, 0%) (alpha removed)
+ *
+ * @param colorString - The color string to parse
+ * @returns The normalized color string without alpha components
+ */
+function parseColorString(colorString: string): string {
+  const trimmed = colorString.trim();
+
+  if (trimmed.startsWith('#')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('rgb(') && !trimmed.startsWith('rgba(')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('rgba(')) {
+    const rgbaMatch = trimmed.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*[\d.]+\s*\)/);
+    if (rgbaMatch) {
+      const [_, r, g, b] = rgbaMatch;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  }
+
+  // Handle hsl (no change needed)
+  if (trimmed.startsWith('hsl(') && !trimmed.startsWith('hsla(')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('hsla(')) {
+    const hslaMatch = trimmed.match(/hsla\(\s*(\d+)\s*,\s*(\d+%?)\s*,\s*(\d+%?)\s*,\s*[\d.]+\s*\)/);
+    if (hslaMatch) {
+      const [_, h, s, l] = hslaMatch;
+      return `hsl(${h}, ${s}, ${l})`;
+    }
+  }
+
+  return trimmed;
+}
+
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod } = props;
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
   const { __experimental_commerceSettings } = useEnvironment();
+  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
+  const elementsAppearance: StripeAppearance = {
+    variables: {
+      colorPrimary: parseColorString(colors.$primary500),
+      colorBackground: parseColorString(colors.$colorInputBackground),
+      colorText: parseColorString(colors.$colorText),
+      colorTextSecondary: parseColorString(colors.$colorTextSecondary),
+      colorSuccess: parseColorString(colors.$success500),
+      colorDanger: parseColorString(colors.$danger500),
+      colorWarning: parseColorString(colors.$warning500),
+      fontWeightNormal: fontWeights.$normal.toString(),
+      fontWeightMedium: fontWeights.$medium.toString(),
+      fontWeightBold: fontWeights.$bold.toString(),
+      fontSizeXl: fontSizes.$xl,
+      fontSizeLg: fontSizes.$lg,
+      fontSizeSm: fontSizes.$md,
+      fontSizeXs: fontSizes.$sm,
+      borderRadius: radii.$md,
+      spacingUnit: space.$1,
+    },
+  };
 
   const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
@@ -97,7 +165,10 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           {stripe && (
             <Elements
               stripe={stripe}
-              options={{ clientSecret: checkout.externalClientSecret }}
+              options={{
+                clientSecret: checkout.externalClientSecret,
+                appearance: elementsAppearance,
+              }}
             >
               <CheckoutForm
                 checkout={checkout}
