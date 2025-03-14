@@ -6,7 +6,7 @@ import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements'
 import { useFetch, useLoadingStatus } from '../../hooks';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
-import { getRelativeToNowDateKey } from '../../utils';
+import { getRelativeToNowDateKey, handleError } from '../../utils';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
@@ -60,13 +60,11 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
     if (isCurrent || !session) {
       return;
     }
+
     status.setLoading();
-    return (
-      revokeSession()
-        // TODO-STEPUP: Properly handler the response with a setCardError
-        .catch(() => {})
-        .finally(() => status.setIdle())
-    );
+    return revokeSession()
+      .catch(err => handleError(err, [], status.setError))
+      .finally(() => status.setIdle());
   };
 
   return (
@@ -76,15 +74,14 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
       sx={{
         alignItems: 'flex-start',
+        opacity: status.isLoading ? 0.5 : 1,
       }}
+      isDisabled={status.isLoading}
     >
-      {status.isLoading && <FullHeightLoader />}
-      {!status.isLoading && (
-        <>
-          <DeviceInfo session={session} />
-          {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
-        </>
-      )}
+      <>
+        <DeviceInfo session={session} />
+        {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
+      </>
     </ProfileSection.Item>
   );
 };
