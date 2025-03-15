@@ -28,7 +28,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
   const { title, onSuccess, onReset } = props;
   const { user } = useUser();
   const card = useCardState();
-  const [createTOTP] = useReverification(() => user?.createTOTP());
+  const { action: createTOTP } = useReverification(() => user?.createTOTP());
   const { close } = useActionContext();
   const [totp, setTOTP] = React.useState<TOTPResource | undefined>(undefined);
   const [displayFormat, setDisplayFormat] = React.useState<DisplayFormat>('qr');

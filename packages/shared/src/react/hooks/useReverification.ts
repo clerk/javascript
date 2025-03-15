@@ -1,10 +1,10 @@
-import type { Clerk } from '@clerk/types';
-import { useMemo, useRef } from 'react';
+import type { Clerk, SessionVerificationLevel } from '@clerk/types';
+import { useRef, useState } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
-import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '../../error';
-import { createDeferredPromise } from '../../utils/createDeferredPromise';
+import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
+import { createDeferredPromise } from '../../utils';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
@@ -28,21 +28,26 @@ async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<
   }
 }
 
-type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnCancel: true } ? never : null) : T;
+type ExcludeClerkError<T, P> = T extends { clerk_error: any } ? (P extends { throwOnError: true } ? never : null) : T;
 
 /**
- * The optional options object.
+ * The `useReverification` hook options
+ *
  * @interface
  */
 type UseReverificationOptions = {
   /**
-   * A callback function that is invoked when the user cancels the reverification process.
+   * If `false`, this won't automatically open the reverification modal and instead you need to use the necessary functions to control the reverification flow.
+   *
+   * @default true
    */
-  onCancel?: () => void;
+  defaultUI?: boolean;
   /**
-   * Determines if an error should throw when the user cancels the reverification process. Defaults to `false`.
+   * If `true`, the action will throw an error if it fails or is cancelled.
+   *
+   * @default true
    */
-  throwOnCancel?: boolean;
+  throwOnError?: boolean;
 };
 
 /**
@@ -51,7 +56,37 @@ type UseReverificationOptions = {
 type UseReverificationResult<
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
-> = readonly [(...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>];
+> = {
+  /**
+   * The action that will trigger the fetcher and handle the reverification flow if necessary.
+   */
+  action: (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Options>>;
+
+  /**
+   * A boolean indicating if the reverification process is in progress.
+   */
+  inProgress: boolean;
+
+  /**
+   * The level of reverification required.
+   */
+  level: SessionVerificationLevel | undefined;
+
+  /**
+   * A function to cancel the reverification process.
+   */
+  cancel: () => void;
+
+  /**
+   * A function to complete the reverification process.
+   */
+  complete: () => void;
+
+  /**
+   * An error that occurred during the reverification process or from the fetcher.
+   */
+  error: Error | undefined;
+};
 
 /**
  * @interface
@@ -68,7 +103,13 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
 };
 
-function createReverificationHandler(params: CreateReverificationHandlerParams) {
+function useCreateReverificationHandler(params: CreateReverificationHandlerParams) {
+  const [level, setLevel] = useState<SessionVerificationLevel | undefined>(undefined);
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+  const [complete, setComplete] = useState<() => void>(() => {});
+  const [cancel, setCancel] = useState<() => void>(() => {});
+
   function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (
@@ -85,23 +126,42 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
         const isValidMetadata = validateReverificationConfig(result.clerk_error.metadata?.reverification);
 
-        /**
-         * On success resolve the pending promise
-         * On cancel reject the pending promise
-         */
-        params.openUIComponent?.({
-          level: isValidMetadata ? isValidMetadata().level : undefined,
-          afterVerification() {
+        setLevel(isValidMetadata ? isValidMetadata().level : undefined);
+        setInProgress(true);
+        setComplete(() => {
+          return () => {
             resolvers.resolve(true);
-          },
-          afterVerificationCancelled() {
+          };
+        });
+        setCancel(() => {
+          return () => {
             resolvers.reject(
               new ClerkRuntimeError('User cancelled attempted verification', {
                 code: 'reverification_cancelled',
               }),
             );
-          },
+          };
         });
+
+        if (params.defaultUI) {
+          /**
+           * On success resolve the pending promise
+           * On cancel reject the pending promise
+           */
+          params.openUIComponent?.({
+            level: isValidMetadata ? isValidMetadata().level : undefined,
+            afterVerification() {
+              resolvers.resolve(true);
+            },
+            afterVerificationCancelled() {
+              resolvers.reject(
+                new ClerkRuntimeError('User cancelled attempted verification', {
+                  code: 'reverification_cancelled',
+                }),
+              );
+            },
+          });
+        }
 
         try {
           /**
@@ -109,15 +169,14 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
            */
           await resolvers.promise;
         } catch (e) {
-          if (params.onCancel) {
-            params.onCancel();
-          }
-
-          if (isClerkRuntimeError(e) && e.code === 'reverification_cancelled' && params.throwOnCancel) {
+          setError(e as Error);
+          if (params.throwOnError) {
             throw e;
           }
 
           return null;
+        } finally {
+          setInProgress(false);
         }
 
         /**
@@ -130,9 +189,17 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
     }) as ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>;
   }
 
-  return assertReverification;
+  return {
+    assertReverification,
+    state: {
+      level,
+      inProgress,
+      error,
+      complete,
+      cancel,
+    },
+  };
 }
-
 /**
  * > [!WARNING]
  * > This feature is currently in public beta. **It is not recommended for production use.**
@@ -149,37 +216,14 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * The following example demonstrates how to handle scenarios where a user cancels the reverification flow, such as closing the modal, which might result in `myData` being `null`.
  *
  * In the following example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/reverification) for more information.
- *
- * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
- * import { useReverification } from '@clerk/react'
- *
- * export function MyButton() {
- *   const [enhancedFetcher] = useReverification(myFetcher)
- *
- *   const handleClick = async () => {
- *     const myData = await enhancedFetcher()
- *     // If `myData` is null, the user canceled the reverification process
- *     // You can choose how your app responds. This example returns null.
- *     if (!myData) return
- *   }
- *
- *   return <button onClick={handleClick}>Update User</button>
- * }
- * ```
- *
- * @example
- * ### Handle `throwOnCancel`
- *
- * When `throwOnCancel` is set to `true`, the fetcher will throw a `ClerkRuntimeError` with the code `"reverification_cancelled"` if the user cancels the reverification flow (for example, by closing the modal). This error can be caught and handled according to your app's needs. For example, by displaying a toast notification to the user or silently ignoring the cancellation.
- *
- * In this example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/reverification) for more information.
+ * If there is an error it will be thrown, and it can be caught and handled according to your app's needs. For example, by displaying a toast notification to the user.
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
  * import { useReverification } from '@clerk/clerk-react'
  * import { isClerkRuntimeError } from '@clerk/clerk-react/errors'
  *
  * export function MyButton() {
- *   const [enhancedFetcher] = useReverification(myFetcher, { throwOnCancel: true })
+ *   const { action: enhancedFetcher } = useReverification(myFetcher, { throwOnCancel: true })
  *
  *   const handleClick = async () => {
  *     try {
@@ -195,25 +239,62 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   return <button onClick={handleClick}>Update user</button>
  * }
  * ```
+ *
+ * @example
+ * ### Handle `throwOnError: false`
+ *
+ * When `throwOnError` is set to `false`, the fetcher will not throw an error, but the `error` returned from the `useReverification`.
+ * If there is an error it the `error` property will be filled, and it handled according to your app's needs. For example, by displaying a toast notification to the user.
+ *
+ * In this example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/reverification) for more information.
+ *
+ * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
+ * import { useReverification } from '@clerk/react'
+ * import { isClerkRuntimeError } from '@clerk/clerk-react/errors'
+ *
+ * export function MyButton() {
+ *   const { action: enhancedFetcher, error } = useReverification(myFetcher)
+ *
+ *   const handleClick = async () => {
+ *     const myData = await enhancedFetcher()
+ *
+ *    if (isClerkRuntimeError(error) && error.code === 'reverification_cancelled') {
+ *      // User has cancelled reverification
+ *    }
+ *
+ *     if (!myData) return
+ *   }
+ *
+ *   return <button onClick={handleClick}>Update User</button>
+ * }
+ * ```
  */
 export const useReverification: UseReverification = (fetcher, options) => {
-  const { __internal_openReverification } = useClerk();
+  const defaultOptions = {
+    defaultUI: true,
+    throwOnError: true,
+    ...options,
+  };
+  const clerk = useClerk();
   const fetcherRef = useRef(fetcher);
-  const optionsRef = useRef(options);
-
-  const handleReverification = useMemo(() => {
-    const handler = createReverificationHandler({
-      openUIComponent: __internal_openReverification,
-      ...optionsRef.current,
-    })(fetcherRef.current);
-    return [handler] as const;
-  }, [__internal_openReverification, fetcherRef.current, optionsRef.current]);
+  const optionsRef = useRef(defaultOptions);
+  const { assertReverification, state } = useCreateReverificationHandler({
+    openUIComponent: clerk.__internal_openReverification,
+    ...optionsRef.current,
+  });
 
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
-    optionsRef.current = options;
+    optionsRef.current = defaultOptions;
   });
 
-  return handleReverification;
+  return {
+    action: assertReverification(fetcherRef.current),
+    inProgress: state.inProgress,
+    level: state.level,
+    error: state.error,
+    cancel: state.cancel,
+    complete: state.cancel,
+  };
 };
