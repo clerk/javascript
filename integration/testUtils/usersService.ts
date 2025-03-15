@@ -44,7 +44,7 @@ export type FakeUser = {
   deleteIfExists: () => Promise<void>;
 };
 
-export type FakeOrganization = {
+export type FakeUserOrganization = {
   name: string;
   organization: { id: string };
   delete: () => Promise<Organization>;
@@ -54,7 +54,7 @@ export type UserService = {
   createFakeUser: (options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
   deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
-  createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
+  createFakeOrganization: (userId: string) => Promise<FakeUserOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
 };
 
@@ -150,7 +150,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         name,
         organization,
         delete: () => clerkClient.organizations.deleteOrganization(organization.id),
-      } satisfies FakeOrganization;
+      } satisfies FakeUserOrganization;
     },
   };
 

@@ -44,6 +44,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -1000,6 +1001,8 @@ export class Clerk implements ClerkInterface {
      */
     await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
+    const hadTasksBeforeTouch = newSession?.status === 'pending' && newSession.currentTask;
+
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
     //   id.
@@ -1013,6 +1016,20 @@ export class Clerk implements ClerkInterface {
     const token = await newSession?.getToken();
     if (!token) {
       eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    // Handles navigation to next pending tasks if /touch returns a session with pending status
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
+    }
+
+    const hasResolvedTasks = hadTasksBeforeTouch && newSession?.status === 'active';
+    if (hasResolvedTasks) {
+      const signUpUrl = this.#options.signUpUrl || this.environment?.displayConfig.signUpUrl;
+      const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
+
+      redirectUrl = referrerIsSignUpUrl ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
     }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
@@ -1058,7 +1075,7 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
     }
@@ -1067,7 +1084,7 @@ export class Clerk implements ClerkInterface {
     // to `pending`
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+      session = (this.#getSessionFromClient(session.id) ?? session) as PendingSessionResource;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
