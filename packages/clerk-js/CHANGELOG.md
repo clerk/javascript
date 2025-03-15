@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.57.0
+
+### Minor Changes
+
+- Navigate to tasks on after sign-in/sign-up ([#5280](https://github.com/clerk/javascript/pull/5280)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Deprecate out of date jwt types in favour of existing that are up-to-date. ([#5354](https://github.com/clerk/javascript/pull/5354)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `<CheckoutForm />` select positioning and option text color. ([#5356](https://github.com/clerk/javascript/pull/5356)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Simplify plan card avatar badge container styling. ([#5355](https://github.com/clerk/javascript/pull/5355)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce experimental billing APIs and components ([#5248](https://github.com/clerk/javascript/pull/5248)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `<Drawer />` component and update commerce components implementations to make use of it. ([#5337](https://github.com/clerk/javascript/pull/5337)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update floating-ui packages to latest. ([#5341](https://github.com/clerk/javascript/pull/5341)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally render the avatar and badge components within PlanCard. ([#5348](https://github.com/clerk/javascript/pull/5348)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When a C2 is not signed-in, redirect them to sign-in from the `<PlanCard />`. ([#5349](https://github.com/clerk/javascript/pull/5349)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update plan feed rendering within `<PlanCard />` to only render `annualMonthlyAmount` when it's greater than 0. ([#5357](https://github.com/clerk/javascript/pull/5357)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`725918df2e74cea15e9b748aaf103a52df8e8500`](https://github.com/clerk/javascript/commit/725918df2e74cea15e9b748aaf103a52df8e8500), [`91d0f0b0dccab7168ad4dc06c8629808938c235f`](https://github.com/clerk/javascript/commit/91d0f0b0dccab7168ad4dc06c8629808938c235f), [`150b5c89477abb0feab15e0a886179473f653cac`](https://github.com/clerk/javascript/commit/150b5c89477abb0feab15e0a886179473f653cac), [`23c931e9e95e6de992549ad499b477aca9a9c344`](https://github.com/clerk/javascript/commit/23c931e9e95e6de992549ad499b477aca9a9c344), [`730262f0f973923c8749b09078c80c2fc966a8ec`](https://github.com/clerk/javascript/commit/730262f0f973923c8749b09078c80c2fc966a8ec), [`021bc5f40044d34e49956ce3c9b61d833d815b42`](https://github.com/clerk/javascript/commit/021bc5f40044d34e49956ce3c9b61d833d815b42)]:
+  - @clerk/types@4.49.0
+  - @clerk/localizations@3.12.1
+  - @clerk/shared@3.0.2
+
 ## 5.56.0
 
 ### Minor Changes
