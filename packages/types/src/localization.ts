@@ -482,6 +482,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsAction__nonPrimary: LocalizationValue;
       };
       dangerSection: {
         title: LocalizationValue;
