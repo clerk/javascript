@@ -103,6 +103,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { usageByUIComponents } from '../utils/detect-ui-caller';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
@@ -349,6 +350,9 @@ export class Clerk implements ClerkInterface {
       isSatellite: this.isSatellite,
       getSessionId: () => {
         return this.session?.id;
+      },
+      isTriggeredByUI: () => {
+        return usageByUIComponents.get();
       },
       proxyUrl: this.proxyUrl,
     });
