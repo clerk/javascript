@@ -13,7 +13,6 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import { Box, descriptors, Flex, Heading, Icon, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -24,6 +23,9 @@ import { colors } from '../utils';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
+
+const transitionTimingDuration = 500;
+const transitionTimingFunction = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer Context
@@ -164,11 +166,11 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       position: strategy,
       inset: 0,
       transitionProperty: 'opacity',
-      transitionTimingFunction: transitionTiming.slowBezier,
+      transitionTimingFunction,
     },
     duration: {
-      open: transitionDurationValues.slower,
-      close: transitionDurationValues.slow,
+      open: transitionTimingDuration,
+      close: transitionTimingDuration,
     },
   });
 
@@ -202,17 +204,17 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    initial: { transform: 'translateX(100%)' },
-    open: { transform: 'translateX(0)' },
-    close: { transform: 'translateX(100%)' },
+    initial: { transform: `translate3d(var(--transform-offset), 0, 0)` },
+    open: { transform: 'translate3d(0, 0, 0)' },
+    close: { transform: `translate3d(var(--transform-offset), 0, 0)` },
     common: {
       transitionProperty: 'transform',
-      transitionTimingFunction: transitionTiming.slowBezier,
+      transitionTimingFunction,
     },
     duration: isMotionSafe
       ? {
-          open: transitionDurationValues.slower,
-          close: transitionDurationValues.slow,
+          open: transitionTimingDuration,
+          close: transitionTimingDuration,
         }
       : 0,
   });
@@ -234,6 +236,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           style={transitionStyles}
           direction='col'
           sx={t => ({
+            '--transform-offset':
+              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+            willChange: 'transform',
             position: strategy,
             insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
