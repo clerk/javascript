@@ -123,17 +123,17 @@ interface ContentProps {
 
 const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, ref) => {
   const context = React.useContext(DisclosureContext);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
   if (!context) {
     throw new Error('Disclosure.Content must be used within Disclosure.Root');
   }
   const { isOpen, id } = context;
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const animation: ThemableCssProp = t => ({
-    transition:
-      appearanceAnimations && !prefersReducedMotion
-        ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
-        : 'none',
+    transition: isMotionSafe
+      ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
+      : 'none',
   });
 
   return (

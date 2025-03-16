@@ -4,34 +4,30 @@ import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, Flex, Icon, Text } from '../../customizables';
 import { LineItems } from '../../elements';
 import { Check } from '../../icons';
-import type { ThemableCssProp } from '../../styledSystem';
 
-export const CheckoutComplete = ({
-  checkout,
-  sx,
-}: {
-  checkout: __experimental_CommerceCheckoutResource;
-  sx?: ThemableCssProp;
-}) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
+export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+  const { setIsOpen } = useCheckoutContext();
+
+  const handleClose = () => {
+    if (setIsOpen) {
+      setIsOpen(false);
+    }
+  };
 
   return (
     <Col
-      sx={[
-        t => ({
-          width: '100%',
-          padding: t.space.$4,
-        }),
-        sx,
-      ]}
+      sx={{
+        flex: 1,
+      }}
     >
       <Col
         align='center'
         justify='center'
         gap={8}
-        sx={{
+        sx={t => ({
           flex: 1,
-        }}
+          paddingBlock: t.space.$4,
+        })}
       >
         <SuccessCircle />
 
@@ -48,14 +44,15 @@ export const CheckoutComplete = ({
           </Text>
         </Col>
       </Col>
+
       <Col
         gap={2}
         sx={t => ({
-          flex: 0,
-          paddingTop: t.space.$4,
+          padding: t.space.$4,
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
           borderTopColor: t.colors.$neutralAlpha100,
+          position: 'relative',
         })}
       >
         <LineItems.Root>
@@ -90,7 +87,7 @@ export const CheckoutComplete = ({
             width: '100%',
             marginTop: t.space.$2,
           })}
-          onClick={handleCloseBlade}
+          onClick={handleClose}
         >
           {/* TODO(@COMMERCE): needs localization */}
           Continue
