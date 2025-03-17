@@ -460,7 +460,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(({ open
         sx={t => ({
           position: 'absolute',
           inset: 0,
-          backgroundImage: `linear-gradient(to bottom, transparent, ${t.colors.$colorBackground})`,
+          backgroundImage: `linear-gradient(to bottom, ${colors.setAlpha(t.colors.$colorBackground, 0.28)}, ${t.colors.$colorBackground})`,
         })}
       />
 
