@@ -15,6 +15,7 @@ import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -203,15 +204,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null = null;
+  #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1103,31 +1096,22 @@ export class Clerk implements ClerkInterface {
   };
 
   public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
-    if (!this.session || !this.environment) {
-      return;
-    }
-
-    // Refresh session state to ensure latest status
-    const session = await this.session.reload();
-
-    // TypeScript requires this check for type narrowing, but this case cannot occur
-    if (!session) {
+    const session = await this.session?.reload();
+    if (!session || !this.environment) {
       return;
     }
 
     if (session.status === 'pending') {
       await navigateToTask(session.currentTask, {
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
       });
-
       return;
     }
 
     const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
-
     await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
   };
 
@@ -1158,15 +1142,7 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigationContext = (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => {
+  public __internal_setComponentNavigationContext = (context: __internal_ComponentNavigationContext) => {
     this.#componentNavigationContext = context;
 
     return () => (this.#componentNavigationContext = null);

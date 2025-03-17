@@ -434,15 +434,7 @@ export interface Clerk {
    * be triggered from `Clerk` methods
    * @internal
    */
-  __internal_setComponentNavigationContext: (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => () => void;
+  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
 
   /**
    * Set the active session and organization explicitly.
@@ -1084,6 +1076,16 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
+export type __internal_ComponentNavigationContext = {
+  navigate: (
+    to: string,
+    options?: {
+      searchParams?: URLSearchParams;
+    },
+  ) => Promise<unknown>;
+  basePath: string;
+};
+
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
@@ -1204,11 +1206,6 @@ export type OrganizationProfileProps = RoutingOptions & {
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
 
 export type CreateOrganizationProps = RoutingOptions & {
-  /**
-   * Callback function triggered after successfully creating a new organization
-   */
-  onComplete?: () => void;
-
   /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
@@ -1403,11 +1400,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
-   * Callback function triggered after successfully selecting a new organization
-   */
-  onComplete?: () => void;
-
-  /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
@@ -1453,6 +1445,9 @@ export type OrganizationListProps = {
    * @default false
    */
   hideSlug?: boolean;
+
+  __internal_onOrganizationSelected?: () => void;
+  __internal_onOrganizationCreated?: () => void;
 };
 
 export type WaitlistProps = {

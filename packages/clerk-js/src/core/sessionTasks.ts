@@ -1,4 +1,9 @@
-import type { ClerkOptions, EnvironmentResource, SessionTask } from '@clerk/types';
+import type {
+  __internal_ComponentNavigationContext,
+  ClerkOptions,
+  EnvironmentResource,
+  SessionTask,
+} from '@clerk/types';
 
 import { buildURL } from '../utils';
 
@@ -7,15 +12,7 @@ export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
 } as const;
 
 interface NavigateToTaskOptions {
-  componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null;
+  componentNavigationContext: __internal_ComponentNavigationContext | null;
   globalNavigate: (to: string) => Promise<unknown>;
   options: ClerkOptions;
   environment: EnvironmentResource;
