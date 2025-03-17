@@ -217,6 +217,11 @@ export type ElementsConfig = {
   drawerBody: WithOptions;
   drawerFooter: WithOptions;
   drawerClose: WithOptions;
+  drawerConfirmationBackdrop: WithOptions;
+  drawerConfirmationRoot: WithOptions;
+  drawerConfirmationTitle: WithOptions;
+  drawerConfirmationDescription: WithOptions;
+  drawerConfirmationActions: WithOptions;
 
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
