@@ -288,6 +288,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes acceso a este método? Prueba otra opción.',
       blockButton__backupCode: 'Usar código de respaldo',
       blockButton__emailCode: 'Usar código de correo electrónico',
+      blockButton__passkey: undefined,
       blockButton__password: 'Usar contraseña',
       blockButton__phoneCode: 'Usar código de teléfono',
       blockButton__totp: 'Usar verificación TOTP',
@@ -314,6 +315,11 @@ export const esES: LocalizationResource = {
       message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',
       subtitle: 'No se encontraron métodos alternativos disponibles.',
       title: 'Métodos de verificación no disponibles',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
@@ -920,6 +926,7 @@ export const esES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Quitar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Agregar cartera Web3',
         title: 'Cartera Web3',
       },

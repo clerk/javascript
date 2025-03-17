@@ -287,6 +287,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Alternatif doğrulama yöntemlerini kullanmak ister misiniz?',
       blockButton__backupCode: 'Yedek kodu kullan',
       blockButton__emailCode: 'E-posta kodu gönder',
+      blockButton__passkey: undefined,
       blockButton__password: 'Şifreyi gir',
       blockButton__phoneCode: 'Telefon kodu gönder',
       blockButton__totp: 'TOTP kodu kullan',
@@ -312,6 +313,11 @@ export const trTR: LocalizationResource = {
       message: 'Alternatif doğrulama yöntemleri mevcut değil.',
       subtitle: 'Lütfen farklı bir doğrulama yöntemi deneyin.',
       title: 'Doğrulama Yöntemleri Yok',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Şifremi unuttum',
@@ -917,6 +923,7 @@ export const trTR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Cüzdanı kaldır',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
       },

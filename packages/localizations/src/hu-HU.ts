@@ -287,6 +287,7 @@ export const huHU: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -310,6 +311,11 @@ export const huHU: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -918,6 +924,7 @@ export const huHU: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Tárca eltávolítása',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 tárcák',
         title: 'Web3 tárcák',
       },
