@@ -340,7 +340,13 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
 
 interface PlanCardFeaturesListProps {
   plan: __experimental_CommercePlanResource;
+  /**
+   * @default false
+   */
   isCompact?: boolean;
+  /**
+   * @default `checkmark`
+   */
   variant?: 'checkmark' | 'avatar';
 }
 
@@ -364,13 +370,17 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
     >
       <Box
         elementDescriptor={descriptors.planCardFeaturesList}
-        elementId={isCompact ? descriptors.planCardFeaturesList.setId('compact') : undefined}
+        elementId={
+          isCompact
+            ? descriptors.planCardFeaturesList.setId('compact')
+            : descriptors.planCardFeaturesList.setId(variant)
+        }
         as='ul'
         role='list'
         sx={t => ({
           display: 'grid',
           flex: '1',
-          rowGap: variant === 'avatar' ? t.space.$6 : isCompact ? t.space.$2 : t.space.$3,
+          rowGap: variant === 'avatar' ? t.space.$4 : isCompact ? t.space.$2 : t.space.$3,
         })}
       >
         {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
