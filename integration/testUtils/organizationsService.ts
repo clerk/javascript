@@ -16,9 +16,7 @@ export const createOrganizationsService = (clerkClient: ClerkClient) => {
     }),
     deleteAll: async () => {
       const organizations = await clerkClient.organizations.getOrganizationList();
-
       const bulkDeletionPromises = organizations.data.map(({ id }) => clerkClient.organizations.deleteOrganization(id));
-
       await Promise.all(bulkDeletionPromises);
     },
   };
