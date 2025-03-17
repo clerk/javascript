@@ -18,9 +18,9 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     if (!data) {
       return this;
     }
-    this.claimedAt = data.claimed_at ? unixEpochToDate(data.claimed_at) : null;
-    this.reverification = data.reverification ?? false;
-    this.singleSessionMode = data.single_session_mode ?? false;
+    this.claimedAt = this.withDefault(data.claimed_at ? unixEpochToDate(data.claimed_at) : null, this.claimedAt);
+    this.reverification = this.withDefault(data.reverification, this.reverification);
+    this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
     return this;
   }
 
