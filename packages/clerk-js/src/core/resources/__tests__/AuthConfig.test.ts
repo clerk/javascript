@@ -6,7 +6,7 @@ jest.mock('../../../utils/date', () => ({
 }));
 
 describe('AuthConfig', () => {
-  it('should initialize with default values', () => {
+  it('initializes with default values', () => {
     const authConfig = new AuthConfig();
 
     expect(authConfig.claimedAt).toBeNull();
@@ -14,7 +14,7 @@ describe('AuthConfig', () => {
     expect(authConfig.singleSessionMode).toBe(false);
   });
 
-  it('should initialize with provided values', () => {
+  it('initializes with provided values', () => {
     const mockData = {
       object: 'auth_config',
       id: '',
@@ -31,7 +31,7 @@ describe('AuthConfig', () => {
     expect(authConfig.singleSessionMode).toBe(true);
   });
 
-  it('should convert to JSON snapshot correctly', () => {
+  it('converts to JSON snapshot correctly', () => {
     const authConfig = new AuthConfig({
       object: 'auth_config',
       id: '',
