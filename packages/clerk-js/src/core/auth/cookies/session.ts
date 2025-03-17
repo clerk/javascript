@@ -36,7 +36,7 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
     sessionCookie.set(token, { expires, sameSite, secure });
   };
 
-  const get = () => suffixedSessionCookie.get() || suffixedSessionCookie.get();
+  const get = () => suffixedSessionCookie.get() || sessionCookie.get();
 
   return {
     set,

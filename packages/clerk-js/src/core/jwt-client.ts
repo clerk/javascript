@@ -17,7 +17,7 @@ import { Client } from './resources/Client';
  */
 export function createClientFromJwt(jwt: string | undefined | null): Client {
   // Use `Token` class to parse the JWT token
-  let token;
+  let token: Token | null;
 
   try {
     token = new Token({
@@ -79,7 +79,8 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
                     organization: {
                       object: 'organization',
                       id: org_id,
-                      name: '',
+                      // Use slug as name for the organization, since name is not available in the token.
+                      name: org_slug,
                       slug: org_slug,
                       members_count: 1,
                       max_allowed_memberships: 1,
