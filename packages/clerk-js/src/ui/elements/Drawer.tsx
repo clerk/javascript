@@ -164,12 +164,9 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       position: strategy,
       inset: 0,
       transitionProperty: 'opacity',
-      transitionTimingFunction: transitionTiming.slowBezier,
+      transitionTimingFunction: transitionTiming.bezier,
     },
-    duration: {
-      open: transitionDurationValues.slower,
-      close: transitionDurationValues.slow,
-    },
+    duration: transitionDurationValues.drawer,
   });
 
   if (!isMounted) return null;
@@ -202,19 +199,14 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    initial: { transform: 'translateX(100%)' },
-    open: { transform: 'translateX(0)' },
-    close: { transform: 'translateX(100%)' },
+    initial: { transform: `translate3d(var(--transform-offset), 0, 0)` },
+    open: { transform: 'translate3d(0, 0, 0)' },
+    close: { transform: `translate3d(var(--transform-offset), 0, 0)` },
     common: {
       transitionProperty: 'transform',
-      transitionTimingFunction: transitionTiming.slowBezier,
+      transitionTimingFunction: transitionTiming.bezier,
     },
-    duration: isMotionSafe
-      ? {
-          open: transitionDurationValues.slower,
-          close: transitionDurationValues.slow,
-        }
-      : 0,
+    duration: isMotionSafe ? transitionDurationValues.drawer : 0,
   });
 
   if (!isMounted) return null;
@@ -234,6 +226,11 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           style={transitionStyles}
           direction='col'
           sx={t => ({
+            // Apply the conditional right offset + the spread of the
+            // box shadow to ensure it is fully offscreen before unmounting
+            '--transform-offset':
+              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+            willChange: 'transform',
             position: strategy,
             insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
