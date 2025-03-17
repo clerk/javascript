@@ -30,6 +30,7 @@ export const CheckoutForm = ({
   return (
     <Drawer.Body>
       <Box
+        elementDescriptor={descriptors.checkoutFormLineItemsRoot}
         sx={t => ({
           padding: t.space.$4,
           borderBottomWidth: t.borderWidths.$normal,
@@ -175,6 +176,7 @@ const CheckoutFormElements = ({
 
   return (
     <Col
+      elementDescriptor={descriptors.checkoutFormElementsRoot}
       gap={3}
       sx={t => ({ padding: t.space.$4 })}
     >

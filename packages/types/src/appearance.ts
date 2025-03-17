@@ -201,6 +201,9 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
 
+  checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormElementsRoot: WithOptions;
+
   checkoutSuccessRoot: WithOptions;
   checkoutSuccessRing: WithOptions;
   checkoutSuccessBadge: WithOptions;
