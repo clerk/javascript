@@ -647,6 +647,14 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
+   * Navigates to the next task or redirects to completion URL.
+   * If the current session has pending tasks, it navigates to the next task.
+   * If all tasks are complete, it navigates to the provided completion URL.
+   * @experimental
+   */
+  __experimental_nextTask: (params: NextTaskParams) => Promise<void>;
+
+  /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
    * @internal
@@ -1197,6 +1205,11 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
+   * Callback function triggered after successfully creating a new organization
+   */
+  onComplete?: () => void;
+
+  /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
@@ -1390,6 +1403,11 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
+   * Callback function triggered after successfully selecting a new organization
+   */
+  onComplete?: () => void;
+
+  /**
    * Full URL or path to navigate after creating a new organization.
    * @default undefined
    */
@@ -1580,6 +1598,14 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
+}
+
+export interface NextTaskParams {
+  /**
+   * Full URL or path to navigate after successful resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {

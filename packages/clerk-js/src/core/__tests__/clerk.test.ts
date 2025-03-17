@@ -2258,4 +2258,14 @@ describe('Clerk singleton', () => {
       });
     });
   });
+
+  describe('nextTask', () => {
+    describe('with pending session', () => {
+      it.todo('navigates to next task');
+    });
+
+    describe('with active session', () => {
+      it.todo('navigates to final destination url');
+    });
+  });
 });

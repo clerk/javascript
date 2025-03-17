@@ -8,7 +8,7 @@ import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared'
 
 export const MembershipPreview = withCardStateProvider((props: { organization: OrganizationResource }) => {
   const card = useCardState();
-  const { navigateAfterSelectOrganization } = useOrganizationListContext();
+  const { navigateAfterSelectOrganization, onComplete } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
 
   if (!isLoaded) {
@@ -19,6 +19,11 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
       await setActive({
         organization,
       });
+
+      if (onComplete) {
+        return onComplete();
+      }
+
       await navigateAfterSelectOrganization(organization);
     });
   };

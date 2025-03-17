@@ -40,6 +40,7 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -1099,6 +1100,35 @@ export class Clerk implements ClerkInterface {
 
     this.#setAccessors(session);
     this.#emit();
+  };
+
+  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams): Promise<void> => {
+    if (!this.session || !this.environment) {
+      return;
+    }
+
+    // Refresh session state to ensure latest status
+    const session = await this.session.reload();
+
+    // TypeScript requires this check for type narrowing, but this case cannot occur
+    if (!session) {
+      return;
+    }
+
+    if (session.status === 'pending') {
+      await navigateToTask(session.currentTask, {
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+        options: this.#options,
+        environment: this.environment,
+      });
+
+      return;
+    }
+
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+
+    await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
