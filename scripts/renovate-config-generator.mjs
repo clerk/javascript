@@ -185,7 +185,6 @@ const renovateConfig = {
     'group:monorepos',
     'group:recommended',
   ],
-  fileMatch: ['(^|/)package\\.json$', '(^|/)pnpm-workspace\\.yaml$'],
   ignorePaths: ['**/node_modules/**', '.nvmrc', 'integration/templates/**', 'playground/**'],
   includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
   major: { dependencyDashboardApproval: true },
