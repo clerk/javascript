@@ -1,7 +1,7 @@
 import type { __experimental_CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
-import { Box, Button, Flex, Heading, Text } from '../../customizables';
+import { Box, Button, descriptors, Flex, Heading, Text } from '../../customizables';
 import { Alert, Drawer } from '../../elements';
 import type { PlanPeriod } from './PlanCard';
 import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
@@ -107,12 +107,14 @@ export function PlanDetailDrawer({
           onOpenChange={setShowConfirmation}
         >
           <Heading
+            elementDescriptor={descriptors.drawerConfirmationTitle}
             as='h2'
             textVariant='h3'
           >
             Cancel {plan.name} Subscription?
           </Heading>
           <Text
+            elementDescriptor={descriptors.drawerConfirmationDescription}
             sx={t => ({
               marginBlockStart: t.space.$1,
             })}
@@ -132,6 +134,7 @@ export function PlanDetailDrawer({
             </Alert>
           )}
           <Flex
+            elementDescriptor={descriptors.drawerConfirmationActions}
             gap={3}
             justify='end'
             sx={t => ({

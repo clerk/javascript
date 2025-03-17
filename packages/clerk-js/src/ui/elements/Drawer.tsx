@@ -455,6 +455,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(({ open
   return (
     <>
       <Span
+        elementDescriptor={descriptors.drawerConfirmationBackdrop}
         style={overlayTransitionStyles}
         sx={t => ({
           position: 'absolute',
@@ -471,6 +472,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(({ open
       >
         <Box
           ref={mergedRefs}
+          elementDescriptor={descriptors.drawerConfirmationRoot}
           style={modalTransitionStyles}
           {...getFloatingProps()}
           sx={t => ({
