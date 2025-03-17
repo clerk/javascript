@@ -416,6 +416,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
             ) : null}
             <Span>
               <Text
+                elementDescriptor={descriptors.planCardFeaturesListItemTitle}
                 colorScheme='body'
                 sx={t => ({
                   fontWeight: variant === 'checkmark' ? t.fontWeights.$normal : t.fontWeights.$medium,
@@ -425,6 +426,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
               </Text>
               {variant === 'avatar' && feature.description ? (
                 <Text
+                  elementDescriptor={descriptors.planCardFeaturesListItemDescription}
                   colorScheme='secondary'
                   sx={t => ({
                     marginBlockStart: t.space.$0x25,
