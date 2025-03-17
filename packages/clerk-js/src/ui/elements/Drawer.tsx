@@ -481,7 +481,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
             sx={t => ({
               display: 'flex',
               flexDirection: 'column',
-              rowGap: t.space.$8,
+              rowGap: t.space.$6,
               outline: 'none',
               willChange: 'transform',
               position: 'absolute',
