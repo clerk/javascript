@@ -6,17 +6,89 @@ import type {
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Button, Col, Flex, Form, Icon, Text } from '../../customizables';
-import { Alert, Disclosure, Divider, Select, SelectButton, SelectOptionList } from '../../elements';
+import { Box, Button, Col, Flex, Form, Icon, Text } from '../../customizables';
+import { Alert, Disclosure, Divider, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 
 export const CheckoutForm = ({
+  stripe,
+  checkout,
+  onCheckoutComplete,
+}: {
+  stripe: Stripe | null;
+  checkout: __experimental_CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+}) => {
+  const { plan, planPeriod, totals } = checkout;
+  return (
+    <>
+      <Box
+        sx={t => ({
+          padding: t.space.$4,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$neutralAlpha100,
+        })}
+      >
+        <LineItems.Root>
+          <LineItems.Group>
+            <LineItems.Title>{plan.name}</LineItems.Title>
+            <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
+              {plan.currencySymbol}
+              {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
+            </LineItems.Description>
+          </LineItems.Group>
+          <LineItems.Group
+            borderTop
+            variant='tertiary'
+          >
+            <LineItems.Title>Subtotal</LineItems.Title>
+            <LineItems.Description>
+              {totals.subtotal.currencySymbol}
+              {totals.subtotal.amountFormatted}
+            </LineItems.Description>
+          </LineItems.Group>
+          <LineItems.Group variant='tertiary'>
+            <LineItems.Title>Tax</LineItems.Title>
+            <LineItems.Description>
+              {totals.taxTotal.currencySymbol}
+              {totals.taxTotal.amountFormatted}
+            </LineItems.Description>
+          </LineItems.Group>
+          <LineItems.Group borderTop>
+            <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
+            <LineItems.Description>
+              {totals.totalDueNow
+                ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
+                : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`}
+            </LineItems.Description>
+          </LineItems.Group>
+        </LineItems.Root>
+      </Box>
+
+      {stripe && (
+        <Elements
+          stripe={stripe}
+          options={{ clientSecret: checkout.externalClientSecret }}
+        >
+          <CheckoutFormElements
+            checkout={checkout}
+            onCheckoutComplete={onCheckoutComplete}
+          />
+        </Elements>
+      )}
+    </>
+  );
+};
+
+const CheckoutFormElements = ({
   checkout,
   onCheckoutComplete,
 }: {

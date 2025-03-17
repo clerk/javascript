@@ -1,16 +1,10 @@
-import type {
-  __experimental_CheckoutProps,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceTotals,
-} from '@clerk/types';
-import { Elements } from '@stripe/react-stripe-js';
+import type { __experimental_CheckoutProps } from '@clerk/types';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Alert, Box, Spinner } from '../../customizables';
-import { LineItems } from '../../elements';
+import { Alert, Spinner } from '../../customizables';
 import { useCheckout } from '../../hooks';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
@@ -72,81 +66,10 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   }
 
   return (
-    <>
-      <Box
-        sx={t => ({
-          padding: t.space.$4,
-          borderBottomWidth: t.borderWidths.$normal,
-          borderBottomStyle: t.borderStyles.$solid,
-          borderBottomColor: t.colors.$neutralAlpha100,
-        })}
-      >
-        <CheckoutPlanRows
-          plan={checkout.plan}
-          planPeriod={checkout.planPeriod}
-          totals={checkout.totals}
-        />
-      </Box>
-
-      {stripe && (
-        <Elements
-          stripe={stripe}
-          options={{ clientSecret: checkout.externalClientSecret }}
-        >
-          <CheckoutForm
-            checkout={checkout}
-            onCheckoutComplete={updateCheckout}
-          />
-        </Elements>
-      )}
-    </>
-  );
-};
-
-// TODO(@COMMERCE): needs localization
-const CheckoutPlanRows = ({
-  plan,
-  planPeriod,
-  totals,
-}: {
-  plan: __experimental_CommercePlanResource;
-  planPeriod: string;
-  totals: __experimental_CommerceTotals;
-}) => {
-  return (
-    <LineItems.Root>
-      <LineItems.Group>
-        <LineItems.Title>{plan.name}</LineItems.Title>
-        <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
-          {plan.currencySymbol}
-          {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
-        </LineItems.Description>
-      </LineItems.Group>
-      <LineItems.Group
-        borderTop
-        variant='tertiary'
-      >
-        <LineItems.Title>Subtotal</LineItems.Title>
-        <LineItems.Description>
-          {totals.subtotal.currencySymbol}
-          {totals.subtotal.amountFormatted}
-        </LineItems.Description>
-      </LineItems.Group>
-      <LineItems.Group variant='tertiary'>
-        <LineItems.Title>Tax</LineItems.Title>
-        <LineItems.Description>
-          {totals.taxTotal.currencySymbol}
-          {totals.taxTotal.amountFormatted}
-        </LineItems.Description>
-      </LineItems.Group>
-      <LineItems.Group borderTop>
-        <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
-        <LineItems.Description>
-          {totals.totalDueNow
-            ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
-            : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`}
-        </LineItems.Description>
-      </LineItems.Group>
-    </LineItems.Root>
+    <CheckoutForm
+      stripe={stripe}
+      checkout={checkout}
+      onCheckoutComplete={updateCheckout}
+    />
   );
 };
