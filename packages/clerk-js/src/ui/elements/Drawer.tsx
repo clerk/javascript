@@ -487,10 +487,10 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(({ open
               colors.setAlpha(t.colors.$colorBackground, 1),
               t.colors.$neutralAlpha50,
             ),
-            borderBlockStartWidth: t.borderWidths.$normal,
-            borderBlockStartStyle: t.borderStyles.$solid,
-            borderBlockStartColor: t.colors.$neutralAlpha100,
             padding: t.space.$4,
+            borderStartStartRadius: t.radii.$md,
+            borderStartEndRadius: t.radii.$md,
+            boxShadow: `0 0 0 1px ${t.colors.$neutralAlpha100}`,
           })}
         >
           {children}
