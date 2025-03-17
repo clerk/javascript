@@ -22,19 +22,24 @@ import {
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-type UseOrganizationParams = {
+/**
+ * @interface
+ */
+export type UseOrganizationParams = {
   /**
    * If set to `true`, all default properties will be used.
    *
    * Otherwise, accepts an object with the following optional properties:
    *
    * - `enrollmentMode`: A string that filters the domains by the provided enrollment mode.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
    * If set to `true`, all default properties will be used. Otherwise, accepts an object with the following optional properties:
    *
    * - `status`: A string that filters the membership requests by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
@@ -44,6 +49,7 @@ type UseOrganizationParams = {
    *
    * - `role`: An array of [`OrganizationCustomRoleKey`](/docs/references/javascript/types/organization-custom-role-key).
    * - `query`: A string that filters the memberships by the provided string.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
@@ -52,14 +58,15 @@ type UseOrganizationParams = {
    * Otherwise, accepts an object with the following optional properties:
    *
    * - `status`: A string that filters the invitations by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
 
 /**
- * @inline
+ * @interface
  */
-type UseOrganizationReturn<T extends UseOrganizationParams> =
+export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -121,8 +128,6 @@ type UseOrganizationReturn<T extends UseOrganizationParams> =
       > | null;
     };
 
-type UseOrganization = <T extends UseOrganizationParams>(params?: T) => UseOrganizationReturn<T>;
-
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
@@ -149,7 +154,7 @@ const undefinedPaginatedResource = {
  *
  * To keep network usage to a minimum, developers are required to opt-in by specifying which resource they need to fetch and paginate through. By default, the `memberships`, `invitations`, `membershipRequests`, and `domains` attributes are not populated. You must pass `true` or an object with the desired properties to fetch and paginate the data.
  *
- * ```jsx
+ * ```tsx
  * // invitations.data will never be populated.
  * const { invitations } = useOrganization()
  *
@@ -179,7 +184,7 @@ const undefinedPaginatedResource = {
  *
  * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
  *
- * ```jsx
+ * ```tsx
  * import { useOrganization } from '@clerk/clerk-react'
  *
  * export default function MemberList() {
@@ -225,7 +230,7 @@ const undefinedPaginatedResource = {
  *
  * Notice the difference between this example's pagination and the infinite pagination example above.
  *
- * ```jsx
+ * ```tsx
  * import { useOrganization } from '@clerk/clerk-react'
  *
  * export default function MemberList() {
@@ -264,7 +269,7 @@ const undefinedPaginatedResource = {
  * }
  * ```
  */
-export const useOrganization: UseOrganization = params => {
+export function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
   const {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
@@ -462,4 +467,4 @@ export const useOrganization: UseOrganization = params => {
     memberships,
     invitations,
   };
-};
+}

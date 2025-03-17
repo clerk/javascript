@@ -16,17 +16,34 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContex
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-type UseOrganizationListParams = {
+/**
+ * @interface
+ */
+export type UseOrganizationListParams = {
   /**
-   * `true` or an object with any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   userMemberships?: true | PaginatedHookConfig<GetUserOrganizationMembershipParams>;
   /**
-   * `true` or an object with [`status: OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization-list#organization-invitation-status) or any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `status`: A string that filters the invitations by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   userInvitations?: true | PaginatedHookConfig<GetUserOrganizationInvitationsParams>;
   /**
-   * `true` or an object with [`status: OrganizationSuggestionsStatus | OrganizationSuggestionStatus[]`](https://clerk.com/docs/references/react/use-organization-list#organization-suggestion-status) or any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization-list#shared-properties). If set to `true`, all default properties will be used.
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `status`: A string that filters the suggestions by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   userSuggestions?: true | PaginatedHookConfig<GetUserOrganizationSuggestionsParams>;
 };
@@ -49,9 +66,10 @@ const undefinedPaginatedResource = {
   setData: undefined,
 } as const;
 
-type UseOrganizationList = <T extends UseOrganizationListParams>(
-  params?: T,
-) =>
+/**
+ * @interface
+ */
+export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -79,35 +97,17 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
       userSuggestions: PaginatedResourcesWithDefault<OrganizationSuggestionResource>;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: boolean;
-      /**
-       * A function that returns a `Promise` which resolves to the newly created `Organization`.
-       */
       createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
-      /**
-       * A function that sets the active session and/or organization.
-       */
       setActive: SetActive;
-      /**
-       * Returns `PaginatedResources` which includes a list of the user's organization memberships.
-       */
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,
         T['userMemberships'] extends { infinite: true } ? true : false
       >;
-      /**
-       * Returns `PaginatedResources` which includes a list of the user's organization invitations.
-       */
       userInvitations: PaginatedResources<
         UserOrganizationInvitationResource,
         T['userInvitations'] extends { infinite: true } ? true : false
       >;
-      /**
-       * Returns `PaginatedResources` which includes a list of suggestions for organizations that the user can join.
-       */
       userSuggestions: PaginatedResources<
         OrganizationSuggestionResource,
         T['userSuggestions'] extends { infinite: true } ? true : false
@@ -116,8 +116,135 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
 
 /**
  * The `useOrganizationList()` hook provides access to the current user's organization memberships, invitations, and suggestions. It also includes methods for creating new organizations and managing the active organization.
+ *
+ * @example
+ * ### Expanding and paginating attributes
+ *
+ * To keep network usage to a minimum, developers are required to opt-in by specifying which resource they need to fetch and paginate through. So by default, the `userMemberships`, `userInvitations`, and `userSuggestions` attributes are not populated. You must pass true or an object with the desired properties to fetch and paginate the data.
+ *
+ * ```tsx
+ * // userMemberships.data will never be populated
+ * const { userMemberships } = useOrganizationList()
+ *
+ * // Use default values to fetch userMemberships, such as initialPage = 1 and pageSize = 10
+ * const { userMemberships } = useOrganizationList({
+ *   userMemberships: true,
+ * })
+ *
+ * // Pass your own values to fetch userMemberships
+ * const { userMemberships } = useOrganizationList({
+ *   userMemberships: {
+ *     pageSize: 20,
+ *     initialPage: 2, // skips the first page
+ *   },
+ * })
+ *
+ * // Aggregate pages in order to render an infinite list
+ * const { userMemberships } = useOrganizationList({
+ *   userMemberships: {
+ *     infinite: true,
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ * ### Infinite pagination
+ *
+ * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+ *
+ * ```tsx {{ filename: 'src/components/JoinedOrganizations.tsx' }}
+ * import { useOrganizationList } from '@clerk/clerk-react'
+ * import React from 'react'
+ *
+ * const JoinedOrganizations = () => {
+ *   const { isLoaded, setActive, userMemberships } = useOrganizationList({
+ *     userMemberships: {
+ *       infinite: true,
+ *     },
+ *   })
+ *
+ *   if (!isLoaded) {
+ *     return <>Loading</>
+ *   }
+ *
+ *   return (
+ *     <>
+ *       <ul>
+ *         {userMemberships.data?.map((mem) => (
+ *           <li key={mem.id}>
+ *             <span>{mem.organization.name}</span>
+ *             <button onClick={() => setActive({ organization: mem.organization.id })}>Select</button>
+ *           </li>
+ *         ))}
+ *       </ul>
+ *
+ *       <button disabled={!userMemberships.hasNextPage} onClick={() => userMemberships.fetchNext()}>
+ *         Load more
+ *       </button>
+ *     </>
+ *   )
+ * }
+ *
+ * export default JoinedOrganizations
+ * ```
+ *
+ * @example
+ * ### Simple pagination
+ *
+ * The following example demonstrates how to use the `fetchPrevious` and `fetchNext` helper functions to paginate through the data. The `userInvitations` attribute will be populated with the first page of invitations. When the "Previous page" or "Next page" button is clicked, the `fetchPrevious` or `fetchNext` helper function will be called to fetch the previous or next page of invitations.
+ *
+ * Notice the difference between this example's pagination and the infinite pagination example above.
+ *
+ * ```tsx {{ filename: 'src/components/UserInvitationsTable.tsx' }}
+ * import { useOrganizationList } from '@clerk/clerk-react'
+ * import React from 'react'
+ *
+ * const UserInvitationsTable = () => {
+ *   const { isLoaded, userInvitations } = useOrganizationList({
+ *     userInvitations: {
+ *       infinite: true,
+ *       keepPreviousData: true,
+ *     },
+ *   })
+ *
+ *   if (!isLoaded || userInvitations.isLoading) {
+ *     return <>Loading</>
+ *   }
+ *
+ *   return (
+ *     <>
+ *       <table>
+ *         <thead>
+ *           <tr>
+ *             <th>Email</th>
+ *             <th>Org name</th>
+ *           </tr>
+ *         </thead>
+ *
+ *         <tbody>
+ *           {userInvitations.data?.map((inv) => (
+ *             <tr key={inv.id}>
+ *               <th>{inv.emailAddress}</th>
+ *               <th>{inv.publicOrganizationData.name}</th>
+ *             </tr>
+ *           ))}
+ *         </tbody>
+ *       </table>
+ *
+ *       <button disabled={!userInvitations.hasPreviousPage} onClick={userInvitations.fetchPrevious}>
+ *         Prev
+ *       </button>
+ *       <button disabled={!userInvitations.hasNextPage} onClick={userInvitations.fetchNext}>
+ *         Next
+ *       </button>
+ *     </>
+ *   )
+ * }
+ *
+ * export default UserInvitationsTable
+ * ```
  */
-export const useOrganizationList: UseOrganizationList = params => {
+export function useOrganizationList<T extends UseOrganizationListParams>(params?: T): UseOrganizationListReturn<T> {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
@@ -253,4 +380,4 @@ export const useOrganizationList: UseOrganizationList = params => {
     userInvitations: invitations,
     userSuggestions: suggestions,
   };
-};
+}

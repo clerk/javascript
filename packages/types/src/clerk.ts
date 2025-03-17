@@ -1532,6 +1532,9 @@ export type CreateBulkOrganizationInvitationParams = {
   role: OrganizationCustomRoleKey;
 };
 
+/**
+ * @inline
+ */
 export interface CreateOrganizationParams {
   name: string;
   slug?: string;
