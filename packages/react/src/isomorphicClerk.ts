@@ -4,6 +4,7 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -23,6 +24,7 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -93,7 +95,6 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
   | '__experimental_commerce'
-  | '__internal_setComponentNavigationContext'
 > & {
   client: ClientResource | undefined;
   __experimental_commerce: __experimental_CommerceNamespace | undefined;
@@ -609,6 +610,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (clerkjs && '__unstable__updateProps' in clerkjs) {
       return (clerkjs as any).__unstable__updateProps(props);
+    }
+  };
+
+  __experimental_nextTask = async (params: NextTaskParams): Promise<void> => {
+    if (this.clerkjs) {
+      return this.clerkjs.__experimental_nextTask(params);
+    } else {
+      return Promise.reject();
+    }
+  };
+
+  __internal_setComponentNavigationContext = (params: __internal_ComponentNavigationContext) => {
+    if (this.clerkjs) {
+      return this.clerkjs.__internal_setComponentNavigationContext(params);
+    } else {
+      return undefined;
     }
   };
 

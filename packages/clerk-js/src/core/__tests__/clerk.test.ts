@@ -2346,9 +2346,12 @@ describe('Clerk singleton', () => {
         await sut.load(mockedLoadOptions);
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
 
-        await sut.__experimental_nextTask();
+        const redirectUrlComplete = '/welcome-to-app';
+        await sut.__experimental_nextTask({ redirectUrlComplete });
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/');
+        console.log(mockNavigate.mock.calls);
+
+        expect(mockNavigate.mock.calls[0][0]).toBe('/welcome-to-app');
       });
     });
   });

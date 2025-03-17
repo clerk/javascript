@@ -109,7 +109,8 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug, onComplete } = useOrganizationListContext();
+  const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug, __internal_onOrganizationCreated } =
+    useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
     <>
@@ -125,7 +126,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
-            onComplete={onComplete}
+            onComplete={__internal_onOrganizationCreated}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
