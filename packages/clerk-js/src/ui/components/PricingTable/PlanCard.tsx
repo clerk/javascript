@@ -355,7 +355,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
   return (
     <Box
       ref={ref}
-      elementDescriptor={descriptors.planCardFeaturesListRoot}
+      elementDescriptor={descriptors.planCardFeatures}
       sx={t => ({
         display: 'grid',
         flex: '1',
