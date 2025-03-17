@@ -8,11 +8,10 @@ import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
-import { useCheckoutContext, useEnvironment } from '../../contexts';
-import { Alert, Box, Button, Col, Flex, Heading, Icon, Spinner } from '../../customizables';
+import { useEnvironment } from '../../contexts';
+import { Alert, Col, Flex, Spinner } from '../../customizables';
 import { LineItems } from '../../elements';
 import { useCheckout } from '../../hooks';
-import { Close } from '../../icons';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
@@ -44,8 +43,6 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   return (
     <>
-      <CheckoutHeader title='Checkout' />
-
       {isLoading ? (
         <Flex
           align='center'
@@ -64,24 +61,13 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           <Alert colorScheme='danger'>There was a problem, please try again later.</Alert>
         </Flex>
       ) : checkout.status === 'completed' ? (
-        <CheckoutComplete
-          checkout={checkout}
-          sx={t => ({ height: `calc(100% - ${t.space.$12})` })}
-        />
+        <CheckoutComplete checkout={checkout} />
       ) : (
-        <Box
-          sx={t => ({
-            overflowY: 'auto',
-            /* minus the height of the header */
-            height: `calc(100% - ${t.space.$12})`,
-            overflowX: 'hidden',
-          })}
-        >
+        <>
           <Col
             gap={3}
             sx={t => ({
               padding: t.space.$4,
-              backgroundColor: t.colors.$neutralAlpha25,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
               borderBottomColor: t.colors.$neutralAlpha100,
@@ -105,46 +91,9 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
               />
             </Elements>
           )}
-        </Box>
+        </>
       )}
     </>
-  );
-};
-
-const CheckoutHeader = ({ title }: { title: string }) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
-
-  return (
-    <Flex
-      align='center'
-      justify='between'
-      gap={2}
-      sx={t => ({
-        position: 'sticky',
-        top: 0,
-        width: '100%',
-        height: t.space.$12,
-        paddingInline: `${t.space.$5} ${t.space.$2}`,
-        borderBottomWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$neutralAlpha100,
-      })}
-    >
-      <Heading textVariant='h2'>{title}</Heading>
-      <Button
-        variant='ghost'
-        onClick={handleCloseBlade}
-        sx={t => ({
-          color: t.colors.$neutralAlpha400,
-          padding: t.space.$2,
-        })}
-      >
-        <Icon
-          icon={Close}
-          size='md'
-        />
-      </Button>
-    </Flex>
   );
 };
 

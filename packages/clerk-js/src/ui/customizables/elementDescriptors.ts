@@ -92,6 +92,14 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'dividerText',
   'dividerLine',
 
+  'drawerBackdrop',
+  'drawerContent',
+  'drawerHeader',
+  'drawerTitle',
+  'drawerBody',
+  'drawerFooter',
+  'drawerClose',
+
   'formHeader',
   'formHeaderTitle',
   'formHeaderSubtitle',
@@ -221,6 +229,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'planCardDescription',
   'planCardAvatarBadgeContainer',
   'planCardAvatar',
+  'planCardBadgeContainer',
+  'planCardBadge',
   'planCardFeatures',
   'planCardFeaturesList',
   'planCardFeaturesListItem',

@@ -1,14 +1,18 @@
-import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
+import type { ActClaim, JwtHeader, JwtPayload } from './jwtv2';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
   encoded: { header: string; payload: string; signature: string };
-  header: JWTHeader;
-  claims: JWTClaims;
+  header: JwtHeader;
+  claims: JwtPayload;
 }
 
 type NonEmptyArray<T> = [T, ...T[]];
 
 // standard names https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1
+/**
+ * @deprecated use `JwtHeader` instead
+ */
 export interface JWTHeader {
   alg: string | Algorithm;
   typ?: string;
@@ -22,6 +26,9 @@ export interface JWTHeader {
   x5c?: string | string[];
 }
 
+/**
+ * @deprecated use `JwtPayload` instead
+ */
 export interface JWTClaims extends ClerkJWTClaims {
   /**
    * Encoded token supporting the `getRawString` method.
@@ -29,7 +36,10 @@ export interface JWTClaims extends ClerkJWTClaims {
   __raw: string;
 }
 
-/* Clerk-issued JWT payload */
+/**
+ * Clerk-issued JWT payload
+ * @deprecated use `JwtPayload` instead
+ */
 export interface ClerkJWTClaims {
   /**
    * JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).
@@ -69,7 +79,7 @@ export interface ClerkJWTClaims {
   /**
    * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
    */
-  act?: ActJWTClaim;
+  act?: ActClaim;
 
   /**
    * Active organization id.
@@ -87,18 +97,6 @@ export interface ClerkJWTClaims {
   org_role?: OrganizationCustomRoleKey;
 
   /**
-   * Active organization permissions
-   */
-  org_permissions?: OrganizationCustomPermissionKey[];
-
-  /**
-   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
-   */
-  fva?: [fistFactorAge: number, secondFactorAge: number];
-
-  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
@@ -107,10 +105,15 @@ export interface ClerkJWTClaims {
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
  * @inline
+ * @deprecated use `ActClaim` instead
  */
 export interface ActJWTClaim {
   sub: string;
+
   [x: string]: unknown;
 }
 
+/**
+ * @deprecated This type will be removed in the next major version.
+ */
 export type OrganizationsJWTClaim = Record<string, OrganizationCustomRoleKey>;

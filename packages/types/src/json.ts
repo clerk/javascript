@@ -5,7 +5,7 @@
 import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
-import type { ActJWTClaim } from './jwt';
+import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
@@ -120,7 +120,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   last_active_at: number;
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
-  actor: ActJWTClaim | null;
+  actor: ActClaim | null;
   tasks: Array<SessionTask> | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
