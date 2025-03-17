@@ -228,6 +228,8 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
           style={transitionStyles}
           direction='col'
           sx={t => ({
+            // Apply the conditional right offset + the spread of the
+            // box shadow to ensure it is fully offscreen before unmounting
             '--transform-offset':
               strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
             willChange: 'transform',
