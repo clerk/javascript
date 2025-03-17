@@ -291,6 +291,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Паспрабуйце іншы метад для верыфікацыі.',
       blockButton__backupCode: 'Увядзіце код з рэзервовага кода',
       blockButton__emailCode: 'Увядзіце код, адправлены на электронную пошту',
+      blockButton__passkey: undefined,
       blockButton__password: 'Увядзіце пароль',
       blockButton__phoneCode: 'Увядзіце код, адправлены на тэлефон',
       blockButton__totp: 'Выкарыстайце TOTP',
@@ -316,6 +317,11 @@ export const beBY: LocalizationResource = {
       message: 'Няма даступных метадаў для верыфікацыі.',
       subtitle: 'Калі ласка, выберыце іншы метад або звярніцеся ў службу падтрымкі.',
       title: 'Няма даступных метадаў верыфікацыі',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Вярнуцца да ўводу пароля',
@@ -923,6 +929,7 @@ export const beBY: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Выдаліць кашалёк',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кашалькі',
         title: 'Web3 кашалькі',
       },
