@@ -13,6 +13,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
+import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import { Box, descriptors, Flex, Heading, Icon, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -23,9 +24,6 @@ import { colors } from '../utils';
 import { IconButton } from './IconButton';
 
 type FloatingPortalProps = React.ComponentProps<typeof FloatingPortal>;
-
-const transitionTimingDuration = 500;
-const transitionTimingFunction = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer Context
@@ -166,9 +164,9 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       position: strategy,
       inset: 0,
       transitionProperty: 'opacity',
-      transitionTimingFunction,
+      transitionTimingFunction: transitionTiming.bezier,
     },
-    duration: transitionTimingDuration,
+    duration: transitionDurationValues.drawer,
   });
 
   if (!isMounted) return null;
@@ -206,9 +204,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
     close: { transform: `translate3d(var(--transform-offset), 0, 0)` },
     common: {
       transitionProperty: 'transform',
-      transitionTimingFunction,
+      transitionTimingFunction: transitionTiming.bezier,
     },
-    duration: isMotionSafe ? transitionTimingDuration : 0,
+    duration: isMotionSafe ? transitionDurationValues.drawer : 0,
   });
 
   if (!isMounted) return null;
