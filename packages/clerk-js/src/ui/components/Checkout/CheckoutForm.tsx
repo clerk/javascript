@@ -11,7 +11,7 @@ import type { Stripe } from '@stripe/stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Box, Button, Col, Flex, Form, Icon, Text } from '../../customizables';
-import { Alert, Disclosure, Divider, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
+import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
@@ -28,7 +28,7 @@ export const CheckoutForm = ({
 }) => {
   const { plan, planPeriod, totals } = checkout;
   return (
-    <>
+    <Drawer.Body>
       <Box
         sx={t => ({
           padding: t.space.$4,
@@ -84,7 +84,7 @@ export const CheckoutForm = ({
           />
         </Elements>
       )}
-    </>
+    </Drawer.Body>
   );
 };
 

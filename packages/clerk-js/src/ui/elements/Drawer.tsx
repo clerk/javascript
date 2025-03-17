@@ -348,27 +348,32 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
 
 interface FooterProps {
   children?: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerFooter}
-      sx={t => ({
-        display: 'flex',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
-        borderBlockStartWidth: t.borderWidths.$normal,
-        borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
-        borderEndStartRadius: t.radii.$xl,
-        borderEndEndRadius: t.radii.$xl,
-        paddingBlock: t.space.$3,
-        paddingInline: t.space.$4,
-      })}
+      sx={[
+        t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 1),
+            t.colors.$neutralAlpha50,
+          ),
+          borderBlockStartWidth: t.borderWidths.$normal,
+          borderBlockStartStyle: t.borderStyles.$solid,
+          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderEndStartRadius: t.radii.$xl,
+          borderEndEndRadius: t.radii.$xl,
+          paddingBlock: t.space.$3,
+          paddingInline: t.space.$4,
+        }),
+        sx,
+      ]}
     >
       {children}
     </Box>
