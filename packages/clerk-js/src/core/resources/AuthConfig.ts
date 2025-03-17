@@ -5,7 +5,6 @@ import { BaseResource } from './internal';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
-  id = '';
   reverification: boolean = false;
   singleSessionMode: boolean = false;
 
