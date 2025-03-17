@@ -519,7 +519,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
-        await sut.setActive({ session: mockSession as ActiveSessionResource });
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
@@ -530,7 +530,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load({ touchSession: false });
-        await sut.setActive({ session: mockSession as ActiveSessionResource });
+        await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         await waitFor(() => {
           expect(mockSession.touch).not.toHaveBeenCalled();
           expect(mockSession.getToken).toHaveBeenCalled();
@@ -544,7 +544,7 @@ describe('Clerk singleton', () => {
 
         const executionOrder: string[] = [];
         mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession;
+          sut.session = mockSession as any;
           executionOrder.push('session.touch');
           return Promise.resolve();
         });
@@ -2330,16 +2330,10 @@ describe('Clerk singleton', () => {
           }),
         ),
       };
-      let eventBusSpy;
-
-      beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
-      });
 
       afterEach(() => {
         mockSession.remove.mockReset();
         mockSession.touch.mockReset();
-        eventBusSpy?.mockRestore();
         (window as any).__unstable__onBeforeSetActive = null;
         (window as any).__unstable__onAfterSetActive = null;
       });
