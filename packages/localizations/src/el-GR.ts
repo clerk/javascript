@@ -287,6 +287,7 @@ export const elGR: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -310,6 +311,11 @@ export const elGR: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -924,6 +930,7 @@ export const elGR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Αφαίρεση πορτοφολιού',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Πορτοφόλια Web3',
         title: 'Πορτοφόλια Web3',
       },

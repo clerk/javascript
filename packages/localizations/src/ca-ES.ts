@@ -287,6 +287,7 @@ export const caES: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -310,6 +311,11 @@ export const caES: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -920,6 +926,7 @@ export const caES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Elimina cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteres Web3',
         title: 'Carteres Web3',
       },
