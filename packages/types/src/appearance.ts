@@ -134,7 +134,7 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
-  button: WithOptions;
+  button: WithOptions<string>;
   input: WithOptions;
   checkbox: WithOptions;
   radio: WithOptions;

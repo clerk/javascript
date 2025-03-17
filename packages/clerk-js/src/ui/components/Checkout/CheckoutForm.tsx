@@ -10,7 +10,7 @@ import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-
 import type { Stripe } from '@stripe/stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, Col, Flex, Form, Icon, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, Icon, Text } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
@@ -253,65 +253,73 @@ const PaymentSourceMethods = ({
   }, [paymentSources]);
 
   return (
-    <Form onSubmit={onPaymentSourceSubmit}>
-      <Col gap={3}>
-        <Select
-          elementId='role'
-          options={options}
-          value={selectedPaymentSource?.id || null}
-          onChange={option => {
-            const paymentSource = paymentSources.find(source => source.id === option.value);
-            setSelectedPaymentSource(paymentSource);
-          }}
-          portal
+    <Form
+      onSubmit={onPaymentSourceSubmit}
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        rowGap: t.space.$3,
+      })}
+    >
+      <Select
+        elementId='role'
+        options={options}
+        value={selectedPaymentSource?.id || null}
+        onChange={option => {
+          const paymentSource = paymentSources.find(source => source.id === option.value);
+          setSelectedPaymentSource(paymentSource);
+        }}
+        portal
+      >
+        {/*Store value inside an input in order to be accessible as form data*/}
+        <input
+          name='payment_source_id'
+          type='hidden'
+          value={selectedPaymentSource?.id}
+        />
+        <SelectButton
+          icon={ArrowUpDown}
+          sx={t => ({
+            justifyContent: 'space-between',
+            backgroundColor: t.colors.$colorBackground,
+          })}
         >
-          {/*Store value inside an input in order to be accessible as form data*/}
-          <input
-            name='payment_source_id'
-            type='hidden'
-            value={selectedPaymentSource?.id}
-          />
-          <SelectButton
-            icon={ArrowUpDown}
-            sx={t => ({
-              justifyContent: 'space-between',
-              backgroundColor: t.colors.$colorBackground,
-            })}
-          >
-            {selectedPaymentSource && (
-              <Flex
-                gap={3}
-                align='center'
+          {selectedPaymentSource && (
+            <Flex
+              gap={3}
+              align='center'
+            >
+              <Icon icon={CreditCard} />
+              <Text
+                as='span'
+                colorScheme='body'
               >
-                <Icon icon={CreditCard} />
-                <Text colorScheme='body'>
-                  {selectedPaymentSource.cardType} ⋯ {selectedPaymentSource.last4}
-                </Text>
-              </Flex>
-            )}
-          </SelectButton>
-          <SelectOptionList
-            sx={t => ({
-              paddingBlock: t.space.$1,
-              color: t.colors.$colorText,
-            })}
-          />
-        </Select>
-        <Button
-          type='submit'
-          colorScheme='primary'
-          size='sm'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-          }}
-          isLoading={isSubmitting}
-        >
-          {/* TODO(@COMMERCE): needs localization */}
-          Pay {totalDueNow.currencySymbol}
-          {totalDueNow.amountFormatted}
-        </Button>
-      </Col>
+                {selectedPaymentSource.cardType} ⋯ {selectedPaymentSource.last4}
+              </Text>
+            </Flex>
+          )}
+        </SelectButton>
+        <SelectOptionList
+          sx={t => ({
+            paddingBlock: t.space.$1,
+            color: t.colors.$colorText,
+          })}
+        />
+      </Select>
+      <Button
+        type='submit'
+        colorScheme='primary'
+        size='sm'
+        textVariant={'buttonLarge'}
+        sx={{
+          width: '100%',
+        }}
+        isLoading={isSubmitting}
+      >
+        {/* TODO(@COMMERCE): needs localization */}
+        Pay {totalDueNow.currencySymbol}
+        {totalDueNow.amountFormatted}
+      </Button>
     </Form>
   );
 };
@@ -336,83 +344,87 @@ const StripePaymentMethods = ({
   }, [collapsed, onExpand]);
 
   return (
-    <Form onSubmit={onStripeSubmit}>
-      <Col gap={3}>
-        <Button
-          variant='unstyled'
-          size='md'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-            backgroundColor: '#FFC43A',
-            color: '#222D65',
-          }}
-        >
-          {/* TODO(@COMMERCE): needs localization */}
-          Pay with PayPal
-        </Button>
-        {collapsed ? (
-          <>
-            <Button
-              variant='unstyled'
-              size='md'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-                backgroundColor: 'black',
-                color: 'white',
-              }}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Pay with ApplePay
-            </Button>
-            <Button
-              variant='unstyled'
-              size='md'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-                backgroundColor: 'black',
-                color: 'white',
-              }}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Pay with GPay
-            </Button>
-            <Button
-              colorScheme='secondary'
-              variant='bordered'
-              size='md'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-              }}
-              onClick={() => setCollapsed(false)}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              More Payment Methods
-            </Button>
-          </>
-        ) : (
-          <>
-            <PaymentElement />
-            <Button
-              type='submit'
-              colorScheme='primary'
-              size='sm'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-              }}
-              isLoading={isSubmitting}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Pay {totalDueNow.currencySymbol}
-              {totalDueNow.amountFormatted}
-            </Button>
-          </>
-        )}
-      </Col>
+    <Form
+      onSubmit={onStripeSubmit}
+      sx={t => ({
+        display: 'flex',
+        flexDirection: 'column',
+        rowGap: t.space.$3,
+      })}
+    >
+      <Button
+        elementId={descriptors.button.setId('paypal')}
+        variant='unstyled'
+        size='md'
+        textVariant={'buttonLarge'}
+        block
+        sx={{
+          backgroundColor: '#FFC43A',
+          color: '#222D65',
+        }}
+      >
+        {/* TODO(@COMMERCE): needs localization */}
+        Pay with PayPal
+      </Button>
+      {collapsed ? (
+        <>
+          <Button
+            elementId={descriptors.button.setId('applePay')}
+            variant='unstyled'
+            size='md'
+            textVariant={'buttonLarge'}
+            sx={{
+              width: '100%',
+              backgroundColor: 'black',
+              color: 'white',
+            }}
+          >
+            {/* TODO(@COMMERCE): needs localization */}
+            Pay with ApplePay
+          </Button>
+          <Button
+            elementId={descriptors.button.setId('gPay')}
+            variant='unstyled'
+            size='md'
+            textVariant={'buttonLarge'}
+            block
+            sx={{
+              backgroundColor: 'black',
+              color: 'white',
+            }}
+          >
+            {/* TODO(@COMMERCE): needs localization */}
+            Pay with GPay
+          </Button>
+          <Button
+            colorScheme='secondary'
+            variant='bordered'
+            size='md'
+            textVariant={'buttonLarge'}
+            block
+            onClick={() => setCollapsed(false)}
+          >
+            {/* TODO(@COMMERCE): needs localization */}
+            More Payment Methods
+          </Button>
+        </>
+      ) : (
+        <>
+          <PaymentElement />
+          <Button
+            type='submit'
+            colorScheme='primary'
+            size='sm'
+            textVariant={'buttonLarge'}
+            block
+            isLoading={isSubmitting}
+          >
+            {/* TODO(@COMMERCE): needs localization */}
+            Pay {totalDueNow.currencySymbol}
+            {totalDueNow.amountFormatted}
+          </Button>
+        </>
+      )}
     </Form>
   );
 };
