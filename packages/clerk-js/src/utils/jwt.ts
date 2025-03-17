@@ -1,4 +1,4 @@
-import type { JWT, JWTClaims } from '@clerk/types';
+import type { JWT, JwtPayload } from '@clerk/types';
 
 import { urlDecodeB64 } from './encoders';
 
@@ -11,7 +11,7 @@ export function decode(token: string): JWT {
   }
 
   const payloadJSON = JSON.parse(urlDecodeB64(payload));
-  const claims = { __raw: token } as JWTClaims;
+  const claims = { __raw: token } as JwtPayload;
 
   Object.keys(payloadJSON).forEach(k => {
     claims[k] = payloadJSON[k];

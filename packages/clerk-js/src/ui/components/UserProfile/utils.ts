@@ -1,4 +1,10 @@
-import type { Attributes, EmailAddressResource, PhoneNumberResource, UserResource } from '@clerk/types';
+import type {
+  Attributes,
+  EmailAddressResource,
+  PhoneNumberResource,
+  UserResource,
+  Web3WalletResource,
+} from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -38,10 +44,9 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   return sfs;
 }
 
-export function sortIdentificationBasedOnVerification<T extends Array<EmailAddressResource | PhoneNumberResource>>(
-  array: T | null | undefined,
-  primaryId: string | null | undefined,
-): T {
+export function sortIdentificationBasedOnVerification<
+  T extends Array<EmailAddressResource | PhoneNumberResource | Web3WalletResource>,
+>(array: T | null | undefined, primaryId: string | null | undefined): T {
   if (!array) {
     return [] as unknown as T;
   }
