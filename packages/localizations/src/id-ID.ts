@@ -288,6 +288,7 @@ export const idID: LocalizationResource = {
       actionText: 'Tidak memiliki salah satu dari ini?',
       blockButton__backupCode: 'Gunakan kode cadangan',
       blockButton__emailCode: 'Kirim kode ke {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Lanjutkan dengan kata sandi Anda',
       blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
       blockButton__totp: 'Gunakan aplikasi autentikator Anda',
@@ -314,6 +315,11 @@ export const idID: LocalizationResource = {
       message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',
       subtitle: 'Terjadi kesalahan',
       title: 'Tidak dapat memverifikasi akun Anda',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gunakan metode lain',
@@ -915,6 +921,7 @@ export const idID: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: undefined,
+        detailsAction__nonPrimary: undefined,
         primaryButton: undefined,
         title: undefined,
       },

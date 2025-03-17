@@ -288,6 +288,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Heb je geen van deze?',
       blockButton__backupCode: 'Backupcode gebruiken',
       blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Doorgaan met je wachtwoord',
       blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -314,6 +315,11 @@ export const nlNL: LocalizationResource = {
       message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',
       subtitle: 'Er is een fout opgetreden',
       title: 'Kan je account niet verifiëren',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gebruik een andere methode',
@@ -912,6 +918,7 @@ export const nlNL: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Verwijder portefeuille',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
       },
