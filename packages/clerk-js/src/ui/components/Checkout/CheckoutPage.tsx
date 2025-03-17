@@ -31,36 +31,13 @@ import { CheckoutForm } from './CheckoutForm';
 function parseColorString(colorString: string): string {
   const trimmed = colorString.trim();
 
-  if (trimmed.startsWith('#')) {
+  // Early return for hex colors and non-alpha formats
+  if (trimmed.startsWith('#') || trimmed.startsWith('rgb(') || trimmed.startsWith('hsl(')) {
     return trimmed;
   }
 
-  if (trimmed.startsWith('rgb(') && !trimmed.startsWith('rgba(')) {
-    return trimmed;
-  }
-
-  if (trimmed.startsWith('rgba(')) {
-    const rgbaMatch = trimmed.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*[\d.]+\s*\)/);
-    if (rgbaMatch) {
-      const [_, r, g, b] = rgbaMatch;
-      return `rgb(${r}, ${g}, ${b})`;
-    }
-  }
-
-  // Handle hsl (no change needed)
-  if (trimmed.startsWith('hsl(') && !trimmed.startsWith('hsla(')) {
-    return trimmed;
-  }
-
-  if (trimmed.startsWith('hsla(')) {
-    const hslaMatch = trimmed.match(/hsla\(\s*(\d+)\s*,\s*(\d+%?)\s*,\s*(\d+%?)\s*,\s*[\d.]+\s*\)/);
-    if (hslaMatch) {
-      const [_, h, s, l] = hslaMatch;
-      return `hsl(${h}, ${s}, ${l})`;
-    }
-  }
-
-  return trimmed;
+  // Convert rgba/hsla to rgb/hsl by removing the alpha component
+  return trimmed.replace(/([rgb|hsl])a\((.*),\s*[\d.]+\)/, '$1($2)');
 }
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
