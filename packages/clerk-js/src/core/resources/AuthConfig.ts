@@ -5,16 +5,18 @@ import { BaseResource } from './internal';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
+  id = '';
+  object = 'auth_config' as const;
   reverification: boolean = false;
   singleSessionMode: boolean = false;
 
-  public constructor(data: AuthConfigJSON | null = null) {
+  public constructor(data: Partial<AuthConfigJSON> | null = null) {
     super();
 
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: AuthConfigJSON | null): this {
+  protected fromJSON(data: Partial<AuthConfigJSON> | null): this {
     if (!data) {
       return this;
     }
@@ -26,9 +28,9 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
 
   public __internal_toSnapshot(): AuthConfigJSONSnapshot {
     return {
-      object: 'auth_config',
       claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
       id: this.id ?? '',
+      object: this.object,
       reverification: this.reverification,
       single_session_mode: this.singleSessionMode,
     };

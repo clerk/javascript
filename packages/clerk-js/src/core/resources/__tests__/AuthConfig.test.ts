@@ -16,8 +16,6 @@ describe('AuthConfig', () => {
 
   it('initializes with provided values', () => {
     const mockData = {
-      object: 'auth_config',
-      id: '',
       claimed_at: 1672531200000,
       reverification: true,
       single_session_mode: true,
@@ -33,8 +31,6 @@ describe('AuthConfig', () => {
 
   it('converts to JSON snapshot correctly', () => {
     const authConfig = new AuthConfig({
-      object: 'auth_config',
-      id: '',
       claimed_at: 1672531200000,
       reverification: true,
       single_session_mode: true,
