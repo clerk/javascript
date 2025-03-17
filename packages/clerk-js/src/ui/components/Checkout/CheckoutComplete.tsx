@@ -100,7 +100,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='secondary'>
             <LineItems.Title>Total paid</LineItems.Title>
             <LineItems.Description>
-              {checkout?.invoice
+              {checkout.invoice
                 ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
                 : '–'}
             </LineItems.Description>
@@ -109,13 +109,13 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             {/* TODO(@COMMERCE): needs localization */}
             <LineItems.Title>Payment method</LineItems.Title>
             <LineItems.Description>
-              {checkout?.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
+              {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@COMMERCE): needs localization */}
             <LineItems.Title>Invoice ID</LineItems.Title>
-            <LineItems.Description>{checkout?.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
+            <LineItems.Description>{checkout.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
           </LineItems.Group>
         </LineItems.Root>
         <Button onClick={handleClose}>
