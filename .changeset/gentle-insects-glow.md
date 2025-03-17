@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-expo': major
+'@clerk/clerk-expo': minor
 ---
 
 Mark `secureStore` as deprecated in favor of `resourceCache` from `@clerk/clerk-expo/resource-cache`.
