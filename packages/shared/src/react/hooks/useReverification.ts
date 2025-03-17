@@ -1,5 +1,5 @@
 import type { Clerk, SessionVerificationLevel } from '@clerk/types';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -223,7 +223,7 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
  * import { isClerkRuntimeError } from '@clerk/clerk-react/errors'
  *
  * export function MyButton() {
- *   const { action: enhancedFetcher } = useReverification(myFetcher, { throwOnCancel: true })
+ *   const { action: enhancedFetcher } = useReverification(myFetcher, { throwOnError: true })
  *
  *   const handleClick = async () => {
  *     try {
@@ -253,16 +253,16 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
  * import { isClerkRuntimeError } from '@clerk/clerk-react/errors'
  *
  * export function MyButton() {
- *   const { action: enhancedFetcher, error } = useReverification(myFetcher)
+ *   const { action: enhancedFetcher, error } = useReverification(myFetcher, { throwOnError: false })
  *
  *   const handleClick = async () => {
  *     const myData = await enhancedFetcher()
  *
- *    if (isClerkRuntimeError(error) && error.code === 'reverification_cancelled') {
- *      // User has cancelled reverification
- *    }
- *
  *     if (!myData) return
+ *   }
+ *
+ *   if (error) {
+ *     return <div>There was an error</div>
  *   }
  *
  *   return <button onClick={handleClick}>Update User</button>
@@ -283,6 +283,10 @@ export const useReverification: UseReverification = (fetcher, options) => {
     ...optionsRef.current,
   });
 
+  const handler = useMemo(() => {
+    return assertReverification(fetcherRef.current);
+  }, [fetcherRef, assertReverification]);
+
   // Keep fetcher and options ref in sync
   useSafeLayoutEffect(() => {
     fetcherRef.current = fetcher;
@@ -290,11 +294,11 @@ export const useReverification: UseReverification = (fetcher, options) => {
   });
 
   return {
-    action: assertReverification(fetcherRef.current),
+    action: handler,
     inProgress: state.inProgress,
     level: state.level,
     error: state.error,
     cancel: state.cancel,
-    complete: state.cancel,
+    complete: state.complete,
   };
 };
