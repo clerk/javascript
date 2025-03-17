@@ -35,6 +35,6 @@ const createTokenCache = (): TokenCache => {
  * - `getToken(key: string): Promise<string | null>`
  * - `saveToken(key: string, token: string): Promise<void>`
  *
- * @returns {TokenCache | undefined} Object with `getToken` and `saveToken` methods, undefined on web
+ * @type {TokenCache | undefined} Object with `getToken` and `saveToken` methods, undefined on web
  */
 export const tokenCache = Platform.OS !== 'web' ? createTokenCache() : undefined;
