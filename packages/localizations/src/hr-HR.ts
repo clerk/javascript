@@ -286,6 +286,7 @@ export const hrHR: LocalizationResource = {
       actionText: 'Nemate ništa od ovoga?',
       blockButton__backupCode: 'Koristite rezervni kod',
       blockButton__emailCode: 'Pošalji kod e-poštom na {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Nastavite s vašom lozinkom',
       blockButton__phoneCode: 'Pošalji SMS kod na {{identifier}}',
       blockButton__totp: 'Koristite vašu aplikaciju za autentifikaciju',
@@ -312,6 +313,11 @@ export const hrHR: LocalizationResource = {
       message: 'Ne može se nastaviti s verifikacijom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',
       title: 'Ne može se verificirati vaš račun',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Koristite drugu metodu',
@@ -920,6 +926,7 @@ export const hrHR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ukloni novčanik',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Poveži novčanik',
         title: 'Web3 novčanici',
       },

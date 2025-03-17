@@ -282,6 +282,7 @@ export const heIL: LocalizationResource = {
       actionText: 'אין לך אף אחד מאלה?',
       blockButton__backupCode: 'השתמש בקוד גיבוי',
       blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'המשך עם הסיסמה שלך',
       blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
       blockButton__totp: 'השתמש באפליקציית האימות שלך',
@@ -307,6 +308,11 @@ export const heIL: LocalizationResource = {
       message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
       subtitle: 'קרתה תקלה',
       title: 'לא ניתן לאמת את חשבונך',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'השתמש בשיטה אחרת',
@@ -895,6 +901,7 @@ export const heIL: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'הסר ארנק',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
       },

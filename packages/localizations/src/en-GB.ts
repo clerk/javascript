@@ -287,6 +287,7 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -313,6 +314,11 @@ export const enGB: LocalizationResource = {
       message: 'Cannot proceed with verification. No suitable authentication factor is configured',
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Use another method',
@@ -923,6 +929,7 @@ export const enGB: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },
