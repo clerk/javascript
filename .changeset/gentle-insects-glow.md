@@ -15,7 +15,7 @@ import { resourceCache } from '@clerk/clerk-expo/resource-cache'
 export default function RootLayout() {
   return (
     <ClerkProvider
-      publishableKey={publishableKey}
+      publishableKey="your-publishable-key"
       tokenCache={tokenCache}
       __experimental_resourceCache={resourceCache}
     >
