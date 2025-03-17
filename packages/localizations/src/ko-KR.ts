@@ -284,6 +284,7 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -307,6 +308,11 @@ export const koKR: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -901,6 +907,7 @@ export const koKR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '지갑 제거',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 지갑',
         title: 'Web3 지갑',
       },
