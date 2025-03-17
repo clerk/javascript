@@ -169,6 +169,7 @@ for (const pkg of packageNames) {
 }
 
 const renovateConfig = {
+  commitMessageLowerCase: 'never',
   extends: [
     ':combinePatchMinorReleases',
     ':dependencyDashboard',
@@ -184,26 +185,22 @@ const renovateConfig = {
     'group:monorepos',
     'group:recommended',
   ],
-  includePaths: ['package.json', 'packages/**'],
+  fileMatch: ['(^|/)package\\.json$', '(^|/)pnpm-workspace\\.yaml$'],
   ignorePaths: ['**/node_modules/**', '.nvmrc', 'integration/templates/**', 'playground/**'],
-  nvm: {
-    enabled: false,
-  },
+  includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
+  major: { dependencyDashboardApproval: true },
   minimumReleaseAge: '3 days',
-  timezone: 'GMT',
-  schedule: ['before 7am on the first day of the week'],
-  prCreation: 'immediate',
-  updateNotScheduled: false,
-  major: {
-    dependencyDashboardApproval: true,
-  },
-  rangeStrategy: 'bump',
-  prHourlyLimit: 4,
-  prConcurrentLimit: 16,
-  postUpdateOptions: ['pnpmDedupe'],
-  semanticCommitScope: 'repo',
-  commitMessageLowerCase: 'never',
+  nvm: { enabled: false },
   packageRules: Array.from(rules.values()).flat().concat(defaultRules),
+  postUpdateOptions: ['pnpmDedupe'],
+  prConcurrentLimit: 16,
+  prCreation: 'immediate',
+  prHourlyLimit: 4,
+  rangeStrategy: 'bump',
+  schedule: ['before 7am on the first day of the week'],
+  semanticCommitScope: 'repo',
+  timezone: 'GMT',
+  updateNotScheduled: false,
 };
 
 await fs.writeFile(
