@@ -1,7 +1,7 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
-import { Button, Col, Icon, Span, Text } from '../../customizables';
+import { Box, Button, Col, Heading, Icon, Span, Text } from '../../customizables';
 import { LineItems } from '../../elements';
 import { Check } from '../../icons';
 
@@ -33,26 +33,26 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             flexShrink: 0,
           })}
         >
-          <Circle scale={1} />
-          <Circle scale={0.75} />
-          <Circle scale={0.5} />
-          <Span
+          <Ring scale={1} />
+          <Ring scale={0.75} />
+          <Ring scale={0.5} />
+          <Box
             sx={t => ({
               margin: 'auto',
               gridArea: '1/1',
-              position: 'relative',
               display: 'flex',
+              position: 'relative',
               width: t.sizes.$16,
               height: t.sizes.$16,
               borderRadius: t.radii.$circle,
-              backgroundImage:
-                'linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)',
-              '&:before': {
+              backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
+              boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
+              ':before': {
                 content: '""',
                 position: 'absolute',
                 inset: t.space.$1,
-                backgroundColor: t.colors.$colorBackground,
                 borderRadius: t.radii.$circle,
+                backgroundColor: t.colors.$colorBackground,
               },
             })}
           >
@@ -63,8 +63,9 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                 position: 'relative',
                 margin: 'auto',
               }}
+              aria-hidden
             />
-          </Span>
+          </Box>
           <Span
             sx={t => ({
               margin: 'auto',
@@ -74,8 +75,16 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               transform: `translateY(${t.space.$20})`,
             })}
           >
-            <Text variant='h2'>Payment was successful!</Text>
-            <Text sx={t => ({ textAlign: 'center', paddingInline: t.space.$8 })}>
+            <Heading
+              as='h2'
+              textVariant='h2'
+            >
+              Payment was successful!
+            </Heading>
+            <Text
+              colorScheme='secondary'
+              sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
+            >
               {/* TODO(@COMMERCE): needs localization */}
               Minim adipisicing enim fugiat enim est ad nisi exercitation nisi exercitation quis culpa.
             </Text>
@@ -130,7 +139,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
   );
 };
 
-function Circle({
+function Ring({
   scale,
 }: {
   /**
