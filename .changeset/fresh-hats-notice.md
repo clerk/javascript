@@ -2,7 +2,7 @@
 '@clerk/clerk-expo': minor
 ---
 
-Expose secure token cache implementation using `expo-secure-store`.
+Adds a secure token cache implementation using `expo-secure-store` which encrypts the session token before storing it.
 
 Usage:
 
