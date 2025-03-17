@@ -201,6 +201,12 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
 
+  checkoutSuccessRoot: WithOptions;
+  checkoutSuccessRing: WithOptions;
+  checkoutSuccessBadge: WithOptions;
+  checkoutSuccessTitle: WithOptions;
+  checkoutSuccessDescription: WithOptions;
+
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
   otpCodeFieldInput: WithOptions;

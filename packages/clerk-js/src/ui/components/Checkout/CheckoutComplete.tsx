@@ -1,7 +1,7 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Heading, Icon, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
 import { Drawer, LineItems } from '../../elements';
 import { Check } from '../../icons';
 
@@ -18,6 +18,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
     <>
       <Drawer.Body>
         <Span
+          elementDescriptor={descriptors.checkoutSuccessRoot}
           sx={t => ({
             margin: 'auto',
             position: 'relative',
@@ -32,6 +33,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <Ring scale={0.75} />
           <Ring scale={0.5} />
           <Box
+            elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
               margin: 'auto',
               gridArea: '1/1',
@@ -71,12 +73,14 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             })}
           >
             <Heading
+              elementDescriptor={descriptors.checkoutSuccessTitle}
               as='h2'
               textVariant='h2'
             >
               Payment was successful!
             </Heading>
             <Text
+              elementDescriptor={descriptors.checkoutSuccessDescription}
               colorScheme='secondary'
               sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
             >
@@ -86,6 +90,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           </Span>
         </Span>
       </Drawer.Body>
+
       <Drawer.Footer
         sx={t => ({
           rowGap: t.space.$4,
@@ -132,6 +137,7 @@ function Ring({
 }) {
   return (
     <Span
+      elementDescriptor={descriptors.checkoutSuccessRing}
       sx={t => ({
         margin: 'auto',
         gridArea: '1/1',

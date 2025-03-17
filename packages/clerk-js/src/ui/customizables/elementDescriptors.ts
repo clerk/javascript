@@ -82,6 +82,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alternativeMethodsBlockButtonText',
   'alternativeMethodsBlockButtonArrow',
 
+  'checkoutSuccessRoot',
+  'checkoutSuccessRing',
+  'checkoutSuccessBadge',
+  'checkoutSuccessTitle',
+  'checkoutSuccessDescription',
+
   'otpCodeField',
   'otpCodeFieldInputs',
   'otpCodeFieldInput',
