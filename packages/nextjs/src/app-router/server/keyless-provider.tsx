@@ -33,6 +33,7 @@ export async function getKeylessStatus(
   }
 
   ClerkProviderDebugLogger.debugOnce('Keyless status', {
+    canUseKeyless,
     providedPublishableKey: params.publishableKey || '',
     locallyStoredPublishableKey,
     shouldRunAsKeyless,
@@ -59,7 +60,11 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
   const newOrReadKeys = await import('../../server/keyless-node.js')
     .then(mod => mod.createOrReadKeyless())
     .catch(e => {
-      ClerkProviderDebugLogger.debugOnce('Failed to createOrReadKeyless', (e as Error).toString());
+      ClerkProviderDebugLogger.debugOnce(
+        'Failed to createOrReadKeyless',
+        (e as Error).toString(),
+        (e as Error).stack || '',
+      );
       return null;
     });
 
@@ -122,7 +127,11 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         },
       );
     } catch (e) {
-      ClerkProviderDebugLogger.debugOnce('Failed to complete onboarding', (e as Error).toString());
+      ClerkProviderDebugLogger.debugOnce(
+        'Failed to complete onboarding',
+        (e as Error).toString(),
+        (e as Error).stack || '',
+      );
     }
 
     /**
