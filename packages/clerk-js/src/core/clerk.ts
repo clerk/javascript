@@ -44,6 +44,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -1069,16 +1070,15 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
     }
 
-    // Handles multi-session scenario when switching from `active`
-    // to `pending`
+    // Handles multi-session scenario when switching between `pending` sessions
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+      session = (this.#getSessionFromClient(session.id) as PendingSessionResource) ?? session;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
