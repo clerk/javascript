@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tilbage',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
   badge__primary: 'Primær',
@@ -278,6 +287,7 @@ export const daDK: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -301,6 +311,11 @@ export const daDK: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -646,6 +661,14 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -769,6 +792,7 @@ export const daDK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Administrer dine kontooplysninger.',
       security: 'Sikkerhed',
       title: 'Konto',
@@ -895,6 +919,7 @@ export const daDK: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Fjern tegnebog',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Tilføj Web3 tegnebøger',
         title: 'Web3 tegnebøger',
       },

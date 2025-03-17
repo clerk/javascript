@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tilbake',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annen imitators enhet',
   badge__primary: 'Primær',
@@ -278,6 +287,7 @@ export const nbNO: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -301,6 +311,11 @@ export const nbNO: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -648,6 +663,14 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -772,6 +795,7 @@ export const nbNO: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Administrer kontoinformasjonen din.',
       security: 'Sikkerhet',
       title: 'Konto',
@@ -897,6 +921,7 @@ export const nbNO: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Fjern lommebok',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lommebøker',
         title: 'Web3-lommebøker',
       },

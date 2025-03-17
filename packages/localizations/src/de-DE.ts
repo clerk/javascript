@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Zurück',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
@@ -281,6 +290,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
       blockButton__backupCode: 'Mit Backup-Code verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
+      blockButton__passkey: undefined,
       blockButton__password: 'Mit Passwort verifizieren',
       blockButton__phoneCode: 'Mit SMS-Code verifizieren',
       blockButton__totp: 'Mit TOTP verifizieren',
@@ -306,6 +316,11 @@ export const deDE: LocalizationResource = {
       message: 'Es sind keine Verifizierungsmethoden mehr verfügbar.',
       subtitle: 'Bitte kontaktieren Sie den Support, um Hilfe zu erhalten.',
       title: 'Keine verfügbaren Methoden',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Passwort zurücksetzen',
@@ -659,6 +674,14 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -784,6 +807,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
       title: 'Benutzerkonto',
@@ -910,6 +934,7 @@ export const deDE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Wallet entfernen',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
       },

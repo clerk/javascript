@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Retour',
+  badge__currentPlan: undefined,
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
@@ -281,6 +290,7 @@ export const frFR: LocalizationResource = {
       actionText: 'Vous ne pouvez pas accéder à votre compte ?',
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Recevoir un code par e-mail',
+      blockButton__passkey: undefined,
       blockButton__password: 'Utiliser le mot de passe',
       blockButton__phoneCode: 'Recevoir un code par téléphone',
       blockButton__totp: 'Utiliser un code d’application d’authentification',
@@ -307,6 +317,11 @@ export const frFR: LocalizationResource = {
       message: "Aucune méthode de vérification n'est disponible.",
       subtitle: 'Impossible de procéder à la vérification.',
       title: 'Aucune méthode disponible',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Réinitialiser le mot de passe',
@@ -654,6 +669,14 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -778,6 +801,7 @@ export const frFR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Compte',
+      billing: undefined,
       description: 'Gérer votre compte.',
       security: 'Sécurité',
       title: 'Profil',
@@ -905,6 +929,7 @@ export const frFR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Supprimer le portefeuille',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
       },

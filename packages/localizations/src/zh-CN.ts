@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默认',
   badge__otherImpersonatorDevice: '其他模拟器设备',
   badge__primary: '主要',
@@ -269,6 +278,7 @@ export const zhCN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -292,6 +302,11 @@ export const zhCN: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -633,6 +648,14 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
@@ -745,6 +768,7 @@ export const zhCN: LocalizationResource = {
     mobileButton__menu: '菜单',
     navbar: {
       account: '账户',
+      billing: undefined,
       description: '管理您的账户。',
       security: '安全',
       title: '账户',
@@ -868,6 +892,7 @@ export const zhCN: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '移除钱包',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 钱包',
         title: 'Web3 钱包',
       },

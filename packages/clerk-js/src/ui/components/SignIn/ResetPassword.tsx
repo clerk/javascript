@@ -9,7 +9,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { createPasswordError, handleError, useFormControl } from '../../utils';
 
-export const _ResetPassword = () => {
+const ResetPasswordInternal = () => {
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
@@ -166,4 +166,4 @@ export const _ResetPassword = () => {
   );
 };
 
-export const ResetPassword = withCardStateProvider(_ResetPassword);
+export const ResetPassword = withCardStateProvider(ResetPasswordInternal);

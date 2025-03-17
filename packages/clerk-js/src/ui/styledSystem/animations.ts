@@ -33,6 +33,11 @@ const fadeIn = keyframes`
   100% { opacity: 1; }
 `;
 
+const fadeOut = keyframes`
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
 const inAnimation = keyframes`
   0% {
     opacity: 0;
@@ -87,7 +92,7 @@ const outAnimation = keyframes`
     transform: translateY(0px);
     max-height: 6rem;
     visibility: visible;
-  }  
+  }
   100% {
     opacity: 0;
     transform: translateY(5px);
@@ -128,6 +133,7 @@ export const animations = {
   dropdownSlideInScaleAndFade,
   modalSlideAndFade,
   fadeIn,
+  fadeOut,
   textInSmall,
   textInBig,
   blockBigIn,

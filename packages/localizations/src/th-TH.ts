@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'กลับ',
+  badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__primary: 'หลัก',
@@ -275,6 +284,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่มีวิธีใดที่กล่าวมาหรือ?',
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสไปที่อีเมล {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'ดำเนินการต่อด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
       blockButton__totp: 'ใช้แอปยืนยันตัวตนของคุณ',
@@ -300,6 +310,11 @@ export const thTH: LocalizationResource = {
       message: 'ไม่สามารถดำเนินการยืนยันได้ ไม่มีปัจจัยการยืนยันตัวตนที่เหมาะสมที่ถูกกำหนดค่า',
       subtitle: 'เกิดข้อผิดพลาด',
       title: 'ไม่สามารถยืนยันบัญชีของคุณได้',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',
@@ -647,6 +662,14 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -766,6 +789,7 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
+      billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
       title: 'บัญชี',
@@ -890,6 +914,7 @@ export const thTH: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'ลบวอลเล็ต',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'วอลเล็ต Web3',
         title: 'วอลเล็ต Web3',
       },
