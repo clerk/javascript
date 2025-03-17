@@ -33,6 +33,7 @@ const typedocPluginMarkdownOptions = {
   fileExtension: '.mdx',
   excludeScopesInPaths: true,
   expandObjects: true,
+  formatWithPrettier: true,
 };
 
 /** @type {Partial<import("typedoc-plugin-replace-text").Config>} */
