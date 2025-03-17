@@ -1766,12 +1766,15 @@ export class Clerk implements ClerkInterface {
 
     const { redirectUrl } = params;
 
-    const redirectUrlWithForceRedirectUrl = new URL(redirectUrl);
-    redirectUrlWithForceRedirectUrl.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
-    redirectUrlWithForceRedirectUrl.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
+    const r = new URL(redirectUrl);
+    r.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
+    r.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
+    const redirectUrlWithForceRedirectUrl = this.buildUrlWithAuth(r.toString());
 
     const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
-    const popupRedirectUrl = `https://${accountPortalDomain}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl.toString())}`;
+    const popupRedirectUrl = this.buildUrlWithAuth(
+      `https://${accountPortalDomain}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
+    );
 
     const messageHandler = async (event: MessageEvent) => {
       if (event.origin !== `https://${accountPortalDomain}`) return;
