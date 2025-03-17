@@ -263,6 +263,7 @@ const PaymentSourceMethods = ({
             const paymentSource = paymentSources.find(source => source.id === option.value);
             setSelectedPaymentSource(paymentSource);
           }}
+          portal
         >
           {/*Store value inside an input in order to be accessible as form data*/}
           <input
@@ -289,7 +290,12 @@ const PaymentSourceMethods = ({
               </Flex>
             )}
           </SelectButton>
-          <SelectOptionList />
+          <SelectOptionList
+            sx={t => ({
+              paddingBlock: t.space.$1,
+              color: t.colors.$colorText,
+            })}
+          />
         </Select>
         <Button
           type='submit'

@@ -168,11 +168,19 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
 
+      let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
       __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveToken(KEY, authHeader);
+        }
+
+        if (!nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
+          console.error(
+            'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/last-active?path=native-applications',
+          );
+          nativeApiErrorShown = true;
         }
       });
     }
