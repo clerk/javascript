@@ -13,7 +13,7 @@ const createTokenCache = (): TokenCache => {
         const item = await SecureStore.getItemAsync(key);
         return item;
       } catch (error) {
-        console.error('secure store get item error: ', error);
+        console.error('Clerk: Failed to retrieve token from SecureStore:', error);
         await SecureStore.deleteItemAsync(key);
         return null;
       }
