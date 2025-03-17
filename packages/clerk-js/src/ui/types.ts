@@ -108,8 +108,8 @@ export type __experimental_PricingTableCtx = __experimental_PricingTableProps & 
 export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
   mode?: ComponentMode;
-  isShowingBlade?: boolean;
-  handleCloseBlade?: () => void;
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
 };
 
 export type AvailableComponentCtx =

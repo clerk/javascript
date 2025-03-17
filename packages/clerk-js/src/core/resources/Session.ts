@@ -3,7 +3,7 @@ import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type {
-  ActJWTClaim,
+  ActClaim,
   CheckAuthorization,
   EmailCodeConfig,
   GetToken,
@@ -45,7 +45,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveAt!: Date;
   lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
-  actor!: ActJWTClaim | null;
+  actor!: ActClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;

@@ -2,7 +2,7 @@ import type { OrganizationCustomRoleKey } from 'organizationMembership';
 import type { SignInResource } from 'signIn';
 
 import type { SetActive, SignOut } from './clerk';
-import type { ActJWTClaim } from './jwt';
+import type { ActClaim } from './jwtv2';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -83,7 +83,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -96,7 +96,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;

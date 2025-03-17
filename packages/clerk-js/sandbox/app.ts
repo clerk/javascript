@@ -127,8 +127,84 @@ function addCurrentRouteIndicator(currentRoute: string) {
   link.setAttribute('aria-current', 'page');
 }
 
+function appearanceVariableOptions() {
+  assertClerkIsLoaded(Clerk);
+
+  const resetVariablesBtn = document.getElementById('resetVariablesBtn');
+
+  const variableInputIds = [
+    'colorPrimary',
+    'colorNeutral',
+    'colorBackground',
+    'colorTextOnPrimaryBackground',
+    'colorDanger',
+    'colorSuccess',
+    'colorWarning',
+    'colorText',
+    'colorTextSecondary',
+    'colorInputText',
+    'colorInputBackground',
+    'colorShimmer',
+    'spacingUnit',
+    'borderRadius',
+  ] as const;
+
+  const variableInputs = variableInputIds.reduce(
+    (acc, id) => {
+      const element = document.getElementById(id) as HTMLInputElement | null;
+      if (!element) {
+        throw new Error(`Could not find input element with id: ${id}`);
+      }
+      acc[id] = element;
+      return acc;
+    },
+    {} as Record<(typeof variableInputIds)[number], HTMLInputElement>,
+  );
+
+  Object.entries(variableInputs).forEach(([key, input]) => {
+    const savedColor = sessionStorage.getItem(key);
+    if (savedColor) {
+      input.value = savedColor;
+    }
+  });
+
+  const updateVariables = () => {
+    Clerk.__unstable__updateProps({
+      appearance: {
+        variables: Object.fromEntries(
+          Object.entries(variableInputs).map(([key, input]) => {
+            sessionStorage.setItem(key, input.value);
+            return [key, input.value];
+          }),
+        ),
+      },
+    });
+  };
+
+  Object.values(variableInputs).forEach(input => {
+    input.addEventListener('change', updateVariables);
+  });
+
+  resetVariablesBtn?.addEventListener('click', () => {
+    Object.values(variableInputs).forEach(input => {
+      input.value = input.defaultValue;
+    });
+    updateVariables();
+  });
+
+  return { updateVariables };
+}
+
 (async () => {
   assertClerkIsLoaded(Clerk);
+  const { updateVariables } = appearanceVariableOptions();
+
+  const sidebars = document.querySelectorAll('[data-sidebar]');
+  document.addEventListener('keydown', e => {
+    if (e.key === '/') {
+      sidebars.forEach(s => s.classList.toggle('hidden'));
+    }
+  });
 
   const routes = {
     '/': () => {
@@ -191,6 +267,7 @@ function addCurrentRouteIndicator(currentRoute: string) {
       experimental: { commerce: true },
     });
     renderCurrentRoute();
+    updateVariables();
   } else {
     console.error(`Unknown route: "${route}".`);
   }

@@ -3,7 +3,7 @@ import { colors } from './colors';
 import { opacity } from './opacity';
 import { shadows } from './shadows';
 import { radii, sizes, space } from './sizes';
-import { transitionDuration, transitionProperty, transitionTiming } from './transitions';
+import { transitionDuration, transitionDurationValues, transitionProperty, transitionTiming } from './transitions';
 import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights } from './typography';
 import { zIndices } from './zIndices';
 
@@ -22,6 +22,7 @@ const defaultInternalThemeFoundations = Object.freeze({
   transitionProperty,
   transitionTiming,
   transitionDuration,
+  transitionDurationValues,
   opacity,
   borderStyles,
   borderWidths,

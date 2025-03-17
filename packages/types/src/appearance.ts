@@ -210,6 +210,19 @@ export type ElementsConfig = {
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
+  drawerBackdrop: WithOptions;
+  drawerContent: WithOptions;
+  drawerHeader: WithOptions;
+  drawerTitle: WithOptions;
+  drawerBody: WithOptions;
+  drawerFooter: WithOptions;
+  drawerClose: WithOptions;
+  drawerConfirmationBackdrop: WithOptions;
+  drawerConfirmationRoot: WithOptions;
+  drawerConfirmationTitle: WithOptions;
+  drawerConfirmationDescription: WithOptions;
+  drawerConfirmationActions: WithOptions;
+
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
   formHeaderSubtitle: WithOptions<never, ErrorState>;
@@ -345,12 +358,14 @@ export type ElementsConfig = {
   planCardDefault: WithOptions;
   planCardCompact: WithOptions;
   planCardHeader: WithOptions;
-  planCardAvatarContainer: WithOptions;
+  planCardAvatarBadgeContainer: WithOptions;
   planCardAvatar: WithOptions;
+  planCardBadgeContainer: WithOptions;
+  planCardBadge: WithOptions;
   planCardTitle: WithOptions;
   planCardDescription: WithOptions;
   planCardFeatures: WithOptions;
-  planCardFeaturesList: WithOptions;
+  planCardFeaturesList: WithOptions<string>;
   planCardFeaturesListItem: WithOptions<string>;
   planCardAction: WithOptions;
   planCardPeriodToggle: WithOptions;

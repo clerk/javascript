@@ -52,12 +52,13 @@ const defaultRules = [
   {
     groupName: 'ESLint',
     matchPackageNames: [
-      '@types/eslint',
       '@eslint/{/,}**',
+      '@types/eslint',
       '@stylistic/eslint-plugin{/,}**',
       '@types/eslint__{/,}**',
       '@typescript-eslint/{/,}**',
       'eslint{/,}**',
+      'typescript-eslint{/,}**',
     ],
   },
   {

@@ -92,7 +92,7 @@ const outAnimation = keyframes`
     transform: translateY(0px);
     max-height: 6rem;
     visibility: visible;
-  }  
+  }
   100% {
     opacity: 0;
     transform: translateY(5px);
@@ -128,18 +128,6 @@ const navbarSlideIn = keyframes`
   100% {opacity: 1; transform: translateX(0);}
 `;
 
-const drawerSlideIn = keyframes`
-  0% { opacity: 0; translate: 100% 0; }
-  10% { opacity: 1; }
-  100% { opacity: 1; translate: 0; }
-`;
-
-const drawerSlideOut = keyframes`
-  0% { opacity: 1; translate: 0; }
-  90% { opacity: 1; }
-  100% { opacity: 0; translate: 100% 0; }
-`;
-
 export const animations = {
   spinning,
   dropdownSlideInScaleAndFade,
@@ -155,6 +143,4 @@ export const animations = {
   inDelayAnimation,
   outAnimation,
   notificationAnimation,
-  drawerSlideIn,
-  drawerSlideOut,
 };
