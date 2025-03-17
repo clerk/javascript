@@ -166,6 +166,10 @@ export abstract class BaseResource {
 
   protected abstract fromJSON(data: ClerkResourceJSON | null): this;
 
+  protected withDefault<T>(value: T | undefined | null, defaultValue: T): T {
+    return value ?? defaultValue;
+  }
+
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
     const json = await BaseResource._fetch<J>(
       {

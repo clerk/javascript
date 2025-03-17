@@ -23,7 +23,6 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
   public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null = null) {
     super();
-
     this.fromJSON(data);
   }
 
@@ -33,17 +32,17 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     }
 
     if (data.actions) {
-      this.actions.adminDelete = data.actions.admin_delete ?? this.actions.adminDelete;
+      this.actions.adminDelete = this.withDefault(data.actions.admin_delete, this.actions.adminDelete);
     }
 
     if (data.domains) {
-      this.domains.enabled = data.domains.enabled ?? this.domains.enabled;
-      this.domains.enrollmentModes = data.domains.enrollment_modes ?? this.domains.enrollmentModes;
-      this.domains.defaultRole = data.domains.default_role ?? this.domains.defaultRole;
+      this.domains.enabled = this.withDefault(data.domains.enabled, this.domains.enabled);
+      this.domains.enrollmentModes = this.withDefault(data.domains.enrollment_modes, this.domains.enrollmentModes);
+      this.domains.defaultRole = this.withDefault(data.domains.default_role, this.domains.defaultRole);
     }
 
-    this.enabled = data.enabled ?? this.enabled;
-    this.maxAllowedMemberships = data.max_allowed_memberships ?? this.maxAllowedMemberships;
+    this.enabled = this.withDefault(data.enabled, this.enabled);
+    this.maxAllowedMemberships = this.withDefault(data.max_allowed_memberships, this.maxAllowedMemberships);
 
     return this;
   }
