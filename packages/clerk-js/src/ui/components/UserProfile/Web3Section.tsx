@@ -116,7 +116,7 @@ const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
   const { open } = useActionContext();
   const { user } = useUser();
   const isPrimary = user?.primaryWeb3WalletId === walletId;
-  const [setPrimary] = useReverification(() => {
+  const { action: setPrimary } = useReverification(() => {
     return user?.update({ primaryWeb3WalletId: walletId });
   });
 
