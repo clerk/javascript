@@ -168,10 +168,7 @@ const Overlay = React.forwardRef<HTMLDivElement>((_, ref) => {
       transitionProperty: 'opacity',
       transitionTimingFunction,
     },
-    duration: {
-      open: transitionTimingDuration,
-      close: transitionTimingDuration,
-    },
+    duration: transitionTimingDuration,
   });
 
   if (!isMounted) return null;
@@ -211,12 +208,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       transitionProperty: 'transform',
       transitionTimingFunction,
     },
-    duration: isMotionSafe
-      ? {
-          open: transitionTimingDuration,
-          close: transitionTimingDuration,
-        }
-      : 0,
+    duration: isMotionSafe ? transitionTimingDuration : 0,
   });
 
   if (!isMounted) return null;
