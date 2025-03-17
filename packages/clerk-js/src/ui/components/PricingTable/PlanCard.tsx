@@ -414,7 +414,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
                 imageUrl={feature.avatarUrl}
               />
             ) : null}
-            <Span>
+            <Span elementDescriptor={descriptors.planCardFeaturesListItemContent}>
               <Text
                 elementDescriptor={descriptors.planCardFeaturesListItemTitle}
                 colorScheme='body'

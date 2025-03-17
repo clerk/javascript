@@ -239,6 +239,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'planCardFeatures',
   'planCardFeaturesList',
   'planCardFeaturesListItem',
+  'planCardFeaturesListItemContent',
   'planCardFeaturesListItemTitle',
   'planCardFeaturesListItemDescription',
   'planCardAction',
