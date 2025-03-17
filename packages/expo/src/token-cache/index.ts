@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache';
+import { isNative } from '../utils';
 
 /**
  * Create a token cache using Expo's SecureStore
@@ -37,4 +37,4 @@ const createTokenCache = (): TokenCache => {
  *
  * @type {TokenCache | undefined} Object with `getToken` and `saveToken` methods, undefined on web
  */
-export const tokenCache = Platform.OS !== 'web' ? createTokenCache() : undefined;
+export const tokenCache = isNative() ? createTokenCache() : undefined;
