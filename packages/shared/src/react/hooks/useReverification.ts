@@ -91,7 +91,7 @@ type UseReverificationResult<
 /**
  * @interface
  */
-type UseReverification = <
+export type UseReverification = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions,
 >(
