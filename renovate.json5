@@ -16,10 +16,6 @@
     "group:monorepos",
     "group:recommended",
   ],
-  fileMatch: [
-    "(^|/)package\\.json$",
-    "(^|/)pnpm-workspace\\.yaml$",
-  ],
   ignorePaths: [
     "**/node_modules/**",
     ".nvmrc",
