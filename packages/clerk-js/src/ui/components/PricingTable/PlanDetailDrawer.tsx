@@ -1,7 +1,7 @@
 import type { __experimental_CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
-import { Box, Button, descriptors, Flex, Heading, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, Text } from '../../customizables';
 import { Alert, Drawer } from '../../elements';
 import type { PlanPeriod } from './PlanCard';
 import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
@@ -105,6 +105,33 @@ export function PlanDetailDrawer({
         <Drawer.Confirmation
           open={showConfirmation}
           onOpenChange={setShowConfirmation}
+          actionsSlot={
+            <>
+              {!isSubmitting && (
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  textVariant='buttonLarge'
+                  onClick={() => {
+                    setHasError(false);
+                    setShowConfirmation(false);
+                  }}
+                >
+                  Keep Subscription
+                </Button>
+              )}
+              <Button
+                variant='solid'
+                colorScheme='danger'
+                size='sm'
+                textVariant='buttonLarge'
+                isLoading={isSubmitting}
+                onClick={cancelSubscription}
+              >
+                Cancel Subscription
+              </Button>
+            </>
+          }
         >
           <Heading
             elementDescriptor={descriptors.drawerConfirmationTitle}
@@ -115,56 +142,14 @@ export function PlanDetailDrawer({
           </Heading>
           <Text
             elementDescriptor={descriptors.drawerConfirmationDescription}
-            sx={t => ({
-              marginBlockStart: t.space.$1,
-            })}
             colorScheme='secondary'
           >
             You can keep using &ldquo;{plan.name}&rdquo; features until [DATE], after which you will no longer have
             access.
           </Text>
           {hasError && (
-            <Alert
-              sx={t => ({
-                marginBlockStart: t.space.$3,
-              })}
-              colorScheme='danger'
-            >
-              There was a problem canceling your subscription, please try again.
-            </Alert>
+            <Alert colorScheme='danger'>There was a problem canceling your subscription, please try again.</Alert>
           )}
-          <Flex
-            elementDescriptor={descriptors.drawerConfirmationActions}
-            gap={3}
-            justify='end'
-            sx={t => ({
-              marginBlockStart: t.space.$8,
-            })}
-          >
-            {!isSubmitting && (
-              <Button
-                variant='ghost'
-                size='sm'
-                textVariant='buttonLarge'
-                onClick={() => {
-                  setHasError(false);
-                  setShowConfirmation(false);
-                }}
-              >
-                Keep Subscription
-              </Button>
-            )}
-            <Button
-              variant='solid'
-              colorScheme='danger'
-              size='sm'
-              textVariant='buttonLarge'
-              isLoading={isSubmitting}
-              onClick={cancelSubscription}
-            >
-              Cancel Subscription
-            </Button>
-          </Flex>
         </Drawer.Confirmation>
       </Drawer.Content>
     </Drawer.Root>
