@@ -59,6 +59,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     await waitForTokenImmediatly;
 
+    // Wait for the client to be loaded. and the internal `getToken({skipped: true})` to have been completed.
+    await u.po.clerk.toBeLoaded();
+
+    // Read the newly refreshed token.
     const tokenOnClientOutage = await page.evaluate(() => {
       return window.Clerk?.session?.getToken();
     });
