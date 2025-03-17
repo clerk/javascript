@@ -6,7 +6,6 @@ import { BaseResource } from './internal';
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
   id = '';
-  object = 'auth_config' as const;
   reverification: boolean = false;
   singleSessionMode: boolean = false;
 
@@ -30,7 +29,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     return {
       claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
       id: this.id ?? '',
-      object: this.object,
+      object: 'auth_config',
       reverification: this.reverification,
       single_session_mode: this.singleSessionMode,
     };
