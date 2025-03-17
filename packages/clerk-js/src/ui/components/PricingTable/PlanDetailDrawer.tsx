@@ -38,7 +38,7 @@ export function PlanDetailDrawer({
     setHasError(false);
     setIsSubmitting(true);
 
-    // TODO: we need to get a handle on the subscription object in order to cancel it,
+    // TODO(@COMMERCE): we need to get a handle on the subscription object in order to cancel it,
     // but this method doesn't exist yet.
     //
     // await subscription.cancel().then(() => {
@@ -47,8 +47,6 @@ export function PlanDetailDrawer({
     // }).catch(() => { setHasError(true); setIsSubmitting(false); });
   };
 
-  // TODO: remove when we can hook up cancel button
-  // return null;
   return (
     <Drawer.Root
       open={isOpen}
@@ -98,6 +96,7 @@ export function PlanDetailDrawer({
             block
             onClick={() => setShowConfirmation(true)}
           >
+            {/* TODO(@COMMERCE): needs localization */}
             Cancel Subscription
           </Button>
         </Drawer.Footer>
@@ -117,6 +116,7 @@ export function PlanDetailDrawer({
                     setShowConfirmation(false);
                   }}
                 >
+                  {/* TODO(@COMMERCE): needs localization */}
                   Keep Subscription
                 </Button>
               )}
@@ -128,6 +128,7 @@ export function PlanDetailDrawer({
                 isLoading={isSubmitting}
                 onClick={cancelSubscription}
               >
+                {/* TODO(@COMMERCE): needs localization */}
                 Cancel Subscription
               </Button>
             </>
@@ -138,16 +139,19 @@ export function PlanDetailDrawer({
             as='h2'
             textVariant='h3'
           >
+            {/* TODO(@COMMERCE): needs localization */}
             Cancel {plan.name} Subscription?
           </Heading>
           <Text
             elementDescriptor={descriptors.drawerConfirmationDescription}
             colorScheme='secondary'
           >
+            {/* TODO(@COMMERCE): needs localization */}
             You can keep using &ldquo;{plan.name}&rdquo; features until [DATE], after which you will no longer have
             access.
           </Text>
           {hasError && (
+            // TODO(@COMMERCE): needs localization
             <Alert colorScheme='danger'>There was a problem canceling your subscription, please try again.</Alert>
           )}
         </Drawer.Confirmation>
