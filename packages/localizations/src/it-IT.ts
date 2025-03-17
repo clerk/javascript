@@ -288,6 +288,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Usa un metodo di verifica alternativo',
       blockButton__backupCode: 'Verifica con il codice di backup',
       blockButton__emailCode: 'Verifica con il codice via email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Verifica con la password',
       blockButton__phoneCode: 'Verifica con il codice SMS',
       blockButton__totp: 'Verifica con il TOTP',
@@ -313,6 +314,11 @@ export const itIT: LocalizationResource = {
       message: 'Non sono disponibili metodi di verifica.',
       subtitle: 'Contatta il supporto per assistenza.',
       title: 'Nessun metodo disponibile',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Reimposta la password',
@@ -918,6 +924,7 @@ export const itIT: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Rimuovi wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },

@@ -286,6 +286,7 @@ export const srRS: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -309,6 +310,11 @@ export const srRS: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -914,6 +920,7 @@ export const srRS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ukloni novčanik',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 novčanici',
         title: 'Web3 novčanici',
       },
