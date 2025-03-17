@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
   badge__primary: '主要',
@@ -275,6 +284,7 @@ export const zhTW: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -298,6 +308,11 @@ export const zhTW: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -641,6 +656,14 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -755,6 +778,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -879,6 +903,7 @@ export const zhTW: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '移除錢包',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 錢包',
         title: 'Web3 錢包',
       },

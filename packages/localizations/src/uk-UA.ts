@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'За замовчуванням',
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
   badge__primary: 'Основний',
@@ -277,6 +286,7 @@ export const ukUA: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -300,6 +310,11 @@ export const ukUA: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -645,6 +660,14 @@ export const ukUA: LocalizationResource = {
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопійовано!',
       actionLabel__copy: 'Копіювати все',
@@ -769,6 +792,7 @@ export const ukUA: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -894,6 +918,7 @@ export const ukUA: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Видалити гаманець',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
       },

@@ -5,7 +5,7 @@ import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { ChatAltIcon, Email, LockClosedIcon } from '../../icons';
+import { ChatAltIcon, Email, Fingerprint, LockClosedIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { useUserVerificationSession } from './useUserVerificationSession';
@@ -111,6 +111,8 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
       });
     case 'password':
       return localizationKeys('reverification.alternativeMethods.blockButton__password');
+    case 'passkey':
+      return localizationKeys('reverification.alternativeMethods.blockButton__passkey');
     default:
       throw new Error(`Invalid sign in strategy: "${(factor as any).strategy}"`);
   }
@@ -121,6 +123,7 @@ export function getButtonIcon(factor: SessionVerificationFirstFactor) {
     email_code: Email,
     phone_code: ChatAltIcon,
     password: LockClosedIcon,
+    passkey: Fingerprint,
   } as const;
 
   return icons[factor.strategy];

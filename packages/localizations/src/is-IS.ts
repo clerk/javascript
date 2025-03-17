@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Til baka',
+  badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
@@ -279,6 +288,7 @@ export const isIS: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -302,6 +312,11 @@ export const isIS: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -652,6 +667,14 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Afritað!',
       actionLabel__copy: 'Afrita allt',
@@ -776,6 +799,7 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
+      billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',
       title: 'Reikningur',
@@ -903,6 +927,7 @@ export const isIS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Fjarlægja veski',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
       },

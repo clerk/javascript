@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Voltar',
+  badge__currentPlan: undefined,
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__primary: 'Principal',
@@ -278,6 +287,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Não tem nenhum dos métodos? Tente outra forma.',
       blockButton__backupCode: 'Usar código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Usar senha',
       blockButton__phoneCode: 'Enviar código de telefone',
       blockButton__totp: 'Usar autenticação TOTP',
@@ -303,6 +313,11 @@ export const ptBR: LocalizationResource = {
       message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.',
       subtitle: 'Não há métodos de verificação disponíveis no momento.',
       title: 'Métodos de verificação indisponíveis',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usar outro método',
@@ -653,6 +668,14 @@ export const ptBR: LocalizationResource = {
     action__signOutAll: 'Sair de todas as contas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -778,6 +801,7 @@ export const ptBR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gerencie seus dados de perfil.',
       security: 'Segurança',
       title: 'Conta',
@@ -904,6 +928,7 @@ export const ptBR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remover carteira',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
       },

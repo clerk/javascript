@@ -2,9 +2,10 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
-import type { ActJWTClaim } from './jwt';
+import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
 import type { OrganizationDomainVerificationStatus, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
@@ -57,6 +58,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
+  commerce_settings: __experimental_CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
@@ -116,7 +118,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   last_active_at: number;
   last_active_token: TokenJSON;
   last_active_organization_id: string | null;
-  actor: ActJWTClaim | null;
+  actor: ActClaim | null;
   tasks: Array<SessionTask> | null;
   user: UserJSON;
   public_user_data: PublicUserDataJSON;
@@ -571,4 +573,99 @@ export interface WaitlistJSON extends ClerkResourceJSON {
   id: string;
   created_at: number;
   updated_at: number;
+}
+
+export interface __experimental_CommerceFeatureJSON extends ClerkResourceJSON {
+  object: 'commerce_feature';
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  avatar_url: string;
+}
+
+export interface __experimental_CommercePlanJSON extends ClerkResourceJSON {
+  object: 'commerce_plan';
+  id: string;
+  name: string;
+  amount: number;
+  amount_formatted: string;
+  annual_monthly_amount: number;
+  annual_monthly_amount_formatted: string;
+  currency_symbol: string;
+  currency: string;
+  description: string;
+  is_active_for_payer: boolean;
+  is_recurring: boolean;
+  has_base_fee: boolean;
+  payer_type: string[];
+  publicly_visible: boolean;
+  slug: string;
+  avatar_url: string;
+  features: __experimental_CommerceFeatureJSON[];
+}
+
+export interface __experimental_CommerceProductJSON extends ClerkResourceJSON {
+  object: 'commerce_product';
+  id: string;
+  slug: string;
+  currency: string;
+  is_default: boolean;
+  plans: __experimental_CommercePlanJSON[];
+}
+
+export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_source';
+  id: string;
+  last4: string;
+  payment_method: string;
+  card_type: string;
+}
+
+export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
+  object: 'commerce_invoice';
+  id: string;
+  paid_on: number;
+  payment_due_on: number;
+  payment_source_id: string;
+  plan_id: string;
+  status: string;
+  totals: __experimental_CommerceTotalsJSON;
+}
+
+export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
+  object: 'commerce_subscription';
+  id: string;
+  payment_source_id: string;
+  plan: __experimental_CommercePlanJSON;
+  plan_period: string;
+  status: string;
+}
+
+export interface __experimental_CommerceMoneyJSON {
+  amount: number;
+  amount_formatted: string;
+  currency: string;
+  currency_symbol: string;
+}
+
+export interface __experimental_CommerceTotalsJSON {
+  grand_total: __experimental_CommerceMoneyJSON;
+  subtotal: __experimental_CommerceMoneyJSON;
+  tax_total: __experimental_CommerceMoneyJSON;
+  total_due_now?: __experimental_CommerceMoneyJSON;
+}
+
+export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
+  object: 'commerce_checkout';
+  id: string;
+  external_client_secret: string;
+  external_gateway_id: string;
+  invoice?: __experimental_CommerceInvoiceJSON;
+  payment_source?: __experimental_CommercePaymentSourceJSON;
+  plan: __experimental_CommercePlanJSON;
+  plan_period: string;
+  status: string;
+  subscription?: __experimental_CommerceSubscriptionJSON;
+  totals: __experimental_CommerceTotalsJSON;
 }

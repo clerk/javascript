@@ -55,10 +55,12 @@ export function stripPrivateDataFromObject<T extends WithResources<object>>(auth
 function prunePrivateMetadata(resource?: { private_metadata: any } | { privateMetadata: any } | null) {
   // Delete sensitive private metadata from resource before rendering in SSR
   if (resource) {
-    // @ts-ignore
-    delete resource['privateMetadata'];
-    // @ts-ignore
-    delete resource['private_metadata'];
+    if ('privateMetadata' in resource) {
+      delete resource['privateMetadata'];
+    }
+    if ('private_metadata' in resource) {
+      delete resource['private_metadata'];
+    }
   }
 
   return resource;

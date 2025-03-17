@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tillbaka',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
   badge__primary: 'Primär',
@@ -278,6 +287,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget av dessa?',
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Fortsätt med ditt lösenord',
       blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
       blockButton__totp: 'Använd din autentiseringsapp',
@@ -304,6 +314,11 @@ export const svSE: LocalizationResource = {
       message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte verifiera ditt konto',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Använd en annan metod',
@@ -651,6 +666,14 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -773,6 +796,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',
       title: 'Konto',
@@ -899,6 +923,7 @@ export const svSE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ta bort plånbok',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
       },

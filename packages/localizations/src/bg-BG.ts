@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
   badge__primary: 'Основен',
@@ -278,6 +287,7 @@ export const bgBG: LocalizationResource = {
       actionText: "Don't have one of these?",
       blockButton__backupCode: 'Use backup code',
       blockButton__emailCode: 'Send code to email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Login with password',
       blockButton__phoneCode: 'Send code to phone',
       blockButton__totp: 'Use authenticator app',
@@ -303,6 +313,11 @@ export const bgBG: LocalizationResource = {
       message: 'Unable to proceed. No available authentication methods.',
       subtitle: 'Something went wrong.',
       title: 'Authentication failed',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Use another method',
@@ -645,6 +660,14 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -769,6 +792,7 @@ export const bgBG: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Управлявайте информацията в профила си.',
       security: 'Security',
       title: 'Профил',
@@ -895,6 +919,7 @@ export const bgBG: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Премахни портфейл',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 портфейли',
         title: 'Web3 портфейли',
       },
