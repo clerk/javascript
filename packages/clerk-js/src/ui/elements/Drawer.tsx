@@ -469,6 +469,7 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(({ open
         modal
         outsideElementsInert
         initialFocus={refs.floating}
+        visuallyHiddenDismiss
       >
         <Box
           ref={mergedRefs}
