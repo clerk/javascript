@@ -1,5 +1,5 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react/index';
-import type { UseDismissProps, UseFloatingOptions } from '@floating-ui/react';
+import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
   FloatingPortal,
@@ -411,10 +411,11 @@ interface ConfirmationProps {
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   actionsSlot: React.ReactNode;
+  roleProps?: UseRoleProps;
 }
 
 const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
-  ({ open, onOpenChange, children, actionsSlot }, ref) => {
+  ({ open, onOpenChange, children, actionsSlot, roleProps }, ref) => {
     const prefersReducedMotion = usePrefersReducedMotion();
     const { animations: layoutAnimations } = useAppearance().parsedLayout;
     const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
@@ -425,6 +426,11 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
       transform: false,
       strategy: 'absolute',
     });
+    const { getFloatingProps } = useInteractions([
+      useClick(context),
+      useDismiss(context),
+      useRole(context, { role: 'alertdialog', ...roleProps }),
+    ]);
 
     const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
@@ -450,8 +456,6 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
       duration: isMotionSafe ? transitionDurationValues.drawer : 0,
     });
 
-    const { getFloatingProps } = useInteractions([useClick(context), useDismiss(context), useRole(context)]);
-
     if (!isMounted) return null;
 
     return (
@@ -471,7 +475,6 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
           modal
           outsideElementsInert
           initialFocus={refs.floating}
-          visuallyHiddenDismiss
         >
           <Box
             ref={mergedRefs}
