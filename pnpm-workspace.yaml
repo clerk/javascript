@@ -18,5 +18,5 @@ catalogs:
   repo:
     tslib: 2.8.1
     tsup: 8.4.0
-    typescript: 5.6.3
+    typescript: 5.8.2
     zx: 8.4.1
