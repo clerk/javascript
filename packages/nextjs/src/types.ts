@@ -22,8 +22,4 @@ export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey
    * @default false
    */
   dynamic?: boolean;
-  /**
-   *
-   */
-  debug?: boolean;
 };

@@ -11,7 +11,6 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { onlyTry } from '../../utils/only-try';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
-import { ClerkProviderDebugLogger } from './logger';
 
 export async function getKeylessStatus(
   params: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
@@ -20,25 +19,11 @@ export async function getKeylessStatus(
   if (canUseKeyless) {
     locallyStoredPublishableKey = await import('../../server/keyless-node.js')
       .then(mod => mod.safeParseClerkFile()?.publishableKey || '')
-      .catch(e => {
-        ClerkProviderDebugLogger.debugOnce(
-          'Failed to read publishable key on `getKeylessStatus`',
-          (e as Error).toString(),
-        );
-        return '';
-      });
+      .catch(() => '');
 
     runningWithClaimedKeys = Boolean(params.publishableKey) && params.publishableKey === locallyStoredPublishableKey;
     shouldRunAsKeyless = !params.publishableKey || runningWithClaimedKeys;
   }
-
-  ClerkProviderDebugLogger.debugOnce('Keyless status', {
-    canUseKeyless,
-    providedPublishableKey: params.publishableKey || '',
-    locallyStoredPublishableKey,
-    shouldRunAsKeyless,
-    runningWithClaimedKeys,
-  });
 
   return {
     shouldRunAsKeyless,
@@ -59,14 +44,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
     .then(mod => mod.createOrReadKeyless())
-    .catch(e => {
-      ClerkProviderDebugLogger.debugOnce(
-        'Failed to createOrReadKeyless',
-        (e as Error).toString(),
-        (e as Error).stack || '',
-      );
-      return null;
-    });
+    .catch(() => null);
 
   const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
     '../../server/keyless-log-cache.js'
@@ -74,7 +52,6 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
 
   if (!newOrReadKeys) {
     // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
-    ClerkProviderDebugLogger.debugOnce('Keys not found, mounting `<ClientClerkProvider disableKeyless/>`');
     return (
       <ClientClerkProvider
         {...mergeNextClerkPropsWithEnv(rest)}
@@ -126,12 +103,8 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
           onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
         },
       );
-    } catch (e) {
-      ClerkProviderDebugLogger.debugOnce(
-        'Failed to complete onboarding',
-        (e as Error).toString(),
-        (e as Error).stack || '',
-      );
+    } catch {
+      // noop
     }
 
     /**

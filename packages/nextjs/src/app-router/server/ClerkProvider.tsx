@@ -10,7 +10,6 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { getKeylessStatus, KeylessProvider } from './keyless-provider';
-import { ClerkProviderDebugLogger } from './logger';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -27,11 +26,7 @@ const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader()
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
-  const { children, dynamic, debug, ...rest } = props;
-
-  if (debug) {
-    ClerkProviderDebugLogger.enable();
-  }
+  const { children, dynamic, ...rest } = props;
 
   async function generateStatePromise() {
     if (!dynamic) {
