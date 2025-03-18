@@ -23,7 +23,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
   public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null = null) {
     super();
-      this.fromJSON(data);
+    this.fromJSON(data);
   }
 
   protected fromJSON(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null): this {
