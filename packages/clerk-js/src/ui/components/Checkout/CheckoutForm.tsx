@@ -15,31 +15,7 @@ import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, Se
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
-import { handleError } from '../../utils';
-
-/**
- * Parses different color format strings and normalizes them
- * Handles conversions between:
- * - #000 to #000
- * - rgb(0, 0, 0) to rgb(0, 0, 0) (unchanged)
- * - rgba(0, 0, 0, 1) to rgb(0, 0, 0) (alpha removed)
- * - hsl(0, 0%, 0%) to hsl(0, 0%, 0%) (unchanged)
- * - hsla(0, 0%, 0%, 1) to hsl(0, 0%, 0%) (alpha removed)
- *
- * @param colorString - The color string to parse
- * @returns The normalized color string without alpha components
- */
-function parseColorString(colorString: string): string {
-  const trimmed = colorString.trim();
-
-  // Early return for hex colors and non-alpha formats
-  if (trimmed.startsWith('#') || trimmed.startsWith('rgb(') || trimmed.startsWith('hsl(')) {
-    return trimmed;
-  }
-
-  // Convert rgba/hsla to rgb/hsl by removing the alpha component
-  return trimmed.replace(/([rgb|hsl])a\((.*),\s*[\d.]+\)/, '$1($2)');
-}
+import { handleError, normalizeColorString } from '../../utils';
 
 export const CheckoutForm = ({
   stripe,
@@ -54,13 +30,13 @@ export const CheckoutForm = ({
   const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
   const elementsAppearance: StripeAppearance = {
     variables: {
-      colorPrimary: parseColorString(colors.$primary500),
-      colorBackground: parseColorString(colors.$colorInputBackground),
-      colorText: parseColorString(colors.$colorText),
-      colorTextSecondary: parseColorString(colors.$colorTextSecondary),
-      colorSuccess: parseColorString(colors.$success500),
-      colorDanger: parseColorString(colors.$danger500),
-      colorWarning: parseColorString(colors.$warning500),
+      colorPrimary: normalizeColorString(colors.$primary500),
+      colorBackground: normalizeColorString(colors.$colorInputBackground),
+      colorText: normalizeColorString(colors.$colorText),
+      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
+      colorSuccess: normalizeColorString(colors.$success500),
+      colorDanger: normalizeColorString(colors.$danger500),
+      colorWarning: normalizeColorString(colors.$warning500),
       fontWeightNormal: fontWeights.$normal.toString(),
       fontWeightMedium: fontWeights.$medium.toString(),
       fontWeightBold: fontWeights.$bold.toString(),
