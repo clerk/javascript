@@ -1,6 +1,7 @@
 import { Composite, CompositeItem } from '@floating-ui/react';
 import React, { createContext, useContext, useState } from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, SimpleButton } from '../customizables';
 
 /* -------------------------------------------------------------------------------------------------
@@ -83,11 +84,11 @@ Root.displayName = 'SegmentedControl.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface ButtonProps {
-  children: React.ReactNode;
+  text: string | LocalizationKey;
   value: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, value }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
   const { currentValue, onValueChange } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
@@ -98,6 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
           <SimpleButton
             ref={ref}
             {...compProps}
+            localizationKey={text}
             elementDescriptor={descriptors.segmentedControlButton}
             variant='unstyled'
             role='radio'
@@ -118,9 +120,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
                 zIndex: 2,
               },
             })}
-          >
-            {children}
-          </SimpleButton>
+          />
         );
       }}
     />
