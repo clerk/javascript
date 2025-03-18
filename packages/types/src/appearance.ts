@@ -217,6 +217,11 @@ export type ElementsConfig = {
   drawerBody: WithOptions;
   drawerFooter: WithOptions;
   drawerClose: WithOptions;
+  drawerConfirmationBackdrop: WithOptions;
+  drawerConfirmationRoot: WithOptions;
+  drawerConfirmationTitle: WithOptions;
+  drawerConfirmationDescription: WithOptions;
+  drawerConfirmationActions: WithOptions;
 
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
@@ -362,6 +367,9 @@ export type ElementsConfig = {
   planCardFeatures: WithOptions;
   planCardFeaturesList: WithOptions<string>;
   planCardFeaturesListItem: WithOptions<string>;
+  planCardFeaturesListItemContent: WithOptions;
+  planCardFeaturesListItemTitle: WithOptions;
+  planCardFeaturesListItemDescription: WithOptions;
   planCardAction: WithOptions;
   planCardPeriodToggle: WithOptions;
   planCardFeeContainer: WithOptions;
