@@ -41,6 +41,7 @@ export const CheckoutForm = ({
         <LineItems.Root>
           <LineItems.Group>
             <LineItems.Title>{plan.name}</LineItems.Title>
+            {/* TODO(@Commerce): needs localization */}
             <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
               {plan.currencySymbol}
               {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
@@ -50,6 +51,7 @@ export const CheckoutForm = ({
             borderTop
             variant='tertiary'
           >
+            {/* TODO(@Commerce): needs localization */}
             <LineItems.Title>Subtotal</LineItems.Title>
             <LineItems.Description>
               {totals.subtotal.currencySymbol}
@@ -57,6 +59,7 @@ export const CheckoutForm = ({
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
+            {/* TODO(@Commerce): needs localization */}
             <LineItems.Title>Tax</LineItems.Title>
             <LineItems.Description>
               {totals.taxTotal.currencySymbol}
@@ -64,6 +67,7 @@ export const CheckoutForm = ({
             </LineItems.Description>
           </LineItems.Group>
           <LineItems.Group borderTop>
+            {/* TODO(@Commerce): needs localization */}
             <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
             <LineItems.Description>
               {totals.totalDueNow
@@ -196,6 +200,7 @@ const CheckoutFormElements = ({
             open={openAccountFundsDropDown}
             onOpenChange={setOpenAccountFundsDropDown}
           >
+            {/* TODO(@Commerce): needs localization */}
             <Disclosure.Trigger>Account Funds</Disclosure.Trigger>
             <Disclosure.Content>
               <Col gap={3}>
@@ -216,6 +221,7 @@ const CheckoutFormElements = ({
         open={openAddNewSourceDropDown}
         onOpenChange={setOpenAddNewSourceDropDown}
       >
+        {/* TODO(@Commerce): needs localization */}
         <Disclosure.Trigger>Add a New Payment Source</Disclosure.Trigger>
         <Disclosure.Content>
           <StripePaymentMethods
