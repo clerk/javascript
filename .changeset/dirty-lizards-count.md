@@ -2,4 +2,4 @@
 '@clerk/clerk-js': minor
 ---
 
-Allow initialization of Clerk.environment even if the API call to get environment details fails
+Improve the resilience of the SDK against situations where the /v1/environment endpoint is not reachable. This is achieved by allowing the initialization of the environment with default values.
