@@ -4,7 +4,6 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
-  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -95,6 +94,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
   | '__experimental_commerce'
+  | '__internal_setComponentNavigationContext'
 > & {
   client: ClientResource | undefined;
   __experimental_commerce: __experimental_CommerceNamespace | undefined;
@@ -618,14 +618,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return this.clerkjs.__experimental_nextTask(params);
     } else {
       return Promise.reject();
-    }
-  };
-
-  __internal_setComponentNavigationContext = (params: __internal_ComponentNavigationContext) => {
-    if (this.clerkjs) {
-      return this.clerkjs.__internal_setComponentNavigationContext(params);
-    } else {
-      return undefined;
     }
   };
 
