@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Box, descriptors, Icon, SimpleButton, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
@@ -72,10 +73,11 @@ Root.displayName = 'Disclosure.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface TriggerProps {
-  children: React.ReactNode;
+  textKey?: LocalizationKey;
+  textSlot?: React.ReactNode;
 }
 
-const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children }, ref) => {
+const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ textKey, textSlot }, ref) => {
   const context = React.useContext(DisclosureContext);
   if (!context) {
     throw new Error('Disclosure.Trigger must be used within Disclosure.Root');
@@ -99,7 +101,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         zIndex: 2,
       })}
     >
-      {children}
+      <Span localizationKey={textKey}>{textSlot}</Span>
       <Icon
         icon={ChevronDown}
         colorScheme='neutral'

@@ -14,6 +14,7 @@ import {
 import * as React from 'react';
 
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
+import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -263,12 +264,14 @@ Overlay.displayName = 'Drawer.Content';
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  title?: string;
+  titleKey?: LocalizationKey;
+  titleSlot?: React.ReactNode;
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
 
-const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children, sx }, ref) => {
+const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ titleKey, titleSlot, children, sx }, ref) => {
+  const hasTitle = titleKey || titleSlot;
   return (
     <Box
       ref={ref}
@@ -286,15 +289,16 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           borderBlockEndColor: t.colors.$neutralAlpha100,
           borderStartStartRadius: t.radii.$xl,
           borderStartEndRadius: t.radii.$xl,
-          paddingBlock: title ? t.space.$3 : undefined,
-          paddingInline: title ? t.space.$4 : undefined,
+          paddingBlock: hasTitle ? t.space.$3 : undefined,
+          paddingInline: hasTitle ? t.space.$4 : undefined,
         }),
         sx,
       ]}
     >
-      {title ? (
+      {hasTitle ? (
         <>
           <Heading
+            localizationKey={titleKey}
             as='h2'
             elementDescriptor={descriptors.drawerTitle}
             textVariant='h2'
@@ -302,7 +306,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
               alignSelf: 'center',
             }}
           >
-            {title}
+            {titleSlot}
           </Heading>
           <Close />
         </>
@@ -416,6 +420,9 @@ interface ConfirmationProps {
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   actionsSlot: React.ReactNode;
+  /**
+   * @see https://floating-ui.com/docs/userole
+   */
   roleProps?: UseRoleProps;
 }
 

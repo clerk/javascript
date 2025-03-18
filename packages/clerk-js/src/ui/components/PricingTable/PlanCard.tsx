@@ -325,8 +325,14 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
             value={planPeriod}
             onChange={value => setPlanPeriod(value as PlanPeriod)}
           >
-            <SegmentedControl.Button value='month'>Monthly</SegmentedControl.Button>
-            <SegmentedControl.Button value='annual'>Annually</SegmentedControl.Button>
+            <SegmentedControl.Button
+              value='month'
+              textSlot='Monthly'
+            />
+            <SegmentedControl.Button
+              value='annual'
+              textSlot='Annually'
+            />
           </SegmentedControl.Root>
         </Box>
       ) : null}

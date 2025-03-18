@@ -40,40 +40,36 @@ export const CheckoutForm = ({
       >
         <LineItems.Root>
           <LineItems.Group>
-            <LineItems.Title>{plan.name}</LineItems.Title>
+            <LineItems.Title titleSlot={plan.name} />
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Description suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}>
-              {plan.currencySymbol}
-              {planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}
-            </LineItems.Description>
+            <LineItems.Description
+              textSlot={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              suffixSlot={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
+            />
           </LineItems.Group>
           <LineItems.Group
             borderTop
             variant='tertiary'
           >
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title>Subtotal</LineItems.Title>
-            <LineItems.Description>
-              {totals.subtotal.currencySymbol}
-              {totals.subtotal.amountFormatted}
-            </LineItems.Description>
+            <LineItems.Title titleSlot='Subtotal' />
+            <LineItems.Description textSlot={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title>Tax</LineItems.Title>
-            <LineItems.Description>
-              {totals.taxTotal.currencySymbol}
-              {totals.taxTotal.amountFormatted}
-            </LineItems.Description>
+            <LineItems.Title titleSlot='Tax' />
+            <LineItems.Description textSlot={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title>Total{totals.totalDueNow ? ' Due Today' : ''}</LineItems.Title>
-            <LineItems.Description>
-              {totals.totalDueNow
-                ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
-                : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`}
-            </LineItems.Description>
+            <LineItems.Title titleSlot={`Total${totals.totalDueNow ? ' Due Today' : ''}`} />
+            <LineItems.Description
+              textSlot={`${
+                totals.totalDueNow
+                  ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
+                  : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`
+              }`}
+            />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
@@ -201,7 +197,7 @@ const CheckoutFormElements = ({
             onOpenChange={setOpenAccountFundsDropDown}
           >
             {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger>Account Funds</Disclosure.Trigger>
+            <Disclosure.Trigger textSlot='Account Funds' />
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
@@ -222,7 +218,7 @@ const CheckoutFormElements = ({
         onOpenChange={setOpenAddNewSourceDropDown}
       >
         {/* TODO(@Commerce): needs localization */}
-        <Disclosure.Trigger>Add a New Payment Source</Disclosure.Trigger>
+        <Disclosure.Trigger textSlot='Add a New Payment Source' />
         <Disclosure.Content>
           <StripePaymentMethods
             totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}

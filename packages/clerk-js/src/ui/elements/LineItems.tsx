@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
 import { common } from '../styledSystem';
 
@@ -76,11 +77,13 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  children: React.ReactNode;
-  description?: React.ReactNode;
+  titleKey?: LocalizationKey;
+  titleSlot?: React.ReactNode;
+  descriptionKey?: LocalizationKey;
+  descriptionSlot?: React.ReactNode;
 }
 
-function Title({ children, description }: TitleProps) {
+function Title({ titleKey, titleSlot, descriptionKey, descriptionSlot }: TitleProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
@@ -98,16 +101,17 @@ function Title({ children, description }: TitleProps) {
         ...common.textVariants(t)[textVariant],
       })}
     >
-      {children}
-      {description ? (
+      <Span localizationKey={titleKey}>{titleSlot}</Span>
+      {descriptionKey || descriptionSlot ? (
         <Span
+          localizationKey={descriptionKey}
           elementDescriptor={descriptors.lineItemsTitleDescription}
           sx={t => ({
             fontSize: t.fontSizes.$sm,
             color: t.colors.$colorTextSecondary,
           })}
         >
-          {description}
+          {descriptionSlot}
         </Span>
       ) : null}
     </Dt>
@@ -119,18 +123,15 @@ function Title({ children, description }: TitleProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface DescriptionProps {
-  children: React.ReactNode;
-  /**
-   * Render a piece of text before the description text.
-   */
-  prefix?: React.ReactNode;
-  /**
-   * Render a note below the description text.
-   */
-  suffix?: React.ReactNode;
+  textKey?: LocalizationKey;
+  textSlot?: React.ReactNode;
+  prefixKey?: LocalizationKey;
+  prefixSlot?: React.ReactNode;
+  suffixKey?: LocalizationKey;
+  suffixSlot?: React.ReactNode;
 }
 
-function Description({ children, prefix, suffix }: DescriptionProps) {
+function Description({ textKey, textSlot, prefixKey, prefixSlot, suffixKey, suffixSlot }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -155,35 +156,38 @@ function Description({ children, prefix, suffix }: DescriptionProps) {
           gap: t.space.$1,
         })}
       >
-        {prefix ? (
+        {prefixKey || prefixSlot ? (
           <Span
+            localizationKey={prefixKey}
             elementDescriptor={descriptors.lineItemsDescriptionPrefix}
             sx={t => ({
               color: t.colors.$colorTextSecondary,
               ...common.textVariants(t).caption,
             })}
           >
-            {prefix}
+            {prefixSlot}
           </Span>
         ) : null}
         <Span
+          localizationKey={textKey}
           elementDescriptor={descriptors.lineItemsDescriptionText}
           sx={t => ({
             ...common.textVariants(t).body,
           })}
         >
-          {children}
+          {textSlot}
         </Span>
       </Span>
-      {suffix ? (
+      {suffixKey || suffixSlot ? (
         <Span
+          localizationKey={suffixKey}
           elementDescriptor={descriptors.lineItemsDescriptionSuffix}
           sx={t => ({
             color: t.colors.$colorTextSecondary,
             ...common.textVariants(t).caption,
           })}
         >
-          {suffix}
+          {suffixSlot}
         </Span>
       ) : null}
     </Dd>
