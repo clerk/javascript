@@ -79,7 +79,6 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
 interface TitleProps {
   title?: string | LocalizationKey;
   description?: string | LocalizationKey;
-  descriptionSlot?: React.ReactNode;
 }
 
 function Title({ title, description }: TitleProps) {
