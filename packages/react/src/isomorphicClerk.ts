@@ -773,7 +773,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__experimental_mountPricingTable(node, props);
     } else {
       this.premountPricingTableNodes.set(node, props);
@@ -781,7 +781,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __experimental_unmountPricingTable = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__experimental_unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
