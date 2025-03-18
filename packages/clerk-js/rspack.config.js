@@ -93,6 +93,15 @@ const common = ({ mode, disableRHC = false }) => {
             name: 'signup',
             test: module => module.resource && module.resource.includes('/ui/components/SignUp'),
           },
+          checkout: {
+            minChunks: 1,
+            name: 'checkout',
+            test: module =>
+              module.resource &&
+              (module.resource.includes('/ui/components/Checkout') ||
+                // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
+                module.resource.includes('/node_modules/@stripe')),
+          },
           common: {
             minChunks: 1,
             name: 'ui-common',

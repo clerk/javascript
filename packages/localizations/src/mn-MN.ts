@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Буцах',
+  badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
   badge__primary: 'Үндсэн',
@@ -279,6 +288,7 @@ export const mnMN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -302,6 +312,11 @@ export const mnMN: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -649,6 +664,14 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -772,6 +795,7 @@ export const mnMN: LocalizationResource = {
     mobileButton__menu: 'Цэс',
     navbar: {
       account: 'Профайл',
+      billing: undefined,
       description: 'Бүртгэлийнхээ мэдээллийг удирдана уу.',
       security: 'Аюулгүй байдал',
       title: 'Бүртгэл',
@@ -898,6 +922,7 @@ export const mnMN: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Wallet устгэх',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },

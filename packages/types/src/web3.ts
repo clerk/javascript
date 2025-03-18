@@ -15,6 +15,8 @@ export type Web3Provider = MetamaskWeb3Provider | CoinbaseWalletWeb3Provider | O
 /**
  * @deprecated This constant will be dropped in the next major release.
  * You can import it from `@clerk/shared/web3`.
+ *
+ * @hidden
  */
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
@@ -41,6 +43,8 @@ interface getWeb3ProviderDataProps {
 
 /**
  * @deprecated This utility will be dropped in the next major release.
+ *
+ * @hidden
  */
 export function getWeb3ProviderData({
   provider,

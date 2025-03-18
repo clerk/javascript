@@ -1,6 +1,6 @@
 {
   "name": "@clerk/agent-toolkit",
-  "version": "0.0.6",
+  "version": "0.0.10",
   "description": "Clerk Toolkit for AI Agents",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -16,14 +16,21 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    "./langchain": {
-      "types": "./dist/langchain/index.d.ts",
-      "default": "./dist/langchain/index.js"
-    },
     "./ai-sdk": {
       "types": "./dist/ai-sdk/index.d.ts",
       "default": "./dist/ai-sdk/index.js"
+    },
+    "./modelcontextprotocol": {
+      "types": "./dist/modelcontextprotocol/index.d.ts",
+      "default": "./dist/modelcontextprotocol/index.js"
+    },
+    "./langchain": {
+      "types": "./dist/langchain/index.d.ts",
+      "default": "./dist/langchain/index.js"
     }
+  },
+  "bin": {
+    "local-mcp": "./dist/modelcontextprotocol/local-server.js"
   },
   "files": [
     "dist"
@@ -34,16 +41,19 @@
     "dev": "tsup --watch",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
-    "lint:publint": "publint"
+    "lint:publint": "publint",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "zod": "^3.24.2"
+    "@modelcontextprotocol/sdk": "1.7.0",
+    "yargs": "17.7.2",
+    "zod": "3.24.2"
   },
   "devDependencies": {
-    "esbuild-plugin-file-path-extensions": "^2.1.4"
+    "@types/yargs": "^17.0.33"
   },
   "peerDependencies": {
     "@langchain/core": "^0.3.6",

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Atrás',
+  badge__currentPlan: undefined,
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
@@ -279,6 +288,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes acceso a este método? Prueba otra opción.',
       blockButton__backupCode: 'Usar código de respaldo',
       blockButton__emailCode: 'Usar código de correo electrónico',
+      blockButton__passkey: undefined,
       blockButton__password: 'Usar contraseña',
       blockButton__phoneCode: 'Usar código de teléfono',
       blockButton__totp: 'Usar verificación TOTP',
@@ -305,6 +315,11 @@ export const esES: LocalizationResource = {
       message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',
       subtitle: 'No se encontraron métodos alternativos disponibles.',
       title: 'Métodos de verificación no disponibles',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
@@ -651,6 +666,14 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '¡Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -776,6 +799,7 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -902,6 +926,7 @@ export const esES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Quitar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Agregar cartera Web3',
         title: 'Cartera Web3',
       },

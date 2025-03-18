@@ -1,9 +1,11 @@
 import type {
   Appearance,
+  CheckoutTheme,
   CreateOrganizationTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PricingTableTheme,
   SignInTheme,
   SignUpTheme,
   UserButtonTheme,
@@ -12,6 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { __experimental_CommerceNamespace } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -43,20 +46,19 @@ import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 /**
- * Contains information about the SDK that the host application is using.
- * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+ * @inline
  */
 export type SDKMetadata = {
   /**
-   * The npm package name of the SDK
+   * The npm package name of the SDK.
    */
   name: string;
   /**
-   * The npm package version of the SDK
+   * The npm package version of the SDK.
    */
   version: string;
   /**
-   * Typically this will be the NODE_ENV that the SDK is currently running in
+   * Typically this will be the `NODE_ENV` that the SDK is currently running in.
    */
   environment?: string;
 };
@@ -105,6 +107,9 @@ export interface Clerk {
    */
   loaded: boolean;
 
+  /**
+   * @internal
+   */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   frontendApi: string;
@@ -143,6 +148,9 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /** Commerce Object */
+  __experimental_commerce: __experimental_CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -383,6 +391,21 @@ export interface Clerk {
   unmountWaitlist: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a pricing table component at the target element.
+   * @param targetNode Target node to mount the PricingTable component.
+   * @param props configuration parameters.
+   */
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+
+  /**
+   * Unmount a pricing table component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the PricingTable component from.
+   */
+  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -399,8 +422,24 @@ export interface Clerk {
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
    * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   * @internal
    */
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
+  /**
+   * Registers the internal navigation context from UI components in order to
+   * be triggered from `Clerk` methods
+   * @internal
+   */
+  __internal_setComponentNavigationContext: (context: {
+    navigate: (
+      to: string,
+      options?: {
+        searchParams?: URLSearchParams;
+      },
+    ) => Promise<unknown>;
+    basePath: string;
+  }) => () => void;
 
   /**
    * Set the active session and organization explicitly.
@@ -607,14 +646,16 @@ export interface Clerk {
   /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   * @internal
    */
   __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
 
   /**
-   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
-   **/
+   * This function is used to reload the initial resources (Environment/Client) from the Frontend API.
+   * @internal
+   */
   __internal_reloadInitialResources: () => Promise<void>;
 }
 
@@ -684,13 +725,7 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     }
   | {
-      /**
-       * A function which takes the destination path as an argument and performs a "push" navigation.
-       */
       routerPush: RouterFn;
-      /**
-       * A function which takes the destination path as an argument and performs a "replace" navigation.
-       */
       routerReplace: RouterFn;
       routerDebug?: boolean;
     };
@@ -725,14 +760,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     supportEmail?: string;
     /**
-     * By default, the [FAPI `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signInUrl?: string;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     */
     signUpUrl?: string;
     /**
      * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
@@ -747,7 +784,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry)
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
       | false
@@ -763,32 +800,46 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
+     */
     waitlistUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
       {
+        /**
+         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         */
         persistClient: boolean;
+        /**
+         * Clerk will rethrow network errors that occur while the user is offline.
+         */
         rethrowOfflineNetworkErrors: boolean;
+        commerce: boolean;
+        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
+        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
 
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
+     * @internal
      */
     __internal_keyless_claimKeylessApplicationUrl?: string;
 
     /**
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     * @internal
      */
     __internal_keyless_copyInstanceKeysUrl?: string;
 
     /**
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
   };
@@ -834,9 +885,27 @@ type NavigationType =
 
 type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
 
+/**
+ * @inline
+ */
 type RouterFn = (
+  /**
+   * The destination path
+   */
   to: string,
-  metadata?: { __internal_metadata?: RouterMetadata; windowNavigate: (to: URL | string) => void },
+  /**
+   * Optional metadata
+   */
+  metadata?: {
+    /**
+     * @internal
+     */
+    __internal_metadata?: RouterMetadata;
+    /**
+     * Provide a function to be used for navigation.
+     */
+    windowNavigate: (to: URL | string) => void;
+  },
 ) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
@@ -871,34 +940,38 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+/**
+ * The parameters for the `setActive()` method.
+ * @interface
+ */
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set on the client.
-   * If `null`, the current session is deleted.
+   * The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.
    */
   session?: SignedInSessionResource | string | null;
 
   /**
-   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
-   * If `null`, the currently active organization is removed as active.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session. If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated use the redirectUrl parameter to redirect a user
+   * @deprecated in favor of `redirectUrl`.
    *
-   * Callback run just before the active session and/or organization is set to the passed object.
-   * Can be used to hook up for pre-navigation actions.
+   * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   * The full URL or path to redirect to just before the active session and/or organization is set.
    */
   redirectUrl?: string;
 };
 
-export type SetActive = (params: SetActiveParams) => Promise<void>;
+/**
+ * @inline
+ */
+export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
@@ -1379,6 +1452,20 @@ export type WaitlistProps = {
 };
 
 export type WaitlistModalProps = WaitlistProps;
+
+export type __experimental_PricingTableProps = {
+  appearance?: PricingTableTheme;
+  ctaPosition?: 'top' | 'bottom';
+  collapseFeatures?: boolean;
+  layout?: 'default' | 'matrix';
+};
+
+export type __experimental_CheckoutProps = {
+  appearance?: CheckoutTheme;
+  planId?: string;
+  planPeriod?: string;
+  checkoutId?: string;
+};
 
 export interface HandleEmailLinkVerificationParams {
   /**

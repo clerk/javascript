@@ -193,8 +193,7 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 // TODO(dimkl): Will be probably be dropped in next major version
 function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
   return async (...args) => {
-    // @ts-ignore
-    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb<T>(...args);
+    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb(...args);
     if (errors) {
       // instead of passing `data: errors`, we have set the `error.errors` because
       // the errors returned from callback is already parsed and passing them as `data`

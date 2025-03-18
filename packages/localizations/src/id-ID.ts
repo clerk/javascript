@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Kembali',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
   badge__primary: 'Utama',
@@ -279,6 +288,7 @@ export const idID: LocalizationResource = {
       actionText: 'Tidak memiliki salah satu dari ini?',
       blockButton__backupCode: 'Gunakan kode cadangan',
       blockButton__emailCode: 'Kirim kode ke {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Lanjutkan dengan kata sandi Anda',
       blockButton__phoneCode: 'Kirim kode SMS ke {{identifier}}',
       blockButton__totp: 'Gunakan aplikasi autentikator Anda',
@@ -305,6 +315,11 @@ export const idID: LocalizationResource = {
       message: 'Tidak dapat melanjutkan verifikasi. Tidak ada faktor autentikasi yang sesuai dikonfigurasi',
       subtitle: 'Terjadi kesalahan',
       title: 'Tidak dapat memverifikasi akun Anda',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gunakan metode lain',
@@ -658,6 +673,14 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
@@ -773,6 +796,7 @@ export const idID: LocalizationResource = {
     mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',
       title: 'Akun',
@@ -897,6 +921,7 @@ export const idID: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: undefined,
+        detailsAction__nonPrimary: undefined,
         primaryButton: undefined,
         title: undefined,
       },

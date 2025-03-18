@@ -21,7 +21,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _SignInFactorTwo(): JSX.Element {
+function SignInFactorTwoInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const availableFactors = signIn.supportedSecondFactors;
 
@@ -80,4 +80,4 @@ export function _SignInFactorTwo(): JSX.Element {
   }
 }
 
-export const SignInFactorTwo = withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorTwo));
+export const SignInFactorTwo = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorTwoInternal));

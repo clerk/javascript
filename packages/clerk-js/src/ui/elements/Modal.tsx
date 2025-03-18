@@ -54,6 +54,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
+      outsideElementsInert
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Indietro',
+  badge__currentPlan: undefined,
   badge__default: 'Predefinito',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__primary: 'Primario',
@@ -279,6 +288,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Usa un metodo di verifica alternativo',
       blockButton__backupCode: 'Verifica con il codice di backup',
       blockButton__emailCode: 'Verifica con il codice via email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Verifica con la password',
       blockButton__phoneCode: 'Verifica con il codice SMS',
       blockButton__totp: 'Verifica con il TOTP',
@@ -304,6 +314,11 @@ export const itIT: LocalizationResource = {
       message: 'Non sono disponibili metodi di verifica.',
       subtitle: 'Contatta il supporto per assistenza.',
       title: 'Nessun metodo disponibile',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Reimposta la password',
@@ -649,6 +664,14 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -773,6 +796,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profilo',
+      billing: undefined,
       description: 'Gestisci il tuo account.',
       security: 'Sicurezza',
       title: 'Account',
@@ -900,6 +924,7 @@ export const itIT: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Rimuovi wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },

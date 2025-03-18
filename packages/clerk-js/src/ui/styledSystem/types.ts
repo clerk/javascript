@@ -31,6 +31,9 @@ type ElementProps = {
   th: React.JSX.IntrinsicElements['th'];
   tr: React.JSX.IntrinsicElements['tr'];
   td: React.JSX.IntrinsicElements['td'];
+  dl: React.JSX.IntrinsicElements['dl'];
+  dt: React.JSX.IntrinsicElements['dt'];
+  dd: React.JSX.IntrinsicElements['dd'];
 };
 
 /**

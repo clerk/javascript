@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '돌아가기',
+  badge__currentPlan: undefined,
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
   badge__primary: '기본',
@@ -275,6 +284,7 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -298,6 +308,11 @@ export const koKR: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -642,6 +657,14 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -759,6 +782,7 @@ export const koKR: LocalizationResource = {
     mobileButton__menu: '메뉴',
     navbar: {
       account: '프로필',
+      billing: undefined,
       description: '계정 정보를 관리하세요.',
       security: '보안',
       title: '계정',
@@ -883,6 +907,7 @@ export const koKR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '지갑 제거',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 지갑',
         title: 'Web3 지갑',
       },

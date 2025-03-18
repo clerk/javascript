@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Geri',
+  badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
   badge__primary: 'Birincil',
@@ -278,6 +287,7 @@ export const trTR: LocalizationResource = {
       actionText: 'Alternatif doğrulama yöntemlerini kullanmak ister misiniz?',
       blockButton__backupCode: 'Yedek kodu kullan',
       blockButton__emailCode: 'E-posta kodu gönder',
+      blockButton__passkey: undefined,
       blockButton__password: 'Şifreyi gir',
       blockButton__phoneCode: 'Telefon kodu gönder',
       blockButton__totp: 'TOTP kodu kullan',
@@ -303,6 +313,11 @@ export const trTR: LocalizationResource = {
       message: 'Alternatif doğrulama yöntemleri mevcut değil.',
       subtitle: 'Lütfen farklı bir doğrulama yöntemi deneyin.',
       title: 'Doğrulama Yöntemleri Yok',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Şifremi unuttum',
@@ -651,6 +666,14 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopyala',
@@ -774,6 +797,7 @@ export const trTR: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hesap bilgilerinizi yönetin.',
       security: 'Güvenlik',
       title: 'Hesap',
@@ -899,6 +923,7 @@ export const trTR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Cüzdanı kaldır',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
       },

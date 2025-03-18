@@ -19,15 +19,59 @@ const typedocPluginMarkdownOptions = {
   hidePageHeader: true,
   hideBreadcrumbs: true,
   hidePageTitle: true,
+  parametersFormat: 'table',
+  interfacePropertiesFormat: 'table',
+  classPropertiesFormat: 'table',
+  enumMembersFormat: 'table',
+  propertyMembersFormat: 'table',
+  typeDeclarationFormat: 'table',
+  typeDeclarationVisibility: 'compact',
+  useHTMLAnchors: false,
+  tableColumnSettings: {
+    hideSources: true,
+  },
+  fileExtension: '.mdx',
+  excludeScopesInPaths: true,
+  expandObjects: true,
+};
+
+/** @type {Partial<import("typedoc-plugin-replace-text").Config>} */
+const typedocPluginReplaceTextOptions = {
+  replaceText: {
+    replacements: [
+      {
+        /**
+         * Inside our JSDoc comments we have absolute links to our docs, e.g. [Foo](https://clerk.com/docs/bar).
+         * We want to replace these with relative links, e.g. [Foo](/docs/bar).
+         */
+        pattern: /https:\/\/clerk\.com\/docs/,
+        replace: '/docs',
+        flags: 'g',
+      },
+      {
+        /**
+         * Sometimes we need to add ```empty``` to an @example so that it's properly rendered (but we don't want to show a codeblock). This removes these placeholders.
+         */
+        pattern: /```empty```/,
+        replace: '',
+      },
+    ],
+  },
 };
 
 /** @type {Partial<import("typedoc").TypeDocOptions>} */
 const config = {
   out: './.typedoc/docs',
-  // TODO: Once we're happy with the output the JSON should be written to a non-gitignored location as we want to consume it in other places
-  json: './.typedoc/output.json',
+  json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
-  plugin: ['typedoc-plugin-markdown'],
+  plugin: [
+    'typedoc-plugin-replace-text',
+    'typedoc-plugin-markdown',
+    './.typedoc/custom-theme.mjs',
+    './.typedoc/custom-plugin.mjs',
+  ],
+  theme: 'clerkTheme',
+  readme: 'none',
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -43,6 +87,7 @@ const config = {
     readme: 'none',
     disableGit: true,
     disableSources: true,
+    ...typedocPluginReplaceTextOptions,
   },
   entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
   ...typedocPluginMarkdownOptions,

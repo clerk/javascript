@@ -119,6 +119,5 @@ export interface JwtPayload extends CustomJwtSessionClaims {
  */
 export interface ActClaim {
   sub: string;
-
   [x: string]: unknown;
 }

@@ -55,6 +55,11 @@ const createExpectPageObject = ({ page }: TestArgs) => {
 
 const createClerkUtils = ({ page }: TestArgs) => {
   return {
+    toBeLoaded: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.loaded;
+      });
+    },
     getClientSideUser: () => {
       return page.evaluate(() => {
         return window.Clerk?.user;

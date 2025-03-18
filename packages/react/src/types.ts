@@ -36,26 +36,27 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSVersion?: string;
   /**
-   * The Clerk publishable key for your instance
-   * @note This can be found in your Clerk Dashboard on the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) page
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;
   /**
-   * This nonce value will be passed through to the `@clerk/clerk-js` script tag.
-   * @note You can use this to implement [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp)
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
    */
   nonce?: string;
 } & MultiDomainAndOrProxy;
 
+/**
+ * @interface
+ */
 export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
   /**
-   * Provide an initial state of the Clerk client during server-side rendering (SSR)
+   * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
    */
   initialState?: InitialState;
   /**
-   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
-   * Defaults to `false`.
+   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error. Defaults to `false`.
+   * @internal
    */
   __internal_bypassMissingPublishableKey?: boolean;
 };

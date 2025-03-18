@@ -146,6 +146,23 @@ export type ElementsConfig = {
   actionCard: WithOptions;
   popoverBox: WithOptions;
 
+  disclosureRoot: WithOptions;
+  disclosureTrigger: WithOptions;
+  disclosureContentRoot: WithOptions;
+  disclosureContentInner: WithOptions;
+  disclosureContent: WithOptions;
+
+  lineItemsRoot: WithOptions;
+  lineItemsDivider: WithOptions;
+  lineItemsGroup: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitle: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitleDescription: WithOptions;
+  lineItemsDescription: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsDescriptionInner: WithOptions;
+  lineItemsDescriptionText: WithOptions;
+  lineItemsDescriptionSuffix: WithOptions;
+  lineItemsDescriptionPrefix: WithOptions;
+
   logoBox: WithOptions;
   logoImage: WithOptions;
 
@@ -193,6 +210,19 @@ export type ElementsConfig = {
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
+  drawerBackdrop: WithOptions;
+  drawerContent: WithOptions;
+  drawerHeader: WithOptions;
+  drawerTitle: WithOptions;
+  drawerBody: WithOptions;
+  drawerFooter: WithOptions;
+  drawerClose: WithOptions;
+  drawerConfirmationBackdrop: WithOptions;
+  drawerConfirmationRoot: WithOptions;
+  drawerConfirmationTitle: WithOptions;
+  drawerConfirmationDescription: WithOptions;
+  drawerConfirmationActions: WithOptions;
+
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
   formHeaderSubtitle: WithOptions<never, ErrorState>;
@@ -234,6 +264,9 @@ export type ElementsConfig = {
 
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
+
+  segmentedControlRoot: WithOptions;
+  segmentedControlButton: WithOptions;
 
   avatarBox: WithOptions;
   avatarImage: WithOptions;
@@ -319,6 +352,32 @@ export type ElementsConfig = {
   accountSwitcherActionButton: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
+
+  pricingTable: WithOptions;
+  planCard: WithOptions<string>;
+  planCardDefault: WithOptions;
+  planCardCompact: WithOptions;
+  planCardHeader: WithOptions;
+  planCardAvatarBadgeContainer: WithOptions;
+  planCardAvatar: WithOptions;
+  planCardBadgeContainer: WithOptions;
+  planCardBadge: WithOptions;
+  planCardTitle: WithOptions;
+  planCardDescription: WithOptions;
+  planCardFeatures: WithOptions;
+  planCardFeaturesList: WithOptions<string>;
+  planCardFeaturesListItem: WithOptions<string>;
+  planCardFeaturesListItemContent: WithOptions;
+  planCardFeaturesListItemTitle: WithOptions;
+  planCardFeaturesListItemDescription: WithOptions;
+  planCardAction: WithOptions;
+  planCardPeriodToggle: WithOptions;
+  planCardFeeContainer: WithOptions;
+  planCardFee: WithOptions;
+  planCardFeePeriod: WithOptions;
+  planCardFeePeriodNotice: WithOptions;
+  planCardFeePeriodNoticeInner: WithOptions;
+  planCardFeePeriodNoticeLabel: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
@@ -666,6 +725,8 @@ export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
+export type PricingTableTheme = Theme;
+export type CheckoutTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -712,4 +773,12 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<Waitlist />` component
    */
   waitlist?: T;
+  /**
+   * Theme overrides that only apply to the `<PricingTable />` component
+   */
+  pricingTable?: T;
+  /**
+   * Theme overrides that only apply to the `<Checkout />` component
+   */
+  checkout?: T;
 };

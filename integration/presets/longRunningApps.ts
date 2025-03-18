@@ -37,6 +37,11 @@ export const createLongRunningApps = () => {
       config: next.appRouter,
       env: envs.withSignInOrUpEmailLinksFlow,
     },
+    {
+      id: 'next.appRouter.withSessionTasks',
+      config: next.appRouter,
+      env: envs.withSessionTasks,
+    },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },

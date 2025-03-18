@@ -62,7 +62,7 @@ export abstract class BaseResource {
     return !this.id;
   }
 
-  protected static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
+  static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
