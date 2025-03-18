@@ -25,12 +25,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     await u.po.signIn.goTo();
 
-    let waitForClientImmediatly = page.waitForResponse(response => response.url().includes('/sign_ins'), {
+    let waitForClientImmediately = page.waitForResponse(response => response.url().includes('/sign_ins'), {
       timeout: 3_000,
     });
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
 
-    const clientReponse = await waitForClientImmediatly;
+    const clientReponse = await waitForClientImmediately;
     const d = await clientReponse.json();
     console.log('Response from `/sign_ins`', d.client.sessions[0].last_active_token);
 
@@ -77,12 +77,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
     await page.reload();
 
-    waitForClientImmediatly = page.waitForResponse(
+    waitForClientImmediately = page.waitForResponse(
       response => response.url().includes('/client?') && response.status() === 500,
       { timeout: 3_000 },
     );
 
-    const waitForTokenImmediatly = page.waitForResponse(
+    const waitForTokenImmediately = page.waitForResponse(
       response =>
         response.url().includes('/tokens?') && response.status() === 200 && response.request().method() === 'POST',
       { timeout: 3_000 },
@@ -90,12 +90,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     await page.waitForLoadState('domcontentloaded');
 
-    await waitForClientImmediatly;
-    const res = await waitForTokenImmediatly;
+    await waitForClientImmediately;
+    const res = await waitForTokenImmediately;
     console.log('Response from `/tokens`', await res.json());
     console.log('');
 
-    // Wait for the client to be loaded. and the internal `getToken({skipped: true})` to have been completed.
+    // Wait for the client to be loaded. and the internal `getToken({skipCache: true})` to have been completed.
     await u.po.clerk.toBeLoaded();
 
     // Read the newly refreshed token.
