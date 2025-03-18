@@ -66,7 +66,7 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * </Tab>
  * <Tab>
  *
- * {@include ../../../examples/use-user.md#nextjs-01}
+ * {@include ../../../docs/use-user.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>
@@ -117,7 +117,7 @@ import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
  * </Tab>
  * <Tab>
  *
- * {@include ../../../examples/use-user.md#nextjs-02}
+ * {@include ../../../docs/use-user.md#nextjs-02}
  *
  * </Tab>
  * </Tabs>

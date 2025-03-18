@@ -34,7 +34,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * </Tab>
  * <Tab>
  *
- * {@include ../../examples/use-sign-up.md#nextjs-01}
+ * {@include ../../docs/use-sign-up.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>

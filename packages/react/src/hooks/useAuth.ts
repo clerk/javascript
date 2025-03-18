@@ -65,7 +65,7 @@ import { createGetToken, createSignOut } from './utils';
  * </Tab>
  * <Tab>
  *
- * {@include ../../examples/use-auth.md#nextjs-01}
+ * {@include ../../docs/use-auth.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>

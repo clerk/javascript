@@ -41,7 +41,7 @@ type UseSession = () => UseSessionReturn;
  * </Tab>
  * <Tab>
  *
- * {@include ../../../examples/use-session.md#nextjs-01}
+ * {@include ../../../docs/use-session.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>

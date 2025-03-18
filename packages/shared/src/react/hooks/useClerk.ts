@@ -30,7 +30,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
  * </Tab>
  * <Tab>
  *
- * {@include ../../../examples/use-clerk.md#nextjs-01}
+ * {@include ../../../docs/use-clerk.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>

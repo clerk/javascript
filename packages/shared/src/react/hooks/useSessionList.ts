@@ -35,7 +35,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientCont
  * </Tab>
  * <Tab>
  *
- * {@include ../../../examples/use-session-list.md#nextjs-01}
+ * {@include ../../../docs/use-session-list.md#nextjs-01}
  *
  * </Tab>
  * </Tabs>
