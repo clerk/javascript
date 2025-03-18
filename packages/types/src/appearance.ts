@@ -367,6 +367,9 @@ export type ElementsConfig = {
   planCardFeatures: WithOptions;
   planCardFeaturesList: WithOptions<string>;
   planCardFeaturesListItem: WithOptions<string>;
+  planCardFeaturesListItemContent: WithOptions;
+  planCardFeaturesListItemTitle: WithOptions;
+  planCardFeaturesListItemDescription: WithOptions;
   planCardAction: WithOptions;
   planCardPeriodToggle: WithOptions;
   planCardFeeContainer: WithOptions;
