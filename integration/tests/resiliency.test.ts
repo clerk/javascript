@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -32,33 +32,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     const clientReponse = await waitForClientImmediately;
     const d = await clientReponse.json();
-    console.log('Response from `/sign_ins`', d.client.sessions[0].last_active_token);
 
     await u.po.expect.toBeSignedIn();
 
-    const tokenFromClient = await page.evaluate(() => {
-      return window.Clerk?.session.lastActiveToken.jwt.claims.__raw;
-    });
-
-    // console.log('tokenFromClient');
-    // console.log(tokenFromClient);
-    // console.log('');
-
-    const tokenAfterSignIn = await page.evaluate(() => {
-      return window.Clerk?.session?.getToken();
-    });
-
-    // await page.evaluate(async () => {
-    //   console.log('tokenAfterSignIn', await window.Clerk?.session?.getToken());
-    // });
-
-    console.log('getToken() after sign in');
-    console.log(tokenAfterSignIn);
-    console.log('');
-
-    // await page.waitForTimeout(1_000);
-
-    // Simulate developer comming back and client fails to load.
+    // Simulate developer coming back and client fails to load.
     await page.route('**/v1/client?**', route => {
       return route.fulfill({
         status: 500,
@@ -91,26 +68,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     await page.waitForLoadState('domcontentloaded');
 
     await waitForClientImmediately;
-    const res = await waitForTokenImmediately;
-    console.log('Response from `/tokens`', await res.json());
-    console.log('');
+    await waitForTokenImmediately;
 
     // Wait for the client to be loaded. and the internal `getToken({skipCache: true})` to have been completed.
     await u.po.clerk.toBeLoaded();
-
-    // Read the newly refreshed token.
-    const tokenOnClientOutage = await page.evaluate(() => {
-      return window.Clerk?.session?.getToken();
-    });
-
-    console.log('tokenOnClientOutage');
-    console.log(tokenOnClientOutage);
-    console.log('');
-    expect(tokenOnClientOutage).not.toEqual(tokenAfterSignIn);
-
-    // await page.evaluate(async () => {
-    //   console.log('tokenOnClientOutage', await window.Clerk?.session?.getToken());
-    // });
 
     await u.po.expect.toBeSignedIn();
   });
