@@ -65,12 +65,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     },
     username: {
       ...DISABLED_ATTRIBUTE,
-
       name: 'username',
     },
     web3_wallet: {
       ...DISABLED_ATTRIBUTE,
-
       name: 'web3_wallet',
     },
     first_name: {
