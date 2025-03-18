@@ -1,7 +1,8 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
+import { SessionTaskContext } from '../../contexts/components/SessionTask';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -109,9 +110,9 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug, __internal_onOrganizationCreated } =
-    useOrganizationListContext();
+  const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
+  const sessionTaskContext = useContext(SessionTaskContext);
   return (
     <>
       {!isCreateOrganizationFlow && (
@@ -126,7 +127,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
-            onComplete={__internal_onOrganizationCreated}
+            onComplete={sessionTaskContext?.nextTask}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>

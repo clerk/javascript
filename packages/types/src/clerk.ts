@@ -1445,9 +1445,6 @@ export type OrganizationListProps = {
    * @default false
    */
   hideSlug?: boolean;
-
-  __internal_onOrganizationSelected?: () => void;
-  __internal_onOrganizationCreated?: () => void;
 };
 
 export type WaitlistProps = {
