@@ -1,5 +1,5 @@
 import type { Clerk, SessionVerificationLevel } from '@clerk/types';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
@@ -110,7 +110,7 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
   const [complete, setComplete] = useState<() => void>(() => {});
   const [cancel, setCancel] = useState<() => void>(() => {});
 
-  function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
+  function assertReverificationCallback<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (
     ...args: Parameters<Fetcher>
@@ -150,16 +150,8 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
            */
           params.openUIComponent?.({
             level: isValidMetadata ? isValidMetadata().level : undefined,
-            afterVerification() {
-              resolvers.resolve(true);
-            },
-            afterVerificationCancelled() {
-              resolvers.reject(
-                new ClerkRuntimeError('User cancelled attempted verification', {
-                  code: 'reverification_cancelled',
-                }),
-              );
-            },
+            afterVerification: complete,
+            afterVerificationCancelled: cancel,
           });
         }
 
@@ -188,6 +180,8 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
       return result;
     }) as ExcludeClerkError<Awaited<ReturnType<Fetcher>>, Parameters<Fetcher>[1]>;
   }
+
+  const assertReverification = useCallback(assertReverificationCallback, [cancel, complete, params]);
 
   return {
     assertReverification,
@@ -223,7 +217,7 @@ function useCreateReverificationHandler(params: CreateReverificationHandlerParam
  * import { isClerkRuntimeError } from '@clerk/clerk-react/errors'
  *
  * export function MyButton() {
- *   const { action: enhancedFetcher } = useReverification(myFetcher, { throwOnError: true })
+ *   const { action: enhancedFetcher } = useReverification(myFetcher)
  *
  *   const handleClick = async () => {
  *     try {

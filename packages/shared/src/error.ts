@@ -75,6 +75,10 @@ export function isPasswordPwnedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
 }
 
+export function isReverificationCancelled(err: any) {
+  return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
+}
+
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
