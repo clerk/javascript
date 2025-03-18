@@ -13,6 +13,12 @@ export const createUserVerificationComponentPageObject = (testArgs: TestArgs) =>
     waitForMounted: (selector = '.cl-userVerification-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
+    waitForClosed: (selector = '.cl-userVerification-root') => {
+      return page.waitForSelector(selector, { state: 'detached' });
+    },
+    closeReverificationModal: () => {
+      return page.getByLabel('Close modal').click();
+    },
     getUseAnotherMethodLink: () => {
       return page.getByRole('link', { name: /use another method/i });
     },

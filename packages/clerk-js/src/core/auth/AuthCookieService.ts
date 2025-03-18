@@ -1,6 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
@@ -183,12 +183,6 @@ export class AuthCookieService {
       void this.clerk.handleUnauthenticated();
       return;
     }
-
-    if (isNetworkError(e)) {
-      return;
-    }
-
-    clerkCoreErrorTokenRefreshFailed(e.toString());
   }
 
   /**
@@ -215,5 +209,9 @@ export class AuthCookieService {
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  public getSessionCookie() {
+    return this.sessionCookie.get();
   }
 }

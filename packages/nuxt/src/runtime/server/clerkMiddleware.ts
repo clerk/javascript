@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -115,9 +114,3 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     await handler?.(event);
   });
 };
-
-declare module 'h3' {
-  interface H3EventContext {
-    auth: AuthObject;
-  }
-}

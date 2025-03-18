@@ -1,3 +1,6 @@
+import type { SessionTask } from '@clerk/types';
+
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
@@ -22,6 +25,28 @@ export function buildVerificationRedirectUrl({
     path,
     endpoint:
       isCombinedFlow && intent === 'sign-up' ? `/create${MAGIC_LINK_VERIFY_PATH_ROUTE}` : MAGIC_LINK_VERIFY_PATH_ROUTE,
+  });
+}
+
+export function buildSessionTaskRedirectUrl({
+  routing,
+  path,
+  baseUrl,
+  task,
+}: Pick<SignInContextType | SignUpContextType, 'routing' | 'path'> & {
+  baseUrl: string;
+  task?: SessionTask;
+}) {
+  if (!task) {
+    return null;
+  }
+
+  return buildRedirectUrl({
+    routing,
+    baseUrl,
+    path,
+    endpoint: `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+    authQueryString: null,
   });
 }
 

@@ -32,13 +32,13 @@ const getOrganization = ClerkTool({
       .optional()
       .describe('(boolean, optional): Whether to include the members count for the organization.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     if (!params.organizationId && !params.slug) {
       throw new Error('Either organizationId or slug must be provided');
     }
     const res = await clerkClient.organizations.getOrganization({
       ...params,
-      organizationId: context.organizationId || params.organizationId,
+      organizationId: context.orgId || params.organizationId,
     });
     return prunePrivateData(context, res.raw);
   },
@@ -85,7 +85,7 @@ const createOrganization = ClerkTool({
       .optional()
       .describe('(Record<string,any>, optional): Private metadata for the organization (backend-only).'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const { createdBy, ...createParams } = params;
     // Use provided createdBy or fall back to context userId
     const createParamsWithUser =
@@ -123,12 +123,9 @@ const updateOrganization = ClerkTool({
       .optional()
       .describe('(Record<string,any>, optional): New private metadata for the organization (backend-only).'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const { organizationId, ...updateParams } = params;
-    const res = await clerkClient.organizations.updateOrganization(
-      context.organizationId || organizationId,
-      updateParams,
-    );
+    const res = await clerkClient.organizations.updateOrganization(context.orgId || organizationId, updateParams);
     return prunePrivateData(context, res.raw);
   },
 });
@@ -165,10 +162,10 @@ const updateOrganizationMetadata = ClerkTool({
         '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
       ),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const { organizationId, ...metadataParams } = params;
     const res = await clerkClient.organizations.updateOrganizationMetadata(
-      context.organizationId || organizationId,
+      context.orgId || organizationId,
       metadataParams,
     );
     return prunePrivateData(context, res.raw);
@@ -192,8 +189,8 @@ const deleteOrganization = ClerkTool({
   parameters: z.object({
     organizationId: z.string().describe('(string): The ID of the organization to delete. Required.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.deleteOrganization(context.organizationId || params.organizationId);
+  execute: (clerkClient, context) => async params => {
+    const res = await clerkClient.organizations.deleteOrganization(context.orgId || params.organizationId);
     return prunePrivateData(context, res.raw);
   },
 });
@@ -217,10 +214,10 @@ const createOrganizationMembership = ClerkTool({
     userId: z.string().describe('(string): The ID of the user to add as a member. Required.'),
     role: z.string().describe('(string): The role to assign to the user in the organization. Required.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const res = await clerkClient.organizations.createOrganizationMembership({
       ...params,
-      organizationId: context.organizationId || params.organizationId,
+      organizationId: context.orgId || params.organizationId,
       userId: context.userId || params.userId,
     });
     return prunePrivateData(context, res.raw);
@@ -246,10 +243,10 @@ const updateOrganizationMembership = ClerkTool({
     userId: z.string().describe('(string): The ID of the user whose membership is being updated. Required.'),
     role: z.string().describe('(string): The new role to assign to the user. Required.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const res = await clerkClient.organizations.updateOrganizationMembership({
       ...params,
-      organizationId: context.organizationId || params.organizationId,
+      organizationId: context.orgId || params.organizationId,
     });
     return prunePrivateData(context, res.raw);
   },
@@ -288,10 +285,10 @@ const updateOrganizationMembershipMetadata = ClerkTool({
         '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
       ),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const res = await clerkClient.organizations.updateOrganizationMembershipMetadata({
       ...params,
-      organizationId: context.organizationId || params.organizationId,
+      organizationId: context.orgId || params.organizationId,
     });
     return prunePrivateData(context, res.raw);
   },
@@ -315,7 +312,7 @@ const deleteOrganizationMembership = ClerkTool({
     organizationId: z.string().describe('(string): The ID of the organization to remove the member from. Required.'),
     userId: z.string().describe('(string): The ID of the user to remove from the organization. Required.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const res = await clerkClient.organizations.deleteOrganizationMembership({
       ...params,
       userId: context.userId || params.userId,
@@ -357,7 +354,7 @@ const createOrganizationInvitation = ClerkTool({
       .optional()
       .describe('(Record<string,any>, optional): Public metadata for the invitation.'),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const { inviterUserId, ...inviteParams } = params;
     // Use provided inviterUserId or fall back to context userId
     const inviteParamsWithUser =
@@ -394,7 +391,7 @@ const revokeOrganizationInvitation = ClerkTool({
         '(string, optional): User ID of the person revoking the invitation. Defaults to the current authenticated user.',
       ),
   }),
-  bindRunnable: (clerkClient, context) => async params => {
+  execute: (clerkClient, context) => async params => {
     const { requestingUserId, ...revokeParams } = params;
     // Use provided requestingUserId or fall back to context userId
     const revokeParamsWithUser =

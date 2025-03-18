@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.12.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Update Turkish translations to replace English and Portuguese phrases ([#5257](https://github.com/clerk/javascript/pull/5257)) by [@kaandok](https://github.com/kaandok)
+
+- Add sv-SE translations for localization keys under `signUp.legalConsent`. ([#5251](https://github.com/clerk/javascript/pull/5251)) by [@severi](https://github.com/severi)
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/types@4.48.0
+
 ## 3.11.1
 
 ### Patch Changes

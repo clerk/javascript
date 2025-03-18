@@ -5,6 +5,7 @@ import {
   addImportsDir,
   addPlugin,
   addServerHandler,
+  addTypeTemplate,
   createResolver,
   defineNuxtModule,
   updateRuntimeConfig,
@@ -96,6 +97,21 @@ export default defineNuxtModule<ModuleOptions>({
         handler: resolver.resolve('./runtime/server/middleware'),
       });
     }
+
+    // Adds TS support for `event.context.auth` in event handlers
+    addTypeTemplate(
+      {
+        filename: 'types/clerk.d.ts',
+        getContents: () => `import type { AuthObject } from '@clerk/backend';
+          declare module 'h3' {
+            interface H3EventContext {
+              auth: AuthObject;
+            }
+          }
+        `,
+      },
+      { nitro: true },
+    );
 
     // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));

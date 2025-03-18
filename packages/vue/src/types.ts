@@ -1,5 +1,5 @@
 import type {
-  ActJWTClaim,
+  ActClaim,
   Clerk,
   ClerkOptions,
   ClientResource,
@@ -19,7 +19,7 @@ export interface VueClerkInjectionKeyType {
   authCtx: ComputedRef<{
     userId: string | null | undefined;
     sessionId: string | null | undefined;
-    actor: ActJWTClaim | null | undefined;
+    actor: ActClaim | null | undefined;
     orgId: string | null | undefined;
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Takaisin',
+  badge__currentPlan: undefined,
   badge__default: 'Oletus',
   badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
   badge__primary: 'Ensisijainen',
@@ -279,6 +288,7 @@ export const fiFI: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -302,6 +312,11 @@ export const fiFI: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -649,6 +664,14 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopioitu',
       actionLabel__copy: 'Kopioi',
@@ -773,6 +796,7 @@ export const fiFI: LocalizationResource = {
     mobileButton__menu: 'Valikko',
     navbar: {
       account: 'Profiili',
+      billing: undefined,
       description: 'Hallitse tilisi tietoja',
       security: 'Turvallisuus',
       title: 'Tili',
@@ -900,6 +924,7 @@ export const fiFI: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Poista lompakko',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
       },
