@@ -26,6 +26,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Validate Renovate Config
-        env:
-          RENOVATE_VERSION: 37.440.7 # Last version compatible with Node 18
-        run: npx --yes --package renovate@${{ env.RENOVATE_VERSION }} renovate-config-validator
+        run: npx --yes --package renovate@latest renovate-config-validator
