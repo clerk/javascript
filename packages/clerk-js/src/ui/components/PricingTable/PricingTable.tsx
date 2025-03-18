@@ -4,12 +4,14 @@ import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
-import { Box, descriptors } from '../../customizables';
+import { Box, descriptors, Icon, Text } from '../../customizables';
+import { SegmentedControl } from '../../elements';
 import { useFetch } from '../../hooks';
+import { Check } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
 import { __experimental_Checkout } from '../Checkout';
 import type { PlanPeriod } from './PlanCard';
-import { PlanCard } from './PlanCard';
+import { PlanCard, PlanCardHeader } from './PlanCard';
 import { PlanDetailDrawer } from './PlanDetailDrawer';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
@@ -34,6 +36,181 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
 
   return (
     <InternalThemeProvider>
+      {plans ? (
+        <Box role='table'>
+          <Box role='rowgroup'>
+            <Box
+              role='row'
+              sx={t => ({
+                display: 'grid',
+                gridTemplateColumns: `repeat(${plans.length + 1}, minmax(0,1fr))`,
+              })}
+            >
+              <Box
+                role='columnheader'
+                sx={t => ({
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'flex-start',
+                })}
+              >
+                <SegmentedControl.Root
+                  aria-label='Set pay period'
+                  value={planPeriod}
+                  onChange={value => setPlanPeriod(value as PlanPeriod)}
+                >
+                  <SegmentedControl.Button
+                    value='month'
+                    // TODO(@Commerce): needs localization
+                    text='Monthly'
+                  />
+                  <SegmentedControl.Button
+                    value='annual'
+                    // TODO(@Commerce): needs localization
+                    text='Annually'
+                  />
+                </SegmentedControl.Root>
+              </Box>
+              {plans?.map(plan => (
+                <Box
+                  key={plan.slug}
+                  role='columnheader'
+                >
+                  <PlanCardHeader
+                    plan={plan}
+                    planPeriod={planPeriod}
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+          <Box role='rowgroup'>
+            <Box
+              role='row'
+              sx={t => ({
+                display: 'grid',
+                gridTemplateColumns: `repeat(${plans.length + 1}, minmax(0,1fr))`,
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                ':hover': {
+                  backgroundColor: t.colors.$neutralAlpha25,
+                },
+              })}
+            >
+              <Box
+                role='cell'
+                sx={t => ({
+                  padding: t.space.$4,
+                })}
+              >
+                <Text>Feature 1</Text>
+              </Box>
+              {plans.map((_, i) => (
+                <Box
+                  key={i}
+                  role='cell'
+                  sx={t => ({
+                    display: 'grid',
+                    placeContent: 'center',
+                    padding: t.space.$4,
+                  })}
+                >
+                  <Icon
+                    icon={Check}
+                    colorScheme='neutral'
+                    size='sm'
+                  />
+                </Box>
+              ))}
+            </Box>
+            <Box
+              role='row'
+              sx={t => ({
+                display: 'grid',
+                gridTemplateColumns: `repeat(${plans.length + 1}, minmax(0,1fr))`,
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                ':hover': {
+                  backgroundColor: t.colors.$neutralAlpha25,
+                },
+              })}
+            >
+              <Box
+                role='cell'
+                sx={t => ({
+                  padding: t.space.$4,
+                })}
+              >
+                <Text>Feature 1</Text>
+              </Box>
+              {plans.map((_, i) => (
+                <Box
+                  key={i}
+                  role='cell'
+                  sx={t => ({
+                    display: 'grid',
+                    placeContent: 'center',
+                    padding: t.space.$4,
+                  })}
+                >
+                  <Icon
+                    icon={Check}
+                    colorScheme='neutral'
+                    size='sm'
+                  />
+                </Box>
+              ))}
+            </Box>
+            <Box
+              role='row'
+              sx={t => ({
+                display: 'grid',
+                gridTemplateColumns: `repeat(${plans.length + 1}, minmax(0,1fr))`,
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                ':hover': {
+                  backgroundColor: t.colors.$neutralAlpha25,
+                },
+              })}
+            >
+              <Box
+                role='cell'
+                sx={t => ({
+                  padding: t.space.$4,
+                })}
+              >
+                <Text>Feature 1</Text>
+              </Box>
+              {plans.map((_, i) => (
+                <Box
+                  key={i}
+                  role='cell'
+                  sx={t => ({
+                    display: 'grid',
+                    placeContent: 'center',
+                    padding: t.space.$4,
+                  })}
+                >
+                  <Icon
+                    icon={Check}
+                    colorScheme='neutral'
+                    size='sm'
+                  />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Box>
+      ) : null}
+
+      <br />
+      <br />
+      <br />
+      <br />
+
       <Box
         elementDescriptor={descriptors.pricingTable}
         sx={t => ({

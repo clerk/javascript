@@ -139,7 +139,7 @@ interface PlanCardHeaderProps {
   isCompact?: boolean;
   isActivePlan?: boolean;
   planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  setPlanPeriod?: (val: PlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -312,7 +312,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           />
         )}
       </Flex>
-      {plan.hasBaseFee && annualMonthlyAmount > 0 ? (
+      {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.planCardPeriodToggle}
           sx={t => ({
