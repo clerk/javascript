@@ -108,6 +108,9 @@
     },
     "expo-local-authentication": {
       "optional": true
+    },
+    "expo-secure-store": {
+      "optional": true
     }
   },
   "engines": {
