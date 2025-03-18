@@ -134,7 +134,7 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
-  button: WithOptions;
+  button: WithOptions<string>;
   input: WithOptions;
   checkbox: WithOptions;
   radio: WithOptions;
@@ -200,6 +200,15 @@ export type ElementsConfig = {
   alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
+
+  checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormElementsRoot: WithOptions;
+
+  checkoutSuccessRoot: WithOptions;
+  checkoutSuccessRing: WithOptions;
+  checkoutSuccessBadge: WithOptions;
+  checkoutSuccessTitle: WithOptions;
+  checkoutSuccessDescription: WithOptions;
 
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
