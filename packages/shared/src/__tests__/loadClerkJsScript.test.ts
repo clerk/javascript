@@ -60,7 +60,7 @@ describe('loadClerkJsScript(options)', () => {
     const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
     mockExistingScript.dispatchEvent(new Event('error'));
 
-    await expect(loadPromise).rejects.toBe('Clerk: Failed to load Clerk');
+    await expect(loadPromise).rejects.toThrow('Clerk: Failed to load Clerk');
     expect(loadScript).not.toHaveBeenCalled();
   });
 
