@@ -6,6 +6,7 @@ const transitionDurationValues = Object.freeze({
   focusRing: 200,
   controls: 100,
   textField: 450,
+  drawer: 500,
 } as const);
 
 const toMs = (value: number) => `${value}ms`;
@@ -24,6 +25,7 @@ const transitionProperty = Object.freeze({
 const transitionTiming = Object.freeze({
   common: 'ease',
   easeOut: 'ease-out',
+  bezier: 'cubic-bezier(0.32, 0.72, 0, 1)',
   slowBezier: 'cubic-bezier(0.16, 1, 0.3, 1)',
 } as const);
 
