@@ -7,15 +7,39 @@ import type {
   ClerkRuntimeError,
 } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Form, Icon, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, Icon, Text, useAppearance } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
+
+/**
+ * Parses different color format strings and normalizes them
+ * Handles conversions between:
+ * - #000 to #000
+ * - rgb(0, 0, 0) to rgb(0, 0, 0) (unchanged)
+ * - rgba(0, 0, 0, 1) to rgb(0, 0, 0) (alpha removed)
+ * - hsl(0, 0%, 0%) to hsl(0, 0%, 0%) (unchanged)
+ * - hsla(0, 0%, 0%, 1) to hsl(0, 0%, 0%) (alpha removed)
+ *
+ * @param colorString - The color string to parse
+ * @returns The normalized color string without alpha components
+ */
+function parseColorString(colorString: string): string {
+  const trimmed = colorString.trim();
+
+  // Early return for hex colors and non-alpha formats
+  if (trimmed.startsWith('#') || trimmed.startsWith('rgb(') || trimmed.startsWith('hsl(')) {
+    return trimmed;
+  }
+
+  // Convert rgba/hsla to rgb/hsl by removing the alpha component
+  return trimmed.replace(/([rgb|hsl])a\((.*),\s*[\d.]+\)/, '$1($2)');
+}
 
 export const CheckoutForm = ({
   stripe,
@@ -27,6 +51,27 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals } = checkout;
+  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
+  const elementsAppearance: StripeAppearance = {
+    variables: {
+      colorPrimary: parseColorString(colors.$primary500),
+      colorBackground: parseColorString(colors.$colorInputBackground),
+      colorText: parseColorString(colors.$colorText),
+      colorTextSecondary: parseColorString(colors.$colorTextSecondary),
+      colorSuccess: parseColorString(colors.$success500),
+      colorDanger: parseColorString(colors.$danger500),
+      colorWarning: parseColorString(colors.$warning500),
+      fontWeightNormal: fontWeights.$normal.toString(),
+      fontWeightMedium: fontWeights.$medium.toString(),
+      fontWeightBold: fontWeights.$bold.toString(),
+      fontSizeXl: fontSizes.$xl,
+      fontSizeLg: fontSizes.$lg,
+      fontSizeSm: fontSizes.$md,
+      fontSizeXs: fontSizes.$sm,
+      borderRadius: radii.$md,
+      spacingUnit: space.$1,
+    },
+  };
   return (
     <Drawer.Body>
       <Box
@@ -77,7 +122,7 @@ export const CheckoutForm = ({
       {stripe && (
         <Elements
           stripe={stripe}
-          options={{ clientSecret: checkout.externalClientSecret }}
+          options={{ clientSecret: checkout.externalClientSecret, appearance: elementsAppearance }}
         >
           <CheckoutFormElements
             checkout={checkout}
