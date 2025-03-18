@@ -30,7 +30,7 @@ export function navigateToTask(
   const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
 
   if (componentNavigationContext) {
-    return componentNavigationContext.navigate(`/${componentNavigationContext.basePath + taskRoute}`);
+    return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;

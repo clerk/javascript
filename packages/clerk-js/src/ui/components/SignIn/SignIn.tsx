@@ -174,7 +174,7 @@ const usePreloadSessionTask = (enabled = false) =>
 
 function SignInRoot() {
   const { __internal_setComponentNavigationContext } = useClerk();
-  const { navigate, basePath } = useRouter();
+  const { navigate, indexPath } = useRouter();
 
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
@@ -197,8 +197,8 @@ function SignInRoot() {
   usePreloadSessionTask(signInContext.withSessionTasks);
 
   React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, [basePath, navigate]);
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+  }, [indexPath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

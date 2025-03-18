@@ -1077,13 +1077,24 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 export type __internal_ComponentNavigationContext = {
+  /**
+   * The `navigate` reference within the component router context
+   */
   navigate: (
     to: string,
     options?: {
       searchParams?: URLSearchParams;
     },
   ) => Promise<unknown>;
-  basePath: string;
+  /**
+   * This path represents the root route for a specific component type and is used
+   * for internal routing and navigation.
+   *
+   * @example
+   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
+   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
+   */
+  indexPath: string;
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
