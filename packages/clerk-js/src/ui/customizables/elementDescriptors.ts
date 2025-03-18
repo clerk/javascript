@@ -82,6 +82,15 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alternativeMethodsBlockButtonText',
   'alternativeMethodsBlockButtonArrow',
 
+  'checkoutFormLineItemsRoot',
+  'checkoutFormElementsRoot',
+
+  'checkoutSuccessRoot',
+  'checkoutSuccessRing',
+  'checkoutSuccessBadge',
+  'checkoutSuccessTitle',
+  'checkoutSuccessDescription',
+
   'otpCodeField',
   'otpCodeFieldInputs',
   'otpCodeFieldInput',
@@ -239,6 +248,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'planCardFeatures',
   'planCardFeaturesList',
   'planCardFeaturesListItem',
+  'planCardFeaturesListItemContent',
+  'planCardFeaturesListItemTitle',
+  'planCardFeaturesListItemDescription',
   'planCardAction',
   'planCardPeriodToggle',
   'planCardFeeContainer',

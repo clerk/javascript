@@ -82,7 +82,10 @@ export function PlanDetailDrawer({
                 padding: t.space.$4,
               })}
             >
-              <PlanCardFeaturesList plan={plan} />
+              <PlanCardFeaturesList
+                plan={plan}
+                variant='avatar'
+              />
             </Box>
           </Drawer.Body>
         ) : null}
