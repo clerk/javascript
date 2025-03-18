@@ -88,9 +88,6 @@ importers:
       '@faker-js/faker':
         specifier: ^8.1.0
         version: 8.1.0
-      '@hcaptcha/types':
-        specifier: ^1.0.3
-        version: 1.0.3
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
@@ -2957,9 +2954,6 @@ packages:
 
   '@hapi/topo@5.1.0':
     resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
-
-  '@hcaptcha/types@1.0.3':
-    resolution: {integrity: sha512-1mbU6eSGawRrqeahRrOzZo/SVLI6oZ5/azuBpSyVrRRR96CnS3fOVDWfzxpngfxKD0/I9Rwu6c/3ITqD8rXeTQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -16761,8 +16755,6 @@ snapshots:
   '@hapi/topo@5.1.0':
     dependencies:
       '@hapi/hoek': 9.3.0
-
-  '@hcaptcha/types@1.0.3': {}
 
   '@humanfs/core@0.19.1': {}
 
