@@ -175,9 +175,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       .flat() as any as Web3Strategy[];
   }
 
-  /**
-   * Constructor now accepts an optional data object.
-   */
   public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
