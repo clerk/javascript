@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -24,16 +24,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     const u = createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
-
-    let waitForClientImmediately = page.waitForResponse(response => response.url().includes('/sign_ins'), {
-      timeout: 3_000,
-    });
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-
-    const clientReponse = await waitForClientImmediately;
-    const d = await clientReponse.json();
-
     await u.po.expect.toBeSignedIn();
+
+    const tokenAfterSignIn = await page.evaluate(() => {
+      return window.Clerk?.session?.getToken();
+    });
 
     // Simulate developer coming back and client fails to load.
     await page.route('**/v1/client?**', route => {
@@ -52,9 +48,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
         }),
       });
     });
+
+    await page.waitForTimeout(1_000);
     await page.reload();
 
-    waitForClientImmediately = page.waitForResponse(
+    const waitForClientImmediately = page.waitForResponse(
       response => response.url().includes('/client?') && response.status() === 500,
       { timeout: 3_000 },
     );
@@ -72,6 +70,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     // Wait for the client to be loaded. and the internal `getToken({skipCache: true})` to have been completed.
     await u.po.clerk.toBeLoaded();
+
+    // Read the newly refreshed token.
+    const tokenOnClientOutage = await page.evaluate(() => {
+      return window.Clerk?.session?.getToken();
+    });
+
+    expect(tokenOnClientOutage).not.toEqual(tokenAfterSignIn);
 
     await u.po.expect.toBeSignedIn();
   });
