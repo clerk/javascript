@@ -77,7 +77,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       object: 'environment',
       auth_config: this.authConfig.__internal_toSnapshot(),
       display_config: this.displayConfig.__internal_toSnapshot(),
-      id: this.id || '',
+      id: this.id ?? '',
       maintenance_mode: this.maintenanceMode,
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
