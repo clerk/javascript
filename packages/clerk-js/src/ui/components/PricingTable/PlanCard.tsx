@@ -340,11 +340,18 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
 
 interface PlanCardFeaturesListProps {
   plan: __experimental_CommercePlanResource;
+  /**
+   * @default false
+   */
   isCompact?: boolean;
+  /**
+   * @default `checkmark`
+   */
+  variant?: 'checkmark' | 'avatar';
 }
 
 export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFeaturesListProps>((props, ref) => {
-  const { plan, isCompact } = props;
+  const { plan, isCompact, variant = 'checkmark' } = props;
   const totalFeatures = plan.features.length;
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
   const canToggleFeatures = isCompact && totalFeatures > 3;
@@ -354,10 +361,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
   return (
     <Box
       ref={ref}
-      elementDescriptor={descriptors.planCardFeaturesList}
-      elementId={isCompact ? descriptors.planCardFeaturesList.setId('compact') : undefined}
-      as='ul'
-      role='list'
+      elementDescriptor={descriptors.planCardFeatures}
       sx={t => ({
         display: 'grid',
         flex: '1',
@@ -366,12 +370,17 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
     >
       <Box
         elementDescriptor={descriptors.planCardFeaturesList}
+        elementId={
+          isCompact
+            ? descriptors.planCardFeaturesList.setId('compact')
+            : descriptors.planCardFeaturesList.setId(variant)
+        }
         as='ul'
         role='list'
         sx={t => ({
           display: 'grid',
           flex: '1',
-          rowGap: isCompact ? t.space.$2 : t.space.$3,
+          rowGap: variant === 'avatar' ? t.space.$4 : isCompact ? t.space.$2 : t.space.$3,
         })}
       >
         {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
@@ -383,19 +392,51 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
             sx={t => ({
               display: 'flex',
               alignItems: 'baseline',
-              gap: t.space.$2,
+              gap: variant === 'checkmark' ? t.space.$2 : t.space.$3,
             })}
           >
-            <Icon
-              icon={Check}
-              colorScheme='neutral'
-              size='sm'
-              aria-hidden
-              sx={t => ({
-                transform: `translateY(${t.space.$0x25})`,
-              })}
-            />
-            <Text colorScheme='body'>{feature.description || feature.name}</Text>
+            {variant === 'checkmark' ? (
+              <Icon
+                icon={Check}
+                colorScheme='neutral'
+                size='sm'
+                aria-hidden
+                sx={t => ({
+                  transform: `translateY(${t.space.$0x25})`,
+                })}
+              />
+            ) : feature.avatarUrl ? (
+              <Avatar
+                size={_ => 24}
+                title={feature.name}
+                initials={feature.name[0]}
+                rounded={false}
+                imageUrl={feature.avatarUrl}
+              />
+            ) : null}
+            <Span elementDescriptor={descriptors.planCardFeaturesListItemContent}>
+              <Text
+                elementDescriptor={descriptors.planCardFeaturesListItemTitle}
+                colorScheme='body'
+                sx={t => ({
+                  fontWeight: variant === 'checkmark' ? t.fontWeights.$normal : t.fontWeights.$medium,
+                })}
+              >
+                {feature.name}
+              </Text>
+              {variant === 'avatar' && feature.description ? (
+                <Text
+                  elementDescriptor={descriptors.planCardFeaturesListItemDescription}
+                  colorScheme='secondary'
+                  sx={t => ({
+                    marginBlockStart: t.space.$0x25,
+                    fontSize: t.fontSizes.$xs,
+                  })}
+                >
+                  {feature.description}
+                </Text>
+              ) : null}
+            </Span>
           </Box>
         ))}
       </Box>

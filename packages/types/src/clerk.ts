@@ -81,6 +81,9 @@ export type SignOutOptions = {
   redirectUrl?: string;
 };
 
+/**
+ * @inline
+ */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
 
@@ -1529,6 +1532,9 @@ export type CreateBulkOrganizationInvitationParams = {
   role: OrganizationCustomRoleKey;
 };
 
+/**
+ * @inline
+ */
 export interface CreateOrganizationParams {
   name: string;
   slug?: string;
