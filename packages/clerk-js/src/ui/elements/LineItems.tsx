@@ -77,7 +77,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  title?: string | LocalizationKey;
+  title: string | LocalizationKey;
   description?: string | LocalizationKey;
 }
 
@@ -119,7 +119,7 @@ function Title({ title, description }: TitleProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface DescriptionProps {
-  text?: string | LocalizationKey;
+  text: string | LocalizationKey;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
 }

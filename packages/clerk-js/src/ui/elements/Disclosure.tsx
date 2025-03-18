@@ -73,7 +73,7 @@ Root.displayName = 'Disclosure.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface TriggerProps {
-  text?: string | LocalizationKey;
+  text: string | LocalizationKey;
 }
 
 const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ text }, ref) => {
