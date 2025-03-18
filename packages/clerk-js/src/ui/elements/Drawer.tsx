@@ -1,5 +1,5 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react/index';
-import type { UseDismissProps, UseFloatingOptions } from '@floating-ui/react';
+import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
   FloatingPortal,
@@ -14,7 +14,7 @@ import {
 import * as React from 'react';
 
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
-import { Box, descriptors, Flex, Heading, Icon, useAppearance } from '../customizables';
+import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
@@ -345,27 +345,32 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
 
 interface FooterProps {
   children?: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerFooter}
-      sx={t => ({
-        display: 'flex',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
-        borderBlockStartWidth: t.borderWidths.$normal,
-        borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
-        borderEndStartRadius: t.radii.$xl,
-        borderEndEndRadius: t.radii.$xl,
-        paddingBlock: t.space.$3,
-        paddingInline: t.space.$4,
-      })}
+      sx={[
+        t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 1),
+            t.colors.$neutralAlpha50,
+          ),
+          borderBlockStartWidth: t.borderWidths.$normal,
+          borderBlockStartStyle: t.borderStyles.$solid,
+          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderEndStartRadius: t.radii.$xl,
+          borderEndEndRadius: t.radii.$xl,
+          paddingBlock: t.space.$3,
+          paddingInline: t.space.$4,
+        }),
+        sx,
+      ]}
     >
       {children}
     </Box>
@@ -402,6 +407,123 @@ const Close = React.forwardRef<HTMLButtonElement>((_, ref) => {
 
 Close.displayName = 'Drawer.Close';
 
+/* -------------------------------------------------------------------------------------------------
+ * Drawer.Confirmation
+ * -----------------------------------------------------------------------------------------------*/
+
+interface ConfirmationProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+  actionsSlot: React.ReactNode;
+  roleProps?: UseRoleProps;
+}
+
+const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
+  ({ open, onOpenChange, children, actionsSlot, roleProps }, ref) => {
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const { animations: layoutAnimations } = useAppearance().parsedLayout;
+    const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
+    const { refs, context } = useFloating({
+      open,
+      onOpenChange,
+      transform: false,
+      strategy: 'absolute',
+    });
+    const { getFloatingProps } = useInteractions([
+      useClick(context),
+      useDismiss(context),
+      useRole(context, { role: 'alertdialog', ...roleProps }),
+    ]);
+
+    const mergedRefs = useMergeRefs([ref, refs.setFloating]);
+
+    const { styles: overlayTransitionStyles } = useTransitionStyles(context, {
+      initial: { opacity: 0 },
+      open: { opacity: 1 },
+      close: { opacity: 0 },
+      common: {
+        transitionProperty: 'opacity',
+        transitionTimingFunction: transitionTiming.bezier,
+      },
+      duration: transitionDurationValues.drawer,
+    });
+
+    const { isMounted, styles: modalTransitionStyles } = useTransitionStyles(context, {
+      initial: { transform: 'translate3D(0, 100%, 0)' },
+      open: { transform: 'translate3D(0, 0, 0)' },
+      close: { transform: 'translate3D(0, 100%, 0)' },
+      common: {
+        transitionProperty: 'transform',
+        transitionTimingFunction: transitionTiming.bezier,
+      },
+      duration: isMotionSafe ? transitionDurationValues.drawer : 0,
+    });
+
+    if (!isMounted) return null;
+
+    return (
+      <>
+        <Span
+          elementDescriptor={descriptors.drawerConfirmationBackdrop}
+          style={overlayTransitionStyles}
+          sx={t => ({
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `linear-gradient(to bottom, ${colors.setAlpha(t.colors.$colorBackground, 0.28)}, ${t.colors.$colorBackground})`,
+          })}
+        />
+
+        <FloatingFocusManager
+          context={context}
+          modal
+          outsideElementsInert
+          initialFocus={refs.floating}
+        >
+          <Box
+            ref={mergedRefs}
+            elementDescriptor={descriptors.drawerConfirmationRoot}
+            style={modalTransitionStyles}
+            {...getFloatingProps()}
+            sx={t => ({
+              display: 'flex',
+              flexDirection: 'column',
+              rowGap: t.space.$6,
+              outline: 'none',
+              willChange: 'transform',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: common.mergedColorsBackground(
+                colors.setAlpha(t.colors.$colorBackground, 1),
+                t.colors.$neutralAlpha50,
+              ),
+              padding: t.space.$4,
+              borderStartStartRadius: t.radii.$md,
+              borderStartEndRadius: t.radii.$md,
+              boxShadow: `0 0 0 1px ${t.colors.$neutralAlpha100}`,
+            })}
+          >
+            {children}
+
+            <Flex
+              elementDescriptor={descriptors.drawerConfirmationActions}
+              gap={3}
+              justify='end'
+            >
+              {actionsSlot}
+            </Flex>
+          </Box>
+        </FloatingFocusManager>
+      </>
+    );
+  },
+);
+
+Confirmation.displayName = 'Drawer.Confirmation';
+
 export const Drawer = {
   Root,
   Overlay,
@@ -409,5 +531,6 @@ export const Drawer = {
   Header,
   Body,
   Footer,
+  Confirmation,
   Close,
 };
