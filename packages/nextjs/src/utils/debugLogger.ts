@@ -9,36 +9,9 @@ export type LogEntry = Log | Log[];
 export type Logger<L = Log> = {
   commit: () => void;
   debug: (...args: Array<L | (() => L)>) => void;
-  debugOnce: (...args: Array<L | (() => L)>) => void;
   enable: () => void;
 };
 export type LoggerNoCommit<L = Logger> = Omit<L, 'commit'>;
-
-const logEntriesToString = (entries: LogEntry[], name: string, formatter: (val: LogEntry) => string): void => {
-  console.log(debugLogHeader(name));
-
-  /**
-   * We buffer each collected log entry so we can format them and log them all at once.
-   * Individual console.log calls are used to ensure we don't hit platform-specific log limits (Vercel and Netlify are 4kb).
-   */
-  for (const log of entries) {
-    let output = formatter(log);
-
-    output = output
-      .split('\n')
-      .map(l => `  ${l}`)
-      .join('\n');
-
-    // Vercel errors if the output is > 4kb, so we truncate it
-    if (process.env.VERCEL) {
-      output = truncate(output, 4096);
-    }
-
-    console.log(output);
-  }
-
-  console.log(debugLogFooter(name));
-};
 
 export const createDebugLogger = (name: string, formatter: (val: LogEntry) => string) => (): Logger => {
   const entries: LogEntry[] = [];
@@ -53,15 +26,31 @@ export const createDebugLogger = (name: string, formatter: (val: LogEntry) => st
         entries.push(args.map(arg => (typeof arg === 'function' ? arg() : arg)));
       }
     },
-    debugOnce: (...args) => {
-      if (isEnabled) {
-        const localEntries = args.map(arg => (typeof arg === 'function' ? arg() : arg));
-        logEntriesToString(localEntries, name, formatter);
-      }
-    },
     commit: () => {
       if (isEnabled) {
-        logEntriesToString(entries, name, formatter);
+        console.log(debugLogHeader(name));
+
+        /**
+         * We buffer each collected log entry so we can format them and log them all at once.
+         * Individual console.log calls are used to ensure we don't hit platform-specific log limits (Vercel and Netlify are 4kb).
+         */
+        for (const log of entries) {
+          let output = formatter(log);
+
+          output = output
+            .split('\n')
+            .map(l => `  ${l}`)
+            .join('\n');
+
+          // Vercel errors if the output is > 4kb, so we truncate it
+          if (process.env.VERCEL) {
+            output = truncate(output, 4096);
+          }
+
+          console.log(output);
+        }
+
+        console.log(debugLogFooter(name));
       }
     },
   };

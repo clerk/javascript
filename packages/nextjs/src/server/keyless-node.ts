@@ -134,7 +134,9 @@ async function createOrReadKeyless(): Promise<AccountlessApplication | null> {
    * At this step, it is safe to create new keys and store them.
    */
   const client = createClerkClientWithOptions({});
-  const accountlessApplication = await client.__experimental_accountlessApplications.createAccountlessApplication();
+  const accountlessApplication = await client.__experimental_accountlessApplications
+    .createAccountlessApplication()
+    .catch(() => null);
 
   if (accountlessApplication) {
     writeFileSync(CONFIG_PATH, JSON.stringify(accountlessApplication), {
