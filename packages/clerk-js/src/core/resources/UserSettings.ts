@@ -175,9 +175,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
   public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot | null = null) {
     super();
-    if (data) {
-      this.fromJSON(data);
-    }
+    this.fromJSON(data);
   }
 
   get instanceIsPasswordBased() {
@@ -192,9 +190,6 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     );
   }
 
-  /**
-   * fromJSON now safely returns the instance even if null is provided.
-   */
   protected fromJSON(data: UserSettingsJSON | UserSettingsJSONSnapshot | null): this {
     if (!data) {
       return this;
