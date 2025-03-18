@@ -3,7 +3,7 @@ import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type {
-  ActJWTClaim,
+  ActClaim,
   CheckAuthorization,
   EmailCodeConfig,
   GetToken,
@@ -45,7 +45,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveAt!: Date;
   lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
-  actor!: ActJWTClaim | null;
+  actor!: ActClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
@@ -282,11 +282,11 @@ export class Session extends BaseResource implements SessionResource {
     this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
-    this.actor = data.actor;
+    this.actor = data.actor || null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.tasks = data.tasks;
+    this.tasks = data.tasks || null;
 
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);

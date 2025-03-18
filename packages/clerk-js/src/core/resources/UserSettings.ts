@@ -28,34 +28,152 @@ export type Actions = {
   delete_self: boolean;
 };
 
+const DISABLED_ATTRIBUTE = {
+  enabled: false,
+  first_factors: [],
+  name: 'phone_number',
+  required: false,
+  second_factors: [],
+  used_for_first_factor: false,
+  used_for_second_factor: false,
+  verifications: [],
+  verify_at_sign_up: false,
+};
+
 /**
  * @internal
  */
 export class UserSettings extends BaseResource implements UserSettingsResource {
   id = undefined;
-  social: OAuthProviders = {} as OAuthProviders;
-  saml: SamlSettings = {} as SamlSettings;
-  enterpriseSSO: EnterpriseSSOSettings = {} as EnterpriseSSOSettings;
 
-  // @ts-expect-error - This is a partial object, but we want to ensure that all attributes are present.
-  attributes: Partial<Attributes> = {};
-  // @ts-expect-error - This is a partial object, but we want to ensure that all actions are present.
-  actions: Partial<Actions> = {};
-  signIn: SignInData = {} as SignInData;
-  signUp: SignUpData = {} as SignUpData;
+  actions: Actions = { create_organization: false, delete_self: false };
+  attributes: Attributes = {
+    email_address: {
+      enabled: true,
+      first_factors: ['email_code'],
+      name: 'email_address',
+      required: true,
+      second_factors: [],
+      used_for_first_factor: true,
+      used_for_second_factor: false,
+      verifications: ['email_code'],
+      verify_at_sign_up: true,
+    },
+    phone_number: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'phone_number',
+    },
+    username: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'username',
+    },
+    web3_wallet: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'web3_wallet',
+    },
+    first_name: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'first_name',
+    },
+    last_name: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'last_name',
+    },
+    password: {
+      enabled: true,
+      first_factors: [],
+      name: 'password',
+      required: true,
+      second_factors: [],
+      used_for_first_factor: false,
+      used_for_second_factor: false,
+      verifications: [],
+      verify_at_sign_up: false,
+    },
+    authenticator_app: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'authenticator_app',
+    },
+    backup_code: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'backup_code',
+    },
+    passkey: {
+      ...DISABLED_ATTRIBUTE,
+      name: 'passkey',
+    },
+  };
+  enterpriseSSO: EnterpriseSSOSettings = {
+    enabled: false,
+  };
+  passkeySettings: PasskeySettingsData = {
+    allow_autofill: false,
+    show_sign_in_button: false,
+  };
   passwordSettings: PasswordSettingsData = {} as PasswordSettingsData;
-  passkeySettings: PasskeySettingsData = {} as PasskeySettingsData;
+  saml: SamlSettings = {
+    enabled: false,
+  };
+  signIn: SignInData = {
+    second_factor: {
+      required: false,
+      enabled: false,
+    },
+  };
+  signUp: SignUpData = {
+    allowlist_only: false,
+    captcha_enabled: false,
+    legal_consent_enabled: false,
+    mode: 'public',
+    progressive: true,
+  };
+  social: OAuthProviders = {} as OAuthProviders;
   usernameSettings: UsernameSettingsData = {} as UsernameSettingsData;
 
-  socialProviderStrategies: OAuthStrategy[] = [];
-  authenticatableSocialStrategies: OAuthStrategy[] = [];
-  web3FirstFactors: Web3Strategy[] = [];
-  enabledFirstFactorIdentifiers: Array<keyof UserSettingsResource['attributes']> = [];
+  get authenticatableSocialStrategies(): OAuthStrategy[] {
+    if (!this.social) {
+      return [];
+    }
 
-  /**
-   * Constructor now accepts an optional data object.
-   */
-  public constructor(data?: UserSettingsJSON | UserSettingsJSONSnapshot | null) {
+    return Object.entries(this.social)
+      .filter(([, desc]) => desc.enabled && desc.authenticatable)
+      .map(([, desc]) => desc.strategy)
+      .sort();
+  }
+
+  get enabledFirstFactorIdentifiers(): Array<keyof UserSettingsResource['attributes']> {
+    if (!this.attributes) {
+      return [];
+    }
+
+    return Object.entries(this.attributes)
+      .filter(([name, attr]) => attr.used_for_first_factor && !name.startsWith('web3'))
+      .map(([name]) => name) as Array<keyof UserSettingsResource['attributes']>;
+  }
+
+  get socialProviderStrategies(): OAuthStrategy[] {
+    if (!this.social) {
+      return [];
+    }
+
+    return Object.entries(this.social)
+      .filter(([, desc]) => desc.enabled)
+      .map(([, desc]) => desc.strategy)
+      .sort();
+  }
+
+  get web3FirstFactors(): Web3Strategy[] {
+    if (!this.attributes) {
+      return [];
+    }
+
+    return Object.entries(this.attributes)
+      .filter(([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'))
+      .map(([, desc]) => desc.first_factors)
+      .flat() as any as Web3Strategy[];
+  }
+
+  public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot | null = null) {
     super();
     if (data) {
       this.fromJSON(data);
@@ -82,74 +200,59 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       return this;
     }
 
-    this.social = data.social;
-    this.saml = data.saml;
-    this.enterpriseSSO = data.enterprise_sso;
-    this.attributes = Object.fromEntries(
-      Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
-    ) as Attributes;
-    this.actions = data.actions;
-    this.signIn = data.sign_in;
-    this.signUp = data.sign_up;
-    this.passwordSettings = {
-      ...data.password_settings,
-      min_length: Math.max(data.password_settings?.min_length, defaultMinPasswordLength),
-      max_length:
-        data.password_settings?.max_length === 0
-          ? defaultMaxPasswordLength
-          : Math.min(data.password_settings?.max_length, defaultMaxPasswordLength),
-    };
-    this.usernameSettings = {
-      ...data.username_settings,
-      min_length: Math.max(data.username_settings?.min_length, defaultMinUsernameLength),
-      max_length: Math.min(data.username_settings?.max_length, defaultMaxUsernameLength),
-    };
-    this.passkeySettings = data.passkey_settings;
-    this.socialProviderStrategies = this.getSocialProviderStrategies();
-    this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies();
-    this.web3FirstFactors = this.getWeb3FirstFactors();
-    this.enabledFirstFactorIdentifiers = this.getEnabledFirstFactorIdentifiers();
+    this.attributes = this.withDefault(
+      data.attributes
+        ? (Object.fromEntries(Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }])) as Attributes)
+        : null,
+      this.attributes,
+    );
+    this.actions = this.withDefault(data.actions, this.actions);
+    this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
+    this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
+    this.passwordSettings = data.password_settings
+      ? {
+          ...data.password_settings,
+          min_length: Math.max(
+            data.password_settings?.min_length ?? defaultMinPasswordLength,
+            defaultMinPasswordLength,
+          ),
+          max_length:
+            data.password_settings?.max_length === 0
+              ? defaultMaxPasswordLength
+              : Math.min(data.password_settings?.max_length ?? defaultMaxPasswordLength, defaultMaxPasswordLength),
+        }
+      : this.passwordSettings;
+    this.saml = this.withDefault(data.saml, this.saml);
+    this.signIn = this.withDefault(data.sign_in, this.signIn);
+    this.signUp = this.withDefault(data.sign_up, this.signUp);
+    this.social = this.withDefault(data.social, this.social);
+    this.usernameSettings = data.username_settings
+      ? {
+          ...data.username_settings,
+          min_length: Math.max(
+            data.username_settings?.min_length ?? defaultMinUsernameLength,
+            defaultMinUsernameLength,
+          ),
+          max_length: Math.min(
+            data.username_settings?.max_length ?? defaultMaxUsernameLength,
+            defaultMaxUsernameLength,
+          ),
+        }
+      : this.usernameSettings;
 
     return this;
   }
 
   public __internal_toSnapshot(): UserSettingsJSONSnapshot {
     return {
-      social: this.social,
-      saml: this.saml,
-      attributes: this.attributes,
       actions: this.actions,
+      attributes: this.attributes,
+      passkey_settings: this.passkeySettings,
+      password_settings: this.passwordSettings,
+      saml: this.saml,
       sign_in: this.signIn,
       sign_up: this.signUp,
-      password_settings: this.passwordSettings,
-      passkey_settings: this.passkeySettings,
+      social: this.social,
     } as unknown as UserSettingsJSONSnapshot;
-  }
-
-  private getEnabledFirstFactorIdentifiers(): Array<keyof UserSettingsResource['attributes']> {
-    return Object.entries(this.attributes)
-      .filter(([name, attr]) => attr.used_for_first_factor && !name.startsWith('web3'))
-      .map(([name]) => name) as Array<keyof UserSettingsResource['attributes']>;
-  }
-
-  private getWeb3FirstFactors(): Web3Strategy[] {
-    return Object.entries(this.attributes)
-      .filter(([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'))
-      .map(([, desc]) => desc.first_factors)
-      .flat() as any as Web3Strategy[];
-  }
-
-  private getSocialProviderStrategies(): OAuthStrategy[] {
-    return Object.entries(this.social)
-      .filter(([, desc]) => desc.enabled)
-      .map(([, desc]) => desc.strategy)
-      .sort();
-  }
-
-  private getAuthenticatableSocialStrategies(): OAuthStrategy[] {
-    return Object.entries(this.social)
-      .filter(([, desc]) => desc.enabled && desc.authenticatable)
-      .map(([, desc]) => desc.strategy)
-      .sort();
   }
 }

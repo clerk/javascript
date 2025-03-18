@@ -290,6 +290,7 @@ export const esMX: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -313,6 +314,11 @@ export const esMX: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -921,6 +927,7 @@ export const esMX: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Quitar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cartera',
         title: 'Web3 cartera',
       },

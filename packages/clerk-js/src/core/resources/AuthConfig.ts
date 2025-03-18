@@ -5,31 +5,30 @@ import { BaseResource } from './internal';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;
-  reverification: boolean = true;
-  singleSessionMode: boolean = true;
+  reverification: boolean = false;
+  singleSessionMode: boolean = false;
 
-  public constructor(data: AuthConfigJSON | null = null) {
+  public constructor(data: Partial<AuthConfigJSON> | null = null) {
     super();
-    if (data) {
-      this.fromJSON(data);
-    }
+
+    this.fromJSON(data);
   }
 
-  protected fromJSON(data: AuthConfigJSON | null): this {
+  protected fromJSON(data: Partial<AuthConfigJSON> | null): this {
     if (!data) {
       return this;
     }
-    this.claimedAt = data.claimed_at ? unixEpochToDate(data.claimed_at) : null;
-    this.reverification = data.reverification ?? true;
-    this.singleSessionMode = data.single_session_mode ?? true;
+    this.claimedAt = this.withDefault(data.claimed_at ? unixEpochToDate(data.claimed_at) : null, this.claimedAt);
+    this.reverification = this.withDefault(data.reverification, this.reverification);
+    this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
     return this;
   }
 
   public __internal_toSnapshot(): AuthConfigJSONSnapshot {
     return {
-      object: 'auth_config',
       claimed_at: this.claimedAt ? this.claimedAt.getTime() : null,
       id: this.id ?? '',
+      object: 'auth_config',
       reverification: this.reverification,
       single_session_mode: this.singleSessionMode,
     };

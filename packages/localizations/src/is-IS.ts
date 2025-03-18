@@ -288,6 +288,7 @@ export const isIS: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -311,6 +312,11 @@ export const isIS: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -921,6 +927,7 @@ export const isIS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Fjarlægja veski',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
       },

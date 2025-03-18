@@ -287,6 +287,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget av dessa?',
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Fortsätt med ditt lösenord',
       blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
       blockButton__totp: 'Använd din autentiseringsapp',
@@ -313,6 +314,11 @@ export const svSE: LocalizationResource = {
       message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte verifiera ditt konto',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Använd en annan metod',
@@ -917,6 +923,7 @@ export const svSE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ta bort plånbok',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
       },

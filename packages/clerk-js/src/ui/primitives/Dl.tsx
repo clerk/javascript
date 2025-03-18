@@ -1,11 +1,15 @@
 import React from 'react';
 
-export const Dl = React.forwardRef<
-  HTMLDListElement,
-  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDListElement>, HTMLDListElement>
->((props, ref) => {
+import type { PrimitiveProps } from '../styledSystem';
+import type { BoxProps } from './Box';
+import { Box } from './Box';
+
+export type DlProps = PrimitiveProps<'dl'> & Omit<BoxProps, 'as'>;
+
+export const Dl = React.forwardRef<HTMLTableCellElement, DlProps>((props, ref) => {
   return (
-    <dl
+    <Box
+      as='dl'
       {...props}
       ref={ref}
     />

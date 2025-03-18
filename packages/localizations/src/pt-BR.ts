@@ -287,6 +287,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Não tem nenhum dos métodos? Tente outra forma.',
       blockButton__backupCode: 'Usar código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Usar senha',
       blockButton__phoneCode: 'Enviar código de telefone',
       blockButton__totp: 'Usar autenticação TOTP',
@@ -312,6 +313,11 @@ export const ptBR: LocalizationResource = {
       message: 'Nenhum método de verificação disponível. Entre em contato com o suporte.',
       subtitle: 'Não há métodos de verificação disponíveis no momento.',
       title: 'Métodos de verificação indisponíveis',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Usar outro método',
@@ -922,6 +928,7 @@ export const ptBR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remover carteira',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
       },

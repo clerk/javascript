@@ -287,6 +287,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Nie używasz żadnej z tych metod?',
       blockButton__backupCode: 'Użyj kodu zapasowego',
       blockButton__emailCode: 'Wyślij kod e-mailem do {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Zaloguj się za pomocą hasła',
       blockButton__phoneCode: 'Wyślij kod SMS-em do {{identifier}}',
       blockButton__totp: 'Użyj aplikacji uwierzytelniającej',
@@ -313,6 +314,11 @@ export const plPL: LocalizationResource = {
       message: 'Nie można kontynuować weryfikacji. Brak dostępnych czynników uwierzytelniania.',
       subtitle: 'Wystąpił błąd',
       title: 'Nie możemy zweryfikować twojego konta',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Użyj innej metody',
@@ -926,6 +932,7 @@ export const plPL: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Usuń portfel',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Portfele Web3',
         title: 'Portfele Web3',
       },

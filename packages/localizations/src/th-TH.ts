@@ -284,6 +284,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่มีวิธีใดที่กล่าวมาหรือ?',
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสไปที่อีเมล {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'ดำเนินการต่อด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
       blockButton__totp: 'ใช้แอปยืนยันตัวตนของคุณ',
@@ -309,6 +310,11 @@ export const thTH: LocalizationResource = {
       message: 'ไม่สามารถดำเนินการยืนยันได้ ไม่มีปัจจัยการยืนยันตัวตนที่เหมาะสมที่ถูกกำหนดค่า',
       subtitle: 'เกิดข้อผิดพลาด',
       title: 'ไม่สามารถยืนยันบัญชีของคุณได้',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',
@@ -908,6 +914,7 @@ export const thTH: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'ลบวอลเล็ต',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'วอลเล็ต Web3',
         title: 'วอลเล็ต Web3',
       },

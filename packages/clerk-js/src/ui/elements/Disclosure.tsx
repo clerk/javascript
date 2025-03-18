@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { Box, descriptors, Icon, SimpleButton, useAppearance } from '../customizables';
+import type { LocalizationKey } from '../customizables';
+import { Box, descriptors, Icon, SimpleButton, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
@@ -72,10 +73,10 @@ Root.displayName = 'Disclosure.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface TriggerProps {
-  children: React.ReactNode;
+  text: string | LocalizationKey;
 }
 
-const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children }, ref) => {
+const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ text }, ref) => {
   const context = React.useContext(DisclosureContext);
   if (!context) {
     throw new Error('Disclosure.Trigger must be used within Disclosure.Root');
@@ -99,7 +100,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ children },
         zIndex: 2,
       })}
     >
-      {children}
+      <Span localizationKey={text} />
       <Icon
         icon={ChevronDown}
         colorScheme='neutral'
@@ -123,17 +124,17 @@ interface ContentProps {
 
 const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, ref) => {
   const context = React.useContext(DisclosureContext);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
   if (!context) {
     throw new Error('Disclosure.Content must be used within Disclosure.Root');
   }
   const { isOpen, id } = context;
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const animation: ThemableCssProp = t => ({
-    transition:
-      appearanceAnimations && !prefersReducedMotion
-        ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
-        : 'none',
+    transition: isMotionSafe
+      ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
+      : 'none',
   });
 
   return (

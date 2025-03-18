@@ -286,6 +286,7 @@ export const csCZ: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -309,6 +310,11 @@ export const csCZ: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -911,6 +917,7 @@ export const csCZ: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Odstranit peněženku',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 peněženky',
         title: 'Web3 peněženky',
       },

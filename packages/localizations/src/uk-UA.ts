@@ -286,6 +286,7 @@ export const ukUA: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -309,6 +310,11 @@ export const ukUA: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -912,6 +918,7 @@ export const ukUA: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Видалити гаманець',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
       },

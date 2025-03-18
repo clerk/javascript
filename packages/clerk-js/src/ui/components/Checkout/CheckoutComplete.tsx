@@ -1,210 +1,159 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, Flex, Icon, Text } from '../../customizables';
-import { LineItems } from '../../elements';
+import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
+import { Drawer, LineItems } from '../../elements';
 import { Check } from '../../icons';
-import type { ThemableCssProp } from '../../styledSystem';
 
-export const CheckoutComplete = ({
-  checkout,
-  sx,
-}: {
-  checkout: __experimental_CommerceCheckoutResource;
-  sx?: ThemableCssProp;
-}) => {
-  const { handleCloseBlade = () => {} } = useCheckoutContext();
+export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+  const { setIsOpen } = useCheckoutContext();
+
+  const handleClose = () => {
+    if (setIsOpen) {
+      setIsOpen(false);
+    }
+  };
 
   return (
-    <Col
-      sx={[
-        t => ({
-          width: '100%',
-          padding: t.space.$4,
-        }),
-        sx,
-      ]}
-    >
-      <Col
-        align='center'
-        justify='center'
-        gap={8}
-        sx={{
-          flex: 1,
-        }}
-      >
-        <SuccessCircle />
-
-        <Col
-          align='center'
-          gap={2}
-          sx={{ position: 'relative' }}
+    <>
+      <Drawer.Body>
+        <Span
+          elementDescriptor={descriptors.checkoutSuccessRoot}
+          sx={t => ({
+            margin: 'auto',
+            position: 'relative',
+            aspectRatio: '1/1',
+            display: 'grid',
+            width: '100%',
+            padding: t.space.$4,
+            flexShrink: 0,
+          })}
         >
-          {/* TODO(@COMMERCE): needs localization */}
-          <Text variant='h2'>Payment was successful!</Text>
-          <Text sx={t => ({ textAlign: 'center', paddingInline: t.space.$8 })}>
-            {/* TODO(@COMMERCE): needs localization */}
-            Minim adipisicing enim fugiat enim est ad nisi exercitation nisi exercitation quis culpa.
-          </Text>
-        </Col>
-      </Col>
-      <Col
-        gap={2}
+          <Ring scale={1} />
+          <Ring scale={0.75} />
+          <Ring scale={0.5} />
+          <Box
+            elementDescriptor={descriptors.checkoutSuccessBadge}
+            sx={t => ({
+              margin: 'auto',
+              gridArea: '1/1',
+              display: 'flex',
+              position: 'relative',
+              width: t.sizes.$16,
+              height: t.sizes.$16,
+              borderRadius: t.radii.$circle,
+              backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
+              boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
+              ':before': {
+                content: '""',
+                position: 'absolute',
+                inset: t.space.$1,
+                borderRadius: t.radii.$circle,
+                backgroundColor: t.colors.$colorBackground,
+              },
+            })}
+          >
+            <Icon
+              icon={Check}
+              colorScheme='neutral'
+              sx={{
+                position: 'relative',
+                margin: 'auto',
+              }}
+              aria-hidden
+            />
+          </Box>
+          <Span
+            sx={t => ({
+              margin: 'auto',
+              gridArea: '1/1',
+              position: 'relative',
+              textAlign: 'center',
+              transform: `translateY(${t.space.$20})`,
+            })}
+          >
+            <Heading
+              elementDescriptor={descriptors.checkoutSuccessTitle}
+              as='h2'
+              textVariant='h2'
+            >
+              Payment was successful!
+            </Heading>
+            <Text
+              elementDescriptor={descriptors.checkoutSuccessDescription}
+              colorScheme='secondary'
+              sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
+            >
+              {/* TODO(@COMMERCE): needs localization */}
+              Minim adipisicing enim fugiat enim est ad nisi exercitation nisi exercitation quis culpa.
+            </Text>
+          </Span>
+        </Span>
+      </Drawer.Body>
+
+      <Drawer.Footer
         sx={t => ({
-          flex: 0,
-          paddingTop: t.space.$4,
-          borderTopWidth: t.borderWidths.$normal,
-          borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
+          rowGap: t.space.$4,
         })}
       >
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
-            <LineItems.Title>Total paid</LineItems.Title>
-            <LineItems.Description>
-              {checkout.invoice
-                ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-                : '–'}
-            </LineItems.Description>
+            {/* TODO(@COMMERCE): needs localization */}
+            <LineItems.Title title='Total paid' />
+            <LineItems.Description
+              text={
+                checkout.invoice
+                  ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
+                  : '–'
+              }
+            />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title>Payment method</LineItems.Title>
-            <LineItems.Description>
-              {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
-            </LineItems.Description>
+            <LineItems.Title title='Payment method' />
+            <LineItems.Description
+              text={
+                checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'
+              }
+            />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title>Invoice ID</LineItems.Title>
-            <LineItems.Description>{checkout.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
+            <LineItems.Title title='Invoice ID' />
+            <LineItems.Description text={checkout.invoice ? checkout.invoice.id : '–'} />
           </LineItems.Group>
         </LineItems.Root>
         <Button
-          colorScheme='secondary'
-          variant='bordered'
-          size='sm'
-          hasArrow
-          textVariant={'buttonSmall'}
-          sx={t => ({
-            width: '100%',
-            marginTop: t.space.$2,
-          })}
-          onClick={handleCloseBlade}
-        >
-          {/* TODO(@COMMERCE): needs localization */}
-          Continue
-        </Button>
-      </Col>
-    </Col>
+          onClick={handleClose}
+          localizationKey={localizationKeys('formButtonPrimary')}
+        />
+      </Drawer.Footer>
+    </>
   );
 };
 
-const SuccessCircle = () => {
+function Ring({
+  scale,
+}: {
+  /**
+   * Number between 0-1
+   */
+  scale: number;
+}) {
   return (
-    <Flex
-      align='center'
-      justify='center'
+    <Span
+      elementDescriptor={descriptors.checkoutSuccessRing}
       sx={t => ({
-        position: 'relative',
-        width: '100%',
-        height: t.sizes.$16,
+        margin: 'auto',
+        gridArea: '1/1',
+        width: `${scale * 100}%`,
+        height: `${scale * 100}%`,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: t.colors.$neutralAlpha200,
+        borderRadius: t.radii.$circle,
+        maskImage: `linear-gradient(to bottom, transparent 15%, black, transparent 85%)`,
       })}
-    >
-      {/* rings */}
-      <Box>
-        <Box
-          sx={t => ({
-            position: 'absolute',
-            top: `-${t.sizes.$8}`,
-            bottom: `-${t.sizes.$8}`,
-            left: '50%',
-            translate: '-50% 0',
-            aspectRatio: '1/1',
-            borderWidth: 1,
-            borderStyle: 'solid',
-            borderColor: t.colors.$neutralAlpha150,
-            borderRadius: t.radii.$circle,
-          })}
-        />
-        <Box
-          sx={t => ({
-            position: 'absolute',
-            top: `-${t.sizes.$24}`,
-            bottom: `-${t.sizes.$24}`,
-            left: '50%',
-            translate: '-50% 0',
-            aspectRatio: '1/1',
-            borderWidth: 1,
-            borderStyle: 'solid',
-            borderColor: t.colors.$neutralAlpha200,
-            borderRadius: t.radii.$circle,
-          })}
-        />
-        <Box
-          sx={t => ({
-            position: 'absolute',
-            top: `-${t.sizes.$40}`,
-            bottom: `-${t.sizes.$40}`,
-            left: '50%',
-            translate: '-50% 0',
-            aspectRatio: '1/1',
-            borderWidth: 1,
-            borderStyle: 'solid',
-            borderColor: t.colors.$neutralAlpha200,
-            borderRadius: t.radii.$circle,
-          })}
-        />
-      </Box>
-
-      {/* fade overlays */}
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          width: '120%',
-          aspectRatio: '1/1',
-          top: '50%',
-          translate: '0 -50%',
-          backgroundImage: `linear-gradient(to bottom, ${t.colors.$colorBackground} 35%, transparent 48%, transparent 52%, ${t.colors.$colorBackground} 65%)`,
-        })}
-      />
-
-      {/* coin */}
-      <Box
-        sx={t => ({
-          position: 'relative',
-          width: t.sizes.$16,
-          height: t.sizes.$16,
-          borderRadius: t.radii.$circle,
-          backgroundImage:
-            'linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)',
-        })}
-      >
-        <Box
-          sx={t => ({
-            position: 'relative',
-            width: t.sizes.$16,
-            height: t.sizes.$16,
-            borderRadius: t.radii.$circle,
-            backgroundImage: 'linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.00) 60.94%)',
-            backgroundBlendMode: 'plus-lighter, normal',
-            boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
-          })}
-        >
-          <Flex
-            align='center'
-            justify='center'
-            sx={t => ({
-              position: 'absolute',
-              inset: t.space.$1,
-              borderRadius: t.radii.$circle,
-              backgroundColor: t.colors.$colorBackground,
-            })}
-          >
-            <Icon icon={Check} />
-          </Flex>
-        </Box>
-      </Box>
-    </Flex>
+    />
   );
-};
+}

@@ -287,6 +287,7 @@ export const jaJP: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -310,6 +311,11 @@ export const jaJP: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -910,6 +916,7 @@ export const jaJP: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'ウォレットの削除',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3ウォレット',
         title: 'Web3ウォレット',
       },

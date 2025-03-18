@@ -294,6 +294,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'У вас нет ничего из этого?',
       blockButton__backupCode: 'Использовать резервный код',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Продолжить с вашим паролем',
       blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
       blockButton__totp: 'Использовать приложение аутентификации',
@@ -320,6 +321,11 @@ export const ruRU: LocalizationResource = {
       message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',
       subtitle: 'Произошла ошибка',
       title: 'Невозможно подтвердить учетную запись',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Используйте другой метод',
@@ -932,6 +938,7 @@ export const ruRU: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Удалить кошелек',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
       },

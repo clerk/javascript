@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/index.ts", "./src/react/index.ts", "./src/react/types.ts"],
+  "entryPoints": ["./src/index.ts", "./src/react/types.ts", "./src/react/hooks/*.{ts,tsx}"],
   "compilerOptions": {
     "noImplicitAny": false
   }

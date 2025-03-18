@@ -286,6 +286,7 @@ export const ptPT: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -309,6 +310,11 @@ export const ptPT: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -913,6 +919,7 @@ export const ptPT: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remover carteira',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
       },
