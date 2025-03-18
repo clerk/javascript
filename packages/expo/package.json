@@ -61,7 +61,9 @@
     "web",
     "local-credentials",
     "passkeys",
-    "secure-store"
+    "secure-store",
+    "resource-cache",
+    "token-cache"
   ],
   "scripts": {
     "build": "tsup",
