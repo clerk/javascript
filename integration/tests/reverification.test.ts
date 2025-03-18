@@ -153,14 +153,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await expect(u.page.locator('.cl-profileSectionItem__emailAddresses')).not.toContainText(newFakeEmail);
     });
 
-    test('reverification propmt when deleting account', async ({ page, context }) => {
+    test('reverification prompt when deleting account', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       const delFakeUser = u.services.users.createFakeUser({
         withUsername: true,
         fictionalEmail: true,
         withPhoneNumber: true,
       });
-      const bapiFakeUser = await u.services.users.createBapiUser({
+      await u.services.users.createBapiUser({
         ...delFakeUser,
         username: undefined,
         phoneNumber: undefined,

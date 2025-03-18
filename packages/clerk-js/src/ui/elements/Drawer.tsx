@@ -1,5 +1,5 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react/index';
-import type { UseDismissProps, UseFloatingOptions } from '@floating-ui/react';
+import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
   FloatingPortal,
@@ -14,6 +14,7 @@ import {
 import * as React from 'react';
 
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
+import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -263,7 +264,7 @@ Overlay.displayName = 'Drawer.Content';
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  title?: string;
+  title?: string | LocalizationKey;
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
@@ -295,15 +296,14 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
       {title ? (
         <>
           <Heading
+            localizationKey={title}
             as='h2'
             elementDescriptor={descriptors.drawerTitle}
             textVariant='h2'
             sx={{
               alignSelf: 'center',
             }}
-          >
-            {title}
-          </Heading>
+          />
           <Close />
         </>
       ) : (
@@ -345,27 +345,32 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
 
 interface FooterProps {
   children?: React.ReactNode;
+  sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
   return (
     <Box
       ref={ref}
       elementDescriptor={descriptors.drawerFooter}
-      sx={t => ({
-        display: 'flex',
-        background: common.mergedColorsBackground(
-          colors.setAlpha(t.colors.$colorBackground, 1),
-          t.colors.$neutralAlpha50,
-        ),
-        borderBlockStartWidth: t.borderWidths.$normal,
-        borderBlockStartStyle: t.borderStyles.$solid,
-        borderBlockStartColor: t.colors.$neutralAlpha100,
-        borderEndStartRadius: t.radii.$xl,
-        borderEndEndRadius: t.radii.$xl,
-        paddingBlock: t.space.$3,
-        paddingInline: t.space.$4,
-      })}
+      sx={[
+        t => ({
+          display: 'flex',
+          flexDirection: 'column',
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 1),
+            t.colors.$neutralAlpha50,
+          ),
+          borderBlockStartWidth: t.borderWidths.$normal,
+          borderBlockStartStyle: t.borderStyles.$solid,
+          borderBlockStartColor: t.colors.$neutralAlpha100,
+          borderEndStartRadius: t.radii.$xl,
+          borderEndEndRadius: t.radii.$xl,
+          paddingBlock: t.space.$3,
+          paddingInline: t.space.$4,
+        }),
+        sx,
+      ]}
     >
       {children}
     </Box>
@@ -411,10 +416,14 @@ interface ConfirmationProps {
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   actionsSlot: React.ReactNode;
+  /**
+   * @see https://floating-ui.com/docs/userole
+   */
+  roleProps?: UseRoleProps;
 }
 
 const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
-  ({ open, onOpenChange, children, actionsSlot }, ref) => {
+  ({ open, onOpenChange, children, actionsSlot, roleProps }, ref) => {
     const prefersReducedMotion = usePrefersReducedMotion();
     const { animations: layoutAnimations } = useAppearance().parsedLayout;
     const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
@@ -425,6 +434,11 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
       transform: false,
       strategy: 'absolute',
     });
+    const { getFloatingProps } = useInteractions([
+      useClick(context),
+      useDismiss(context),
+      useRole(context, { role: 'alertdialog', ...roleProps }),
+    ]);
 
     const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
@@ -450,8 +464,6 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
       duration: isMotionSafe ? transitionDurationValues.drawer : 0,
     });
 
-    const { getFloatingProps } = useInteractions([useClick(context), useDismiss(context), useRole(context)]);
-
     if (!isMounted) return null;
 
     return (
@@ -471,7 +483,6 @@ const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
           modal
           outsideElementsInert
           initialFocus={refs.floating}
-          visuallyHiddenDismiss
         >
           <Box
             ref={mergedRefs}

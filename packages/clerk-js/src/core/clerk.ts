@@ -121,6 +121,7 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { createClientFromJwt } from './jwt-client';
 import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
@@ -325,9 +326,6 @@ export class Clerk implements ClerkInterface {
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
-    this.#domain = options?.domain;
-    this.#proxyUrl = options?.proxyUrl;
-
     if (!key) {
       return errorThrower.throwMissingPublishableKeyError();
     }
@@ -338,8 +336,11 @@ export class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.#publishableKey = key;
+    this.#domain = options?.domain;
+    this.#proxyUrl = options?.proxyUrl;
+    this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
+    this.#publishableKey = key;
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
@@ -2052,10 +2053,26 @@ export class Clerk implements ClerkInterface {
             this.updateEnvironment(res);
           });
 
-        const initClient = () => {
+        const initClient = async () => {
           return Client.getOrCreateInstance()
             .fetch()
-            .then(res => this.updateClient(res));
+            .then(res => this.updateClient(res))
+            .catch(async e => {
+              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+                throw e;
+              }
+
+              const jwtInCookie = this.#authService?.getSessionCookie();
+              const localClient = createClientFromJwt(jwtInCookie);
+
+              this.updateClient(localClient);
+
+              // Always grab a fresh token
+              await this.session?.getToken({ skipCache: true });
+
+              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
+              return null;
+            });
         };
 
         const initComponents = () => {
@@ -2068,16 +2085,20 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
-          // limit the changes for this specific error for now
+        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+        if (clientResult.status === 'rejected') {
+          const e = clientResult.reason;
+
           if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-            await initEnvironmentPromise;
+            if (envResult.status === 'rejected') {
+              await initEnvironmentPromise;
+            }
             initComponents();
             await initClient();
           } else {
             throw e;
           }
-        });
+        }
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 

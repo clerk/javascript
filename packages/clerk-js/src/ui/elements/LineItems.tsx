@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
 import { common } from '../styledSystem';
 
@@ -76,11 +77,11 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  children: React.ReactNode;
-  description?: React.ReactNode;
+  title: string | LocalizationKey;
+  description?: string | LocalizationKey;
 }
 
-function Title({ children, description }: TitleProps) {
+function Title({ title, description }: TitleProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Title must be used within LineItems.Group');
@@ -98,17 +99,16 @@ function Title({ children, description }: TitleProps) {
         ...common.textVariants(t)[textVariant],
       })}
     >
-      {children}
+      <Span localizationKey={title} />
       {description ? (
         <Span
+          localizationKey={description}
           elementDescriptor={descriptors.lineItemsTitleDescription}
           sx={t => ({
             fontSize: t.fontSizes.$sm,
             color: t.colors.$colorTextSecondary,
           })}
-        >
-          {description}
-        </Span>
+        />
       ) : null}
     </Dt>
   );
@@ -119,18 +119,12 @@ function Title({ children, description }: TitleProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface DescriptionProps {
-  children: React.ReactNode;
-  /**
-   * Render a piece of text before the description text.
-   */
-  prefix?: React.ReactNode;
-  /**
-   * Render a note below the description text.
-   */
-  suffix?: React.ReactNode;
+  text: string | LocalizationKey;
+  prefix?: string | LocalizationKey;
+  suffix?: string | LocalizationKey;
 }
 
-function Description({ children, prefix, suffix }: DescriptionProps) {
+function Description({ text, prefix, suffix }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -157,34 +151,31 @@ function Description({ children, prefix, suffix }: DescriptionProps) {
       >
         {prefix ? (
           <Span
+            localizationKey={prefix}
             elementDescriptor={descriptors.lineItemsDescriptionPrefix}
             sx={t => ({
               color: t.colors.$colorTextSecondary,
               ...common.textVariants(t).caption,
             })}
-          >
-            {prefix}
-          </Span>
+          />
         ) : null}
         <Span
+          localizationKey={text}
           elementDescriptor={descriptors.lineItemsDescriptionText}
           sx={t => ({
             ...common.textVariants(t).body,
           })}
-        >
-          {children}
-        </Span>
+        />
       </Span>
       {suffix ? (
         <Span
+          localizationKey={suffix}
           elementDescriptor={descriptors.lineItemsDescriptionSuffix}
           sx={t => ({
             color: t.colors.$colorTextSecondary,
             ...common.textVariants(t).caption,
           })}
-        >
-          {suffix}
-        </Span>
+        />
       ) : null}
     </Dd>
   );
