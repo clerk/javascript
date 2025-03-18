@@ -1,5 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
-import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { OrganizationResource, UserResource } from '@clerk/types';
 import { createContext, useContext } from 'react';
 
@@ -12,7 +10,6 @@ export const OrganizationListContext = createContext<OrganizationListCtx | null>
 
 export const useOrganizationListContext = () => {
   const context = useContext(OrganizationListContext);
-  const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig, organizationSettings } = useEnvironment();
 
@@ -77,15 +74,6 @@ export const useOrganizationListContext = () => {
   const navigateAfterSelectOrganization = (organization: OrganizationResource) =>
     navigateAfterSelectOrganizationOrPersonal({ organization });
   const navigateAfterSelectPersonal = (user: UserResource) => navigateAfterSelectOrganizationOrPersonal({ user });
-
-  const hidePersonal = organizationSettings.forceOrganizationSelection || ctx.hidePersonal || false;
-
-  clerk?.telemetry?.record(
-    eventComponentMounted('OrganizationList', {
-      hidePersonal,
-      forceOrganizationSelection: organizationSettings.forceOrganizationSelection,
-    }),
-  );
 
   return {
     ...ctx,

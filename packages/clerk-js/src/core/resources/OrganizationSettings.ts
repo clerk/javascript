@@ -28,7 +28,6 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   }
 
   protected fromJSON(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null): this {
-<<<<<<< HEAD
     if (!data) {
       return this;
     }
@@ -45,25 +44,11 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
     this.enabled = this.withDefault(data.enabled, this.enabled);
     this.maxAllowedMemberships = this.withDefault(data.max_allowed_memberships, this.maxAllowedMemberships);
+    this.forceOrganizationSelection = this.withDefault(
+      data.force_organization_selection,
+      this.forceOrganizationSelection,
+    );
 
-=======
-    const {
-      enabled = false,
-      max_allowed_memberships = 0,
-      force_organization_selection = false,
-      actions,
-      domains,
-    } = data || {};
-    this.enabled = enabled;
-    this.maxAllowedMemberships = max_allowed_memberships;
-    this.forceOrganizationSelection = force_organization_selection;
-    this.actions = { adminDelete: actions?.admin_delete || false };
-    this.domains = {
-      enabled: domains?.enabled || false,
-      enrollmentModes: domains?.enrollment_modes || [],
-      defaultRole: domains?.default_role || null,
-    };
->>>>>>> 6413d61b9 (Add `force_organization_selection` to environment resource)
     return this;
   }
 
