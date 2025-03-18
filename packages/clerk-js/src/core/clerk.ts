@@ -1387,15 +1387,6 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
       sessionId: signIn.createdSessionId,
     };
-    console.log(JSON.stringify({ su, si }));
-    if (window.opener && window.opener.location.origin === window.location.origin) {
-      window.opener.postMessage(
-        { return_url: window.location.href, metadata: JSON.stringify({ su, si }) },
-        window.location.origin,
-      );
-      window.close();
-      return;
-    }
 
     const makeNavigate = (to: string) => () => navigate(to);
 
