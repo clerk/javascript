@@ -84,12 +84,11 @@ Root.displayName = 'SegmentedControl.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface ButtonProps {
-  textKey?: LocalizationKey;
-  textSlot?: React.ReactNode;
+  text: string | LocalizationKey;
   value: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ textKey, textSlot, value }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
   const { currentValue, onValueChange } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
@@ -100,7 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ textKey, text
           <SimpleButton
             ref={ref}
             {...compProps}
-            localizationKey={textKey}
+            localizationKey={text}
             elementDescriptor={descriptors.segmentedControlButton}
             variant='unstyled'
             role='radio'
@@ -121,9 +120,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ textKey, text
                 zIndex: 2,
               },
             })}
-          >
-            {textSlot}
-          </SimpleButton>
+          />
         );
       }}
     />

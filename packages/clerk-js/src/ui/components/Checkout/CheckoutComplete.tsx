@@ -99,9 +99,9 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title titleSlot='Total paid' />
+            <LineItems.Title title='Total paid' />
             <LineItems.Description
-              textSlot={
+              text={
                 checkout.invoice
                   ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
                   : '–'
@@ -110,17 +110,17 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title titleSlot='Payment method' />
+            <LineItems.Title title='Payment method' />
             <LineItems.Description
-              textSlot={
+              text={
                 checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'
               }
             />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title titleSlot='Invoice ID' />
-            <LineItems.Description textSlot={checkout.invoice ? checkout.invoice.id : '–'} />
+            <LineItems.Title title='Invoice ID' />
+            <LineItems.Description text={checkout.invoice ? checkout.invoice.id : '–'} />
           </LineItems.Group>
         </LineItems.Root>
         <Button

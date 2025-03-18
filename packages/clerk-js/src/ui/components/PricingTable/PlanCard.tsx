@@ -327,11 +327,11 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           >
             <SegmentedControl.Button
               value='month'
-              textSlot='Monthly'
+              text='Monthly'
             />
             <SegmentedControl.Button
               value='annual'
-              textSlot='Annually'
+              text='Annually'
             />
           </SegmentedControl.Root>
         </Box>

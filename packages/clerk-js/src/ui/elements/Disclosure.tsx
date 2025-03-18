@@ -73,11 +73,10 @@ Root.displayName = 'Disclosure.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface TriggerProps {
-  textKey?: LocalizationKey;
-  textSlot?: React.ReactNode;
+  text?: string | LocalizationKey;
 }
 
-const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ textKey, textSlot }, ref) => {
+const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ text }, ref) => {
   const context = React.useContext(DisclosureContext);
   if (!context) {
     throw new Error('Disclosure.Trigger must be used within Disclosure.Root');
@@ -101,7 +100,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(({ textKey, te
         zIndex: 2,
       })}
     >
-      <Span localizationKey={textKey}>{textSlot}</Span>
+      <Span localizationKey={text} />
       <Icon
         icon={ChevronDown}
         colorScheme='neutral'

@@ -264,14 +264,12 @@ Overlay.displayName = 'Drawer.Content';
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  titleKey?: LocalizationKey;
-  titleSlot?: React.ReactNode;
+  title?: string | LocalizationKey;
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
 
-const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ titleKey, titleSlot, children, sx }, ref) => {
-  const hasTitle = titleKey || titleSlot;
+const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children, sx }, ref) => {
   return (
     <Box
       ref={ref}
@@ -289,25 +287,23 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ titleKey, titleS
           borderBlockEndColor: t.colors.$neutralAlpha100,
           borderStartStartRadius: t.radii.$xl,
           borderStartEndRadius: t.radii.$xl,
-          paddingBlock: hasTitle ? t.space.$3 : undefined,
-          paddingInline: hasTitle ? t.space.$4 : undefined,
+          paddingBlock: title ? t.space.$3 : undefined,
+          paddingInline: title ? t.space.$4 : undefined,
         }),
         sx,
       ]}
     >
-      {hasTitle ? (
+      {title ? (
         <>
           <Heading
-            localizationKey={titleKey}
+            localizationKey={title}
             as='h2'
             elementDescriptor={descriptors.drawerTitle}
             textVariant='h2'
             sx={{
               alignSelf: 'center',
             }}
-          >
-            {titleSlot}
-          </Heading>
+          />
           <Close />
         </>
       ) : (

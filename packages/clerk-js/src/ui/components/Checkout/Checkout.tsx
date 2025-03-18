@@ -35,7 +35,7 @@ const AuthenticatedRoutes = withCoreUserGuard((props: __experimental_CheckoutPro
     >
       <Drawer.Overlay />
       <Drawer.Content>
-        <Drawer.Header titleSlot='Checkout' />
+        <Drawer.Header title='Checkout' />
         <CheckoutPage {...props} />
       </Drawer.Content>
     </Drawer.Root>

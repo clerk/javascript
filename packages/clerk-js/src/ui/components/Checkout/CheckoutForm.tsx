@@ -40,11 +40,11 @@ export const CheckoutForm = ({
       >
         <LineItems.Root>
           <LineItems.Group>
-            <LineItems.Title titleSlot={plan.name} />
+            <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
-              textSlot={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
-              suffixSlot={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
+              text={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
           <LineItems.Group
@@ -52,19 +52,19 @@ export const CheckoutForm = ({
             variant='tertiary'
           >
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title titleSlot='Subtotal' />
-            <LineItems.Description textSlot={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
+            <LineItems.Title title='Subtotal' />
+            <LineItems.Description text={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title titleSlot='Tax' />
-            <LineItems.Description textSlot={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
+            <LineItems.Title title='Tax' />
+            <LineItems.Description text={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title titleSlot={`Total${totals.totalDueNow ? ' Due Today' : ''}`} />
+            <LineItems.Title title={`Total${totals.totalDueNow ? ' Due Today' : ''}`} />
             <LineItems.Description
-              textSlot={`${
+              text={`${
                 totals.totalDueNow
                   ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
                   : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`
@@ -197,7 +197,7 @@ const CheckoutFormElements = ({
             onOpenChange={setOpenAccountFundsDropDown}
           >
             {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger textSlot='Account Funds' />
+            <Disclosure.Trigger text='Account Funds' />
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
@@ -218,7 +218,7 @@ const CheckoutFormElements = ({
         onOpenChange={setOpenAddNewSourceDropDown}
       >
         {/* TODO(@Commerce): needs localization */}
-        <Disclosure.Trigger textSlot='Add a New Payment Source' />
+        <Disclosure.Trigger text='Add a New Payment Source' />
         <Disclosure.Content>
           <StripePaymentMethods
             totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
