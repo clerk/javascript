@@ -67,6 +67,7 @@
     "@eslint/eslintrc": "^3.3.0",
     "@eslint/js": "9.22.0",
     "@faker-js/faker": "^8.1.0",
+    "@hcaptcha/types": "^1.0.3",
     "@jest/globals": "29.7.0",
     "@octokit/rest": "^20.0.2",
     "@playwright/test": "^1.44.0",
