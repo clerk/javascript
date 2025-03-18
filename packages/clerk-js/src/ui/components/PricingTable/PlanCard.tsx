@@ -327,10 +327,12 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           >
             <SegmentedControl.Button
               value='month'
+              // TODO(@Commerce): needs localization
               text='Monthly'
             />
             <SegmentedControl.Button
               value='annual'
+              // TODO(@Commerce): needs localization
               text='Annually'
             />
           </SegmentedControl.Root>
