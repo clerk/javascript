@@ -160,7 +160,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         fictionalEmail: true,
         withPhoneNumber: true,
       });
-      const bapiFakeUser = await u.services.users.createBapiUser({
+      await u.services.users.createBapiUser({
         ...delFakeUser,
         username: undefined,
         phoneNumber: undefined,
