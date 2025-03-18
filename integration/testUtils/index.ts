@@ -52,7 +52,7 @@ const createExpectPageObject = ({ page }: TestArgs) => {
         return !!window.Clerk?.user;
       });
     },
-    toHaveCurrentTask: async () => {
+    toHaveResolvedTask: async () => {
       return page.waitForFunction(() => {
         return !window.Clerk?.session?.currentTask;
       });

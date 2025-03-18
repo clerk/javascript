@@ -40,7 +40,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // Resolves task
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
-      await u.po.expect.toHaveCurrentTask();
+      await u.po.expect.toHaveResolvedTask();
 
       // Navigates to after sign-in
       await u.page.waitForAppUrl('/');
