@@ -6,26 +6,28 @@
  * - HSL: hsl(h, s%, l%), hsla(h, s%, l%, a) → hsl(h, s%, l%)
  *
  * @param colorString - The color string to normalize
- * @returns The normalized color string without alpha components
- * @throws Error if the input is not a valid color format
+ * @returns The normalized color string without alpha components, or the original string if invalid
  */
 export function normalizeColorString(colorString: string): string {
   if (!colorString || typeof colorString !== 'string') {
-    throw new Error('Invalid input: color string must be a non-empty string');
+    console.warn('Invalid input: color string must be a non-empty string');
+    return colorString || '';
   }
 
   const trimmed = colorString.trim();
 
   // Handle empty strings
   if (trimmed === '') {
-    throw new Error('Invalid input: color string cannot be empty');
+    console.warn('Invalid input: color string cannot be empty');
+    return '';
   }
 
   // Handle hex colors
   if (trimmed.startsWith('#')) {
     // Validate hex format
     if (!/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(trimmed)) {
-      throw new Error(`Invalid hex color format: ${colorString}`);
+      console.warn(`Invalid hex color format: ${colorString}`);
+      return trimmed;
     }
 
     // #RGBA format (4 chars)
@@ -56,7 +58,8 @@ export function normalizeColorString(colorString: string): string {
       return `rgb(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]})`;
     }
 
-    throw new Error(`Invalid RGB/RGBA format: ${colorString}`);
+    console.warn(`Invalid RGB/RGBA format: ${colorString}`);
+    return trimmed;
   }
 
   // Handle hsl/hsla
@@ -75,9 +78,11 @@ export function normalizeColorString(colorString: string): string {
       return `hsl(${hslaMatch[1]}, ${hslaMatch[2]}%, ${hslaMatch[3]}%)`;
     }
 
-    throw new Error(`Invalid HSL/HSLA format: ${colorString}`);
+    console.warn(`Invalid HSL/HSLA format: ${colorString}`);
+    return trimmed;
   }
 
   // If we reach here, the input is not a recognized color format
-  throw new Error(`Unrecognized color format: ${colorString}`);
+  console.warn(`Unrecognized color format: ${colorString}`);
+  return trimmed;
 }
