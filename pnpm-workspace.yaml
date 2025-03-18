@@ -16,7 +16,7 @@ catalogs:
 
   # Can be referenced through "catalog:repo"
   repo:
-    tslib: 2.4.1
+    tslib: 2.8.1
     tsup: 8.3.5
     typescript: 5.6.3
     zx: 8.3.0
