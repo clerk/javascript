@@ -32,7 +32,15 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
 
   return (
     <>
-      {mode === 'modal' || props.layout === 'default' ? (
+      {mode !== 'modal' && props.layout === 'matrix' ? (
+        <PricingTableMatrix
+          plans={plans || []}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          onSelect={selectPlan}
+          highlightedPlan={props.matrixHighlightedPlan}
+        />
+      ) : (
         <PricingTableDefault
           plans={plans}
           planPeriod={planPeriod}
@@ -40,14 +48,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           onSelect={selectPlan}
           isCompact={isCompact}
           props={props}
-        />
-      ) : (
-        <PricingTableMatrix
-          plans={plans || []}
-          planPeriod={planPeriod}
-          setPlanPeriod={setPlanPeriod}
-          onSelect={selectPlan}
-          highlightedPlan='basic'
         />
       )}
 

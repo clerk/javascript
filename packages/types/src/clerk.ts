@@ -1461,6 +1461,7 @@ export type __experimental_PricingTableProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
   layout?: 'default' | 'matrix';
+  matrixHighlightedPlan?: string;
 };
 
 export type __experimental_CheckoutProps = {

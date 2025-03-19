@@ -391,7 +391,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
           rowGap: variant === 'avatar' ? t.space.$4 : isCompact ? t.space.$2 : t.space.$3,
         })}
       >
-        {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
+        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
           <Box
             elementDescriptor={descriptors.planCardFeaturesListItem}
             elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}
