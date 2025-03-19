@@ -1904,6 +1904,19 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
+      // Detect the transition of a active session to a pending with tasks
+      // This can happen when the instance-level settings change while the user has a active session
+      // eg: App owner removes user org membership or enforces MFA
+      const hasPendingTask = this.session.status === 'active' && session?.status === 'pending';
+      if (this.environment && hasPendingTask) {
+        navigateToTask(session.currentTask, {
+          globalNavigate: this.navigate,
+          componentNavigationContext: this.#componentNavigationContext,
+          options: this.#options,
+          environment: this.environment,
+        });
+      }
+
       // Note: this might set this.session to null
       this.#setAccessors(session);
 
