@@ -3,6 +3,7 @@ import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
+import { Token } from '../../core/resources';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -144,6 +145,7 @@ export class AuthCookieService {
       if (updateCookieImmediately) {
         this.updateSessionCookie(token);
       }
+      void this.handleSessionCookieStatus(token);
     } catch (e) {
       return this.handleGetTokenError(e);
     }
@@ -213,5 +215,33 @@ export class AuthCookieService {
 
   public getSessionCookie() {
     return this.sessionCookie.get();
+  }
+
+  private handleSessionCookieStatus(sessionCookie: string | null) {
+    if (!sessionCookie) {
+      return;
+    }
+
+    const { jwt } = new Token({
+      jwt: sessionCookie,
+      object: 'token',
+      id: sessionCookie,
+    });
+
+    // User has gone through tasks resolution via sign-in and sign-up already
+    // We don't want to redirect again for token updates triggered via /touch or window focus events on sign-in/sign-up
+    const hasPendingStatus = jwt?.claims.sts === 'pending';
+    const isIntersectionFlow = hasPendingStatus && !this.clerk.client?.signIn.id && !this.clerk.client?.signUp.id;
+    // TODO -> Add `sts` to our JWT types
+    const isTasksReferrer = typeof window === 'object' && window.location.href.includes('add-organization');
+    console.log({ isIntersectionFlow, hasPendingStatus, isTasksReferrer });
+
+    if (!isIntersectionFlow || isTasksReferrer) {
+      return;
+    }
+
+    // TODO -> Introduce page for tasks resolution such as SSO callback
+    // TODO -> Handle transitive state -> the `organization` should be set to undefined in order unmount
+    return this.clerk.navigate(this.clerk.buildSignInUrl());
   }
 }

@@ -1124,8 +1124,6 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    console.log({ session }, '__experimental_nextTask');
-
     if (session.status === 'pending') {
       await navigateToTask(session.currentTask, {
         options: this.#options,
