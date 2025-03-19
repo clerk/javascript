@@ -1467,6 +1467,7 @@ export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
+  orgId?: string;
 };
 
 export interface HandleEmailLinkVerificationParams {

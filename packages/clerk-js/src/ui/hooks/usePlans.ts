@@ -12,7 +12,7 @@ export const usePlans = (props: UsePlansProps) => {
   const { __experimental_commerce } = useClerk();
 
   const activeUserSubscriptions: __experimental_CommerceSubscriptionResource[] = [];
-  const { subscriptions: orgSubscriptions } = useOrganization({ subscriptions: { status: 'active' } });
+  const { subscriptions: orgSubscriptions } = useOrganization({ subscriptions: true });
   const activeOrgSubscriptions: __experimental_CommerceSubscriptionResource[] = orgSubscriptions?.data || [];
   const activeSubscriptions = [...(subscriberType === 'user' ? activeUserSubscriptions : activeOrgSubscriptions)];
 

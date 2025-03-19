@@ -108,6 +108,7 @@ export interface __experimental_CommerceTotals {
 export interface __experimental_CreateCheckoutParams {
   planId: string;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  orgId?: string;
 }
 
 export interface __experimental_ConfirmCheckoutParams {

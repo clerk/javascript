@@ -1,3 +1,4 @@
+import { useOrganization } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -16,6 +17,7 @@ import { PlanCard } from './PlanCard';
 import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
+  const { organization } = useOrganization();
   const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
@@ -88,6 +90,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
             <__experimental_Checkout
               planPeriod={planPeriod}
               planId={checkoutPlan.id}
+              orgId={subscriberType === 'org' ? organization?.id : undefined}
             />
           )}
         </div>

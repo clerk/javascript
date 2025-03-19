@@ -10,7 +10,7 @@ import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod } = props;
+  const { planId, planPeriod, orgId } = props;
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
   const { __experimental_commerceSettings } = useEnvironment();
@@ -18,6 +18,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
     planPeriod,
+    orgId,
   });
 
   useEffect(() => {
