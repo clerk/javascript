@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
@@ -21,11 +22,20 @@ import type { PlanPeriod } from './PlanCard';
 
 interface PricingTableMatrixProps {
   plans?: __experimental_CommercePlanResource[] | null;
+  highlightedPlan?: __experimental_CommercePlanResource['slug'];
   planPeriod: PlanPeriod;
   setPlanPeriod: (val: PlanPeriod) => void;
+  onSelect: (plan: __experimental_CommercePlanResource) => void;
 }
 
-export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: PricingTableMatrixProps) {
+export function PricingTableMatrix({
+  plans,
+  planPeriod,
+  setPlanPeriod,
+  onSelect,
+  highlightedPlan,
+}: PricingTableMatrixProps) {
+  const clerk = useClerk();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
@@ -47,10 +57,14 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
     return Array.from(featuresSet);
   };
 
+  const gridTemplateColumns = `repeat(${plans.length + 1}, minmax(12.5rem,1fr))`;
+
   return (
     <Box
       role='table'
       sx={{
+        marginInline: 'auto',
+        width: 'auto',
         isolation: 'isolate',
         // overflowX: 'auto'
       }}
@@ -70,7 +84,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
           role='row'
           sx={_ => ({
             display: 'grid',
-            gridTemplateColumns: `repeat(${plans.length + 1}, minmax(12.5rem,31.25rem))`,
+            gridTemplateColumns,
           })}
         >
           <Box
@@ -108,7 +122,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
             </SegmentedControl.Root>
           </Box>
           {plans?.map(plan => {
-            const highlight = plan.slug === 'basic';
+            const highlight = plan.slug === highlightedPlan;
             const planFee =
               plan.annualMonthlyAmount <= 0
                 ? plan.amountFormatted
@@ -138,24 +152,35 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                     padding: t.space.$4,
                   })}
                 >
-                  <Span
-                    sx={t => ({
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      marginBlockEnd: t.space.$3,
-                    })}
-                  >
-                    <Avatar
-                      size={_ => 40}
-                      title={plan.name}
-                      initials={plan.name[0]}
-                      rounded={false}
-                      imageUrl={plan.avatarUrl}
-                    />
-                    {highlight ? <Badge colorScheme='secondary'>Popular</Badge> : null}
-                  </Span>
+                  {plan.avatarUrl || highlight ? (
+                    <Span
+                      sx={t => ({
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        marginBlockEnd: t.space.$3,
+                      })}
+                    >
+                      {plan.avatarUrl ? (
+                        <Avatar
+                          size={_ => 40}
+                          title={plan.name}
+                          initials={plan.name[0]}
+                          rounded={false}
+                          imageUrl={plan.avatarUrl}
+                        />
+                      ) : null}
+                      <Avatar
+                        size={_ => 40}
+                        title={plan.name}
+                        initials={plan.name[0]}
+                        rounded={false}
+                        imageUrl={plan.avatarUrl}
+                      />
+                      {highlight ? <Badge colorScheme='secondary'>Popular</Badge> : null}
+                    </Span>
+                  ) : null}
                   <Heading textVariant='h3'>{plan.name}</Heading>
                   <Flex
                     align='center'
@@ -252,9 +277,19 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                     colorScheme={highlight ? 'primary' : 'secondary'}
                     textVariant='buttonSmall'
                     size='xs'
-                  >
-                    Get started
-                  </Button>
+                    onClick={() => {
+                      if (clerk.isSignedIn) {
+                        onSelect(plan);
+                      } else {
+                        void clerk.redirectToSignIn();
+                      }
+                    }}
+                    localizationKey={
+                      plan.isActiveForPayer
+                        ? localizationKeys('__experimental_commerce.manageMembership')
+                        : localizationKeys('__experimental_commerce.getStarted')
+                    }
+                  />
                 </Box>
               </Box>
             );
@@ -270,7 +305,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
           ...getAllFeatures(plans),
           ...getAllFeatures(plans),
         ].map((f, i) => {
-          const renderFeatureSetHeader = i % 6 === 0; // Render header every 6 rows
+          const renderFeatureSetHeader = i % 6 === 0;
           return (
             <React.Fragment key={f}>
               {renderFeatureSetHeader ? (
@@ -279,7 +314,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                     // position: 'sticky',
                     // top: height,
                     display: 'grid',
-                    gridTemplateColumns: `repeat(${plans.length + 1}, minmax(12.5rem,31.25rem))`,
+                    gridTemplateColumns,
                     borderBottomWidth: t.borderWidths.$normal,
                     borderBottomStyle: t.borderStyles.$solid,
                     borderBottomColor: t.colors.$neutralAlpha100,
@@ -296,7 +331,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                     <Text variant='h3'>Feature set</Text>
                   </Box>
                   {plans.map(plan => {
-                    const highlight = plan.slug === 'basic';
+                    const highlight = plan.slug === highlightedPlan;
                     return (
                       <Box
                         key={plan.slug}
@@ -317,7 +352,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                 role='row'
                 sx={t => ({
                   display: 'grid',
-                  gridTemplateColumns: `repeat(${plans.length + 1}, minmax(12.5rem,31.25rem))`,
+                  gridTemplateColumns,
                   borderBottomWidth: t.borderWidths.$normal,
                   borderBottomStyle: t.borderStyles.$solid,
                   borderBottomColor: t.colors.$neutralAlpha100,
@@ -335,7 +370,7 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
                   <Text colorScheme='body'>{f}</Text>
                 </Box>
                 {plans.map(plan => {
-                  const highlight = plan.slug === 'basic';
+                  const highlight = plan.slug === highlightedPlan;
                   const hasFeature = plan.features.some(feature => feature.name === f);
                   return (
                     <Box
@@ -365,6 +400,30 @@ export function PricingTableMatrix({ plans, planPeriod, setPlanPeriod }: Pricing
             </React.Fragment>
           );
         })}
+        <Box
+          sx={_ => ({
+            display: 'grid',
+            gridTemplateColumns,
+          })}
+        >
+          <Box />
+          {plans.map(plan => {
+            const highlight = plan.slug === highlightedPlan;
+            return (
+              <Box
+                key={plan.slug}
+                sx={t => ({
+                  height: t.space.$10,
+                  borderEndStartRadius: t.radii.$xl,
+                  borderEndEndRadius: t.radii.$xl,
+                  ...(highlight && {
+                    backgroundColor: t.colors.$neutralAlpha25,
+                  }),
+                })}
+              />
+            );
+          })}
+        </Box>
       </Box>
     </Box>
   );

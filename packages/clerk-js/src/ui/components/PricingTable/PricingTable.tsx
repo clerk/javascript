@@ -38,6 +38,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         plans={plans}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
+        onSelect={selectPlan}
+        highlightedPlan='basic'
       />
 
       <br />
