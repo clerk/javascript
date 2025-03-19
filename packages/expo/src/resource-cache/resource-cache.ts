@@ -27,7 +27,7 @@ type Metadata = {
  * - key-{A/B}-complete -> 'true'/'false'
  *
  **/
-export const createSecureStore = (): IStorage => {
+export const createResourceCacheStore = (): IStorage => {
   let queue: KeyValuePair[] = [];
   let isProcessing = false;
 

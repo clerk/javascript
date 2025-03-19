@@ -844,7 +844,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationSwitcher', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -878,7 +883,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationList', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {

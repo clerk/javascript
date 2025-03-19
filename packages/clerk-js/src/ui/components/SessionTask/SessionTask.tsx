@@ -7,8 +7,12 @@ import { OrganizationList } from '../OrganizationList';
 
 const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
   org: () => (
-    // TODO - Hide personal workspace within organization list context based on environment
-    <OrganizationListContext.Provider value={{ componentName: 'OrganizationList', hidePersonal: true }}>
+    <OrganizationListContext.Provider
+      value={{
+        componentName: 'OrganizationList',
+        skipInvitationScreen: true,
+      }}
+    >
       <OrganizationList />
     </OrganizationListContext.Provider>
   ),
