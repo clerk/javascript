@@ -970,12 +970,11 @@ export class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
-    if (session?.status === 'pending') {
-      await this.#handlePendingSession(session);
+    let newSession = session === undefined ? this.session : session;
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession, organization);
       return;
     }
-
-    let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
@@ -1064,15 +1063,35 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: PendingSessionResource) => {
+  #handlePendingSession = async (
+    session: PendingSessionResource,
+    organization?: string | OrganizationResource | null | undefined,
+  ) => {
     if (!this.environment) {
       return;
     }
 
+    const shouldSwitchOrganization = organization !== undefined;
+    if (shouldSwitchOrganization) {
+      const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
+
+      if (isOrganizationId(organizationIdOrSlug)) {
+        session.lastActiveOrganizationId = organizationIdOrSlug || null;
+      } else {
+        const matchingOrganization = session.user.organizationMemberships.find(
+          mem => mem.organization.slug === organizationIdOrSlug,
+        );
+        session.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+      }
+    }
+
+    let newSession: SignedInSessionResource | null = session;
+
     // Handles multi-session scenario when switching between `pending` sessions
+    // and satisfying task requirements such as organization selection
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = (this.#getSessionFromClient(session.id) as PendingSessionResource) ?? session;
+      newSession = this.#getSessionFromClient(session.id) ?? session;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
@@ -1082,16 +1101,20 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    if (session.currentTask) {
+    if (newSession?.currentTask) {
       await navigateToTask(session.currentTask, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
       });
+
+      // Delay updating session accessors until active status transition to prevent premature component unmounting.
+      // This is particularly important when SignIn components are wrapped in SignedOut components,
+      // as early state updates could cause unwanted unmounting during the transition.
+      this.#setAccessors(session);
     }
 
-    this.#setAccessors(session);
     this.#emit();
   };
 
@@ -1100,6 +1123,8 @@ export class Clerk implements ClerkInterface {
     if (!session || !this.environment) {
       return;
     }
+
+    console.log({ session }, '__experimental_nextTask');
 
     if (session.status === 'pending') {
       await navigateToTask(session.currentTask, {
@@ -1111,8 +1136,12 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    this.#setTransitiveState();
     const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
     await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+
+    this.#setAccessors(session);
+    this.#emit();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -2275,6 +2304,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  /**
+   * Temporarily clears the accessors before emitting changes to React context state.
+   * This is used during transitions like sign-out or session changes to prevent UI flickers
+   * such as unexpected unmount of control components
+   */
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;

@@ -2301,8 +2301,8 @@ describe('Clerk singleton', () => {
       it('navigates to next task', async () => {
         const sut = new Clerk(productionPublishableKey);
         await sut.load(mockedLoadOptions);
-        await sut.setActive({ session: mockResource as any as PendingSessionResource });
 
+        await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__experimental_nextTask();
 
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/add-organization');
