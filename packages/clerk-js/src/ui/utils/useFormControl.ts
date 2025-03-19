@@ -1,6 +1,6 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDebounce } from '../hooks';
 import type { LocalizationKey } from '../localization';
@@ -17,6 +17,7 @@ type Options = {
   transformer?: Transformer;
   defaultChecked?: boolean;
   infoText?: LocalizationKey | string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => string | undefined;
 } & (
   | {
       label: string | LocalizationKey;
@@ -52,7 +53,65 @@ type Options = {
     }
 );
 
-type FieldStateProps<Id> = {
+class Store<T> {
+  private state: T;
+  private listeners: ((newState: T) => void)[] = [];
+
+  constructor(initialState: T) {
+    this.state = initialState;
+  }
+
+  public getState<K>(selector?: (state: T) => K): K extends keyof T ? T[K] : K extends undefined ? T : K {
+    // debugger
+    if (selector) {
+      return selector(this.state) as any;
+    }
+    return this.state as any;
+  }
+
+  public setState(newState: T | ((prevState: T) => T)): void {
+    this.state = typeof newState === 'function' ? (newState as (prevState: T) => T)(this.state) : newState;
+    this.listeners.forEach(listener => listener(this.state));
+  }
+
+  public subscribe<K>(listener: (selectedState: K) => void, selector?: (state: T) => K): () => void {
+    const notify = () => {
+      const selectedState = selector ? selector(this.state) : (this.state as any);
+      listener(selectedState);
+    };
+
+    this.listeners.push(notify);
+    notify(); // Notify immediately on subscription
+
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== notify);
+    };
+  }
+}
+
+const allStores = new Map<string, Store<{ [key: string]: FieldStateProps<string> }>>();
+
+export const useForm = (key: string): Store<{ [key: string]: FieldStateProps<string> }> => {
+  if (!allStores.has(key)) {
+    allStores.set(key, new Store<any>({}));
+  }
+  return allStores.get(key)!;
+};
+
+// export const useFormSelector = <T extends FieldStateProps<string>>(key: string, selector: (state: T) => T) => {
+//   const store = allStores.get(key);
+
+//   if (!store) {
+//     throw new Error(`Store with key ${key} not found`);
+//   }
+
+//   return useSyncExternalStore(
+//     (a: any) => store.subscribe(a, selector),
+//     () => store.getState(selector),
+//   );
+// };
+
+export type FieldStateProps<Id> = {
   id: Id;
   name: Id;
   value: string;
@@ -71,7 +130,7 @@ type FieldStateProps<Id> = {
   hasPassedComplexity: boolean;
   isFocused: boolean;
   ignorePasswordManager?: boolean;
-} & Omit<Options, 'defaultChecked'>;
+} & Omit<Options, 'defaultChecked' | 'onChange'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
   setError: (error: string | ClerkAPIError) => void;
@@ -98,6 +157,7 @@ export const useFormControl = <Id extends string>(
   id: Id,
   initialState: string,
   opts?: Options,
+  storeKey?: string,
 ): FormControlState<Id> => {
   const options = opts || {
     type: 'text',
@@ -125,11 +185,40 @@ export const useFormControl = <Id extends string>(
     type: 'info',
   });
 
+  useEffect(() => {
+    if (storeKey) {
+      allStores.get(storeKey)?.setState(prev => ({
+        ...prev,
+        [id]: {
+          id,
+          name: id,
+          value,
+          type: options.type,
+        } as unknown as FieldStateProps<string>,
+      }));
+    }
+    // TODO: remove on unmount
+  }, []);
+
   const onChange: FormControlState['onChange'] = event => {
+    const result = options.onChange?.(event);
+
     if (options?.type === 'checkbox') {
       return setCheckedInternal(event.target.checked);
     }
-    return setValueInternal(applyTransformers(event.target.value || '', transformers));
+
+    if (storeKey) {
+      allStores.get(storeKey)?.setState(prev => ({
+        ...prev,
+        [id]: {
+          id,
+          name: id,
+          value: applyTransformers(result || event.target.value || '', transformers),
+          type: options.type,
+        } as unknown as FieldStateProps<string>,
+      }));
+    }
+    return setValueInternal(applyTransformers(result || event.target.value || '', transformers));
   };
 
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
@@ -161,7 +250,14 @@ export const useFormControl = <Id extends string>(
     setFocused(false);
   };
 
-  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = options;
+  const {
+    defaultChecked,
+    validatePassword: validatePasswordProp,
+    buildErrorMessage,
+    // Simply ignore the onChange prop from the options.
+    onChange: onChangeProp,
+    ...restOpts
+  } = options;
 
   const props = {
     id,

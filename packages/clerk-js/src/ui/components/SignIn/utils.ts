@@ -1,9 +1,9 @@
 import { titleize } from '@clerk/shared/underscore';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
-import type { FormControlState } from 'ui/utils';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
+import type { FieldStateProps } from '../../utils';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
@@ -111,7 +111,7 @@ export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
-export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
+export function getSignUpAttributeFromIdentifier(identifier: FieldStateProps<string>) {
   if (identifier.type === 'tel') {
     return 'phoneNumber';
   }

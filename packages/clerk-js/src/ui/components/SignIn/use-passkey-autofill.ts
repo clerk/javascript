@@ -1,4 +1,4 @@
-import { isWebAuthnAutofillSupported } from '@clerk/shared/dist/webauthn';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useEffect, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';

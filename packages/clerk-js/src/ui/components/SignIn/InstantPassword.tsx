@@ -1,12 +1,27 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { useEnvironment } from '../../../ui/contexts';
+import { localizationKeys } from '../../../ui/localization';
+import { useFormControl } from '../../../ui/utils';
 import { Form } from '../../elements';
-import type { FormControlState } from '../../utils';
 
-export const InstantPassword = ({ field }: { field?: FormControlState<'password'> }) => {
+export const InstantPassword = () => {
+  const { userSettings } = useEnvironment();
+
+  const instantPasswordField = useFormControl(
+    'password',
+    '',
+    {
+      type: 'password',
+      label: localizationKeys('formFieldLabel__password'),
+      placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
+    },
+    'sign-in-start',
+  );
+
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
-  const show = !!(autofilled || field?.value);
+  const show = !!(autofilled || instantPasswordField?.value);
 
   // show password if it's autofilled by the browser
   useLayoutEffect(() => {
@@ -30,22 +45,22 @@ export const InstantPassword = ({ field }: { field?: FormControlState<'password'
 
   useEffect(() => {
     //if the field receives a value, we default to normal behaviour
-    if (field?.value && field.value !== '') {
+    if (instantPasswordField?.value && instantPasswordField.value !== '') {
       setAutofilled(false);
     }
-  }, [field?.value]);
+  }, [instantPasswordField?.value]);
 
-  if (!field) {
+  if (!userSettings.instanceIsPasswordBased) {
     return null;
   }
 
   return (
     <Form.ControlRow
-      elementId={field.id}
+      elementId={instantPasswordField.id}
       sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
     >
       <Form.PasswordInput
-        {...field.props}
+        {...instantPasswordField.props}
         ref={ref}
         tabIndex={show ? undefined : -1}
       />
