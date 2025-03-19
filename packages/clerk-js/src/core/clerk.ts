@@ -1460,7 +1460,6 @@ export class Clerk implements ClerkInterface {
       navigate: (to: string) => Promise<unknown>;
     },
   ): Promise<unknown> => {
-    console.log('handling redirect callback');
     if (!this.loaded || !this.environment || !this.client) {
       return;
     }
@@ -1610,12 +1609,9 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    console.log('here 1');
-
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
-      console.log('user needs to be created');
       if (params.transferable === false) {
         return navigateToSignIn();
       }
@@ -1650,8 +1646,6 @@ export class Clerk implements ClerkInterface {
       su.externalAccountErrorCode === 'identifier_already_signed_in' &&
       su.externalAccountSessionId;
 
-    console.log('here 2');
-
     const siUserAlreadySignedIn =
       si.firstFactorVerificationStatus === 'failed' &&
       si.firstFactorVerificationErrorCode === 'identifier_already_signed_in' &&
@@ -1669,15 +1663,12 @@ export class Clerk implements ClerkInterface {
     }
 
     if (hasExternalAccountSignUpError(signUp)) {
-      console.log('has external account sign up error');
       return navigateToSignUp();
     }
 
     if (su.externalAccountStatus === 'verified' && su.status === 'missing_requirements') {
       return navigateToNextStepSignUp({ missingFields: signUp.missingFields });
     }
-
-    console.log('here 3');
 
     return navigateToSignIn();
   };
@@ -1885,7 +1876,6 @@ export class Clerk implements ClerkInterface {
       let shouldRemoveListener = false;
 
       if (event.data.session) {
-        console.log(`calling setActive with session ${event.data.session} adn redirectUrl ${redirectUrl}`);
         const existingSession = this.client?.sessions.find(x => x.id === event.data.session) || null;
         if (!existingSession) {
           try {
@@ -1900,8 +1890,6 @@ export class Clerk implements ClerkInterface {
         });
         shouldRemoveListener = true;
       } else if (event.data.return_url) {
-        console.log(`navigating to ${event.data.return_url}`);
-        console.log(event.data.metadata);
         this.navigate(event.data.return_url);
         shouldRemoveListener = true;
       }
