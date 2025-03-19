@@ -171,7 +171,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private initHeaderValues() {
-    this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.sessionTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);
     this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
@@ -200,10 +200,6 @@ class AuthenticateContext implements AuthenticateContext {
     this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
   }
 
-  private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
-    return authValue?.replace('Bearer ', '');
-  }
-
   private getQueryParam(name: string) {
     return this.clerkRequest.clerkUrl.searchParams.get(name);
   }
@@ -225,6 +221,18 @@ class AuthenticateContext implements AuthenticateContext {
       return this.getSuffixedCookie(cookieName);
     }
     return this.getCookie(cookieName);
+  }
+
+  private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
+    if (!authorizationHeader) {
+      return undefined;
+    }
+
+    if (authorizationHeader.startsWith('Bearer ')) {
+      return authorizationHeader.slice('Bearer '.length);
+    }
+
+    return undefined;
   }
 
   private tokenHasIssuer(token: string): boolean {
