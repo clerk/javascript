@@ -4,18 +4,16 @@ import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
-import { Box, descriptors } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { InternalThemeProvider } from '../../styledSystem';
 import { __experimental_Checkout } from '../Checkout';
-import { PlanCard, type PlanPeriod } from './PlanCard';
 import { PlanDetailDrawer } from './PlanDetailDrawer';
 import { PricingTableMatrix } from './PricingTableMatrix';
+import { PricingTableDefault } from './PricingTableDefault';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
   const { __experimental_commerce } = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
-  const [planPeriod, setPlanPeriod] = useState<PlanPeriod>('month');
+  const [planPeriod, setPlanPeriod] = useState<'month' | 'annual'>('month');
   const [selectedPlan, setSelectedPlan] = useState<__experimental_CommercePlanResource>();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPlanDetail, setShowPlanDetail] = useState(false);
@@ -33,53 +31,25 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   };
 
   return (
-    <InternalThemeProvider>
-      <PricingTableMatrix
-        plans={plans}
-        planPeriod={planPeriod}
-        setPlanPeriod={setPlanPeriod}
-        onSelect={selectPlan}
-        highlightedPlan='basic'
-      />
-
-      <br />
-      <br />
-      <br />
-      <br />
-
-      <Box
-        elementDescriptor={descriptors.pricingTable}
-        sx={t => ({
-          // Sets the minimum width a column can be before wrapping
-          '--grid-min-size': isCompact ? '11.75rem' : '20rem',
-          // Set a max amount of columns before they start wrapping to new rows.
-          '--grid-max-columns': 'infinity',
-          // Set the default gap, use `--grid-gap-y` to override the row gap
-          '--grid-gap': t.space.$4,
-          // Derived from the maximum column size based on the grid configuration
-          '--max-column-width': '100% / var(--grid-max-columns, infinity) - var(--grid-gap)',
-          // Derived from `--max-column-width` and ensures it respects the minimum size and maximum width constraints
-          '--column-width': 'max(var(--max-column-width), min(var(--grid-min-size, 10rem), 100%))',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
-          gap: `var(--grid-gap-y, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
-          alignItems: 'start',
-          width: '100%',
-          minWidth: '0',
-        })}
-      >
-        {plans?.map(plan => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            planPeriod={planPeriod}
-            setPlanPeriod={setPlanPeriod}
-            onSelect={selectPlan}
-            props={props}
-            isCompact={isCompact}
-          />
-        ))}
-      </Box>
+    <>
+      {mode === 'modal' || props.layout === 'default' ? (
+        <PricingTableDefault
+          plans={plans}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          onSelect={selectPlan}
+          isCompact={isCompact}
+          props={props}
+        />
+      ) : (
+        <PricingTableMatrix
+          plans={plans || []}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          onSelect={selectPlan}
+          highlightedPlan='basic'
+        />
+      )}
 
       <__experimental_CheckoutContext.Provider
         value={{
@@ -108,6 +78,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
         }}
       />
-    </InternalThemeProvider>
+    </>
   );
 };
