@@ -28,13 +28,17 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
       idleAfterDelay={!shouldUsePopup}
       oauthCallback={(strategy: OAuthStrategy) => {
         if (shouldUsePopup) {
+          // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
+          // opened within async functions. The `signUpWithPopup` method handles setting the URL of the popup.
           const popup = window.open('about:blank', '', 'width=600,height=800');
+          // Unfortunately, there's no good way to detect when the popup is closed, so we simply poll and check if it's closed.
           const interval = setInterval(() => {
             if (popup?.closed) {
               clearInterval(interval);
               card.setIdle();
             }
           }, 500);
+
           return clerk
             .signUpWithPopup({
               strategy,

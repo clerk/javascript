@@ -1464,6 +1464,10 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
+    // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
+    // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
+    // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
     if (!window.opener) {
       try {
         await signIn.reload();
@@ -1860,9 +1864,12 @@ export class Clerk implements ClerkInterface {
 
     const { redirectUrl } = params;
 
+    // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
+    // in situations like a modal transfer flow.
     const r = new URL(redirectUrl);
     r.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
     r.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
+    // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
     const redirectUrlWithForceRedirectUrl = this.buildUrlWithAuth(r.toString());
 
     const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
