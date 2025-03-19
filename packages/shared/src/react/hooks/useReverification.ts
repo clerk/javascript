@@ -155,7 +155,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * In the following example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/reverification) for more information.
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
- * import { useReverification } from '@clerk/react'
+ * import { useReverification } from '@clerk/clerk-react'
  *
  * export function MyButton() {
  *   const enhancedFetcher = useReverification(myFetcher)

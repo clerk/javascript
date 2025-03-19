@@ -6,8 +6,8 @@
 This introducing changes to `useReverification`, the changes include removing the array and returning the fetcher directly and also the dropping the options `throwOnCancel` and `onCancel` in favour of always throwing the cancellation error.
 
 ```tsx {{ filename: 'src/components/MyButton.tsx' }}
-import { useReverification } from '@clerk/react'
-import { isClerkRuntimeError } from '@clerk/react/error'
+import { useReverification } from '@clerk/clerk-react'
+import { isClerkRuntimeError } from '@clerk/clerk-react/error'
 
 export function MyButton() {
   const enhancedFetcher = useReverification(() => fetch('/api/balance'))
