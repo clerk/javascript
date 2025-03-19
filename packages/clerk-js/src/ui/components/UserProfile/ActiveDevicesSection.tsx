@@ -6,7 +6,7 @@ import { FullHeightLoader, ProfileSection, ThreeDotsMenu } from '../../elements'
 import { useFetch, useLoadingStatus } from '../../hooks';
 import { DeviceLaptop, DeviceMobile } from '../../icons';
 import { mqu, type PropsOfComponent } from '../../styledSystem';
-import { getRelativeToNowDateKey } from '../../utils';
+import { getRelativeToNowDateKey, handleError } from '../../utils';
 import { currentSessionFirst } from './utils';
 
 export const ActiveDevicesSection = () => {
@@ -54,7 +54,7 @@ const isSignedInStatus = (status: string): status is SignedInSessionResource['st
 const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => {
   const isCurrent = useSession().session?.id === session.id;
   const status = useLoadingStatus();
-  const [revokeSession] = useReverification(session.revoke.bind(session));
+  const revokeSession = useReverification(session.revoke.bind(session));
 
   const revoke = async () => {
     if (isCurrent || !session) {
@@ -64,7 +64,7 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
     return (
       revokeSession()
         // TODO-STEPUP: Properly handler the response with a setCardError
-        .catch(() => {})
+        .catch(err => handleError(err, [], status.setError))
         .finally(() => status.setIdle())
     );
   };
@@ -76,15 +76,14 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
       sx={{
         alignItems: 'flex-start',
+        opacity: status.isLoading ? 0.5 : 1,
       }}
+      isDisabled={status.isLoading}
     >
-      {status.isLoading && <FullHeightLoader />}
-      {!status.isLoading && (
-        <>
-          <DeviceInfo session={session} />
-          {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
-        </>
-      )}
+      <>
+        <DeviceInfo session={session} />
+        {!isCurrent && <ActiveDeviceMenu revoke={revoke} />}
+      </>
     </ProfileSection.Item>
   );
 };
