@@ -458,6 +458,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.eventEmitter.off('loaded', cb);
   }
 
+  /**
+   * Emits the loaded event.
+   * This is used to notify listeners that the Clerk instance has been loaded.
+   * This is only here for testing purposes.
+   */
+  public emitLoaded = () => {
+    this.eventEmitter.emit('loaded');
+  };
+
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
