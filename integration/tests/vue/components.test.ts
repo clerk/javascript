@@ -225,16 +225,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.waitForSelector('.cl-organizationSwitcherPopoverCard', { state: 'visible' });
     await u.page.locator('.cl-button__manageOrganization').click();
 
-    // Check if custom pages and links are visible
-    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+    // Get the organization profile dialog
+    const dialog = u.page.getByRole('dialog');
+
+    // Check if custom pages and links are visible within the dialog
+    await expect(dialog.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /Homepage/i })).toBeVisible();
 
     // Navigate to custom page
-    await u.page.getByRole('button', { name: /Terms/i }).click();
-    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+    await dialog.getByRole('button', { name: /Terms/i }).click();
+    await expect(dialog.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
     // Click custom link and check navigation
-    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await dialog.getByRole('button', { name: /Homepage/i }).click();
     await u.page.waitForAppUrl('/');
   });
 
