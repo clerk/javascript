@@ -25,7 +25,7 @@ import {
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpContinue() {
+function SignUpContinueInternal() {
   const card = useCardState();
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -242,4 +242,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withCardStateProvider(_SignUpContinue);
+export const SignUpContinue = withCardStateProvider(SignUpContinueInternal);

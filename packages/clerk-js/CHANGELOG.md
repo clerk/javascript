@@ -1,5 +1,107 @@
 # Change Log
 
+## 5.57.0
+
+### Minor Changes
+
+- Navigate to tasks on after sign-in/sign-up ([#5280](https://github.com/clerk/javascript/pull/5280)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve the resilience of the SDK against situations where the /v1/environment endpoint is not reachable. This is achieved by allowing the initialization of the environment with default values. ([#5287](https://github.com/clerk/javascript/pull/5287)) by [@jacekradko](https://github.com/jacekradko)
+
+- Allow user set primary web3 wallet in `<UserProfile />` when more than one web3 wallets presented ([#5353](https://github.com/clerk/javascript/pull/5353)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Deprecate out of date jwt types in favour of existing that are up-to-date. ([#5354](https://github.com/clerk/javascript/pull/5354)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `<CheckoutForm />` select positioning and option text color. ([#5356](https://github.com/clerk/javascript/pull/5356)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for localizationKeys within commerce components. ([#5390](https://github.com/clerk/javascript/pull/5390)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Default `<Drawer.Confirmation />` to `alertdialog` role. ([#5383](https://github.com/clerk/javascript/pull/5383)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Simplify plan card avatar badge container styling. ([#5355](https://github.com/clerk/javascript/pull/5355)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `<Drawer.Confirmation />` component to be used within Commerce cancel subscription flow. ([#5376](https://github.com/clerk/javascript/pull/5376)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Hide personal workspace options when organization selection is enforced ([#5391](https://github.com/clerk/javascript/pull/5391)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Allow token refresh when Client failed to resolve. ([#5345](https://github.com/clerk/javascript/pull/5345)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce experimental billing APIs and components ([#5248](https://github.com/clerk/javascript/pull/5248)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `<Drawer />` component and update commerce components implementations to make use of it. ([#5337](https://github.com/clerk/javascript/pull/5337)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update floating-ui packages to latest. ([#5341](https://github.com/clerk/javascript/pull/5341)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally render the avatar and badge components within PlanCard. ([#5348](https://github.com/clerk/javascript/pull/5348)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When a C2 is not signed-in, redirect them to sign-in from the `<PlanCard />`. ([#5349](https://github.com/clerk/javascript/pull/5349)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update plan feed rendering within `<PlanCard />` to only render `annualMonthlyAmount` when it's greater than 0. ([#5357](https://github.com/clerk/javascript/pull/5357)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adjust the `<Drawer />` enter/exit animations timing and easings. ([#5369](https://github.com/clerk/javascript/pull/5369)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor `<Checkout />` components to apply descriptors and ensure styling is properly connected to theming layer. ([#5359](https://github.com/clerk/javascript/pull/5359)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `<PlanCardFeaturesList/>` variants to render the avatar and description fields within `<PlanDetailsDrawer />`. ([#5379](https://github.com/clerk/javascript/pull/5379)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`725918d`](https://github.com/clerk/javascript/commit/725918df2e74cea15e9b748aaf103a52df8e8500), [`91d0f0b`](https://github.com/clerk/javascript/commit/91d0f0b0dccab7168ad4dc06c8629808938c235f), [`9572bf5`](https://github.com/clerk/javascript/commit/9572bf5bdfb7dc309ec8714989b98ab12174965b), [`39bbc51`](https://github.com/clerk/javascript/commit/39bbc5189a33dc6cebdc269ac2184dc4ffff2534), [`3dddcda`](https://github.com/clerk/javascript/commit/3dddcda191d8f8d6a9b02464f1f6374d3c6aacb9), [`7524943`](https://github.com/clerk/javascript/commit/7524943300d7e693d61cc1820b520abfadec1c64), [`150b5c8`](https://github.com/clerk/javascript/commit/150b5c89477abb0feab15e0a886179473f653cac), [`23c931e`](https://github.com/clerk/javascript/commit/23c931e9e95e6de992549ad499b477aca9a9c344), [`730262f`](https://github.com/clerk/javascript/commit/730262f0f973923c8749b09078c80c2fc966a8ec), [`0b18bb1`](https://github.com/clerk/javascript/commit/0b18bb1fe6fa3ded97547bb6b4d2c73030aad329), [`021bc5f`](https://github.com/clerk/javascript/commit/021bc5f40044d34e49956ce3c9b61d833d815b42), [`1a61390`](https://github.com/clerk/javascript/commit/1a61390d3482bd4af58508b972ad89dea56fa224)]:
+  - @clerk/types@4.49.0
+  - @clerk/shared@3.0.2
+  - @clerk/localizations@3.13.0
+
+## 5.56.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Removes legal consent checkbox from sign-up start card when only social or web3 strategies are enabled. ([#5289](https://github.com/clerk/javascript/pull/5289)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Make use of native browser navigator locks property to avoid needing to use localstorage or cookies. ([#5156](https://github.com/clerk/javascript/pull/5156)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- When a user passes `withSignUp={false}` we should opt out of combined flow even when `signUpUrl` is undefined. ([#5286](https://github.com/clerk/javascript/pull/5286)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- fix(clerk-js): Correctly show alternative methods for user re-verification card ([#5164](https://github.com/clerk/javascript/pull/5164)) by [@octoper](https://github.com/octoper)
+
+- Remove the Primary Web3 wallet from user preview section, in the `<UserProfile/>` ([#5319](https://github.com/clerk/javascript/pull/5319)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Handle pwned password error during sign in instant password submit. ([#5298](https://github.com/clerk/javascript/pull/5298)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`1427c92069483f3f0880739c4ca5b418872e5d38`](https://github.com/clerk/javascript/commit/1427c92069483f3f0880739c4ca5b418872e5d38), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`657af338e7464162419189dde9cd6696a0622e41`](https://github.com/clerk/javascript/commit/657af338e7464162419189dde9cd6696a0622e41), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+  - @clerk/localizations@3.12.0
+
+## 5.55.1
+
+### Patch Changes
+
+- Updated dependencies [[`aefaf48071cc7df172011febb4a870526be89d24`](https://github.com/clerk/javascript/commit/aefaf48071cc7df172011febb4a870526be89d24)]:
+  - @clerk/localizations@3.11.1
+
+## 5.55.0
+
+### Minor Changes
+
+- Lazily load components related to `<SignUp>` functionality when used with the combined flow in `<SignIn>`. ([#5237](https://github.com/clerk/javascript/pull/5237)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Revert offlineScheduler ([#5279](https://github.com/clerk/javascript/pull/5279)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Display validation error in `<Waitlist />` for email address field correctly ([#5243](https://github.com/clerk/javascript/pull/5243)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`ae53f31442b661c291c4b4cc4cc5152df6c6aa47`](https://github.com/clerk/javascript/commit/ae53f31442b661c291c4b4cc4cc5152df6c6aa47), [`02defeda4d73de9cf34904d76590fd98d4abd3a9`](https://github.com/clerk/javascript/commit/02defeda4d73de9cf34904d76590fd98d4abd3a9), [`79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3`](https://github.com/clerk/javascript/commit/79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3), [`f18318179180b1f95690a4982ba44df9de1c57ab`](https://github.com/clerk/javascript/commit/f18318179180b1f95690a4982ba44df9de1c57ab)]:
+  - @clerk/localizations@3.11.0
+
 ## 5.54.2
 
 ### Patch Changes

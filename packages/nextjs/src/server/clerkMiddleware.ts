@@ -104,7 +104,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
@@ -143,6 +143,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
+
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Basic ')) {
+        logger.debug('Basic Auth detected');
+      }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
@@ -224,7 +229,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
 
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.

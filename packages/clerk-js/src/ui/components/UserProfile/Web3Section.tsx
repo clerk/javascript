@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import { Fragment, useState } from 'react';
 
 import { Badge, Box, Flex, Image, localizationKeys, Text } from '../../customizables';
@@ -7,7 +7,9 @@ import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
+import { handleError } from '../../utils';
 import { RemoveWeb3WalletForm } from './RemoveResourceForm';
+import { sortIdentificationBasedOnVerification } from './utils';
 import { AddWeb3WalletActionMenu } from './Web3Form';
 
 type RemoveWeb3WalletScreenProps = { walletId: string };
@@ -44,6 +46,7 @@ export const Web3Section = withCardStateProvider(
     return (
       <ProfileSection.Root
         title={localizationKeys('userProfile.start.web3WalletsSection.title')}
+        centered={false}
         id='web3Wallets'
       >
         <Card.Alert>{card.error}</Card.Alert>
@@ -52,7 +55,7 @@ export const Web3Section = withCardStateProvider(
           onChange={setActionValue}
         >
           <ProfileSection.ItemList id='web3Wallets'>
-            {user?.web3Wallets.map(wallet => {
+            {sortIdentificationBasedOnVerification(user?.web3Wallets, user?.primaryWeb3WalletId).map(wallet => {
               const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
               const walletId = wallet.id;
               return (
@@ -109,12 +112,27 @@ export const Web3Section = withCardStateProvider(
 );
 
 const Web3WalletMenu = ({ walletId }: { walletId: string }) => {
+  const card = useCardState();
   const { open } = useActionContext();
+  const { user } = useUser();
+  const isPrimary = user?.primaryWeb3WalletId === walletId;
+  const [setPrimary] = useReverification(() => {
+    return user?.update({ primaryWeb3WalletId: walletId });
+  });
 
   const actions = (
     [
+      !isPrimary
+        ? {
+            label: localizationKeys('userProfile.start.web3WalletsSection.detailsAction__nonPrimary'),
+            onClick: () => {
+              setPrimary().catch(e => handleError(e, [], card.setError));
+            },
+          }
+        : null,
       {
         label: localizationKeys('userProfile.start.web3WalletsSection.destructiveAction'),
+        isDestructive: true,
         onClick: () => open(`remove-${walletId}`),
       },
     ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]

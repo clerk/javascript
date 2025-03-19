@@ -87,6 +87,7 @@ type _LocalizationResource = {
   badge__unverified: LocalizationValue;
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
+  badge__currentPlan: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -97,6 +98,15 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
+  __experimental_commerce: {
+    month: LocalizationValue;
+    free: LocalizationValue;
+    getStarted: LocalizationValue;
+    manageMembership: LocalizationValue;
+    switchPlan: LocalizationValue;
+    billedAnnually: LocalizationValue;
+    accountFunds: LocalizationValue;
+  };
   signUp: {
     start: {
       title: LocalizationValue;
@@ -346,6 +356,11 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -355,6 +370,7 @@ type _LocalizationResource = {
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
       blockButton__totp: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
       getHelp: {
         title: LocalizationValue;
@@ -381,6 +397,7 @@ type _LocalizationResource = {
       description: LocalizationValue;
       account: LocalizationValue;
       security: LocalizationValue;
+      billing: LocalizationValue;
     };
     start: {
       headerTitle__account: LocalizationValue;
@@ -465,6 +482,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsAction__nonPrimary: LocalizationValue;
       };
       dangerSection: {
         title: LocalizationValue;
@@ -635,6 +653,14 @@ type _LocalizationResource = {
       messageLine2: LocalizationValue;
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
+    };
+    __experimental_billingPage: {
+      title: LocalizationValue;
+      start: {
+        headerTitle__plans: LocalizationValue;
+        headerTitle__invoices: LocalizationValue;
+        headerTitle__paymentSources: LocalizationValue;
+      };
     };
   };
   userButton: {

@@ -26,7 +26,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
     return null;
   }
 
-  const isUsernameRequired = userSettings.attributes.username.required;
+  const isUsernameRequired = userSettings.attributes.username?.required;
 
   const canSubmit =
     (isUsernameRequired ? usernameField.value.length > 0 : true) && user.username !== usernameField.value;

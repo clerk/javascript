@@ -97,13 +97,13 @@ test.describe('root and subdomain production apps @sessions', () => {
       // Check that the cookies are set as expected
       const tab0Cookies = await u[0].page.cookies();
       expect(tab0Cookies.get('__session')).toBeDefined();
-      expect(tab0Cookies.get('__session').domain).toEqual(hosts[0]);
+      expect(tab0Cookies.get('__session').domain).toEqual(hosts[0].split(':')[0]);
       expect(tab0Cookies.get('__session').value).toEqual(tab0Cookies.get('__session_*').value);
       expect(tab0Cookies.get('__session_*').name.split('__session_')[1].length).toEqual(8);
 
       expect(tab0Cookies.get('__client_uat')).toBeDefined();
       // The client_uat cookie should always be set on etld+1
-      expect(tab0Cookies.get('__client_uat').domain).toEqual('.' + hosts[0]);
+      expect(tab0Cookies.get('__client_uat').domain).toEqual('.' + hosts[0].split(':')[0]);
       expect(tab0Cookies.get('__client_uat').value).toEqual(tab0Cookies.get('__client_uat_*').value);
       expect(tab0Cookies.get('__client_uat').domain).toEqual(tab0Cookies.get('__client_uat_*').domain);
       expect(tab0Cookies.get('__client_uat_*').name.split('__client_uat_')[1].length).toEqual(8);
@@ -131,7 +131,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       expect(tab0Cookies.raw().filter(c => c.name.startsWith('__client_uat')).length).toEqual(2);
       // the session cookie should be set on the domain of the app
       // so, it can be accessed by the host server
-      expect(tab1Cookies.get('__session').domain).toEqual(hosts[1]);
+      expect(tab1Cookies.get('__session').domain).toEqual(hosts[1].split(':')[0]);
       expect(tab1Cookies.get('__session').domain).not.toEqual(tab0Cookies.get('__session').domain);
     });
 
@@ -180,7 +180,7 @@ test.describe('root and subdomain production apps @sessions', () => {
    * 5. The second app is going to be served on sub-1.multiple-apps-e2e.clerk.app
    */
   test.describe('multiple apps same domain for different production instances', () => {
-    const hosts = ['multiple-apps-e2e.clerk.app', 'sub-2.multiple-apps-e2e.clerk.app'];
+    const hosts = ['multiple-apps-e2e.clerk.app:8443', 'sub-2.multiple-apps-e2e.clerk.app:8443'];
     let fakeUsers: FakeUser[];
     let server: Server;
     let apps: Array<{ app: Application; serverUrl: string }>;
@@ -235,16 +235,16 @@ test.describe('root and subdomain production apps @sessions', () => {
       const tab0Cookies = await u[0].page.cookies();
       expect(tab0Cookies.get('__client')).toBeDefined();
       expect(tab0Cookies.get('__client_*')).not.toBeDefined();
-      expect(tab0Cookies.get('__client').domain).toBe(`.clerk.${hosts[0]}`);
+      expect(tab0Cookies.get('__client').domain).toBe(`.clerk.${hosts[0].split(':')[0]}`);
       expect(tab0Cookies.get('__client').httpOnly).toBeTruthy();
 
       expect(tab0Cookies.get('__session')).toBeDefined();
-      expect(tab0Cookies.get('__session').domain).toEqual(hosts[0]);
+      expect(tab0Cookies.get('__session').domain).toEqual(hosts[0].split(':')[0]);
 
       // ensure that only 2 client_uat cookies (base and suffixed variant) are visible here
       expect([...tab0Cookies.values()].filter(c => c.name.startsWith('__client_uat')).length).toEqual(2);
       // The client_uat cookie should always be set on etld+1
-      expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0]);
+      expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0].split(':')[0]);
 
       u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
@@ -263,13 +263,13 @@ test.describe('root and subdomain production apps @sessions', () => {
       const tab1Cookies = await u[1].page.cookies();
       expect(tab1Cookies.get('__client')).toBeDefined();
       expect(tab1Cookies.get('__client_*')).not.toBeDefined();
-      expect(tab1Cookies.get('__client').domain).toBe(`.clerk.${hosts[1]}`);
+      expect(tab1Cookies.get('__client').domain).toBe(`.clerk.${hosts[1].split(':')[0]}`);
 
       expect(tab1Cookies.get('__session')).toBeDefined();
-      expect(tab1Cookies.get('__session').domain).toEqual(hosts[1]);
+      expect(tab1Cookies.get('__session').domain).toEqual(hosts[1].split(':')[0]);
 
       // ensure that all client_uat cookies are still set on the root domain
-      expect(tab1Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0]);
+      expect(tab1Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0].split(':')[0]);
       // we have 3 client_uat cookies here: 1 base and 2 suffixed variants
       expect(tab1Cookies.raw().filter(c => c.name.startsWith('__client_uat')).length).toEqual(3);
     });
@@ -312,7 +312,7 @@ test.describe('root and subdomain production apps @sessions', () => {
    *
    */
   test.describe('multiple apps different same-level subdomains  for different production instances', () => {
-    const hosts = ['sub-1.multiple-apps-e2e.clerk.app', 'sub-2.multiple-apps-e2e.clerk.app'];
+    const hosts = ['sub-1.multiple-apps-e2e.clerk.app:8443', 'sub-2.multiple-apps-e2e.clerk.app:8443'];
     let fakeUsers: FakeUser[];
     let server: Server;
     let apps: Array<{ app: Application; serverUrl: string }>;

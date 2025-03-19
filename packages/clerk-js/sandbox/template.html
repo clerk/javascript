@@ -131,8 +131,11 @@
       };
     </script>
   </head>
-  <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50">
-    <div class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4 max-lg:hidden">
+  <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50 lg:has-[*[data-sidebar]:not(.hidden)]:px-72">
+    <div
+      data-sidebar
+      class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4 max-lg:hidden"
+    >
       <header class="mb-2 flex items-center justify-center gap-x-2 border-b border-gray-100 pb-4">
         <svg
           viewBox="0 0 62 18"
@@ -252,6 +255,14 @@
           <li class="relative">
             <a
               class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
+              href="/pricing-table"
+            >
+              PricingTable
+            </a>
+          </li>
+          <li class="relative">
+            <a
+              class="relative isolate flex w-full rounded-md border border-white px-2 py-[0.4375rem] text-sm hover:bg-gray-50 aria-[current]:bg-gray-50"
               href="/open-sign-in"
             >
               Open sign in
@@ -269,12 +280,141 @@
       </nav>
     </div>
 
-    <main
-      class="bg-gray-25 flex h-full min-w-px flex-1 items-center justify-center overflow-y-auto overflow-x-hidden py-12 lg:pl-72"
+    <div
+      data-sidebar
+      class="fixed inset-y-0 right-0 w-72 overflow-y-auto border-l border-gray-100 bg-white px-2 py-4 max-lg:hidden"
     >
+      <fieldset>
+        <div class="mb-2 flex items-center justify-between">
+          <legend class="block text-sm">Variables</legend>
+          <button
+            id="resetVariablesBtn"
+            class="text-sm"
+          >
+            Reset
+          </button>
+        </div>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorPrimary</span>
+          <input
+            type="color"
+            id="colorPrimary"
+            value="#2F3037"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorNeutral</span>
+          <input
+            type="color"
+            id="colorNeutral"
+            value="#000000"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorBackground</span>
+          <input
+            type="color"
+            id="colorBackground"
+            value="#ffffff"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorTextOnPrimaryBackground</span>
+          <input
+            type="color"
+            id="colorTextOnPrimaryBackground"
+            value="#ffffff"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorDanger</span>
+          <input
+            type="color"
+            id="colorDanger"
+            value="#EF4444"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorSuccess</span>
+          <input
+            type="color"
+            id="colorSuccess"
+            value="#22C543"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorWarning</span>
+          <input
+            type="color"
+            id="colorWarning"
+            value="#F36B16"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorText</span>
+          <input
+            type="color"
+            id="colorText"
+            value="#212126"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorTextSecondary</span>
+          <input
+            type="color"
+            id="colorTextSecondary"
+            value="#747686"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorInputText</span>
+          <input
+            type="color"
+            id="colorInputText"
+            value="#000000"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorInputBackground</span>
+          <input
+            type="color"
+            id="colorInputBackground"
+            value="#ffffff"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">colorShimmer</span>
+          <input
+            type="color"
+            id="colorShimmer"
+            value="#ffffff"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">spacingUnit</span>
+          <input
+            type="text"
+            id="spacingUnit"
+            value="1rem"
+            class="text-sm outline-none [field-sizing:content]"
+          />
+        </label>
+        <label class="flex items-center justify-between border-t border-gray-100 py-2">
+          <span class="font-mono text-xs">borderRadius</span>
+          <input
+            type="text"
+            id="borderRadius"
+            value="0.375rem"
+            class="text-sm outline-none [field-sizing:content]"
+          />
+        </label>
+      </fieldset>
+    </div>
+
+    <main class="flex h-full min-w-px flex-1 items-center justify-center overflow-y-auto overflow-x-hidden py-12">
       <div
         id="app"
-        class="max-w-full p-12"
+        class="container w-full p-12"
       ></div>
     </main>
 

@@ -1,9 +1,10 @@
 import type { ClerkClient } from '@clerk/backend';
 import type { ZodObject } from 'zod';
+import { z } from 'zod';
 
-import type { ToolkitContext } from './types';
+import type { CreateClerkToolkitParams, ToolsContext } from './types';
 
-export interface ClerkTool {
+export interface ClerkToolParams {
   /**
    * The name of the tool. This can be used to reference the tool in the code.
    * A descriptive LLM-readable string.
@@ -18,11 +19,16 @@ export interface ClerkTool {
   /**
    * The Zod schema for the input parameters of the tool
    */
-  parameters: ZodObject<any>;
+  parameters?: ZodObject<any>;
   /**
    * The actual implementation of the tool.
    */
-  bindRunnable: (clerkClient: ClerkClient, context: ToolkitContext) => (input: any) => Promise<unknown>;
+  execute: (clerkClient: ClerkClient, params: ToolsContext) => (input: any) => Promise<unknown>;
+}
+
+export interface ClerkTool extends Omit<ClerkToolParams, 'execute'> {
+  bindExecute: (clerkClient: ClerkClient, params: CreateClerkToolkitParams) => (input: any) => Promise<unknown>;
+  parameters: ZodObject<any>;
 }
 
 const trimLines = (text: string) =>
@@ -32,12 +38,15 @@ const trimLines = (text: string) =>
     .filter(Boolean)
     .join('\n');
 
-export const ClerkTool = (params: ClerkTool): ClerkTool => {
-  const schemaEntries = Object.entries(params.parameters.shape);
+export const ClerkTool = (_params: ClerkToolParams): ClerkTool => {
+  const { execute, ...params } = _params;
+  const parameters = params.parameters ? params.parameters : z.object({});
+  const schemaEntries = Object.entries(parameters.shape);
+
   const args =
     schemaEntries.length === 0
       ? 'Takes no arguments'
-      : Object.entries(params.parameters.shape)
+      : schemaEntries
           .map(([key, value]) => {
             return `- ${key}: ${(value as any).description || ''}`;
           })
@@ -51,5 +60,14 @@ export const ClerkTool = (params: ClerkTool): ClerkTool => {
   Arguments:
   ${args}
   `);
-  return { ...params, description };
+
+  return {
+    ...params,
+    parameters,
+    description,
+    bindExecute: (clerkClient, params) => {
+      const toolContext = { ...params.authContext, allowPrivateMetadata: params.allowPrivateMetadata };
+      return execute(clerkClient, toolContext);
+    },
+  };
 };

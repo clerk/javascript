@@ -76,7 +76,7 @@ function handleDashboardUrlParsing(url: string) {
   };
 }
 
-const _KeylessPrompt = (_props: KeylessPromptProps) => {
+const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   const { isSignedIn } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -598,7 +598,7 @@ const _KeylessPrompt = (_props: KeylessPromptProps) => {
 
 export const KeylessPrompt = (props: KeylessPromptProps) => (
   <InternalThemeProvider>
-    <_KeylessPrompt {...props} />
+    <KeylessPromptInternal {...props} />
   </InternalThemeProvider>
 );
 

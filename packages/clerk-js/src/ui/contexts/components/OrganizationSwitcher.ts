@@ -11,7 +11,7 @@ export const OrganizationSwitcherContext = createContext<OrganizationSwitcherCtx
 export const useOrganizationSwitcherContext = () => {
   const context = useContext(OrganizationSwitcherContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, organizationSettings } = useEnvironment();
 
   if (!context || context.componentName !== 'OrganizationSwitcher') {
     throw new Error('Clerk: useOrganizationSwitcherContext called outside OrganizationSwitcher.');
@@ -96,7 +96,7 @@ export const useOrganizationSwitcherContext = () => {
 
   return {
     ...ctx,
-    hidePersonal: ctx.hidePersonal || false,
+    hidePersonal: organizationSettings.forceOrganizationSelection || ctx.hidePersonal || false,
     organizationProfileMode: organizationProfileMode || 'modal',
     createOrganizationMode: createOrganizationMode || 'modal',
     skipInvitationScreen: ctx.skipInvitationScreen || false,

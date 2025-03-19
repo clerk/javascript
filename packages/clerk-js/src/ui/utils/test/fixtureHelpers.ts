@@ -281,7 +281,10 @@ const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
     // TODO:
     ac.single_session_mode = false;
   };
-  return { withMultiSessionMode };
+  const withReverification = () => {
+    ac.reverification = true;
+  };
+  return { withMultiSessionMode, withReverification };
 };
 
 const createDisplayConfigFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -314,13 +317,16 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withMaxAllowedMemberships = ({ max = 5 }) => {
     os.max_allowed_memberships = max;
   };
+  const withForceOrganizationSelection = () => {
+    os.force_organization_selection = true;
+  };
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
     os.domains.default_role = defaultRole ?? null;
   };
-  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
+  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };
 };
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {

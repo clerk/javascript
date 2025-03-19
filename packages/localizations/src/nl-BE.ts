@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Terug',
+  badge__currentPlan: undefined,
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
   badge__primary: 'Primair',
@@ -129,6 +138,7 @@ export const nlBE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Uitnodigen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Verwijder lid',
         tableHeader__actions: 'Acties',
@@ -278,6 +288,7 @@ export const nlBE: LocalizationResource = {
       actionText: 'Heb je geen van deze?',
       blockButton__backupCode: 'Backupcode gebruiken',
       blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Doorgaan met je wachtwoord',
       blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -304,6 +315,11 @@ export const nlBE: LocalizationResource = {
       message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',
       subtitle: 'Er is een fout opgetreden',
       title: 'Kan je account niet verifiëren',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gebruik een andere methode',
@@ -646,6 +662,14 @@ export const nlBE: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -768,6 +792,7 @@ export const nlBE: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
+      billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',
       title: 'Account',
@@ -866,6 +891,7 @@ export const nlBE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -892,6 +918,7 @@ export const nlBE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Verwijder portefeuille',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
       },
