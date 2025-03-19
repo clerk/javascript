@@ -224,7 +224,23 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
-    return authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice(7) : undefined;
+    if (!authorizationHeader) {
+      return undefined;
+    }
+
+    const [scheme, token] = authorizationHeader.split(' ', 2);
+
+    if (!token) {
+      // No scheme specified, treat the entire value as the token
+      return scheme;
+    }
+
+    if (scheme === 'Bearer') {
+      return token;
+    }
+
+    // Skip all other schemes
+    return undefined;
   }
 
   private tokenHasIssuer(token: string): boolean {
