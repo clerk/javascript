@@ -7,12 +7,7 @@ import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError, web3CallbackErrorHandler } from '../../utils';
-
-const POPUP_PREFERRED_ORIGINS = ['.lovable.app', '.lovableproject.com', '.webcontainer-api.io'];
-function originPrefersPopup(): boolean {
-  return POPUP_PREFERRED_ORIGINS.some(origin => window.location.origin.endsWith(origin));
-}
+import { handleError, web3CallbackErrorHandler, originPrefersPopup } from '../../utils';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & { continueSignUp?: boolean; legalAccepted?: boolean };
 
