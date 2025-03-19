@@ -27,7 +27,7 @@ type Fetcher = typeof fetcherWithHelper;
 
 describe('useReverification type tests', () => {
   it('allow pass through types', () => {
-    type UseReverificationWithFetcher = typeof useReverification<typeof fetcher, object>;
+    type UseReverificationWithFetcher = typeof useReverification<typeof fetcher>;
     type VerifiedFetcher = ReturnType<UseReverificationWithFetcher>;
     expectTypeOf(fetcher).toEqualTypeOf<VerifiedFetcher>();
   });

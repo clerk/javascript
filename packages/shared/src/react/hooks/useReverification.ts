@@ -62,7 +62,7 @@ type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | 
  */
 type UseReverification = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
-  Options extends UseReverificationOptions,
+  Options extends UseReverificationOptions = UseReverificationOptions,
 >(
   fetcher: Fetcher,
   options?: Options,
