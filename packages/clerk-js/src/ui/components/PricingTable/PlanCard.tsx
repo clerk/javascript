@@ -1,5 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
+import type {
+  __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_PricingTableProps,
+} from '@clerk/types';
 import * as React from 'react';
 
 import {
@@ -23,16 +27,14 @@ import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
-export type PlanPeriod = 'month' | 'annual';
-
 /* -------------------------------------------------------------------------------------------------
  * PlanCard
  * -----------------------------------------------------------------------------------------------*/
 
 interface PlanCardProps {
   plan: __experimental_CommercePlanResource;
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (p: PlanPeriod) => void;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
@@ -42,7 +44,7 @@ export function PlanCard(props: PlanCardProps) {
   const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
-  const { id, slug, isActiveForPayer, features } = plan;
+  const { id, slug, subscriptionIdForCurrentSubscriber, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
 
@@ -70,7 +72,7 @@ export function PlanCard(props: PlanCardProps) {
       <PlanCardHeader
         plan={plan}
         isCompact={isCompact}
-        isActivePlan={isActiveForPayer}
+        isActivePlan={!!subscriptionIdForCurrentSubscriber}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
       />
@@ -109,10 +111,10 @@ export function PlanCard(props: PlanCardProps) {
           <Button
             block
             textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            variant={isCompact || isActiveForPayer ? 'bordered' : 'solid'}
-            colorScheme={isCompact || isActiveForPayer ? 'secondary' : 'primary'}
+            variant={isCompact || !!subscriptionIdForCurrentSubscriber ? 'bordered' : 'solid'}
+            colorScheme={isCompact || !!subscriptionIdForCurrentSubscriber ? 'secondary' : 'primary'}
             localizationKey={
-              isActiveForPayer
+              subscriptionIdForCurrentSubscriber
                 ? localizationKeys('__experimental_commerce.manageMembership')
                 : localizationKeys('__experimental_commerce.getStarted')
             }
@@ -138,8 +140,8 @@ interface PlanCardHeaderProps {
   plan: __experimental_CommercePlanResource;
   isCompact?: boolean;
   isActivePlan?: boolean;
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -147,7 +149,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const { plan, isCompact, planPeriod, setPlanPeriod, closeSlot } = props;
-  const { name, avatarUrl, isActiveForPayer, annualMonthlyAmount } = plan;
+  const { name, avatarUrl, subscriptionIdForCurrentSubscriber, annualMonthlyAmount } = plan;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -169,7 +171,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
         padding: isCompact ? t.space.$3 : t.space.$4,
       })}
     >
-      {avatarUrl || isActiveForPayer || closeSlot ? (
+      {avatarUrl || !!subscriptionIdForCurrentSubscriber || closeSlot ? (
         <Box
           elementDescriptor={descriptors.planCardAvatarBadgeContainer}
           sx={t => ({
@@ -179,7 +181,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: t.space.$3,
-            float: !avatarUrl && !isActiveForPayer ? 'right' : undefined,
+            float: !avatarUrl && !subscriptionIdForCurrentSubscriber ? 'right' : undefined,
           })}
         >
           {avatarUrl ? (
@@ -194,7 +196,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           ) : null}
           <ReversibleContainer reverse={!avatarUrl}>
             {closeSlot}
-            {isActiveForPayer ? (
+            {subscriptionIdForCurrentSubscriber ? (
               <Span
                 elementDescriptor={descriptors.planCardBadgeContainer}
                 sx={{
@@ -323,7 +325,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           <SegmentedControl.Root
             aria-label='Set pay period'
             value={planPeriod}
-            onChange={value => setPlanPeriod(value as PlanPeriod)}
+            onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button value='month'>Monthly</SegmentedControl.Button>
             <SegmentedControl.Button value='annual'>Annually</SegmentedControl.Button>

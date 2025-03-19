@@ -1,4 +1,6 @@
 import type {
+  __experimental_CommerceSubscriptionJSON,
+  __experimental_CommerceSubscriptionResource,
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -8,6 +10,7 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
+  GetSubscriptionsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -28,7 +31,12 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
+import {
+  __experimental_CommerceSubscription,
+  BaseResource,
+  OrganizationInvitation,
+  OrganizationMembership,
+} from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -227,6 +235,29 @@ export class Organization extends BaseResource implements OrganizationResource {
       method: 'DELETE',
       path: `/organizations/${this.id}/memberships/${userId}`,
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
+  };
+
+  __experimental_getSubscriptions = async (
+    getSubscriptionsParams?: GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/subscriptions`,
+        method: 'GET',
+        search: convertPageToOffsetSearchParams(getSubscriptionsParams),
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: subscriptions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
+
+      return {
+        total_count,
+        data: subscriptions.map(subscription => new __experimental_CommerceSubscription(subscription)),
+      };
+    });
   };
 
   destroy = async (): Promise<void> => {

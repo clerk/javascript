@@ -1,39 +1,39 @@
-import type { __experimental_CommercePlanResource } from '@clerk/types';
+import type {
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
+} from '@clerk/types';
 import * as React from 'react';
 
 import { Box, Button, descriptors, Heading, Text } from '../../customizables';
 import { Alert, Drawer } from '../../elements';
-import type { PlanPeriod } from './PlanCard';
 import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
 
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
 
-type PlanDetailDrawerProps = {
+type SubscriptionDetailDrawerProps = {
   isOpen: DrawerRootProps['open'];
   setIsOpen: DrawerRootProps['onOpenChange'];
   portalProps?: DrawerRootProps['portalProps'];
   strategy: DrawerRootProps['strategy'];
-  plan?: __experimental_CommercePlanResource;
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (p: PlanPeriod) => void;
+  subscription?: __experimental_CommerceSubscriptionResource;
+  setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
 };
 
-export function PlanDetailDrawer({
+export function SubscriptionDetailDrawer({
   isOpen,
   setIsOpen,
   portalProps,
   strategy,
-  plan,
-  planPeriod,
+  subscription,
   setPlanPeriod,
-}: PlanDetailDrawerProps) {
+}: SubscriptionDetailDrawerProps) {
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
-  if (!plan) {
+  if (!subscription) {
     return null;
   }
-  const hasFeatures = plan.features.length > 0;
+  const hasFeatures = subscription.plan.features.length > 0;
   const cancelSubscription = async () => {
     setHasError(false);
     setIsSubmitting(true);
@@ -68,8 +68,8 @@ export function PlanDetailDrawer({
           }
         >
           <PlanCardHeader
-            plan={plan}
-            planPeriod={planPeriod}
+            plan={subscription.plan}
+            planPeriod={subscription.planPeriod}
             setPlanPeriod={setPlanPeriod}
             closeSlot={<Drawer.Close />}
           />
@@ -83,7 +83,7 @@ export function PlanDetailDrawer({
               })}
             >
               <PlanCardFeaturesList
-                plan={plan}
+                plan={subscription.plan}
                 variant='avatar'
               />
             </Box>
@@ -143,15 +143,15 @@ export function PlanDetailDrawer({
             textVariant='h3'
           >
             {/* TODO(@COMMERCE): needs localization */}
-            Cancel {plan.name} Subscription?
+            Cancel {subscription.plan.name} Subscription?
           </Heading>
           <Text
             elementDescriptor={descriptors.drawerConfirmationDescription}
             colorScheme='secondary'
           >
             {/* TODO(@COMMERCE): needs localization */}
-            You can keep using &ldquo;{plan.name}&rdquo; features until [DATE], after which you will no longer have
-            access.
+            You can keep using &ldquo;{subscription.plan.name}&rdquo; features until [DATE], after which you will no
+            longer have access.
           </Text>
           {hasError && (
             // TODO(@COMMERCE): needs localization

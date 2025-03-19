@@ -1,33 +1,40 @@
-import { useClerk } from '@clerk/shared/react';
-import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
+import type {
+  __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
+  __experimental_PricingTableProps,
+} from '@clerk/types';
 import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
 import { Box, descriptors } from '../../customizables';
-import { useFetch } from '../../hooks';
+import { usePlans } from '../../hooks';
 import { InternalThemeProvider } from '../../styledSystem';
 import { __experimental_Checkout } from '../Checkout';
-import type { PlanPeriod } from './PlanCard';
 import { PlanCard } from './PlanCard';
-import { PlanDetailDrawer } from './PlanDetailDrawer';
+import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
-  const { __experimental_commerce } = useClerk();
   const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
-  const [planPeriod, setPlanPeriod] = useState<PlanPeriod>('month');
-  const [selectedPlan, setSelectedPlan] = useState<__experimental_CommercePlanResource>();
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [showPlanDetail, setShowPlanDetail] = useState(false);
   const isCompact = mode === 'modal';
 
-  const { data: plans } = useFetch(__experimental_commerce?.__experimental_billing.getPlans, { subscriberType });
+  const { plans, activeSubscriptions } = usePlans({ subscriberType });
+
+  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
+  const [checkoutPlan, setCheckoutPlan] = useState<__experimental_CommercePlanResource>();
+  const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
+
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showSubscriptionDetailDrawer, setShowSubscriptionDetailDrawer] = useState(false);
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
-    setSelectedPlan(plan);
-    if (plan.isActiveForPayer) {
-      setShowPlanDetail(true);
+    const activeSubscription = activeSubscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
+    if (activeSubscription) {
+      setDetailSubscription(activeSubscription);
+      setShowSubscriptionDetailDrawer(true);
     } else {
+      setCheckoutPlan(plan);
       setShowCheckout(true);
     }
   };
@@ -77,17 +84,18 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <__experimental_Checkout
-            planPeriod={planPeriod}
-            planId={selectedPlan?.id}
-          />
+          {checkoutPlan && (
+            <__experimental_Checkout
+              planPeriod={planPeriod}
+              planId={checkoutPlan.id}
+            />
+          )}
         </div>
       </__experimental_CheckoutContext.Provider>
-      <PlanDetailDrawer
-        isOpen={showPlanDetail}
-        setIsOpen={setShowPlanDetail}
-        plan={selectedPlan}
-        planPeriod={planPeriod}
+      <SubscriptionDetailDrawer
+        isOpen={showSubscriptionDetailDrawer}
+        setIsOpen={setShowSubscriptionDetailDrawer}
+        subscription={detailSubscription}
         setPlanPeriod={setPlanPeriod}
         strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
         portalProps={{

@@ -14,7 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace } from './commerce';
+import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -1466,8 +1466,7 @@ export type __experimental_PricingTableProps = {
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: string;
-  checkoutId?: string;
+  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
 };
 
 export interface HandleEmailLinkVerificationParams {
