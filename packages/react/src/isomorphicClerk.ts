@@ -10,6 +10,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithPopupParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
@@ -1121,6 +1122,24 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithWeb3', callback);
+    }
+  };
+
+  signUpWithPopup = async (params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata }) => {
+    const callback = () => this.clerkjs?.signUpWithPopup(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('signUpWithPopup', callback);
+    }
+  };
+
+  signInWithPopup = async (params: AuthenticateWithPopupParams) => {
+    const callback = () => this.clerkjs?.signInWithPopup(params);
+    if (this.clerkjs && this.#loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('signInWithPopup', callback);
     }
   };
 
