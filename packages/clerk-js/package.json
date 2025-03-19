@@ -38,7 +38,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
-    "bundlewatch": "FORCE_COLOR=1 pnpm dlx bundlewatch --config bundlewatch.config.json",
+    "bundlewatch": "pnpm dlx -- FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
