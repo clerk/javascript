@@ -581,6 +581,7 @@ Environment {
       "enrollmentModes": [],
     },
     "enabled": false,
+    "forceOrganizationSelection": false,
     "maxAllowedMemberships": 5,
     "pathRoot": "",
   },
