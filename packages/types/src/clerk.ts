@@ -1456,13 +1456,22 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-export type __experimental_PricingTableProps = {
-  appearance?: PricingTableTheme;
+type __experimental_PricingTableDefaultProps = {
+  layout: 'default';
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-  layout?: 'default' | 'matrix';
-  matrixHighlightedPlan?: string;
 };
+
+type __experimental_PricingTableMatrixProps = {
+  layout: 'matrix';
+  highlightedPlan?: string;
+};
+
+export type __experimental_PricingTableProps =
+  | ({
+      appearance?: PricingTableTheme;
+    } & __experimental_PricingTableDefaultProps)
+  | __experimental_PricingTableMatrixProps;
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;

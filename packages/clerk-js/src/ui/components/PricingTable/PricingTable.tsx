@@ -38,7 +38,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
-          highlightedPlan={props.matrixHighlightedPlan}
+          highlightedPlan={props.highlightedPlan}
         />
       ) : (
         <PricingTableDefault
