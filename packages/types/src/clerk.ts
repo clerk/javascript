@@ -1154,7 +1154,7 @@ export type SignUpProps = RoutingOptions & {
    */
   waitlistUrl?: string;
   /**
-   *
+   * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
@@ -1535,6 +1535,7 @@ export type SignUpButtonProps = {
     | 'signInForceRedirectUrl'
     | 'signInFallbackRedirectUrl'
     | 'initialValues'
+    | 'oauthFlow'
   >;
 
 export type CreateOrganizationInvitationParams = {
