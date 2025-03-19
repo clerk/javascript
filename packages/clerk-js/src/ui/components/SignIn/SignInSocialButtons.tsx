@@ -8,7 +8,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError, web3CallbackErrorHandler, originPrefersPopup } from '../../utils';
+import { handleError, originPrefersPopup, web3CallbackErrorHandler } from '../../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useClerk();
