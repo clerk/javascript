@@ -250,7 +250,7 @@ const mockOptions = (options?) => {
 };
 
 const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
-  return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
+  return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
@@ -545,7 +545,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
     const requestState = await authenticateRequest(
       mockRequestWithHeaderAuth({
-        authorization: mockInvalidSignatureJwt,
+        authorization: `Bearer ${mockInvalidSignatureJwt}`,
       }),
       mockOptions(),
     );
@@ -560,7 +560,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
   test('headerToken: returns signed out state when an malformed token [1y.1n]', async () => {
     const requestState = await authenticateRequest(
-      mockRequestWithHeaderAuth({ authorization: 'test_header_token' }),
+      mockRequestWithHeaderAuth({ authorization: 'Bearer test_header_token' }),
       mockOptions(),
     );
 
