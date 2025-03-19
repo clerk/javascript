@@ -92,8 +92,18 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
+    // This will retry the getToken call if it fails with a non-4xx error
+    // We're going to trigger 8 retries in the span of ~3 minutes,
+    // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
     return retry(() => this._getToken(options), {
-      shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
+      factor: 1.55,
+      retryImmediately: false,
+      initialDelay: 3 * 1000,
+      maxDelayBetweenRetries: 50 * 1_000,
+      jitter: false,
+      shouldRetry: (error, iterationsCount) => {
+        return !is4xxError(error) && iterationsCount <= 8;
+      },
     });
   };
 
