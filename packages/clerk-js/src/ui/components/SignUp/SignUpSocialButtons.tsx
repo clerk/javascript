@@ -19,14 +19,22 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   const signUp = useCoreSignUp();
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+  const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
   const { continueSignUp = false, ...rest } = props;
 
   return (
     <SocialButtons
       {...rest}
+      idleAfterDelay={!shouldUsePopup}
       oauthCallback={(strategy: OAuthStrategy) => {
-        if (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup())) {
+        if (shouldUsePopup) {
           const popup = window.open('about:blank', '', 'width=600,height=800');
+          const interval = setInterval(() => {
+            if (popup?.closed) {
+              clearInterval(interval);
+              card.setIdle();
+            }
+          }, 500);
           return clerk
             .signUpWithPopup({
               strategy,
