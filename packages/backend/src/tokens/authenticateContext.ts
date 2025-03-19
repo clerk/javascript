@@ -224,15 +224,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
-    if (!authorizationHeader) {
-      return undefined;
-    }
-
-    if (authorizationHeader.startsWith('Bearer ')) {
-      return authorizationHeader.slice('Bearer '.length);
-    }
-
-    return undefined;
+    return authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice(7) : undefined;
   }
 
   private tokenHasIssuer(token: string): boolean {
