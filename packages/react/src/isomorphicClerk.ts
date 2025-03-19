@@ -1,3 +1,4 @@
+import { EventEmitter } from '@clerk/shared/event-emitter';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
@@ -53,7 +54,6 @@ import type {
   IsomorphicClerkOptions,
 } from './types';
 import { isConstructor } from './utils';
-import { EventEmitter } from './utils/EventEmitter';
 
 if (typeof globalThis.__BUILD_DISABLE_RHC__ === 'undefined') {
   globalThis.__BUILD_DISABLE_RHC__ = false;

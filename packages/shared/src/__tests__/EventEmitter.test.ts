@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { EventEmitter } from '../EventEmitter';
+import { EventEmitter } from '../event-emitter';
 
 describe('EventEmitter', () => {
   let emitter: EventEmitter;
