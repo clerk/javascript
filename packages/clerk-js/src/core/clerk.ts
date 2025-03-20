@@ -971,10 +971,6 @@ export class Clerk implements ClerkInterface {
     }
 
     let newSession = session === undefined ? this.session : session;
-    if (newSession?.status === 'pending') {
-      await this.#handlePendingSession(newSession, organization);
-      return;
-    }
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
     // ,`null` or `undefined`.
@@ -994,6 +990,11 @@ export class Clerk implements ClerkInterface {
         );
         newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
       }
+    }
+
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
     }
 
     if (session?.lastActiveToken) {
@@ -1063,26 +1064,9 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (
-    session: PendingSessionResource,
-    organization?: string | OrganizationResource | null | undefined,
-  ) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
-    }
-
-    const shouldSwitchOrganization = organization !== undefined;
-    if (shouldSwitchOrganization) {
-      const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
-
-      if (isOrganizationId(organizationIdOrSlug)) {
-        session.lastActiveOrganizationId = organizationIdOrSlug || null;
-      } else {
-        const matchingOrganization = session.user.organizationMemberships.find(
-          mem => mem.organization.slug === organizationIdOrSlug,
-        );
-        session.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
-      }
     }
 
     let newSession: SignedInSessionResource | null = session;
