@@ -17,7 +17,7 @@ import {
 import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
-import { mqu, InternalThemeProvider, type ThemableCssProp } from '../../styledSystem';
+import { InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 import type { PlanPeriod } from './PlanCard';
 
 interface PricingTableMatrixProps {

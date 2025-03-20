@@ -7,8 +7,8 @@ import { __experimental_CheckoutContext, usePricingTableContext } from '../../co
 import { useFetch } from '../../hooks';
 import { __experimental_Checkout } from '../Checkout';
 import { PlanDetailDrawer } from './PlanDetailDrawer';
-import { PricingTableMatrix } from './PricingTableMatrix';
 import { PricingTableDefault } from './PricingTableDefault';
+import { PricingTableMatrix } from './PricingTableMatrix';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
   const { __experimental_commerce } = useClerk();

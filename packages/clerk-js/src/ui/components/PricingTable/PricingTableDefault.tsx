@@ -1,7 +1,9 @@
-import { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
+import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
+
 import { Box, descriptors } from '../../customizables';
 import { InternalThemeProvider } from '../../styledSystem';
-import { PlanCard, PlanPeriod } from './PlanCard';
+import type { PlanPeriod } from './PlanCard';
+import { PlanCard } from './PlanCard';
 
 interface PricingTableDefaultProps {
   plans?: __experimental_CommercePlanResource[] | null;
