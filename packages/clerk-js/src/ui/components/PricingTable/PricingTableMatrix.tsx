@@ -6,6 +6,7 @@ import {
   Badge,
   Box,
   Button,
+  descriptors,
   Flex,
   Heading,
   Icon,
@@ -70,9 +71,9 @@ export function PricingTableMatrix({
   return (
     <InternalThemeProvider>
       <Box
+        elementDescriptor={descriptors.pricingTableMatrixRoot}
         sx={{
           position: 'relative',
-          marginInline: 'auto',
           minWidth: '100%',
           display: 'grid',
           isolation: 'isolate',
@@ -81,8 +82,12 @@ export function PricingTableMatrix({
           },
         }}
       >
-        <Box role='table'>
+        <Box
+          elementDescriptor={descriptors.pricingTableMatrixTable}
+          role='table'
+        >
           <Box
+            elementDescriptor={descriptors.pricingTableMatrixRowGroup}
             role='rowgroup'
             sx={t => ({
               position: 'sticky',
@@ -93,6 +98,7 @@ export function PricingTableMatrix({
             })}
           >
             <Box
+              elementDescriptor={descriptors.pricingTableMatrixRow}
               role='row'
               sx={{
                 display: 'grid',
@@ -100,6 +106,7 @@ export function PricingTableMatrix({
               }}
             >
               <Box
+                elementDescriptor={descriptors.pricingTableMatrixColumnHeader}
                 role='columnheader'
                 sx={t => ({
                   display: 'flex',
@@ -149,6 +156,7 @@ export function PricingTableMatrix({
 
                 return (
                   <Box
+                    elementDescriptor={descriptors.pricingTableMatrixColumnHeader}
                     key={plan.slug}
                     role='columnheader'
                     sx={[
@@ -188,6 +196,7 @@ export function PricingTableMatrix({
                               imageUrl={plan.avatarUrl}
                             />
                           ) : null}
+                          {/* TODO(@Commerce): needs localization */}
                           {highlight ? <Badge colorScheme='secondary'>Popular</Badge> : null}
                         </Span>
                       ) : null}
@@ -307,6 +316,7 @@ export function PricingTableMatrix({
             </Box>
           </Box>
           <Box
+            elementDescriptor={descriptors.pricingTableMatrixRowGroup}
             role='rowgroup'
             sx={{
               minWidth: '100%',
@@ -315,6 +325,7 @@ export function PricingTableMatrix({
             {getAllFeatures.map(feature => {
               return (
                 <Box
+                  elementDescriptor={descriptors.pricingTableMatrixRow}
                   key={feature}
                   role='row'
                   sx={t => ({
@@ -338,6 +349,7 @@ export function PricingTableMatrix({
                   })}
                 >
                   <Box
+                    elementDescriptor={descriptors.pricingTableMatrixCell}
                     role='cell'
                     sx={t => ({
                       padding: t.space.$3,
@@ -350,6 +362,7 @@ export function PricingTableMatrix({
                     const hasFeature = plan.features.some(f => f.name === feature);
                     return (
                       <Box
+                        elementDescriptor={descriptors.pricingTableMatrixCell}
                         key={plan.slug}
                         role='cell'
                         sx={[
