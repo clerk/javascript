@@ -2,4 +2,4 @@
 '@clerk/expo-passkeys': minor
 ---
 
-Bump `expo-modules-core` to 2.2.3 for Expo SDK 52 support.
+Remove expo-modules-core direct dependency in favor of using the version bundled with Expo SDK. This prevents version conflicts and improves compatibility across different SDK versions.
