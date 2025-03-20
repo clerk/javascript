@@ -39,6 +39,8 @@ export function PricingTableMatrix({
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const pricingTableMatrixId = React.useId();
+  const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -119,13 +121,14 @@ export function PricingTableMatrix({
                 {renderBillingCycleControls ? (
                   <>
                     <Text
+                      id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
                     >
                       Billing cycle
                     </Text>
                     <SegmentedControl.Root
-                      aria-label='Set pay period'
+                      aria-labelledby={segmentedControlId}
                       value={planPeriod}
                       onChange={value => setPlanPeriod(value as PlanPeriod)}
                     >
@@ -155,7 +158,6 @@ export function PricingTableMatrix({
                 return (
                   <Box
                     elementDescriptor={descriptors.pricingTableMatrixColumnHeader}
-                    elementId={highlight ? descriptors.pricingTableMatrixColumnHeader.setId('highlighted') : undefined}
                     key={plan.slug}
                     role='columnheader'
                     sx={[
@@ -169,6 +171,7 @@ export function PricingTableMatrix({
                       }),
                       highlight && highlightBackgroundColor,
                     ]}
+                    data-highlighted={highlight}
                   >
                     <Box
                       sx={t => ({
@@ -188,6 +191,7 @@ export function PricingTableMatrix({
                         >
                           {plan.avatarUrl ? (
                             <Avatar
+                              elementDescriptor={descriptors.pricingTableMatrixAvatar}
                               size={_ => 40}
                               title={plan.name}
                               initials={plan.name[0]}
@@ -196,10 +200,22 @@ export function PricingTableMatrix({
                             />
                           ) : null}
                           {/* TODO(@Commerce): needs localization */}
-                          {highlight ? <Badge colorScheme='secondary'>Popular</Badge> : null}
+                          {highlight ? (
+                            <Badge
+                              elementDescriptor={descriptors.pricingTableMatrixBadge}
+                              colorScheme='secondary'
+                            >
+                              Popular
+                            </Badge>
+                          ) : null}
                         </Span>
                       ) : null}
-                      <Heading textVariant='h3'>{plan.name}</Heading>
+                      <Heading
+                        elementDescriptor={descriptors.pricingTableMatrixPlanName}
+                        textVariant='h3'
+                      >
+                        {plan.name}
+                      </Heading>
                       <Flex
                         align='center'
                         wrap='wrap'
@@ -211,6 +227,7 @@ export function PricingTableMatrix({
                         {plan.hasBaseFee ? (
                           <>
                             <Text
+                              elementDescriptor={descriptors.pricingTableMatrixFee}
                               variant='h2'
                               colorScheme='body'
                             >
@@ -218,6 +235,7 @@ export function PricingTableMatrix({
                               {planFee}
                             </Text>
                             <Text
+                              elementDescriptor={descriptors.pricingTableMatrixFeePeriod}
                               variant='caption'
                               colorScheme='secondary'
                               sx={t => ({
@@ -231,6 +249,7 @@ export function PricingTableMatrix({
                             />
                             {plan.annualMonthlyAmount > 0 ? (
                               <Box
+                                elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[
                                   _ => ({
                                     width: '100%',
@@ -243,12 +262,14 @@ export function PricingTableMatrix({
                                 inert={planPeriod !== 'annual' ? 'true' : undefined}
                               >
                                 <Box
+                                  elementDescriptor={descriptors.pricingTableMatrixFeePeriodNoticeInner}
                                   sx={{
                                     overflow: 'hidden',
                                     minHeight: 0,
                                   }}
                                 >
                                   <Text
+                                    elementDescriptor={descriptors.pricingTableMatrixFeePeriodNoticeLabel}
                                     variant='caption'
                                     colorScheme='secondary'
                                     sx={t => ({
@@ -274,6 +295,7 @@ export function PricingTableMatrix({
                           </>
                         ) : (
                           <Text
+                            elementDescriptor={descriptors.pricingTableMatrixFee}
                             variant='h2'
                             localizationKey={localizationKeys('__experimental_commerce.free')}
                             colorScheme='body'
@@ -313,9 +335,6 @@ export function PricingTableMatrix({
           <Box
             elementDescriptor={descriptors.pricingTableMatrixRowGroup}
             role='rowgroup'
-            sx={{
-              minWidth: '100%',
-            }}
           >
             {getAllFeatures.map(feature => {
               return (
@@ -358,7 +377,6 @@ export function PricingTableMatrix({
                     return (
                       <Box
                         elementDescriptor={descriptors.pricingTableMatrixCell}
-                        elementId={highlight ? descriptors.pricingTableMatrixCell.setId('highlighted') : undefined}
                         key={plan.slug}
                         role='cell'
                         sx={[
@@ -369,6 +387,8 @@ export function PricingTableMatrix({
                           }),
                           highlight && highlightBackgroundColor,
                         ]}
+                        data-highlighted={highlight}
+                        data-checked={hasFeature}
                       >
                         {hasFeature && (
                           <Icon
@@ -385,16 +405,18 @@ export function PricingTableMatrix({
               );
             })}
             <Box
+              elementDescriptor={descriptors.pricingTableMatrixFooter}
               sx={{
                 display: 'grid',
                 gridTemplateColumns,
               }}
             >
-              <Box />
+              <Box elementDescriptor={descriptors.pricingTableMatrixCell} />
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 return (
                   <Box
+                    elementDescriptor={descriptors.pricingTableMatrixCell}
                     key={plan.slug}
                     sx={[
                       t => ({
@@ -404,6 +426,7 @@ export function PricingTableMatrix({
                       }),
                       highlight && highlightBackgroundColor,
                     ]}
+                    data-highlighted={highlight}
                   />
                 );
               })}

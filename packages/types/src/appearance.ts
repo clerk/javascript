@@ -368,8 +368,17 @@ export type ElementsConfig = {
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRow: WithOptions;
-  pricingTableMatrixColumnHeader: WithOptions<'highlighted'>;
-  pricingTableMatrixCell: WithOptions<'highlighted'>;
+  pricingTableMatrixColumnHeader: WithOptions;
+  pricingTableMatrixCell: WithOptions;
+  pricingTableMatrixAvatar: WithOptions;
+  pricingTableMatrixBadge: WithOptions;
+  pricingTableMatrixPlanName: WithOptions;
+  pricingTableMatrixFee: WithOptions;
+  pricingTableMatrixFeePeriod: WithOptions;
+  pricingTableMatrixFeePeriodNotice: WithOptions;
+  pricingTableMatrixFeePeriodNoticeInner: WithOptions;
+  pricingTableMatrixFeePeriodNoticeLabel: WithOptions;
+  pricingTableMatrixFooter: WithOptions;
 
   planCard: WithOptions<string>;
   planCardDefault: WithOptions;
