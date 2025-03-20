@@ -77,7 +77,7 @@ export abstract class BaseResource {
       clerkMissingFapiClientInResources();
     }
 
-    let fapiResponse: FapiResponse<J> | undefined;
+    let fapiResponse: FapiResponse<J>;
     const { fetchMaxTries } = opts;
 
     try {
@@ -92,13 +92,8 @@ export abstract class BaseResource {
         console.warn(e);
         return null;
       } else {
-        console.error(e);
+        throw e;
       }
-    }
-
-    if (typeof fapiResponse === 'undefined') {
-      // handle offline case
-      return null;
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
