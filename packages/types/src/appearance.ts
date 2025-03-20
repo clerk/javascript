@@ -368,8 +368,8 @@ export type ElementsConfig = {
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRow: WithOptions;
-  pricingTableMatrixColumnHeader: WithOptions;
-  pricingTableMatrixCell: WithOptions;
+  pricingTableMatrixColumnHeader: WithOptions<'highlighted'>;
+  pricingTableMatrixCell: WithOptions<'highlighted'>;
 
   planCard: WithOptions<string>;
   planCardDefault: WithOptions;

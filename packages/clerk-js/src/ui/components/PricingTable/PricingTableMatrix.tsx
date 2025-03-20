@@ -155,6 +155,7 @@ export function PricingTableMatrix({
                 return (
                   <Box
                     elementDescriptor={descriptors.pricingTableMatrixColumnHeader}
+                    elementId={highlight ? descriptors.pricingTableMatrixColumnHeader.setId('highlighted') : undefined}
                     key={plan.slug}
                     role='columnheader'
                     sx={[
@@ -357,6 +358,7 @@ export function PricingTableMatrix({
                     return (
                       <Box
                         elementDescriptor={descriptors.pricingTableMatrixCell}
+                        elementId={highlight ? descriptors.pricingTableMatrixCell.setId('highlighted') : undefined}
                         key={plan.slug}
                         role='cell'
                         sx={[
