@@ -33,7 +33,7 @@
   "dependencies": {
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "expo-modules-core": "1.12.26"
+    "expo-modules-core": "2.2.3"
   },
   "peerDependencies": {
     "expo": "*",

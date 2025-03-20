@@ -645,8 +645,8 @@ importers:
         specifier: '*'
         version: 51.0.38(@babel/core@7.26.9)(@babel/preset-env@7.26.0(@babel/core@7.26.9))
       expo-modules-core:
-        specifier: 1.12.26
-        version: 1.12.26
+        specifier: 2.2.3
+        version: 2.2.3
       react:
         specifier: catalog:peer-react
         version: 18.3.1
@@ -2848,7 +2848,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.18.30':
     resolution: {integrity: sha512-V90TUJh9Ly8stYo8nwqIqNWCsYjE28GlVFWEhAFCUOp99foiQr8HSTpiiX5GIrprcPoWmlGoY+J5fQA29R4lFg==}
@@ -7824,6 +7824,9 @@ packages:
 
   expo-modules-core@1.12.26:
     resolution: {integrity: sha512-y8yDWjOi+rQRdO+HY+LnUlz8qzHerUaw/LUjKPU/mX8PRXP4UUPEEp5fjAwBU44xjNmYSHWZDwet4IBBE+yQUA==}
+
+  expo-modules-core@2.2.3:
+    resolution: {integrity: sha512-01QqZzpP/wWlxnNly4G06MsOBUTbMDj02DQigZoXfDh80vd/rk3/uVXqnZgOdLSggTs6DnvOgAUy0H2q30XdUg==}
 
   expo-secure-store@12.8.1:
     resolution: {integrity: sha512-Ju3jmkHby4w7rIzdYAt9kQyQ7HhHJ0qRaiQOInknhOLIltftHjEgF4I1UmzKc7P5RCfGNmVbEH729Pncp/sHXQ==}
@@ -23423,6 +23426,10 @@ snapshots:
       resolve-from: 5.0.0
 
   expo-modules-core@1.12.26:
+    dependencies:
+      invariant: 2.2.4
+
+  expo-modules-core@2.2.3:
     dependencies:
       invariant: 2.2.4
 
