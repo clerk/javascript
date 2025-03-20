@@ -17,7 +17,8 @@ import {
 import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
-import { InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
+import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
+import { colors } from '../../utils';
 import type { PlanPeriod } from './PlanCard';
 
 interface PricingTableMatrixProps {
@@ -39,10 +40,15 @@ export function PricingTableMatrix({
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
   const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
       : 'none',
+  });
+
+  const highlightBackgroundColor: ThemableCssProp = t => ({
+    background: common.mergedColorsBackground(colors.setAlpha(t.colors.$colorBackground, 1), t.colors.$neutralAlpha25),
   });
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
@@ -64,17 +70,16 @@ export function PricingTableMatrix({
   return (
     <InternalThemeProvider>
       <Box
-        sx={t => ({
+        sx={{
           position: 'relative',
           marginInline: 'auto',
           minWidth: '100%',
           display: 'grid',
           isolation: 'isolate',
-          backgroundColor: t.colors.$colorBackground,
           [mqu.md]: {
             overflowX: 'auto',
           },
-        })}
+        }}
       >
         <Box role='table'>
           <Box
@@ -82,7 +87,6 @@ export function PricingTableMatrix({
             sx={t => ({
               position: 'sticky',
               top: 0,
-              backgroundColor: t.colors.$colorBackground,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
               borderBottomColor: t.colors.$neutralAlpha100,
@@ -147,17 +151,17 @@ export function PricingTableMatrix({
                   <Box
                     key={plan.slug}
                     role='columnheader'
-                    sx={t => ({
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      flex: 1,
-                      borderStartStartRadius: t.radii.$xl,
-                      borderStartEndRadius: t.radii.$xl,
-                      ...(highlight && {
-                        backgroundColor: t.colors.$neutralAlpha25,
+                    sx={[
+                      t => ({
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        flex: 1,
+                        borderStartStartRadius: t.radii.$xl,
+                        borderStartEndRadius: t.radii.$xl,
                       }),
-                    })}
+                      highlight && highlightBackgroundColor,
+                    ]}
                   >
                     <Box
                       sx={t => ({
@@ -308,19 +312,28 @@ export function PricingTableMatrix({
               minWidth: '100%',
             }}
           >
-            {getAllFeatures.map(f => {
+            {getAllFeatures.map(feature => {
               return (
                 <Box
-                  key={f}
+                  key={feature}
                   role='row'
                   sx={t => ({
+                    position: 'relative',
                     display: 'grid',
                     gridTemplateColumns,
                     borderBottomWidth: t.borderWidths.$normal,
                     borderBottomStyle: t.borderStyles.$solid,
                     borderBottomColor: t.colors.$neutralAlpha100,
-                    ':hover': {
+                    ':after': {
+                      content: '""',
+                      position: 'absolute',
+                      inset: 0,
+                      pointerEvents: 'none',
                       backgroundColor: t.colors.$neutralAlpha25,
+                      opacity: 0,
+                    },
+                    ':hover:after': {
+                      opacity: 1,
                     },
                   })}
                 >
@@ -330,23 +343,23 @@ export function PricingTableMatrix({
                       padding: t.space.$3,
                     })}
                   >
-                    <Text colorScheme='body'>{f}</Text>
+                    <Text colorScheme='body'>{feature}</Text>
                   </Box>
                   {plans.map(plan => {
                     const highlight = plan.slug === highlightedPlan;
-                    const hasFeature = plan.features.some(feature => feature.name === f);
+                    const hasFeature = plan.features.some(f => f.name === feature);
                     return (
                       <Box
                         key={plan.slug}
                         role='cell'
-                        sx={t => ({
-                          display: 'grid',
-                          placeContent: 'center',
-                          padding: t.space.$3,
-                          ...(highlight && {
-                            backgroundColor: t.colors.$neutralAlpha25,
+                        sx={[
+                          t => ({
+                            display: 'grid',
+                            placeContent: 'center',
+                            padding: t.space.$3,
                           }),
-                        })}
+                          highlight && highlightBackgroundColor,
+                        ]}
                       >
                         {hasFeature && (
                           <Icon
@@ -374,14 +387,14 @@ export function PricingTableMatrix({
                 return (
                   <Box
                     key={plan.slug}
-                    sx={t => ({
-                      height: t.space.$10,
-                      borderEndStartRadius: t.radii.$xl,
-                      borderEndEndRadius: t.radii.$xl,
-                      ...(highlight && {
-                        backgroundColor: t.colors.$neutralAlpha25,
+                    sx={[
+                      t => ({
+                        height: t.space.$10,
+                        borderEndStartRadius: t.radii.$xl,
+                        borderEndEndRadius: t.radii.$xl,
                       }),
-                    })}
+                      highlight && highlightBackgroundColor,
+                    ]}
                   />
                 );
               })}
