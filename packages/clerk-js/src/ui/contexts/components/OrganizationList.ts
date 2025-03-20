@@ -11,7 +11,7 @@ export const OrganizationListContext = createContext<OrganizationListCtx | null>
 export const useOrganizationListContext = () => {
   const context = useContext(OrganizationListContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, organizationSettings } = useEnvironment();
 
   if (!context || context.componentName !== 'OrganizationList') {
     throw new Error('Clerk: useOrganizationListContext called outside OrganizationList.');
@@ -80,7 +80,7 @@ export const useOrganizationListContext = () => {
     afterCreateOrganizationUrl,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
     hideSlug: ctx.hideSlug || false,
-    hidePersonal: ctx.hidePersonal || false,
+    hidePersonal: organizationSettings.forceOrganizationSelection || ctx.hidePersonal || false,
     navigateAfterCreateOrganization,
     navigateAfterSelectOrganization,
     navigateAfterSelectPersonal,

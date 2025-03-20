@@ -144,6 +144,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Basic ')) {
+        logger.debug('Basic Auth detected');
+      }
+
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
