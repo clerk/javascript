@@ -18,6 +18,7 @@ export type BaseMutateParams = {
   body?: any;
   method?: HTTPMethod;
   path?: string;
+  skipResourceUpdate?: boolean;
 };
 
 function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
@@ -192,15 +193,17 @@ export abstract class BaseResource {
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
+    const { action, body, method, path, skipResourceUpdate } = params;
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
-    return this.fromJSON((json?.response || json) as J);
+    const payload = !skipResourceUpdate ? ((json?.response || json) as J) : null;
+    return this.fromJSON(payload);
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
-    const { action, body, method, path } = params;
+    const { action, body, method, path, skipResourceUpdate } = params;
     const json = await BaseResource._baseFetch<J>({ method, path: path || this.path(action), body });
-    return this.fromJSON((json?.response || json) as J);
+    const payload = !skipResourceUpdate ? ((json?.response || json) as J) : null;
+    return this.fromJSON(payload);
   }
 
   protected async _basePost<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {

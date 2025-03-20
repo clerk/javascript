@@ -118,7 +118,10 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   public sendCaptchaToken(params: unknown): Promise<ClientResource> {
-    return this._basePostBypass({ body: params, path: this.path() + '/verify' });
+    // We don't want to update the Client resource after sending the captcha token
+    // because we expect an empty JSON object as a response
+    // that's why we set skipResourceUpdate to true
+    return this._basePostBypass({ body: params, path: this.path() + '/verify', skipResourceUpdate: true });
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
