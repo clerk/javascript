@@ -1692,8 +1692,11 @@ export class Clerk implements ClerkInterface {
       }
       return this.setActive({ session: null });
     } catch (err) {
-      // Clerk is already attempting to sign out the user, respect the sign-out when client fails to re-load.
-      if (isClerkAPIResponseError(err) && err.status > 400) {
+      // `/client` can fail with either a 401, a 403, 500 or network errors.
+      // 401 is already handled internally in our fetcher.
+      // 403 means that the client is blocked, signing out the user is the only option.
+      // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
+      if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
         return this.setActive({ session: null });
       } else {
         throw err;
