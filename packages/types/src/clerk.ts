@@ -1605,7 +1605,7 @@ export interface AuthenticateWithGoogleOneTapParams {
 
 export interface NextTaskParams {
   /**
-   * Full URL or path to navigate after successful resolving all tasks
+   * Full URL or path to navigate after successfully resolving all tasks
    * @default undefined
    */
   redirectUrlComplete?: string;
