@@ -11,7 +11,7 @@ import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
-  const { __experimental_commerce } = useClerk();
+  const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const [planPeriod, setPlanPeriod] = useState<'month' | 'annual'>('month');
   const [selectedPlan, setSelectedPlan] = useState<__experimental_CommercePlanResource>();
@@ -19,9 +19,12 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   const [showPlanDetail, setShowPlanDetail] = useState(false);
   const isCompact = mode === 'modal';
 
-  const { data: plans } = useFetch(__experimental_commerce?.__experimental_billing.getPlans, 'commerce-plans');
+  const { data: plans } = useFetch(clerk.__experimental_commerce?.__experimental_billing.getPlans, 'commerce-plans');
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
+    if (!clerk.isSignedIn) {
+      void clerk.redirectToSignIn();
+    }
     setSelectedPlan(plan);
     if (plan.isActiveForPayer) {
       setShowPlanDetail(true);

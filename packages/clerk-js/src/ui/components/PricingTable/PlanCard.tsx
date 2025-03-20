@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -39,7 +38,6 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const isDefaultLayout = pricingTableProps.layout === 'default';
   const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
@@ -119,11 +117,7 @@ export function PlanCard(props: PlanCardProps) {
                 : localizationKeys('__experimental_commerce.getStarted')
             }
             onClick={() => {
-              if (clerk.isSignedIn) {
-                onSelect(plan);
-              } else {
-                void clerk.redirectToSignIn();
-              }
+              onSelect(plan);
             }}
           />
         </Box>

@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource } from '@clerk/types';
 import * as React from 'react';
 
@@ -37,7 +36,6 @@ export function PricingTableMatrix({
   onSelect,
   highlightedPlan,
 }: PricingTableMatrixProps) {
-  const clerk = useClerk();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
@@ -299,11 +297,7 @@ export function PricingTableMatrix({
                         textVariant='buttonSmall'
                         size='xs'
                         onClick={() => {
-                          if (clerk.isSignedIn) {
-                            onSelect(plan);
-                          } else {
-                            void clerk.redirectToSignIn();
-                          }
+                          onSelect(plan);
                         }}
                         localizationKey={
                           plan.isActiveForPayer ? 'Manage' : localizationKeys('__experimental_commerce.getStarted')
