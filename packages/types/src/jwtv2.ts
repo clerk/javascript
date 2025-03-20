@@ -1,3 +1,5 @@
+import type { SessionStatus } from 'session';
+
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface Jwt {
@@ -100,6 +102,11 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Active organization permissions
    */
   org_permissions?: OrganizationCustomPermissionKey[];
+
+  /**
+   * Session status
+   */
+  sts?: SessionStatus;
 
   /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.

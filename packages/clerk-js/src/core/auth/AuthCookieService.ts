@@ -3,6 +3,7 @@ import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
+import { decode } from '../../utils';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -113,7 +114,19 @@ export class AuthCookieService {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+    this.poller.startPollingForSessionToken(() => {
+      const oldCookie = this.getSessionCookie();
+
+      return this.refreshSessionToken().then(() => {
+        const newCookie = this.getSessionCookie();
+
+        if (!oldCookie || !newCookie) {
+          return;
+        }
+
+        this.monitorSessionTransitionStatus(oldCookie, newCookie);
+      });
+    });
   }
 
   private refreshTokenOnFocus() {
@@ -183,6 +196,22 @@ export class AuthCookieService {
       void this.clerk.handleUnauthenticated();
       return;
     }
+  }
+
+  /**
+   * Monitors and handles changes to the `sts` claim in the JWT token.
+   * Emits an event when the `sts` transitions to `pending`, enabling the core `Clerk` class to react accordingly.
+   */
+  private monitorSessionTransitionStatus(oldCookie: string, newCookie: string) {
+    const { sts: oldStatus } = decode(oldCookie).claims;
+    const { sts: newStatus } = decode(newCookie).claims;
+
+    const hasTransitionedToPending = oldStatus === 'active' && newStatus === 'pending';
+    if (!hasTransitionedToPending) {
+      return;
+    }
+
+    eventBus.dispatch(events.SessionPendingTransition, null);
   }
 
   /**

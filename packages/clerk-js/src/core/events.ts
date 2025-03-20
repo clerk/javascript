@@ -3,6 +3,7 @@ import type { TokenResource } from '@clerk/types';
 export const events = {
   TokenUpdate: 'token:update',
   UserSignOut: 'user:signOut',
+  SessionPendingTransition: 'session:pendingTransition',
 } as const;
 
 type ClerkEvent = (typeof events)[keyof typeof events];
@@ -13,6 +14,7 @@ type TokenUpdatePayload = { token: TokenResource | null };
 type EventPayload = {
   [events.TokenUpdate]: TokenUpdatePayload;
   [events.UserSignOut]: null;
+  [events.SessionPendingTransition]: null;
 };
 
 const createEventBus = () => {

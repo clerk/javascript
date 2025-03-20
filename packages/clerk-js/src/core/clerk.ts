@@ -2261,6 +2261,12 @@ export class Clerk implements ClerkInterface {
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
+
+    eventBus.on(events.SessionPendingTransition, () => {
+      // TODO -> Refresh session, get the latest task, and open the modal state
+      // For now, we're just forcing open a modal with a fixed task
+      // TODO -> Open modal
+    });
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc
