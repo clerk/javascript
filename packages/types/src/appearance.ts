@@ -367,9 +367,14 @@ export type ElementsConfig = {
   pricingTableMatrixRoot: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
+  pricingTableMatrixRowGroupHeader: WithOptions;
+  pricingTableMatrixRowGroupBody: WithOptions;
   pricingTableMatrixRow: WithOptions;
+  pricingTableMatrixRowHeader: WithOptions;
+  pricingTableMatrixRowBody: WithOptions;
   pricingTableMatrixColumnHeader: WithOptions;
   pricingTableMatrixCell: WithOptions;
+  pricingTableMatrixCellFooter: WithOptions;
   pricingTableMatrixAvatar: WithOptions;
   pricingTableMatrixBadge: WithOptions;
   pricingTableMatrixPlanName: WithOptions;

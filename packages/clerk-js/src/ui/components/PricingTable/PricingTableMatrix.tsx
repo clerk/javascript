@@ -87,7 +87,7 @@ export function PricingTableMatrix({
           role='table'
         >
           <Box
-            elementDescriptor={descriptors.pricingTableMatrixRowGroup}
+            elementDescriptor={[descriptors.pricingTableMatrixRowGroup, descriptors.pricingTableMatrixRowGroupHeader]}
             role='rowgroup'
             sx={t => ({
               position: 'sticky',
@@ -98,7 +98,7 @@ export function PricingTableMatrix({
             })}
           >
             <Box
-              elementDescriptor={descriptors.pricingTableMatrixRow}
+              elementDescriptor={[descriptors.pricingTableMatrixRow, descriptors.pricingTableMatrixRowHeader]}
               role='row'
               sx={{
                 display: 'grid',
@@ -333,13 +333,13 @@ export function PricingTableMatrix({
             </Box>
           </Box>
           <Box
-            elementDescriptor={descriptors.pricingTableMatrixRowGroup}
+            elementDescriptor={[descriptors.pricingTableMatrixRowGroup, descriptors.pricingTableMatrixRowGroupBody]}
             role='rowgroup'
           >
             {getAllFeatures.map(feature => {
               return (
                 <Box
-                  elementDescriptor={descriptors.pricingTableMatrixRow}
+                  elementDescriptor={[descriptors.pricingTableMatrixRow, descriptors.pricingTableMatrixRowBody]}
                   key={feature}
                   role='row'
                   sx={t => ({
@@ -411,12 +411,12 @@ export function PricingTableMatrix({
                 gridTemplateColumns,
               }}
             >
-              <Box elementDescriptor={descriptors.pricingTableMatrixCell} />
+              <Box elementDescriptor={[descriptors.pricingTableMatrixCell, descriptors.pricingTableMatrixCellFooter]} />
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
                 return (
                   <Box
-                    elementDescriptor={descriptors.pricingTableMatrixCell}
+                    elementDescriptor={[descriptors.pricingTableMatrixCell, descriptors.pricingTableMatrixCellFooter]}
                     key={plan.slug}
                     sx={[
                       t => ({
