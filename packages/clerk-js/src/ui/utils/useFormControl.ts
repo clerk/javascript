@@ -1,6 +1,6 @@
 import type { ClerkAPIError } from '@clerk/types';
 import type { HTMLInputTypeAttribute } from 'react';
-import { useEffect, useState } from 'react';
+import { useRef, useSyncExternalStore } from 'react';
 
 import { useDebounce } from '../hooks';
 import type { LocalizationKey } from '../localization';
@@ -61,12 +61,13 @@ class Store<T> {
     this.state = initialState;
   }
 
-  public getState<K>(selector?: (state: T) => K): K extends keyof T ? T[K] : K extends undefined ? T : K {
-    // debugger
+  public getState(): T;
+  public getState<K>(selector: (state: T) => K): K;
+  public getState<K>(selector?: (state: T) => K): T | K {
     if (selector) {
-      return selector(this.state) as any;
+      return selector(this.state);
     }
-    return this.state as any;
+    return this.state;
   }
 
   public setState(newState: T | ((prevState: T) => T)): void {
@@ -74,9 +75,11 @@ class Store<T> {
     this.listeners.forEach(listener => listener(this.state));
   }
 
-  public subscribe<K>(listener: (selectedState: K) => void, selector?: (state: T) => K): () => void {
+  public subscribe(listener: (selectedState: T) => void): () => void;
+  public subscribe<K>(listener: (selectedState: K) => void, selector: (state: T) => K): () => void;
+  public subscribe<K>(listener: (selectedState: any) => void, selector?: (state: T) => K): () => void {
     const notify = () => {
-      const selectedState = selector ? selector(this.state) : (this.state as any);
+      const selectedState = selector ? selector(this.state) : this.state;
       listener(selectedState);
     };
 
@@ -98,18 +101,39 @@ export const useForm = (key: string): Store<{ [key: string]: FieldStateProps<str
   return allStores.get(key)!;
 };
 
-// export const useFormSelector = <T extends FieldStateProps<string>>(key: string, selector: (state: T) => T) => {
+// export const useFormSelector = <T extends FieldStateProps<string> | undefined, K>(
+//   key: string,
+//   fieldId: string,
+//   selector: (state: T) => K,
+// ) => {
 //   const store = allStores.get(key);
-
+//
 //   if (!store) {
 //     throw new Error(`Store with key ${key} not found`);
 //   }
-
+//
 //   return useSyncExternalStore(
-//     (a: any) => store.subscribe(a, selector),
-//     () => store.getState(selector),
+//     (a: any) =>
+//       store.subscribe(a, (v: any) => {
+//         return selector(v?.[fieldId]);
+//       }),
+//     () =>
+//       store.getState((v: any) => {
+//         return selector(v?.[fieldId]);
+//       }),
 //   );
 // };
+
+type ControlState<Id> = {
+  id: Id;
+  name: Id;
+  value: string;
+  checked?: boolean;
+  feedback: string;
+  feedbackType: FeedbackType;
+  hasPassedComplexity: boolean;
+  isFocused: boolean;
+} & Partial<Options>;
 
 export type FieldStateProps<Id> = {
   id: Id;
@@ -153,12 +177,12 @@ const applyTransformers = (v: string, transformers: Transformer[]) => {
   return value;
 };
 
-export const useFormControl = <Id extends string>(
+const createFormControl = <Id extends string>(
+  localizationUtils: ReturnType<typeof useLocalizations>,
   id: Id,
   initialState: string,
   opts?: Options,
-  storeKey?: string,
-): FormControlState<Id> => {
+) => {
   const options = opts || {
     type: 'text',
     label: '',
@@ -167,6 +191,7 @@ export const useFormControl = <Id extends string>(
     options: [],
     defaultChecked: false,
   };
+
   const transformers: Transformer[] = [];
   if (options.transformer) {
     transformers.push(options.transformer);
@@ -175,113 +200,222 @@ export const useFormControl = <Id extends string>(
     transformers.push(emailTransformer);
   }
 
-  const { translateError, t } = useLocalizations();
-  const [value, setValueInternal] = useState<string>(applyTransformers(initialState, transformers));
-  const [isFocused, setFocused] = useState(false);
-  const [checked, setCheckedInternal] = useState<boolean>(options?.defaultChecked || false);
-  const [hasPassedComplexity, setHasPassedComplexity] = useState(false);
-  const [feedback, setFeedback] = useState<{ message: string; type: FeedbackType }>({
-    message: '',
-    type: 'info',
+  const control = new Store<ControlState<Id>>({
+    ...options,
+    id,
+    name: id,
+    value: applyTransformers(initialState, transformers),
+    checked: options.defaultChecked || false,
+    validatePassword: (options.type === 'password' ? options.validatePassword : undefined) as undefined,
+    feedback: localizationUtils.t(options.infoText),
+    feedbackType: 'info',
+    hasPassedComplexity: false,
+    isFocused: false,
   });
 
-  useEffect(() => {
-    if (storeKey) {
-      allStores.get(storeKey)?.setState(prev => ({
-        ...prev,
-        [id]: {
-          id,
-          name: id,
-          value,
-          type: options.type,
-        } as unknown as FieldStateProps<string>,
-      }));
-    }
-    // TODO: remove on unmount
-  }, []);
-
   const onChange: FormControlState['onChange'] = event => {
-    const result = options.onChange?.(event);
+    const { onChange, type } = control.getState();
+    const result = onChange?.(event);
 
-    if (options?.type === 'checkbox') {
-      return setCheckedInternal(event.target.checked);
-    }
-
-    if (storeKey) {
-      allStores.get(storeKey)?.setState(prev => ({
+    if (type === 'checkbox') {
+      return control.setState(prev => ({
         ...prev,
-        [id]: {
-          id,
-          name: id,
-          value: applyTransformers(result || event.target.value || '', transformers),
-          type: options.type,
-        } as unknown as FieldStateProps<string>,
+        checked: event.target.checked,
       }));
     }
-    return setValueInternal(applyTransformers(result || event.target.value || '', transformers));
+
+    control.setState(prev => ({
+      ...prev,
+      value: applyTransformers(result || event.target.value || '', transformers),
+    }));
   };
 
-  const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
-  const setChecked: FormControlState['setChecked'] = checked => setCheckedInternal(checked);
+  const setValue: FormControlState['setValue'] = val => {
+    control.setState(prev => ({
+      ...prev,
+      value: val || '',
+    }));
+  };
+  const setChecked: FormControlState['setChecked'] = checked => {
+    control.setState(prev => ({
+      ...prev,
+      checked,
+    }));
+  };
   const setError: FormControlState['setError'] = error => {
-    setFeedback({ message: translateError(error), type: 'error' });
+    control.setState(prev => ({
+      ...prev,
+      feedback: localizationUtils.translateError(error),
+      feedbackType: 'error',
+    }));
   };
   const setSuccess: FormControlState['setSuccess'] = message => {
-    setFeedback({ message, type: 'success' });
+    control.setState(prev => ({
+      ...prev,
+      feedback: message,
+      feedbackType: 'success',
+    }));
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
-    setFeedback({ message: translateError(warning), type: 'warning' });
+    control.setState(prev => ({
+      ...prev,
+      feedback: localizationUtils.translateError(warning),
+      feedbackType: 'warning',
+    }));
   };
 
   const setInfo: FormControlState['setInfo'] = info => {
-    setFeedback({ message: info, type: 'info' });
+    control.setState(prev => ({
+      ...prev,
+      feedback: info,
+      feedbackType: 'warning',
+    }));
   };
 
   const clearFeedback: FormControlState['clearFeedback'] = () => {
-    setFeedback({ message: '', type: 'info' });
+    control.setState(prev => ({
+      ...prev,
+      feedback: localizationUtils.t(options.infoText),
+      feedbackType: 'info',
+    }));
   };
 
   const onFocus: FormControlState['onFocus'] = () => {
-    setFocused(true);
+    control.setState(prev => ({
+      ...prev,
+      isFocused: true,
+    }));
   };
 
   const onBlur: FormControlState['onBlur'] = () => {
-    setFocused(false);
+    control.setState(prev => ({
+      ...prev,
+      isFocused: false,
+    }));
   };
 
-  const {
-    defaultChecked,
-    validatePassword: validatePasswordProp,
-    buildErrorMessage,
-    // Simply ignore the onChange prop from the options.
-    onChange: onChangeProp,
-    ...restOpts
-  } = options;
+  const setHasPassedComplexity: FormControlState['setHasPassedComplexity'] = b => {
+    control.setState(prev => ({
+      ...prev,
+      hasPassedComplexity: b,
+    }));
+  };
 
-  const props = {
-    id,
-    name: id,
-    value,
-    checked,
-    setSuccess,
-    setError,
+  return {
+    control,
     onChange,
-    onBlur,
-    onFocus,
+    setValue,
+    setChecked,
+    setError,
+    setSuccess,
     setWarning,
-    feedback: feedback.message || t(options.infoText),
-    feedbackType: feedback.type,
     setInfo,
     clearFeedback,
-    hasPassedComplexity,
+    onFocus,
+    onBlur,
     setHasPassedComplexity,
-    validatePassword: options.type === 'password' ? options.validatePassword : undefined,
-    isFocused,
-    ...restOpts,
+  };
+};
+
+const init = <Id extends string>(...args: [string | undefined, ...Parameters<typeof createFormControl<Id>>]) => {
+  const [storeKey, localization, id, initialState, opts] = args;
+  const _control = createFormControl(localization, id, initialState, opts);
+  const { control, ...mutators } = _control;
+
+  if (storeKey) {
+    allStores.get(storeKey)?.setState(prev => ({
+      ...prev,
+      [id]: {
+        ...control.getState(),
+        ...mutators,
+      },
+    }));
+
+    control.subscribe(newControl => {
+      allStores.get(storeKey)?.setState(prev => ({
+        ...prev,
+        [id]: {
+          ...prev[id],
+          ...newControl,
+        },
+      }));
+    });
+  }
+  // TODO: remove on unmount
+
+  return _control;
+};
+
+export const useFormControl = <Id extends string>(
+  id: Id,
+  initialState: string,
+  opts?: Options,
+  storeKey?: string,
+): FormControlState<Id> => {
+  const localization = useLocalizations();
+  const fieldControl = useRef<ReturnType<typeof createFormControl<Id>>>();
+
+  if (!fieldControl.current) {
+    fieldControl.current = init(storeKey, localization, id, initialState, opts);
+  }
+
+  const { control, ...mutators } = fieldControl.current;
+
+  const state = useSyncExternalStore(
+    o => control.subscribe(o),
+    () => control.getState(),
+    () => control.getState(),
+  );
+
+  const { defaultChecked, buildErrorMessage, ...sanitzedState } = state;
+
+  const props = {
+    ...sanitzedState,
+    // ...mutators,
+    setSuccess: mutators.setSuccess,
+    setError: mutators.setError,
+    onChange: mutators.onChange,
+    onBlur: mutators.onBlur,
+    onFocus: mutators.onFocus,
+    setWarning: mutators.setWarning,
+    setInfo: mutators.setInfo,
+    clearFeedback: mutators.clearFeedback,
+    setHasPassedComplexity: mutators.setHasPassedComplexity,
   };
 
-  return { props, ...props, buildErrorMessage, setError, setValue, setChecked };
+  // const props = {
+  //   id,
+  //   name: id,
+  //   value,
+  //   checked,
+  //   setSuccess,
+  //   setError,
+  //   onChange,
+  //   onBlur,
+  //   onFocus,
+  //   setWarning,
+  //   feedback: feedback.message || t(options.infoText),
+  //   feedbackType: feedback.type,
+  //   setInfo,
+  //   clearFeedback,
+  //   hasPassedComplexity,
+  //   setHasPassedComplexity,
+  //   validatePassword: options.type === 'password' ? options.validatePassword : undefined,
+  //   isFocused,
+  //   ...restOpts,
+  // };
+
+  // console.log('props', props);
+
+  return {
+    props,
+    ...props,
+    buildErrorMessage,
+    setError: mutators.setError,
+    setValue: mutators.setValue,
+    setChecked: mutators.setChecked,
+  };
 };
 
 type FormControlStateLike = Pick<FormControlState, 'id' | 'value' | 'checked' | 'type'>;

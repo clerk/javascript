@@ -25,7 +25,7 @@ const components = {
 };
 
 const isInstantPasswordError = (e: any) =>
-  e.errors.find(
+  e?.errors?.find(
     (e: ClerkAPIError) =>
       e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
       e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||

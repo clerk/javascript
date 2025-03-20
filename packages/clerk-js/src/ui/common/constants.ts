@@ -9,7 +9,7 @@ type FirstFactorConfig = {
   placeholder: string | LocalizationKey;
   action?: string | LocalizationKey;
 };
-const FirstFactorConfigs = Object.freeze({
+export const FirstFactorConfigs = Object.freeze({
   email_address_username: {
     label: localizationKeys('formFieldLabel__emailAddress_username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
@@ -59,15 +59,14 @@ export const groupIdentifiers = (attributes: Attribute[]): SignInStartIdentifier
 export const getIdentifierControlDisplayValues = (
   identifiers: SignInStartIdentifier[],
   identifier: SignInStartIdentifier,
-): { currentIdentifier: FirstFactorConfig; nextIdentifier?: FirstFactorConfig } => {
+): { nextIdentifier?: FirstFactorConfig } => {
   const index = identifiers.indexOf(identifier);
 
   if (index === -1) {
-    return { currentIdentifier: { ...FirstFactorConfigs['default'] }, nextIdentifier: undefined };
+    return { nextIdentifier: undefined };
   }
 
   return {
-    currentIdentifier: { ...FirstFactorConfigs[identifier] },
     nextIdentifier:
       identifiers.length > 1 ? { ...FirstFactorConfigs[identifiers[(index + 1) % identifiers.length]] } : undefined,
   };

@@ -4,7 +4,11 @@ import type { SignInStartIdentifier } from 'ui/common/constants';
 import { useSignInContext } from '../../../../ui//contexts/components';
 import { useEnvironment } from '../../../../ui//contexts/EnvironmentContext';
 import { isMobileDevice } from '../../../../ui//utils/isMobileDevice';
-import { getIdentifierControlDisplayValues, groupIdentifiers } from '../../../../ui/common/constants';
+import {
+  FirstFactorConfigs,
+  getIdentifierControlDisplayValues,
+  groupIdentifiers,
+} from '../../../../ui/common/constants';
 import { useFormControl } from '../../../../ui/utils/useFormControl';
 
 export const useIdentifierField = () => {
@@ -33,20 +37,23 @@ export const useIdentifierField = () => {
     !!initialValues?.phone_number && !(initialValues.email_address || initialValues.username);
   const shouldStartWithPhoneNumberIdentifier =
     onlyPhoneNumberInitialValueExists && identifierAttributes.includes('phone_number');
+
   const [identifierAttribute, setIdentifierAttribute] = useState<SignInStartIdentifier>(
     shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
   );
 
-  const { currentIdentifier, nextIdentifier } = getIdentifierControlDisplayValues(
-    identifierAttributes,
-    identifierAttribute,
-  );
+  const { nextIdentifier } = getIdentifierControlDisplayValues(identifierAttributes, identifierAttribute);
+
+  const allExcludingPhoneNumber =
+    identifierAttribute === 'phone_number'
+      ? identifierAttributes.filter(a => a !== 'phone_number')[0]
+      : identifierAttribute;
 
   const textIdentifierField = useFormControl(
     'identifier',
-    initialValues[identifierAttribute] || '',
+    initialValues[allExcludingPhoneNumber] || '',
     {
-      ...currentIdentifier,
+      ...FirstFactorConfigs[allExcludingPhoneNumber],
       isRequired: true,
       transformer: value => value.trim(),
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +82,7 @@ export const useIdentifierField = () => {
     'identifier',
     initialValues['phone_number'] || '',
     {
-      ...currentIdentifier,
+      ...FirstFactorConfigs['phone_number'],
       isRequired: true,
     },
     'sign-in-start',
