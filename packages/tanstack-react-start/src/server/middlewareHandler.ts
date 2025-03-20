@@ -1,5 +1,5 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { EventHandler } from 'vinxi/http';
+import type { EventHandler } from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';

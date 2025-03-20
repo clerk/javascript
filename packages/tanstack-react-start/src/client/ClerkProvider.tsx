@@ -38,7 +38,7 @@ export function ClerkProvider({ children, ...providerProps }: TanstackStartClerk
 
   return (
     <>
-      <ScriptOnce>{`window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)};`}</ScriptOnce>
+      <ScriptOnce sync>{`window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)};`}</ScriptOnce>
       <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
           initialState={clerkSsrState}
