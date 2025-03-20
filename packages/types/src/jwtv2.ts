@@ -1,6 +1,5 @@
-import type { SessionStatus } from 'session';
-
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
+import type { SessionStatus } from './session';
 
 export interface Jwt {
   header: JwtHeader;

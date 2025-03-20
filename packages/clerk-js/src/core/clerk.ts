@@ -15,7 +15,7 @@ import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
-  __internal_ComponentNavigationContext,
+  __internal_SessionTaskModalProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -542,6 +542,27 @@ export class Clerk implements ClerkInterface {
     return this.#componentControls
       .ensureMounted({ preloadHint: 'BlankCaptchaModal' })
       .then(controls => controls.closeModal('blankCaptcha'));
+  };
+
+  public __internal_openSessionTask = (props: __internal_SessionTaskModalProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        // TODO -> Update warning
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
+    }
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SessionTaskModal' })
+      .then(controls => controls.openModal('sessionTask', props));
+  };
+
+  public __internal_closeSessionTask = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('sessionTask'));
   };
 
   public openSignUp = (props?: SignUpProps): void => {

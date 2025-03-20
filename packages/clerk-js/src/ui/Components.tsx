@@ -1,6 +1,7 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
+  __internal_SessionTaskProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -29,6 +30,7 @@ import {
   KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
+  SessionTaskModal,
   SignInModal,
   SignUpModal,
   UserProfileModal,
@@ -71,7 +73,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'sessionTask',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -82,7 +85,9 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : UserProfileProps,
+            : T extends 'sessionTask'
+              ? __internal_SessionTaskProps
+              : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -94,7 +99,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'sessionTask',
     options?: {
       notify?: boolean;
     },
@@ -125,6 +131,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
+  sessionTaskModal: null | __internal_SessionTaskProps;
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
@@ -212,6 +219,7 @@ const Components = (props: ComponentsProps) => {
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
+    sessionTaskModal: null,
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -226,6 +234,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
+    sessionTaskModal,
     nodes,
   } = state;
 
@@ -481,6 +490,21 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedSessionTaskModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'sessionTask' as any}
+      flowName={'sessionTask'}
+      onClose={() => componentsControls.closeModal('sessionTask')}
+      onExternalNavigate={() => componentsControls.closeModal('sessionTask')}
+      startPath={buildVirtualRouterUrl({ base: '/session-task', path: urlStateParam?.path })}
+      componentName={'SessionTaskModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+    >
+      <SessionTaskModal {...sessionTaskModal} />
+    </LazyModalRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -511,6 +535,7 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
+        {sessionTaskModal && mountedSessionTaskModal}
 
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>

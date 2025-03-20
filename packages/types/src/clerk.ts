@@ -34,7 +34,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { SignedInSessionResource } from './session';
+import type { SessionTask, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -188,6 +188,16 @@ export interface Clerk {
    * Closes the Clerk user verification modal.
    */
   __internal_closeReverification: () => void;
+
+  /**
+   * Opens the current session task in a modal.
+   */
+  __internal_openSessionTask: (props?: __internal_SessionTaskModalProps) => void;
+
+  /**
+   * Closes the session task modal.
+   */
+  __internal_closeSessionTask: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -1096,6 +1106,12 @@ export type __internal_ComponentNavigationContext = {
    */
   indexPath: string;
 };
+
+export type __internal_SessionTaskProps = {
+  task: SessionTask['key'];
+};
+
+export type __internal_SessionTaskModalProps = Partial<__internal_SessionTaskProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

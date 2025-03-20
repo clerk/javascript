@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionTask } from '@clerk/types';
+import type { __internal_SessionTaskModalProps, SessionTask } from '@clerk/types';
 import { useCallback, useEffect } from 'react';
 
 import { OrganizationListContext } from '../../contexts';
@@ -55,4 +55,22 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
       <Content />
     </SessionTaskContext.Provider>
   );
+}
+
+/**
+ * @internal
+ */
+export function SessionTaskModal({ task }: __internal_SessionTaskModalProps): JSX.Element | null {
+  if (!task) {
+    return null;
+  }
+
+  const clerk = useClerk();
+
+  clerk.telemetry?.record(eventComponentMounted('SessionTaskModal', { task }));
+
+  const Content = ContentRegistry[task];
+
+  // TODO -> Introduce basic routing to navigate between tasks
+  return <Content />;
 }

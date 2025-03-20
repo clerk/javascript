@@ -99,6 +99,9 @@ export const preloadSessionTask = () => import(/* webpackChunkName: "sessionTask
 export const SessionTask = lazy(() =>
   componentImportPaths.SessionTask().then(module => ({ default: module.SessionTask })),
 );
+export const SessionTaskModal = lazy(() =>
+  componentImportPaths.SessionTask().then(module => ({ default: module.SessionTaskModal })),
+);
 
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
@@ -125,6 +128,7 @@ export const ClerkComponents = {
   WaitlistModal,
   BlankCaptchaModal,
   PricingTable,
+  SessionTaskModal,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

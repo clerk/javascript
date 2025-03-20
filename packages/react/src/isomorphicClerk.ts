@@ -4,6 +4,8 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_SessionTaskModalProps,
+  __internal_SessionTaskProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -107,6 +109,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
+  private preopenSessionTask?: null | __internal_SessionTaskProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -496,6 +499,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     if (this.preOpenWaitlist !== null) {
       clerkjs.openWaitlist(this.preOpenWaitlist);
+    }
+
+    if (this.preopenSessionTask !== null) {
+      clerkjs.__internal_openSessionTask(this.preopenSessionTask);
     }
 
     this.premountSignInNodes.forEach((props, node) => {
@@ -926,6 +933,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountWaitlist(node);
     } else {
       this.premountWaitlistNodes.delete(node);
+    }
+  };
+
+  __internal_openSessionTask = (props?: __internal_SessionTaskModalProps) => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_openSessionTask(props);
+    } else {
+      this.preopenSessionTask = props;
+    }
+  };
+
+  __internal_closeSessionTask = () => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_closeSessionTask();
+    } else {
+      this.preopenSessionTask = null;
     }
   };
 
