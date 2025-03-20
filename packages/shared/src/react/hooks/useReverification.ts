@@ -31,6 +31,15 @@ async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<
 type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 
 /**
+ * @interface
+ */
+type NeedsReverificationParameters = {
+  cancel: () => void;
+  complete: () => void;
+  level: SessionVerificationLevel | undefined;
+};
+
+/**
  * The optional options object.
  * @interface
  */
@@ -43,11 +52,7 @@ type UseReverificationOptions = {
    * @param level - The level returned with the reverification hint.
    *
    */
-  onNeedsReverification?: (properties: {
-    cancel: () => void;
-    complete: () => void;
-    level: SessionVerificationLevel | undefined;
-  }) => void;
+  onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
 
 /**
