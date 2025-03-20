@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Ignore the response of the /client/verify endpoint
+Skip the Client resource update on the `/v1/client/verify` endpoint
