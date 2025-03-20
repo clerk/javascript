@@ -45,7 +45,7 @@ export function PricingTableMatrix({
       : 'none',
   });
 
-  const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(12.5rem,1fr))`, [plans.length]);
+  const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -286,9 +286,7 @@ export function PricingTableMatrix({
                           }
                         }}
                         localizationKey={
-                          plan.isActiveForPayer
-                            ? localizationKeys('__experimental_commerce.manageMembership')
-                            : localizationKeys('__experimental_commerce.getStarted')
+                          plan.isActiveForPayer ? 'Manage' : localizationKeys('__experimental_commerce.getStarted')
                         }
                       />
                     </Box>

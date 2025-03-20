@@ -1457,21 +1457,22 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 type __experimental_PricingTableDefaultProps = {
-  layout: 'default';
+  layout?: 'default';
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
 };
 
 type __experimental_PricingTableMatrixProps = {
-  layout: 'matrix';
-  highlightedPlan?: string;
+  layout?: 'matrix';
+  highlightPlan?: string;
 };
 
-export type __experimental_PricingTableProps =
-  | ({
-      appearance?: PricingTableTheme;
-    } & __experimental_PricingTableDefaultProps)
-  | __experimental_PricingTableMatrixProps;
+type __experimental_PricingTableBaseProps = {
+  appearance?: PricingTableTheme;
+};
+
+export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
+  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;

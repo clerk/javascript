@@ -41,7 +41,9 @@ interface PlanCardProps {
 export function PlanCard(props: PlanCardProps) {
   const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
+  const isDefaultLayout = pricingTableProps.layout === 'default';
+  const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
+  const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
   const { id, slug, isActiveForPayer, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
