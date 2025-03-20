@@ -1,6 +1,6 @@
-import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { EventEmitter } from '@clerk/shared/event-emitter';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -183,6 +183,7 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
+  private eventEmitter = new EventEmitter();
 
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
@@ -255,6 +256,16 @@ export class Clerk implements ClerkInterface {
 
   get status() {
     return this.#status;
+  }
+
+  set status(status: ClerkInterface['status']) {
+    if (this.#status === 'ready') {
+      throw new Error('Clerk status cannot be changed once the instance has been loaded.');
+    }
+    if (status === 'ready') {
+      this.eventEmitter.emit('ready');
+    }
+    this.#status = status;
   }
 
   get isSatellite(): boolean {
