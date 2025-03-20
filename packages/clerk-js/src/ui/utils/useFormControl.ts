@@ -61,25 +61,26 @@ class Store<T> {
     this.state = initialState;
   }
 
-  public getState(): T;
-  public getState<K>(selector: (state: T) => K): K;
-  public getState<K>(selector?: (state: T) => K): T | K {
-    if (selector) {
-      return selector(this.state);
+  public _g(): T;
+  public _g<K>(select: (state: T) => K): K;
+  public _g<K>(select?: (state: T) => K): T | K {
+    if (select) {
+      return select(this.state);
     }
     return this.state;
   }
 
-  public setState(newState: T | ((prevState: T) => T)): void {
-    this.state = typeof newState === 'function' ? (newState as (prevState: T) => T)(this.state) : newState;
+  public _s(newState: Partial<T> | ((prevState: T) => T)): void {
+    this.state =
+      typeof newState === 'function' ? (newState as (prevState: T) => T)(this.state) : { ...this.state, ...newState };
     this.listeners.forEach(listener => listener(this.state));
   }
 
-  public subscribe(listener: (selectedState: T) => void): () => void;
-  public subscribe<K>(listener: (selectedState: K) => void, selector: (state: T) => K): () => void;
-  public subscribe<K>(listener: (selectedState: any) => void, selector?: (state: T) => K): () => void {
+  public _sub(listener: (selectedState: T) => void): () => void;
+  public _sub<K>(listener: (selectedState: K) => void, select: (state: T) => K): () => void;
+  public _sub<K>(listener: (selectedState: any) => void, select?: (state: T) => K): () => void {
     const notify = () => {
-      const selectedState = selector ? selector(this.state) : this.state;
+      const selectedState = select ? select(this.state) : this.state;
       listener(selectedState);
     };
 
@@ -214,92 +215,51 @@ const createFormControl = <Id extends string>(
   });
 
   const onChange: FormControlState['onChange'] = event => {
-    const { onChange, type } = control.getState();
+    const { onChange, type } = control._g();
     const result = onChange?.(event);
 
     if (type === 'checkbox') {
-      return control.setState(prev => ({
-        ...prev,
-        checked: event.target.checked,
-      }));
+      return control._s({ checked: event.target.checked });
     }
 
-    control.setState(prev => ({
-      ...prev,
-      value: applyTransformers(result || event.target.value || '', transformers),
-    }));
+    control._s({ value: applyTransformers(result || event.target.value || '', transformers) });
   };
 
   const setValue: FormControlState['setValue'] = val => {
-    control.setState(prev => ({
-      ...prev,
-      value: val || '',
-    }));
+    control._s({ value: val || '' });
   };
   const setChecked: FormControlState['setChecked'] = checked => {
-    control.setState(prev => ({
-      ...prev,
-      checked,
-    }));
+    control._s({ checked });
   };
   const setError: FormControlState['setError'] = error => {
-    control.setState(prev => ({
-      ...prev,
-      feedback: localizationUtils.translateError(error),
-      feedbackType: 'error',
-    }));
+    control._s({ feedback: localizationUtils.translateError(error), feedbackType: 'error' });
   };
   const setSuccess: FormControlState['setSuccess'] = message => {
-    control.setState(prev => ({
-      ...prev,
-      feedback: message,
-      feedbackType: 'success',
-    }));
+    control._s({ feedback: message, feedbackType: 'success' });
   };
 
   const setWarning: FormControlState['setWarning'] = warning => {
-    control.setState(prev => ({
-      ...prev,
-      feedback: localizationUtils.translateError(warning),
-      feedbackType: 'warning',
-    }));
+    control._s({ feedback: localizationUtils.translateError(warning), feedbackType: 'warning' });
   };
 
   const setInfo: FormControlState['setInfo'] = info => {
-    control.setState(prev => ({
-      ...prev,
-      feedback: info,
-      feedbackType: 'warning',
-    }));
+    control._s({ feedback: info, feedbackType: 'warning' });
   };
 
   const clearFeedback: FormControlState['clearFeedback'] = () => {
-    control.setState(prev => ({
-      ...prev,
-      feedback: localizationUtils.t(options.infoText),
-      feedbackType: 'info',
-    }));
+    control._s({ feedback: localizationUtils.t(options.infoText), feedbackType: 'info' });
   };
 
   const onFocus: FormControlState['onFocus'] = () => {
-    control.setState(prev => ({
-      ...prev,
-      isFocused: true,
-    }));
+    control._s({ isFocused: true });
   };
 
   const onBlur: FormControlState['onBlur'] = () => {
-    control.setState(prev => ({
-      ...prev,
-      isFocused: false,
-    }));
+    control._s({ isFocused: false });
   };
 
   const setHasPassedComplexity: FormControlState['setHasPassedComplexity'] = b => {
-    control.setState(prev => ({
-      ...prev,
-      hasPassedComplexity: b,
-    }));
+    control._s({ hasPassedComplexity: b });
   };
 
   return {
@@ -324,16 +284,15 @@ const init = <Id extends string>(...args: [string | undefined, ...Parameters<typ
   const { control, ...mutators } = _control;
 
   if (storeKey) {
-    allStores.get(storeKey)?.setState(prev => ({
-      ...prev,
+    allStores.get(storeKey)?._s({
       [id]: {
-        ...control.getState(),
+        ...control._g(),
         ...mutators,
       },
-    }));
+    });
 
-    control.subscribe(newControl => {
-      allStores.get(storeKey)?.setState(prev => ({
+    control._sub(newControl => {
+      allStores.get(storeKey)?._s(prev => ({
         ...prev,
         [id]: {
           ...prev[id],
@@ -363,9 +322,8 @@ export const useFormControl = <Id extends string>(
   const { control, ...mutators } = fieldControl.current;
 
   const state = useSyncExternalStore(
-    o => control.subscribe(o),
-    () => control.getState(),
-    () => control.getState(),
+    o => control._sub(o),
+    () => control._g(),
   );
 
   const { defaultChecked, buildErrorMessage, ...sanitzedState } = state;
