@@ -13,9 +13,9 @@ import { useRouter } from '../../../router';
 import type { FieldStateProps } from '../../../utils';
 import { buildRequest, useForm } from '../../../utils';
 import { InstantPassword } from '../InstantPassword';
-import { useAutoFillPasskey } from '../use-passkey-autofill';
 import { useSignInStartErrorHandler } from './recover-start-error';
 import { useIdentifierField } from './use-identifier-field';
+import { useAutoFillPasskey } from './use-passkey-autofill';
 
 const components = {
   tel: Form.PhoneInput,
