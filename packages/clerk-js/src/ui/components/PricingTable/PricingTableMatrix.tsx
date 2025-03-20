@@ -47,6 +47,8 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyAmount > 0), [plans]);
+
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
     plans.forEach(({ features }) => {
@@ -102,30 +104,35 @@ export function PricingTableMatrix({
                   justifyContent: 'flex-end',
                   rowGap: t.space.$3,
                   paddingBlockEnd: t.space.$12,
+                  paddingInlineStart: t.space.$3,
                 })}
               >
-                <Text
-                  colorScheme='secondary'
-                  variant='caption'
-                >
-                  Billing cycle
-                </Text>
-                <SegmentedControl.Root
-                  aria-label='Set pay period'
-                  value={planPeriod}
-                  onChange={value => setPlanPeriod(value as PlanPeriod)}
-                >
-                  <SegmentedControl.Button
-                    value='month'
-                    // TODO(@Commerce): needs localization
-                    text='Monthly'
-                  />
-                  <SegmentedControl.Button
-                    value='annual'
-                    // TODO(@Commerce): needs localization
-                    text='Annually'
-                  />
-                </SegmentedControl.Root>
+                {renderBillingCycleControls ? (
+                  <>
+                    <Text
+                      colorScheme='secondary'
+                      variant='caption'
+                    >
+                      Billing cycle
+                    </Text>
+                    <SegmentedControl.Root
+                      aria-label='Set pay period'
+                      value={planPeriod}
+                      onChange={value => setPlanPeriod(value as PlanPeriod)}
+                    >
+                      <SegmentedControl.Button
+                        value='month'
+                        // TODO(@Commerce): needs localization
+                        text='Monthly'
+                      />
+                      <SegmentedControl.Button
+                        value='annual'
+                        // TODO(@Commerce): needs localization
+                        text='Annually'
+                      />
+                    </SegmentedControl.Root>
+                  </>
+                ) : null}
               </Box>
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
