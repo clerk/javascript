@@ -61,8 +61,8 @@ To initialize Clerk with your TanStack Start application, you will need to make 
 ```tsx
 import { ClerkProvider } from '@clerk/tanstack-react-start'
 import { createRootRoute } from '@tanstack/react-router'
-import { Link, Outlet, ScrollRestoration } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { Link, Outlet } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { Body, Head, Html, Meta, Scripts } from '@tanstack/start'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'

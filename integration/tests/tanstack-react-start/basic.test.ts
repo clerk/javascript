@@ -56,7 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
     });
 
-    test.skip('clerk handler has ran', async ({ page, context }) => {
+    test('clerk handler has ran', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
