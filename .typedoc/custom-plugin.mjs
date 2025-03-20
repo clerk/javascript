@@ -3,6 +3,7 @@ import { MarkdownPageEvent, MarkdownRendererEvent } from 'typedoc-plugin-markdow
 
 /**
  * A list of files where we want to remove any headings
+ * TODO: Move this logic to the custom-theme logic and don't change it after the fact
  */
 const FILES_WITHOUT_HEADINGS = [
   'use-organization-return.mdx',
