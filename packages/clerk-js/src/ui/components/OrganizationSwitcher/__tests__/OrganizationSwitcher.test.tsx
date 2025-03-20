@@ -45,6 +45,19 @@ describe('OrganizationSwitcher', () => {
       expect(queryByText('Personal Workspace')).toBeNull();
       expect(getByText('No organization selected')).toBeInTheDocument();
     });
+
+    describe('with force organization selection setting on environment', () => {
+      it('does not show the personal workspace', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withUser({ email_addresses: ['test@clerk.com'] });
+        });
+        const { queryByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+        await userEvent.click(getByRole('button'));
+        expect(queryByText('Personal Workspace')).toBeNull();
+      });
+    });
   });
 
   describe('OrganizationSwitcherTrigger', () => {
