@@ -80,4 +80,63 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     await u.po.expect.toBeSignedIn();
   });
+
+  test('resiliency to not break devBroswer - dummy client and is not created on `/client` 4xx errors', async ({
+    page,
+    context,
+  }) => {
+    // Simulate "Needs new dev browser, when db jwt exists but does not match the instance".
+
+    const response = {
+      status: 401,
+      body: JSON.stringify({
+        errors: [
+          {
+            message: '',
+            long_message: '',
+            code: 'dev_browser_unauthenticated',
+          },
+        ],
+        clerk_trace_id: 'some-trace-id',
+      }),
+    };
+    await page.route('**/v1/client?**', route => {
+      return route.fulfill(response);
+    });
+
+    await page.route('**/v1/environment?**', route => {
+      return route.fulfill(response);
+    });
+
+    const u = createTestUtils({ app, page, context });
+
+    const waitForClientImmediately = page.waitForResponse(
+      response => response.url().includes('/client?') && response.status() === 401,
+      { timeout: 3_000 },
+    );
+
+    const waitForEnvironmentImmediately = page.waitForResponse(
+      response => response.url().includes('/environment?') && response.status() === 401,
+      { timeout: 3_000 },
+    );
+
+    await u.page.goToAppHome();
+    await page.waitForLoadState('domcontentloaded');
+
+    await waitForEnvironmentImmediately;
+    const waitForDevBrowserImmediately = page.waitForResponse(
+      response => response.url().includes('/dev_browser') && response.status() === 200,
+      {
+        timeout: 4_000,
+      },
+    );
+    await waitForClientImmediately;
+
+    // To remove specific route handlers
+    await page.unrouteAll();
+
+    await waitForDevBrowserImmediately;
+
+    await u.po.clerk.toBeLoaded();
+  });
 });
