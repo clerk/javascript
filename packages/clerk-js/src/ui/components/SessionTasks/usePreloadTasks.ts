@@ -1,5 +1,6 @@
 import { useEnvironment } from '../../../ui/contexts';
-import { preloadOrganizationSelectionTask } from './lazySessionTasks';
+import { useFetch } from '../../../ui/hooks';
+import { preloadOrganizationSelectionTask } from './lazyTasks';
 
 /**
  * Preloads tasks based on the environment settings
@@ -9,6 +10,6 @@ export function usePreloadTasks() {
   const { organizationSettings } = useEnvironment();
 
   if (organizationSettings.forceOrganizationSelection) {
-    void preloadOrganizationSelectionTask();
+    void useFetch(preloadOrganizationSelectionTask, 'preloadComponent', { staleTime: Infinity });
   }
 }
