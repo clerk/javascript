@@ -26,3 +26,4 @@ export * from './createCustomMenuItems';
 export * from './usernameUtils';
 export * from './web3CallbackErrorHandler';
 export * from './originPrefersPopup';
+export * from './normalizeColorString';
