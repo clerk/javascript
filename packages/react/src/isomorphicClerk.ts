@@ -10,7 +10,6 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  AuthenticateWithPopupParams,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
