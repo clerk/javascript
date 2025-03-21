@@ -21,6 +21,7 @@
     { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" },
     { "path": "./dist/pricingTable*.js", "maxSize": "5KB" },
     { "path": "./dist/checkout*.js", "maxSize": "9KB" },
-    { "path": "./dist/up-billing-page*.js", "maxSize": "1KB" }
+    { "path": "./dist/up-billing-page*.js", "maxSize": "1KB" },
+    { "path": "./dist/session-tasks*.js", "maxSize": "1KB" }
   ]
 }

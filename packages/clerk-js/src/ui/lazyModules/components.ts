@@ -19,7 +19,7 @@ const componentImportPaths = {
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
-  SessionTask: () => import(/* webpackChunkName: "sessionTask" */ '../components/SessionTask'),
+  SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -95,9 +95,9 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
 );
 
-export const preloadSessionTask = () => import(/* webpackChunkName: "sessionTask" */ '../components/SessionTask');
-export const SessionTask = lazy(() =>
-  componentImportPaths.SessionTask().then(module => ({ default: module.SessionTask })),
+export const preloadSessionTasks = () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks');
+export const SessionTasks = lazy(() =>
+  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
 );
 
 export const preloadComponent = async (component: unknown) => {
