@@ -144,11 +144,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await u.page.getByRole('button', { name: /^add$/i }).click();
 
       await u.po.userVerification.waitForMounted();
-
       await u.po.userVerification.closeReverificationModal();
-
       await u.po.userVerification.waitForClosed();
-      await u.po.userProfile.enterTestOtpCode();
 
       await expect(u.page.locator('.cl-profileSectionItem__emailAddresses')).not.toContainText(newFakeEmail);
     });
@@ -160,7 +157,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
         fictionalEmail: true,
         withPhoneNumber: true,
       });
-      const bapiFakeUser = await u.services.users.createBapiUser({
+      await u.services.users.createBapiUser({
         ...delFakeUser,
         username: undefined,
         phoneNumber: undefined,

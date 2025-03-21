@@ -15,6 +15,7 @@ import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -40,10 +41,12 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -201,15 +204,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null = null;
+  #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -326,9 +321,6 @@ export class Clerk implements ClerkInterface {
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
-    this.#domain = options?.domain;
-    this.#proxyUrl = options?.proxyUrl;
-
     if (!key) {
       return errorThrower.throwMissingPublishableKeyError();
     }
@@ -339,8 +331,11 @@ export class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.#publishableKey = key;
+    this.#domain = options?.domain;
+    this.#proxyUrl = options?.proxyUrl;
+    this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
+    this.#publishableKey = key;
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
@@ -829,7 +824,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationSwitcher', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -863,7 +863,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationList', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -965,11 +970,6 @@ export class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
-    if (session?.status === 'pending') {
-      await this.#handlePendingSession(session);
-      return;
-    }
-
     let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
@@ -990,6 +990,11 @@ export class Clerk implements ClerkInterface {
         );
         newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
       }
+    }
+
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
     }
 
     if (session?.lastActiveToken) {
@@ -1059,16 +1064,18 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
     }
 
-    // Handles multi-session scenario when switching from `active`
-    // to `pending`
+    let newSession: SignedInSessionResource | null = session;
+
+    // Handles multi-session scenario when switching between `pending` sessions
+    // and satisfying task requirements such as organization selection
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+      newSession = this.#getSessionFromClient(session.id) ?? session;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
@@ -1078,13 +1085,50 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    if (session.currentTask) {
+    if (newSession?.currentTask) {
       await navigateToTask(session.currentTask, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
       });
+
+      // Delay updating session accessors until active status transition to prevent premature component unmounting.
+      // This is particularly important when SignIn components are wrapped in SignedOut components,
+      // as early state updates could cause unwanted unmounting during the transition.
+      this.#setAccessors(session);
+    }
+
+    this.#emit();
+  };
+
+  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+    const session = await this.session?.reload();
+    if (!session || !this.environment) {
+      return;
+    }
+
+    if (session.status === 'pending') {
+      await navigateToTask(session.currentTask, {
+        options: this.#options,
+        environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+      });
+      return;
+    }
+
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+
+    this.#setTransitiveState();
+
+    await tracker.track(async () => {
+      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+    });
+
+    if (tracker.isUnloading()) {
+      return;
     }
 
     this.#setAccessors(session);
@@ -1118,15 +1162,7 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigationContext = (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => {
+  public __internal_setComponentNavigationContext = (context: __internal_ComponentNavigationContext) => {
     this.#componentNavigationContext = context;
 
     return () => (this.#componentNavigationContext = null);
@@ -2058,7 +2094,11 @@ export class Clerk implements ClerkInterface {
             .fetch()
             .then(res => this.updateClient(res))
             .catch(async e => {
-              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+              /**
+               * Only handle non 4xx errors, like 5xx errors and network errors.
+               */
+              if (is4xxError(e)) {
+                // bubble it up
                 throw e;
               }
 
@@ -2085,16 +2125,20 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
-          // limit the changes for this specific error for now
-          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-            await initEnvironmentPromise;
+        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+        if (clientResult.status === 'rejected') {
+          const e = clientResult.reason;
+
+          if (isError(e, 'requires_captcha')) {
+            if (envResult.status === 'rejected') {
+              await initEnvironmentPromise;
+            }
             initComponents();
             await initClient();
           } else {
             throw e;
           }
-        });
+        }
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
@@ -2255,6 +2299,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  /**
+   * Temporarily clears the accessors before emitting changes to React context state.
+   * This is used during transitions like sign-out or session changes to prevent UI flickers
+   * such as unexpected unmount of control components
+   */
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;

@@ -1,7 +1,7 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems } from '../../elements';
 import { Check } from '../../icons';
 
@@ -98,30 +98,35 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
       >
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
-            <LineItems.Title>Total paid</LineItems.Title>
-            <LineItems.Description>
-              {checkout.invoice
-                ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-                : '–'}
-            </LineItems.Description>
+            {/* TODO(@COMMERCE): needs localization */}
+            <LineItems.Title title='Total paid' />
+            <LineItems.Description
+              text={
+                checkout.invoice
+                  ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
+                  : '–'
+              }
+            />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title>Payment method</LineItems.Title>
-            <LineItems.Description>
-              {checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'}
-            </LineItems.Description>
+            <LineItems.Title title='Payment method' />
+            <LineItems.Description
+              text={
+                checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'
+              }
+            />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title>Invoice ID</LineItems.Title>
-            <LineItems.Description>{checkout.invoice ? checkout.invoice.id : '–'}</LineItems.Description>
+            <LineItems.Title title='Invoice ID' />
+            <LineItems.Description text={checkout.invoice ? checkout.invoice.id : '–'} />
           </LineItems.Group>
         </LineItems.Root>
-        <Button onClick={handleClose}>
-          {/* TODO(@COMMERCE): needs localization */}
-          Continue
-        </Button>
+        <Button
+          onClick={handleClose}
+          localizationKey={localizationKeys('formButtonPrimary')}
+        />
       </Drawer.Footer>
     </>
   );

@@ -24,11 +24,14 @@ const proxyUrl =
 const domain =
   document.querySelector('script[data-clerk-domain]')?.getAttribute('data-clerk-domain') || window.__clerk_domain || '';
 
-window.Clerk = new Clerk(publishableKey, {
-  proxyUrl,
-  // @ts-expect-error
-  domain,
-});
+// Ensure that if the script has already been injected we don't overwrite the existing Clerk instance.
+if (!window.Clerk) {
+  window.Clerk = new Clerk(publishableKey, {
+    proxyUrl,
+    // @ts-expect-error
+    domain,
+  });
+}
 
 if (module.hot) {
   module.hot.accept();

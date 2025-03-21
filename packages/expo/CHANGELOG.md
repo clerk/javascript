@@ -1,5 +1,79 @@
 # Change Log
 
+## 2.9.1
+
+### Patch Changes
+
+- The `publishableKey` prop type in the `<ClerkProvider>` component is now marked as optional to match its runtime behavior. Please use the `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` environment variable to set your publishable key. ([#5399](https://github.com/clerk/javascript/pull/5399)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`f59a90b`](https://github.com/clerk/javascript/commit/f59a90b0832ddd1c59c58f64dec3fba1f7958383), [`591648f`](https://github.com/clerk/javascript/commit/591648fcc85012d0aafad1ea8e8f5a7a3ef5eb42), [`598d1ce`](https://github.com/clerk/javascript/commit/598d1ce82e3f79bca4793d37f03efdb16f8d8b94), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d), [`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220), [`841a180`](https://github.com/clerk/javascript/commit/841a180fcac8556ed422801080763c3fd2121979), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d)]:
+  - @clerk/clerk-js@5.57.1
+  - @clerk/clerk-react@5.25.1
+  - @clerk/types@4.49.1
+  - @clerk/shared@3.1.0
+
+## 2.9.0
+
+### Minor Changes
+
+- Adds a secure token cache implementation using `expo-secure-store` which encrypts the session token before storing it. ([#5375](https://github.com/clerk/javascript/pull/5375)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```tsx
+  // app/_layout.tsx
+  import { ClerkProvider } from '@clerk/clerk-expo';
+  import { tokenCache } from '@clerk/clerk-expo/token-cache';
+
+  export default function RootLayout() {
+    return (
+      <ClerkProvider
+        publishableKey='your-publishable-key'
+        tokenCache={tokenCache}
+      >
+        {/* Your app code */}
+      </ClerkProvider>
+    );
+  }
+  ```
+
+- Mark `secureStore` as deprecated in favor of `resourceCache` from `@clerk/clerk-expo/resource-cache`. ([#5375](https://github.com/clerk/javascript/pull/5375)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```tsx
+  // app/_layout.tsx
+  import { ClerkProvider } from '@clerk/clerk-expo'
+  import { tokenCache } from '@clerk/clerk-expo/token-cache'
+  // import { secureStore } from '@clerk/clerk-expo/secure-store'
+  import { resourceCache } from '@clerk/clerk-expo/resource-cache'
+
+  export default function RootLayout() {
+    return (
+      <ClerkProvider
+        publishableKey="your-publishable-key"
+        tokenCache={tokenCache}
+        // __experimental_resourceCache={secureStore}
+        __experimental_resourceCache={resourceCache}
+      >
+        {...}
+      </ClerkProvider>
+    )
+  }
+  ```
+
+### Patch Changes
+
+- Add a console error if the Native API is disabled for the instance. ([#5373](https://github.com/clerk/javascript/pull/5373)) by [@anagstef](https://github.com/anagstef)
+
+- Export `TokenCache` type. ([#5358](https://github.com/clerk/javascript/pull/5358)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`725918d`](https://github.com/clerk/javascript/commit/725918df2e74cea15e9b748aaf103a52df8e8500), [`e3f74b5`](https://github.com/clerk/javascript/commit/e3f74b5fd76a5ceafeb896a59e4173d3b82fa542), [`8121344`](https://github.com/clerk/javascript/commit/81213440105a342de069aad41d19d5cbd81d7da1), [`f05efe2`](https://github.com/clerk/javascript/commit/f05efe26fc8d5440314fd11a5d57b60f816ce3c3), [`50a27e2`](https://github.com/clerk/javascript/commit/50a27e2f2d1673b273b41d1eb3f0bd72a71aac93), [`91d0f0b`](https://github.com/clerk/javascript/commit/91d0f0b0dccab7168ad4dc06c8629808938c235f), [`9572bf5`](https://github.com/clerk/javascript/commit/9572bf5bdfb7dc309ec8714989b98ab12174965b), [`39bbc51`](https://github.com/clerk/javascript/commit/39bbc5189a33dc6cebdc269ac2184dc4ffff2534), [`3dddcda`](https://github.com/clerk/javascript/commit/3dddcda191d8f8d6a9b02464f1f6374d3c6aacb9), [`7524943`](https://github.com/clerk/javascript/commit/7524943300d7e693d61cc1820b520abfadec1c64), [`150b5c8`](https://github.com/clerk/javascript/commit/150b5c89477abb0feab15e0a886179473f653cac), [`23c931e`](https://github.com/clerk/javascript/commit/23c931e9e95e6de992549ad499b477aca9a9c344), [`cb6c4bd`](https://github.com/clerk/javascript/commit/cb6c4bde2e2deb58447e2eae7112e270b421cdf8), [`730262f`](https://github.com/clerk/javascript/commit/730262f0f973923c8749b09078c80c2fc966a8ec), [`968c747`](https://github.com/clerk/javascript/commit/968c74732231ebe0872f46e0f3194b896ac5827a), [`05b9734`](https://github.com/clerk/javascript/commit/05b9734012bc4d16a9282e3aa3aa756c70839cdd), [`0b18bb1`](https://github.com/clerk/javascript/commit/0b18bb1fe6fa3ded97547bb6b4d2c73030aad329), [`021bc5f`](https://github.com/clerk/javascript/commit/021bc5f40044d34e49956ce3c9b61d833d815b42), [`ecc2b93`](https://github.com/clerk/javascript/commit/ecc2b938acef8406cb4dc3f73c38022767a145cb), [`1a61390`](https://github.com/clerk/javascript/commit/1a61390d3482bd4af58508b972ad89dea56fa224), [`149ba72`](https://github.com/clerk/javascript/commit/149ba7228fd90027ef1adab0baac036bd16a8ea3)]:
+  - @clerk/clerk-js@5.57.0
+  - @clerk/types@4.49.0
+  - @clerk/clerk-react@5.25.0
+  - @clerk/shared@3.0.2
+
 ## 2.8.5
 
 ### Patch Changes

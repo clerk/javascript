@@ -114,6 +114,10 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   setIsOpen?: (open: boolean) => void;
 };
 
+export type SessionTaskCtx = {
+  nextTask: () => void;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx

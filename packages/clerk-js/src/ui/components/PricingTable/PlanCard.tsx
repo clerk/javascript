@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -41,9 +40,10 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
+  const isDefaultLayout = pricingTableProps.layout === 'default';
+  const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
+  const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
   const { id, slug, subscriptionIdForCurrentSubscriber, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
@@ -119,11 +119,7 @@ export function PlanCard(props: PlanCardProps) {
                 : localizationKeys('__experimental_commerce.getStarted')
             }
             onClick={() => {
-              if (clerk.isSignedIn) {
-                onSelect(plan);
-              } else {
-                void clerk.redirectToSignIn();
-              }
+              onSelect(plan);
             }}
           />
         </Box>
@@ -314,7 +310,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           />
         )}
       </Flex>
-      {plan.hasBaseFee && annualMonthlyAmount > 0 ? (
+      {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.planCardPeriodToggle}
           sx={t => ({
@@ -327,8 +323,16 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
             value={planPeriod}
             onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
           >
-            <SegmentedControl.Button value='month'>Monthly</SegmentedControl.Button>
-            <SegmentedControl.Button value='annual'>Annually</SegmentedControl.Button>
+            <SegmentedControl.Button
+              value='month'
+              // TODO(@Commerce): needs localization
+              text='Monthly'
+            />
+            <SegmentedControl.Button
+              value='annual'
+              // TODO(@Commerce): needs localization
+              text='Annually'
+            />
           </SegmentedControl.Root>
         </Box>
       ) : null}
@@ -385,7 +389,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
           rowGap: variant === 'avatar' ? t.space.$4 : isCompact ? t.space.$2 : t.space.$3,
         })}
       >
-        {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
+        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
           <Box
             elementDescriptor={descriptors.planCardFeaturesListItem}
             elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}

@@ -1,14 +1,26 @@
-import { useClerk } from '@clerk/shared/react/index';
+import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionTask } from '@clerk/types';
+import { useCallback, useEffect } from 'react';
 
 import { OrganizationListContext } from '../../contexts';
+import { SessionTaskContext as SessionTaskContext } from '../../contexts/components/SessionTask';
+import { useRouter } from '../../router';
 import { OrganizationList } from '../OrganizationList';
+
+interface SessionTaskProps {
+  task: SessionTask['key'];
+  redirectUrlComplete: string;
+}
 
 const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
   org: () => (
-    // TODO - Hide personal workspace within organization list context based on environment
-    <OrganizationListContext.Provider value={{ componentName: 'OrganizationList', hidePersonal: true }}>
+    <OrganizationListContext.Provider
+      value={{
+        componentName: 'OrganizationList',
+        skipInvitationScreen: true,
+      }}
+    >
       <OrganizationList />
     </OrganizationListContext.Provider>
   ),
@@ -17,12 +29,30 @@ const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
 /**
  * @internal
  */
-export function SessionTask({ task }: { task: SessionTask['key'] }): React.ReactNode {
-  const clerk = useClerk();
+export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): React.ReactNode {
+  const { session, telemetry, __experimental_nextTask } = useClerk();
+  const { navigate } = useRouter();
 
-  clerk.telemetry?.record(eventComponentMounted('SessionTask', { task }));
+  useEffect(() => {
+    if (session?.currentTask) {
+      return;
+    }
+
+    void navigate(redirectUrlComplete);
+  }, [session?.currentTask, navigate, redirectUrlComplete]);
+
+  telemetry?.record(eventComponentMounted('SessionTask', { task }));
+
+  const nextTask = useCallback(
+    () => __experimental_nextTask({ redirectUrlComplete }),
+    [__experimental_nextTask, redirectUrlComplete],
+  );
 
   const Content = ContentRegistry[task];
 
-  return <Content />;
+  return (
+    <SessionTaskContext.Provider value={{ nextTask }}>
+      <Content />
+    </SessionTaskContext.Provider>
+  );
 }

@@ -1,6 +1,7 @@
 import { Composite, CompositeItem } from '@floating-ui/react';
 import React, { createContext, useContext, useState } from 'react';
 
+import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, SimpleButton } from '../customizables';
 
 /* -------------------------------------------------------------------------------------------------
@@ -28,14 +29,25 @@ function useSegmentedControlContext() {
 
 interface RootProps {
   children: React.ReactNode;
-  'aria-label': string;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
 }
 
 const Root = React.forwardRef<HTMLDivElement, RootProps>(
-  ({ children, value: controlledValue, defaultValue, onChange, 'aria-label': ariaLabel }, ref) => {
+  (
+    {
+      children,
+      value: controlledValue,
+      defaultValue,
+      onChange,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+    },
+    ref,
+  ) => {
     const [internalValue, setInternalValue] = useState(defaultValue);
     const isControlled = controlledValue !== undefined;
     const currentValue = isControlled ? controlledValue : internalValue;
@@ -58,6 +70,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
               ref={ref}
               elementDescriptor={descriptors.segmentedControlRoot}
               aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledby}
               sx={t => ({
                 backgroundColor: t.colors.$neutralAlpha50,
                 borderRadius: t.radii.$md,
@@ -83,11 +96,11 @@ Root.displayName = 'SegmentedControl.Root';
  * -----------------------------------------------------------------------------------------------*/
 
 interface ButtonProps {
-  children: React.ReactNode;
+  text: string | LocalizationKey;
   value: string;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, value }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
   const { currentValue, onValueChange } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
@@ -98,6 +111,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
           <SimpleButton
             ref={ref}
             {...compProps}
+            localizationKey={text}
             elementDescriptor={descriptors.segmentedControlButton}
             variant='unstyled'
             role='radio'
@@ -118,9 +132,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ children, val
                 zIndex: 2,
               },
             })}
-          >
-            {children}
-          </SimpleButton>
+          />
         );
       }}
     />

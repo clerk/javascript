@@ -363,6 +363,28 @@ export type ElementsConfig = {
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
   pricingTable: WithOptions;
+
+  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrixTable: WithOptions;
+  pricingTableMatrixRowGroup: WithOptions;
+  pricingTableMatrixRowGroupHeader: WithOptions;
+  pricingTableMatrixRowGroupBody: WithOptions;
+  pricingTableMatrixRow: WithOptions;
+  pricingTableMatrixRowHeader: WithOptions;
+  pricingTableMatrixRowBody: WithOptions;
+  pricingTableMatrixColumnHeader: WithOptions;
+  pricingTableMatrixCell: WithOptions;
+  pricingTableMatrixCellFooter: WithOptions;
+  pricingTableMatrixAvatar: WithOptions;
+  pricingTableMatrixBadge: WithOptions;
+  pricingTableMatrixPlanName: WithOptions;
+  pricingTableMatrixFee: WithOptions;
+  pricingTableMatrixFeePeriod: WithOptions;
+  pricingTableMatrixFeePeriodNotice: WithOptions;
+  pricingTableMatrixFeePeriodNoticeInner: WithOptions;
+  pricingTableMatrixFeePeriodNoticeLabel: WithOptions;
+  pricingTableMatrixFooter: WithOptions;
+
   planCard: WithOptions<string>;
   planCardDefault: WithOptions;
   planCardCompact: WithOptions;

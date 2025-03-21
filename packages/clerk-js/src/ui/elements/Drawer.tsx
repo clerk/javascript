@@ -14,6 +14,7 @@ import {
 import * as React from 'react';
 
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
+import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -263,7 +264,7 @@ Overlay.displayName = 'Drawer.Content';
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  title?: string;
+  title?: string | LocalizationKey;
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
@@ -295,15 +296,14 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
       {title ? (
         <>
           <Heading
+            localizationKey={title}
             as='h2'
             elementDescriptor={descriptors.drawerTitle}
             textVariant='h2'
             sx={{
               alignSelf: 'center',
             }}
-          >
-            {title}
-          </Heading>
+          />
           <Close />
         </>
       ) : (
@@ -416,6 +416,9 @@ interface ConfirmationProps {
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   actionsSlot: React.ReactNode;
+  /**
+   * @see https://floating-ui.com/docs/userole
+   */
   roleProps?: UseRoleProps;
 }
 

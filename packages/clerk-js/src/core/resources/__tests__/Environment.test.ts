@@ -3,6 +3,12 @@ import type { EnvironmentJSONSnapshot } from '@clerk/types';
 import { Environment } from '../internal';
 
 describe('Environment', () => {
+  it('defaults values when instantiated without arguments', () => {
+    const environment = new Environment();
+
+    expect(environment).toMatchSnapshot();
+  });
+
   it('has the same initial properties', () => {
     const environmentJSON = {
       object: 'environment',
@@ -231,6 +237,7 @@ describe('Environment', () => {
       organization_settings: {
         enabled: false,
         max_allowed_memberships: 5,
+        force_organization_selection: false,
         actions: { admin_delete: true },
         domains: { enabled: false, enrollment_modes: [], default_role: null },
       },
