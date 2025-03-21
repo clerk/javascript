@@ -71,15 +71,16 @@ export function PricingTableMatrix({
     <InternalThemeProvider>
       <Box
         elementDescriptor={descriptors.pricingTableMatrixRoot}
-        sx={{
+        sx={t => ({
           position: 'relative',
           minWidth: '100%',
           display: 'grid',
           isolation: 'isolate',
+          backgroundColor: t.colors.$colorBackground,
           [mqu.md]: {
             overflowX: 'auto',
           },
-        }}
+        })}
       >
         <Box
           elementDescriptor={descriptors.pricingTableMatrixTable}
@@ -91,9 +92,11 @@ export function PricingTableMatrix({
             sx={t => ({
               position: 'sticky',
               top: 0,
+              backgroundColor: t.colors.$colorBackground,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
               borderBottomColor: t.colors.$neutralAlpha100,
+              zIndex: 1,
             })}
           >
             <Box

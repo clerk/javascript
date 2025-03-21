@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -242,8 +243,14 @@ function SignUpStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    return signUp
-      .upsert(buildRequest(fieldsToSubmit))
+    let signUpAttempt: Promise<SignUpResource>;
+    if (!fields.ticket) {
+      signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
+    } else {
+      signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
+    }
+
+    return signUpAttempt
       .then(res =>
         completeSignUpFlow({
           signUp: res,
