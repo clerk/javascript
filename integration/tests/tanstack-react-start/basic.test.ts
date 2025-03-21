@@ -66,7 +66,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.po.expect.toBeSignedIn();
 
       await u.page.waitForAppUrl('/');
-      await u.page.waitForClerkJsLoaded();
 
       const clerkInitialState = await u.page.waitForFunction(() => window.__clerk_init_state);
 
