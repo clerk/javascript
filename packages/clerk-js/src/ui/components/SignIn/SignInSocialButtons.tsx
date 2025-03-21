@@ -32,7 +32,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
           const popup = window.open('about:blank', '', 'width=600,height=800');
           // Unfortunately, there's no good way to detect when the popup is closed, so we simply poll and check if it's closed.
           const interval = setInterval(() => {
-            if (popup?.closed) {
+            if (!popup || popup.closed) {
               clearInterval(interval);
               card.setIdle();
             }
