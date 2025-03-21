@@ -1,6 +1,12 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkRuntimeError,
+  EmailLinkErrorCodeStatus,
+  hasInvalidOrganizationError,
+  is4xxError,
+  isClerkAPIResponseError,
+} from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -16,7 +22,6 @@ import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
-  __internal_SessionTaskModalProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -545,7 +550,7 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('blankCaptcha'));
   };
 
-  public __internal_openSessionTask = (props: __internal_SessionTaskModalProps): void => {
+  public __internal_openSessionTask = (): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -558,7 +563,7 @@ export class Clerk implements ClerkInterface {
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SessionTaskModal' })
-      .then(controls => controls.openModal('sessionTask', props));
+      .then(controls => controls.openModal('sessionTask', {}));
   };
 
   public __internal_closeSessionTask = (): void => {
@@ -1087,6 +1092,8 @@ export class Clerk implements ClerkInterface {
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
+    debugger;
+
     if (!this.environment) {
       return;
     }
@@ -1108,7 +1115,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (newSession?.currentTask) {
-      await navigateToTask({
+      await navigateToTask('root', {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
@@ -1124,14 +1131,14 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_nextTask = async ({ redirectUrlComplete, onComplete }: NextTaskParams = {}): Promise<void> => {
+  public __experimental_nextTask = async (params: NextTaskParams): Promise<void> => {
     const session = await this.session?.reload();
     if (!session || !this.environment) {
       return;
     }
 
     if (session.status === 'pending') {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
         globalNavigate: this.navigate,
@@ -1140,21 +1147,21 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (!onComplete) {
-      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+    if ('onComplete' in params) {
+      params.onComplete();
+    } else {
       const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       this.#setTransitiveState();
 
       await tracker.track(async () => {
-        await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+        await this.navigate(params.redirectUrlComplete ?? defaultRedirectUrlComplete);
       });
 
       if (tracker.isUnloading()) {
         return;
       }
-    } else {
-      await onComplete();
     }
 
     this.#setAccessors(session);
@@ -1924,11 +1931,14 @@ export class Clerk implements ClerkInterface {
     }
     this.client = newClient;
 
+    let hasTransitionedToPending = false;
+
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
-      const hasTransitioned = this.session.status === 'active' && session?.status === 'pending';
-      if (!hasTransitioned) {
+      hasTransitionedToPending = this.session.status === 'active' && session?.status === 'pending';
+
+      if (!hasTransitionedToPending) {
         // Note: this might set this.session to null
         this.#setAccessors(session);
       }
@@ -1937,7 +1947,9 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
-    this.#emit();
+    if (!hasTransitionedToPending) {
+      this.#emit();
+    }
   };
 
   get __unstable__environment(): EnvironmentResource | null | undefined {
@@ -2295,10 +2307,16 @@ export class Clerk implements ClerkInterface {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
     });
 
-    eventBus.on(events.SessionPendingTransition, () => {
-      // TODO -> Refresh session, get the latest task, and open the modal state
-      // TODO -> Open modal based on the current client session task
-      this.__internal_openSessionTask({ task: 'org' });
+    eventBus.on(events.EnforceOrganizationSelection, () => {
+      if (!this.environment?.organizationSettings.forceOrganizationSelection) {
+        void this.handleUnauthenticated();
+        return;
+      }
+
+      this.session!.lastActiveOrganizationId = null;
+      this.#setAccessors(this.session);
+
+      this.__internal_openSessionTask();
     });
   };
 
@@ -2310,6 +2328,11 @@ export class Clerk implements ClerkInterface {
 
     await session.touch().catch(e => {
       if (is4xxError(e)) {
+        if (hasInvalidOrganizationError(e)) {
+          eventBus.dispatch(events.EnforceOrganizationSelection, null);
+          return;
+        }
+
         void this.handleUnauthenticated();
       }
     });

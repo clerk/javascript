@@ -15,6 +15,10 @@ export function is4xxError(e: any): boolean {
   return !!status && status >= 400 && status < 500;
 }
 
+export function hasInvalidOrganizationError(e: ClerkAPIResponseError): boolean {
+  return ['organization_not_found_or_unauthorized', 'not_a_member_in_organization'].includes(e.errors[0].code);
+}
+
 export function isNetworkError(e: any): boolean {
   // TODO: revise during error handling epic
   const message = (`${e.message}${e.name}` || '').toLowerCase().replace(/\s+/g, '');

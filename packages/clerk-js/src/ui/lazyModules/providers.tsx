@@ -68,7 +68,6 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
     >
       <Portal
         node={props.node}
-        // @ts-ignore TODO -> Fix type error
         component={ClerkComponents[props.componentName as ClerkComponentName]}
         props={props.componentProps}
         componentName={props.componentName}

@@ -4,8 +4,6 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
-  __internal_SessionTaskModalProps,
-  __internal_SessionTaskProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -109,7 +107,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
-  private preopenSessionTask?: null | __internal_SessionTaskProps = null;
+  private preopenSessionTask?: null = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -936,11 +934,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openSessionTask = (props: __internal_SessionTaskModalProps) => {
+  __internal_openSessionTask = () => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__internal_openSessionTask(props);
+      this.clerkjs.__internal_openSessionTask();
     } else {
-      this.preopenSessionTask = props;
+      this.preopenSessionTask = null;
     }
   };
 

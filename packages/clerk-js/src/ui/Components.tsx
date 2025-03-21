@@ -1,7 +1,6 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __internal_SessionTaskProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -86,7 +85,7 @@ export type ComponentControls = {
           : T extends 'waitlist'
             ? WaitlistProps
             : T extends 'sessionTask'
-              ? __internal_SessionTaskProps
+              ? Record<string, unknown>
               : UserProfileProps,
   ) => void;
   closeModal: (
@@ -131,7 +130,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
-  sessionTaskModal: null | __internal_SessionTaskProps;
+  sessionTaskModal: null;
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
@@ -498,15 +497,14 @@ const Components = (props: ComponentsProps) => {
       onClose={() => componentsControls.closeModal('sessionTask')}
       onExternalNavigate={() => componentsControls.closeModal('sessionTask')}
       startPath={buildVirtualRouterUrl({
-        base: '/session-task',
-        path: sessionTaskModal ? '/tasks' : urlStateParam?.path,
+        base: '/tasks',
+        path: urlStateParam?.path,
       })}
       componentName={'SessionTaskModal'}
       canCloseModal={false}
       modalContainerSx={{ alignItems: 'center' }}
     >
-      {/* @ts-ignore todo -> fix type error */}
-      <SessionTaskModal {...sessionTaskModal} />
+      <SessionTaskModal />
     </LazyModalRenderer>
   );
 
