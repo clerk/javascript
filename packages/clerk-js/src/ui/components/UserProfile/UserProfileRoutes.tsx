@@ -1,9 +1,10 @@
+import { lazy, Suspense } from 'react';
+
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { BillingPage } from './BillingPage';
 import { SecurityPage } from './SecurityPage';
 
 export const UserProfileRoutes = () => {
@@ -13,6 +14,12 @@ export const UserProfileRoutes = () => {
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
+
+  const BillingPage = lazy(() =>
+    import('./BillingPage').then(module => ({
+      default: module.BillingPage,
+    })),
+  );
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && !isSecurityPageRoot && index === 0;
@@ -52,7 +59,9 @@ export const UserProfileRoutes = () => {
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>
-                <BillingPage />
+                <Suspense fallback={''}>
+                  <BillingPage />
+                </Suspense>
               </Route>
             </Switch>
           </Route>
