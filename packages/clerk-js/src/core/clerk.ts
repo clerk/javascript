@@ -2016,6 +2016,7 @@ export class Clerk implements ClerkInterface {
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
