@@ -169,7 +169,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * type MyData = {
  *   balance: number
  * }
- * 
+ *
  * export function MyButton() {
  *   const fetchMyData = () => fetch('/api/balance').then(res=> res.json() as Promise<MyData>)
  *   const enhancedFetcher = useReverification(fetchMyData);
@@ -177,7 +177,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   const handleClick = async () => {
  *     try {
  *       const myData = await enhancedFetcher()
- *       //     ^ is types as `MyData`    
+ *       //     ^ is types as `MyData`
  *     } catch (e) {
  *       // Handle error returned from the fetcher here
  *
