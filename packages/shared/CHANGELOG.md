@@ -1,5 +1,82 @@
 # Change Log
 
+## 3.1.0
+
+### Minor Changes
+
+- This introducing changes to `useReverification`, the changes include removing the array and returning the fetcher directly and also the dropping the options `throwOnCancel` and `onCancel` in favour of always throwing the cancellation error. ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+  ```tsx {{ filename: 'src/components/MyButton.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData);
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+  These changes are also adding a new handler in options called `onNeedsReverification`, which can be used to create a custom UI
+  to handle re-verification flow. When the handler is passed the default UI our AIO components provide will not be triggered so you will have to create and handle the re-verification process.
+
+  ```tsx {{ filename: 'src/components/MyButtonCustom.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData, {
+      onNeedsReverification: ({ complete, cancel, level }) => {
+        // e.g open a modal here and handle the re-verification flow
+      },
+    });
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220)]:
+  - @clerk/types@4.49.1
+
 ## 3.0.2
 
 ### Patch Changes
