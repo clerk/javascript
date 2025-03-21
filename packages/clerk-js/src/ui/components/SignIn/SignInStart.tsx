@@ -336,6 +336,7 @@ function SignInStartInternal(): JSX.Element {
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
+      continueSignIn: true,
     });
   };
 
