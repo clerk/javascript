@@ -129,7 +129,7 @@ export const useSignInContext = (): SignInContextType => {
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
-    oauthFlow: ctx.oauthFlow ?? 'auto',
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signUpUrl,
     signInUrl,
