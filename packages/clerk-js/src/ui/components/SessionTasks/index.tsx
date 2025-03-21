@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { SessionTaskContext as SessionTaskContext } from '../../contexts/components/SessionTask';
 import { Route, Switch, useRouter } from '../../router';
-import { LazyOrganizationSelectionTask } from './lazySessionTasks';
+import { LazyOrganizationSelectionTask } from './lazyTasks';
 import { usePreloadTasks } from './usePreloadTasks';
 
 function SessionTaskRoutes(): JSX.Element {
@@ -24,18 +24,20 @@ function SessionTaskRoutes(): JSX.Element {
  */
 export function SessionTask({ redirectUrlComplete }: { redirectUrlComplete: string }): JSX.Element {
   usePreloadTasks();
+
   const { __experimental_nextTask, session, telemetry } = useClerk();
   const { navigate } = useRouter();
 
-  telemetry?.record(eventComponentMounted('SessionTask', { task: session?.currentTask?.key as string }));
+  const task = session?.currentTask;
 
   useEffect(() => {
-    if (session?.currentTask) {
+    if (task) {
+      telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
       return;
     }
 
     void navigate(redirectUrlComplete);
-  }, [session?.currentTask, navigate, redirectUrlComplete]);
+  }, [task, telemetry, navigate, redirectUrlComplete]);
 
   const nextTask = useCallback(
     () => __experimental_nextTask({ redirectUrlComplete }),
