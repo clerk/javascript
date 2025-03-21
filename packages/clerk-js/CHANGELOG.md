@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.57.3
+
+### Patch Changes
+
+- Pass appearance variables to stripe elements. ([#5346](https://github.com/clerk/javascript/pull/5346)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.57.2
 
 ### Patch Changes
