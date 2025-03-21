@@ -76,7 +76,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../ui/utils/localStorage';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
