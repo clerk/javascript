@@ -15,6 +15,7 @@ export const SignUpButton = withClerk(
       mode,
       unsafeMetadata,
       initialValues,
+      oauthFlow,
       ...rest
     } = props;
 
@@ -29,6 +30,7 @@ export const SignUpButton = withClerk(
         signInForceRedirectUrl,
         unsafeMetadata,
         initialValues,
+        oauthFlow,
       };
 
       if (mode === 'modal') {

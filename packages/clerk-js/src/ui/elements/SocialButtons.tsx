@@ -35,6 +35,7 @@ export type SocialButtonsProps = React.PropsWithChildren<{
 type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
+  idleAfterDelay?: boolean;
 };
 
 const isWeb3Strategy = (val: string): val is Web3Strategy => {
@@ -42,7 +43,13 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 };
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
-  const { oauthCallback, web3Callback, enableOAuthProviders = true, enableWeb3Providers = true } = props;
+  const {
+    oauthCallback,
+    web3Callback,
+    enableOAuthProviders = true,
+    enableWeb3Providers = true,
+    idleAfterDelay = true,
+  } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
@@ -78,8 +85,10 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       await sleep(1000);
       card.setIdle();
     }
-    await sleep(5000);
-    card.setIdle();
+    if (idleAfterDelay) {
+      await sleep(5000);
+      card.setIdle();
+    }
   };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;

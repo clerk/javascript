@@ -47,7 +47,7 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
 import type {
@@ -103,6 +103,8 @@ export interface SignInResource extends ClerkResource {
   attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+
+  authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
