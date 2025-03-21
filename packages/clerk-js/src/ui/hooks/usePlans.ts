@@ -11,7 +11,7 @@ export const usePlans = (props: UsePlansProps) => {
   const { subscriberType } = props;
   const { __experimental_commerce } = useClerk();
 
-  const { data: userSubscriptions, invalidate: invalidateUserSubscriptions } = useFetch(
+  const { data: userSubscriptions, revalidate: revalidateUserSubscriptions } = useFetch(
     __experimental_commerce?.__experimental_billing.getSubscriptions,
     {},
   );
@@ -21,9 +21,10 @@ export const usePlans = (props: UsePlansProps) => {
 
   const activeSubscriptions = [...(subscriberType === 'user' ? activeUserSubscriptions : activeOrgSubscriptions)];
 
-  const { data: allPlans, invalidate: invalidatePlans } = useFetch(
+  const { data: allPlans, revalidate: revalidatePlans } = useFetch(
     __experimental_commerce?.__experimental_billing.getPlans,
     { subscriberType },
+    { staleTime: 0 },
   );
 
   const plans =
@@ -34,10 +35,11 @@ export const usePlans = (props: UsePlansProps) => {
     }) || [];
 
   const revalidate = async () => {
+    console.log('revalidating plans and subscriptions');
     // Revalidate the plans and subscriptions
     await orgSubscriptions?.revalidate?.();
-    invalidateUserSubscriptions();
-    invalidatePlans();
+    revalidateUserSubscriptions();
+    revalidatePlans();
   };
 
   return {
