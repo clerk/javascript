@@ -32,8 +32,10 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
-    "expo-modules-core": "1.12.26"
+    "@clerk/types": "workspace:^"
+  },
+  "devDependencies": {
+    "expo": "~52.0.0"
   },
   "peerDependencies": {
     "expo": "*",
