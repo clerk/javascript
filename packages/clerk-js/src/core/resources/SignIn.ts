@@ -265,7 +265,7 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     return this.authenticateWithRedirectOrPopup(params, url => {
-      popup.location.href = url instanceof URL ? url.toString() : url;
+      popup.location.href = url.toString();
     });
   };
 
