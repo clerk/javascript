@@ -23,6 +23,7 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -609,6 +610,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
     if (clerkjs && '__unstable__updateProps' in clerkjs) {
       return (clerkjs as any).__unstable__updateProps(props);
+    }
+  };
+
+  __experimental_nextTask = async (params: NextTaskParams): Promise<void> => {
+    if (this.clerkjs) {
+      return this.clerkjs.__experimental_nextTask(params);
+    } else {
+      return Promise.reject();
     }
   };
 
