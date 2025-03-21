@@ -25,6 +25,7 @@ import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFo
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
+import type { SignUpResource } from '@clerk/types';
 
 function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
@@ -242,8 +243,14 @@ function SignUpStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    return signUp
-      .upsert(buildRequest(fieldsToSubmit))
+    let signUpAttempt: Promise<SignUpResource>;
+    if (!fields.ticket && phoneNumberProvided) {
+      signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
+    } else {
+      signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
+    }
+
+    return signUpAttempt
       .then(res =>
         completeSignUpFlow({
           signUp: res,
