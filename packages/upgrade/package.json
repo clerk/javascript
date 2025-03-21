@@ -19,7 +19,7 @@
     "build": "pnpm clean && NODE_ENV=production babel --keep-file-extension --out-dir=dist src --copy-files",
     "clean": "rm -rf dist/*",
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
-    "lint": "eslint src/",
+    "lint": "eslint --quiet src/",
     "lint:publint": "publint",
     "test": "vitest run",
     "test:watch": "vitest watch"

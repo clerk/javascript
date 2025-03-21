@@ -1706,6 +1706,7 @@ export class Clerk implements ClerkInterface {
   ): Promise<SignInResource | SignUpResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Google One Tap');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this.client!.signIn; // TODO: Remove not null assertion
     }
 
@@ -2328,7 +2329,7 @@ export class Clerk implements ClerkInterface {
 
     let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     if (this.#isCombinedSignInOrUpFlow()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       signInOrUpUrl = this.#options.signInUrl!;
     }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
