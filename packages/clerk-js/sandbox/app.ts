@@ -249,7 +249,8 @@ function appearanceVariableOptions() {
       Clerk.__experimental_mountPricingTable(
         app,
         componentControls.pricingTable.getProps() ?? {
-          layout: 'default',
+          layout: 'matrix',
+          highlightPlan: 'pro-plan',
         },
       );
     },

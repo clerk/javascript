@@ -45,7 +45,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   };
 
   const onSubscriptionChange = async () => {
-    console.log('onSubscriptionChange');
     await revalidate();
   };
 

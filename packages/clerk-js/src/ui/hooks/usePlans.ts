@@ -35,7 +35,6 @@ export const usePlans = (props: UsePlansProps) => {
     }) || [];
 
   const revalidate = async () => {
-    console.log('revalidating plans and subscriptions');
     // Revalidate the plans and subscriptions
     await orgSubscriptions?.revalidate?.();
     revalidateUserSubscriptions();

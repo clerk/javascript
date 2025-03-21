@@ -37,7 +37,6 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
-    console.log('onCheckoutComplete');
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
   };
