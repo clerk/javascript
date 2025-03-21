@@ -1,0 +1,20 @@
+# PreviewTemplateRequest
+
+## Example Usage
+
+```typescript
+import { PreviewTemplateRequest } from '@clerk/backend-sdk/models/operations';
+
+let value: PreviewTemplateRequest = {
+  templateType: '<value>',
+  slug: '<value>',
+};
+```
+
+## Fields
+
+| Field          | Type                                                                                           | Required           | Description                         |
+| -------------- | ---------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------- |
+| `templateType` | _string_                                                                                       | :heavy_check_mark: | The type of template to preview     |
+| `slug`         | _string_                                                                                       | :heavy_check_mark: | The slug of the template to preview |
+| `requestBody`  | [operations.PreviewTemplateRequestBody](../../models/operations/previewtemplaterequestbody.md) | :heavy_minus_sign: | Required parameters                 |

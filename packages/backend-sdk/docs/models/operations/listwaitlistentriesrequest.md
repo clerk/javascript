@@ -1,0 +1,19 @@
+# ListWaitlistEntriesRequest
+
+## Example Usage
+
+```typescript
+import { ListWaitlistEntriesRequest } from '@clerk/backend-sdk/models/operations';
+
+let value: ListWaitlistEntriesRequest = {};
+```
+
+## Fields
+
+| Field     | Type                                                                                                             | Required           | Description                                                                                                                                                                                            |
+| --------- | ---------------------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `limit`   | _number_                                                                                                         | :heavy_minus_sign: | Applies a limit to the number of results returned.<br/>Can be used for paginating the results together with `offset`.                                                                                  |
+| `offset`  | _number_                                                                                                         | :heavy_minus_sign: | Skip the first `offset` results when paginating.<br/>Needs to be an integer greater or equal to zero.<br/>To be used in conjunction with `limit`.                                                      |
+| `query`   | _string_                                                                                                         | :heavy_minus_sign: | Filter waitlist entries by `email_address` or `id`                                                                                                                                                     |
+| `status`  | [operations.ListWaitlistEntriesQueryParamStatus](../../models/operations/listwaitlistentriesqueryparamstatus.md) | :heavy_minus_sign: | Filter waitlist entries by their status                                                                                                                                                                |
+| `orderBy` | _string_                                                                                                         | :heavy_minus_sign: | Specify the order of results. Supported values are:<br/>- `created_at`<br/>- `email_address`<br/>- `invited_at`<br/><br/>Use `+` for ascending or `-` for descending order. Defaults to `-created_at`. |

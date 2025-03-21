@@ -1,0 +1,59 @@
+configVersion: 2.0.0
+generation:
+  devContainers:
+    enabled: true
+    schemaPath: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-12-03.yml
+  sdkClassName: Clerk
+  maintainOpenAPIOrder: true
+  usageSnippets:
+    optionalPropertyRendering: withExample
+  useClassNamesForArrayFields: true
+  fixes:
+    nameResolutionDec2023: true
+    nameResolutionFeb2025: false
+    parameterOrderingFeb2024: true
+    requestResponseComponentNamesFeb2024: true
+    securityFeb2025: true
+  auth:
+    oAuth2ClientCredentialsEnabled: true
+    oAuth2PasswordEnabled: true
+typescript:
+  version: 0.1.2
+  additionalDependencies:
+    dependencies: {}
+    devDependencies: {}
+    peerDependencies: {}
+  additionalPackageJSON: {}
+  author: Speakeasy
+  clientServerStatusCodesAsErrors: true
+  compileCommand:
+    - pnpm
+    - install
+    - --filter
+    - '@clerk/backend-sdk'
+  defaultErrorName: APIError
+  enableCustomCodeRegions: true
+  enableMCPServer: true
+  enableReactQuery: false
+  enumFormat: union
+  envVarPrefix: CLERK
+  flattenGlobalSecurity: true
+  flatteningOrder: parameters-first
+  imports:
+    option: openapi
+    paths:
+      callbacks: models/callbacks
+      errors: models/errors
+      operations: models/operations
+      shared: models/components
+      webhooks: models/webhooks
+  inputModelSuffix: input
+  jsonpath: rfc9535
+  maxMethodParams: 0
+  methodArguments: require-security-and-request
+  moduleFormat: dual
+  outputModelSuffix: output
+  packageName: '@clerk/backend-sdk'
+  responseFormat: flat
+  templateVersion: v2
+  useIndexModules: true

@@ -1,0 +1,17 @@
+# GetEmailAddressRequest
+
+## Example Usage
+
+```typescript
+import { GetEmailAddressRequest } from '@clerk/backend-sdk/models/operations';
+
+let value: GetEmailAddressRequest = {
+  emailAddressId: '<id>',
+};
+```
+
+## Fields
+
+| Field            | Type     | Required           | Description                             |
+| ---------------- | -------- | ------------------ | --------------------------------------- |
+| `emailAddressId` | _string_ | :heavy_check_mark: | The ID of the email address to retrieve |

@@ -1,0 +1,24 @@
+# Otp
+
+## Example Usage
+
+```typescript
+import { Otp } from '@clerk/backend-sdk/models/components';
+
+let value: Otp = {
+  status: 'failed',
+  strategy: 'phone_code',
+  attempts: 919483,
+  expireAt: 714242,
+};
+```
+
+## Fields
+
+| Field              | Type                                                                           | Required           | Description |
+| ------------------ | ------------------------------------------------------------------------------ | ------------------ | ----------- |
+| `status`           | [components.VerificationStatus](../../models/components/verificationstatus.md) | :heavy_check_mark: | N/A         |
+| `strategy`         | [components.Strategy](../../models/components/strategy.md)                     | :heavy_check_mark: | N/A         |
+| `attempts`         | _number_                                                                       | :heavy_check_mark: | N/A         |
+| `expireAt`         | _number_                                                                       | :heavy_check_mark: | N/A         |
+| `verifiedAtClient` | _string_                                                                       | :heavy_minus_sign: | N/A         |
