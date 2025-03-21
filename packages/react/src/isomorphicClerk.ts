@@ -1134,24 +1134,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  signUpWithPopup = async (params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata }) => {
-    const callback = () => this.clerkjs?.signUpWithPopup(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('signUpWithPopup', callback);
-    }
-  };
-
-  signInWithPopup = async (params: AuthenticateWithPopupParams) => {
-    const callback = () => this.clerkjs?.signInWithPopup(params);
-    if (this.clerkjs && this.#loaded) {
-      return callback() as Promise<void>;
-    } else {
-      this.premountMethodCalls.set('signInWithPopup', callback);
-    }
-  };
-
   authenticateWithGoogleOneTap = async (params: AuthenticateWithGoogleOneTapParams) => {
     const clerkjs = await this.#waitForClerkJS();
     return clerkjs.authenticateWithGoogleOneTap(params);
