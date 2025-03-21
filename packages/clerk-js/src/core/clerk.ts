@@ -2094,7 +2094,11 @@ export class Clerk implements ClerkInterface {
             .fetch()
             .then(res => this.updateClient(res))
             .catch(async e => {
-              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+              /**
+               * Only handle non 4xx errors, like 5xx errors and network errors.
+               */
+              if (is4xxError(e)) {
+                // bubble it up
                 throw e;
               }
 
@@ -2125,7 +2129,7 @@ export class Clerk implements ClerkInterface {
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
-          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+          if (isError(e, 'requires_captcha')) {
             if (envResult.status === 'rejected') {
               await initEnvironmentPromise;
             }
