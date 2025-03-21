@@ -1,4 +1,5 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
+import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -1883,10 +1884,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const accountPortalDomain = this.frontendApi
-      // staging accounts
-      .replace(/clerk\.accountsstage\./, 'accountsstage.')
-      .replace(/clerk\.accounts\.|clerk\./, 'accounts.');
+    const accountPortalHost = buildAccountsBaseUrl(this.frontendApi);
 
     const { redirectUrl } = params;
 
@@ -1898,13 +1896,13 @@ export class Clerk implements ClerkInterface {
     // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
     const redirectUrlWithForceRedirectUrl = this.buildUrlWithAuth(r.toString());
 
-    const popupRedirectUrlComplete = this.buildUrlWithAuth(`https://${accountPortalDomain}/popup-callback`);
+    const popupRedirectUrlComplete = this.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
     const popupRedirectUrl = this.buildUrlWithAuth(
-      `https://${accountPortalDomain}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
+      `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
     );
 
     const messageHandler = async (event: MessageEvent) => {
-      if (event.origin !== `https://${accountPortalDomain}`) return;
+      if (event.origin !== accountPortalHost) return;
 
       let shouldRemoveListener = false;
 
