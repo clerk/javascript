@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
+import { eventMethodCalled } from '../../telemetry';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
@@ -75,6 +76,7 @@ type UseReverification = <
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
   openUIComponent: Clerk['__internal_openReverification'];
+  telemetry: Clerk['telemetry'];
 };
 
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
@@ -117,6 +119,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
             afterVerificationCancelled: cancel,
           });
         } else {
+          params.telemetry?.record(eventMethodCalled('UserVerificationCustomUI'));
           params.onNeedsReverification({
             cancel,
             complete,
@@ -185,13 +188,14 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  */
 export const useReverification: UseReverification = (fetcher, options) => {
-  const { __internal_openReverification } = useClerk();
+  const { __internal_openReverification, telemetry } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
 
   const handleReverification = useMemo(() => {
     const handler = createReverificationHandler({
       openUIComponent: __internal_openReverification,
+      telemetry,
       ...optionsRef.current,
     })(fetcherRef.current);
     return handler;
