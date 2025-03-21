@@ -120,8 +120,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const elapsedSeconds = nowSeconds - value.createdAt;
     // We will include the authentication poller interval as part of the leeway to ensure
     // that the cache value will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const expiresSoon = value.expiresIn! - elapsedSeconds < (leeway || 1) + SYNC_LEEWAY;
-
     if (expiresSoon) {
       cache.delete(cacheKey.toKey());
       return;

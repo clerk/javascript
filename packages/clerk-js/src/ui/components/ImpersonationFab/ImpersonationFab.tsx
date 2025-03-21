@@ -102,6 +102,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
         localizationKey={signOutText}
         onClick={
           // clerk-js has been loaded at this point so we can safely access session
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           handleSignOutSessionClicked(session!)
         }
       />

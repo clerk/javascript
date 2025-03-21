@@ -25,6 +25,7 @@ export const useUserButtonCustomMenuItems = () => {
         const baseItem: CustomMenuItem = {
           label,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,
@@ -58,6 +59,7 @@ export const useUserButtonCustomMenuItems = () => {
           label,
           href,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,

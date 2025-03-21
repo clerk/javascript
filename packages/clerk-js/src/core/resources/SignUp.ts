@@ -199,6 +199,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkMissingOptionError('generateSignature');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
@@ -317,6 +318,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // to reload the environment and try again one more time with the new environment.
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await SignUp.clerk.__unstable__environment!.reload();
         return authenticateFn();
       }
@@ -416,6 +418,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       return false;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
@@ -424,6 +427,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     if (
       params.transfer &&
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
       return true;

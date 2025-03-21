@@ -119,6 +119,7 @@ export const useFetch = <K, T>(
       isValidating: true,
       error: null,
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fetcherRef.current!(params)
       .then(result => {
         if (typeof result !== 'undefined') {

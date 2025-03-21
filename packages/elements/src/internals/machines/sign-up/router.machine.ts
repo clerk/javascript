@@ -116,6 +116,7 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
         case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
         case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
         default:

@@ -28,6 +28,7 @@ export const ActiveDevicesSection = () => {
         {isLoading ? (
           <FullHeightLoader />
         ) : (
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           sessions?.sort(currentSessionFirst(session!.id)).map(sa => {
             if (!isSignedInStatus(sa.status)) {
               return null;

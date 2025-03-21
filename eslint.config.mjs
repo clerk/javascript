@@ -274,7 +274,6 @@ export default tseslint.config([
         },
       ],
       '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/no-redundant-type-constituents': 'warn',
       '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
       '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
@@ -328,6 +327,7 @@ export default tseslint.config([
     extends: [pluginImport.flatConfigs.recommended, pluginImport.flatConfigs.typescript],
     rules: {
       'no-unused-vars': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
     },
   },
   {

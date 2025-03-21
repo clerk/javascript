@@ -37,6 +37,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   }, []);
 
   const prepare = () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     void session!
       .prepareFirstFactorVerification(props.factor)
       .then(() => props.onFactorPrepare())
@@ -44,6 +45,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     session!
       .attemptFirstFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {

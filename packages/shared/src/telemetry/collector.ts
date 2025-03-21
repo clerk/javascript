@@ -71,7 +71,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     }
 
     // We will try to grab the SDK data lazily when an event is triggered, so it should always be defined once the event is sent.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#metadata.sdk = options.sdk!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#metadata.sdkVersion = options.sdkVersion!;
 
     this.#metadata.publishableKey = options.publishableKey ?? '';

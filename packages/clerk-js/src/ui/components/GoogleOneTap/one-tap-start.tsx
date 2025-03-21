@@ -42,6 +42,7 @@ function OneTapStartInternal(): JSX.Element | null {
     const google = await loadGIS();
 
     google.accounts.id.initialize({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       client_id: environmentClientID!,
       callback: oneTapCallback,
       itp_support: ctx.itpSupport,

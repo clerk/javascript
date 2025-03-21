@@ -20,6 +20,7 @@ const mountAllClerkAstroJSComponents = () => {
     const elementsOfCategory = document.querySelectorAll(`[data-clerk-id^="clerk-${category}"]`);
     elementsOfCategory.forEach(el => {
       const clerkId = el.getAttribute('data-clerk-id');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const props = window.__astro_clerk_component_props?.get(category)?.get(clerkId!);
       if (el) {
         $clerk.get()?.[mountFn](el as HTMLDivElement, props);

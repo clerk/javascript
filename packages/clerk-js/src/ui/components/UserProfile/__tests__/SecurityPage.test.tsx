@@ -94,6 +94,7 @@ describe('SecurityPage', () => {
         last_name: 'Clerk',
       });
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fixtures.clerk.user!.getSessions.mockReturnValue(
       Promise.resolve([
         {
@@ -168,7 +169,7 @@ describe('SecurityPage', () => {
     devices.forEach(d => {
       const elem = d.parentElement?.parentElement?.parentElement?.parentElement;
       expect(elem).toBeDefined();
-      // eslint-disable-next-line jest/unbound-method
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, jest/unbound-method
       const { getByText } = within(elem!);
       getByText(/107.0.0.0/i);
       getByText(/Athens/i);

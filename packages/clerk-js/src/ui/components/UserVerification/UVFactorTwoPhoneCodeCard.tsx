@@ -11,6 +11,7 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
 
   const prepare = () => {
     const { phoneNumberId, strategy } = props.factor;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return session!.prepareSecondFactorVerification({ phoneNumberId, strategy });
   };
 

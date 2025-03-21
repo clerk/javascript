@@ -14,6 +14,7 @@ const getRolesParams = {
 };
 export const useFetchRoles = (enabled = true) => {
   const { organization } = useOrganization();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const getRoles = ({ pageSize, initialPage }: GetRolesParams) => organization!.getRoles({ pageSize, initialPage });
   const { data, isLoading } = useFetch(enabled && !!organization?.id ? getRoles : undefined, {
     ...getRolesParams,

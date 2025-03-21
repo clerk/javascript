@@ -74,10 +74,12 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
           label,
           url,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,
           mount(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.default!);
           },
           unmount,
@@ -95,6 +97,7 @@ export const useCustomPages = (customPagesParams: UseCustomPagesParams) => {
           label,
           url,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,

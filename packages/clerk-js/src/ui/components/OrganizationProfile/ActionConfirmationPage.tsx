@@ -42,6 +42,7 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   const { organization } = useOrganization();
   const { user } = useUser();
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-assertion
   const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
 
   if (!organization || !user) {

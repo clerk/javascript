@@ -42,6 +42,7 @@ export const useSessionList: UseSessionList = () => {
     return {
       isLoaded: true,
       sessions: clientCtx.value.sessions,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       setActive: clerk.value!.setActive,
     };
   });

@@ -24,6 +24,7 @@ const clerkLoaded = () => {
   return new Promise<Clerk>(resolve => {
     $csrState.subscribe(({ isLoaded }) => {
       if (isLoaded) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         resolve($clerk.get()!);
       }
     });

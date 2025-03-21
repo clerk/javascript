@@ -26,6 +26,7 @@ export const $authStore = batched([$csrState, $initialState], (state, initialSta
       session: state.session,
       user: state.user,
       organization: state.organization,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       client: state.client!,
     },
     initialState,

@@ -83,7 +83,7 @@
     "build:lib": "tsup --env.NODE_ENV production",
     "build:runtime": "cpy 'src/runtime/**/*.{mjs,js,cjs}' dist/runtime",
     "clean": "rimraf ./dist",
-    "lint": "eslint src",
+    "lint": "eslint --quiet src",
     "lint:publint": "publint",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules false-cjs",
     "test": "run-s test:node test:edge-runtime test:cloudflare-miniflare",

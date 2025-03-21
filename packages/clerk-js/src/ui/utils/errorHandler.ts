@@ -29,7 +29,7 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
     }
 
     const errorsArray = errors.filter(err => {
-      return err.meta!.paramName === field.id || snakeToCamel(err.meta!.paramName) === field.id;
+      return err.meta?.paramName === field.id || snakeToCamel(err.meta?.paramName) === field.id;
     });
 
     const errorMessage = buildErrorMessage(errorsArray);
@@ -44,7 +44,7 @@ function setFieldErrors(fieldStates: Array<FormControlState<string>>, errors: Cl
 function parseErrors(errors: ClerkAPIError[]): ParserErrors {
   return (errors || []).reduce(
     (memo, err) => {
-      if (err.meta!.paramName) {
+      if (err.meta?.paramName) {
         memo.fieldErrors.push(err);
       } else {
         memo.globalErrors.push(err);
