@@ -43,7 +43,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
   return (
     <Card.Root>
       <Card.Content>
-        <Header.Root showLogo>
+        <Header.Root>
           <Header.Title localizationKey={props.cardTitle} />
           <Header.Subtitle localizationKey={props.cardSubtitle} />
           <IdentityPreview

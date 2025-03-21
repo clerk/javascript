@@ -1,3 +1,4 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
@@ -56,6 +57,9 @@ type LazyComponentRendererProps = React.PropsWithChildren<
 type PortalProps = Parameters<typeof Portal>[0];
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
+  if (props?.componentProps?.routing === 'virtual') {
+    deprecated('routing="virtual"', 'Use routing="hash" instead.');
+  }
   return (
     <AppearanceProvider
       globalAppearance={props.globalAppearance}
@@ -80,7 +84,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     flowName?: FlowMetadata['flow'];
     startPath?: string;
     onClose?: ModalProps['handleClose'];
-    onExternalNavigate?: () => any;
+    onExternalNavigate?: () => void;
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
     canCloseModal?: boolean;

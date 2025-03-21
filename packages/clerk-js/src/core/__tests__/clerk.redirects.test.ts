@@ -91,7 +91,7 @@ describe('Clerk singleton - Redirects', () => {
   beforeEach(() => {
     mockClientFetch.mockReturnValue(
       Promise.resolve({
-        activeSessions: [],
+        signedInSessions: [],
       }),
     );
   });

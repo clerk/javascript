@@ -3,6 +3,7 @@ import type {
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
+  SignedInSessionResource,
   SignInResource,
   SignUpResource,
 } from '@clerk/types';
@@ -53,8 +54,15 @@ export class Client extends BaseResource implements ClientResource {
     return this.signIn;
   }
 
+  /**
+   * @deprecated Use `signedInSessions` instead
+   */
   get activeSessions(): ActiveSessionResource[] {
     return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
+  }
+
+  get signedInSessions(): SignedInSessionResource[] {
+    return this.sessions.filter(s => s.status === 'active' || s.status === 'pending') as SignedInSessionResource[];
   }
 
   create(): Promise<this> {
@@ -83,7 +91,10 @@ export class Client extends BaseResource implements ClientResource {
   removeSessions(): Promise<ClientResource> {
     return this._baseDelete({
       path: this.path() + '/sessions',
-    }) as unknown as Promise<ClientResource>;
+    }).then(e => {
+      SessionTokenCache.clear();
+      return e as unknown as ClientResource;
+    });
   }
 
   clearCache(): void {
@@ -129,7 +140,6 @@ export class Client extends BaseResource implements ClientResource {
   public __internal_toSnapshot(): ClientJSONSnapshot {
     return {
       object: 'client',
-      status: null,
       id: this.id || '',
       sessions: this.sessions.map(s => s.__internal_toSnapshot()),
       sign_up: this.signUp.__internal_toSnapshot(),

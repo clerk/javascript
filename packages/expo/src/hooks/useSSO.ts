@@ -6,6 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { errorThrower } from '../utils/errors';
 
 export type StartSSOFlowParams = {
+  redirectUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
 } & (
   | {
@@ -19,7 +20,7 @@ export type StartSSOFlowParams = {
 
 export type StartSSOFlowReturnType = {
   createdSessionId: string | null;
-  authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
+  authSessionResult: WebBrowser.WebBrowserAuthSessionResult | null;
   setActive?: SetActive;
   signIn?: SignInResource;
   signUp?: SignUpResource;
@@ -33,6 +34,7 @@ export function useSSO() {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
+        authSessionResult: null,
         signIn,
         signUp,
         setActive,
@@ -47,9 +49,11 @@ export function useSSO() {
      * to include the `rotating_token_nonce` on SSO callback
      * @ref https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
      */
-    const redirectUrl = AuthSession.makeRedirectUri({
-      path: 'sso-callback',
-    });
+    const redirectUrl =
+      startSSOFlowParams.redirectUrl ??
+      AuthSession.makeRedirectUri({
+        path: 'sso-callback',
+      });
 
     await signIn.create({
       strategy,
@@ -62,13 +66,17 @@ export function useSSO() {
       return errorThrower.throw('Missing external verification redirect URL for SSO flow');
     }
 
-    const authSessionResult = await WebBrowser.openAuthSessionAsync(externalVerificationRedirectURL.toString());
+    const authSessionResult = await WebBrowser.openAuthSessionAsync(
+      externalVerificationRedirectURL.toString(),
+      redirectUrl,
+    );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
         createdSessionId: null,
         setActive,
         signIn,
         signUp,
+        authSessionResult,
       };
     }
 
@@ -89,6 +97,7 @@ export function useSSO() {
       setActive,
       signIn,
       signUp,
+      authSessionResult,
     };
   }
 

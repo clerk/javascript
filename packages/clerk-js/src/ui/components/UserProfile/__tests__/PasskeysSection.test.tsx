@@ -203,4 +203,32 @@ describe('PasskeySection', () => {
       });
     });
   });
+
+  describe('Handles opening/closing actions', () => {
+    it('closes remove passkey form when add a passkey action is clicked', async () => {
+      const { wrapper } = await createFixtures(withPasskeys);
+      const { getByRole, userEvent, getByText, queryByRole } = render(
+        <CardStateProvider>
+          <PasskeySection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText(passkeys[0].name);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /remove passkey/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).toBeInTheDocument());
+
+      await userEvent.click(getByRole('button', { name: /add a passkey/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).not.toBeInTheDocument());
+    });
+  });
 });

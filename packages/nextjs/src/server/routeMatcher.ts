@@ -1,11 +1,9 @@
-import { pathToRegexp } from '@clerk/shared/pathToRegexp';
+import { createPathMatcher, type WithPathPatternWildcard } from '@clerk/shared/pathMatcher';
 import type { Autocomplete } from '@clerk/types';
 import type Link from 'next/link';
 import type { NextRequest } from 'next/server';
 
-type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
-
 type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathPatternWildcard<NextTypedRoute> | NextTypedRoute>;
 
 export type RouteMatcherParam =
@@ -27,11 +25,6 @@ export const createRouteMatcher = (routes: RouteMatcherParam) => {
     return (req: NextRequest) => routes(req);
   }
 
-  const routePatterns = [routes || ''].flat().filter(Boolean);
-  const matchers = precomputePathRegex(routePatterns);
-  return (req: NextRequest) => matchers.some(matcher => matcher.test(req.nextUrl.pathname));
-};
-
-const precomputePathRegex = (patterns: Array<string | RegExp>) => {
-  return patterns.map(pattern => (pattern instanceof RegExp ? pattern : pathToRegexp(pattern)));
+  const matcher = createPathMatcher(routes);
+  return (req: NextRequest) => matcher(req.nextUrl.pathname);
 };

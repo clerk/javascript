@@ -33,7 +33,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
           .authenticateWithWeb3({
             customNavigate: navigate,
             redirectUrl: redirectUrlComplete,
-            signUpContinueUrl: ctx.signUpContinueUrl,
+            signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
             strategy,
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));

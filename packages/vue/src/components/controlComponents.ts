@@ -41,9 +41,9 @@ export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
   const { sessionCtx, clientCtx } = useClerkContext();
 
   useClerkLoaded(clerk => {
-    const hasActiveSessions = clientCtx.value?.activeSessions && clientCtx.value.activeSessions.length > 0;
+    const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
 
-    if (sessionCtx.value === null && hasActiveSessions) {
+    if (sessionCtx.value === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);

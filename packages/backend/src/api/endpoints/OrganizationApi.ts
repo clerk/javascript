@@ -25,6 +25,7 @@ type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
   orderBy?: WithSign<'name' | 'created_at' | 'members_count'>;
+  organizationId?: string[];
 }>;
 
 type CreateParams = {
@@ -77,7 +78,7 @@ type DeleteOrganizationMembershipParams = {
 
 type CreateOrganizationInvitationParams = {
   organizationId: string;
-  inviterUserId: string;
+  inviterUserId?: string;
   emailAddress: string;
   role: OrganizationMembershipRole;
   redirectUrl?: string;

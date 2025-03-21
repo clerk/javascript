@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import { useAttrs, useSlots } from 'vue';
-import type { SignUpProps } from '@clerk/types';
+import type { SignUpButtonProps } from '@clerk/types';
 import { useClerk } from '../composables/useClerk';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
-
-type SignUpButtonProps = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-} & Pick<
-  SignUpProps,
-  'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl' | 'initialValues'
-> & {
-    mode?: 'modal' | 'redirect';
-  };
 
 const props = defineProps<SignUpButtonProps>();
 
@@ -28,7 +19,7 @@ function clickHandler() {
   const { mode, ...opts } = props;
 
   if (mode === 'modal') {
-    return clerk.value?.openSignUp(opts);
+    return clerk.value?.openSignUp({ ...opts, appearance: props.appearance });
   }
 
   void clerk.value?.redirectToSignUp({

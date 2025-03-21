@@ -135,7 +135,7 @@ function hasSupportedLockfile() {
 async function importPackageLock() {
   return new Promise((resolve, reject) => {
     if (!hasSupportedLockfile()) {
-      resolve();
+      return resolve();
     }
     console.log('Supported non-pnpm lockfile detected, importing with `pnpm import`...');
 

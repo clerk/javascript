@@ -1,3 +1,7 @@
+import { warnPackageRenaming } from '../utils/errors';
+
+warnPackageRenaming();
+
 export * from './middlewareHandler';
 
 export * from './getAuth';
@@ -14,13 +18,14 @@ export type {
   // Resources
   AllowlistIdentifier,
   Client,
-  OrganizationMembership,
   EmailAddress,
   ExternalAccount,
   Invitation,
   OauthAccessToken,
   Organization,
+  OrganizationDomain,
   OrganizationInvitation,
+  OrganizationMembership,
   OrganizationMembershipPublicUserData,
   PhoneNumber,
   Session,

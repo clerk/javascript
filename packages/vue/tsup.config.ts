@@ -9,7 +9,7 @@ type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
 export default defineConfig(() => {
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/internal.ts'],
+    entry: ['./src/index.ts', './src/internal.ts', './src/errors.ts'],
     format: ['esm'],
     bundle: true,
     sourcemap: true,

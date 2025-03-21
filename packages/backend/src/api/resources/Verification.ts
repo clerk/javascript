@@ -1,6 +1,4 @@
-import type { OrganizationDomainVerificationJSON } from '@clerk/types';
-
-import type { VerificationJSON } from './JSON';
+import type { OrganizationDomainVerificationJSON, VerificationJSON } from './JSON';
 
 export class Verification {
   constructor(

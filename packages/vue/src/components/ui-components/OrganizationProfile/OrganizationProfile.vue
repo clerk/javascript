@@ -6,8 +6,11 @@ import type { OrganizationProfileProps } from '@clerk/types';
 import { OrganizationProfileInjectionKey } from '../../../keys';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 
-const props = defineProps<OrganizationProfileProps>();
+type Props = Omit<OrganizationProfileProps, 'customPages'>;
+const props = defineProps<Props>();
+
 const clerk = useClerk();
+
 const { customPages, customPagesPortals, addCustomPage } = useOrganizationProfileCustomPages();
 
 const finalProps = computed(() => ({

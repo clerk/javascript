@@ -66,8 +66,10 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
     typeEmailAddress: (value: string) => {
       return page.getByLabel(/Email address/i).fill(value);
     },
-    waitForUserProfileModal: () => {
-      return page.waitForSelector('.cl-modalContent > .cl-userProfile-root', { state: 'visible' });
+    waitForUserProfileModal: (state?: 'open' | 'closed') => {
+      return page.waitForSelector('.cl-modalContent:has(.cl-userProfile-root)', {
+        state: state === 'closed' ? 'detached' : 'attached',
+      });
     },
   };
   return self;

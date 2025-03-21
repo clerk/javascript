@@ -1,8 +1,30 @@
 <script setup lang="ts">
-import { OrganizationProfile } from '@clerk/vue';
+import { OrganizationProfile, OrganizationSwitcher } from '@clerk/vue';
 </script>
 
 <template>
+  <OrganizationSwitcher>
+    <OrganizationSwitcher.OrganizationProfilePage
+      label="Terms"
+      url="terms"
+    >
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
+      <div>
+        <h1>Custom Terms Page</h1>
+        <p>This is the custom terms page</p>
+      </div>
+    </OrganizationSwitcher.OrganizationProfilePage>
+    <OrganizationSwitcher.OrganizationProfileLink
+      label="Homepage"
+      url="/"
+    >
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
+    </OrganizationSwitcher.OrganizationProfileLink>
+  </OrganizationSwitcher>
   <OrganizationProfile>
     <OrganizationProfile.Page
       label="Terms"

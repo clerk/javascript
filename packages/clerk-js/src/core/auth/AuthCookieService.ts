@@ -1,6 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
@@ -124,6 +124,7 @@ export class AuthCookieService {
         // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
+        // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
         void this.refreshSessionToken({ updateCookieImmediately: true });
       }
     });
@@ -182,12 +183,6 @@ export class AuthCookieService {
       void this.clerk.handleUnauthenticated();
       return;
     }
-
-    if (isNetworkError(e)) {
-      return;
-    }
-
-    clerkCoreErrorTokenRefreshFailed(e.toString());
   }
 
   /**
@@ -214,5 +209,9 @@ export class AuthCookieService {
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  public getSessionCookie() {
+    return this.sessionCookie.get();
   }
 }

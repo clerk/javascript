@@ -62,7 +62,7 @@ export abstract class BaseResource {
     return !this.id;
   }
 
-  protected static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
+  static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
@@ -165,6 +165,18 @@ export abstract class BaseResource {
   }
 
   protected abstract fromJSON(data: ClerkResourceJSON | null): this;
+
+  /**
+   * Returns the provided value if it is not `undefined` or `null`, otherwise returns the default value.
+   *
+   * @template T - The type of the value.
+   * @param value - The value to check.
+   * @param defaultValue - The default value to return if the provided value is `undefined` or `null`.
+   * @returns The provided value if it is not `undefined` or `null`, otherwise the default value.
+   */
+  protected withDefault<T>(value: T | undefined | null, defaultValue: T): T {
+    return value ?? defaultValue;
+  }
 
   protected async _baseGet<J extends ClerkResourceJSON | null>(opts: BaseFetchOptions = {}): Promise<this> {
     const json = await BaseResource._fetch<J>(

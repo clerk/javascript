@@ -27,6 +27,11 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
     waitForMounted: (selector = '.cl-signUp-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
+    waitForModal: (state?: 'open' | 'closed') => {
+      return page.waitForSelector('.cl-modalContent:has(.cl-signUp-root)', {
+        state: state === 'closed' ? 'detached' : 'attached',
+      });
+    },
     signUpWithOauth: (provider: string) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },

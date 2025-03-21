@@ -1,5 +1,5 @@
-import type { OrganizationDomainJSON, OrganizationEnrollmentMode } from '@clerk/types';
-
+import type { OrganizationEnrollmentMode } from './Enums';
+import type { OrganizationDomainJSON } from './JSON';
 import { OrganizationDomainVerification } from './Verification';
 
 export class OrganizationDomain {

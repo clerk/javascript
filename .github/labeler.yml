@@ -65,3 +65,6 @@ actions:
 
 integration:
   - integration/**
+
+agent-toolkit:
+  - packages/agent-toolkit/**

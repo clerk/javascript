@@ -24,6 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         persistClient: process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT
           ? process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT === 'true'
           : undefined,
+        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
+        withSessionTasks: true,
       }}
     >
       <html lang='en'>

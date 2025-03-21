@@ -32,7 +32,6 @@ export const MembersActionsRow = ({ actionSlot }: MembersActionsRowProps) => {
               <Button
                 elementDescriptor={descriptors.membersPageInviteButton}
                 aria-label='Invite'
-                textVariant='buttonSmall'
                 localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
               />
             </Action.Trigger>

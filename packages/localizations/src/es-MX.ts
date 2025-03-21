@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Atrás',
+  badge__currentPlan: undefined,
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
@@ -281,6 +290,7 @@ export const esMX: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -304,6 +314,11 @@ export const esMX: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -652,6 +667,14 @@ export const esMX: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -777,6 +800,7 @@ export const esMX: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Administra tu información de cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -820,7 +844,7 @@ export const esMX: LocalizationResource = {
       imageFormTitle: 'Imagen de perfil',
       readonly: 'Tu información de perfil ha sido proporcionada por la conexión de empresa y no se puede editar.',
       successMessage: 'Tu perfil ha sido actualizado.',
-      title: 'Actualizar Cuenta',
+      title: 'Actualizar perfil',
     },
     start: {
       activeDevicesSection: {
@@ -876,6 +900,7 @@ export const esMX: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar',
         menuAction__rename: 'Renombrar',
+        primaryButton: undefined,
         title: 'Llaves de acceso',
       },
       passwordSection: {
@@ -892,7 +917,7 @@ export const esMX: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {
@@ -902,6 +927,7 @@ export const esMX: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Quitar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cartera',
         title: 'Web3 cartera',
       },

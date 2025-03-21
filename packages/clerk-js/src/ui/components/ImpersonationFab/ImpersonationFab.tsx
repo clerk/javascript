@@ -1,5 +1,5 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import type { ActiveSessionResource } from '@clerk/types';
+import type { SignedInSessionResource } from '@clerk/types';
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
@@ -66,7 +66,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { otherSessions } = useMultipleSessions({ user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
-  const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
+  const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
       return signOut(navigateAfterSignOut);
     }
@@ -109,7 +109,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   );
 };
 
-const _ImpersonationFab = () => {
+const ImpersonationFabInternal = () => {
   const { session } = useSession();
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
@@ -249,6 +249,6 @@ const _ImpersonationFab = () => {
 
 export const ImpersonationFab = withCoreUserGuard(() => (
   <InternalThemeProvider>
-    <_ImpersonationFab />
+    <ImpersonationFabInternal />
   </InternalThemeProvider>
 ));

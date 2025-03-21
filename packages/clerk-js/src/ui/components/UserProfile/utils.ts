@@ -1,4 +1,10 @@
-import type { Attributes, EmailAddressResource, PhoneNumberResource, UserResource } from '@clerk/types';
+import type {
+  Attributes,
+  EmailAddressResource,
+  PhoneNumberResource,
+  UserResource,
+  Web3WalletResource,
+} from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -10,7 +16,7 @@ export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ?
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
-export function getSecondFactors(attributes: Attributes): string[] {
+export function getSecondFactors(attributes: Partial<Attributes>): string[] {
   const secondFactors: string[] = [];
 
   Object.entries(attributes).forEach(([, attr]) => {
@@ -22,7 +28,7 @@ export function getSecondFactors(attributes: Attributes): string[] {
   return secondFactors;
 }
 
-export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: UserResource): string[] {
+export function getSecondFactorsAvailableToAdd(attributes: Partial<Attributes>, user: UserResource): string[] {
   let sfs = getSecondFactors(attributes);
 
   // If user.totp_enabled, skip totp from the list of choices
@@ -38,10 +44,9 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   return sfs;
 }
 
-export function sortIdentificationBasedOnVerification<T extends Array<EmailAddressResource | PhoneNumberResource>>(
-  array: T | null | undefined,
-  primaryId: string | null | undefined,
-): T {
+export function sortIdentificationBasedOnVerification<
+  T extends Array<EmailAddressResource | PhoneNumberResource | Web3WalletResource>,
+>(array: T | null | undefined, primaryId: string | null | undefined): T {
   if (!array) {
     return [] as unknown as T;
   }

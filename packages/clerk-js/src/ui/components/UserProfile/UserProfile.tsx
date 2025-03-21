@@ -1,4 +1,4 @@
-import type { UserProfileModalProps, UserProfileProps, WithInternalRouting } from '@clerk/types';
+import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { UserProfileContext, withCoreUserGuard } from '../../contexts';
@@ -10,7 +10,7 @@ import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';
 
-const _UserProfile = () => {
+const _UserProfile = (_: UserProfileProps) => {
   return (
     <Flow.Root flow='userProfile'>
       <Flow.Part>
@@ -42,10 +42,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const UserProfile: React.ComponentType<UserProfileProps> = withCardStateProvider(_UserProfile);
-
-const InternalUserProfile: React.ComponentType<WithInternalRouting<UserProfileProps>> =
-  withCardStateProvider(_UserProfile);
+export const UserProfile = withCardStateProvider(_UserProfile);
 
 export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {
   const userProfileProps: UserProfileCtx = {
@@ -60,7 +57,7 @@ export const UserProfileModal = (props: UserProfileModalProps): JSX.Element => {
       <UserProfileContext.Provider value={userProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <InternalUserProfile {...userProfileProps} />
+          <UserProfile {...userProfileProps} />
         </div>
       </UserProfileContext.Provider>
     </Route>

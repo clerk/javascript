@@ -12,11 +12,9 @@ type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) 
  * Clerk uses `buildClerkProps` to inform the client-side helpers of the authentication state of the user. This function is used SSR in the `getServerSideProps` function of your Next.js application.
  *
  * @example
- * **Basic usage**
+ * ### Basic usage
  *
- * ```tsx
- * // pages/myServerSidePage.tsx
- *
+ * ```tsx {{ filename: 'pages/myServerSidePage.tsx' }}
  * import { getAuth, buildClerkProps } from '@clerk/nextjs/server'
  * import { GetServerSideProps } from 'next'
  *
@@ -33,13 +31,11 @@ type BuildClerkProps = (req: RequestLike, authState?: BuildClerkPropsInitState) 
  * ```
  *
  * @example
- * **Usage with `clerkClient`**
+ * ### Usage with `clerkClient`
  *
  * The `clerkClient` allows you to access the Clerk API. You can use this to retrieve or update data.
  *
- * ```tsx
- * // pages/api/example.ts
- *
+ * ```tsx {{ filename: 'pages/api/example.ts' }}
  * import { getAuth, buildClerkProps, clerkClient } from '@clerk/nextjs/server'
  * import { GetServerSideProps } from 'next'
  *

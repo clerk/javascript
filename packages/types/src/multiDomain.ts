@@ -1,7 +1,5 @@
 import type { ClerkOptions } from './clerk';
 
-type StringOrURLFnToString = string | ((url: URL) => string);
-
 /**
  * You can configure proxy and satellite domains in a few ways:
  *
@@ -12,25 +10,43 @@ type StringOrURLFnToString = string | ((url: URL) => string);
  */
 export type MultiDomainAndOrProxy =
   | {
+      /**
+       * Whether the application is a satellite application.
+       */
       isSatellite?: never;
-      proxyUrl?: never | StringOrURLFnToString;
+      /**
+       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       */
+      proxyUrl?: never | string | ((url: URL) => string);
+      /**
+       * **Required if your application is a satellite application**. Sets the domain of the satellite application.
+       */
       domain?: never;
     }
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
       proxyUrl?: never;
-      domain: StringOrURLFnToString;
+      domain: string | ((url: URL) => string);
     }
   | {
       isSatellite: Exclude<ClerkOptions['isSatellite'], undefined>;
-      proxyUrl: StringOrURLFnToString;
+      proxyUrl: string | ((url: URL) => string);
       domain?: never;
     };
 
 export type MultiDomainAndOrProxyPrimitives =
   | {
+      /**
+       * Whether the application is a satellite application.
+       */
       isSatellite?: never;
+      /**
+       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       */
       proxyUrl?: never | string;
+      /**
+       * **Required if your application is a satellite application**. Sets the domain of the satellite application.
+       */
       domain?: never;
     }
   | {
@@ -46,10 +62,16 @@ export type MultiDomainAndOrProxyPrimitives =
 
 export type DomainOrProxyUrl =
   | {
+      /**
+       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       */
       proxyUrl?: never;
-      domain?: StringOrURLFnToString;
+      /**
+       * **Required if your application is a satellite application**. Sets the domain of the satellite application.
+       */
+      domain?: string | ((url: URL) => string);
     }
   | {
-      proxyUrl?: StringOrURLFnToString;
+      proxyUrl?: string | ((url: URL) => string);
       domain?: never;
     };

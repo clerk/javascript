@@ -187,4 +187,62 @@ describe('EmailSection', () => {
       });
     });
   });
+
+  describe('Handles opening/closing actions', () => {
+    it('closes add email form when remove an email address action is clicked', async () => {
+      const { wrapper, fixtures } = await createFixtures(withEmails);
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <EmailsSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fixtures.clerk.user?.emailAddresses[0].destroy.mockResolvedValue();
+
+      await userEvent.click(getByRole('button', { name: /add email address/i }));
+      await waitFor(() => getByRole('heading', { name: /add email address/i }));
+
+      const item = getByText(emails[0]);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove email/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove email/i }));
+      await waitFor(() => getByRole('heading', { name: /remove email address/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove email address/i })).toBeInTheDocument());
+      await waitFor(() => expect(queryByRole('heading', { name: /add email address/i })).not.toBeInTheDocument());
+    });
+
+    it('closes remove email address form when add email address action is clicked', async () => {
+      const { wrapper, fixtures } = await createFixtures(withEmails);
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <EmailsSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fixtures.clerk.user?.emailAddresses[0].destroy.mockResolvedValue();
+
+      const item = getByText(emails[0]);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove email/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove email/i }));
+      await waitFor(() => getByRole('heading', { name: /remove email address/i }));
+
+      await userEvent.click(getByRole('button', { name: /add email address/i }));
+      await waitFor(() => getByRole('heading', { name: /add email address/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove email address/i })).not.toBeInTheDocument());
+      await waitFor(() => expect(queryByRole('heading', { name: /add email address/i })).toBeInTheDocument());
+    });
+  });
 });

@@ -134,6 +134,25 @@ describe('SecurityPage', () => {
           actor: null,
           revoke: jest.fn().mockResolvedValue({}),
         } as any as SessionWithActivitiesResource,
+        {
+          pathRoot: '/me/sessions',
+          id: 'sess_2HyQfBh8wRJUbpvCtPNllWdsHFi',
+          status: 'pending',
+          expireAt: '2022-12-01T01:55:44.636Z',
+          abandonAt: '2022-12-24T01:55:44.636Z',
+          lastActiveAt: '2022-11-24T12:11:49.328Z',
+          latestActivity: {
+            id: 'sess_activity_2HyQwElm529O5NDL1KNpJAGWVJZ',
+            deviceType: 'Macintosh',
+            browserName: 'Chrome',
+            browserVersion: '107.0.0.0',
+            country: 'Greece',
+            city: 'Athens',
+            isMobile: false,
+          },
+          actor: null,
+          revoke: jest.fn().mockResolvedValue({}),
+        } as any as SessionWithActivitiesResource,
       ]),
     );
 

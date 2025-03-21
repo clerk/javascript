@@ -55,6 +55,7 @@ export type UserService = {
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
   deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
+  getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
 };
 
 /**
@@ -62,7 +63,7 @@ export type UserService = {
  * Allowing 10^5 combinations should be enough entropy for e2e purposes.
  * @see https://clerk.com/docs/testing/e2e-testing#phone-numbers
  */
-function fakerPhoneNumber() {
+export function fakerPhoneNumber() {
   return `+1###55501##`.replace(/#+/g, m => faker.string.numeric(m.length));
 }
 
@@ -115,6 +116,29 @@ export const createUserService = (clerkClient: ClerkClient) => {
       }
 
       await clerkClient.users.deleteUser(id);
+    },
+    getUser: async (opts: { id?: string; email?: string }) => {
+      if (opts.id) {
+        try {
+          const user = await clerkClient.users.getUser(opts.id);
+          return user;
+        } catch (err) {
+          console.log(`Error fetching user "${opts.id}": ${err.message}`);
+          return;
+        }
+      }
+
+      if (opts.email) {
+        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        if (users.length > 0) {
+          return users[0];
+        } else {
+          console.log(`User "${opts.email}" does not exist!`);
+          return;
+        }
+      }
+
+      throw new Error('Either id or email must be provided');
     },
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();

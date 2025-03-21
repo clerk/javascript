@@ -1,5 +1,7 @@
 import * as path from 'node:path';
 
+import type { AccountlessApplication } from '@clerk/backend';
+
 import { constants } from '../constants';
 import { createLogger, fs } from '../scripts';
 import { application } from './application';
@@ -13,7 +15,7 @@ type Scripts = { dev: string; build: string; setup: string; serve: string };
 export const applicationConfig = () => {
   let name = '';
   let serverUrl = '';
-  const templates: string[] = [];
+  let template: string;
   const files = new Map<string, string>();
   const scripts: Scripts = { dev: 'pnpm dev', serve: 'pnpm serve', build: 'pnpm build', setup: 'pnpm install' };
   const envFormatters = { public: (key: string) => key, private: (key: string) => key };
@@ -26,7 +28,9 @@ export const applicationConfig = () => {
       clone.setName(name);
       clone.setEnvFormatter('public', envFormatters.public);
       clone.setEnvFormatter('private', envFormatters.private);
-      templates.forEach(t => clone.useTemplate(t));
+      if (template) {
+        clone.useTemplate(template);
+      }
       dependencies.forEach((v, k) => clone.addDependency(k, v));
       Object.entries(scripts).forEach(([k, v]) => clone.addScript(k as keyof typeof scripts, v));
       files.forEach((v, k) => clone.addFile(k, () => v));
@@ -44,8 +48,12 @@ export const applicationConfig = () => {
       files.set(filePath, cbOrPath(helpers));
       return self;
     },
+    removeFile: (filePath: string) => {
+      files.set(filePath, '');
+      return self;
+    },
     useTemplate: (path: string) => {
-      templates.push(path);
+      template = path;
       return self;
     },
     setEnvFormatter: (type: keyof typeof envFormatters, formatter: typeof envFormatters.public) => {
@@ -76,20 +84,32 @@ export const applicationConfig = () => {
       const appDirPath = path.resolve(constants.TMP_DIR, appDirName);
 
       // Copy template files
-      for (const template of templates) {
+      if (template) {
         logger.info(`Copying template "${path.basename(template)}" -> ${appDirPath}`);
         await fs.ensureDir(appDirPath);
         await fs.copy(template, appDirPath, { overwrite: true, filter: (p: string) => !p.includes('node_modules') });
       }
 
+      await Promise.all(
+        [...files]
+          .filter(([, contents]) => !contents)
+          .map(async ([pathname]) => {
+            const dest = path.resolve(appDirPath, pathname);
+            logger.info(`Deleting file ${dest}`);
+            await fs.remove(dest);
+          }),
+      );
+
       // Create individual files
       await Promise.all(
-        [...files].map(async ([pathname, contents]) => {
-          const dest = path.resolve(appDirPath, pathname);
-          logger.info(`Copying file "${pathname}" -> ${dest}`);
-          await fs.ensureFile(dest);
-          await fs.writeFile(dest, contents);
-        }),
+        [...files]
+          .filter(([, contents]) => contents)
+          .map(async ([pathname, contents]) => {
+            const dest = path.resolve(appDirPath, pathname);
+            logger.info(`Copying file "${pathname}" -> ${dest}`);
+            await fs.ensureFile(dest);
+            await fs.writeFile(dest, contents);
+          }),
       );
 
       // Adjust package.json dependencies
@@ -112,6 +132,28 @@ export const applicationConfig = () => {
     get scripts() {
       return scripts;
     },
+    get copyKeylessToEnv() {
+      const writer = async (appDir: string) => {
+        const CONFIG_PATH = path.join(appDir, '.clerk', '.tmp', 'keyless.json');
+        try {
+          const fileAsString = await fs.readFile(CONFIG_PATH, { encoding: 'utf-8' });
+          const maybeAccountlessApplication: AccountlessApplication = JSON.parse(fileAsString);
+          if (maybeAccountlessApplication.publishableKey) {
+            await fs.writeFile(
+              path.join(appDir, '.env'),
+              `${envFormatters.public('CLERK_PUBLISHABLE_KEY')}=${maybeAccountlessApplication.publishableKey}\n` +
+                `${envFormatters.private('CLERK_SECRET_KEY')}=${maybeAccountlessApplication.secretKey}`,
+              {
+                flag: 'a',
+              },
+            );
+          }
+        } catch (e) {
+          throw new Error('unable to copy keys from .clerk/', e);
+        }
+      };
+      return writer;
+    },
     get envWriter() {
       const defaultWriter = async (appDir: string, env: EnvironmentConfig) => {
         // Create env files
@@ -128,7 +170,8 @@ export const applicationConfig = () => {
             [...env.privateVariables]
               .filter(([_, v]) => v)
               .map(([k, v]) => `${envFormatters.private(k)}=${v}`)
-              .join('\n'),
+              .join('\n') +
+            '\n',
         );
       };
       return defaultWriter;

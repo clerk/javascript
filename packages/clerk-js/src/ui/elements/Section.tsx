@@ -268,10 +268,11 @@ type ProfileSectionActionMenuProps = {
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
   id: ProfileSectionId;
+  onClick?: () => void;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
-  const { children, triggerLocalizationKey, id, triggerSx } = props;
+  const { children, triggerLocalizationKey, id, triggerSx, onClick } = props;
   return (
     <Flex
       sx={{
@@ -292,6 +293,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
             ]}
             leftIcon={Plus}
             leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+            onClick={onClick}
           />
         </MenuTrigger>
         <MenuList

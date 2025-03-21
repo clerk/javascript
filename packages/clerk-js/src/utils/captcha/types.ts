@@ -9,6 +9,7 @@ export type CaptchaOptions = {
   modalWrapperQuerySelector?: string;
   openModal?: () => Promise<unknown>;
   closeModal?: () => Promise<unknown>;
+  action?: 'verify' | 'signup' | 'heartbeat';
 };
 
 export type GetCaptchaTokenReturn = {

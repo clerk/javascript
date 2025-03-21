@@ -52,6 +52,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.expect.toBeSignedIn();
   });
 
+  test('does not allow arbitrary redirect URLs on sign in', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo({
+      searchParams: new URLSearchParams({ redirect_url: 'https://evil.com' }),
+      headlessSelector: '[data-test-id="sign-in-step-start"]',
+    });
+
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+    expect(u.page.url()).not.toContain('https://evil.com');
+
+    await u.po.expect.toBeSignedIn();
+  });
+
   test('sign in with email code', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });

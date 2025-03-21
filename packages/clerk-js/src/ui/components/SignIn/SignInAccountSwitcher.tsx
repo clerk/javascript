@@ -7,12 +7,12 @@ import { Add, SwitchArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
-const _SignInAccountSwitcher = () => {
+const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
-  const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
+  const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
@@ -40,7 +40,7 @@ const _SignInAccountSwitcher = () => {
             })}
           >
             <Actions role='menu'>
-              {activeSessions.map(s => (
+              {signedInSessions.map(s => (
                 <PreviewButton
                   key={s.id}
                   onClick={handleSessionClicked(s)}
@@ -120,4 +120,4 @@ const _SignInAccountSwitcher = () => {
     </Flow.Part>
   );
 };
-export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(_SignInAccountSwitcher));
+export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(SignInAccountSwitcherInternal));

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { EmailLinkError, EmailLinkErrorCode } from '../../../../core/resources';
+import { EmailLinkError, EmailLinkErrorCodeStatus } from '../../../../core/resources';
 import { render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -50,7 +50,7 @@ describe('SignUpEmailLinkFlowComplete', () => {
       });
       fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
         await Promise.resolve(() => {
-          throw new EmailLinkError(EmailLinkErrorCode.Expired);
+          throw new EmailLinkError(EmailLinkErrorCodeStatus.Expired);
         }),
       );
 
@@ -68,7 +68,7 @@ describe('SignUpEmailLinkFlowComplete', () => {
       });
       fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
         await Promise.resolve(() => {
-          throw new EmailLinkError(EmailLinkErrorCode.Failed);
+          throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
         }),
       );
       await runFakeTimers(async timers => {

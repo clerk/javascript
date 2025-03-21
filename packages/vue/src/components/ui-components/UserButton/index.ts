@@ -8,7 +8,7 @@ import {
 } from '../../../errors/messages';
 import { UserButtonInjectionKey, UserButtonMenuItemsInjectionKey } from '../../../keys';
 import type { UserButtonActionProps, UserButtonLinkProps } from '../../../types';
-import { UserProfilePage } from '../UserProfile';
+import { UserProfileLink, UserProfilePage } from '../UserProfile';
 import _UserButton from './UserButton.vue';
 
 const MenuItems = defineComponent((_, { slots }) => {
@@ -63,4 +63,5 @@ export const UserButton = Object.assign(_UserButton, {
   Action: MenuAction,
   Link: MenuLink,
   UserProfilePage,
+  UserProfileLink,
 });

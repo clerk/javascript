@@ -1,16 +1,16 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { OrganizationProfileModalProps, OrganizationProfileProps, WithInternalRouting } from '@clerk/types';
+import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
-import type { OrganizationProfileCtx } from 'ui/types';
 
 import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
+import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
-const _OrganizationProfile = () => {
+const _OrganizationProfile = (_: OrganizationProfileProps) => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -48,9 +48,6 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 
 export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
-const InternalOrganizationProfile: React.ComponentType<WithInternalRouting<OrganizationProfileProps>> =
-  withCardStateProvider(_OrganizationProfile);
-
 export const OrganizationProfileModal = (props: OrganizationProfileModalProps): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {
     ...props,
@@ -64,7 +61,7 @@ export const OrganizationProfileModal = (props: OrganizationProfileModalProps): 
       <OrganizationProfileContext.Provider value={organizationProfileProps}>
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <InternalOrganizationProfile {...organizationProfileProps} />
+          <OrganizationProfile {...organizationProfileProps} />
         </div>
       </OrganizationProfileContext.Provider>
     </Route>

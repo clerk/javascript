@@ -12,9 +12,7 @@ import { auth } from './auth';
  * - counts towards the [Backend API request rate limit](https://clerk.com/docs/backend-requests/resources/rate-limits#rate-limits).
  *
  * @example
- * ```tsx
- * // app/page.tsx
- *
+ * ```tsx {{ filename: 'app/page.tsx' }}
  * import { currentUser } from '@clerk/nextjs/server'
  *
  * export default async function Page() {

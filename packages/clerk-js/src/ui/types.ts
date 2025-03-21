@@ -1,4 +1,6 @@
 import type {
+  __experimental_CheckoutProps,
+  __experimental_PricingTableProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -10,7 +12,6 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
-  WithInternalRouting,
 } from '@clerk/types';
 
 export type {
@@ -37,26 +38,28 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
+  | __experimental_PricingTableProps
+  | __experimental_CheckoutProps
   | __internal_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
-export type SignInCtx = WithInternalRouting<SignInProps> & {
+export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
   mode?: ComponentMode;
 };
 
-export type UserVerificationCtx = WithInternalRouting<__internal_UserVerificationProps> & {
+export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
-export type UserProfileCtx = WithInternalRouting<UserProfileProps> & {
+export type UserProfileCtx = UserProfileProps & {
   componentName: 'UserProfile';
   mode?: ComponentMode;
 };
 
-export type SignUpCtx = WithInternalRouting<SignUpProps> & {
+export type SignUpCtx = SignUpProps & {
   componentName: 'SignUp';
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
@@ -68,12 +71,12 @@ export type UserButtonCtx = UserButtonProps & {
   mode?: ComponentMode;
 };
 
-export type OrganizationProfileCtx = WithInternalRouting<OrganizationProfileProps> & {
+export type OrganizationProfileCtx = OrganizationProfileProps & {
   componentName: 'OrganizationProfile';
   mode?: ComponentMode;
 };
 
-export type CreateOrganizationCtx = WithInternalRouting<CreateOrganizationProps> & {
+export type CreateOrganizationCtx = CreateOrganizationProps & {
   componentName: 'CreateOrganization';
   mode?: ComponentMode;
 };
@@ -97,6 +100,18 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
+export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
+  componentName: 'PricingTable';
+  mode?: ComponentMode;
+};
+
+export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
+  componentName: 'Checkout';
+  mode?: ComponentMode;
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -108,6 +123,8 @@ export type AvailableComponentCtx =
   | OrganizationSwitcherCtx
   | OrganizationListCtx
   | GoogleOneTapCtx
-  | WaitlistCtx;
+  | WaitlistCtx
+  | __experimental_PricingTableCtx
+  | __experimental_CheckoutCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

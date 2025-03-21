@@ -13,7 +13,7 @@ import {
 } from '../errors';
 import { runtime } from '../runtime';
 import { joinPaths } from '../util/path';
-import { callWithRetry } from '../util/shared';
+import { retry } from '../util/shared';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -115,7 +115,7 @@ export type LoadClerkJWKFromRemoteOptions = {
  *
  * Loads a key from JWKS retrieved from the well-known Frontend API endpoint of the issuer.
  * The result is also cached on the module level to avoid network requests in subsequent invocations.
- * The cache lasts 1 hour by default.
+ * The cache lasts up to 5 minutes.
  *
  * @param {Object} options
  * @param {string} options.kid - The id of the key that the JWT was signed with
@@ -137,8 +137,8 @@ export async function loadClerkJWKFromRemote({
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }
-    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion);
-    const { keys } = await callWithRetry<{ keys: JsonWebKeyWithKid[] }>(fetcher);
+    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion) as Promise<{ keys: JsonWebKeyWithKid[] }>;
+    const { keys } = await retry(fetcher);
 
     if (!keys || !keys.length) {
       throw new TokenVerificationError({

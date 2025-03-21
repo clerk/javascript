@@ -1,5 +1,5 @@
 import type {
-  ActJWTClaim,
+  ActClaim,
   CheckAuthorizationWithCustomPermissions,
   Clerk,
   GetToken,
@@ -85,7 +85,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -98,7 +98,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;

@@ -10,7 +10,8 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/vue', linkPackage('vue'));
+  .addDependency('@clerk/vue', linkPackage('vue'))
+  .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 export const vue = {
   vite,

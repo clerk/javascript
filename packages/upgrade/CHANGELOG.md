@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 1.2.4
+
+### Patch Changes
+
+- Remove an internal function that was executed but its return value wasn't used. In some instances this function threw an error. ([#5138](https://github.com/clerk/javascript/pull/5138)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 1.2.3
 
 ### Patch Changes

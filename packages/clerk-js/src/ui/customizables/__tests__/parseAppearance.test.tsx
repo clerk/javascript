@@ -380,3 +380,87 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeBColor);
   });
 });
+
+describe('AppearanceProvider captcha', () => {
+  it('sets the parsedCaptcha correctly from the globalAppearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          captcha: {
+            theme: 'dark',
+            size: 'compact',
+            language: 'el-GR',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedCaptcha.theme).toBe('dark');
+    expect(result.current.parsedCaptcha.size).toBe('compact');
+    expect(result.current.parsedCaptcha.language).toBe('el-GR');
+  });
+
+  it('sets the parsedCaptcha correctly from the appearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        appearance={{
+          captcha: {
+            theme: 'dark',
+            size: 'compact',
+            language: 'el-GR',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedCaptcha.theme).toBe('dark');
+    expect(result.current.parsedCaptcha.size).toBe('compact');
+    expect(result.current.parsedCaptcha.language).toBe('el-GR');
+  });
+
+  it('sets the parsedLayout correctly from the globalAppearance and appearance prop', () => {
+    const wrapper = ({ children }) => (
+      <AppearanceProvider
+        appearanceKey='signIn'
+        globalAppearance={{
+          captcha: {
+            theme: 'light',
+            size: 'flexible',
+            language: 'en-US',
+          },
+        }}
+        appearance={{
+          captcha: {
+            theme: 'dark',
+            size: 'compact',
+            language: 'el-GR',
+          },
+        }}
+      >
+        {children}
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedCaptcha.theme).toBe('dark');
+    expect(result.current.parsedCaptcha.size).toBe('compact');
+    expect(result.current.parsedCaptcha.language).toBe('el-GR');
+  });
+
+  it('uses the default values when no captcha property is passed', () => {
+    const wrapper = ({ children }) => <AppearanceProvider appearanceKey='signIn'>{children}</AppearanceProvider>;
+
+    const { result } = renderHook(() => useAppearance(), { wrapper });
+    expect(result.current.parsedCaptcha.theme).toBe('auto');
+    expect(result.current.parsedCaptcha.size).toBe('normal');
+    expect(result.current.parsedCaptcha.language).toBe('');
+  });
+});

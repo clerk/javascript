@@ -59,7 +59,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
 };
 
-type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
+type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -102,9 +102,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
@@ -143,6 +143,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
+
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Basic ')) {
+        logger.debug('Basic Auth detected');
+      }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
@@ -201,10 +206,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
-        publishableKey: keyless?.publishableKey,
-        secretKey: keyless?.secretKey,
-      });
+      const keylessKeysForRequestData =
+        // Only pass keyless credentials when there are no explicit keys
+        secretKey === keyless?.secretKey
+          ? {
+              publishableKey: keyless?.publishableKey,
+              secretKey: keyless?.secretKey,
+            }
+          : {};
+
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
 
       return handlerResult;
     });
@@ -217,8 +228,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         return returnBackFromKeylessSync(request);
       }
 
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.

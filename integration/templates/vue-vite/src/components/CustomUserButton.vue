@@ -47,6 +47,14 @@ const isActionClicked = ref(false);
         <p>This is the custom terms page</p>
       </div>
     </UserButton.UserProfilePage>
+    <UserButton.UserProfileLink
+      label="Homepage"
+      url="/"
+    >
+      <template #labelIcon>
+        <div>Icon</div>
+      </template>
+    </UserButton.UserProfileLink>
   </UserButton>
   <div>Is action clicked: {{ isActionClicked }}</div>
 </template>

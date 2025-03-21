@@ -170,7 +170,7 @@ describe('api.client', () => {
     await apiClient.domains.deleteDomain(DOMAIN_ID);
   });
 
-  it('successfully retrieves user access tokens from backend API for a specific provider', async () => {
+  it('successfully retrieves user access tokens from backend API for a specific provider (with prefix)', async () => {
     server.use(
       http.get(
         'https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google',
@@ -200,6 +200,43 @@ describe('api.client', () => {
     );
 
     const { data } = await apiClient.users.getUserOauthAccessToken('user_deadbeef', 'oauth_google');
+
+    expect(data[0].externalAccountId).toBe('eac_2dYS7stz9bgxQsSRvNqEAHhuxvW');
+    expect(data[0].provider).toBe('oauth_google');
+    expect(data[0].token).toBe('<token>');
+    expect(data[0].scopes).toEqual(['email', 'profile']);
+  });
+
+  it('successfully retrieves user access tokens from backend API for a specific provider', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google',
+        validateHeaders(({ request }): any => {
+          const paginated = new URL(request.url).searchParams.get('paginated');
+
+          if (!paginated) {
+            return new HttpResponse(null, { status: 404 });
+          }
+
+          return HttpResponse.json({
+            data: [
+              {
+                external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
+                object: 'oauth_access_token',
+                token: '<token>',
+                provider: 'oauth_google',
+                public_metadata: {},
+                label: null,
+                scopes: ['email', 'profile'],
+              },
+            ],
+            total_count: 1,
+          });
+        }),
+      ),
+    );
+
+    const { data } = await apiClient.users.getUserOauthAccessToken('user_deadbeef', 'google');
 
     expect(data[0].externalAccountId).toBe('eac_2dYS7stz9bgxQsSRvNqEAHhuxvW');
     expect(data[0].provider).toBe('oauth_google');

@@ -1,5 +1,5 @@
 import type {
-  ActJWTClaim,
+  ActClaim,
   SessionActivity,
   SessionActivityJSON,
   SessionWithActivitiesJSON,
@@ -28,7 +28,7 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
   expireAt!: Date;
   lastActiveAt!: Date;
   latestActivity!: SessionActivity;
-  actor!: ActJWTClaim | null;
+  actor!: ActClaim | null;
 
   constructor(data: SessionWithActivitiesJSON, pathRoot: string) {
     super();
