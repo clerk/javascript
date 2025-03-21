@@ -4,11 +4,16 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { TokenVerificationErrorReason } from '../../errors';
 import {
   mockExpiredJwt,
+  mockExpiredMachineJwt,
   mockInvalidSignatureJwt,
   mockJwks,
   mockJwt,
   mockJwtPayload,
+  mockMachineJwks,
+  mockMachineJwt,
+  mockMachineJwtPayload,
   mockMalformedJwt,
+  mockUserTokenForMachineTesting,
 } from '../../fixtures';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
@@ -31,6 +36,10 @@ interface CustomMatchers<R = unknown> {
   toMatchHandshake: (expected: unknown) => R;
   toBeSignedIn: (expected?: unknown) => R;
   toBeSignedInToAuth: () => R;
+  toBeMachineAuthenticated: (expected?: unknown) => R;
+  toBeMachineAuthenticatedToAuth: () => R;
+  toBeMachineUnAuthenticated: (expected: unknown) => R;
+  toBeMachineUnAuthenticatedToAuth: () => R;
 }
 
 declare module 'vitest' {
@@ -218,6 +227,115 @@ expect.extend({
       };
     }
   },
+  toBeMachineAuthenticated(
+    received,
+    expected: {
+      domain?: string;
+      isSatellite?: boolean;
+      signInUrl?: string;
+    },
+  ) {
+    const pass =
+      received.afterSignInUrl === '' &&
+      received.afterSignUpUrl === '' &&
+      received.domain === (expected?.domain ?? '') &&
+      received.isSatellite === (expected?.isSatellite ?? false) &&
+      received.isSignedIn === false &&
+      received.proxyUrl === '' &&
+      received.signInUrl === (expected?.signInUrl ?? '') &&
+      received.signUpUrl === '' &&
+      received.isMachineAuthenticated === true &&
+      received.status === AuthStatus.MachineAuthenticated;
+
+    if (pass) {
+      return {
+        message: () => `expected to be machine authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected not to be machine authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineAuthenticatedToAuth(received) {
+    const pass =
+      !received.orgId &&
+      !received.orgRole &&
+      !received.orgSlug &&
+      !received.sessionClaims &&
+      !received.sessionId &&
+      !received.userId;
+
+    if (pass) {
+      return {
+        message: () => `expected machine to be authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected machine not to be authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineUnAuthenticated(
+    received,
+    expected: {
+      domain?: string;
+      isSatellite?: boolean;
+      reason: AuthReason;
+      signInUrl?: string;
+    },
+  ) {
+    const pass =
+      received.afterSignInUrl === '' &&
+      received.afterSignUpUrl === '' &&
+      received.domain === (expected?.domain ?? '') &&
+      received.isSatellite === (expected?.isSatellite ?? false) &&
+      received.isSignedIn === false &&
+      received.proxyUrl === '' &&
+      received.signInUrl === (expected?.signInUrl ?? '') &&
+      received.signUpUrl === '' &&
+      received.reason === expected.reason &&
+      received.isMachineAuthenticated === false &&
+      received.status === AuthStatus.MachineUnauthenticated;
+
+    if (pass) {
+      return {
+        message: () => `expected to be machine authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected not to be machine authenticated`,
+        pass: false,
+      };
+    }
+  },
+  toBeMachineUnAuthenticatedToAuth(received) {
+    const pass =
+      !received.orgId &&
+      !received.orgRole &&
+      !received.orgSlug &&
+      !received.sessionClaims &&
+      !received.sessionId &&
+      !received.userId &&
+      !received.machineId;
+
+    if (pass) {
+      return {
+        message: () => `expected machine not to be authenticated`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => `expected machine to be authenticated`,
+        pass: false,
+      };
+    }
+  },
 });
 
 const defaultHeaders: Record<string, string> = {
@@ -245,6 +363,7 @@ const mockOptions = (options?) => {
     afterSignInUrl: '',
     afterSignUpUrl: '',
     domain: '',
+    entity: '',
     ...options,
   } satisfies AuthenticateRequestOptions;
 };
@@ -596,6 +715,252 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState).toBeSignedOutToAuth();
   });
 
+  test('headerToken: returns signed out state when passing a machine token to entity: `user` [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockMachineJwt }),
+      mockOptions({ entity: 'user' }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: TokenVerificationErrorReason.MachineTokenUsedForUserRequest,
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+  test('headerToken: returns signed out state when passing an expired machine token to entity: `user` [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockExpiredMachineJwt }),
+      mockOptions({ entity: 'user' }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: TokenVerificationErrorReason.MachineTokenUsedForUserRequest,
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+  test('headerToken: returns signed in state when passing a valid user session token to entity: `user` [1y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'user' }));
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+  test('headerToken: returns handshake state when token expired (expected behavior) passing expired user token to entity: `user` [1y.2n]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    // advance clock for 1 hour
+    vi.advanceTimersByTime(3600 * 1000);
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'user' }));
+
+    expect(requestState).toMatchHandshake({
+      reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+    });
+    expect(requestState.toAuth()).toBeNull();
+  });
+
+  test('headerToken: returns machine authenticated state when passing valid machine token [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({
+        authorization: mockMachineJwt,
+      }),
+      mockOptions({
+        entity: 'machine',
+      }),
+    );
+
+    expect(requestState).toBeMachineAuthenticated();
+    expect(requestState.toAuth()).toBeMachineAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing an expired machine token [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockExpiredMachineJwt }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.TokenExpired,
+      message: 'JWT is expired',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing a user session token [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: mockUserTokenForMachineTesting }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.UserTokenUsedForMachineRequest,
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing no token [1y.2y]', async () => {
+    vi.setSystemTime(vi.getRealSystemTime());
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: '' }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: 'no token in header',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing malformed token [1y.1n]', async () => {
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({ authorization: 'test_header_token' }),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message:
+        'Invalid JWT form. A JWT consists of three parts separated by dots. (reason=token-invalid, token-carrier=header)',
+    });
+    expect(requestState).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing expired user token [1y.2n]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    // advance clock for 1 hour
+    vi.advanceTimersByTime(3600 * 1000);
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'machine' }));
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.UserTokenUsedForMachineRequest,
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns signed in state when a valid user session token to entity:`any` [1y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'any' }));
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+  test('headerToken: returns machine authenticated state when passing a machine token to entity: `any` [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({
+        authorization: mockMachineJwt,
+      }),
+      mockOptions({
+        entity: 'any',
+      }),
+    );
+
+    expect(requestState).toBeMachineAuthenticated();
+    expect(requestState.toAuth()).toBeMachineAuthenticatedToAuth();
+  });
+
+  test('headerToken: returns signed in state when a valid user token to entity: `any` [1y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'any' }));
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+  test('headerToken: returns machine unauthenticated state when passing an expired machine token to entity: `any` [1y.2y]', async () => {
+    vi.setSystemTime(new Date(mockMachineJwtPayload.iat * 1000));
+
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockMachineJwks);
+      }),
+    );
+    const requestState = await authenticateRequest(
+      mockRequestWithHeaderAuth({
+        authorization: mockExpiredMachineJwt,
+      }),
+      mockOptions({
+        entity: 'any',
+      }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: TokenVerificationErrorReason.TokenExpired,
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('headerToken: returns signed in state when passing a valid user session token to entity: `any` [1y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions({ entity: 'any' }));
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
   test('cookieToken: returns handshake when clientUat is missing or equals to 0 and is satellite and not is synced [11y]', async () => {
     server.use(
       http.get('https://api.clerk.test/v1/jwks', () => {
@@ -938,6 +1303,108 @@ describe('tokens.authenticateRequest(options)', () => {
 
     expect(requestState).toBeSignedIn();
     expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+  test('cookieToken: returns signed in when cookieToken.iat >= clientUat and valid token and entity: `user` [10y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        },
+      ),
+      mockOptions({ entity: 'user' }),
+    );
+
+    expect(requestState).toBeSignedIn();
+    expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+  test('cookieToken: returns handshake when cookieToken.iat >= clientUat and expired token and entity: `user` [10y.2n.1n]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    // advance clock for 1 hour
+    vi.advanceTimersByTime(3600 * 1000);
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        },
+      ),
+      mockOptions({ entity: 'user' }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+    });
+    expect(requestState.message || '').toMatch(/^JWT is expired/);
+    expect(requestState.toAuth()).toBeNull();
+  });
+  test('cookieToken: returns signed out when cookieToken.iat >= clientUat and valid token and entity: `machine` [10y.2y]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        },
+      ),
+      mockOptions({ entity: 'machine' }),
+    );
+
+    expect(requestState).toBeMachineUnAuthenticated({
+      reason: 'no token in header',
+    });
+    expect(requestState.toAuth()).toBeMachineUnAuthenticatedToAuth();
+  });
+  test('cookieToken: returns handshake when cookieToken.iat >= clientUat and expired token and entity: `user` [10y.2n.1n]', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
+
+    // advance clock for 1 hour
+    vi.advanceTimersByTime(3600 * 1000);
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: mockJwt,
+        },
+      ),
+      mockOptions({ entity: 'any' }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: `${AuthErrorReason.SessionTokenExpired}-refresh-${RefreshTokenErrorReason.NonEligibleNoCookie}`,
+    });
+    expect(requestState.message || '').toMatch(/^JWT is expired/);
+    expect(requestState.toAuth()).toBeNull();
   });
 
   // todo(
