@@ -244,7 +244,7 @@ function SignUpStartInternal(): JSX.Element {
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     let signUpAttempt: Promise<SignUpResource>;
-    if (!fields.ticket && phoneNumberProvided) {
+    if (!fields.ticket) {
       signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
     } else {
       signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
