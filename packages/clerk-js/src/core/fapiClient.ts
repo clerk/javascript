@@ -250,7 +250,12 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    const json: FapiResponseJSON<T> = await response.json();
+    let json: FapiResponseJSON<T> | null = null;
+    try {
+      json = await response.json();
+    } catch {
+      json = null;
+    }
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
