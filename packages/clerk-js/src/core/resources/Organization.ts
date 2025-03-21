@@ -1,6 +1,7 @@
 import type {
   __experimental_CommerceSubscriptionJSON,
   __experimental_CommerceSubscriptionResource,
+  __experimental_GetSubscriptionsParams,
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -10,7 +11,6 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
-  GetSubscriptionsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -238,7 +238,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   __experimental_getSubscriptions = async (
-    getSubscriptionsParams?: GetSubscriptionsParams,
+    getSubscriptionsParams?: __experimental_GetSubscriptionsParams,
   ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
     return await BaseResource._fetch(
       {

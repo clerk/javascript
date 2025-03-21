@@ -1468,6 +1468,7 @@ export type __experimental_CheckoutProps = {
   planId?: string;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   orgId?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {

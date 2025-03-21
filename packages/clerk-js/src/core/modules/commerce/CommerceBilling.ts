@@ -3,12 +3,21 @@ import type {
   __experimental_CommerceCheckoutJSON,
   __experimental_CommercePlanResource,
   __experimental_CommerceProductJSON,
+  __experimental_CommerceSubscriptionJSON,
+  __experimental_CommerceSubscriptionResource,
   __experimental_CreateCheckoutParams,
   __experimental_GetPlansParams,
+  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
-import { __experimental_CommerceCheckout, __experimental_CommercePlan, BaseResource } from '../../resources/internal';
+import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
+import {
+  __experimental_CommerceCheckout,
+  __experimental_CommercePlan,
+  __experimental_CommerceSubscription,
+  BaseResource,
+} from '../../resources/internal';
 
 export class __experimental_CommerceBilling implements __experimental_CommerceBillingNamespace {
   getPlans = async (params?: __experimental_GetPlansParams): Promise<__experimental_CommercePlanResource[]> => {
@@ -20,6 +29,29 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
 
     const defaultProduct = products.find(product => product.is_default);
     return defaultProduct?.plans.map(plan => new __experimental_CommercePlan(plan)) || [];
+  };
+
+  getSubscriptions = async (
+    params?: __experimental_GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    return await BaseResource._fetch(
+      {
+        path: `/me/subscriptions`,
+        method: 'GET',
+        search: convertPageToOffsetSearchParams(params),
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: subscriptions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
+
+      return {
+        total_count,
+        data: subscriptions.map(subscription => new __experimental_CommerceSubscription(subscription)),
+      };
+    });
   };
 
   startCheckout = async (params: __experimental_CreateCheckoutParams) => {

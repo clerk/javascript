@@ -1,11 +1,11 @@
 import type {
   __experimental_CommerceSubscriptionResource,
+  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembersParams,
-  GetSubscriptionsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,
@@ -71,7 +71,7 @@ export type UseOrganizationParams = {
    * - `status`: A string that filters the subscriptions by the provided status.
    * - Any of the properties described in [Shared properties](#shared-properties).
    */
-  subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
+  subscriptions?: true | PaginatedHookConfig<__experimental_GetSubscriptionsParams>;
 };
 
 /**
@@ -460,7 +460,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   );
 
   const subscriptions = usePagesOrInfinite<
-    GetSubscriptionsParams,
+    __experimental_GetSubscriptionsParams,
     ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>
   >(
     {

@@ -1,5 +1,5 @@
 import type { DeletedObjectResource } from './deletedObject';
-import type { ClerkPaginatedResponse } from './pagination';
+import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 
 export interface __experimental_CommerceNamespace {
@@ -12,6 +12,9 @@ export interface __experimental_CommerceNamespace {
 
 export interface __experimental_CommerceBillingNamespace {
   getPlans: () => Promise<__experimental_CommercePlanResource[]>;
+  getSubscriptions: (
+    params?: __experimental_GetSubscriptionsParams,
+  ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
 
@@ -81,6 +84,10 @@ export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   paidOn: number;
   status: string;
 }
+
+export type __experimental_GetSubscriptionsParams = ClerkPaginationParams<{
+  status?: __experimental_CommerceSubscriptionStatus;
+}>;
 
 export interface __experimental_CommerceSubscriptionResource extends ClerkResource {
   id: string;

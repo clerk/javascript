@@ -17,6 +17,7 @@ type SubscriptionDetailDrawerProps = {
   strategy: DrawerRootProps['strategy'];
   subscription?: __experimental_CommerceSubscriptionResource;
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  onSubscriptionCancel: () => void;
 };
 
 export function SubscriptionDetailDrawer({
@@ -26,6 +27,7 @@ export function SubscriptionDetailDrawer({
   strategy,
   subscription,
   setPlanPeriod,
+  onSubscriptionCancel,
 }: SubscriptionDetailDrawerProps) {
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -38,13 +40,16 @@ export function SubscriptionDetailDrawer({
     setHasError(false);
     setIsSubmitting(true);
 
-    // TODO(@COMMERCE): we need to get a handle on the subscription object in order to cancel it,
-    // but this method doesn't exist yet.
-    //
-    // await subscription.cancel().then(() => {
-    //   setIsSubmitting(false);
-    //   handleClose();
-    // }).catch(() => { setHasError(true); setIsSubmitting(false); });
+    await subscription
+      .cancel()
+      .then(() => {
+        setIsSubmitting(false);
+        onSubscriptionCancel();
+      })
+      .catch(() => {
+        setHasError(true);
+        setIsSubmitting(false);
+      });
   };
 
   return (
