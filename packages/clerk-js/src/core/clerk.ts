@@ -106,6 +106,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
@@ -2087,6 +2088,18 @@ export class Clerk implements ClerkInterface {
           .fetch({ touch: shouldTouchEnv })
           .then(res => {
             this.updateEnvironment(res);
+          })
+          .catch(e => {
+            const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+              CLERK_ENVIRONMENT_STORAGE_ENTRY,
+              null,
+            );
+
+            if (!environmentSnapshot) {
+              throw e;
+            }
+
+            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
         const initClient = async () => {
@@ -2126,6 +2139,7 @@ export class Clerk implements ClerkInterface {
         };
 
         const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
@@ -2139,6 +2153,8 @@ export class Clerk implements ClerkInterface {
             throw e;
           }
         }
+
+        await initEnvironmentPromise;
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
@@ -2264,6 +2280,15 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
+
+    eventBus.on(events.EnvironmentUpdate, () => {
+      // Cache the environment snapshot for 24 hours
+      SafeLocalStorage.setItem(
+        CLERK_ENVIRONMENT_STORAGE_ENTRY,
+        this.environment?.__internal_toSnapshot(),
+        24 * 60 * 60 * 1_000,
+      );
     });
   };
 
