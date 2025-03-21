@@ -21,6 +21,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   navigateToGeneralPageRoot: () => Promise<unknown>;
   isMembersPageRoot: boolean;
   isGeneralPageRoot: boolean;
+  isBillingPageRoot: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -44,6 +45,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
+  const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -55,5 +57,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     navigateToGeneralPageRoot,
     isMembersPageRoot,
     isGeneralPageRoot,
+    isBillingPageRoot,
   };
 };

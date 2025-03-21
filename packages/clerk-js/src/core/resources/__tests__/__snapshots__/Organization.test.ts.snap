@@ -2,6 +2,7 @@
 
 exports[`Organization has the same initial properties 1`] = `
 Organization {
+  "__experimental_getSubscriptions": [Function],
   "addMember": [Function],
   "adminDeleteEnabled": true,
   "createDomain": [Function],

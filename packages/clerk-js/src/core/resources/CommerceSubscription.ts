@@ -1,9 +1,12 @@
 import type {
   __experimental_CommerceSubscriptionJSON,
+  __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
+  __experimental_CommerceSubscriptionStatus,
+  DeletedObjectJSON,
 } from '@clerk/types';
 
-import { __experimental_CommercePlan, BaseResource } from './internal';
+import { __experimental_CommercePlan, BaseResource, DeletedObject } from './internal';
 
 export class __experimental_CommerceSubscription
   extends BaseResource
@@ -12,8 +15,8 @@ export class __experimental_CommerceSubscription
   id!: string;
   paymentSourceId!: string;
   plan!: __experimental_CommercePlan;
-  planPeriod!: string;
-  status!: string;
+  planPeriod!: __experimental_CommerceSubscriptionPlanPeriod;
+  status!: __experimental_CommerceSubscriptionStatus;
 
   constructor(data: __experimental_CommerceSubscriptionJSON) {
     super();
@@ -40,7 +43,8 @@ export class __experimental_CommerceSubscription
         path: `/me/commerce/subscriptions/${this.id}`,
         method: 'DELETE',
       })
-    )?.response;
-    return json;
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
   }
 }

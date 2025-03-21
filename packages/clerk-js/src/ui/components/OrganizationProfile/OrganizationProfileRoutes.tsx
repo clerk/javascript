@@ -1,12 +1,21 @@
+import { lazy, Suspense } from 'react';
+
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { useOrganizationProfileContext } from '../../contexts';
+import { useOptions, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot } = useOrganizationProfileContext();
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
+  const { experimental } = useOptions();
+
+  const OrganizationBillingPage = lazy(() =>
+    import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
+      default: module.OrganizationBillingPage,
+    })),
+  );
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -49,6 +58,17 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
+        {experimental?.commerce && (
+          <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationBillingPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        )}
       </Route>
     </Switch>
   );

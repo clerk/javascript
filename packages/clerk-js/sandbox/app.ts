@@ -246,7 +246,13 @@ function appearanceVariableOptions() {
       });
     },
     '/pricing-table': () => {
-      Clerk.__experimental_mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+      Clerk.__experimental_mountPricingTable(
+        app,
+        componentControls.pricingTable.getProps() ?? {
+          layout: 'matrix',
+          highlightPlan: 'pro-plan',
+        },
+      );
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

@@ -2,6 +2,11 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type {
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionStatus,
+} from 'commerce';
+
 import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
@@ -597,7 +602,6 @@ export interface __experimental_CommercePlanJSON extends ClerkResourceJSON {
   currency_symbol: string;
   currency: string;
   description: string;
-  is_active_for_payer: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   payer_type: string[];
@@ -640,8 +644,8 @@ export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJS
   id: string;
   payment_source_id: string;
   plan: __experimental_CommercePlanJSON;
-  plan_period: string;
-  status: string;
+  plan_period: __experimental_CommerceSubscriptionPlanPeriod;
+  status: __experimental_CommerceSubscriptionStatus;
 }
 
 export interface __experimental_CommerceMoneyJSON {
@@ -666,7 +670,7 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   invoice?: __experimental_CommerceInvoiceJSON;
   payment_source?: __experimental_CommercePaymentSourceJSON;
   plan: __experimental_CommercePlanJSON;
-  plan_period: string;
+  plan_period: __experimental_CommerceSubscriptionPlanPeriod;
   status: string;
   subscription?: __experimental_CommerceSubscriptionJSON;
   totals: __experimental_CommerceTotalsJSON;

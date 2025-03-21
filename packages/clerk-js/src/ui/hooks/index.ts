@@ -13,6 +13,7 @@ export * from './useLocalStorage';
 export * from './useNavigateToFlowStart';
 export * from './usePassword';
 export * from './usePasswordComplexity';
+export * from './usePlans';
 export * from './usePopover';
 export * from './usePrefersReducedMotion';
 export * from './useResizeObserver';

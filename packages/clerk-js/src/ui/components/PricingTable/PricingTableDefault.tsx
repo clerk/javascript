@@ -1,15 +1,18 @@
-import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
+import type {
+  __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_PricingTableProps,
+} from '@clerk/types';
 
 import { Box, descriptors } from '../../customizables';
 import { InternalThemeProvider } from '../../styledSystem';
-import type { PlanPeriod } from './PlanCard';
 import { PlanCard } from './PlanCard';
 
 interface PricingTableDefaultProps {
   plans?: __experimental_CommercePlanResource[] | null;
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
