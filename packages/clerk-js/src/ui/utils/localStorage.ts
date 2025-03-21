@@ -1,11 +1,13 @@
 const CLERK_PREFIX = 'clerk_';
 
-export const CLERK_ENVIRONMENT_STORAGE_ENTRY = 'environment_snapshot';
+export const CLERK_ENVIRONMENT_STORAGE_ENTRY = 'environment';
 
 interface StorageEntry<T> {
   value: T;
   exp?: number;
 }
+
+const serialize = JSON.stringify;
 
 /**
  * Safe wrapper around localStorage that automatically prefixes keys with 'clerk_'
@@ -26,7 +28,7 @@ export class SafeLocalStorage {
         value,
         ...(expiresInMs && { exp: Date.now() + expiresInMs }),
       };
-      window.localStorage.setItem(this._key(key), JSON.stringify(entry));
+      window.localStorage.setItem(this._key(key), serialize(entry));
     } catch {
       // noop
     }
@@ -37,7 +39,7 @@ export class SafeLocalStorage {
       const item = window.localStorage.getItem(this._key(key));
       if (!item) return defaultValue;
 
-      const entry = JSON.parse(item) as StorageEntry<T>;
+      const entry = serialize(item) as unknown as StorageEntry<T>;
 
       // Handle legacy items that weren't stored with expiration metadata
       if (!('value' in entry)) {
