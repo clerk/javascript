@@ -20,11 +20,13 @@ const proxyUrl =
 const domain =
   document.querySelector('script[data-clerk-domain]')?.getAttribute('data-clerk-domain') || window.__clerk_domain || '';
 
-window.Clerk = new Clerk(publishableKey, {
-  proxyUrl,
-  // @ts-expect-error
-  domain,
-});
+if (!window.Clerk) {
+  window.Clerk = new Clerk(publishableKey, {
+    proxyUrl,
+    // @ts-expect-error
+    domain,
+  });
+}
 
 if (module.hot) {
   module.hot.accept();

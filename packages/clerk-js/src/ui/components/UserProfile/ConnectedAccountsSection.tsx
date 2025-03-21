@@ -104,7 +104,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       })
     : window.location.href;
 
-  const [createExternalAccount] = useReverification(() =>
+  const createExternalAccount = useReverification(() =>
     user?.createExternalAccount({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       strategy: account.verification!.strategy as OAuthStrategy,
