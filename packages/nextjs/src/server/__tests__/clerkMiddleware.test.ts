@@ -376,6 +376,81 @@ describe('clerkMiddleware(params)', () => {
     });
   });
 
+  describe('auth().redirectToSignUp()', () => {
+    it('redirects to sign-up url when redirectToSignUp is called and the request is a page request', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignUp } = await auth();
+        redirectToSignUp();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-up');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to sign-up url when redirectToSignUp is called with the correct returnBackUrl', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignUp } = await auth();
+        redirectToSignUp();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-up');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to sign-up url with redirect_url set to the provided returnBackUrl param', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignUp } = await auth();
+        redirectToSignUp({ returnBackUrl: 'https://www.clerk.com/hello' });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-up');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
+        'https://www.clerk.com/hello',
+      );
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('redirects to sign-up url without a redirect_url when returnBackUrl is null', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        const { redirectToSignUp } = await auth();
+        redirectToSignUp({ returnBackUrl: null });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('sign-up');
+      expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+  });
+
   describe('auth.protect()', () => {
     it('redirects to sign-in url when protect is called, the user is signed out and the request is a page request', async () => {
       const req = mockRequest({

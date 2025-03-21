@@ -18,8 +18,10 @@ import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
+  isRedirectToSignUpError,
   nextjsRedirectError,
   redirectToSignInError,
+  redirectToSignUpError,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -34,6 +36,7 @@ import {
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   redirectToSignIn: RedirectFun<Response>;
+  redirectToSignUp: RedirectFun<Response>;
 };
 
 export interface ClerkMiddlewareAuth {
@@ -172,9 +175,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
+        redirectToSignIn,
+        redirectToSignUp,
+      });
       const authHandler = () => Promise.resolve(authObjWithMethods);
       authHandler.protect = protect;
 
@@ -311,6 +318,15 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
+const createMiddlewareRedirectToSignUp = (
+  clerkRequest: ClerkRequest,
+): ClerkMiddlewareAuthObject['redirectToSignUp'] => {
+  return (opts = {}) => {
+    const url = clerkRequest.clerkUrl.toString();
+    redirectToSignUpError(url, opts.returnBackUrl);
+  };
+};
+
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
@@ -361,6 +377,16 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+  }
+
+  if (isRedirectToSignUpError(e)) {
+    return createRedirect({
+      redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
+      signInUrl: requestState.signInUrl,
+      signUpUrl: requestState.signUpUrl,
+      publishableKey: requestState.publishableKey,
+    }).redirectToSignUp({ returnBackUrl: e.returnBackUrl });
   }
 
   if (isNextjsRedirectError(e)) {
