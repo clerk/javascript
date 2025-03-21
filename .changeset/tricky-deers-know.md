@@ -9,15 +9,20 @@ This introducing changes to `useReverification`, the changes include removing th
 import { useReverification } from '@clerk/clerk-react'
 import { isReverificationCancelledError } from '@clerk/clerk-react/error'
 
-export function MyButton() {
-  const enhancedFetcher = useReverification(() => fetch('/api/balance'))
+type MyData = {
+  balance: number
+}
 
+export function MyButton() {
+  const fetchMyData = () => fetch('/api/balance').then(res=> res.json() as Promise<MyData>)
+  const enhancedFetcher = useReverification(fetchMyData);
+  
   const handleClick = async () => {
     try {
       const myData = await enhancedFetcher()
+      //     ^ is typed as `MyData`
     } catch (e) {
       // Handle error returned from the fetcher here
-
       // You can also handle cancellation with the following
       if (isReverificationCancelledError(err)) {
         // Handle the cancellation error here
@@ -37,8 +42,13 @@ to handle re-verification flow. When the handler is passed the default UI our AI
 import { useReverification } from '@clerk/clerk-react'
 import { isReverificationCancelledError } from '@clerk/clerk-react/error'
 
+type MyData = {
+  balance: number
+}
+
 export function MyButton() {
-  const enhancedFetcher = useReverification(() => fetch('/api/balance'), {
+  const fetchMyData = () => fetch('/api/balance').then(res=> res.json() as Promise<MyData>)
+  const enhancedFetcher = useReverification(fetchMyData, {
     onNeedsReverification: ({ complete, cancel, level }) => {
       // e.g open a modal here and handle the re-verification flow
     }
@@ -47,6 +57,7 @@ export function MyButton() {
   const handleClick = async () => {
     try {
       const myData = await enhancedFetcher()
+      //     ^ is typed as `MyData`
     } catch (e) {
       // Handle error returned from the fetcher here
 

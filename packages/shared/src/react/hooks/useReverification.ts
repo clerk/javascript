@@ -166,12 +166,18 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * import { useReverification } from '@clerk/clerk-react'
  * import { isReverificationCancelledError } from '@clerk/clerk-react/error'
  *
+ * type MyData = {
+ *   balance: number
+ * }
+ * 
  * export function MyButton() {
- *   const enhancedFetcher = useReverification(() => fetch('/api/balance'))
+ *   const fetchMyData = () => fetch('/api/balance').then(res=> res.json() as Promise<MyData>)
+ *   const enhancedFetcher = useReverification(fetchMyData);
  *
  *   const handleClick = async () => {
  *     try {
  *       const myData = await enhancedFetcher()
+ *       //     ^ is types as `MyData`    
  *     } catch (e) {
  *       // Handle error returned from the fetcher here
  *
