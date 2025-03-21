@@ -1086,7 +1086,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (newSession?.currentTask) {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
@@ -1109,7 +1109,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (session.status === 'pending') {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
         globalNavigate: this.navigate,

@@ -24,13 +24,13 @@ interface NavigateToTaskOptions {
  * @internal
  */
 export function navigateToTask(
-  task: SessionTask,
+  routeKey: keyof typeof SESSION_TASK_ROUTE_BY_KEY,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
+  const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
   if (componentNavigationContext) {
-    return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
+    return componentNavigationContext.navigate(componentNavigationContext.indexPath + routeKey);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;
