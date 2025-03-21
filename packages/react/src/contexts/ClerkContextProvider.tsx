@@ -29,7 +29,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
   React.useEffect(() => {
     return clerk.addListener(e => setState({ ...e }));
-  }, []);
+  }, [clerk]);
 
   const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
@@ -49,19 +49,22 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     factorVerificationAge,
   } = derivedState;
 
-  const authCtx = React.useMemo(() => {
-    const value = {
-      sessionId,
-      userId,
-      actor,
-      orgId,
-      orgRole,
-      orgSlug,
-      orgPermissions,
-      factorVerificationAge,
-    };
-    return { value };
-  }, [sessionId, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge]);
+  const authCtx = React.useMemo(
+    () => ({
+      value: {
+        sessionId,
+        userId,
+        actor,
+        orgId,
+        orgRole,
+        orgSlug,
+        orgPermissions,
+        factorVerificationAge,
+      },
+    }),
+    [sessionId, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge],
+  );
+
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const organizationCtx = React.useMemo(() => {

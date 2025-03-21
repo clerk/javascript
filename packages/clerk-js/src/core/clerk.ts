@@ -1,6 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { EventEmitter } from '@clerk/shared/event-emitter';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -183,6 +184,7 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
+  private eventEmitter = new EventEmitter();
 
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
@@ -194,7 +196,7 @@ export class Clerk implements ClerkInterface {
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
-  #loaded = false;
+  #status: ClerkInterface['status'] = 'uninitialized';
 
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -250,7 +252,21 @@ export class Clerk implements ClerkInterface {
   }
 
   get loaded(): boolean {
-    return this.#loaded;
+    return this.#status === 'ready';
+  }
+
+  get status() {
+    return this.#status;
+  }
+
+  set status(status: ClerkInterface['status']) {
+    if (this.#status === 'ready') {
+      throw new Error('Clerk status cannot be changed once the instance has been loaded.');
+    }
+    if (status === 'ready') {
+      this.eventEmitter.emit('ready');
+    }
+    this.#status = status;
   }
 
   get isSatellite(): boolean {
@@ -359,41 +375,52 @@ export class Clerk implements ClerkInterface {
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
-  public load = async (options?: ClerkOptions): Promise<void> => {
-    if (this.loaded) {
+  public async load(options?: ClerkOptions): Promise<void> {
+    if (this.status === 'loading') {
+      logger.warnOnce('Clerk is already loading. Ignoring duplicate call.');
       return;
     }
 
-    // Log a development mode warning once
-    if (this.#instanceType === 'development') {
-      logger.warnOnce(
-        'Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview',
-      );
+    if (this.status === 'ready') {
+      logger.warnOnce('Clerk is already loaded. Skipping load process.');
+      return;
     }
 
-    this.#options = this.#initOptions(options);
+    this.#status = 'loading';
 
-    assertNoLegacyProp(this.#options);
+    try {
+      if (this.#instanceType === 'development') {
+        logger.warnOnce('Clerk is running in development mode. Usage limits apply. Do not use in production.');
+      }
 
-    if (this.#options.sdkMetadata) {
-      Clerk.sdkMetadata = this.#options.sdkMetadata;
+      this.#options = this.#initOptions(options);
+      assertNoLegacyProp(this.#options);
+
+      if (this.#options.sdkMetadata) {
+        Clerk.sdkMetadata = this.#options.sdkMetadata;
+      }
+
+      if (this.#options.telemetry !== false) {
+        this.telemetry = new TelemetryCollector({
+          clerkVersion: Clerk.version,
+          samplingRate: 1,
+          publishableKey: this.publishableKey,
+          ...this.#options.telemetry,
+        });
+      }
+
+      const loaded = this.#options.standardBrowser
+        ? await this.#loadInStandardBrowser()
+        : await this.#loadInNonStandardBrowser();
+
+      if (loaded === false) throw new Error('Clerk failed to load');
+
+      this.#status = 'ready';
+    } catch (error) {
+      this.#status = 'error';
+      throw error;
     }
-
-    if (this.#options.telemetry !== false) {
-      this.telemetry = new TelemetryCollector({
-        clerkVersion: Clerk.version,
-        samplingRate: 1,
-        publishableKey: this.publishableKey,
-        ...this.#options.telemetry,
-      });
-    }
-
-    if (this.#options.standardBrowser) {
-      this.#loaded = await this.#loadInStandardBrowser();
-    } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
-    }
-  };
+  }
 
   #isCombinedSignInOrUpFlow(): boolean {
     return Boolean(!this.#options.signUpUrl && this.#options.signInUrl && !isAbsoluteUrl(this.#options.signInUrl));
