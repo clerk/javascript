@@ -5,17 +5,13 @@ import React from 'react';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { useFetch } from '../../hooks';
-import { preloadSessionTasks, SessionTasks } from '../../lazyModules/components';
+import { SessionTasks } from '../../lazyModules/components';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
-
-const usePreloadSessionTask = (enabled = false) =>
-  useFetch(enabled ? preloadSessionTasks : undefined, 'preloadComponent', { staleTime: Infinity });
 
 function RedirectToSignUp() {
   const clerk = useClerk();
