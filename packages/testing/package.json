@@ -59,7 +59,7 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint src"
+    "lint": "eslint --quiet src"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

@@ -55,7 +55,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "eslint src",
+    "lint": "eslint --quiet src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
