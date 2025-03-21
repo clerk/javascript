@@ -247,9 +247,6 @@ export default tseslint.config([
   {
     name: 'repo/global-temporary',
     rules: {
-      // Making this rule an error to see if we can catch any issues
-      '@typescript-eslint/no-non-null-assertion': 'error',
-
       // TODO: All rules below should be set to their defaults
       // when we're able to make the appropriate changes.
       '@typescript-eslint/await-thenable': 'warn',
@@ -330,6 +327,7 @@ export default tseslint.config([
     extends: [pluginImport.flatConfigs.recommended, pluginImport.flatConfigs.typescript],
     rules: {
       'no-unused-vars': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
     },
   },
   {
