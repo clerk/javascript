@@ -1,0 +1,37 @@
+# OrganizationSettings
+
+Success
+
+## Example Usage
+
+```typescript
+import { OrganizationSettings } from '@clerk/backend-sdk/models/components';
+
+let value: OrganizationSettings = {
+  object: 'organization_settings',
+  enabled: false,
+  maxAllowedMemberships: 232744,
+  maxAllowedRoles: 614465,
+  maxAllowedPermissions: 33074,
+  creatorRole: '<value>',
+  adminDeleteEnabled: false,
+  domainsEnabled: false,
+  domainsEnrollmentModes: ['manual_invitation'],
+  domainsDefaultRole: '<value>',
+};
+```
+
+## Fields
+
+| Field                    | Type                                                                                           | Required           | Description                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
+| `object`                 | [components.OrganizationSettingsObject](../../models/components/organizationsettingsobject.md) | :heavy_check_mark: | String representing the object's type. Objects of the same type share the same value.          |
+| `enabled`                | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                            |
+| `maxAllowedMemberships`  | _number_                                                                                       | :heavy_check_mark: | N/A                                                                                            |
+| `maxAllowedRoles`        | _number_                                                                                       | :heavy_check_mark: | N/A                                                                                            |
+| `maxAllowedPermissions`  | _number_                                                                                       | :heavy_check_mark: | N/A                                                                                            |
+| `creatorRole`            | _string_                                                                                       | :heavy_check_mark: | The role key that a user will be assigned after creating an organization.                      |
+| `adminDeleteEnabled`     | _boolean_                                                                                      | :heavy_check_mark: | The default for whether an admin can delete an organization with the Frontend API.             |
+| `domainsEnabled`         | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                            |
+| `domainsEnrollmentModes` | [components.DomainsEnrollmentModes](../../models/components/domainsenrollmentmodes.md)[]       | :heavy_check_mark: | N/A                                                                                            |
+| `domainsDefaultRole`     | _string_                                                                                       | :heavy_check_mark: | The role key that it will be used in order to create an organization invitation or suggestion. |

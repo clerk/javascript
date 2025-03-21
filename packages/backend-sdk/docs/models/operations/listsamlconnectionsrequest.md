@@ -1,0 +1,19 @@
+# ListSAMLConnectionsRequest
+
+## Example Usage
+
+```typescript
+import { ListSAMLConnectionsRequest } from '@clerk/backend-sdk/models/operations';
+
+let value: ListSAMLConnectionsRequest = {};
+```
+
+## Fields
+
+| Field            | Type       | Required           | Description                                                                                                                                                                                                                                                                                                                         |
+| ---------------- | ---------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `limit`          | _number_   | :heavy_minus_sign: | Applies a limit to the number of results returned.<br/>Can be used for paginating the results together with `offset`.                                                                                                                                                                                                               |
+| `offset`         | _number_   | :heavy_minus_sign: | Skip the first `offset` results when paginating.<br/>Needs to be an integer greater or equal to zero.<br/>To be used in conjunction with `limit`.                                                                                                                                                                                   |
+| `query`          | _string_   | :heavy_minus_sign: | Returns SAML connections that have a name that matches the given query, via case-insensitive partial match.                                                                                                                                                                                                                         |
+| `orderBy`        | _string_   | :heavy_minus_sign: | Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.<br/>By prepending one of those values with + or -,<br/>we can choose to sort in ascending (ASC) or descending (DESC) order.                                                                                          |
+| `organizationId` | _string_[] | :heavy_minus_sign: | Returns SAML connections that have an associated organization ID to the<br/>given organizations.<br/>For each organization id, the `+` and `-` can be<br/>prepended to the id, which denote whether the<br/>respective organization should be included or<br/>excluded from the result set.<br/>Accepts up to 100 organization ids. |

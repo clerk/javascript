@@ -1,0 +1,17 @@
+# UpdateDomainRequestBody
+
+## Example Usage
+
+```typescript
+import { UpdateDomainRequestBody } from '@clerk/backend-sdk/models/operations';
+
+let value: UpdateDomainRequestBody = {};
+```
+
+## Fields
+
+| Field         | Type      | Required           | Description                                                                                                                                                                                                                                                             |
+| ------------- | --------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | _string_  | :heavy_minus_sign: | The new domain name. For development instances, can contain the port,<br/>i.e `myhostname:3000`. For production instances, must be a valid FQDN,<br/>i.e `mysite.com`. Cannot contain protocol scheme.                                                                  |
+| `proxyUrl`    | _string_  | :heavy_minus_sign: | The full URL of the proxy that will forward requests to Clerk's Frontend API.<br/>Can only be updated for production instances.                                                                                                                                         |
+| `isSecondary` | _boolean_ | :heavy_minus_sign: | Whether this is a domain for a secondary app, meaning that any subdomain provided is significant and<br/>will be stored as part of the domain. This is useful for supporting multiple apps (one primary and<br/>multiple secondaries) on the same root domain (eTLD+1). |

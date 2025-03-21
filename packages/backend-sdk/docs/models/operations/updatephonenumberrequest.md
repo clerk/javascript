@@ -1,0 +1,18 @@
+# UpdatePhoneNumberRequest
+
+## Example Usage
+
+```typescript
+import { UpdatePhoneNumberRequest } from '@clerk/backend-sdk/models/operations';
+
+let value: UpdatePhoneNumberRequest = {
+  phoneNumberId: '<id>',
+};
+```
+
+## Fields
+
+| Field           | Type                                                                                               | Required           | Description                          |
+| --------------- | -------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------ |
+| `phoneNumberId` | _string_                                                                                           | :heavy_check_mark: | The ID of the phone number to update |
+| `requestBody`   | [operations.UpdatePhoneNumberRequestBody](../../models/operations/updatephonenumberrequestbody.md) | :heavy_minus_sign: | N/A                                  |

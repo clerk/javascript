@@ -1,0 +1,16 @@
+# ChangeProductionInstanceDomainRequestBody
+
+## Example Usage
+
+```typescript
+import { ChangeProductionInstanceDomainRequestBody } from '@clerk/backend-sdk/models/operations';
+
+let value: ChangeProductionInstanceDomainRequestBody = {};
+```
+
+## Fields
+
+| Field         | Type      | Required           | Description                                                                                                                                                                                                                                                             |
+| ------------- | --------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `homeUrl`     | _string_  | :heavy_minus_sign: | The new home URL of the production instance e.g. https://www.example.com                                                                                                                                                                                                |
+| `isSecondary` | _boolean_ | :heavy_minus_sign: | Whether this is a domain for a secondary app, meaning that any subdomain provided is significant and<br/>will be stored as part of the domain. This is useful for supporting multiple apps (one primary and<br/>multiple secondaries) on the same root domain (eTLD+1). |

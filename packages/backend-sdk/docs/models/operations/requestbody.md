@@ -1,0 +1,23 @@
+# RequestBody
+
+## Example Usage
+
+```typescript
+import { RequestBody } from '@clerk/backend-sdk/models/operations';
+
+let value: RequestBody = {
+  emailAddress: 'Whitney.Ritchie28@yahoo.com',
+};
+```
+
+## Fields
+
+| Field            | Type                                                                                                         | Required           | Description                                                                                                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `emailAddress`   | _string_                                                                                                     | :heavy_check_mark: | The email address the invitation will be sent to                                                                                                                                                                                                     |
+| `publicMetadata` | Record<string, _any_>                                                                                        | :heavy_minus_sign: | Metadata that will be attached to the newly created invitation.<br/>The value of this property should be a well-formed JSON object.<br/>Once the user accepts the invitation and signs up, these metadata will end up in the user's public metadata. |
+| `redirectUrl`    | _string_                                                                                                     | :heavy_minus_sign: | The URL where the user is redirected upon visiting the invitation link, where they can accept the invitation. Required if you have implemented a [custom flow for handling application invitations](/docs/custom-flows/invitations).                 |
+| `notify`         | _boolean_                                                                                                    | :heavy_minus_sign: | Optional flag which denotes whether an email invitation should be sent to the given email address.<br/>Defaults to true.                                                                                                                             |
+| `ignoreExisting` | _boolean_                                                                                                    | :heavy_minus_sign: | Whether an invitation should be created if there is already an existing invitation for this email<br/>address, or it's claimed by another user.                                                                                                      |
+| `expiresInDays`  | _number_                                                                                                     | :heavy_minus_sign: | The number of days the invitation will be valid for. By default, the invitation expires after 30 days.                                                                                                                                               |
+| `templateSlug`   | [operations.CreateBulkInvitationsTemplateSlug](../../models/operations/createbulkinvitationstemplateslug.md) | :heavy_minus_sign: | The slug of the email template to use for the invitation email.                                                                                                                                                                                      |
