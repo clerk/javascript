@@ -434,15 +434,7 @@ export interface Clerk {
    * be triggered from `Clerk` methods
    * @internal
    */
-  __internal_setComponentNavigationContext: (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => () => void;
+  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
 
   /**
    * Set the active session and organization explicitly.
@@ -645,6 +637,14 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
+
+  /**
+   * Navigates to the next task or redirects to completion URL.
+   * If the current session has pending tasks, it navigates to the next task.
+   * If all tasks are complete, it navigates to the provided completion URL.
+   * @experimental
+   */
+  __experimental_nextTask: (params: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -1075,6 +1075,27 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
+
+export type __internal_ComponentNavigationContext = {
+  /**
+   * The `navigate` reference within the component router context
+   */
+  navigate: (
+    to: string,
+    options?: {
+      searchParams?: URLSearchParams;
+    },
+  ) => Promise<unknown>;
+  /**
+   * This path represents the root route for a specific component type and is used
+   * for internal routing and navigation.
+   *
+   * @example
+   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
+   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
+   */
+  indexPath: string;
+};
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
@@ -1580,6 +1601,14 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
+}
+
+export interface NextTaskParams {
+  /**
+   * Full URL or path to navigate after successfully resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {
