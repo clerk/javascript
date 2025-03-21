@@ -73,6 +73,7 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
+  __internal_ComponentNavigationContext,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -1510,6 +1511,10 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    if (this.session?.status === 'pending') {
+      return this.#handlePendingSession(this.session);
+    }
+
     const { displayConfig } = this.environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1918,8 +1923,11 @@ export class Clerk implements ClerkInterface {
     if (this.session) {
       const session = this.#getSessionFromClient(this.session.id);
 
-      // Note: this might set this.session to null
-      this.#setAccessors(session);
+      const hasTransitioned = this.session.status === 'active' && session?.status === 'pending';
+      if (!hasTransitioned) {
+        // Note: this might set this.session to null
+        this.#setAccessors(session);
+      }
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
@@ -2285,8 +2293,8 @@ export class Clerk implements ClerkInterface {
 
     eventBus.on(events.SessionPendingTransition, () => {
       // TODO -> Refresh session, get the latest task, and open the modal state
-      // For now, we're just forcing open a modal with a fixed task
-      // TODO -> Open modal
+      // TODO -> Open modal based on the current client session task
+      this.__internal_openSessionTask({ task: 'org' });
     });
   };
 

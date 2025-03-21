@@ -936,7 +936,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openSessionTask = (props?: __internal_SessionTaskModalProps) => {
+  __internal_openSessionTask = (props: __internal_SessionTaskModalProps) => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.__internal_openSessionTask(props);
     } else {

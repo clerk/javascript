@@ -192,7 +192,7 @@ export interface Clerk {
   /**
    * Opens the current session task in a modal.
    */
-  __internal_openSessionTask: (props?: __internal_SessionTaskModalProps) => void;
+  __internal_openSessionTask: (props: __internal_SessionTaskModalProps) => void;
 
   /**
    * Closes the session task modal.
@@ -1111,7 +1111,7 @@ export type __internal_SessionTaskProps = {
   task: SessionTask['key'];
 };
 
-export type __internal_SessionTaskModalProps = Partial<__internal_SessionTaskProps>;
+export type __internal_SessionTaskModalProps = __internal_SessionTaskProps;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

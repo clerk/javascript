@@ -501,6 +501,7 @@ const Components = (props: ComponentsProps) => {
       componentName={'SessionTaskModal'}
       modalContainerSx={{ alignItems: 'center' }}
     >
+      {/* @ts-ignore todo -> fix type error */}
       <SessionTaskModal {...sessionTaskModal} />
     </LazyModalRenderer>
   );

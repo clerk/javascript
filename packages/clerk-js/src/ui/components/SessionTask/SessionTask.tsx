@@ -60,11 +60,7 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
 /**
  * @internal
  */
-export function SessionTaskModal({ task }: __internal_SessionTaskModalProps): JSX.Element | null {
-  if (!task) {
-    return null;
-  }
-
+export function SessionTaskModal({ task }: __internal_SessionTaskModalProps): JSX.Element {
   const clerk = useClerk();
 
   clerk.telemetry?.record(eventComponentMounted('SessionTaskModal', { task }));
