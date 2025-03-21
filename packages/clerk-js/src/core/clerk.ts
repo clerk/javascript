@@ -76,7 +76,7 @@ import type {
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
-import { SafeLocalStorage } from '../ui/utils/localStorage';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../ui/utils/localStorage';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
@@ -2091,16 +2091,15 @@ export class Clerk implements ClerkInterface {
           })
           .catch(e => {
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
-              'environment_snapshot',
+              CLERK_ENVIRONMENT_STORAGE_ENTRY,
               null,
             );
 
-            if (environmentSnapshot) {
-              this.updateEnvironment(new Environment(environmentSnapshot));
-              return;
+            if (!environmentSnapshot) {
+              throw e;
             }
 
-            throw e;
+            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
         const initClient = async () => {
@@ -2285,7 +2284,11 @@ export class Clerk implements ClerkInterface {
 
     eventBus.on(events.EnvironmentUpdate, () => {
       // Cache the environment snapshot for 24 hours
-      SafeLocalStorage.setItem('environment_snapshot', this.environment?.__internal_toSnapshot(), 24 * 60 * 60 * 1_000);
+      SafeLocalStorage.setItem(
+        CLERK_ENVIRONMENT_STORAGE_ENTRY,
+        this.environment?.__internal_toSnapshot(),
+        24 * 60 * 60 * 1_000,
+      );
     });
   };
 

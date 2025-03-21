@@ -1,5 +1,7 @@
 const CLERK_PREFIX = 'clerk_';
 
+export const CLERK_ENVIRONMENT_STORAGE_ENTRY = 'environment_snapshot';
+
 interface StorageEntry<T> {
   value: T;
   exp?: number;
