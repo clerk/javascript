@@ -31,6 +31,15 @@ const createBeforeUnloadListener = () => {
   return { startListening, stopListening, isUnloading };
 };
 
+/**
+ * Creates a beforeUnload event tracker to prevent state updates and re-renders during hard
+ * navigation events.
+ *
+ * It can be wrapped around navigation-related operations to ensure they don't trigger unnecessary
+ * state updates during page transitions.
+ *
+ * @internal
+ */
 export const createBeforeUnloadTracker = (enabled = false) => {
   if (!enabled) {
     return {

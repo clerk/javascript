@@ -251,6 +251,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
         },
       },
       missing_fields: [],
+      unverified_fields: emailVerificationStatus === 'unverified' ? ['email_address'] : [],
     } as SignUpJSON;
   };
 
@@ -272,7 +273,23 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignUpJSON;
   };
 
-  return { startSignUpWithEmailAddress, startSignUpWithPhoneNumber, startSignUpWithMissingLegalAccepted };
+  const startSignUpWithMissingLegalAcceptedAndUnverifiedFields = (emailAddress = 'hello@clerk.com') => {
+    baseClient.sign_up = {
+      id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
+      status: 'missing_requirements',
+      legal_accepted_at: null,
+      missing_fields: ['legal_accepted'],
+      email_address: emailAddress,
+      unverified_fields: ['email_address'],
+    } as SignUpJSON;
+  };
+
+  return {
+    startSignUpWithEmailAddress,
+    startSignUpWithPhoneNumber,
+    startSignUpWithMissingLegalAccepted,
+    startSignUpWithMissingLegalAcceptedAndUnverifiedFields,
+  };
 };
 
 const createAuthConfigFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -317,13 +334,16 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withMaxAllowedMemberships = ({ max = 5 }) => {
     os.max_allowed_memberships = max;
   };
+  const withForceOrganizationSelection = () => {
+    os.force_organization_selection = true;
+  };
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
     os.domains.default_role = defaultRole ?? null;
   };
-  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
+  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };
 };
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {

@@ -20,6 +20,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
   };
   enabled: boolean = false;
   maxAllowedMemberships: number = 1;
+  forceOrganizationSelection!: boolean;
 
   public constructor(data: OrganizationSettingsJSON | OrganizationSettingsJSONSnapshot | null = null) {
     super();
@@ -43,6 +44,10 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
 
     this.enabled = this.withDefault(data.enabled, this.enabled);
     this.maxAllowedMemberships = this.withDefault(data.max_allowed_memberships, this.maxAllowedMemberships);
+    this.forceOrganizationSelection = this.withDefault(
+      data.force_organization_selection,
+      this.forceOrganizationSelection,
+    );
 
     return this;
   }

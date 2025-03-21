@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { createSecureStore } from '../secure-store';
+import { createResourceCacheStore } from '../resource-cache';
 import { DUMMY_TEST_LARGE_JSON } from './dummy-test-data';
 
 const KEY = 'key';
@@ -37,7 +37,7 @@ describe('SecureStore', () => {
     beforeEach(() => {
       vi.useFakeTimers();
 
-      const createSecureStoreMock = () => {
+      const createResourceCacheStoreMock = () => {
         const _map = new Map();
         return {
           setItemAsync: (key: string, value: string): Promise<void> => {
@@ -53,7 +53,7 @@ describe('SecureStore', () => {
           },
         };
       };
-      const secureStoreMock = createSecureStoreMock();
+      const secureStoreMock = createResourceCacheStoreMock();
       mocks.setItemAsync.mockImplementation(secureStoreMock.setItemAsync);
       mocks.getItemAsync.mockImplementation(secureStoreMock.getItemAsync);
       mocks.deleteItemAsync.mockImplementation(secureStoreMock.deleteItemAsync);
@@ -64,19 +64,19 @@ describe('SecureStore', () => {
     });
 
     test('sets a value correctly', async () => {
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       await secureStore.set(KEY, 'value');
       await vi.runAllTimersAsync();
       expect(await secureStore.get(KEY)).toBe('value');
     });
 
     test('returns null for a non-existent key', async () => {
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       expect(await secureStore.get(KEY)).toBeNull();
     });
 
     test('returns the last set value', async () => {
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       await secureStore.set(KEY, 'value1');
       await secureStore.set(KEY, 'value2');
       await vi.runAllTimersAsync();
@@ -90,7 +90,7 @@ describe('SecureStore', () => {
   describe('delayed write', () => {
     beforeEach(() => {
       vi.useFakeTimers();
-      const createSecureStoreMock = () => {
+      const createResourceCacheStoreMock = () => {
         const _map = new Map();
         return {
           setItemAsync: (key: string, value: string): Promise<void> => {
@@ -114,7 +114,7 @@ describe('SecureStore', () => {
           },
         };
       };
-      const secureStoreMock = createSecureStoreMock();
+      const secureStoreMock = createResourceCacheStoreMock();
       mocks.setItemAsync.mockImplementation(secureStoreMock.setItemAsync);
       mocks.getItemAsync.mockImplementation(secureStoreMock.getItemAsync);
       mocks.deleteItemAsync.mockImplementation(secureStoreMock.deleteItemAsync);
@@ -125,7 +125,7 @@ describe('SecureStore', () => {
     });
 
     test('sets a value async', async () => {
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, 'value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
@@ -134,7 +134,7 @@ describe('SecureStore', () => {
     });
 
     test('sets the correct last value when many sets happen almost at the same time', async () => {
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, 'value');
       void secureStore.set(KEY, 'value2');
       void secureStore.set(KEY, 'value3');
@@ -177,7 +177,7 @@ describe('SecureStore', () => {
       mocks.getItemAsync.mockImplementation(getItemAsync);
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
       await vi.runAllTimersAsync();
 
@@ -225,7 +225,7 @@ describe('SecureStore', () => {
       mocks.getItemAsync.mockImplementation(getItemAsync);
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, JSON.stringify(DUMMY_TEST_LARGE_JSON));
       await vi.runAllTimersAsync();
       void secureStore.set(KEY, 'new value');
@@ -288,7 +288,7 @@ describe('SecureStore', () => {
       mocks.getItemAsync.mockImplementation(getItemAsync);
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, 'new value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
@@ -333,7 +333,7 @@ describe('SecureStore', () => {
       mocks.getItemAsync.mockImplementation(getItemAsync);
       mocks.deleteItemAsync.mockImplementation(deleteItemAsync);
 
-      const secureStore = createSecureStore();
+      const secureStore = createResourceCacheStore();
       void secureStore.set(KEY, 'new value');
       await vi.runAllTimersAsync();
       const value = secureStore.get(KEY);
