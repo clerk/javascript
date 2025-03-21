@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommercePlanResource, __experimental_PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -39,9 +38,10 @@ interface PlanCardProps {
 }
 
 export function PlanCard(props: PlanCardProps) {
-  const clerk = useClerk();
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const { ctaPosition = 'top', collapseFeatures = false } = pricingTableProps;
+  const isDefaultLayout = pricingTableProps.layout === 'default';
+  const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
+  const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
   const { id, slug, isActiveForPayer, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
@@ -117,11 +117,7 @@ export function PlanCard(props: PlanCardProps) {
                 : localizationKeys('__experimental_commerce.getStarted')
             }
             onClick={() => {
-              if (clerk.isSignedIn) {
-                onSelect(plan);
-              } else {
-                void clerk.redirectToSignIn();
-              }
+              onSelect(plan);
             }}
           />
         </Box>
@@ -139,7 +135,7 @@ interface PlanCardHeaderProps {
   isCompact?: boolean;
   isActivePlan?: boolean;
   planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  setPlanPeriod?: (val: PlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -312,7 +308,7 @@ export const PlanCardHeader = React.forwardRef<HTMLDivElement, PlanCardHeaderPro
           />
         )}
       </Flex>
-      {plan.hasBaseFee && annualMonthlyAmount > 0 ? (
+      {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
           elementDescriptor={descriptors.planCardPeriodToggle}
           sx={t => ({
@@ -391,7 +387,7 @@ export const PlanCardFeaturesList = React.forwardRef<HTMLDivElement, PlanCardFea
           rowGap: variant === 'avatar' ? t.space.$4 : isCompact ? t.space.$2 : t.space.$3,
         })}
       >
-        {plan.features.slice(0, showAllFeatures ? totalFeatures : 3).map(feature => (
+        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
           <Box
             elementDescriptor={descriptors.planCardFeaturesListItem}
             elementId={descriptors.planCardFeaturesListItem.setId(feature.slug)}

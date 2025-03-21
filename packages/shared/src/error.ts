@@ -63,6 +63,10 @@ export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
   return 'clerkRuntimeError' in err;
 }
 
+export function isReverificationCancelledError(err: any) {
+  return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
+}
+
 export function isMetamaskError(err: any): err is MetamaskError {
   return 'code' in err && [4001, 32602, 32603].includes(err.code) && 'message' in err;
 }

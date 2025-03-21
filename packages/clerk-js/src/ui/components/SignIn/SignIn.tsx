@@ -132,7 +132,10 @@ function SignInRoutes(): JSX.Element {
               </Route>
               {signInContext.withSessionTasks && (
                 <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-                  <SessionTask task='org' />
+                  <SessionTask
+                    task='org'
+                    redirectUrlComplete={signInContext.afterSignUpUrl}
+                  />
                 </Route>
               )}
               <Route index>
@@ -146,7 +149,10 @@ function SignInRoutes(): JSX.Element {
         )}
         {signInContext.withSessionTasks && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-            <SessionTask task='org' />
+            <SessionTask
+              task='org'
+              redirectUrlComplete={signInContext.afterSignInUrl}
+            />
           </Route>
         )}
         <Route index>
@@ -168,7 +174,7 @@ const usePreloadSessionTask = (enabled = false) =>
 
 function SignInRoot() {
   const { __internal_setComponentNavigationContext } = useClerk();
-  const { navigate, basePath } = useRouter();
+  const { navigate, indexPath } = useRouter();
 
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
@@ -191,8 +197,8 @@ function SignInRoot() {
   usePreloadSessionTask(signInContext.withSessionTasks);
 
   React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, [basePath, navigate]);
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+  }, [indexPath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>
