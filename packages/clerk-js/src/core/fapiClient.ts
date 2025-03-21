@@ -238,7 +238,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
           // Since fapiClient is responsible for the network layer only,
           // callers need to use their own retry logic where needed.
           retryImmediately: true,
-          // And then exponentially back off with a max delay of 3 seconds.
+          // And then exponentially back off with a max delay of 5 seconds.
           initialDelay: 700,
           maxDelayBetweenRetries: 5000,
           shouldRetry: (_: unknown, iterations: number) => {
