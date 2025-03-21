@@ -29,14 +29,25 @@ function useSegmentedControlContext() {
 
 interface RootProps {
   children: React.ReactNode;
-  'aria-label': string;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
 }
 
 const Root = React.forwardRef<HTMLDivElement, RootProps>(
-  ({ children, value: controlledValue, defaultValue, onChange, 'aria-label': ariaLabel }, ref) => {
+  (
+    {
+      children,
+      value: controlledValue,
+      defaultValue,
+      onChange,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledby,
+    },
+    ref,
+  ) => {
     const [internalValue, setInternalValue] = useState(defaultValue);
     const isControlled = controlledValue !== undefined;
     const currentValue = isControlled ? controlledValue : internalValue;
@@ -59,6 +70,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
               ref={ref}
               elementDescriptor={descriptors.segmentedControlRoot}
               aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledby}
               sx={t => ({
                 backgroundColor: t.colors.$neutralAlpha50,
                 borderRadius: t.radii.$md,

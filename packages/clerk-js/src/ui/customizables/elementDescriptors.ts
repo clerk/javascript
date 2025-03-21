@@ -262,6 +262,27 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'pricingTable',
 
+  'pricingTableMatrixRoot',
+  'pricingTableMatrixTable',
+  'pricingTableMatrixRowGroup',
+  'pricingTableMatrixRowGroupHeader',
+  'pricingTableMatrixRowGroupBody',
+  'pricingTableMatrixRow',
+  'pricingTableMatrixRowHeader',
+  'pricingTableMatrixRowBody',
+  'pricingTableMatrixColumnHeader',
+  'pricingTableMatrixCell',
+  'pricingTableMatrixCellFooter',
+  'pricingTableMatrixAvatar',
+  'pricingTableMatrixBadge',
+  'pricingTableMatrixPlanName',
+  'pricingTableMatrixFee',
+  'pricingTableMatrixFeePeriod',
+  'pricingTableMatrixFeePeriodNotice',
+  'pricingTableMatrixFeePeriodNoticeInner',
+  'pricingTableMatrixFeePeriodNoticeLabel',
+  'pricingTableMatrixFooter',
+
   'segmentedControlRoot',
   'segmentedControlButton',
 

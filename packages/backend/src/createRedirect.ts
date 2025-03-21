@@ -1,3 +1,5 @@
+import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+
 import { constants } from './constants';
 import { errorThrower, parsePublishableKey } from './util/shared';
 
@@ -52,19 +54,6 @@ const legacyBuildUrl = (targetUrl: string, redirectUrl?: string) => {
   }
 
   return url.toString();
-};
-
-const buildAccountsBaseUrl = (frontendApi?: string) => {
-  if (!frontendApi) {
-    return '';
-  }
-
-  // convert url from FAPI to accounts for Kima and legacy (prod & dev) instances
-  const accountsBaseUrl = frontendApi
-    // staging accounts
-    .replace(/clerk\.accountsstage\./, 'accountsstage.')
-    .replace(/clerk\.accounts\.|clerk\./, 'accounts.');
-  return `https://${accountsBaseUrl}`;
 };
 
 type RedirectAdapter<RedirectReturn> = (url: string) => RedirectReturn;
