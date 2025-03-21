@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Lazy-loads the BillingPage within the UserProfile
+Lazy-loads experimental `BillingPage` within `UserProfile`, preventing unnecessary code from loading.
