@@ -16,7 +16,7 @@ type FlowMetadata = {
     | 'blankCaptcha'
     | 'waitlist'
     | 'checkout'
-    | 'sessionTask';
+    | 'tasks';
   part?:
     | 'start'
     | 'emailCode'

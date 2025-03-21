@@ -7,6 +7,8 @@ import type {
 
 import { buildURL } from '../utils';
 
+export const ROOT_TASKS_ROUTE = 'tasks';
+
 export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
   org: 'add-organization',
 } as const;
@@ -23,11 +25,13 @@ interface NavigateToTaskOptions {
  * as internal component routing or custom flows.
  * @internal
  */
-export function navigateToTask(
-  task: SessionTask,
-  { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
-) {
-  const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
+export function navigateToTask({
+  componentNavigationContext,
+  globalNavigate,
+  options,
+  environment,
+}: NavigateToTaskOptions) {
+  const taskRoute = `/${ROOT_TASKS_ROUTE}`;
 
   if (componentNavigationContext) {
     return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);

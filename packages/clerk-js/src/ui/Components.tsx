@@ -494,10 +494,13 @@ const Components = (props: ComponentsProps) => {
     <LazyModalRenderer
       globalAppearance={state.appearance}
       appearanceKey={'sessionTask' as any}
-      flowName={'sessionTask'}
+      flowName={'tasks'}
       onClose={() => componentsControls.closeModal('sessionTask')}
       onExternalNavigate={() => componentsControls.closeModal('sessionTask')}
-      startPath={buildVirtualRouterUrl({ base: '/session-task', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({
+        base: '/session-task',
+        path: sessionTaskModal ? '/tasks' : urlStateParam?.path,
+      })}
       componentName={'SessionTaskModal'}
       canCloseModal={false}
       modalContainerSx={{ alignItems: 'center' }}

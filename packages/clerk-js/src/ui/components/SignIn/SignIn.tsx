@@ -2,7 +2,6 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
-import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -131,11 +130,8 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               {signInContext.withSessionTasks && (
-                <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-                  <SessionTask
-                    task='org'
-                    redirectUrlComplete={signInContext.afterSignUpUrl}
-                  />
+                <Route path='tasks'>
+                  <SessionTask redirectUrlComplete={signInContext.afterSignUpUrl} />
                 </Route>
               )}
               <Route index>
@@ -148,11 +144,8 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         {signInContext.withSessionTasks && (
-          <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-            <SessionTask
-              task='org'
-              redirectUrlComplete={signInContext.afterSignInUrl}
-            />
+          <Route path='tasks'>
+            <SessionTask redirectUrlComplete={signInContext.afterSignUpUrl} />
           </Route>
         )}
         <Route index>
@@ -198,7 +191,7 @@ function SignInRoot() {
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ indexPath, navigate });
-  }, [indexPath, navigate]);
+  }, [indexPath, navigate, __internal_setComponentNavigationContext]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

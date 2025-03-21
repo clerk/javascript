@@ -1,36 +1,43 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { __internal_SessionTaskModalProps, SessionTask } from '@clerk/types';
+import type { SessionTask } from '@clerk/types';
+import { SESSION_TASK_ROUTE_BY_KEY } from 'core/sessionTasks';
 import { useCallback, useEffect } from 'react';
 
+import { Flow } from '../../../ui/customizables';
 import { OrganizationListContext } from '../../contexts';
 import { SessionTaskContext as SessionTaskContext } from '../../contexts/components/SessionTask';
-import { useRouter } from '../../router';
+import { Route, Switch, useRouter } from '../../router';
 import { OrganizationList } from '../OrganizationList';
 
-interface SessionTaskProps {
-  task: SessionTask['key'];
-  redirectUrlComplete: string;
-}
+function SessionTaskRoutes(): JSX.Element {
+  const { telemetry, session } = useClerk();
 
-const ContentRegistry: Record<SessionTask['key'], React.ComponentType> = {
-  org: () => (
-    <OrganizationListContext.Provider
-      value={{
-        componentName: 'OrganizationList',
-        skipInvitationScreen: true,
-      }}
-    >
-      <OrganizationList />
-    </OrganizationListContext.Provider>
-  ),
-};
+  telemetry?.record(eventComponentMounted('SessionTask', { task: session?.currentTask?.key as string }));
+
+  return (
+    <Flow.Root flow='tasks'>
+      <Switch>
+        <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
+          <OrganizationListContext.Provider
+            value={{
+              componentName: 'OrganizationList',
+              skipInvitationScreen: true,
+            }}
+          >
+            <OrganizationList />
+          </OrganizationListContext.Provider>
+        </Route>
+      </Switch>
+    </Flow.Root>
+  );
+}
 
 /**
  * @internal
  */
-export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): React.ReactNode {
-  const { session, telemetry, __experimental_nextTask } = useClerk();
+export function SessionTask({ redirectUrlComplete }: { redirectUrlComplete: string }): JSX.Element {
+  const { __experimental_nextTask, session } = useClerk();
   const { navigate } = useRouter();
 
   useEffect(() => {
@@ -41,18 +48,14 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
     void navigate(redirectUrlComplete);
   }, [session?.currentTask, navigate, redirectUrlComplete]);
 
-  telemetry?.record(eventComponentMounted('SessionTask', { task }));
-
   const nextTask = useCallback(
     () => __experimental_nextTask({ redirectUrlComplete }),
     [__experimental_nextTask, redirectUrlComplete],
   );
 
-  const Content = ContentRegistry[task];
-
   return (
-    <SessionTaskContext.Provider value={{ nextTask }}>
-      <Content />
+    <SessionTaskContext.Provider value={{ nextTask, componentName: 'SessionTask' }}>
+      <SessionTaskRoutes />
     </SessionTaskContext.Provider>
   );
 }
@@ -60,21 +63,19 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
 /**
  * @internal
  */
-export function SessionTaskModal({ task }: __internal_SessionTaskModalProps): JSX.Element {
-  const { telemetry, __experimental_nextTask, __internal_closeSessionTask } = useClerk();
-
-  telemetry?.record(eventComponentMounted('SessionTask', { task }));
+export function SessionTaskModal(): JSX.Element {
+  const { __experimental_nextTask, __internal_closeSessionTask } = useClerk();
 
   const nextTask = useCallback(
     () => __experimental_nextTask({ onComplete: __internal_closeSessionTask }),
     [__experimental_nextTask, __internal_closeSessionTask],
   );
 
-  const Content = ContentRegistry[task];
-
   return (
-    <SessionTaskContext.Provider value={{ nextTask }}>
-      <Content />
-    </SessionTaskContext.Provider>
+    <Route path='tasks'>
+      <SessionTaskContext.Provider value={{ nextTask, mode: 'modal', componentName: 'SessionTask' }}>
+        <SessionTaskRoutes />
+      </SessionTaskContext.Provider>
+    </Route>
   );
 }

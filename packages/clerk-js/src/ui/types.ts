@@ -114,6 +114,8 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
 
 export type SessionTaskCtx = {
   nextTask: () => void;
+  componentName: 'SessionTask';
+  mode?: ComponentMode;
 };
 
 export type AvailableComponentCtx =
