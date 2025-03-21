@@ -24,6 +24,7 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
 
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return session!
       .attemptSecondFactorVerification({ strategy: 'backup_code', code: codeControl.value })
       .then(handleVerificationResponse)

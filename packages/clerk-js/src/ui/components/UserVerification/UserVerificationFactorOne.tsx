@@ -34,6 +34,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { navigate } = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const sessionVerification = data!;
 
   const availableFactors = sessionVerification.supportedFirstFactors;
