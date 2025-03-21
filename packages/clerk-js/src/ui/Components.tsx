@@ -499,6 +499,7 @@ const Components = (props: ComponentsProps) => {
       onExternalNavigate={() => componentsControls.closeModal('sessionTask')}
       startPath={buildVirtualRouterUrl({ base: '/session-task', path: urlStateParam?.path })}
       componentName={'SessionTaskModal'}
+      canCloseModal={false}
       modalContainerSx={{ alignItems: 'center' }}
     >
       {/* @ts-ignore todo -> fix type error */}

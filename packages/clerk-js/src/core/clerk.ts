@@ -15,6 +15,7 @@ import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_SessionTaskModalProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -73,7 +74,6 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-  __internal_ComponentNavigationContext,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -1124,7 +1124,7 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public __experimental_nextTask = async ({ redirectUrlComplete, onComplete }: NextTaskParams = {}): Promise<void> => {
     const session = await this.session?.reload();
     if (!session || !this.environment) {
       return;
@@ -1140,17 +1140,21 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+    if (!onComplete) {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+      const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
 
-    this.#setTransitiveState();
+      this.#setTransitiveState();
 
-    await tracker.track(async () => {
-      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
-    });
+      await tracker.track(async () => {
+        await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+      });
 
-    if (tracker.isUnloading()) {
-      return;
+      if (tracker.isUnloading()) {
+        return;
+      }
+    } else {
+      await onComplete();
     }
 
     this.#setAccessors(session);

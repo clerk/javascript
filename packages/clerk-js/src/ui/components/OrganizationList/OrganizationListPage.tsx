@@ -149,6 +149,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const { hidePersonal } = useOrganizationListContext();
+  const sessionTaskContext = useContext(SessionTaskContext);
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
@@ -173,11 +174,13 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
             !hidePersonal ? 'organizationList.title' : 'organizationList.titleWithoutPersonal',
           )}
         />
-        <Header.Subtitle
-          localizationKey={localizationKeys('organizationList.subtitle', {
-            applicationName: environment.displayConfig.applicationName,
-          })}
-        />
+        {!sessionTaskContext && (
+          <Header.Subtitle
+            localizationKey={localizationKeys('organizationList.subtitle', {
+              applicationName: environment.displayConfig.applicationName,
+            })}
+          />
+        )}
       </Header.Root>
       <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>

@@ -61,12 +61,20 @@ export function SessionTask({ task, redirectUrlComplete }: SessionTaskProps): Re
  * @internal
  */
 export function SessionTaskModal({ task }: __internal_SessionTaskModalProps): JSX.Element {
-  const clerk = useClerk();
+  const { telemetry, __experimental_nextTask, __internal_closeSessionTask } = useClerk();
 
-  clerk.telemetry?.record(eventComponentMounted('SessionTaskModal', { task }));
+  telemetry?.record(eventComponentMounted('SessionTask', { task }));
+
+  const nextTask = useCallback(
+    () => __experimental_nextTask({ onComplete: __internal_closeSessionTask }),
+    [__experimental_nextTask, __internal_closeSessionTask],
+  );
 
   const Content = ContentRegistry[task];
 
-  // TODO -> Introduce basic routing to navigate between tasks
-  return <Content />;
+  return (
+    <SessionTaskContext.Provider value={{ nextTask }}>
+      <Content />
+    </SessionTaskContext.Provider>
+  );
 }

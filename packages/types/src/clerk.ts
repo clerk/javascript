@@ -1619,13 +1619,21 @@ export interface AuthenticateWithGoogleOneTapParams {
   legalAccepted?: boolean;
 }
 
-export interface NextTaskParams {
-  /**
-   * Full URL or path to navigate after successfully resolving all tasks
-   * @default undefined
-   */
-  redirectUrlComplete?: string;
-}
+export type NextTaskParams =
+  | {
+      /**
+       * Full URL or path to navigate after successfully resolving all tasks
+       * @default undefined
+       */
+      redirectUrlComplete?: string;
+    }
+  | {
+      /**
+       * Callback function that gets executed once all tasks get successfull resolved
+       * @default undefined
+       */
+      onComplete?: () => Promise<void>;
+    };
 
 export interface LoadedClerk extends Clerk {
   client: ClientResource;
