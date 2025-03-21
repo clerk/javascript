@@ -39,8 +39,8 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             }
           }, 500);
 
-          return clerk
-            .signUpWithPopup({
+          return signUp
+            .authenticateWithPopup({
               strategy,
               redirectUrl,
               redirectUrlComplete,

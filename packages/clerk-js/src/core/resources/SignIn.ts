@@ -49,6 +49,7 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
+import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -263,8 +264,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!popup) {
       clerkMissingOptionError('popup');
     }
-
-    return this.authenticateWithRedirectOrPopup(params, url => {
+    return _authenticateWithPopup(SignIn.clerk, this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url.toString();
     });
   };

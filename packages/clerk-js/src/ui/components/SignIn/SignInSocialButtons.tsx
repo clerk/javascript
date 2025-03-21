@@ -38,8 +38,8 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
             }
           }, 500);
 
-          return clerk
-            .signInWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
+          return signIn
+            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
             .catch(err => handleError(err, [], card.setError));
         }
 

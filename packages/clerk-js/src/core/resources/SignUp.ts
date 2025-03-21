@@ -35,6 +35,7 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
+import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -357,7 +358,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkMissingOptionError('popup');
     }
 
-    return this.authenticateWithRedirectOrPopup(params, url => {
+    return _authenticateWithPopup(SignUp.clerk, this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url instanceof URL ? url.toString() : url;
     });
   };

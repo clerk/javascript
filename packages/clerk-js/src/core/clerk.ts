@@ -1,5 +1,4 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
-import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -22,7 +21,6 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  AuthenticateWithPopupParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
@@ -1872,86 +1870,6 @@ export class Clerk implements ClerkInterface {
         redirectUrl,
       });
     }
-  };
-
-  private authenticateWithPopup = async (
-    authenticationType: 'signIn' | 'signUp',
-    params: AuthenticateWithPopupParams & {
-      unsafeMetadata?: SignUpUnsafeMetadata;
-    },
-  ): Promise<void> => {
-    if (!this.client || !this.environment || !params.popup) {
-      return;
-    }
-
-    const accountPortalHost = buildAccountsBaseUrl(this.frontendApi);
-
-    const { redirectUrl } = params;
-
-    // We set the force_redirect_url query parameter to ensure that the user is redirected to the correct page even
-    // in situations like a modal transfer flow.
-    const r = new URL(redirectUrl);
-    r.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
-    r.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
-    // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
-    const redirectUrlWithForceRedirectUrl = this.buildUrlWithAuth(r.toString());
-
-    const popupRedirectUrlComplete = this.buildUrlWithAuth(`${accountPortalHost}/popup-callback`);
-    const popupRedirectUrl = this.buildUrlWithAuth(
-      `${accountPortalHost}/popup-callback?return_url=${encodeURIComponent(redirectUrlWithForceRedirectUrl)}`,
-    );
-
-    const messageHandler = async (event: MessageEvent) => {
-      if (event.origin !== accountPortalHost) return;
-
-      let shouldRemoveListener = false;
-
-      if (event.data.session) {
-        const existingSession = this.client?.sessions.find(x => x.id === event.data.session) || null;
-        if (!existingSession) {
-          try {
-            await this.client?.reload();
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        await this.setActive({
-          session: event.data.session,
-          redirectUrl: params.redirectUrlComplete,
-        });
-        shouldRemoveListener = true;
-      } else if (event.data.return_url) {
-        this.navigate(event.data.return_url);
-        shouldRemoveListener = true;
-      }
-
-      if (shouldRemoveListener) {
-        window.removeEventListener('message', messageHandler);
-      }
-    };
-
-    window.addEventListener('message', messageHandler);
-
-    const authenticateMethod =
-      authenticationType === 'signIn'
-        ? this.client.signIn.authenticateWithPopup
-        : this.client.signUp.authenticateWithPopup;
-
-    await authenticateMethod({
-      ...params,
-      redirectUrlComplete: popupRedirectUrlComplete,
-      redirectUrl: popupRedirectUrl,
-    });
-  };
-
-  public signUpWithPopup = async (
-    params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
-  ): Promise<void> => {
-    return this.authenticateWithPopup('signUp', params);
-  };
-
-  public signInWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
-    return this.authenticateWithPopup('signIn', params);
   };
 
   public createOrganization = async ({ name, slug }: CreateOrganizationParams): Promise<OrganizationResource> => {
