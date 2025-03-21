@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -25,7 +26,6 @@ import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFo
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
-import type { SignUpResource } from '@clerk/types';
 
 function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
