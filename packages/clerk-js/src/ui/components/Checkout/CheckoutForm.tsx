@@ -7,15 +7,15 @@ import type {
   ClerkRuntimeError,
 } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Form, Icon, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, Icon, Text, useAppearance } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
-import { handleError } from '../../utils';
+import { handleError, normalizeColorString } from '../../utils';
 
 export const CheckoutForm = ({
   stripe,
@@ -27,6 +27,27 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals } = checkout;
+  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
+  const elementsAppearance: StripeAppearance = {
+    variables: {
+      colorPrimary: normalizeColorString(colors.$primary500),
+      colorBackground: normalizeColorString(colors.$colorInputBackground),
+      colorText: normalizeColorString(colors.$colorText),
+      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
+      colorSuccess: normalizeColorString(colors.$success500),
+      colorDanger: normalizeColorString(colors.$danger500),
+      colorWarning: normalizeColorString(colors.$warning500),
+      fontWeightNormal: fontWeights.$normal.toString(),
+      fontWeightMedium: fontWeights.$medium.toString(),
+      fontWeightBold: fontWeights.$bold.toString(),
+      fontSizeXl: fontSizes.$xl,
+      fontSizeLg: fontSizes.$lg,
+      fontSizeSm: fontSizes.$md,
+      fontSizeXs: fontSizes.$sm,
+      borderRadius: radii.$md,
+      spacingUnit: space.$1,
+    },
+  };
   return (
     <Drawer.Body>
       <Box
@@ -77,7 +98,7 @@ export const CheckoutForm = ({
       {stripe && (
         <Elements
           stripe={stripe}
-          options={{ clientSecret: checkout.externalClientSecret }}
+          options={{ clientSecret: checkout.externalClientSecret, appearance: elementsAppearance }}
         >
           <CheckoutFormElements
             checkout={checkout}
