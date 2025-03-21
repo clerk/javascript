@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Add shared `buildAccountsBaseUrl` utility. ([#5416](https://github.com/clerk/javascript/pull/5416)) by [@dstaley](https://github.com/dstaley)
+
 ## 3.1.0
 
 ### Minor Changes

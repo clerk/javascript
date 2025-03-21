@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.57.2
+
+### Patch Changes
+
+- Add background color to `<PricingTableMatrix />` elements to ensure sticky elements cover the scrollable content. ([#5417](https://github.com/clerk/javascript/pull/5417)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a new signUp attempt on SignUp component when there is no ticket flow and a phone number is provided to prevent rate-limiting issues. ([#5415](https://github.com/clerk/javascript/pull/5415)) by [@anagstef](https://github.com/anagstef)
+
+- Add `matrix` layout option to `<PricingTable />` component. ([#5393](https://github.com/clerk/javascript/pull/5393)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/shared@3.2.0
+
 ## 5.57.1
 
 ### Patch Changes
