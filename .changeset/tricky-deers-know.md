@@ -7,7 +7,7 @@ This introducing changes to `useReverification`, the changes include removing th
 
 ```tsx {{ filename: 'src/components/MyButton.tsx' }}
 import { useReverification } from '@clerk/clerk-react'
-import { isClerkRuntimeError } from '@clerk/clerk-react/error'
+import { isReverificationCancelledError } from '@clerk/clerk-react/error'
 
 export function MyButton() {
   const enhancedFetcher = useReverification(() => fetch('/api/balance'))
@@ -15,14 +15,11 @@ export function MyButton() {
   const handleClick = async () => {
     try {
       const myData = await enhancedFetcher()
-      // If `myData` is null, the user canceled the reverification process
-      // You can choose how your app responds. This example returns null.
-      if (!myData) return
     } catch (e) {
-      // Handle error returned from the fetcher
+      // Handle error returned from the fetcher here
 
       // You can also handle cancellation with the following
-      if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
+      if (isReverificationCancelledError(err)) {
         // Handle the cancellation error here
       }
     }
@@ -37,8 +34,8 @@ to handle re-verification flow. When the handler is passed the default UI our AI
 
 
 ```tsx {{ filename: 'src/components/MyButtonCustom.tsx' }}
-import { useReverification } from '@clerk/react'
-import { isClerkRuntimeError } from '@clerk/react/error'
+import { useReverification } from '@clerk/clerk-react'
+import { isReverificationCancelledError } from '@clerk/clerk-react/error'
 
 export function MyButton() {
   const enhancedFetcher = useReverification(() => fetch('/api/balance'), {
@@ -50,11 +47,13 @@ export function MyButton() {
   const handleClick = async () => {
     try {
       const myData = await enhancedFetcher()
-      // If `myData` is null, the user canceled the reverification process
-      // You can choose how your app responds. This example returns null.
-      if (!myData) return
     } catch (e) {
-      // Handle error returned from the fetcher
+      // Handle error returned from the fetcher here
+
+      // You can also handle cancellation with the following
+      if (isReverificationCancelledError(err)) {
+        // Handle the cancellation error here
+      }
     }
   }
 

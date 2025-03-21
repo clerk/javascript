@@ -161,15 +161,22 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
  * import { useReverification } from '@clerk/clerk-react'
+ * import { isReverificationCancelledError } from '@clerk/clerk-react/error'
  *
  * export function MyButton() {
- *   const enhancedFetcher = useReverification(myFetcher)
+ *   const enhancedFetcher = useReverification(() => fetch('/api/balance'))
  *
  *   const handleClick = async () => {
- *     const myData = await enhancedFetcher()
- *     // If `myData` is null, the user canceled the reverification process
- *     // You can choose how your app responds. This example returns null.
- *     if (!myData) return
+ *     try {
+ *       const myData = await enhancedFetcher()
+ *     } catch (e) {
+ *       // Handle error returned from the fetcher here
+ *
+ *       // You can also handle cancellation with the following
+ *       if (isReverificationCancelledError(err)) {
+ *         // Handle the cancellation error here
+ *       }
+ *     }
  *   }
  *
  *   return <button onClick={handleClick}>Update User</button>

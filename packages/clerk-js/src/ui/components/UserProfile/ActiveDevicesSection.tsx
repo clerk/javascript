@@ -61,12 +61,9 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       return;
     }
     status.setLoading();
-    return (
-      revokeSession()
-        // TODO-STEPUP: Properly handler the response with a setCardError
-        .catch(err => handleError(err, [], status.setError))
-        .finally(() => status.setIdle())
-    );
+    return revokeSession()
+      .catch(err => handleError(err, [], status.setError))
+      .finally(() => status.setIdle());
   };
 
   return (
