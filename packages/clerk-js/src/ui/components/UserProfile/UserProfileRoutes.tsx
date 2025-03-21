@@ -16,7 +16,7 @@ export const UserProfileRoutes = () => {
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
 
   const BillingPage = lazy(() =>
-    import('./BillingPage').then(module => ({
+    import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
       default: module.BillingPage,
     })),
   );
