@@ -251,9 +251,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     }
 
     let json: FapiResponseJSON<T> | null = null;
-    try {
+    // 204 No Content responses do not have a body so we should not try to parse it
+    if (response.status !== 204) {
       json = await response.json();
-    } catch {
+    } else {
       json = null;
     }
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
