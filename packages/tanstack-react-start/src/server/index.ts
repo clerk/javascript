@@ -1,7 +1,3 @@
-import { warnPackageRenaming } from '../utils/errors';
-
-warnPackageRenaming();
-
 export * from './middlewareHandler';
 
 export * from './getAuth';
