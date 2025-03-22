@@ -4,7 +4,7 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
-import { getEvent } from 'vinxi/http';
+import { getEvent } from '@tanstack/react-start/server';
 
 import { errorThrower } from '../utils';
 import { getPublicEnvVariables } from '../utils/env';

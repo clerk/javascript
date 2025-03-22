@@ -1,6 +1,6 @@
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
-import { getEvent } from 'vinxi/http';
+import { getEvent } from '@tanstack/react-start/server';
 
 import { getPublicEnvVariables } from '../utils/env';
 

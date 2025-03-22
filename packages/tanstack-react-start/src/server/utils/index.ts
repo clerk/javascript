@@ -2,7 +2,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import { debugRequestState } from '@clerk/backend/internal';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import { getEvent } from 'vinxi/http';
+import { getEvent } from '@tanstack/react-start/server';
 
 import type { AdditionalStateOptions } from '../types';
 
