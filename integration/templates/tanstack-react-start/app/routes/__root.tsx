@@ -39,7 +39,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </head>
         <body>
           {children}
-          <ScrollRestoration />
           <TanStackRouterDevtools position="bottom-right" />
           <Scripts />
         </body>
