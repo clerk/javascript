@@ -130,6 +130,7 @@ export type {
   UserWebhookEvent,
   WaitlistEntryWebhookEvent,
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
 } from './api/resources/Webhooks';
 
