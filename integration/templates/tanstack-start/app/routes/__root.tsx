@@ -9,7 +9,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
-import { ClerkProvider } from '@clerk/tanstack-start'
+import { ClerkProvider } from '@clerk/tanstack-react-start'
 import appCss from '~/styles/app.css?url'
 
 export const Route = createRootRoute({

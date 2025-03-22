@@ -10,7 +10,7 @@ const router = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-start'));
 
 const start = applicationConfig()
   .setName('tanstack-start')
@@ -20,7 +20,7 @@ const start = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-start'));
 
 export const tanstack = {
   start,
