@@ -246,6 +246,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     };
 
     const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (request.headers.get('x-middleware-subrequest')) {
+        return new NextResponse('Forbidden', { status: 403 });
+      }
+
       if (canUseKeyless) {
         return keylessMiddleware(request, event);
       }
