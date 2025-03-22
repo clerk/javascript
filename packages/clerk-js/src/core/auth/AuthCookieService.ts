@@ -109,11 +109,18 @@ export class AuthCookieService {
     this.devBrowser.clear();
   }
 
-  private startPollingForToken() {
+  public startPollingForToken() {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
+      this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+  }
+
+  public stopPollingForToken() {
+    if (this.poller) {
+      this.poller.stopPollingForSessionToken();
+      this.poller = null;
+    }
   }
 
   private refreshTokenOnFocus() {

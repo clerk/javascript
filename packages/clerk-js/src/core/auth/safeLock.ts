@@ -9,7 +9,7 @@ export function SafeLock(key: string) {
     await lock.releaseLock(key);
   });
 
-  const acquireLockAndRun = async (cb: () => unknown) => {
+  const acquireLockAndRun = async (cb: () => Promise<unknown>) => {
     if ('locks' in navigator && isSecureContext) {
       const controller = new AbortController();
       const lockTimeout = setTimeout(() => controller.abort(), 4999);

@@ -29,7 +29,7 @@ type RetryOptions = Partial<{
   /**
    * Controls whether the helper should retry the operation immediately once before applying exponential backoff.
    * The delay for the immediate retry is 100ms.
-   * @default true
+   * @default false
    */
   retryImmediately: boolean;
   /**
@@ -44,7 +44,7 @@ const defaultOptions: Required<RetryOptions> = {
   maxDelayBetweenRetries: 0,
   factor: 2,
   shouldRetry: (_: unknown, iteration: number) => iteration < 5,
-  retryImmediately: true,
+  retryImmediately: false,
   jitter: true,
 };
 

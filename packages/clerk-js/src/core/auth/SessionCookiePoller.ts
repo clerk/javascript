@@ -10,19 +10,23 @@ export class SessionCookiePoller {
   private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
 
-  public startPollingForSessionToken(cb: () => unknown): void {
+  public startPollingForSessionToken(cb: () => Promise<unknown>): void {
     if (this.timerId) {
       return;
     }
 
-    this.timerId = this.workerTimers.setInterval(() => {
-      void this.lock.acquireLockAndRun(cb);
-    }, INTERVAL_IN_MS);
+    const run = async () => {
+      await this.lock.acquireLockAndRun(cb);
+      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+    };
+
+    void run();
   }
 
   public stopPollingForSessionToken(): void {
-    if (this.timerId) {
-      this.workerTimers.clearInterval(this.timerId);
+    // Note: `timerId` can be 0.
+    if (this.timerId != null) {
+      this.workerTimers.clearTimeout(this.timerId);
       this.timerId = null;
     }
   }

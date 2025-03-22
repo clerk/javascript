@@ -232,17 +232,20 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
-        response =
-          // retry only on GET requests for safety
-          overwrittenRequestMethod === 'GET'
-            ? await retry(() => fetch(urlStr, fetchOpts), {
-                initialDelay: 500,
-                maxDelayBetweenRetries: 3000,
-                shouldRetry: (_: unknown, iterationsCount: number) => {
-                  return iterationsCount < maxTries;
-                },
-              })
-            : await fetch(urlStr, fetchOpts);
+        response = await retry(() => fetch(urlStr, fetchOpts), {
+          // This retry handles only network errors, not 4xx or 5xx responses,
+          // so we want to try once immediately to handle simple network blips.
+          // Since fapiClient is responsible for the network layer only,
+          // callers need to use their own retry logic where needed.
+          retryImmediately: true,
+          // And then exponentially back off with a max delay of 5 seconds.
+          initialDelay: 700,
+          maxDelayBetweenRetries: 5000,
+          shouldRetry: (_: unknown, iterations: number) => {
+            // We want to retry only GET requests, as other methods are not idempotent.
+            return overwrittenRequestMethod === 'GET' && iterations < maxTries;
+          },
+        });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
