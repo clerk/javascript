@@ -2,27 +2,27 @@ import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
 
-const router = applicationConfig()
-  .setName('tanstack-router')
-  .useTemplate(templates['tanstack-router'])
+const reactRouter = applicationConfig()
+  .setName('tanstack-react-router')
+  .useTemplate(templates['tanstack-react-router'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
-const start = applicationConfig()
-  .setName('tanstack-start')
-  .useTemplate(templates['tanstack-start'])
+const reactStart = applicationConfig()
+  .setName('tanstack-react-start')
+  .useTemplate(templates['tanstack-react-start'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'pnpm install')
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-start'));
+  .addDependency('@clerk/tanstack-react-start', linkPackage('tanstack-react-start'));
 
 export const tanstack = {
-  start,
-  router,
+  reactStart,
+  reactRouter,
 } as const;

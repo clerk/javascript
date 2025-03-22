@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { SignedIn, SignedOut, SignIn, SignOutButton, UserButton } from '@clerk/tanstack-start';
+import { SignedIn, SignedOut, SignIn, SignOutButton, UserButton } from '@clerk/tanstack-react-start';
 
 export const Route = createFileRoute('/')({
   component: Home,
