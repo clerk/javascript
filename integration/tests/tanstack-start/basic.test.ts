@@ -11,7 +11,7 @@ declare global {
 }
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
-  'basic tests for TanStack Start @tanstack-start',
+  'basic tests for TanStack Start @tanstack-react-start',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
