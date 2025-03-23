@@ -151,7 +151,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
-        createAuthenticateRequestOptions(clerkRequest, options),
+        createAuthenticateRequestOptions(clerkRequest, { ...options, entity: 'any' }),
       );
 
       logger.debug('requestState', () => ({
