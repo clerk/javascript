@@ -38,6 +38,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.continue();
       await u.po.expect.toBeSignedIn();
 
+      // Gets redirected back to tasks when accessing protected route by `auth.protect`
+      await u.page.goToRelative('/page-protected');
+      expect(page.url()).toContain('add-organization');
+
       // Resolves task
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
       await u.po.expect.toHaveResolvedTask();
