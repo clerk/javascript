@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SessionTasks } from '../../../ui/lazyModules/components';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -14,7 +15,7 @@ import {
 } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
-import { SessionTasks } from '../../lazyModules/components';
+import { usePreloadTasks } from '../../hooks/usePreloadTasks';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import {
   LazySignUpContinue,
@@ -130,7 +131,7 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               <Route path='tasks'>
-                <SessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
+                <SessionTasks />
               </Route>
               <Route index>
                 <LazySignUpContinue />
@@ -142,7 +143,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <SessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
+          <SessionTasks />
         </Route>
         <Route index>
           <SignInStart />
@@ -178,6 +179,8 @@ function SignInRoot() {
    * Preload Sign Up when in Combined Flow.
    */
   usePreloadSignUp(signInContext.isCombinedFlow);
+
+  usePreloadTasks();
 
   React.useEffect(() => {
     return __internal_setComponentNavigationContext?.({ indexPath, navigate });

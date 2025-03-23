@@ -1,19 +1,58 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionTask } from '@clerk/types';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
-import { SessionTaskContext as SessionTaskContext } from '../../contexts/components/SessionTask';
+import { OrganizationListContext, SignInContext, SignUpContext } from '../../../ui/contexts';
+import { Card, LoadingCardContainer, withCardStateProvider } from '../../../ui/elements';
+import { SessionTasksContext as SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
-import { LazyOrganizationSelectionTask } from './lazyTasks';
-import { usePreloadTasks } from './usePreloadTasks';
+import { OrganizationList } from '../OrganizationList';
+
+const SessionTasksStart = withCardStateProvider(() => {
+  const clerk = useClerk();
+  const { navigate } = useRouter();
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      void clerk.session?.reload().then(session => {
+        if (!session.currentTask?.key) {
+          void navigate(clerk.buildAfterSignInUrl());
+          return;
+        }
+
+        void navigate(SESSION_TASK_ROUTE_BY_KEY[session.currentTask?.key]);
+      });
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [navigate, clerk]);
+
+  return (
+    <Card.Root>
+      <Card.Content>
+        <LoadingCardContainer />
+      </Card.Content>
+      <Card.Footer />
+    </Card.Root>
+  );
+});
 
 function SessionTaskRoutes(): JSX.Element {
   return (
     <Switch>
       <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-        <LazyOrganizationSelectionTask />
+        <OrganizationListContext.Provider
+          value={{
+            componentName: 'OrganizationList',
+            skipInvitationScreen: true,
+          }}
+        >
+          <OrganizationList />
+        </OrganizationListContext.Provider>
+      </Route>
+      <Route index>
+        <SessionTasksStart />
       </Route>
     </Switch>
   );
@@ -22,31 +61,34 @@ function SessionTaskRoutes(): JSX.Element {
 /**
  * @internal
  */
-export function SessionTask({ redirectUrlComplete }: { redirectUrlComplete: string }): JSX.Element {
-  usePreloadTasks();
-
-  const { __experimental_nextTask, session, telemetry } = useClerk();
+export function SessionTask(): JSX.Element {
+  const clerk = useClerk();
   const { navigate } = useRouter();
+  const signInContext = useContext(SignInContext);
+  const signUpContext = useContext(SignUpContext);
 
-  const task = session?.currentTask;
+  const redirectUrlComplete =
+    signInContext?.afterSignInUrl ?? signUpContext?.afterSignUpUrl ?? clerk?.buildAfterSignInUrl();
 
   useEffect(() => {
-    if (task) {
-      telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
+    const task = clerk.session?.currentTask;
+
+    if (!task) {
+      void navigate(redirectUrlComplete);
       return;
     }
 
-    void navigate(redirectUrlComplete);
-  }, [task, telemetry, navigate, redirectUrlComplete]);
+    clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
+  }, [clerk, navigate, redirectUrlComplete]);
 
   const nextTask = useCallback(
-    () => __experimental_nextTask({ redirectUrlComplete }),
-    [__experimental_nextTask, redirectUrlComplete],
+    () => clerk.__experimental_nextTask({ redirectUrlComplete: redirectUrlComplete }),
+    [clerk, redirectUrlComplete],
   );
 
   return (
-    <SessionTaskContext.Provider value={{ nextTask }}>
+    <SessionTasksContext.Provider value={{ nextTask }}>
       <SessionTaskRoutes />
-    </SessionTaskContext.Provider>
+    </SessionTasksContext.Provider>
   );
 }
