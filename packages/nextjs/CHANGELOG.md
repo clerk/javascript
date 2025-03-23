@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.31.8
+
+### Patch Changes
+
+- The Vercel team disclosed a NextJS vulnerability on 22 MAR 2025. Your application might be impacted if you're not using the latest NextJS release so we recommend upgrading to the latest NextJS version as soon as possible. ([#5428](https://github.com/clerk/javascript/pull/5428)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  For more details, please see https://clerk.com/blog/cve-2025-29927
+
 ## 4.31.7
 
 ### Patch Changes
