@@ -17,6 +17,8 @@ import { organizationListParams } from './utils';
 const useOrganizationListInView = () => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
 
+  console.log({ userMemberships });
+
   const { ref } = useInView({
     threshold: 0,
     onChange: inView => {
