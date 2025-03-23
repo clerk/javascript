@@ -1,5 +1,6 @@
 import type { SessionTask } from '@clerk/types';
 
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
@@ -44,7 +45,7 @@ export function buildSessionTaskRedirectUrl({
     routing,
     baseUrl,
     path,
-    endpoint: '/tasks',
+    endpoint: `/tasks/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
     authQueryString: null,
   });
 }

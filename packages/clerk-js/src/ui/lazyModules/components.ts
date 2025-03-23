@@ -95,7 +95,6 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
 );
 
-export const preloadSessionTasks = () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks');
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
 );

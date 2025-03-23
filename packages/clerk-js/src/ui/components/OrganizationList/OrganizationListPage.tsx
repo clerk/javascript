@@ -2,7 +2,7 @@ import { useOrganizationList, useUser } from '@clerk/shared/react';
 import { useContext, useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
-import { SessionTaskContext } from '../../contexts/components/SessionTask';
+import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -16,6 +16,8 @@ import { organizationListParams } from './utils';
 
 const useOrganizationListInView = () => {
   const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(organizationListParams);
+
+  console.log({ userMemberships });
 
   const { ref } = useInView({
     threshold: 0,
@@ -112,7 +114,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
-  const sessionTaskContext = useContext(SessionTaskContext);
+  const sessionTasksContext = useContext(SessionTasksContext);
   return (
     <>
       {!isCreateOrganizationFlow && (
@@ -127,7 +129,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
-            onComplete={sessionTaskContext?.nextTask}
+            onComplete={sessionTasksContext?.nextTask}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
