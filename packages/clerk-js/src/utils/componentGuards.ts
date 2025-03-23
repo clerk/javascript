@@ -10,6 +10,10 @@ export const sessionExistsAndSingleSessionModeEnabled: ComponentGuard = (clerk, 
   return !!(clerk.session && environment?.authConfig.singleSessionMode);
 };
 
+export const noSessionExists: ComponentGuard = clerk => {
+  return !clerk.isSignedIn;
+};
+
 export const noUserExists: ComponentGuard = clerk => {
   return !clerk.user;
 };

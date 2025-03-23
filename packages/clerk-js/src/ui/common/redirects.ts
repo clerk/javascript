@@ -1,5 +1,6 @@
 import type { SessionTask } from '@clerk/types';
 
+import { SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 import { SESSION_TASK_ROUTE_BY_KEY } from 'core/sessionTasks';
