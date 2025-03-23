@@ -114,6 +114,7 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
 
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
+  redirectUrlComplete?: string;
 };
 
 export type AvailableComponentCtx =

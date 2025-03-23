@@ -644,7 +644,7 @@ export interface Clerk {
    * If all tasks are complete, it navigates to the provided completion URL.
    * @experimental
    */
-  __experimental_nextTask: (params: NextTaskParams) => Promise<void>;
+  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
