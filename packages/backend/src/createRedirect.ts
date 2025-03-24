@@ -108,10 +108,8 @@ export const createRedirect: CreateRedirect = params => {
       errorThrower.throwMissingPublishableKeyError();
     }
     const rootTasksPath = 'tasks';
-    const signInUrlWithTasks = signInUrl
-      ? `${signInUrl}/${rootTasksPath}`
-      : `${accountsBaseUrl}/sign-in/${rootTasksPath}`;
-    return redirectAdapter(buildUrl(baseUrl, signInUrlWithTasks, null, isDevelopment ? params.devBrowserToken : null));
+    const tasksUrl = signInUrl ? `${signInUrl}/${rootTasksPath}` : `${accountsBaseUrl}/sign-in/${rootTasksPath}`;
+    return redirectAdapter(buildUrl(baseUrl, tasksUrl, null, isDevelopment ? params.devBrowserToken : null));
   };
 
   return { redirectToSignUp, redirectToSignIn, redirectToTasks };
