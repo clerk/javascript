@@ -377,20 +377,6 @@ const StripePaymentMethods = ({
         rowGap: t.space.$3,
       })}
     >
-      <Button
-        elementId={descriptors.button.setId('paypal')}
-        variant='unstyled'
-        size='md'
-        textVariant={'buttonLarge'}
-        block
-        sx={{
-          backgroundColor: '#FFC43A',
-          color: '#222D65',
-        }}
-      >
-        {/* TODO(@COMMERCE): needs localization */}
-        Pay with PayPal
-      </Button>
       {collapsed ? (
         <>
           <Button
