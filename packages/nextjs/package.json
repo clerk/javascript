@@ -58,7 +58,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint --quiet src",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",

@@ -48,7 +48,7 @@
     "build": "tsup --onSuccess \"pnpm build:dts\"",
     "build:dts": "vue-tsc --declaration --emitDeclarationOnly -p tsconfig.build.json",
     "dev": "tsup --watch",
-    "lint": "eslint --quiet src",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",

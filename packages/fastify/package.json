@@ -32,7 +32,7 @@
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint --quiet src",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",

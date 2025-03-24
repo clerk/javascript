@@ -34,7 +34,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint --quiet src",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
