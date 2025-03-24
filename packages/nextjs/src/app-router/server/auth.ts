@@ -25,6 +25,13 @@ type Auth = AuthObject & {
    * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+  /**
+   * The `auth()` helper returns the `redirectToTasks()` method, which you can use to redirect the user to the tasks page.
+   *
+   * @note
+   * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   */
+  redirectToTasks: RedirectFun<ReturnType<typeof redirect>>;
 };
 
 export interface AuthFn {
@@ -104,7 +111,26 @@ export const auth: AuthFn = async () => {
     });
   };
 
-  return Object.assign(authObject, { redirectToSignIn });
+  const redirectToTasks: RedirectFun<never> = () => {
+    const clerkRequest = createClerkRequest(request);
+    const devBrowserToken =
+      clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+      clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+
+    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+    const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+
+    return createRedirect({
+      redirectAdapter: redirect,
+      devBrowserToken: devBrowserToken,
+      baseUrl: clerkRequest.clerkUrl.toString(),
+      publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+      signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
+      signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
+    }).redirectToTasks();
+  };
+
+  return Object.assign(authObject, { redirectToSignIn, redirectToTasks });
 };
 
 auth.protect = async (...args: any[]) => {
@@ -118,6 +144,7 @@ auth.protect = async (...args: any[]) => {
     request,
     authObject,
     redirectToSignIn: authObject.redirectToSignIn,
+    redirectToTasks: authObject.redirectToTasks,
     notFound,
     redirect,
   });

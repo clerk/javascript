@@ -17,8 +17,10 @@ import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
+  isRedirectToTasksError,
   nextjsRedirectError,
   redirectToSignInError,
+  redirectToTasksError,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -33,6 +35,7 @@ import {
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   redirectToSignIn: RedirectFun<Response>;
+  redirectToTasks: RedirectFun<Response>;
 };
 
 export interface ClerkMiddlewareAuth {
@@ -162,9 +165,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
+      const redirectToTasks = createMiddlewareRedirectToTasks(clerkRequest);
+      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn, redirectToTasks);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
+        redirectToSignIn,
+        redirectToTasks,
+      });
       const authHandler = () => Promise.resolve(authObjWithMethods);
       authHandler.protect = protect;
 
@@ -303,10 +310,18 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
+const createMiddlewareRedirectToTasks = (clerkRequest: ClerkRequest): ClerkMiddlewareAuthObject['redirectToTasks'] => {
+  return (opts = {}) => {
+    const url = clerkRequest.clerkUrl.toString();
+    redirectToTasksError(url, opts.returnBackUrl);
+  };
+};
+
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
+  redirectToTasks: RedirectFun<Response>,
 ) => {
   return (async (params: any, options: any) => {
     const notFound = () => nextjsNotFound();
@@ -316,7 +331,10 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
+    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn, redirectToTasks })(
+      params,
+      options,
+    );
   }) as unknown as Promise<AuthProtect>;
 };
 
@@ -353,6 +371,16 @@ const handleControlFlowErrors = (
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+  }
+
+  if (isRedirectToTasksError(e)) {
+    return createRedirect({
+      redirectAdapter,
+      baseUrl: clerkRequest.clerkUrl,
+      signInUrl: requestState.signInUrl,
+      signUpUrl: requestState.signUpUrl,
+      publishableKey: requestState.publishableKey,
+    }).redirectToTasks({ returnBackUrl: e.returnBackUrl });
   }
 
   if (isNextjsRedirectError(e)) {
