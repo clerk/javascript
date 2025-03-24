@@ -2,6 +2,7 @@
 '@clerk/backend': patch
 '@clerk/shared': patch
 '@clerk/clerk-react': patch
+'@clerk/vue': patch
 '@clerk/types': patch
 ---
 

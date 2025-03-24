@@ -68,8 +68,8 @@ export const clerkPlugin: Plugin = {
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));
 
     const authCtx = computed(() => {
-      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions } = derivedState.value;
-      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions };
+      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions, sessionStatus } = derivedState.value;
+      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, sessionStatus };
     });
     const clientCtx = computed(() => resources.value.client);
     const userCtx = computed(() => derivedState.value.user);
