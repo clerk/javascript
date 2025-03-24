@@ -24,7 +24,6 @@ export const usePlans = (props: UsePlansProps) => {
   const { data: allPlans, revalidate: revalidatePlans } = useFetch(
     __experimental_commerce?.__experimental_billing.getPlans,
     { subscriberType },
-    { staleTime: 0 },
   );
 
   const plans =
