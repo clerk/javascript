@@ -23,7 +23,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
     >
       <Col
         elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('account')}
+        elementId={descriptors.profilePage.setId('billing')}
         gap={4}
       >
         <Header.Root>
