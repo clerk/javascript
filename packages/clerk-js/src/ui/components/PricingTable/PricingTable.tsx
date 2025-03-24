@@ -9,6 +9,7 @@ import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
+import { AppearanceProvider } from '../../customizables';
 import { usePlans } from '../../hooks';
 import { __experimental_Checkout } from '../Checkout';
 import { PricingTableDefault } from './PricingTableDefault';
@@ -69,37 +70,42 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         />
       )}
 
-      <__experimental_CheckoutContext.Provider
-        value={{
-          componentName: 'Checkout',
-          mode,
-          isOpen: showCheckout,
-          setIsOpen: setShowCheckout,
-        }}
+      <AppearanceProvider
+        appearanceKey='checkout'
+        appearance={props.checkoutProps?.appearance}
       >
-        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-        <div>
-          {checkoutPlan && (
-            <__experimental_Checkout
-              planPeriod={planPeriod}
-              planId={checkoutPlan.id}
-              orgId={subscriberType === 'org' ? organization?.id : undefined}
-              onSubscriptionComplete={onSubscriptionChange}
-            />
-          )}
-        </div>
-      </__experimental_CheckoutContext.Provider>
-      <SubscriptionDetailDrawer
-        isOpen={showSubscriptionDetailDrawer}
-        setIsOpen={setShowSubscriptionDetailDrawer}
-        subscription={detailSubscription}
-        setPlanPeriod={setPlanPeriod}
-        strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
-        portalProps={{
-          id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-        }}
-        onSubscriptionCancel={onSubscriptionChange}
-      />
+        <__experimental_CheckoutContext.Provider
+          value={{
+            componentName: 'Checkout',
+            mode,
+            isOpen: showCheckout,
+            setIsOpen: setShowCheckout,
+          }}
+        >
+          {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+          <div>
+            {checkoutPlan && (
+              <__experimental_Checkout
+                planPeriod={planPeriod}
+                planId={checkoutPlan.id}
+                orgId={subscriberType === 'org' ? organization?.id : undefined}
+                onSubscriptionComplete={onSubscriptionChange}
+              />
+            )}
+          </div>
+        </__experimental_CheckoutContext.Provider>
+        <SubscriptionDetailDrawer
+          isOpen={showSubscriptionDetailDrawer}
+          setIsOpen={setShowSubscriptionDetailDrawer}
+          subscription={detailSubscription}
+          setPlanPeriod={setPlanPeriod}
+          strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
+          portalProps={{
+            id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+          }}
+          onSubscriptionCancel={onSubscriptionChange}
+        />
+      </AppearanceProvider>
     </>
   );
 };

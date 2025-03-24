@@ -1,5 +1,13 @@
 # Change Log
 
+## 6.12.9
+
+### Patch Changes
+
+- The majority of Clerk applications are not impacted by the NextJS vulnerability disclosed on 22 MAR 2025. Your application might be impacted if you're not using the latest NextJS release and you do not call auth() in your routes or pages. We still recommend upgrading to the latest NextJS version as soon as possible. ([#5426](https://github.com/clerk/javascript/pull/5426)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  For more details, please see https://clerk.com/blog/cve-2025-29927
+
 ## 6.12.8
 
 ### Patch Changes

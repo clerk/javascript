@@ -521,6 +521,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   return {
     isLoaded: clerk.loaded,
     organization,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
     domains,
     membershipRequests,
