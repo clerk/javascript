@@ -1,4 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
+import type { JwtPayload } from '@clerk/types';
 
 import { constants } from './constants';
 import { errorThrower, parsePublishableKey } from './util/shared';
@@ -70,24 +71,38 @@ type CreateRedirect = <ReturnType>(params: {
   baseUrl: URL | string;
   signInUrl?: URL | string;
   signUpUrl?: URL | string;
+  sessionStatus?: JwtPayload['sts'];
 }) => {
   redirectToSignIn: RedirectFun<ReturnType>;
   redirectToSignUp: RedirectFun<ReturnType>;
-  redirectToTasks: RedirectFun<ReturnType>;
 };
 
 export const createRedirect: CreateRedirect = params => {
-  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl } = params;
+  const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl, sessionStatus } = params;
   const parsedPublishableKey = parsePublishableKey(publishableKey);
   const frontendApi = parsedPublishableKey?.frontendApi;
   const isDevelopment = parsedPublishableKey?.instanceType === 'development';
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
+
+  const redirectToTasks = ({ targetUrl, returnBackUrl }: RedirectToParams & { targetUrl: string | URL }) => {
+    const rootTasksPath = '/tasks';
+
+    const tasksUrl =
+      typeof targetUrl === 'string' ? targetUrl.replace(/\/$/, '') + rootTasksPath : new URL(rootTasksPath, targetUrl);
+
+    return redirectAdapter(buildUrl(baseUrl, tasksUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
+  };
 
   const redirectToSignUp = ({ returnBackUrl }: RedirectToParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
       errorThrower.throwMissingPublishableKeyError();
     }
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
+
+    if (sessionStatus === 'pending') {
+      return redirectToTasks({ targetUrl: signUpUrl ?? accountsSignUpUrl, returnBackUrl });
+    }
+
     return redirectAdapter(
       buildUrl(baseUrl, signUpUrl || accountsSignUpUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
     );
@@ -97,20 +112,17 @@ export const createRedirect: CreateRedirect = params => {
     if (!signInUrl && !accountsBaseUrl) {
       errorThrower.throwMissingPublishableKeyError();
     }
+
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;
+
+    if (sessionStatus === 'pending') {
+      return redirectToTasks({ targetUrl: signInUrl ?? accountsSignInUrl, returnBackUrl });
+    }
+
     return redirectAdapter(
       buildUrl(baseUrl, signInUrl || accountsSignInUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
     );
   };
 
-  const redirectToTasks = () => {
-    if (!signInUrl && !accountsBaseUrl) {
-      errorThrower.throwMissingPublishableKeyError();
-    }
-    const rootTasksPath = 'tasks';
-    const tasksUrl = signInUrl ? `${signInUrl}/${rootTasksPath}` : `${accountsBaseUrl}/sign-in/${rootTasksPath}`;
-    return redirectAdapter(buildUrl(baseUrl, tasksUrl, null, isDevelopment ? params.devBrowserToken : null));
-  };
-
-  return { redirectToSignUp, redirectToSignIn, redirectToTasks };
+  return { redirectToSignUp, redirectToSignIn };
 };

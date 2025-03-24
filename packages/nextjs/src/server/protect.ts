@@ -59,9 +59,8 @@ export function createProtect(opts: {
    * use this callback to customise the behavior
    */
   redirectToSignIn: RedirectFun<unknown>;
-  redirectToTasks: RedirectFun<unknown>;
 }): AuthProtect {
-  const { redirectToSignIn, redirectToTasks, authObject, redirect, notFound, request } = opts;
+  const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
   return (async (...args: any[]) => {
     const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
@@ -91,9 +90,9 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    const handleRedirectToTask = () => {
+    const handlePendingSessionStatus = () => {
       if (isPageRequest(request)) {
-        return redirectToTasks();
+        return redirectToSignIn();
       }
       return notFound();
     };
@@ -105,8 +104,11 @@ export function createProtect(opts: {
       return handleUnauthenticated();
     }
 
+    /**
+     * User is authenticated with pending status, indicating client tasks to resolve
+     */
     if (authObject.sessionClaims.sts === 'pending') {
-      return handleRedirectToTask();
+      return handlePendingSessionStatus();
     }
 
     /**
