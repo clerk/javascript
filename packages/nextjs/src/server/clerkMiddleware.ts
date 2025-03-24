@@ -2,7 +2,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { JwtPayload } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/types';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -171,7 +171,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authObject = requestState.toAuth();
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject?.sessionClaims?.sts);
+      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject?.sessionStatus);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
@@ -308,7 +308,7 @@ export const createAuthenticateRequestOptions = (
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
-  sessionStatus?: JwtPayload['sts'],
+  sessionStatus: SessionStatusClaim | null,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();

@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/types';
 
 /**
  * Clerk's identifiers that are used alongside the ones from Next.js
@@ -97,7 +97,7 @@ function nextjsRedirectError(
 function redirectToSignInError(
   url: string,
   returnBackUrl?: string | URL | null,
-  sessionStatus?: JwtPayload['sts'],
+  sessionStatus?: SessionStatusClaim | null,
 ): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN,
@@ -136,7 +136,7 @@ function isNextjsRedirectError(error: unknown): error is RedirectError<{ redirec
 
 function isRedirectToSignInError(
   error: unknown,
-): error is RedirectError<{ returnBackUrl: string | URL; sessionStatus?: JwtPayload['sts'] }> {
+): error is RedirectError<{ returnBackUrl: string | URL; sessionStatus?: SessionStatusClaim }> {
   if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
     return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN;
   }
