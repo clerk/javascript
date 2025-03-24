@@ -7,15 +7,15 @@ import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
+const OrganizationBillingPage = lazy(() =>
+  import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
+    default: module.OrganizationBillingPage,
+  })),
+);
+
 export const OrganizationProfileRoutes = () => {
   const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
   const { experimental } = useOptions();
-
-  const OrganizationBillingPage = lazy(() =>
-    import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
-      default: module.OrganizationBillingPage,
-    })),
-  );
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
