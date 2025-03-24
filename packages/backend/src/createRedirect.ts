@@ -73,6 +73,7 @@ type CreateRedirect = <ReturnType>(params: {
 }) => {
   redirectToSignIn: RedirectFun<ReturnType>;
   redirectToSignUp: RedirectFun<ReturnType>;
+  redirectToTasks: RedirectFun<ReturnType>;
 };
 
 export const createRedirect: CreateRedirect = params => {
@@ -102,5 +103,16 @@ export const createRedirect: CreateRedirect = params => {
     );
   };
 
-  return { redirectToSignUp, redirectToSignIn };
+  const redirectToTasks = () => {
+    if (!signInUrl && !accountsBaseUrl) {
+      errorThrower.throwMissingPublishableKeyError();
+    }
+    const rootTasksPath = 'tasks';
+    const signInUrlWithTasks = signInUrl
+      ? `${signInUrl}/${rootTasksPath}`
+      : `${accountsBaseUrl}/sign-in/${rootTasksPath}`;
+    return redirectAdapter(buildUrl(baseUrl, signInUrlWithTasks, null, isDevelopment ? params.devBrowserToken : null));
+  };
+
+  return { redirectToSignUp, redirectToSignIn, redirectToTasks };
 };
