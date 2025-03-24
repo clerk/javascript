@@ -27,6 +27,7 @@ const getMenuItemFromText = (element: HTMLElement) => {
 describe('EmailSection', () => {
   it('renders the section', async () => {
     const { wrapper, fixtures } = await createFixtures(withEmails);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
     const { getByText } = render(
@@ -107,6 +108,7 @@ describe('EmailSection', () => {
       const item = getByText(emails[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -129,6 +131,7 @@ describe('EmailSection', () => {
       const item = getByText(emails[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -155,6 +158,7 @@ describe('EmailSection', () => {
         const item = getByText(emails[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await userEvent.click(menuButton!);
         });
 
@@ -176,6 +180,7 @@ describe('EmailSection', () => {
         const item = getByText(emails[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await userEvent.click(menuButton!);
         });
 
@@ -206,6 +211,7 @@ describe('EmailSection', () => {
       const item = getByText(emails[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -231,6 +237,7 @@ describe('EmailSection', () => {
       const item = getByText(emails[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 

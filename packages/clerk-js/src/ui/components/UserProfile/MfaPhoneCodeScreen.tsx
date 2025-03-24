@@ -88,7 +88,7 @@ const EnableMFAButtonForPhone = (
 ) => {
   const { phone, onSuccess, onUnverifiedPhoneClick, resourceRef } = props;
   const card = useCardState();
-  const [setReservedForSecondFactor] = useReverification(() => phone.setReservedForSecondFactor({ reserved: true }));
+  const setReservedForSecondFactor = useReverification(() => phone.setReservedForSecondFactor({ reserved: true }));
 
   const { country } = getCountryFromPhoneString(phone.phoneNumber);
   const formattedPhone = stringToFormattedPhoneString(phone.phoneNumber);
@@ -134,7 +134,7 @@ export const MFAVerifyPhone = (props: MFAVerifyPhoneProps) => {
   const { title, onSuccess, resourceRef, onReset } = props;
   const card = useCardState();
   const phone = resourceRef.current;
-  const [setReservedForSecondFactor] = useReverification(() => phone?.setReservedForSecondFactor({ reserved: true }));
+  const setReservedForSecondFactor = useReverification(() => phone?.setReservedForSecondFactor({ reserved: true }));
 
   const enableMfa = async () => {
     card.setLoading(phone?.id);

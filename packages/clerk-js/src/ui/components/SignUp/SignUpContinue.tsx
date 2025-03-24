@@ -59,7 +59,7 @@ function SignUpContinueInternal() {
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
+    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || signUp.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
@@ -91,8 +91,13 @@ function SignUpContinueInternal() {
   } as const;
 
   const onlyLegalConsentMissing = useMemo(
-    () => signUp.missingFields && signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
-    [signUp.missingFields],
+    () =>
+      signUp.missingFields &&
+      signUp.missingFields.length === 1 &&
+      signUp.missingFields[0] === 'legal_accepted' &&
+      signUp.unverifiedFields &&
+      signUp.unverifiedFields.length === 0,
+    [signUp.missingFields, signUp.unverifiedFields],
   );
 
   useEffect(() => {

@@ -96,6 +96,23 @@ describe('SignUpContinue', () => {
     screen.getByText(/Privacy Policy/i);
   });
 
+  it('renders the component if there is a persisted sign up and legal accepted is missing and email address is unverified', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withPassword({ required: true });
+      f.startSignUpWithMissingLegalAcceptedAndUnverifiedFields();
+      f.withLegalConsent();
+      f.withTermsPrivacyPolicyUrls({
+        privacyPolicy: 'https://clerk.dev/privacy',
+        termsOfService: 'https://clerk.dev/tos',
+      });
+    });
+    const screen = render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/email address/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Privacy Policy/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Terms Of Service/i)).toBeInTheDocument();
+  });
+
   it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress({ required: true });

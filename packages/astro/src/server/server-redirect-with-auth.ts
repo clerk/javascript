@@ -23,6 +23,7 @@ export const serverRedirectWithAuth = (
   if (
     shouldAppendDevBrowser &&
     !!location &&
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     isDevelopmentFromSecretKey(opts.secretKey || getSafeEnv(context).sk!) &&
     clerkRequest.clerkUrl.isCrossOrigin(location)
   ) {
