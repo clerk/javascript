@@ -112,7 +112,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   /**
    * Session status
    */
-  sts?: Extract<SessionStatus, 'active' | 'pending'>;
+  sts?: SessionStatusClaim;
 
   /**
    * Any other JWT Claim Set member.
@@ -128,3 +128,8 @@ export interface ActClaim {
   sub: string;
   [x: string]: unknown;
 }
+
+/**
+ * Session status
+ */
+export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;

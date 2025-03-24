@@ -52,6 +52,7 @@ export type SignedInAuthObject = {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
+  sessionStatus: null;
   actor: null;
   userId: null;
   orgId: null;
@@ -134,6 +135,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   return {
     sessionClaims: null,
     sessionId: null,
+    sessionStatus: null,
     userId: null,
     actor: null,
     orgId: null,

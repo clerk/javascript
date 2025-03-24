@@ -37,7 +37,7 @@ type ProtectProps = PropsWithChildren<
 export const useProtect = (params: ProtectParams): boolean => {
   const { session } = useSession();
 
-  if (!session?.id || !!session.currentTask) {
+  if (!session?.id) {
     return false;
   }
 
