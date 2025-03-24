@@ -162,7 +162,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authObject = requestState.toAuth();
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject?.sessionClaims?.sts);
+      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject?.sessionStatus);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {

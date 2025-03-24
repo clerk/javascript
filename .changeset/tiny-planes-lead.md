@@ -1,8 +1,8 @@
 ---
-'@clerk/backend': patch
-'@clerk/nextjs': patch
-'@clerk/astro': patch
-'@clerk/types': patch
+'@clerk/backend': minor
+'@clerk/nextjs': minor
+'@clerk/astro': minor
+'@clerk/types': minor
 ---
 
 Redirect to tasks on `auth.protect()` and `auth.redirectToSignIn`

@@ -3,7 +3,6 @@ import type { SessionTask } from '@clerk/types';
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../core/sessionTasks';
 import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
-import { SESSION_TASK_ROUTE_BY_KEY } from 'core/sessionTasks';
 
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
