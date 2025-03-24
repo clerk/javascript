@@ -78,6 +78,7 @@ export const useOrganization: UseOrganization = () => {
       isLoaded: clerk.value.loaded,
       organization: organizationCtx.value,
       membership: getCurrentOrganizationMembership(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         session.value!.user.organizationMemberships,
         organizationCtx.value.id,
       ),
