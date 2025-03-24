@@ -4,6 +4,7 @@ import { AuthStatus, constants, createClerkRequest, createRedirect } from '@cler
 import { isDevelopmentFromPublishableKey, isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+import type { JwtPayload } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -84,7 +85,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const authObject = requestState.toAuth();
 
-    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+    const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject.sessionClaims?.sts);
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
     decorateAstroLocal(clerkRequest, context, requestState);
@@ -277,6 +278,7 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
         publishableKey: getSafeEnv(context).pk!,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
+        sessionStatus: authObject.sessionClaims?.sts,
       }).redirectToSignIn({
         returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
       });
@@ -365,10 +367,12 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  sessionStatus?: JwtPayload['sts'],
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
     err.returnBackUrl = opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString();
+    err.sessionStatus = sessionStatus;
     throw err;
   };
 };
@@ -395,6 +399,7 @@ const handleControlFlowErrors = (
         signUpUrl: requestState.signUpUrl,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
+        sessionStatus: e.sessionStatus,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

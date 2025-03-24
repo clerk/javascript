@@ -1,10 +1,11 @@
+import type { JwtPayload } from '@clerk/types';
+
 /**
  * Clerk's identifiers that are used alongside the ones from Next.js
  */
 const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
-  REDIRECT_TO_TASKS: 'CLERK_PROTECT_REDIRECT_TO_TASKS',
 };
 
 /**
@@ -93,17 +94,15 @@ function nextjsRedirectError(
   throw error;
 }
 
-function redirectToSignInError(url: string, returnBackUrl?: string | URL | null): never {
+function redirectToSignInError(
+  url: string,
+  returnBackUrl?: string | URL | null,
+  sessionStatus?: JwtPayload['sts'],
+): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN,
     returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
-  });
-}
-
-function redirectToTasksError(url: string, returnBackUrl?: string | URL | null): never {
-  nextjsRedirectError(url, {
-    clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_TASKS,
-    returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
+    sessionStatus,
   });
 }
 
@@ -135,17 +134,11 @@ function isNextjsRedirectError(error: unknown): error is RedirectError<{ redirec
   );
 }
 
-function isRedirectToSignInError(error: unknown): error is RedirectError<{ returnBackUrl: string | URL }> {
+function isRedirectToSignInError(
+  error: unknown,
+): error is RedirectError<{ returnBackUrl: string | URL; sessionStatus?: JwtPayload['sts'] }> {
   if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
     return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN;
-  }
-
-  return false;
-}
-
-function isRedirectToTasksError(error: unknown): error is RedirectError<{ returnBackUrl: string | URL }> {
-  if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
-    return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_TASKS;
   }
 
   return false;
@@ -158,6 +151,4 @@ export {
   nextjsRedirectError,
   isNextjsRedirectError,
   isRedirectToSignInError,
-  redirectToTasksError,
-  isRedirectToTasksError,
 };

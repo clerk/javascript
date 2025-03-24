@@ -1,6 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import type { SessionStatusClaim } from '@clerk/types';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -17,10 +18,8 @@ import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
-  isRedirectToTasksError,
   nextjsRedirectError,
   redirectToSignInError,
-  redirectToTasksError,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -35,7 +34,6 @@ import {
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   redirectToSignIn: RedirectFun<Response>;
-  redirectToTasks: RedirectFun<Response>;
 };
 
 export interface ClerkMiddlewareAuth {
@@ -164,13 +162,11 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const authObject = requestState.toAuth();
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
-      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-      const redirectToTasks = createMiddlewareRedirectToTasks(clerkRequest);
-      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn, redirectToTasks);
+      const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest, authObject?.sessionClaims?.sts);
+      const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
       const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
         redirectToSignIn,
-        redirectToTasks,
       });
       const authHandler = () => Promise.resolve(authObjWithMethods);
       authHandler.protect = protect;
@@ -303,17 +299,11 @@ export const createAuthenticateRequestOptions = (
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
+  sessionStatus?: SessionStatusClaim,
 ): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
-    redirectToSignInError(url, opts.returnBackUrl);
-  };
-};
-
-const createMiddlewareRedirectToTasks = (clerkRequest: ClerkRequest): ClerkMiddlewareAuthObject['redirectToTasks'] => {
-  return (opts = {}) => {
-    const url = clerkRequest.clerkUrl.toString();
-    redirectToTasksError(url, opts.returnBackUrl);
+    redirectToSignInError(url, opts.returnBackUrl, sessionStatus);
   };
 };
 
@@ -321,7 +311,6 @@ const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,
-  redirectToTasks: RedirectFun<Response>,
 ) => {
   return (async (params: any, options: any) => {
     const notFound = () => nextjsNotFound();
@@ -331,10 +320,13 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn, redirectToTasks })(
-      params,
-      options,
-    );
+    return createProtect({
+      request: clerkRequest,
+      redirect,
+      notFound,
+      authObject,
+      redirectToSignIn,
+    })(params, options);
   }) as unknown as Promise<AuthProtect>;
 };
 
@@ -370,17 +362,8 @@ const handleControlFlowErrors = (
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
+      sessionStatus: e.sessionStatus,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
-  }
-
-  if (isRedirectToTasksError(e)) {
-    return createRedirect({
-      redirectAdapter,
-      baseUrl: clerkRequest.clerkUrl,
-      signInUrl: requestState.signInUrl,
-      signUpUrl: requestState.signUpUrl,
-      publishableKey: requestState.publishableKey,
-    }).redirectToTasks({ returnBackUrl: e.returnBackUrl });
   }
 
   if (isNextjsRedirectError(e)) {
