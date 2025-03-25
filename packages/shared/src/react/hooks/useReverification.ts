@@ -153,6 +153,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
  *
+ * @function
+ *
  * @returns The `useReverification()` hook returns an array with the "enhanced" fetcher.
  *
  * @example
