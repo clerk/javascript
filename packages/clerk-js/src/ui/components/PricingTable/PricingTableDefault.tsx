@@ -108,10 +108,7 @@ function Card(props: CardProps) {
   return (
     <Box
       key={id}
-      elementDescriptor={[
-        descriptors.pricingTableCard,
-        isCompact ? descriptors.pricingTableCardCompact : descriptors.pricingTableCardDefault,
-      ]}
+      elementDescriptor={descriptors.pricingTableCard}
       elementId={descriptors.pricingTableCard.setId(slug)}
       sx={t => ({
         display: 'flex',
@@ -128,7 +125,7 @@ function Card(props: CardProps) {
         overflow: 'hidden',
         textAlign: 'left',
       })}
-      data-compact={isCompact ? 'true' : undefined}
+      data-variant={isCompact ? 'compact' : 'default'}
     >
       <CardHeader
         plan={plan}
@@ -151,7 +148,7 @@ function Card(props: CardProps) {
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
-            data-compact={isCompact ? 'true' : undefined}
+            data-variant={isCompact ? 'compact' : 'default'}
           >
             <CardFeaturesList
               plan={plan}
@@ -227,7 +224,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         width: '100%',
         padding: isCompact ? t.space.$3 : t.space.$4,
       })}
-      data-compact={isCompact ? 'true' : undefined}
+      data-variant={isCompact ? 'compact' : 'default'}
     >
       {avatarUrl || !!subscriptionIdForCurrentSubscriber ? (
         <Box
@@ -288,7 +285,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       ) : null}
       <Flex
         elementDescriptor={descriptors.pricingTableCardFeeContainer}
-        data-compact={isCompact ? 'true' : undefined}
+        data-variant={isCompact ? 'compact' : 'default'}
         align='center'
         wrap='wrap'
         sx={t => ({
@@ -434,7 +431,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
     >
       <Box
         elementDescriptor={descriptors.pricingTableCardFeaturesList}
-        data-compact={isCompact ? 'true' : undefined}
+        data-variant={isCompact ? 'compact' : 'default'}
         as='ul'
         role='list'
         sx={t => ({

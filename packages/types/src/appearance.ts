@@ -364,8 +364,6 @@ export type ElementsConfig = {
 
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
-  pricingTableCardDefault: WithOptions;
-  pricingTableCardCompact: WithOptions;
   pricingTableCardHeader: WithOptions;
   pricingTableCardAvatarBadgeContainer: WithOptions;
   pricingTableCardAvatar: WithOptions;
