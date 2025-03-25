@@ -67,7 +67,7 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE: 'remote:rw', CACHE_DIR, SIGNATURE, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
+          const { ENABLED, CACHE = 'remote:rw', CACHE_DIR, SIGNATURE, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
 
           const ARGS = [
             `--cache-dir=${CACHE_DIR}`,
