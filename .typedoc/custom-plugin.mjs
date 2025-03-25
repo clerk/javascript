@@ -18,10 +18,14 @@ const FILES_WITHOUT_HEADINGS = [
 
 /**
  * An array of tuples where the first element is the file name and the second element is the new path.
+ * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
   ['clerk-paginated-response', '/docs/references/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['session-resource', '/docs/references/javascript/session'],
+  ['signed-in-session-resource', '/docs/references/javascript/session'],
+  ['sign-up-resource', '/docs/references/javascript/sign-up'],
 ];
 
 /**

@@ -75,7 +75,6 @@ const typedocPluginReplaceTextOptions = {
 /** @type {import("typedoc").TypeDocOptions} */
 const config = {
   out: './.typedoc/docs',
-  json: './.typedoc/docs.json',
   entryPointStrategy: 'packages',
   plugin: [
     'typedoc-plugin-replace-text',
