@@ -210,6 +210,7 @@ export const handleMultiDomainAndProxy = (
   if (
     isSatellite &&
     !isHttpOrHttps(signInUrl) &&
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     isDevelopmentFromSecretKey(opts.secretKey || getSafeEnv(context).sk!)
   ) {
     throw new Error(missingSignInUrlInDev);
@@ -281,6 +282,7 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
         redirectAdapter,
         devBrowserToken: devBrowserToken,
         baseUrl: clerkUrl.toString(),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
@@ -321,6 +323,7 @@ function decorateRequest(locals: APIContext['locals'], res: Response): Response 
     );
     const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const stream = res.body!.pipeThrough(
       new TransformStream({
         transform(chunk, controller) {
@@ -399,6 +402,7 @@ const handleControlFlowErrors = (
         baseUrl: clerkRequest.clerkUrl,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:

@@ -98,7 +98,7 @@ type GetOrganizationInvitationParams = {
 type RevokeOrganizationInvitationParams = {
   organizationId: string;
   invitationId: string;
-  requestingUserId: string;
+  requestingUserId?: string;
 };
 
 type GetOrganizationDomainListParams = {
