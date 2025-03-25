@@ -10,6 +10,7 @@ const invokeClerkAstroJSFunctions = () => {
     const elementsOfCategory = document.querySelectorAll(`[data-clerk-function-id^="clerk-${fnName}"]`);
     elementsOfCategory.forEach(el => {
       const id = el.getAttribute('data-clerk-function-id');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const props = window.__astro_clerk_function_props?.get(fnName)?.get(id!) ?? {};
       void $clerk.get()?.[fnName]?.(props);
     });

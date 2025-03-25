@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
+import { AppearanceProvider } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { __experimental_Checkout } from '../Checkout';
 import { PlanDetailDrawer } from './PlanDetailDrawer';
@@ -54,33 +55,38 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         />
       )}
 
-      <__experimental_CheckoutContext.Provider
-        value={{
-          componentName: 'Checkout',
-          mode,
-          isOpen: showCheckout,
-          setIsOpen: setShowCheckout,
-        }}
+      <AppearanceProvider
+        appearanceKey='checkout'
+        appearance={props.checkoutProps?.appearance}
       >
-        {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-        <div>
-          <__experimental_Checkout
-            planPeriod={planPeriod}
-            planId={selectedPlan?.id}
-          />
-        </div>
-      </__experimental_CheckoutContext.Provider>
-      <PlanDetailDrawer
-        isOpen={showPlanDetail}
-        setIsOpen={setShowPlanDetail}
-        plan={selectedPlan}
-        planPeriod={planPeriod}
-        setPlanPeriod={setPlanPeriod}
-        strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
-        portalProps={{
-          id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-        }}
-      />
+        <__experimental_CheckoutContext.Provider
+          value={{
+            componentName: 'Checkout',
+            mode,
+            isOpen: showCheckout,
+            setIsOpen: setShowCheckout,
+          }}
+        >
+          {/*TODO: Used by InvisibleRootBox, can we simplify? */}
+          <div>
+            <__experimental_Checkout
+              planPeriod={planPeriod}
+              planId={selectedPlan?.id}
+            />
+          </div>
+        </__experimental_CheckoutContext.Provider>
+        <PlanDetailDrawer
+          isOpen={showPlanDetail}
+          setIsOpen={setShowPlanDetail}
+          plan={selectedPlan}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
+          portalProps={{
+            id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+          }}
+        />
+      </AppearanceProvider>
     </>
   );
 };

@@ -1498,6 +1498,7 @@ type __experimental_PricingTableMatrixProps = {
 
 type __experimental_PricingTableBaseProps = {
   appearance?: PricingTableTheme;
+  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
 
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &

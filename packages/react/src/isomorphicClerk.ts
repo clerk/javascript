@@ -354,6 +354,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   #waitForClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     return new Promise<HeadlessBrowserClerk | BrowserClerk>(resolve => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.addOnLoaded(() => resolve(this.clerkjs!));
     });
   }
