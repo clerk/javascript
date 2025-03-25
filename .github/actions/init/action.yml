@@ -90,7 +90,7 @@ runs:
           if (ENABLED === 'true') {
             core.exportVariable('TURBO_TEAM', TEAM)
             core.exportVariable('TURBO_TOKEN', TOKEN)
-            core.exportVariable('TURBO_REMOTE_ONLY', REMOTE_ONLY)
+            core.exportVariable('TURBO_CACHE','remote:rw')
           }
 
           if (SIGNATURE && SIGNATURE !== '') {
