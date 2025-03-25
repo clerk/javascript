@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { ClerkAPIError, SignInCreateParams, SignInResource } from '@clerk/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { CaptchaElement } from 'ui/elements/CaptchaElement';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -497,6 +498,7 @@ function SignInStartInternal(): JSX.Element {
           </Col>
         </Card.Content>
         <Card.Footer>
+          <CaptchaElement />
           {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
             <Card.Action elementId='signIn'>
               <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
