@@ -7,11 +7,9 @@ import type {
   __experimental_CommerceSubscriptionResource,
   __experimental_CreateCheckoutParams,
   __experimental_GetPlansParams,
-  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
-import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   __experimental_CommerceCheckout,
   __experimental_CommercePlan,
@@ -31,19 +29,11 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     return defaultProduct?.plans.map(plan => new __experimental_CommercePlan(plan)) || [];
   };
 
-  getSubscriptions = async (
-    params?: __experimental_GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
-    return await BaseResource._fetch(
-      {
-        path: `/me/subscriptions`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(params),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+  getSubscriptions = async (): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    return await BaseResource._fetch({
+      path: `/me/subscriptions`,
+      method: 'GET',
+    }).then(res => {
       const { data: subscriptions, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
 

@@ -103,8 +103,8 @@ export const useFetch = <K, T>(
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
   const revalidate = useCallback(() => {
-    clearCache(); // Clear the cache
-    setRevalidationCounter(prev => prev + 1); // Increment counter to trigger effect
+    clearCache();
+    setRevalidationCounter(prev => prev + 1);
   }, [clearCache]);
 
   useEffect(() => {
