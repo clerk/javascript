@@ -22,6 +22,7 @@ export type {
   UserJSON,
   WaitlistEntryJSON,
   WebhookEvent,
+  WebhookEventPayload,
   WebhookEventType,
   UserWebhookEvent,
   EmailWebhookEvent,
