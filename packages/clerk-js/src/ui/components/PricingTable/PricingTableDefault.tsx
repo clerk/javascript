@@ -66,6 +66,7 @@ export function PricingTableDefault({
           width: '100%',
           minWidth: '0',
         })}
+        data-variant={isCompact ? 'compact' : 'default'}
       >
         {plans?.map(plan => (
           <Card
