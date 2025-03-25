@@ -920,7 +920,7 @@ importers:
         specifier: 0.25.0
         version: 0.25.0
 
-  packages/tanstack-start:
+  packages/tanstack-react-start:
     dependencies:
       '@clerk/backend':
         specifier: workspace:^
@@ -943,9 +943,6 @@ importers:
       tslib:
         specifier: catalog:repo
         version: 2.8.1
-      vinxi:
-        specifier: ^0.5.3
-        version: 0.5.3(@types/node@22.13.10)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.2)(yaml@2.7.0)
     devDependencies:
       '@tanstack/react-router':
         specifier: ^1.114.17
