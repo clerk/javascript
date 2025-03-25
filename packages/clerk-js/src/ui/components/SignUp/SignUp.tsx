@@ -28,15 +28,15 @@ function RedirectToSignUp() {
 
 function SignUpRoutes(): JSX.Element {
   const { __internal_setComponentNavigationContext } = useClerk();
-  const { navigate, basePath } = useRouter();
+  const { navigate, indexPath } = useRouter();
   const signUpContext = useSignUpContext();
 
   // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
   usePreloadSessionTask(signUpContext.withSessionTasks);
 
   React.useEffect(() => {
-    return __internal_setComponentNavigationContext?.({ basePath, navigate });
-  }, [basePath, navigate]);
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+  }, [indexPath, navigate]);
 
   return (
     <Flow.Root flow='signUp'>
@@ -91,7 +91,10 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         {signUpContext.withSessionTasks && (
           <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
-            <SessionTask task='org' />
+            <SessionTask
+              task='org'
+              redirectUrlComplete={signUpContext.afterSignUpUrl}
+            />
           </Route>
         )}
         <Route index>

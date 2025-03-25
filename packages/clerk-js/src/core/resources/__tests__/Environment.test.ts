@@ -237,6 +237,7 @@ describe('Environment', () => {
       organization_settings: {
         enabled: false,
         max_allowed_memberships: 5,
+        force_organization_selection: false,
         actions: { admin_delete: true },
         domains: { enabled: false, enrollment_modes: [], default_role: null },
       },

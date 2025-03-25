@@ -348,6 +348,28 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
         return md.join('\n\n');
       },
+      /**
+       * Copied from default theme / source code. This modifies the output of union types by wrapping everything in a single `<code>foo | bar</code>` tag instead of doing `<code>foo</code>` | `<code>bar</code>`
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/type.union.ts
+       * @param {import('typedoc').UnionType} model
+       */
+      unionType: model => {
+        const useCodeBlocks = this.options.getValue('useCodeBlocks');
+        const typesOut = model.types.map(unionType => {
+          // So, .someType adds the backticks to the string and we don't want to deal with modifying that partial. So just remove any backticks in the next step again :shrug:
+          const defaultResult = this.partials.someType(unionType, { forceCollapse: true });
+
+          // Remove any backticks
+          return defaultResult.replace(/`/g, '');
+        });
+
+        const shouldFormat = useCodeBlocks && (typesOut?.join('').length > 70 || typesOut?.join('').includes('\n'));
+
+        const md = typesOut.join(shouldFormat ? `\n  \\| ` : ` \\| `);
+        const result = shouldFormat ? `\n  \\| ` + md : md;
+
+        return `<code>${result}</code>`;
+      },
     };
   }
 }
