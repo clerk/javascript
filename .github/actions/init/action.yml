@@ -52,8 +52,8 @@ runs:
       env:
         # envs are required to pass inputs to the script
         CACHE: ${{ inputs.turbo-cache }}
-        ENABLED: ${{ inputs.turbo-enabled }}
         CACHE_DIR: ${{ inputs.turbo-cache-dir }}
+        ENABLED: ${{ inputs.turbo-enabled }}
         SIGNATURE: ${{ inputs.turbo-signature }}
         SUMMARIZE: ${{ inputs.turbo-summarize }}
         TEAM: ${{ inputs.turbo-team }}
