@@ -80,10 +80,12 @@ const config = {
   plugin: [
     'typedoc-plugin-replace-text',
     'typedoc-plugin-markdown',
+    './.typedoc/custom-router.mjs',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
   ],
   theme: 'clerkTheme',
+  router: 'clerk-router',
   readme: 'none',
   packageOptions: {
     includeVersion: false,

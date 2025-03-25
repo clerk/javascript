@@ -1,5 +1,5 @@
 // @ts-check
-import { MarkdownPageEvent, MarkdownRendererEvent } from 'typedoc-plugin-markdown';
+import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
  * A list of files where we want to remove any headings
@@ -41,42 +41,9 @@ function getRelativeLinkReplacements() {
 }
 
 /**
- * @param {string} str
- */
-function toKebabCase(str) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
-}
-
-/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
-  app.renderer.on(MarkdownRendererEvent.BEGIN, output => {
-    // Modify the output object
-    output.urls = output.urls
-      // Do not output README.mdx files
-      ?.filter(e => !e.url.endsWith('README.mdx'))
-      .map(e => {
-        // Convert URLs (by default camelCase) to kebab-case
-        const kebabUrl = toKebabCase(e.url);
-
-        e.url = kebabUrl;
-        e.model.url = kebabUrl;
-
-        /**
-         * For the `@clerk/shared` package it outputs the hooks as for example: shared/react/hooks/use-clerk/functions/use-clerk.mdx.
-         * It also places the interfaces as shared/react/hooks/use-organization/interfaces/use-organization-return.mdx
-         * Group all those .mdx files under shared/react/hooks
-         */
-        if (e.url.includes('shared/react/hooks')) {
-          e.url = e.url.replace(/\/[^/]+\/(functions|interfaces)\//, '/');
-          e.model.url = e.url;
-        }
-
-        return e;
-      });
-  });
-
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
     const linkReplacements = getRelativeLinkReplacements();
