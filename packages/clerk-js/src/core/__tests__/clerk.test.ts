@@ -853,6 +853,17 @@ describe('Clerk singleton', () => {
   });
 
   describe('.handleRedirectCallback()', () => {
+    // handleRedirectCallback calls signIn/signUp.reload, which relies on the global fetch instance. We don't actually
+    // need a return value though, so we just mock a resolved promise.
+    const originalFetch = global.fetch;
+    beforeAll(() => {
+      global.fetch = jest.fn().mockResolvedValue({ json: jest.fn().mockResolvedValue({}) });
+    });
+
+    afterAll(() => {
+      global.fetch = originalFetch;
+    });
+
     beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
