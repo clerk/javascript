@@ -51,9 +51,9 @@ runs:
       uses: actions/github-script@v7
       env:
         # envs are required to pass inputs to the script
+        CACHE: ${{ inputs.turbo-cache }}
         ENABLED: ${{ inputs.turbo-enabled }}
         CACHE_DIR: ${{ inputs.turbo-cache-dir }}
-        REMOTE_ONLY: ${{ inputs.turbo-remote-only }}
         SIGNATURE: ${{ inputs.turbo-signature }}
         SUMMARIZE: ${{ inputs.turbo-summarize }}
         TEAM: ${{ inputs.turbo-team }}
@@ -67,7 +67,7 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
+          const { ENABLED, CACHE: 'remote:rw', CACHE_DIR, SIGNATURE, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
 
           const ARGS = [
             `--cache-dir=${CACHE_DIR}`,
@@ -88,9 +88,9 @@ runs:
           )
 
           if (ENABLED === 'true') {
+            core.exportVariable('TURBO_CACHE', CACHE)
             core.exportVariable('TURBO_TEAM', TEAM)
             core.exportVariable('TURBO_TOKEN', TOKEN)
-            core.exportVariable('TURBO_CACHE','remote:rw')
           }
 
           if (SIGNATURE && SIGNATURE !== '') {
