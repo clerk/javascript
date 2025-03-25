@@ -232,6 +232,10 @@ export const polishedAppearance: Appearance = {
       card: {
         ...cardContentStyles(theme),
       },
+      pricingTableCardDefault: {
+        borderWidth: 0,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
       planCardDefault: {
         borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
