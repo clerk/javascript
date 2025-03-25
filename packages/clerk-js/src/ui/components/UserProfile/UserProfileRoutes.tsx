@@ -1,10 +1,17 @@
+import { lazy, Suspense } from 'react';
+
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { BillingPage } from './BillingPage';
 import { SecurityPage } from './SecurityPage';
+
+const BillingPage = lazy(() =>
+  import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
+    default: module.BillingPage,
+  })),
+);
 
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
@@ -52,7 +59,9 @@ export const UserProfileRoutes = () => {
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>
-                <BillingPage />
+                <Suspense fallback={''}>
+                  <BillingPage />
+                </Suspense>
               </Route>
             </Switch>
           </Route>

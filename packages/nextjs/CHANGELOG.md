@@ -1,5 +1,38 @@
 # Change Log
 
+## 6.12.9
+
+### Patch Changes
+
+- The majority of Clerk applications are not impacted by the NextJS vulnerability disclosed on 22 MAR 2025. Your application might be impacted if you're not using the latest NextJS release and you do not call auth() in your routes or pages. We still recommend upgrading to the latest NextJS version as soon as possible. ([#5426](https://github.com/clerk/javascript/pull/5426)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  For more details, please see https://clerk.com/blog/cve-2025-29927
+
+## 6.12.8
+
+### Patch Changes
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483), [`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/backend@1.25.5
+  - @clerk/shared@3.2.0
+  - @clerk/clerk-react@5.25.2
+
+## 6.12.7
+
+### Patch Changes
+
+- Handle Basic auth gracefully ([#5395](https://github.com/clerk/javascript/pull/5395)) by [@jacekradko](https://github.com/jacekradko)
+
+- Export `isReverificationCancelledError` error helper ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+- Improve observability on keyless failures. ([#5389](https://github.com/clerk/javascript/pull/5389)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`facefaf`](https://github.com/clerk/javascript/commit/facefafdaf6d602de0acee9218c66c61a0a9ba24), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d), [`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d)]:
+  - @clerk/backend@1.25.4
+  - @clerk/clerk-react@5.25.1
+  - @clerk/types@4.49.1
+  - @clerk/shared@3.1.0
+
 ## 6.12.6
 
 ### Patch Changes

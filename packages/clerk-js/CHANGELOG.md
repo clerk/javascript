@@ -1,5 +1,113 @@
 # Change Log
 
+## 5.57.3
+
+### Patch Changes
+
+- Pass appearance variables to stripe elements. ([#5346](https://github.com/clerk/javascript/pull/5346)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.57.2
+
+### Patch Changes
+
+- Add background color to `<PricingTableMatrix />` elements to ensure sticky elements cover the scrollable content. ([#5417](https://github.com/clerk/javascript/pull/5417)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a new signUp attempt on SignUp component when there is no ticket flow and a phone number is provided to prevent rate-limiting issues. ([#5415](https://github.com/clerk/javascript/pull/5415)) by [@anagstef](https://github.com/anagstef)
+
+- Add `matrix` layout option to `<PricingTable />` component. ([#5393](https://github.com/clerk/javascript/pull/5393)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/shared@3.2.0
+
+## 5.57.1
+
+### Patch Changes
+
+- Fix issue where unverified field weren't showing up when ToS was enabled ([#5404](https://github.com/clerk/javascript/pull/5404)) by [@octoper](https://github.com/octoper)
+
+- Lazy-loads experimental components within `UserProfile`, preventing unnecessary code from loading. ([#5409](https://github.com/clerk/javascript/pull/5409)) by [@aeliox](https://github.com/aeliox)
+
+- Fix an edge case where `window.Clerk` is re-assigned if the Clerk script is injected multiple times. ([#5406](https://github.com/clerk/javascript/pull/5406)) by [@brkalow](https://github.com/brkalow)
+
+- Export `isReverificationCancelledError` error helper ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+- Introduce `__experimental_nextTask` method for navigating to next tasks on a after-auth flow ([#5377](https://github.com/clerk/javascript/pull/5377)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update the resiliency logic for failed client attempts to allow the creation of a dev browser. ([#5411](https://github.com/clerk/javascript/pull/5411)) by [@panteliselef](https://github.com/panteliselef)
+
+- This introducing changes to `useReverification`, the changes include removing the array and returning the fetcher directly and also the dropping the options `throwOnCancel` and `onCancel` in favour of always throwing the cancellation error. ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+  ```tsx {{ filename: 'src/components/MyButton.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData);
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+  These changes are also adding a new handler in options called `onNeedsReverification`, which can be used to create a custom UI
+  to handle re-verification flow. When the handler is passed the default UI our AIO components provide will not be triggered so you will have to create and handle the re-verification process.
+
+  ```tsx {{ filename: 'src/components/MyButtonCustom.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData, {
+      onNeedsReverification: ({ complete, cancel, level }) => {
+        // e.g open a modal here and handle the re-verification flow
+      },
+    });
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+- Updated dependencies [[`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d)]:
+  - @clerk/types@4.49.1
+  - @clerk/shared@3.1.0
+  - @clerk/localizations@3.13.1
+
 ## 5.57.0
 
 ### Minor Changes

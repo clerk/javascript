@@ -15,6 +15,7 @@ import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -40,10 +41,12 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -201,15 +204,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null = null;
+  #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -975,11 +970,6 @@ export class Clerk implements ClerkInterface {
       session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
     }
 
-    if (session?.status === 'pending') {
-      await this.#handlePendingSession(session);
-      return;
-    }
-
     let newSession = session === undefined ? this.session : session;
 
     // At this point, the `session` variable should contain either an `SignedInSessionResource`
@@ -1000,6 +990,11 @@ export class Clerk implements ClerkInterface {
         );
         newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
       }
+    }
+
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
     }
 
     if (session?.lastActiveToken) {
@@ -1069,16 +1064,18 @@ export class Clerk implements ClerkInterface {
     await onAfterSetActive();
   };
 
-  #handlePendingSession = async (session: SignedInSessionResource) => {
+  #handlePendingSession = async (session: PendingSessionResource) => {
     if (!this.environment) {
       return;
     }
 
-    // Handles multi-session scenario when switching from `active`
-    // to `pending`
+    let newSession: SignedInSessionResource | null = session;
+
+    // Handles multi-session scenario when switching between `pending` sessions
+    // and satisfying task requirements such as organization selection
     if (inActiveBrowserTab() || !this.#options.standardBrowser) {
       await this.#touchCurrentSession(session);
-      session = this.#getSessionFromClient(session.id) ?? session;
+      newSession = this.#getSessionFromClient(session.id) ?? session;
     }
 
     // Syncs __session and __client_uat, in case the `pending` session
@@ -1088,13 +1085,50 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    if (session.currentTask) {
+    if (newSession?.currentTask) {
       await navigateToTask(session.currentTask, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
       });
+
+      // Delay updating session accessors until active status transition to prevent premature component unmounting.
+      // This is particularly important when SignIn components are wrapped in SignedOut components,
+      // as early state updates could cause unwanted unmounting during the transition.
+      this.#setAccessors(session);
+    }
+
+    this.#emit();
+  };
+
+  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+    const session = await this.session?.reload();
+    if (!session || !this.environment) {
+      return;
+    }
+
+    if (session.status === 'pending') {
+      await navigateToTask(session.currentTask, {
+        options: this.#options,
+        environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+      });
+      return;
+    }
+
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+
+    this.#setTransitiveState();
+
+    await tracker.track(async () => {
+      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+    });
+
+    if (tracker.isUnloading()) {
+      return;
     }
 
     this.#setAccessors(session);
@@ -1128,15 +1162,7 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public __internal_setComponentNavigationContext = (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => {
+  public __internal_setComponentNavigationContext = (context: __internal_ComponentNavigationContext) => {
     this.#componentNavigationContext = context;
 
     return () => (this.#componentNavigationContext = null);
@@ -1706,6 +1732,7 @@ export class Clerk implements ClerkInterface {
   ): Promise<SignInResource | SignUpResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Google One Tap');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this.client!.signIn; // TODO: Remove not null assertion
     }
 
@@ -2015,6 +2042,7 @@ export class Clerk implements ClerkInterface {
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
@@ -2068,7 +2096,11 @@ export class Clerk implements ClerkInterface {
             .fetch()
             .then(res => this.updateClient(res))
             .catch(async e => {
-              if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+              /**
+               * Only handle non 4xx errors, like 5xx errors and network errors.
+               */
+              if (is4xxError(e)) {
+                // bubble it up
                 throw e;
               }
 
@@ -2099,7 +2131,7 @@ export class Clerk implements ClerkInterface {
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
-          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
+          if (isError(e, 'requires_captcha')) {
             if (envResult.status === 'rejected') {
               await initEnvironmentPromise;
             }
@@ -2269,6 +2301,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  /**
+   * Temporarily clears the accessors before emitting changes to React context state.
+   * This is used during transitions like sign-out or session changes to prevent UI flickers
+   * such as unexpected unmount of control components
+   */
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;
@@ -2328,7 +2365,7 @@ export class Clerk implements ClerkInterface {
 
     let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     if (this.#isCombinedSignInOrUpFlow()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       signInOrUpUrl = this.#options.signInUrl!;
     }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();

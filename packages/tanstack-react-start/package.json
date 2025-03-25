@@ -1,0 +1,86 @@
+{
+  "name": "@clerk/tanstack-react-start",
+  "version": "0.11.5",
+  "description": "Clerk SDK for TanStack React Start",
+  "keywords": [
+    "clerk",
+    "react",
+    "typescript",
+    "tanstack start",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/tanstack-react-start"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "errors",
+    "server"
+  ],
+  "scripts": {
+    "build": "pnpm clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile esm-only",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/clerk-react": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@tanstack/react-router": "^1.114.17",
+    "@tanstack/react-start": "^1.114.19",
+    "esbuild-plugin-file-path-extensions": "^2.1.4"
+  },
+  "peerDependencies": {
+    "@tanstack/react-router": ">=1.114.6",
+    "@tanstack/react-start": ">=1.114.6",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

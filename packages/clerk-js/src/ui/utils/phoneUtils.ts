@@ -9,6 +9,7 @@ export function getFlagEmojiFromCountryIso(iso: CountryIso, fallbackIso = 'us'):
   if (emojiCache[iso]) {
     return emojiCache[iso];
   }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const codePoints = [...iso.toUpperCase()].map(c => c.codePointAt(0)! + OFFSET);
   const res = String.fromCodePoint(...codePoints);
   emojiCache[iso] = res;

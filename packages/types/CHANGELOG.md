@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.49.1
+
+### Patch Changes
+
+- Introduce `__experimental_nextTask` method for navigating to next tasks on a after-auth flow ([#5377](https://github.com/clerk/javascript/pull/5377)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.49.0
 
 ### Minor Changes
