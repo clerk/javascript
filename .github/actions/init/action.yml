@@ -17,6 +17,10 @@ inputs:
     description: 'Enable Turbo?'
     required: false
     default: 'true'
+  turbo-cache:
+    description: 'Cache usage settings'
+    required: false
+    default: 'remote:rw'
   turbo-cache-dir:
     description: 'The cache dir to use for Turbo'
     required: false
@@ -24,10 +28,6 @@ inputs:
   turbo-signature:
     description: 'The signature to use for Turbo'
     required: false
-  turbo-remote-only:
-    description: 'Only use remote cache?'
-    required: false
-    default: 'true'
   turbo-team:
     description: 'The team to use for Turbo remote auth'
     required: true
