@@ -125,7 +125,7 @@ const CheckoutFormElements = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  const { data } = useFetch(__experimental_commerce?.getPaymentSources, {});
+  const { data } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-payment-sources');
   const { data: paymentSources } = data || { data: [] };
 
   const didExpandStripePaymentMethods = useCallback(() => {
@@ -377,20 +377,6 @@ const StripePaymentMethods = ({
         rowGap: t.space.$3,
       })}
     >
-      <Button
-        elementId={descriptors.button.setId('paypal')}
-        variant='unstyled'
-        size='md'
-        textVariant={'buttonLarge'}
-        block
-        sx={{
-          backgroundColor: '#FFC43A',
-          color: '#222D65',
-        }}
-      >
-        {/* TODO(@COMMERCE): needs localization */}
-        Pay with PayPal
-      </Button>
       {collapsed ? (
         <>
           <Button

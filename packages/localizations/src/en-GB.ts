@@ -322,7 +322,7 @@ export const enGB: LocalizationResource = {
     },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {

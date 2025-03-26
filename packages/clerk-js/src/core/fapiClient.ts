@@ -250,7 +250,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    const json: FapiResponseJSON<T> = await response.json();
+    // 204 No Content responses do not have a body so we should not try to parse it
+    const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;

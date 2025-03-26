@@ -11,7 +11,8 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace'> & {
+export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+  publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
    * register the middleware manually in your application.
