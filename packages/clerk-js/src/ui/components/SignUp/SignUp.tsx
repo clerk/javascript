@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
-import { SessionTasks } from '../../../ui/lazyModules/components';
+import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -85,7 +85,7 @@ function SignUpRoutes(): JSX.Element {
           </Route>
         </Route>
         <Route path='tasks'>
-          <SessionTasks />
+          <LazySessionTasks />
         </Route>
         <Route index>
           <SignUpStart />
