@@ -125,7 +125,7 @@ const CheckoutFormElements = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  const { data } = useFetch(__experimental_commerce?.getPaymentSources, {});
+  const { data } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-payment-sources');
   const { data: paymentSources } = data || { data: [] };
 
   const didExpandStripePaymentMethods = useCallback(() => {
