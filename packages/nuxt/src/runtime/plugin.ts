@@ -1,10 +1,17 @@
 import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
+import type { PluginOptions } from '@clerk/vue';
 import { clerkPlugin } from '@clerk/vue';
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
+
+declare module 'nuxt/schema' {
+  interface PublicRuntimeConfig {
+    clerk: PluginOptions;
+  }
+}
 
 export default defineNuxtPlugin(nuxtApp => {
   // SSR-friendly shared state
@@ -15,8 +22,9 @@ export default defineNuxtPlugin(nuxtApp => {
     initialState.value = nuxtApp.ssrContext?.event.context.__clerk_initial_state;
   }
 
+  const runtimeConfig = useRuntimeConfig();
   nuxtApp.vueApp.use(clerkPlugin, {
-    ...(useRuntimeConfig().public.clerk ?? {}),
+    ...(runtimeConfig.public.clerk ?? {}),
     routerPush: (to: string) => navigateTo(to),
     routerReplace: (to: string) => navigateTo(to, { replace: true }),
     initialState: initialState.value,
