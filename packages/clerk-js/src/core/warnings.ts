@@ -13,7 +13,7 @@ const createMessageForDisabledOrganizations = (
 };
 const createMessageForDisabledCommerce = (componentName: 'PricingTable' | 'Checkout') => {
   return formatWarning(
-    `The <${componentName}/> cannot be rendered when commerce is disabled. Visit 'dashboard.clerk.com' to follow the necessary steps to enable commerce. Since commerce is disabled, this is no-op.`,
+    `The <${componentName}/> component cannot be rendered when commerce is disabled. Visit 'https://dashboard.clerk.com/last-active?path=commerce/settings' to follow the necessary steps to enable commerce. Since commerce is disabled, this is no-op.`,
   );
 };
 const warnings = {

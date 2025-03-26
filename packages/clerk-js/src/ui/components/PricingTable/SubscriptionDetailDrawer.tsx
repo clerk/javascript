@@ -1,11 +1,14 @@
 import type {
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
+  ClerkAPIError,
+  ClerkRuntimeError,
 } from '@clerk/types';
-import * as React from 'react';
+import { useState } from 'react';
 
 import { Box, Button, descriptors, Heading, Text } from '../../customizables';
 import { Alert, Drawer } from '../../elements';
+import { handleError } from '../../utils';
 import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
 
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
@@ -29,15 +32,15 @@ export function SubscriptionDetailDrawer({
   setPlanPeriod,
   onSubscriptionCancel,
 }: SubscriptionDetailDrawerProps) {
-  const [showConfirmation, setShowConfirmation] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [hasError, setHasError] = React.useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
   if (!subscription) {
     return null;
   }
   const hasFeatures = subscription.plan.features.length > 0;
   const cancelSubscription = async () => {
-    setHasError(false);
+    setCancelError(undefined);
     setIsSubmitting(true);
 
     await subscription
@@ -45,9 +48,10 @@ export function SubscriptionDetailDrawer({
       .then(() => {
         setIsSubmitting(false);
         onSubscriptionCancel();
+        setIsOpen(false);
       })
-      .catch(() => {
-        setHasError(true);
+      .catch(error => {
+        handleError(error, [], setCancelError);
         setIsSubmitting(false);
       });
   };
@@ -120,7 +124,7 @@ export function SubscriptionDetailDrawer({
                   size='sm'
                   textVariant='buttonLarge'
                   onClick={() => {
-                    setHasError(false);
+                    setCancelError(undefined);
                     setShowConfirmation(false);
                   }}
                 >
@@ -158,9 +162,9 @@ export function SubscriptionDetailDrawer({
             You can keep using &ldquo;{subscription.plan.name}&rdquo; features until [DATE], after which you will no
             longer have access.
           </Text>
-          {hasError && (
+          {cancelError && (
             // TODO(@COMMERCE): needs localization
-            <Alert colorScheme='danger'>There was a problem canceling your subscription, please try again.</Alert>
+            <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
           )}
         </Drawer.Confirmation>
       </Drawer.Content>

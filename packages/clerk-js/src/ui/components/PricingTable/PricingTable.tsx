@@ -22,7 +22,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
-  const { plans, activeSubscriptions, revalidate } = usePlans({ subscriberType });
+  const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
   const [checkoutPlan, setCheckoutPlan] = useState<__experimental_CommercePlanResource>();
@@ -35,7 +35,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
     if (!clerk.isSignedIn) {
       void clerk.redirectToSignIn();
     }
-    const activeSubscription = activeSubscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
+    const activeSubscription = subscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
     if (activeSubscription) {
       setDetailSubscription(activeSubscription);
       setShowSubscriptionDetailDrawer(true);
@@ -45,8 +45,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
     }
   };
 
-  const onSubscriptionChange = async () => {
-    await revalidate();
+  const onSubscriptionChange = () => {
+    void revalidate();
   };
 
   return (
