@@ -5,4 +5,4 @@
 '@clerk/types': minor
 ---
 
-Redirect to tasks on `auth.protect()` and `auth.redirectToSignIn`
+Redirect to tasks on `auth.protect` and `auth.redirectToSignIn`

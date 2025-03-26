@@ -1,5 +1,3 @@
-import type { SessionStatusClaim } from '@clerk/types';
-
 /**
  * Clerk's identifiers that are used alongside the ones from Next.js
  */
@@ -94,15 +92,10 @@ function nextjsRedirectError(
   throw error;
 }
 
-function redirectToSignInError(
-  url: string,
-  returnBackUrl?: string | URL | null,
-  sessionStatus?: SessionStatusClaim | null,
-): never {
+function redirectToSignInError(url: string, returnBackUrl?: string | URL | null): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN,
     returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
-    sessionStatus,
   });
 }
 
@@ -134,9 +127,7 @@ function isNextjsRedirectError(error: unknown): error is RedirectError<{ redirec
   );
 }
 
-function isRedirectToSignInError(
-  error: unknown,
-): error is RedirectError<{ returnBackUrl: string | URL; sessionStatus?: SessionStatusClaim }> {
+function isRedirectToSignInError(error: unknown): error is RedirectError<{ returnBackUrl: string | URL }> {
   if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
     return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN;
   }

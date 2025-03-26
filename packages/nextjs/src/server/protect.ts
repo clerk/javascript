@@ -90,25 +90,18 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    const handlePendingSessionStatus = () => {
-      if (isPageRequest(request)) {
-        return redirectToSignIn();
-      }
-      return notFound();
-    };
+    /**
+     * User has with pending session status, indicating tasks to resolve
+     */
+    if (authObject.sessionStatus === 'pending') {
+      return handleUnauthenticated();
+    }
 
     /**
      * User is not authenticated
      */
     if (!authObject.userId) {
       return handleUnauthenticated();
-    }
-
-    /**
-     * User is authenticated with pending status, indicating client tasks to resolve
-     */
-    if (authObject.sessionClaims.sts === 'pending') {
-      return handlePendingSessionStatus();
     }
 
     /**

@@ -1,5 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import type { JwtPayload } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/types';
 
 import { constants } from './constants';
 import { errorThrower, parsePublishableKey } from './util/shared';
@@ -71,7 +71,7 @@ type CreateRedirect = <ReturnType>(params: {
   baseUrl: URL | string;
   signInUrl?: URL | string;
   signUpUrl?: URL | string;
-  sessionStatus?: JwtPayload['sts'];
+  sessionStatus?: SessionStatusClaim | null;
 }) => {
   redirectToSignIn: RedirectFun<ReturnType>;
   redirectToSignUp: RedirectFun<ReturnType>;
@@ -83,29 +83,27 @@ export const createRedirect: CreateRedirect = params => {
   const frontendApi = parsedPublishableKey?.frontendApi;
   const isDevelopment = parsedPublishableKey?.instanceType === 'development';
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
+  const hasPendingStatus = sessionStatus === 'pending';
 
-  const redirectToTasks = ({ targetUrl, returnBackUrl }: RedirectToParams & { targetUrl: string | URL }) => {
-    const rootTasksPath = '/tasks';
-
-    const tasksUrl =
-      typeof targetUrl === 'string' ? targetUrl.replace(/\/$/, '') + rootTasksPath : new URL(rootTasksPath, targetUrl);
-
-    return redirectAdapter(buildUrl(baseUrl, tasksUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
+  const redirectToTasks = (url: string | URL, { returnBackUrl }: RedirectToParams) => {
+    return redirectAdapter(
+      buildUrl(baseUrl, `${url}/tasks`, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+    );
   };
 
   const redirectToSignUp = ({ returnBackUrl }: RedirectToParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
       errorThrower.throwMissingPublishableKeyError();
     }
-    const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
 
-    if (sessionStatus === 'pending') {
-      return redirectToTasks({ targetUrl: signUpUrl ?? accountsSignUpUrl, returnBackUrl });
+    const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
+    const targetUrl = signUpUrl || accountsSignUpUrl;
+
+    if (hasPendingStatus) {
+      return redirectToTasks(targetUrl, { returnBackUrl });
     }
 
-    return redirectAdapter(
-      buildUrl(baseUrl, signUpUrl || accountsSignUpUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
-    );
+    return redirectAdapter(buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
   };
 
   const redirectToSignIn = ({ returnBackUrl }: RedirectToParams = {}) => {
@@ -114,14 +112,13 @@ export const createRedirect: CreateRedirect = params => {
     }
 
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;
+    const targetUrl = signInUrl || accountsSignInUrl;
 
-    if (sessionStatus === 'pending') {
-      return redirectToTasks({ targetUrl: signInUrl ?? accountsSignInUrl, returnBackUrl });
+    if (hasPendingStatus) {
+      return redirectToTasks(targetUrl, { returnBackUrl });
     }
 
-    return redirectAdapter(
-      buildUrl(baseUrl, signInUrl || accountsSignInUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
-    );
+    return redirectAdapter(buildUrl(baseUrl, targetUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null));
   };
 
   return { redirectToSignUp, redirectToSignIn };
