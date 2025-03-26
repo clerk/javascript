@@ -63,7 +63,7 @@ export type SDKMetadata = {
   environment?: string;
 };
 
-export type Status = 'degraded' | 'error' | 'loading' | 'ready';
+export type Status = 'degraded' | 'error' | 'loading' | 'ready' | 'uninitialized';
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;

@@ -200,7 +200,7 @@ export class Clerk implements ClerkInterface {
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
-  #status: ClerkInterface['status'] = 'loading';
+  #status: ClerkInterface['status'] = 'uninitialized';
 
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -248,7 +248,7 @@ export class Clerk implements ClerkInterface {
   }
 
   get loaded(): boolean {
-    return this.#status === 'ready';
+    return this.status === 'ready';
   }
 
   get status() {
@@ -256,6 +256,7 @@ export class Clerk implements ClerkInterface {
   }
 
   set status(status: ClerkInterface['status']) {
+    console.log(`status: ${this.#status} -> ${status}`);
     if (this.#status === 'ready') {
       throw new Error('Clerk status cannot be changed once the instance has been loaded.');
     }
@@ -382,7 +383,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    this.#status = 'loading';
+    this.status = 'loading';
 
     try {
       if (this.#instanceType === 'development') {
@@ -411,9 +412,9 @@ export class Clerk implements ClerkInterface {
 
       if (loaded === false) throw new Error('Clerk failed to load');
 
-      this.#status = 'ready';
+      this.status = 'ready';
     } catch (error) {
-      this.#status = 'error';
+      this.status = 'error';
       throw error;
     }
   }
