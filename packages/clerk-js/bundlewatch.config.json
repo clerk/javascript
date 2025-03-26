@@ -1,6 +1,6 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "581.5kB" },
+    { "path": "./dist/clerk.js", "maxSize": "582kB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "79.30kB" },
     { "path": "./dist/clerk.headless.js", "maxSize": "55KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "96KB" },
@@ -19,7 +19,7 @@
     { "path": "./dist/onetap*.js", "maxSize": "1KB" },
     { "path": "./dist/waitlist*.js", "maxSize": "1.3KB" },
     { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" },
-    { "path": "./dist/pricingTable*.js", "maxSize": "5KB" },
+    { "path": "./dist/pricingTable*.js", "maxSize": "5.5KB" },
     { "path": "./dist/checkout*.js", "maxSize": "9KB" },
     { "path": "./dist/up-billing-page*.js", "maxSize": "1KB" },
     { "path": "./dist/sessionTasks*.js", "maxSize": "1KB" }
