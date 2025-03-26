@@ -7,7 +7,7 @@ The type of template to revert
 ```typescript
 import { RevertTemplatePathParamTemplateType } from '@clerk/backend-sdk/models/operations';
 
-let value: RevertTemplatePathParamTemplateType = 'sms';
+let value: RevertTemplatePathParamTemplateType = 'email';
 ```
 
 ## Values

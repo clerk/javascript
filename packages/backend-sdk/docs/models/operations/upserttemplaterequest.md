@@ -6,7 +6,7 @@
 import { UpsertTemplateRequest } from '@clerk/backend-sdk/models/operations';
 
 let value: UpsertTemplateRequest = {
-  templateType: 'sms',
+  templateType: 'email',
   slug: '<value>',
 };
 ```

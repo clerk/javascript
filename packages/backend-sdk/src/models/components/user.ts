@@ -172,6 +172,34 @@ export type User = {
    * @remarks
    */
   legalAcceptedAt?: number | null | undefined;
+
+  /**
+   * The primary email address of the user.
+   *
+   * @remarks
+   */
+  primaryEmailAddress?: EmailAddress | null | undefined;
+
+  /**
+   * The primary phone number of the user.
+   *
+   * @remarks
+   */
+  primaryPhoneNumber?: PhoneNumber | null | undefined;
+
+  /**
+   * The primary web3 wallet of the user.
+   *
+   * @remarks
+   */
+  primaryWeb3Wallet?: Web3Wallet | null | undefined;
+
+  /**
+   * The full name of the user.
+   *
+   * @remarks
+   */
+  fullName?: string | null | undefined;
 };
 
 /** @internal */
@@ -268,9 +296,13 @@ export const User$inboundSchema: z.ZodType<User, z.ZodTypeDef, unknown> = z
     create_organizations_limit: z.nullable(z.number().int()).optional(),
     last_active_at: z.nullable(z.number().int()).optional(),
     legal_accepted_at: z.nullable(z.number().int()).optional(),
+    primary_email_address: z.nullable(EmailAddress$outboundSchema).optional(),
+    primary_phone_number: z.nullable(PhoneNumber$outboundSchema).optional(),
+    primary_web3_wallet: z.nullable(Web3Wallet$outboundSchema).optional(),
+    full_name: z.nullable(z.string()).optional(),
   })
   .transform(v => {
-    return remap$(v, {
+    const remappedObj = remap$(v, {
       external_id: 'externalId',
       primary_email_address_id: 'primaryEmailAddressId',
       primary_phone_number_id: 'primaryPhoneNumberId',
@@ -305,6 +337,22 @@ export const User$inboundSchema: z.ZodType<User, z.ZodTypeDef, unknown> = z
       last_active_at: 'lastActiveAt',
       legal_accepted_at: 'legalAcceptedAt',
     });
+
+    return {
+      ...remappedObj,
+      get primaryEmailAddress() {
+        return remappedObj.emailAddresses?.find(emailAddress => emailAddress.id === remappedObj.primaryEmailAddressId);
+      },
+      get primaryPhoneNumber() {
+        return remappedObj.phoneNumbers?.find(phoneNumber => phoneNumber.id === remappedObj.primaryPhoneNumberId);
+      },
+      get primaryWeb3Wallet() {
+        return remappedObj.web3Wallets?.find(web3Wallet => web3Wallet.id === remappedObj.primaryWeb3WalletId);
+      },
+      get fullName() {
+        return [remappedObj.firstName, remappedObj.lastName].join(' ').trim() || null;
+      },
+    };
   });
 
 /** @internal */

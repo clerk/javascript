@@ -7,7 +7,7 @@ The type of template to toggle delivery for
 ```typescript
 import { ToggleTemplateDeliveryPathParamTemplateType } from '@clerk/backend-sdk/models/operations';
 
-let value: ToggleTemplateDeliveryPathParamTemplateType = 'email';
+let value: ToggleTemplateDeliveryPathParamTemplateType = 'sms';
 ```
 
 ## Values

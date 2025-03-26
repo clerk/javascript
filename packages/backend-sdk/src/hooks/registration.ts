@@ -1,5 +1,5 @@
 import { Hooks } from './types.js';
-import { BeforeRequest } from './clerk.js';
+import { AfterError, BeforeRequest } from './clerk.js';
 /*
  * This file is only ever generated once on the first generation and then is free to be modified.
  * Any hooks you wish to add should be registered in the initHooks function. Feel free to define them
@@ -12,6 +12,8 @@ export function initHooks(hooks: Hooks) {
   // Hooks are registered per SDK instance, and are valid for the lifetime of the SDK instance
 
   const beforeRequest = new BeforeRequest();
+  const afterError = new AfterError();
+
   hooks.registerBeforeRequestHook(beforeRequest);
-  // hooks.registerAfterErrorHook(afterError);
+  hooks.registerAfterErrorHook(afterError);
 }

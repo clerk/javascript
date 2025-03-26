@@ -7,7 +7,7 @@ The type of template to update
 ```typescript
 import { UpsertTemplatePathParamTemplateType } from '@clerk/backend-sdk/models/operations';
 
-let value: UpsertTemplatePathParamTemplateType = 'email';
+let value: UpsertTemplatePathParamTemplateType = 'sms';
 ```
 
 ## Values

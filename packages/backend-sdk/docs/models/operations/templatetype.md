@@ -7,7 +7,7 @@ The type of templates to list (email or SMS)
 ```typescript
 import { TemplateType } from '@clerk/backend-sdk/models/operations';
 
-let value: TemplateType = 'email';
+let value: TemplateType = 'sms';
 ```
 
 ## Values

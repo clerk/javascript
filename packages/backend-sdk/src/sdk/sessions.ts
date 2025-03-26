@@ -7,6 +7,7 @@ import { sessionsCreateToken } from '../funcs/sessionsCreateToken.js';
 import { sessionsCreateTokenFromTemplate } from '../funcs/sessionsCreateTokenFromTemplate.js';
 import { sessionsGet } from '../funcs/sessionsGet.js';
 import { sessionsList } from '../funcs/sessionsList.js';
+import { sessionsRefresh } from '../funcs/sessionsRefresh.js';
 import { sessionsRevoke } from '../funcs/sessionsRevoke.js';
 import { sessionsVerify } from '../funcs/sessionsVerify.js';
 import { ClientSDK, RequestOptions } from '../lib/sdks.js';
@@ -52,6 +53,17 @@ export class Sessions extends ClientSDK {
    */
   async get(request: operations.GetSessionRequest, options?: RequestOptions): Promise<components.Session> {
     return unwrapAsync(sessionsGet(this, request, options));
+  }
+
+  /**
+   * Refresh a session
+   *
+   * @remarks
+   * Refreshes a session by creating a new session token. A 401 is returned when there
+   * are validation errors, which signals the SDKs to fallback to the handshake flow.
+   */
+  async refresh(request: operations.RefreshSessionRequest, options?: RequestOptions): Promise<components.Session> {
+    return unwrapAsync(sessionsRefresh(this, request, options));
   }
 
   /**

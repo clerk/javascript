@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
-  docChecksum: fe26007a4b3e2453f7e35e13b8fe3380
+  docChecksum: e78c47dc718596c9bd5b05a9c21b8874
   docVersion: "2025-12-03"
-  speakeasyVersion: 1.521.1
-  generationVersion: 2.558.5
-  releaseVersion: 0.1.2
-  configChecksum: 51f8c133731eb338d84a53f10aca4782
+  speakeasyVersion: 1.524.0
+  generationVersion: 2.562.2
+  releaseVersion: 0.1.5
+  configChecksum: 364d81b084c7b083c5d7df3a071727d8
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -290,6 +290,7 @@ generatedFiles:
   - docs/models/operations/disablemfarequest.md
   - docs/models/operations/disablemfaresponsebody.md
   - docs/models/operations/filet.md
+  - docs/models/operations/format.md
   - docs/models/operations/getclientlistrequest.md
   - docs/models/operations/getclientrequest.md
   - docs/models/operations/getemailaddressrequest.md
@@ -338,6 +339,8 @@ generatedFiles:
   - docs/models/operations/previewtemplateresponsebody.md
   - docs/models/operations/provider.md
   - docs/models/operations/queryparamstatus.md
+  - docs/models/operations/refreshsessionrequest.md
+  - docs/models/operations/refreshsessionrequestbody.md
   - docs/models/operations/requestbody.md
   - docs/models/operations/responsebody.md
   - docs/models/operations/reverttemplatepathparamtemplatetype.md
@@ -539,6 +542,7 @@ generatedFiles:
   - src/funcs/sessionsCreateTokenFromTemplate.ts
   - src/funcs/sessionsGet.ts
   - src/funcs/sessionsList.ts
+  - src/funcs/sessionsRefresh.ts
   - src/funcs/sessionsRevoke.ts
   - src/funcs/sessionsVerify.ts
   - src/funcs/signInTokensCreate.ts
@@ -701,6 +705,7 @@ generatedFiles:
   - src/mcp-server/tools/sessionsCreateTokenFromTemplate.ts
   - src/mcp-server/tools/sessionsGet.ts
   - src/mcp-server/tools/sessionsList.ts
+  - src/mcp-server/tools/sessionsRefresh.ts
   - src/mcp-server/tools/sessionsRevoke.ts
   - src/mcp-server/tools/sessionsVerify.ts
   - src/mcp-server/tools/signInTokensCreate.ts
@@ -802,7 +807,6 @@ generatedFiles:
   - src/models/components/template.ts
   - src/models/components/testingtoken.ts
   - src/models/components/totalcount.ts
-  - src/models/components/user.ts
   - src/models/components/waitlistentries.ts
   - src/models/components/waitlistentry.ts
   - src/models/components/web3wallet.ts
@@ -893,6 +897,7 @@ generatedFiles:
   - src/models/operations/lockuser.ts
   - src/models/operations/mergeorganizationmetadata.ts
   - src/models/operations/previewtemplate.ts
+  - src/models/operations/refreshsession.ts
   - src/models/operations/reverttemplate.ts
   - src/models/operations/revokeactortoken.ts
   - src/models/operations/revokeinvitation.ts
@@ -2251,6 +2256,16 @@ examples:
       responses:
         "200":
           application/json: {"object": "waitlist_entry", "id": "<id>", "email_address": "Loyal79@yahoo.com", "status": "pending", "created_at": 86, "updated_at": 169727, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Pearl_McGlynn@gmail.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 17759, "updated_at": 230313}}
+        "400":
+          application/json: {"errors": []}
+  RefreshSession:
+    speakeasy-default-refresh-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 847279, "expire_at": 593915, "abandon_at": 653005, "updated_at": 377867, "created_at": 3298}
         "400":
           application/json: {"errors": []}
 examplesVersion: 1.0.0

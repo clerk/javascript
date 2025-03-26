@@ -9,6 +9,7 @@
 - [list](#list) - List all sessions
 - [create](#create) - Create a new active session
 - [get](#get) - Retrieve a session
+- [refresh](#refresh) - Refresh a session
 - [revoke](#revoke) - Revoke a session
 - [~~verify~~](#verify) - Verify a session :warning: **Deprecated**
 - [createToken](#createtoken) - Create a session token
@@ -242,6 +243,84 @@ run();
 | ------------------ | ------------- | ---------------- |
 | errors.ClerkErrors | 400, 401, 404 | application/json |
 | errors.APIError    | 4XX, 5XX      | \*/\*            |
+
+## refresh
+
+Refreshes a session by creating a new session token. A 401 is returned when there
+are validation errors, which signals the SDKs to fallback to the handshake flow.
+
+### Example Usage
+
+```typescript
+import { Clerk } from '@clerk/backend-sdk';
+
+const clerk = new Clerk({
+  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+});
+
+async function run() {
+  const result = await clerk.sessions.refresh({
+    sessionId: '<id>',
+  });
+
+  // Handle the result
+  console.log(result);
+}
+
+run();
+```
+
+### Standalone function
+
+The standalone function version of this method:
+
+```typescript
+import { ClerkCore } from '@clerk/backend-sdk/core.js';
+import { sessionsRefresh } from '@clerk/backend-sdk/funcs/sessionsRefresh.js';
+
+// Use `ClerkCore` for best tree-shaking performance.
+// You can create one instance of it to use across an application.
+const clerk = new ClerkCore({
+  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+});
+
+async function run() {
+  const res = await sessionsRefresh(clerk, {
+    sessionId: '<id>',
+  });
+
+  if (!res.ok) {
+    throw res.error;
+  }
+
+  const { value: result } = res;
+
+  // Handle the result
+  console.log(result);
+}
+
+run();
+```
+
+### Parameters
+
+| Parameter              | Type                                                                                    | Required           | Description                                                                                                                                                                    |
+| ---------------------- | --------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`              | [operations.RefreshSessionRequest](../../models/operations/refreshsessionrequest.md)    | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
+| `options`              | RequestOptions                                                                          | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options) | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                           | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+
+### Response
+
+**Promise\<[components.Session](../../models/components/session.md)\>**
+
+### Errors
+
+| Error Type         | Status Code | Content Type     |
+| ------------------ | ----------- | ---------------- |
+| errors.ClerkErrors | 400, 401    | application/json |
+| errors.APIError    | 4XX, 5XX    | \*/\*            |
 
 ## revoke
 

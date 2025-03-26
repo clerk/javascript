@@ -101,6 +101,7 @@ import { tool$sessionsCreateToken } from './tools/sessionsCreateToken.js';
 import { tool$sessionsCreateTokenFromTemplate } from './tools/sessionsCreateTokenFromTemplate.js';
 import { tool$sessionsGet } from './tools/sessionsGet.js';
 import { tool$sessionsList } from './tools/sessionsList.js';
+import { tool$sessionsRefresh } from './tools/sessionsRefresh.js';
 import { tool$sessionsRevoke } from './tools/sessionsRevoke.js';
 import { tool$sessionsVerify } from './tools/sessionsVerify.js';
 import { tool$signInTokensCreate } from './tools/signInTokensCreate.js';
@@ -150,7 +151,7 @@ export function createMCPServer(deps: {
 }) {
   const server = new McpServer({
     name: 'Clerk',
-    version: '0.1.2',
+    version: '0.1.5',
   });
 
   const client = new ClerkCore({
@@ -185,6 +186,7 @@ export function createMCPServer(deps: {
   tool(tool$sessionsList);
   tool(tool$sessionsCreate);
   tool(tool$sessionsGet);
+  tool(tool$sessionsRefresh);
   tool(tool$sessionsRevoke);
   tool(tool$sessionsVerify);
   tool(tool$sessionsCreateToken);

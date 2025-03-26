@@ -98,7 +98,7 @@ async function $do(
   const context = {
     baseURL: options?.serverURL ?? client._baseURL ?? '',
     operationID: 'CreateBlocklistIdentifier',
-    oAuth2Scopes: [],
+    oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,
 

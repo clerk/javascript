@@ -105,7 +105,7 @@ async function $do(
   const context = {
     baseURL: options?.serverURL ?? client._baseURL ?? '',
     operationID: 'UpdateJWTTemplate',
-    oAuth2Scopes: [],
+    oAuth2Scopes: null,
 
     resolvedSecurity: requestSecurity,
 

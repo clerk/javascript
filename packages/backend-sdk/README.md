@@ -392,6 +392,7 @@ run();
 - [list](docs/sdks/sessions/README.md#list) - List all sessions
 - [create](docs/sdks/sessions/README.md#create) - Create a new active session
 - [get](docs/sdks/sessions/README.md#get) - Retrieve a session
+- [refresh](docs/sdks/sessions/README.md#refresh) - Refresh a session
 - [revoke](docs/sdks/sessions/README.md#revoke) - Revoke a session
 - [~~verify~~](docs/sdks/sessions/README.md#verify) - Verify a session :warning: **Deprecated**
 - [createToken](docs/sdks/sessions/README.md#createtoken) - Create a session token
@@ -556,6 +557,7 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 - [`sessionsCreateTokenFromTemplate`](docs/sdks/sessions/README.md#createtokenfromtemplate) - Create a session token from a jwt template
 - [`sessionsGet`](docs/sdks/sessions/README.md#get) - Retrieve a session
 - [`sessionsList`](docs/sdks/sessions/README.md#list) - List all sessions
+- [`sessionsRefresh`](docs/sdks/sessions/README.md#refresh) - Refresh a session
 - [`sessionsRevoke`](docs/sdks/sessions/README.md#revoke) - Revoke a session
 - [`signInTokensCreate`](docs/sdks/signintokens/README.md#create) - Create sign-in token
 - [`signInTokensRevoke`](docs/sdks/signintokens/README.md#revoke) - Revoke the given sign-in token

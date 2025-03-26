@@ -6,7 +6,7 @@
 import { ToggleTemplateDeliveryRequest } from '@clerk/backend-sdk/models/operations';
 
 let value: ToggleTemplateDeliveryRequest = {
-  templateType: 'sms',
+  templateType: 'email',
   slug: '<value>',
 };
 ```
