@@ -22,7 +22,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const userId = initialState.userId;
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
-  const sessionStatus = initialState.sessionClaims?.sts;
+  const sessionStatus = initialState.sessionStatus;
   const session = initialState.session as SignedInSessionResource;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
