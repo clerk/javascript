@@ -459,14 +459,14 @@ function SignInStartInternal(): JSX.Element {
           >
             <SocialButtonsReversibleContainerWithDivider>
               {hasSocialOrWeb3Buttons && (
-                <>
+                <Col>
                   <SignInSocialButtons
                     enableWeb3Providers
                     enableOAuthProviders
                   />
                   {/* This is only needed for Web3 */}
                   <CaptchaElement />
-                </>
+                </Col>
               )}
               {standardFormAttributes.length ? (
                 <Form.Root
