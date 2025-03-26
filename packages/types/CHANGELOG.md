@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.49.2
+
+### Patch Changes
+
+- Wrap nested `<Checkout />` component in its own AppearanceProvider to recieve its own appearance object. ([#5443](https://github.com/clerk/javascript/pull/5443)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.49.1
 
 ### Patch Changes
