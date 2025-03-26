@@ -644,7 +644,7 @@ export interface Clerk {
    * If all tasks are complete, it navigates to the provided completion URL.
    * @experimental
    */
-  __experimental_nextTask: (params: NextTaskParams) => Promise<void>;
+  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -821,8 +821,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
-        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
