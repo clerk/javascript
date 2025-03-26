@@ -1,5 +1,17 @@
 # @clerk/nuxt
 
+## 1.4.5
+
+### Patch Changes
+
+- Improved type-safety in Vue plugin installation. ([#5458](https://github.com/clerk/javascript/pull/5458)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`7babfb2`](https://github.com/clerk/javascript/commit/7babfb2e620e6f581a92b526b58d05e6b20acca0), [`a9b618d`](https://github.com/clerk/javascript/commit/a9b618dfa97a0dacc462186c8b2588ad5ddb6902), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+  - @clerk/vue@1.4.4
+  - @clerk/shared@3.2.2
+  - @clerk/backend@1.25.7
+
 ## 1.4.4
 
 ### Patch Changes
