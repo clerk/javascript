@@ -1,5 +1,32 @@
 # Change Log
 
+## 6.12.10
+
+### Patch Changes
+
+- Updated dependencies [[`27d66a5`](https://github.com/clerk/javascript/commit/27d66a5b252afd18a3491b2746ef2f2f05632f2a), [`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/backend@1.25.6
+  - @clerk/types@4.49.2
+  - @clerk/clerk-react@5.25.3
+  - @clerk/shared@3.2.1
+
+## 6.12.9
+
+### Patch Changes
+
+- The majority of Clerk applications are not impacted by the NextJS vulnerability disclosed on 22 MAR 2025. Your application might be impacted if you're not using the latest NextJS release and you do not call auth() in your routes or pages. We still recommend upgrading to the latest NextJS version as soon as possible. ([#5426](https://github.com/clerk/javascript/pull/5426)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  For more details, please see https://clerk.com/blog/cve-2025-29927
+
+## 6.12.8
+
+### Patch Changes
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483), [`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/backend@1.25.5
+  - @clerk/shared@3.2.0
+  - @clerk/clerk-react@5.25.2
+
 ## 6.12.7
 
 ### Patch Changes

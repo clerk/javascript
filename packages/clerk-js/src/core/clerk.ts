@@ -1489,6 +1489,25 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
+    // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
+    // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
+    // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
+    if (!window.opener) {
+      try {
+        await signIn.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
+      try {
+        await signUp.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
+    }
+
     const { displayConfig } = this.environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1732,6 +1751,7 @@ export class Clerk implements ClerkInterface {
   ): Promise<SignInResource | SignUpResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Google One Tap');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this.client!.signIn; // TODO: Remove not null assertion
     }
 
@@ -2041,6 +2061,7 @@ export class Clerk implements ClerkInterface {
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
@@ -2363,7 +2384,7 @@ export class Clerk implements ClerkInterface {
 
     let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     if (this.#isCombinedSignInOrUpFlow()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       signInOrUpUrl = this.#options.signInUrl!;
     }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();

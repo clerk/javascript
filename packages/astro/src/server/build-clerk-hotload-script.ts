@@ -4,8 +4,11 @@ import type { APIContext } from 'astro';
 import { getSafeEnv } from './get-safe-env';
 
 function buildClerkHotloadScript(locals: APIContext['locals']) {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const publishableKey = getSafeEnv(locals).pk!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const proxyUrl = getSafeEnv(locals).proxyUrl!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const domain = getSafeEnv(locals).domain!;
   const scriptSrc = clerkJsScriptUrl({
     clerkJSUrl: getSafeEnv(locals).clerkJsUrl,

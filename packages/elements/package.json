@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.4",
+  "version": "0.23.6",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -63,7 +63,7 @@
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "test": "jest",

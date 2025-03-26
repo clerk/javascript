@@ -7,6 +7,12 @@ import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { SecurityPage } from './SecurityPage';
 
+const BillingPage = lazy(() =>
+  import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
+    default: module.BillingPage,
+  })),
+);
+
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
   const { experimental } = useOptions();
@@ -14,12 +20,6 @@ export const UserProfileRoutes = () => {
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
-
-  const BillingPage = lazy(() =>
-    import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
-      default: module.BillingPage,
-    })),
-  );
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && !isSecurityPageRoot && index === 0;

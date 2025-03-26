@@ -1,5 +1,24 @@
 # Change Log
 
+## 1.25.6
+
+### Patch Changes
+
+- Update `RevokeOrganizationInvitationParams.requestUserId` to optional ([#5448](https://github.com/clerk/javascript/pull/5448)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+  - @clerk/shared@3.2.1
+
+## 1.25.5
+
+### Patch Changes
+
+- Update `@clerk/shared` dependency to use new shared `buildAccountsBaseUrl` utility. ([#5416](https://github.com/clerk/javascript/pull/5416)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/shared@3.2.0
+
 ## 1.25.4
 
 ### Patch Changes

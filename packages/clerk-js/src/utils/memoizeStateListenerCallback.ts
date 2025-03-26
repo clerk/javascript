@@ -22,6 +22,7 @@ type AcceptedResource =
 function clientChanged(prev: ClientResource, next: ClientResource): boolean {
   return (
     prev.id !== next.id ||
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     prev.updatedAt!.getTime() < next.updatedAt!.getTime() ||
     prev.sessions.length !== next.sessions.length
   );
@@ -39,6 +40,7 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
 
 function userChanged(prev: UserResource, next: UserResource): boolean {
   return (
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     prev.id !== next.id || prev.updatedAt!.getTime() < next.updatedAt!.getTime() || userMembershipsChanged(next, prev)
   );
 }
