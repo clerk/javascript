@@ -256,7 +256,7 @@ export class Clerk implements ClerkInterface {
   }
 
   set status(status: ClerkInterface['status']) {
-    console.log(`status: ${this.#status} -> ${status}`);
+    // console.log(`status: ${this.#status} -> ${status}`);
     if (this.#status === 'ready') {
       throw new Error('Clerk status cannot be changed once the instance has been loaded.');
     }
@@ -413,9 +413,8 @@ export class Clerk implements ClerkInterface {
       if (loaded === false) throw new Error('Clerk failed to load');
 
       this.status = 'ready';
-    } catch (error) {
+    } catch {
       this.status = 'error';
-      throw error;
     }
   }
 
