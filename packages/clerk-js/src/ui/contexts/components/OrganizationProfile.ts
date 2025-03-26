@@ -29,7 +29,7 @@ export const OrganizationProfileContext = createContext<OrganizationProfileCtx |
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
   const context = useContext(OrganizationProfileContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const environment = useEnvironment();
   const clerk = useClerk();
 
   if (!context || context.componentName !== 'OrganizationProfile') {
@@ -38,10 +38,13 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 
   const { componentName, customPages, ...ctx } = context;
 
-  const pages = useMemo(() => createOrganizationProfileCustomPages(customPages || [], clerk), [customPages]);
+  const pages = useMemo(
+    () => createOrganizationProfileCustomPages(customPages || [], clerk, environment),
+    [customPages],
+  );
 
   const navigateAfterLeaveOrganization = () =>
-    navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
+    navigate(ctx.afterLeaveOrganizationUrl || environment.displayConfig.afterLeaveOrganizationUrl);
 
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
