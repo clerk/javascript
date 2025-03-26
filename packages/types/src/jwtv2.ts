@@ -82,7 +82,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
-   * Active organization id.
+   * Active organization ID.
    */
   org_id?: string;
 
@@ -92,7 +92,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_slug?: string;
 
   /**
-   * Active organization role
+   * Active organization role.
    */
   org_role?: OrganizationCustomRoleKey;
 
