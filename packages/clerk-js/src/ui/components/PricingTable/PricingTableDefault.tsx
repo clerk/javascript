@@ -491,6 +491,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             size='md'
             aria-hidden
           />
+          {/* TODO(@Commerce): needs localization */}
           {showAllFeatures ? 'Hide features' : 'See all features'}
         </SimpleButton>
       )}
