@@ -1,5 +1,5 @@
 // @ts-check
-import { ArrayType, IntersectionType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
+import { ArrayType, i18n, IntersectionType, ReflectionKind, ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 /**
@@ -11,7 +11,7 @@ export function load(app) {
 
 class ClerkMarkdownTheme extends MarkdownTheme {
   /**
-   * @param {import('typedoc-plugin-markdown').MarkdownPageEvent} page
+   * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} page
    */
   getRenderContext(page) {
     return new ClerkMarkdownThemeContext(this, page, this.application.options);
@@ -25,7 +25,7 @@ class ClerkMarkdownTheme extends MarkdownTheme {
 class ClerkMarkdownThemeContext extends MarkdownThemeContext {
   /**
    * @param {MarkdownTheme} theme
-   * @param {import('typedoc-plugin-markdown').MarkdownPageEvent} page
+   * @param {import('typedoc-plugin-markdown').MarkdownPageEvent<import('typedoc').Reflection>} page
    * @param {MarkdownTheme["application"]["options"]} options
    */
   constructor(theme, page, options) {
@@ -37,7 +37,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       ...superPartials,
       /**
        * Copied from default theme / source code. This hides the return type heading over the table from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/179a54c502b318cd4f3951e5e8b90f7f7a4752d8/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number }} options
        */
@@ -53,13 +53,12 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
          */
         const typeDeclaration = modelType?.declaration;
 
-        md.push(heading(options.headingLevel, this.i18n.theme_returns()));
+        md.push(heading(options.headingLevel, i18n.theme_returns()));
 
-        if (model.comment?.blockTags.length) {
-          const tags = model.comment.blockTags
-            .filter(tag => tag.tag === '@returns')
-            .map(tag => this.helpers.getCommentParts(tag.content));
-          md.push(tags.join('\n\n'));
+        const returnsTag = model.comment?.getTag('@returns');
+
+        if (returnsTag) {
+          md.push(this.helpers.getCommentParts(returnsTag.content));
         }
 
         if (typeDeclaration?.signatures) {
@@ -85,7 +84,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section and the signature title from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/179a54c502b318cd4f3951e5e8b90f7f7a4752d8/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signature.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signature.ts
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean }} options
        */
@@ -127,7 +126,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         }
 
         if (model.parameters?.length) {
-          md.push(heading(options.headingLevel, this.internationalization.kindPluralString(ReflectionKind.Parameter)));
+          md.push(heading(options.headingLevel, ReflectionKind.pluralString(ReflectionKind.Parameter)));
           if (this.helpers.useTableFormat('parameters')) {
             md.push(this.partials.parametersTable(model.parameters));
           } else {
@@ -163,12 +162,16 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/179a54c502b318cd4f3951e5e8b90f7f7a4752d8/packages/typedoc-plugin-markdown/src/theme/context/partials/member.memberWithGroups.ts#L58
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.memberWithGroups.ts
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number }} options
        */
       memberWithGroups: (model, options) => {
         const md = [];
+
+        if (model.kind === ReflectionKind.TypeAlias) {
+          md.push(this.partials.declarationTitle(model));
+        }
 
         if (
           ![ReflectionKind.Module, ReflectionKind.Namespace].includes(model.kind) &&
@@ -195,7 +198,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         }
 
         if (model.implementedTypes?.length) {
-          md.push(heading(options.headingLevel, this.i18n.theme_implements()));
+          md.push(heading(options.headingLevel, i18n.theme_implements()));
           md.push(
             unorderedList(model.implementedTypes.map(implementedType => this.partials.someType(implementedType))),
           );
@@ -203,9 +206,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
         if (model.kind === ReflectionKind.Class && model.categories?.length) {
           model.groups
-            ?.filter(group => group.title === this.i18n.kind_plural_constructor())
+            ?.filter(group => group.title === i18n.kind_plural_constructor())
             .forEach(group => {
-              md.push(heading(options.headingLevel, this.i18n.kind_plural_constructor()));
+              md.push(heading(options.headingLevel, i18n.kind_plural_constructor()));
               group.children.forEach(child => {
                 md.push(
                   this.partials.constructor(/** @type {import('typedoc').DeclarationReflection} */ (child), {
@@ -227,7 +230,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         }
 
         if (model.indexSignatures?.length) {
-          md.push(heading(options.headingLevel, this.i18n.theme_indexable()));
+          md.push(heading(options.headingLevel, i18n.theme_indexable()));
           model.indexSignatures.forEach(indexSignature => {
             md.push(this.partials.indexSignature(indexSignature));
           });
@@ -239,7 +242,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section and the declaration title from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/e798507a3c04f9ddf7710baf4cc7836053e438ff/packages/typedoc-plugin-markdown/src/theme/context/partials/member.declaration.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.declaration.ts
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
@@ -294,7 +297,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           model.type?.types?.forEach(intersectionType => {
             if (intersectionType instanceof ReflectionType && !intersectionType.declaration.signatures) {
               if (intersectionType.declaration.children) {
-                md.push(heading(opts.headingLevel, this.i18n.theme_type_declaration()));
+                md.push(heading(opts.headingLevel, i18n.theme_type_declaration()));
 
                 md.push(
                   this.partials.typeDeclaration(intersectionType.declaration, {
@@ -309,7 +312,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         if (hasTypeDeclaration) {
           if (model.type instanceof UnionType) {
             if (this.helpers.hasUsefulTypeDetails(model.type)) {
-              md.push(heading(opts.headingLevel, this.i18n.theme_type_declaration()));
+              md.push(heading(opts.headingLevel, i18n.theme_type_declaration()));
 
               model.type.types.forEach(type => {
                 if (type instanceof ReflectionType) {
@@ -325,7 +328,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               typeDeclaration?.children?.length &&
               (model.kind !== ReflectionKind.Property || this.helpers.useTableFormat('properties'));
             if (useHeading) {
-              md.push(heading(opts.headingLevel, this.i18n.theme_type_declaration()));
+              md.push(heading(opts.headingLevel, i18n.theme_type_declaration()));
             }
             md.push(this.partials.typeDeclarationContainer(model, typeDeclaration, options));
           }
