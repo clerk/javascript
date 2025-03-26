@@ -459,7 +459,7 @@ function SignInStartInternal(): JSX.Element {
           >
             <SocialButtonsReversibleContainerWithDivider>
               {hasSocialOrWeb3Buttons && (
-                <Col>
+                <Col gap={6}>
                   <SignInSocialButtons
                     enableWeb3Providers
                     enableOAuthProviders
