@@ -7,7 +7,7 @@ The type of templates to retrieve (email or SMS)
 ```typescript
 import { PathParamTemplateType } from '@clerk/backend-sdk/models/operations';
 
-let value: PathParamTemplateType = 'email';
+let value: PathParamTemplateType = 'sms';
 ```
 
 ## Values

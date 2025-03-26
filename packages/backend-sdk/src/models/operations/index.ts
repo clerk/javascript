@@ -83,6 +83,7 @@ export * from './listwaitlistentries.js';
 export * from './lockuser.js';
 export * from './mergeorganizationmetadata.js';
 export * from './previewtemplate.js';
+export * from './refreshsession.js';
 export * from './reverttemplate.js';
 export * from './revokeactortoken.js';
 export * from './revokeinvitation.js';

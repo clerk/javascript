@@ -1,9 +1,9 @@
-speakeasyVersion: 1.521.1
+speakeasyVersion: 1.524.0
 sources:
     Clerk Backend API:
         sourceNamespace: clerk-backend-api
-        sourceRevisionDigest: sha256:ab0b121bf7bf2fe1292dc48e021b8180b28e5054eb72bf7b97c2c8f820048088
-        sourceBlobDigest: sha256:29fc6f630bf8f72917e17df45bdb66f9a8959bb91ccb4f5e87818f50ad351078
+        sourceRevisionDigest: sha256:60fde767e3caf76f4ce21d4dc696bf004d67c2734fdb400420aceabcbe5e04a2
+        sourceBlobDigest: sha256:03b7e0deae4be1e9160825fcd45005bdd2c17659767289dd2a8d588593a30053
         tags:
             - latest
             - "2025-12-03"
@@ -11,10 +11,10 @@ targets:
     clerk:
         source: Clerk Backend API
         sourceNamespace: clerk-backend-api
-        sourceRevisionDigest: sha256:ab0b121bf7bf2fe1292dc48e021b8180b28e5054eb72bf7b97c2c8f820048088
-        sourceBlobDigest: sha256:29fc6f630bf8f72917e17df45bdb66f9a8959bb91ccb4f5e87818f50ad351078
+        sourceRevisionDigest: sha256:60fde767e3caf76f4ce21d4dc696bf004d67c2734fdb400420aceabcbe5e04a2
+        sourceBlobDigest: sha256:03b7e0deae4be1e9160825fcd45005bdd2c17659767289dd2a8d588593a30053
         codeSamplesNamespace: clerk-backend-api-typescript-code-samples
-        codeSamplesRevisionDigest: sha256:7781ca184d7cbbd3afee63604ddc3af591c39d8d0338e5d7ed245ea9b556adbc
+        codeSamplesRevisionDigest: sha256:97199f35be0aa12ec498631c2a4e063562fcc89647fea1328bc7d50fd7c9fb8d
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
