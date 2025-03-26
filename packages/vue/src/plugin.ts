@@ -27,8 +27,8 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * app.mount('#app')
  * ```
  */
-export const clerkPlugin: Plugin = {
-  install(app, options: PluginOptions) {
+export const clerkPlugin: Plugin<[PluginOptions]> = {
+  install(app, options) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
     const { initialState } = options;
 
