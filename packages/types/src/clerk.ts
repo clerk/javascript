@@ -644,7 +644,7 @@ export interface Clerk {
    * If all tasks are complete, it navigates to the provided completion URL.
    * @experimental
    */
-  __experimental_nextTask: (params: NextTaskParams) => Promise<void>;
+  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -821,8 +821,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
-        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
@@ -1031,6 +1029,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1164,6 +1166,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1542,6 +1548,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
     | 'withSignUp'
+    | 'oauthFlow'
   >;
 
 export type SignUpButtonProps = {
@@ -1554,6 +1561,7 @@ export type SignUpButtonProps = {
     | 'signInForceRedirectUrl'
     | 'signInFallbackRedirectUrl'
     | 'initialValues'
+    | 'oauthFlow'
   >;
 
 export type CreateOrganizationInvitationParams = {

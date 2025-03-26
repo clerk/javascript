@@ -24,10 +24,16 @@ export const usePlans = (props: UsePlansProps) => {
   );
 
   const activeSubscriptions = useMemo(() => {
+    if ((subscriberType === 'user' && !userSubscriptions) || (subscriberType === 'org' && !orgSubscriptions)) {
+      return undefined;
+    }
     return [...(subscriberType === 'user' ? userSubscriptions?.data || [] : orgSubscriptions?.data || [])];
   }, [userSubscriptions, orgSubscriptions, subscriberType]);
 
   const plans = useMemo(() => {
+    if (!activeSubscriptions) {
+      return [];
+    }
     return (
       allPlans?.map(plan => {
         const activeSubscription = activeSubscriptions.find(sub => {
@@ -48,7 +54,7 @@ export const usePlans = (props: UsePlansProps) => {
 
   return {
     plans,
-    activeSubscriptions,
+    subscriptions: activeSubscriptions || [],
     revalidate,
   };
 };

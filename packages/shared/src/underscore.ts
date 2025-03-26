@@ -73,6 +73,7 @@ const createDeepObjectTransformer = (transform: any) => {
  * Transforms camelCased objects/ arrays to snake_cased.
  * This function recursively traverses all objects and arrays of the passed value
  * camelCased keys are removed.
+ * @function
  */
 export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
 
@@ -80,6 +81,7 @@ export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
  * Transforms snake_cased objects/ arrays to camelCased.
  * This function recursively traverses all objects and arrays of the passed value
  * camelCased keys are removed.
+ * @function
  */
 export const deepSnakeToCamel = createDeepObjectTransformer(snakeToCamel);
 

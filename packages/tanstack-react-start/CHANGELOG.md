@@ -1,5 +1,36 @@
 # @clerk/tanstack-react-start
 
+## 0.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`a9b618d`](https://github.com/clerk/javascript/commit/a9b618dfa97a0dacc462186c8b2588ad5ddb6902), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+  - @clerk/shared@3.2.2
+  - @clerk/backend@1.25.7
+  - @clerk/clerk-react@5.25.4
+
+## 0.12.0
+
+### Minor Changes
+
+- The TanStack React Start SDK package name is now `@clerk/tanstack-react-start`, previously `@clerk/tanstack-start`. This change aligns our package naming with TanStack Start's conventions. ([#5424](https://github.com/clerk/javascript/pull/5424)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Please update your imports as follows:
+
+  ```diff
+  - import { ClerkProvider } from '@clerk/tanstack-start'
+  + import { ClerkProvider } from '@clerk/tanstack-react-start'
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`27d66a5`](https://github.com/clerk/javascript/commit/27d66a5b252afd18a3491b2746ef2f2f05632f2a), [`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/backend@1.25.6
+  - @clerk/types@4.49.2
+  - @clerk/clerk-react@5.25.3
+  - @clerk/shared@3.2.1
+
 ## 0.11.5
 
 ### Patch Changes

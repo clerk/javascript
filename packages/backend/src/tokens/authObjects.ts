@@ -7,6 +7,7 @@ import type {
   OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
+  SessionStatusClaim,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
@@ -29,6 +30,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 export type SignedInAuthObject = {
   sessionClaims: JwtPayload;
   sessionId: string;
+  sessionStatus: SessionStatusClaim | null;
   actor: ActClaim | undefined;
   userId: string;
   orgId: string | undefined;
@@ -52,6 +54,7 @@ export type SignedInAuthObject = {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
+  sessionStatus: null;
   actor: null;
   userId: null;
   orgId: null;
@@ -100,6 +103,7 @@ export function signedInAuthObject(
     org_permissions: orgPermissions,
     sub: userId,
     fva,
+    sts,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -111,10 +115,14 @@ export function signedInAuthObject(
   // fva can be undefined for instances that have not opt-in
   const factorVerificationAge = fva ?? null;
 
+  // sts can be undefined for instances that have not opt-in
+  const sessionStatus = sts ?? null;
+
   return {
     actor,
     sessionClaims,
     sessionId,
+    sessionStatus,
     userId,
     orgId,
     orgRole,
@@ -134,6 +142,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   return {
     sessionClaims: null,
     sessionId: null,
+    sessionStatus: null,
     userId: null,
     actor: null,
     orgId: null,

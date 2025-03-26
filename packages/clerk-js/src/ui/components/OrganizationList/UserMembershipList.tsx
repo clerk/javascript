@@ -3,7 +3,7 @@ import type { OrganizationResource } from '@clerk/types';
 import { useContext } from 'react';
 
 import { useOrganizationListContext } from '../../contexts';
-import { SessionTaskContext } from '../../contexts/components/SessionTask';
+import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { OrganizationPreview, PersonalWorkspacePreview, useCardState, withCardStateProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { OrganizationListPreviewButton, sharedMainIdentifierSx } from './shared';
@@ -12,7 +12,7 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
   const card = useCardState();
   const { navigateAfterSelectOrganization } = useOrganizationListContext();
   const { isLoaded, setActive } = useOrganizationList();
-  const sessionTaskContext = useContext(SessionTaskContext);
+  const sessionTasksContext = useContext(SessionTasksContext);
 
   if (!isLoaded) {
     return null;
@@ -23,8 +23,8 @@ export const MembershipPreview = withCardStateProvider((props: { organization: O
         organization,
       });
 
-      if (sessionTaskContext?.nextTask) {
-        return sessionTaskContext?.nextTask();
+      if (sessionTasksContext?.nextTask) {
+        return sessionTasksContext?.nextTask();
       }
 
       await navigateAfterSelectOrganization(organization);

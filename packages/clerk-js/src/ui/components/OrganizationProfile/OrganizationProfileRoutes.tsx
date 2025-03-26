@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { useOptions, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment, useOptions, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
@@ -16,6 +16,7 @@ const OrganizationBillingPage = lazy(() =>
 export const OrganizationProfileRoutes = () => {
   const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
   const { experimental } = useOptions();
+  const { __experimental_commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -58,7 +59,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && (
+        {experimental?.commerce && __experimental_commerceSettings.enabled && (
           <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
             <Switch>
               <Route index>

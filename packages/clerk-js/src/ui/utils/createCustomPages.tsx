@@ -1,4 +1,4 @@
-import type { CustomPage, LoadedClerk } from '@clerk/types';
+import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
 import { isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
@@ -48,7 +48,11 @@ type CreateCustomPagesParams = {
   excludedPathsFromDuplicateWarning: string[];
 };
 
-export const createUserProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+export const createUserProfileCustomPages = (
+  customPages: CustomPage[],
+  clerk: LoadedClerk,
+  environment?: EnvironmentResource,
+) => {
   return createCustomPages(
     {
       customPages,
@@ -57,10 +61,15 @@ export const createUserProfileCustomPages = (customPages: CustomPage[], clerk: L
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    environment,
   );
 };
 
-export const createOrganizationProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+export const createOrganizationProfileCustomPages = (
+  customPages: CustomPage[],
+  clerk: LoadedClerk,
+  environment?: EnvironmentResource,
+) => {
   return createCustomPages(
     {
       customPages,
@@ -69,15 +78,20 @@ export const createOrganizationProfileCustomPages = (customPages: CustomPage[], 
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    environment,
   );
 };
 
 const createCustomPages = (
   { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
   clerk: LoadedClerk,
+  environment?: EnvironmentResource,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
-    commerce: clerk.sdkMetadata?.environment === 'test' ? false : clerk.__internal_getOption('experimental')?.commerce,
+    commerce:
+      clerk.sdkMetadata?.environment === 'test'
+        ? false
+        : clerk.__internal_getOption('experimental')?.commerce && environment?.__experimental_commerceSettings.enabled,
   });
 
   if (isDevelopmentSDK(clerk)) {

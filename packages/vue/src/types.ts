@@ -8,6 +8,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
+  SessionStatusClaim,
   SignedInSessionResource,
   UserResource,
   Without,
@@ -20,6 +21,7 @@ export interface VueClerkInjectionKeyType {
     userId: string | null | undefined;
     sessionId: string | null | undefined;
     actor: ActClaim | null | undefined;
+    sessionStatus: SessionStatusClaim | null | undefined;
     orgId: string | null | undefined;
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;

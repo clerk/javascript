@@ -19,7 +19,7 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
   slug!: string;
   avatarUrl!: string;
   features!: __experimental_CommerceFeature[];
-  subscriptionIdForCurrentSubscriber!: string | undefined;
+  subscriptionIdForCurrentSubscriber: string | undefined;
 
   constructor(data: __experimental_CommercePlanJSON) {
     super();
