@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.1.29",
+  "version": "2.1.30",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",

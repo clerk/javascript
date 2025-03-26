@@ -5,6 +5,7 @@ import type {
   AttemptPhoneNumberVerificationParams,
   AttemptVerificationParams,
   AttemptWeb3WalletVerificationParams,
+  AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
@@ -34,6 +35,7 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
+import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -199,6 +201,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkMissingOptionError('generateSignature');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
     await this.prepareWeb3WalletVerification({ strategy });
@@ -289,19 +292,24 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithRedirect = async ({
-    redirectUrl,
-    redirectUrlComplete,
-    strategy,
-    continueSignUp = false,
-    unsafeMetadata,
-    emailAddress,
-    legalAccepted,
-  }: AuthenticateWithRedirectParams & {
-    unsafeMetadata?: SignUpUnsafeMetadata;
-  }): Promise<void> => {
+  private authenticateWithRedirectOrPopup = async (
+    params: AuthenticateWithRedirectParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+    navigateCallback: (url: URL | string) => void,
+  ): Promise<void> => {
+    const {
+      redirectUrl,
+      redirectUrlComplete,
+      strategy,
+      continueSignUp = false,
+      unsafeMetadata,
+      emailAddress,
+      legalAccepted,
+    } = params;
+
     const authenticateFn = () => {
-      const params = {
+      const authParams = {
         strategy,
         redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectUrl),
         actionCompleteRedirectUrl: redirectUrlComplete,
@@ -309,7 +317,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
       };
-      return continueSignUp && this.id ? this.update(params) : this.create(params);
+      return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };
 
     const { verifications } = await authenticateFn().catch(async e => {
@@ -317,6 +325,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // to reload the environment and try again one more time with the new environment.
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await SignUp.clerk.__unstable__environment!.reload();
         return authenticateFn();
       }
@@ -327,10 +336,33 @@ export class SignUp extends BaseResource implements SignUpResource {
     const { status, externalVerificationRedirectURL } = externalAccount;
 
     if (status === 'unverified' && !!externalVerificationRedirectURL) {
-      windowNavigate(externalVerificationRedirectURL);
+      navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
     }
+  };
+
+  public authenticateWithRedirect = async (
+    params: AuthenticateWithRedirectParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+  ): Promise<void> => {
+    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+  };
+
+  public authenticateWithPopup = async (
+    params: AuthenticateWithPopupParams & {
+      unsafeMetadata?: SignUpUnsafeMetadata;
+    },
+  ): Promise<void> => {
+    const { popup } = params || {};
+    if (!popup) {
+      clerkMissingOptionError('popup');
+    }
+
+    return _authenticateWithPopup(SignUp.clerk, this.authenticateWithRedirectOrPopup, params, url => {
+      popup.location.href = url instanceof URL ? url.toString() : url;
+    });
   };
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
@@ -416,6 +448,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       return false;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
@@ -424,6 +457,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     if (
       params.transfer &&
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       captchaOauthBypass.some(strategy => strategy === SignUp.clerk.client!.signIn.firstFactorVerification.strategy)
     ) {
       return true;

@@ -13,6 +13,7 @@ Please note we have a [code of conduct](https://github.com/clerk/javascript/blob
     - [Setting up your local environment](#setting-up-your-local-environment)
     - [Documenting your changes](#documenting-your-changes)
     - [Writing tests](#writing-tests)
+    - [Authoring Typedoc information](#authoring-typedoc-information)
   - [Opening a Pull Request](#opening-a-pull-request)
     - [Changesets](#changesets)
     - [Commit messages](#commit-messages)
@@ -109,6 +110,16 @@ Inside the repository you'll find two types of tests:
 While changing a file inside a package, check if e.g. a `<name>.test.ts` file or a test inside a `__tests__` folder exists. If you add a completely new file, please add a unit test for it.
 
 If your change can't only be tested by unit tests, you should add/edit an integration test. You can find all necessary information about this in the [integration tests README](../integration/README.md).
+
+### Authoring Typedoc information
+
+As explained in [documenting your changes](#documenting-your-changes), we use JSDoc to annotate our public API surface. We then use [Typedoc](https://typedoc.org/) to autogenerate docs from these comments.
+
+Locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typdoc/docs`.
+
+These files are pushed to [clerk/generated-typedoc](https://github.com/clerk/generated-typedoc) and then used on Clerk's docs. In the docs you can access the files by using a `<Typedoc src="path/to/file" />` component.
+
+So if you find a typo that's inside a Typedoc file, you'll need to edit the source file, [open a PR](#opening-a-pull-request), and get it merged to `main`. You can preview your changes with the aforementioned `pnpm typedoc:generate` command.
 
 ## Opening a Pull Request
 

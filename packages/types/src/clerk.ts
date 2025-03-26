@@ -1031,6 +1031,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1164,6 +1168,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1490,6 +1498,7 @@ type __experimental_PricingTableMatrixProps = {
 
 type __experimental_PricingTableBaseProps = {
   appearance?: PricingTableTheme;
+  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
 
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
@@ -1540,6 +1549,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
     | 'withSignUp'
+    | 'oauthFlow'
   >;
 
 export type SignUpButtonProps = {
@@ -1552,6 +1562,7 @@ export type SignUpButtonProps = {
     | 'signInForceRedirectUrl'
     | 'signInFallbackRedirectUrl'
     | 'initialValues'
+    | 'oauthFlow'
   >;
 
 export type CreateOrganizationInvitationParams = {
