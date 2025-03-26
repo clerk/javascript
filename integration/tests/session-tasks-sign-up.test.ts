@@ -38,6 +38,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         email: fakeUser.email,
         password: fakeUser.password,
       });
+      await u.po.expect.toBeSignedIn();
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
