@@ -31,6 +31,7 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
   const load = async (): Promise<T | null> => {
     assertInitiliazed();
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const value = await storage!.get(itemKey!);
       return value ? JSON.parse(value) : null;
     } catch (error) {
@@ -42,6 +43,7 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
   const save = async (value: T): Promise<void> => {
     assertInitiliazed();
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return await storage!.set(itemKey!, JSON.stringify(value));
     } catch (error) {
       console.log(`Clerk: Error saving value on ${key} in storage:`, error);
@@ -51,6 +53,7 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
   const remove = async (): Promise<void> => {
     assertInitiliazed();
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return await storage!.set(itemKey!, '');
     } catch (error) {
       console.log(`Clerk: Error deleting value on ${key} from storage:`, error);

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.25.6
+
+### Patch Changes
+
+- Update `RevokeOrganizationInvitationParams.requestUserId` to optional ([#5448](https://github.com/clerk/javascript/pull/5448)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+  - @clerk/shared@3.2.1
+
 ## 1.25.5
 
 ### Patch Changes
