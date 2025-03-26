@@ -20,6 +20,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
@@ -458,10 +459,14 @@ function SignInStartInternal(): JSX.Element {
           >
             <SocialButtonsReversibleContainerWithDivider>
               {hasSocialOrWeb3Buttons && (
-                <SignInSocialButtons
-                  enableWeb3Providers
-                  enableOAuthProviders
-                />
+                <>
+                  <SignInSocialButtons
+                    enableWeb3Providers
+                    enableOAuthProviders
+                  />
+                  {/* This is only needed for Web3 */}
+                  <CaptchaElement />
+                </>
               )}
               {standardFormAttributes.length ? (
                 <Form.Root
