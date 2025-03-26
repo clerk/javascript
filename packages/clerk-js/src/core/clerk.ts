@@ -1113,7 +1113,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (newSession?.currentTask) {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
@@ -1136,7 +1136,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (session.status === 'pending') {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
         globalNavigate: this.navigate,
@@ -1514,6 +1514,25 @@ export class Clerk implements ClerkInterface {
   ): Promise<unknown> => {
     if (!this.loaded || !this.environment || !this.client) {
       return;
+    }
+
+    // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
+    // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
+    // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
+    // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
+    if (!window.opener) {
+      try {
+        await signIn.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
+      try {
+        await signUp.reload();
+      } catch (err) {
+        console.log('This can be safely ignored:');
+        console.error(err);
+      }
     }
 
     const { displayConfig } = this.environment;
