@@ -26,6 +26,7 @@ const typedocPluginMarkdownOptions = {
   propertyMembersFormat: 'table',
   typeDeclarationFormat: 'table',
   typeDeclarationVisibility: 'compact',
+  typeAliasPropertiesFormat: 'table',
   useHTMLAnchors: false,
   tableColumnSettings: {
     hideSources: true,
@@ -36,7 +37,7 @@ const typedocPluginMarkdownOptions = {
   formatWithPrettier: true,
 };
 
-/** @type {Partial<import("typedoc-plugin-replace-text").Config>} */
+/** @type {import("typedoc-plugin-replace-text").Config} */
 const typedocPluginReplaceTextOptions = {
   replaceText: {
     replacements: [
@@ -71,17 +72,19 @@ const typedocPluginReplaceTextOptions = {
   },
 };
 
-/** @type {Partial<import("typedoc").TypeDocOptions>} */
+/** @type {import("typedoc").TypeDocOptions} */
 const config = {
   out: './.typedoc/docs',
   entryPointStrategy: 'packages',
   plugin: [
     'typedoc-plugin-replace-text',
     'typedoc-plugin-markdown',
+    './.typedoc/custom-router.mjs',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
   ],
   theme: 'clerkTheme',
+  router: 'clerk-router',
   readme: 'none',
   packageOptions: {
     includeVersion: false,
