@@ -146,7 +146,10 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 }
 
 /**
- *
+ * > [!WARNING]
+ * >
+ * > Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.12.7` or later, `@clerk/clerk-react@5.25.1` or later, and `@clerk/clerk-js@5.57.1` or later.
+ * 
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
  *
  * @returns The `useReverification()` hook returns an array with the "enhanced" fetcher.
