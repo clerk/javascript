@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.57.4
+
+### Patch Changes
+
+- Fix lazy-loading of `BillingPage` in `UserProfile` ([#5445](https://github.com/clerk/javascript/pull/5445)) by [@aeliox](https://github.com/aeliox)
+
+- Remove Paypal option from `<CheckoutForm />` ([#5446](https://github.com/clerk/javascript/pull/5446)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Wrap nested `<Checkout />` component in its own AppearanceProvider to recieve its own appearance object. ([#5443](https://github.com/clerk/javascript/pull/5443)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+  - @clerk/localizations@3.13.2
+  - @clerk/shared@3.2.1
+
+## 5.57.3
+
+### Patch Changes
+
+- Pass appearance variables to stripe elements. ([#5346](https://github.com/clerk/javascript/pull/5346)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.57.2
 
 ### Patch Changes

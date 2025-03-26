@@ -169,6 +169,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 }, 'RedirectToSignUp');
 
 /**
+ * @function
  * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
@@ -181,6 +182,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 }, 'RedirectToUserProfile');
 
 /**
+ * @function
  * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
@@ -193,6 +195,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 }, 'RedirectToOrganizationProfile');
 
 /**
+ * @function
  * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {

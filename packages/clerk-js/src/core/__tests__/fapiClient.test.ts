@@ -200,6 +200,23 @@ describe('request', () => {
     expect(Array.isArray(resp.payload)).toEqual(true);
   });
 
+  it('handles the empty body on 204 response, returning null', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 204,
+        json: () => {
+          throw new Error('json should not be called on 204 response');
+        },
+      }),
+    );
+
+    const resp = await fapiClient.request({
+      path: '/foo',
+    });
+
+    expect(resp.payload).toEqual(null);
+  });
+
   describe('for production instances', () => {
     it.todo('does not append the __clerk_db_jwt cookie value to the query string');
     it.todo('does not set the __clerk_db_jwt cookie from the response Clerk-Cookie header');
