@@ -1506,15 +1506,13 @@ export class Clerk implements ClerkInterface {
     if (!window.opener) {
       try {
         await signIn.reload();
-      } catch (err) {
-        console.log('This can be safely ignored:');
-        console.error(err);
+      } catch {
+        // This can be safely ignored
       }
       try {
         await signUp.reload();
-      } catch (err) {
-        console.log('This can be safely ignored:');
-        console.error(err);
+      } catch {
+        // This can be safely ignored
       }
     }
 
