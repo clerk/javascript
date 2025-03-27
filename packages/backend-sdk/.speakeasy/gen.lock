@@ -5,8 +5,8 @@ management:
   docVersion: "2025-12-03"
   speakeasyVersion: 1.525.1
   generationVersion: 2.562.2
-  releaseVersion: 0.3.2
-  configChecksum: ba5cbe4448e1124e66f6ceb6518b4efc
+  releaseVersion: 0.3.3
+  configChecksum: 215c0ee8f196223cce89cc247a407c78
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -662,6 +662,7 @@ generatedFiles:
   - src/models/components/template.ts
   - src/models/components/testingtoken.ts
   - src/models/components/totalcount.ts
+  - src/models/components/user.ts
   - src/models/components/waitlistentries.ts
   - src/models/components/waitlistentry.ts
   - src/models/components/web3wallet.ts
