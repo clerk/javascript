@@ -71,6 +71,7 @@
     "server",
     "internal",
     "components",
+    "webhooks",
     "env.d.ts",
     "types.ts"
   ],

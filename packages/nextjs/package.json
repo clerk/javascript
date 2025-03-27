@@ -55,7 +55,8 @@
   "files": [
     "dist",
     "server",
-    "errors"
+    "errors",
+    "webhooks"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
