@@ -7,6 +7,7 @@ import { determineStartingSignInSecondFactor } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
+import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
@@ -27,7 +28,9 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
 
-  const availableFactors = sessionVerification.supportedSecondFactors;
+  const availableFactors = useMemo(() => {
+    return sessionVerification.supportedSecondFactors?.sort(sortByPrimaryFactor) || null;
+  }, [sessionVerification.supportedSecondFactors]);
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [currentFactor, setCurrentFactor] = React.useState<SessionVerificationSecondFactor | null>(
