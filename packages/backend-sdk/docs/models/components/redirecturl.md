@@ -10,9 +10,9 @@ import { RedirectURL } from "@clerk/backend-sdk/models/components";
 let value: RedirectURL = {
   object: "redirect_url",
   id: "<id>",
-  url: "https://simplistic-descendant.biz/",
-  createdAt: 449292,
-  updatedAt: 304468,
+  url: "https://improbable-marketplace.biz",
+  createdAt: 455444,
+  updatedAt: 401713,
 };
 ```
 

@@ -10,14 +10,14 @@ import { OrganizationSettings } from "@clerk/backend-sdk/models/components";
 let value: OrganizationSettings = {
   object: "organization_settings",
   enabled: false,
-  maxAllowedMemberships: 232744,
-  maxAllowedRoles: 614465,
-  maxAllowedPermissions: 33074,
+  maxAllowedMemberships: 287051,
+  maxAllowedRoles: 706575,
+  maxAllowedPermissions: 414857,
   creatorRole: "<value>",
   adminDeleteEnabled: false,
   domainsEnabled: false,
   domainsEnrollmentModes: [
-    "manual_invitation",
+    "automatic_invitation",
   ],
   domainsDefaultRole: "<value>",
 };

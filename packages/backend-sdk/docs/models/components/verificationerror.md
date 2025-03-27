@@ -3,10 +3,10 @@
 
 ## Supported Types
 
-### `components.SAMLErrorClerkError`
+### `components.OauthErrorClerkError`
 
 ```typescript
-const value: components.SAMLErrorClerkError = {
+const value: components.OauthErrorClerkError = {
   message: "<value>",
   longMessage: "<value>",
   code: "<value>",

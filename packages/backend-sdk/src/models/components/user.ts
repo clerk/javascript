@@ -15,6 +15,12 @@ import {
   EmailAddress$outboundSchema,
 } from "./emailaddress.js";
 import {
+  ExternalAccountWithVerification,
+  ExternalAccountWithVerification$inboundSchema,
+  ExternalAccountWithVerification$Outbound,
+  ExternalAccountWithVerification$outboundSchema,
+} from "./externalaccountwithverification.js";
+import {
   PhoneNumber,
   PhoneNumber$inboundSchema,
   PhoneNumber$Outbound,
@@ -53,8 +59,6 @@ export const UserObject = {
  * @remarks
  */
 export type UserObject = ClosedEnum<typeof UserObject>;
-
-export type ExternalAccounts = {};
 
 /**
  * Success
@@ -103,7 +107,7 @@ export type User = {
    * @remarks
    */
   mfaDisabledAt?: number | null | undefined;
-  externalAccounts?: Array<ExternalAccounts> | undefined;
+  externalAccounts?: Array<ExternalAccountWithVerification> | undefined;
   samlAccounts?: Array<SAMLAccount> | undefined;
   /**
    * Unix timestamp of last sign-in.
@@ -227,54 +231,6 @@ export namespace UserObject$ {
 }
 
 /** @internal */
-export const ExternalAccounts$inboundSchema: z.ZodType<
-  ExternalAccounts,
-  z.ZodTypeDef,
-  unknown
-> = z.object({});
-
-/** @internal */
-export type ExternalAccounts$Outbound = {};
-
-/** @internal */
-export const ExternalAccounts$outboundSchema: z.ZodType<
-  ExternalAccounts$Outbound,
-  z.ZodTypeDef,
-  ExternalAccounts
-> = z.object({});
-
-/**
- * @internal
- * @deprecated This namespace will be removed in future versions. Use schemas and types that are exported directly from this module.
- */
-export namespace ExternalAccounts$ {
-  /** @deprecated use `ExternalAccounts$inboundSchema` instead. */
-  export const inboundSchema = ExternalAccounts$inboundSchema;
-  /** @deprecated use `ExternalAccounts$outboundSchema` instead. */
-  export const outboundSchema = ExternalAccounts$outboundSchema;
-  /** @deprecated use `ExternalAccounts$Outbound` instead. */
-  export type Outbound = ExternalAccounts$Outbound;
-}
-
-export function externalAccountsToJSON(
-  externalAccounts: ExternalAccounts,
-): string {
-  return JSON.stringify(
-    ExternalAccounts$outboundSchema.parse(externalAccounts),
-  );
-}
-
-export function externalAccountsFromJSON(
-  jsonString: string,
-): SafeParseResult<ExternalAccounts, SDKValidationError> {
-  return safeParse(
-    jsonString,
-    (x) => ExternalAccounts$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ExternalAccounts' from JSON`,
-  );
-}
-
-/** @internal */
 export const User$inboundSchema: z.ZodType<User, z.ZodTypeDef, unknown> = z
   .object({
     id: z.string().optional(),
@@ -302,7 +258,7 @@ export const User$inboundSchema: z.ZodType<User, z.ZodTypeDef, unknown> = z
     backup_code_enabled: z.boolean().optional(),
     mfa_enabled_at: z.nullable(z.number().int()).optional(),
     mfa_disabled_at: z.nullable(z.number().int()).optional(),
-    external_accounts: z.array(z.lazy(() => ExternalAccounts$inboundSchema))
+    external_accounts: z.array(ExternalAccountWithVerification$inboundSchema)
       .optional(),
     saml_accounts: z.array(SAMLAccount$inboundSchema).optional(),
     last_sign_in_at: z.nullable(z.number().int()).optional(),
@@ -402,7 +358,9 @@ export type User$Outbound = {
   backup_code_enabled?: boolean | undefined;
   mfa_enabled_at?: number | null | undefined;
   mfa_disabled_at?: number | null | undefined;
-  external_accounts?: Array<ExternalAccounts$Outbound> | undefined;
+  external_accounts?:
+    | Array<ExternalAccountWithVerification$Outbound>
+    | undefined;
   saml_accounts?: Array<SAMLAccount$Outbound> | undefined;
   last_sign_in_at?: number | null | undefined;
   banned?: boolean | undefined;
@@ -446,7 +404,7 @@ export const User$outboundSchema: z.ZodType<User$Outbound, z.ZodTypeDef, User> =
     backupCodeEnabled: z.boolean().optional(),
     mfaEnabledAt: z.nullable(z.number().int()).optional(),
     mfaDisabledAt: z.nullable(z.number().int()).optional(),
-    externalAccounts: z.array(z.lazy(() => ExternalAccounts$outboundSchema))
+    externalAccounts: z.array(ExternalAccountWithVerification$outboundSchema)
       .optional(),
     samlAccounts: z.array(SAMLAccount$outboundSchema).optional(),
     lastSignInAt: z.nullable(z.number().int()).optional(),

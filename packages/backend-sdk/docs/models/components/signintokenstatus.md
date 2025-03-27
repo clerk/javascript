@@ -5,7 +5,7 @@
 ```typescript
 import { SignInTokenStatus } from "@clerk/backend-sdk/models/components";
 
-let value: SignInTokenStatus = "revoked";
+let value: SignInTokenStatus = "pending";
 ```
 
 ## Values

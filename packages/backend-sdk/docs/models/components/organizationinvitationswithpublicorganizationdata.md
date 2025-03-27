@@ -12,19 +12,19 @@ let value: OrganizationInvitationsWithPublicOrganizationData = {
     {
       object: "organization_invitation",
       id: "<id>",
-      emailAddress: "Caesar_Borer@hotmail.com",
+      emailAddress: "Jaida.Schmidt51@gmail.com",
       role: "<value>",
       roleName: "<value>",
       publicMetadata: {
         "key": "<value>",
       },
-      url: "https://torn-railway.biz",
-      expiresAt: 131482,
-      createdAt: 55374,
-      updatedAt: 301598,
+      url: "https://whimsical-parsnip.com",
+      expiresAt: 430402,
+      createdAt: 510017,
+      updatedAt: 536178,
     },
   ],
-  totalCount: 262118,
+  totalCount: 681393,
 };
 ```
 

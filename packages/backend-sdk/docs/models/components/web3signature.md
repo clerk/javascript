@@ -6,10 +6,10 @@
 import { Web3Signature } from "@clerk/backend-sdk/models/components";
 
 let value: Web3Signature = {
-  status: "unverified",
-  strategy: "web3_coinbase_wallet_signature",
-  attempts: 977496,
-  expireAt: 876506,
+  status: "expired",
+  strategy: "web3_okx_wallet_signature",
+  attempts: 333145,
+  expireAt: 81101,
 };
 ```
 

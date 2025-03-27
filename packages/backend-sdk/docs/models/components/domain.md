@@ -10,7 +10,7 @@ let value: Domain = {
   id: "<id>",
   name: "<value>",
   isSatellite: false,
-  frontendApiUrl: "https://important-travel.com/",
+  frontendApiUrl: "https://excellent-petticoat.biz/",
   developmentOrigin: "<value>",
 };
 ```

@@ -83,7 +83,7 @@ export class Sessions extends ClientSDK {
   async refresh(
     request: operations.RefreshSessionRequest,
     options?: RequestOptions,
-  ): Promise<components.Session> {
+  ): Promise<components.SessionRefresh> {
     return unwrapAsync(sessionsRefresh(
       this,
       request,

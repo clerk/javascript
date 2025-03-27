@@ -7,7 +7,7 @@ Status of the verification. It can be `unverified` or `verified`
 ```typescript
 import { OrganizationDomainStatus } from "@clerk/backend-sdk/models/components";
 
-let value: OrganizationDomainStatus = "verified";
+let value: OrganizationDomainStatus = "unverified";
 ```
 
 ## Values

@@ -5,7 +5,7 @@
 ```typescript
 import { DomainsEnrollmentModes } from "@clerk/backend-sdk/models/components";
 
-let value: DomainsEnrollmentModes = "manual_invitation";
+let value: DomainsEnrollmentModes = "automatic_invitation";
 ```
 
 ## Values

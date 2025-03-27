@@ -8,14 +8,14 @@ import { WaitlistEntryInvitation } from "@clerk/backend-sdk/models/components";
 let value: WaitlistEntryInvitation = {
   object: "invitation",
   id: "<id>",
-  emailAddress: "Ryleigh45@gmail.com",
+  emailAddress: "Alexa_Brekke@gmail.com",
   publicMetadata: {
     "key": "<value>",
   },
   revoked: false,
   status: "pending",
-  createdAt: 423706,
-  updatedAt: 857125,
+  createdAt: 959143,
+  updatedAt: 103298,
 };
 ```
 

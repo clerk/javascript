@@ -5,7 +5,7 @@
 ```typescript
 import { Web3SignatureVerificationStatus } from "@clerk/backend-sdk/models/components";
 
-let value: Web3SignatureVerificationStatus = "verified";
+let value: Web3SignatureVerificationStatus = "expired";
 ```
 
 ## Values

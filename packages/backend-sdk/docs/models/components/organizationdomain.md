@@ -17,13 +17,13 @@ let value: OrganizationDomain = {
   verification: {
     status: "unverified",
     strategy: "<value>",
-    attempts: 360545,
-    expireAt: 828657,
+    attempts: 502389,
+    expireAt: 942584,
   },
-  totalPendingInvitations: 924967,
-  totalPendingSuggestions: 46007,
-  createdAt: 232627,
-  updatedAt: 348519,
+  totalPendingInvitations: 633998,
+  totalPendingSuggestions: 867290,
+  createdAt: 940210,
+  updatedAt: 750765,
 };
 ```
 

@@ -5,7 +5,7 @@
 ```typescript
 import { Web3SignatureVerificationStrategy } from "@clerk/backend-sdk/models/components";
 
-let value: Web3SignatureVerificationStrategy = "web3_coinbase_wallet_signature";
+let value: Web3SignatureVerificationStrategy = "web3_okx_wallet_signature";
 ```
 
 ## Values

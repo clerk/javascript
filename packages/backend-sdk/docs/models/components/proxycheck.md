@@ -11,11 +11,11 @@ let value: ProxyCheck = {
   object: "proxy_check",
   id: "<id>",
   domainId: "<id>",
-  lastRunAt: 233420,
-  proxyUrl: "https://baggy-ravioli.org",
+  lastRunAt: 604118,
+  proxyUrl: "https://unlined-vicinity.name/",
   successful: false,
-  createdAt: 272437,
-  updatedAt: 379057,
+  createdAt: 274823,
+  updatedAt: 592231,
 };
 ```
 

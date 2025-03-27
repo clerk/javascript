@@ -312,7 +312,7 @@ run();
 
 ### Response
 
-**Promise\<[components.Session](../../models/components/session.md)\>**
+**Promise\<[components.SessionRefresh](../../models/components/sessionrefresh.md)\>**
 
 ### Errors
 

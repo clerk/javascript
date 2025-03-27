@@ -38,7 +38,7 @@ export function sessionsRefresh(
   options?: RequestOptions,
 ): APIPromise<
   Result<
-    components.Session,
+    components.SessionRefresh,
     | errors.ClerkErrors
     | APIError
     | SDKValidationError
@@ -63,7 +63,7 @@ async function $do(
 ): Promise<
   [
     Result<
-      components.Session,
+      components.SessionRefresh,
       | errors.ClerkErrors
       | APIError
       | SDKValidationError
@@ -159,7 +159,7 @@ async function $do(
   };
 
   const [result] = await M.match<
-    components.Session,
+    components.SessionRefresh,
     | errors.ClerkErrors
     | APIError
     | SDKValidationError
@@ -169,7 +169,7 @@ async function $do(
     | RequestTimeoutError
     | ConnectionError
   >(
-    M.json(200, components.Session$inboundSchema),
+    M.json(200, components.SessionRefresh$inboundSchema),
     M.jsonErr([400, 401], errors.ClerkErrors$inboundSchema),
     M.fail("4XX"),
     M.fail("5XX"),

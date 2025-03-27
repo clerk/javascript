@@ -10,8 +10,8 @@ import { OrganizationDomainVerification } from "@clerk/backend-sdk/models/compon
 let value: OrganizationDomainVerification = {
   status: "unverified",
   strategy: "<value>",
-  attempts: 554688,
-  expireAt: 287051,
+  attempts: 449292,
+  expireAt: 304468,
 };
 ```
 
