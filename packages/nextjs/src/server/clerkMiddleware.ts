@@ -57,6 +57,11 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * If true, additional debug information will be logged to the console.
    */
   debug?: boolean;
+
+  /**
+   * When true, automatically injects a Content-Security-Policy header compatible with Clerk.
+   */
+  injectCSP?: boolean;
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -187,6 +192,21 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
+      }
+
+      if (options.injectCSP) {
+        const cspHeader = request.headers.get('content-security-policy');
+        if (cspHeader) {
+          logger.debug('Content-Security-Policy header detected');
+          const csp = cspHeader.split(',').map(directive => directive.trim());
+          const cspValues = csp
+            .map(directive => {
+              const [key, value] = directive.split(' ');
+              return `${key} ${value}`;
+            })
+            .join('; ');
+          setHeader(handlerResult, 'Content-Security-Policy', cspValues);
+        }
       }
 
       // TODO @nikos: we need to make this more generic
