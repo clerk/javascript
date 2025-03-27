@@ -1745,8 +1745,11 @@ export class Clerk implements ClerkInterface {
       }
       return this.setActive({ session: null });
     } catch (err) {
-      // Handle the 403 Forbidden
-      if (err.status === 403) {
+      // `/client` can fail with either a 401, a 403, 500 or network errors.
+      // 401 is already handled internally in our fetcher.
+      // 403 means that the client is blocked, signing out the user is the only option.
+      // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
+      if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
         return this.setActive({ session: null });
       } else {
         throw err;
@@ -2148,8 +2151,20 @@ export class Clerk implements ClerkInterface {
 
               this.updateClient(localClient);
 
-              // Always grab a fresh token
-              await this.session?.getToken({ skipCache: true });
+              /**
+               * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
+               * We want to avoid having the below `getToken()` retrying at the same time as the poller.
+               */
+              this.#authService?.stopPollingForToken();
+
+              // Attempt to grab a fresh token
+              await this.session
+                ?.getToken({ skipCache: true })
+                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
+                .catch(() => null)
+                .finally(() => {
+                  this.#authService?.startPollingForToken();
+                });
 
               // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
               return null;
