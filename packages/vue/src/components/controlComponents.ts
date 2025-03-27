@@ -149,6 +149,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
      * Check against the results of `has` called inside the callback
      */
     if (typeof props.condition === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (props.condition(has.value!)) {
         return slots.default?.();
       }

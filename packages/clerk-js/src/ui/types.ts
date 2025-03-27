@@ -1,5 +1,6 @@
 import type {
   __experimental_CheckoutProps,
+  __experimental_CommerceSubscriberType,
   __experimental_PricingTableProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
@@ -103,6 +104,7 @@ export type WaitlistCtx = WaitlistProps & {
 export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
+  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
@@ -112,8 +114,9 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   setIsOpen?: (open: boolean) => void;
 };
 
-export type SessionTaskCtx = {
-  nextTask: () => void;
+export type SessionTasksCtx = {
+  nextTask: () => Promise<void>;
+  redirectUrlComplete?: string;
 };
 
 export type AvailableComponentCtx =

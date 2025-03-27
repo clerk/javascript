@@ -95,6 +95,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     let createdSessionId = '';
 
     if (status === 'complete') {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       createdSessionId = signIn.createdSessionId!;
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({

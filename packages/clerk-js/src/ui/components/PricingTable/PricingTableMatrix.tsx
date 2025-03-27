@@ -1,4 +1,4 @@
-import type { __experimental_CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanResource, __experimental_CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import {
@@ -19,13 +19,12 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 import { colors } from '../../utils';
-import type { PlanPeriod } from './PlanCard';
 
 interface PricingTableMatrixProps {
   plans: __experimental_CommercePlanResource[];
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource) => void;
 }
 
@@ -72,15 +71,16 @@ export function PricingTableMatrix({
     <InternalThemeProvider>
       <Box
         elementDescriptor={descriptors.pricingTableMatrixRoot}
-        sx={{
+        sx={t => ({
           position: 'relative',
           minWidth: '100%',
           display: 'grid',
           isolation: 'isolate',
+          backgroundColor: t.colors.$colorBackground,
           [mqu.md]: {
             overflowX: 'auto',
           },
-        }}
+        })}
       >
         <Box
           elementDescriptor={descriptors.pricingTableMatrixTable}
@@ -92,9 +92,11 @@ export function PricingTableMatrix({
             sx={t => ({
               position: 'sticky',
               top: 0,
+              backgroundColor: t.colors.$colorBackground,
               borderBottomWidth: t.borderWidths.$normal,
               borderBottomStyle: t.borderStyles.$solid,
               borderBottomColor: t.colors.$neutralAlpha100,
+              zIndex: 1,
             })}
           >
             <Box
@@ -130,7 +132,7 @@ export function PricingTableMatrix({
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as PlanPeriod)}
+                      onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'
@@ -323,7 +325,9 @@ export function PricingTableMatrix({
                           onSelect(plan);
                         }}
                         localizationKey={
-                          plan.isActiveForPayer ? 'Manage' : localizationKeys('__experimental_commerce.getStarted')
+                          plan.subscriptionIdForCurrentSubscriber
+                            ? 'Manage'
+                            : localizationKeys('__experimental_commerce.getStarted')
                         }
                       />
                     </Box>

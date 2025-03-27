@@ -45,7 +45,7 @@ export function buildSessionTaskRedirectUrl({
     routing,
     baseUrl,
     path,
-    endpoint: `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+    endpoint: `/tasks/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
     authQueryString: null,
   });
 }

@@ -321,7 +321,7 @@ export const bgBG: LocalizationResource = {
     },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue using "{{applicationName}}"',
+      subtitle: 'Enter your current password to continue using "{{applicationName}}"',
       title: 'Enter your password',
     },
     phoneCode: {

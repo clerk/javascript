@@ -486,14 +486,14 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
         tasks: [{ key: 'org' }],
-        currentTask: { key: 'org', __internal_getUrl: () => 'https://foocorp.com/add-organization' },
+        currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
         reload: jest.fn(() =>
           Promise.resolve({
             id: '1',
             status: 'pending',
             user: {},
             tasks: [{ key: 'org' }],
-            currentTask: { key: 'org', __internal_getUrl: () => 'https://foocorp.com/add-organization' },
+            currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
           }),
         ),
       };
@@ -853,6 +853,17 @@ describe('Clerk singleton', () => {
   });
 
   describe('.handleRedirectCallback()', () => {
+    // handleRedirectCallback calls signIn/signUp.reload, which relies on the global fetch instance. We don't actually
+    // need a return value though, so we just mock a resolved promise.
+    const originalFetch = global.fetch;
+    beforeAll(() => {
+      global.fetch = jest.fn().mockResolvedValue({ json: jest.fn().mockResolvedValue({}) });
+    });
+
+    afterAll(() => {
+      global.fetch = originalFetch;
+    });
+
     beforeEach(() => {
       mockClientFetch.mockReset();
       mockEnvironmentFetch.mockReset();
@@ -2276,7 +2287,7 @@ describe('Clerk singleton', () => {
         status: 'pending',
         user: {},
         tasks: [{ key: 'org' }],
-        currentTask: { key: 'org', __internal_getUrl: () => 'https://foocorp.com/add-organization' },
+        currentTask: { key: 'org', __internal_getUrl: () => 'https://sut/tasks/add-organization' },
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
 
@@ -2305,7 +2316,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockResource as any as PendingSessionResource });
         await sut.__experimental_nextTask();
 
-        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/add-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/tasks/add-organization');
       });
     });
 

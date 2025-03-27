@@ -45,6 +45,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
     : undefined;
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     session!
       .attemptSecondFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {

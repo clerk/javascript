@@ -1,8 +1,9 @@
 // @ts-check
-import { MarkdownPageEvent, MarkdownRendererEvent } from 'typedoc-plugin-markdown';
+import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
  * A list of files where we want to remove any headings
+ * TODO: Move this logic to the custom-theme logic and don't change it after the fact
  */
 const FILES_WITHOUT_HEADINGS = [
   'use-organization-return.mdx',
@@ -17,10 +18,14 @@ const FILES_WITHOUT_HEADINGS = [
 
 /**
  * An array of tuples where the first element is the file name and the second element is the new path.
+ * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
   ['clerk-paginated-response', '/docs/references/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['session-resource', '/docs/references/javascript/session'],
+  ['signed-in-session-resource', '/docs/references/javascript/session'],
+  ['sign-up-resource', '/docs/references/javascript/sign-up'],
 ];
 
 /**
@@ -40,42 +45,9 @@ function getRelativeLinkReplacements() {
 }
 
 /**
- * @param {string} str
- */
-function toKebabCase(str) {
-  return str.replace(/((?<=[a-z\d])[A-Z]|(?<=[A-Z\d])[A-Z](?=[a-z]))/g, '-$1').toLowerCase();
-}
-
-/**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
 export function load(app) {
-  app.renderer.on(MarkdownRendererEvent.BEGIN, output => {
-    // Modify the output object
-    output.urls = output.urls
-      // Do not output README.mdx files
-      ?.filter(e => !e.url.endsWith('README.mdx'))
-      .map(e => {
-        // Convert URLs (by default camelCase) to kebab-case
-        const kebabUrl = toKebabCase(e.url);
-
-        e.url = kebabUrl;
-        e.model.url = kebabUrl;
-
-        /**
-         * For the `@clerk/shared` package it outputs the hooks as for example: shared/react/hooks/use-clerk/functions/use-clerk.mdx.
-         * It also places the interfaces as shared/react/hooks/use-organization/interfaces/use-organization-return.mdx
-         * Group all those .mdx files under shared/react/hooks
-         */
-        if (e.url.includes('shared/react/hooks')) {
-          e.url = e.url.replace(/\/[^/]+\/(functions|interfaces)\//, '/');
-          e.model.url = e.url;
-        }
-
-        return e;
-      });
-  });
-
   app.renderer.on(MarkdownPageEvent.END, output => {
     const fileName = output.url.split('/').pop();
     const linkReplacements = getRelativeLinkReplacements();

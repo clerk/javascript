@@ -172,6 +172,7 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+      billing: 'Billing',
     },
     profilePage: {
       dangerSection: {
@@ -311,7 +312,7 @@ export const enUS: LocalizationResource = {
     },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
