@@ -9,8 +9,8 @@
 const value: components.Passkey = {
   status: "verified",
   strategy: "passkey",
-  attempts: 292147,
-  expireAt: 240829,
+  attempts: 136900,
+  expireAt: 822118,
 };
 ```
 

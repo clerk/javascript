@@ -24,7 +24,7 @@ let value: OrganizationMemberships = {
         id: "<id>",
         name: "<value>",
         slug: "<value>",
-        maxAllowedMemberships: 347233,
+        maxAllowedMemberships: 420539,
         adminDeleteEnabled: false,
         publicMetadata: {
           "key": "<value>",
@@ -32,14 +32,14 @@ let value: OrganizationMemberships = {
         privateMetadata: {
           "key": "<value>",
         },
-        createdAt: 148141,
-        updatedAt: 981830,
+        createdAt: 557369,
+        updatedAt: 860552,
       },
-      createdAt: 478370,
-      updatedAt: 497391,
+      createdAt: 727044,
+      updatedAt: 270328,
     },
   ],
-  totalCount: 639473,
+  totalCount: 131482,
 };
 ```
 

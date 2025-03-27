@@ -6,7 +6,7 @@
 import { CNameTarget } from "@clerk/backend-sdk/models/components";
 
 let value: CNameTarget = {
-  host: "weary-summer.info",
+  host: "rapid-league.info",
   value: "<value>",
   required: false,
 };

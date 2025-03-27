@@ -8,8 +8,8 @@ import { Passkey } from "@clerk/backend-sdk/models/components";
 let value: Passkey = {
   status: "verified",
   strategy: "passkey",
-  attempts: 584476,
-  expireAt: 961937,
+  attempts: 639473,
+  expireAt: 368584,
 };
 ```
 

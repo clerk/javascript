@@ -5,7 +5,7 @@
 ```typescript
 import { NextAction } from "@clerk/backend-sdk/models/components";
 
-let value: NextAction = "";
+let value: NextAction = "needs_prepare";
 ```
 
 ## Values

@@ -7,9 +7,9 @@ import { SAMLConnectionAttributeMapping } from "@clerk/backend-sdk/models/compon
 
 let value: SAMLConnectionAttributeMapping = {
   userId: "<id>",
-  emailAddress: "Westley_Runolfsdottir33@hotmail.com",
-  firstName: "Angie",
-  lastName: "Kemmer",
+  emailAddress: "Dayton.Stokes47@yahoo.com",
+  firstName: "Jacques",
+  lastName: "Kassulke-Stiedemann",
 };
 ```
 

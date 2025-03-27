@@ -7,7 +7,7 @@ Mode of enrollment for the domain
 ```typescript
 import { EnrollmentMode } from "@clerk/backend-sdk/models/components";
 
-let value: EnrollmentMode = "automatic_invitation";
+let value: EnrollmentMode = "automatic_suggestion";
 ```
 
 ## Values

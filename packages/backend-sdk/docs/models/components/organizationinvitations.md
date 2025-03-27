@@ -12,19 +12,19 @@ let value: OrganizationInvitations = {
     {
       object: "organization_invitation",
       id: "<id>",
-      emailAddress: "Lou_Cronin@hotmail.com",
+      emailAddress: "Tyrese.Kling@gmail.com",
       role: "<value>",
       roleName: "<value>",
       publicMetadata: {
         "key": "<value>",
       },
-      url: "https://tinted-importance.org",
-      expiresAt: 575751,
-      createdAt: 820767,
-      updatedAt: 908844,
+      url: "https://aggravating-horde.com/",
+      expiresAt: 251941,
+      createdAt: 221161,
+      updatedAt: 253191,
     },
   ],
-  totalCount: 815524,
+  totalCount: 131055,
 };
 ```
 

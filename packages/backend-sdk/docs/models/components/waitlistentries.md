@@ -12,25 +12,25 @@ let value: WaitlistEntries = {
     {
       object: "waitlist_entry",
       id: "<id>",
-      emailAddress: "Oma74@yahoo.com",
+      emailAddress: "Donavon34@gmail.com",
       status: "pending",
-      createdAt: 935833,
-      updatedAt: 983427,
+      createdAt: 639187,
+      updatedAt: 399161,
       invitation: {
         object: "invitation",
         id: "<id>",
-        emailAddress: "Geo_Paucek86@yahoo.com",
+        emailAddress: "Leta_Schuster@yahoo.com",
         publicMetadata: {
           "key": "<value>",
         },
         revoked: false,
         status: "pending",
-        createdAt: 497777,
-        updatedAt: 581082,
+        createdAt: 110477,
+        updatedAt: 405036,
       },
     },
   ],
-  totalCount: 241557,
+  totalCount: 405373,
 };
 ```
 

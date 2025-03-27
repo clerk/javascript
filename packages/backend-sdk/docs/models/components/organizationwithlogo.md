@@ -10,7 +10,7 @@ let value: OrganizationWithLogo = {
   id: "<id>",
   name: "<value>",
   slug: "<value>",
-  maxAllowedMemberships: 989410,
+  maxAllowedMemberships: 689768,
   adminDeleteEnabled: false,
   publicMetadata: {
     "key": "<value>",
@@ -18,9 +18,9 @@ let value: OrganizationWithLogo = {
   privateMetadata: {
     "key": "<value>",
   },
-  createdAt: 65304,
-  updatedAt: 783235,
-  imageUrl: "https://excellent-petticoat.biz/",
+  createdAt: 58356,
+  updatedAt: 730709,
+  imageUrl: "https://first-glider.info",
   hasImage: false,
 };
 ```

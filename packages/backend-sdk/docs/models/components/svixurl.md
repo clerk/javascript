@@ -8,7 +8,7 @@ Response that contains a temporary Svix URL to access management dashboard
 import { SvixURL } from "@clerk/backend-sdk/models/components";
 
 let value: SvixURL = {
-  svixUrl: "https://black-director.biz/",
+  svixUrl: "https://vain-archaeology.biz",
 };
 ```
 

@@ -69,17 +69,17 @@ export type SAMLVerificationStrategy = ClosedEnum<
   typeof SAMLVerificationStrategy
 >;
 
-export type ClerkErrorErrorMeta = {};
+export type ClerkErrorErrorSAMLAccountMeta = {};
 
 export type SAMLErrorClerkError = {
   message: string;
   longMessage: string;
   code: string;
-  meta?: ClerkErrorErrorMeta | undefined;
+  meta?: ClerkErrorErrorSAMLAccountMeta | undefined;
   clerkTraceId?: string | undefined;
 };
 
-export type VerificationError = SAMLErrorClerkError;
+export type SAMLVerificationError = SAMLErrorClerkError;
 
 export type Saml = {
   status: SAMLVerificationStatus;
@@ -335,50 +335,52 @@ export namespace SAMLVerificationStrategy$ {
 }
 
 /** @internal */
-export const ClerkErrorErrorMeta$inboundSchema: z.ZodType<
-  ClerkErrorErrorMeta,
+export const ClerkErrorErrorSAMLAccountMeta$inboundSchema: z.ZodType<
+  ClerkErrorErrorSAMLAccountMeta,
   z.ZodTypeDef,
   unknown
 > = z.object({});
 
 /** @internal */
-export type ClerkErrorErrorMeta$Outbound = {};
+export type ClerkErrorErrorSAMLAccountMeta$Outbound = {};
 
 /** @internal */
-export const ClerkErrorErrorMeta$outboundSchema: z.ZodType<
-  ClerkErrorErrorMeta$Outbound,
+export const ClerkErrorErrorSAMLAccountMeta$outboundSchema: z.ZodType<
+  ClerkErrorErrorSAMLAccountMeta$Outbound,
   z.ZodTypeDef,
-  ClerkErrorErrorMeta
+  ClerkErrorErrorSAMLAccountMeta
 > = z.object({});
 
 /**
  * @internal
  * @deprecated This namespace will be removed in future versions. Use schemas and types that are exported directly from this module.
  */
-export namespace ClerkErrorErrorMeta$ {
-  /** @deprecated use `ClerkErrorErrorMeta$inboundSchema` instead. */
-  export const inboundSchema = ClerkErrorErrorMeta$inboundSchema;
-  /** @deprecated use `ClerkErrorErrorMeta$outboundSchema` instead. */
-  export const outboundSchema = ClerkErrorErrorMeta$outboundSchema;
-  /** @deprecated use `ClerkErrorErrorMeta$Outbound` instead. */
-  export type Outbound = ClerkErrorErrorMeta$Outbound;
+export namespace ClerkErrorErrorSAMLAccountMeta$ {
+  /** @deprecated use `ClerkErrorErrorSAMLAccountMeta$inboundSchema` instead. */
+  export const inboundSchema = ClerkErrorErrorSAMLAccountMeta$inboundSchema;
+  /** @deprecated use `ClerkErrorErrorSAMLAccountMeta$outboundSchema` instead. */
+  export const outboundSchema = ClerkErrorErrorSAMLAccountMeta$outboundSchema;
+  /** @deprecated use `ClerkErrorErrorSAMLAccountMeta$Outbound` instead. */
+  export type Outbound = ClerkErrorErrorSAMLAccountMeta$Outbound;
 }
 
-export function clerkErrorErrorMetaToJSON(
-  clerkErrorErrorMeta: ClerkErrorErrorMeta,
+export function clerkErrorErrorSAMLAccountMetaToJSON(
+  clerkErrorErrorSAMLAccountMeta: ClerkErrorErrorSAMLAccountMeta,
 ): string {
   return JSON.stringify(
-    ClerkErrorErrorMeta$outboundSchema.parse(clerkErrorErrorMeta),
+    ClerkErrorErrorSAMLAccountMeta$outboundSchema.parse(
+      clerkErrorErrorSAMLAccountMeta,
+    ),
   );
 }
 
-export function clerkErrorErrorMetaFromJSON(
+export function clerkErrorErrorSAMLAccountMetaFromJSON(
   jsonString: string,
-): SafeParseResult<ClerkErrorErrorMeta, SDKValidationError> {
+): SafeParseResult<ClerkErrorErrorSAMLAccountMeta, SDKValidationError> {
   return safeParse(
     jsonString,
-    (x) => ClerkErrorErrorMeta$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'ClerkErrorErrorMeta' from JSON`,
+    (x) => ClerkErrorErrorSAMLAccountMeta$inboundSchema.parse(JSON.parse(x)),
+    `Failed to parse 'ClerkErrorErrorSAMLAccountMeta' from JSON`,
   );
 }
 
@@ -391,7 +393,7 @@ export const SAMLErrorClerkError$inboundSchema: z.ZodType<
   message: z.string(),
   long_message: z.string(),
   code: z.string(),
-  meta: z.lazy(() => ClerkErrorErrorMeta$inboundSchema).optional(),
+  meta: z.lazy(() => ClerkErrorErrorSAMLAccountMeta$inboundSchema).optional(),
   clerk_trace_id: z.string().optional(),
 }).transform((v) => {
   return remap$(v, {
@@ -405,7 +407,7 @@ export type SAMLErrorClerkError$Outbound = {
   message: string;
   long_message: string;
   code: string;
-  meta?: ClerkErrorErrorMeta$Outbound | undefined;
+  meta?: ClerkErrorErrorSAMLAccountMeta$Outbound | undefined;
   clerk_trace_id?: string | undefined;
 };
 
@@ -418,7 +420,7 @@ export const SAMLErrorClerkError$outboundSchema: z.ZodType<
   message: z.string(),
   longMessage: z.string(),
   code: z.string(),
-  meta: z.lazy(() => ClerkErrorErrorMeta$outboundSchema).optional(),
+  meta: z.lazy(() => ClerkErrorErrorSAMLAccountMeta$outboundSchema).optional(),
   clerkTraceId: z.string().optional(),
 }).transform((v) => {
   return remap$(v, {
@@ -459,50 +461,50 @@ export function samlErrorClerkErrorFromJSON(
 }
 
 /** @internal */
-export const VerificationError$inboundSchema: z.ZodType<
-  VerificationError,
+export const SAMLVerificationError$inboundSchema: z.ZodType<
+  SAMLVerificationError,
   z.ZodTypeDef,
   unknown
 > = z.lazy(() => SAMLErrorClerkError$inboundSchema);
 
 /** @internal */
-export type VerificationError$Outbound = SAMLErrorClerkError$Outbound;
+export type SAMLVerificationError$Outbound = SAMLErrorClerkError$Outbound;
 
 /** @internal */
-export const VerificationError$outboundSchema: z.ZodType<
-  VerificationError$Outbound,
+export const SAMLVerificationError$outboundSchema: z.ZodType<
+  SAMLVerificationError$Outbound,
   z.ZodTypeDef,
-  VerificationError
+  SAMLVerificationError
 > = z.lazy(() => SAMLErrorClerkError$outboundSchema);
 
 /**
  * @internal
  * @deprecated This namespace will be removed in future versions. Use schemas and types that are exported directly from this module.
  */
-export namespace VerificationError$ {
-  /** @deprecated use `VerificationError$inboundSchema` instead. */
-  export const inboundSchema = VerificationError$inboundSchema;
-  /** @deprecated use `VerificationError$outboundSchema` instead. */
-  export const outboundSchema = VerificationError$outboundSchema;
-  /** @deprecated use `VerificationError$Outbound` instead. */
-  export type Outbound = VerificationError$Outbound;
+export namespace SAMLVerificationError$ {
+  /** @deprecated use `SAMLVerificationError$inboundSchema` instead. */
+  export const inboundSchema = SAMLVerificationError$inboundSchema;
+  /** @deprecated use `SAMLVerificationError$outboundSchema` instead. */
+  export const outboundSchema = SAMLVerificationError$outboundSchema;
+  /** @deprecated use `SAMLVerificationError$Outbound` instead. */
+  export type Outbound = SAMLVerificationError$Outbound;
 }
 
-export function verificationErrorToJSON(
-  verificationError: VerificationError,
+export function samlVerificationErrorToJSON(
+  samlVerificationError: SAMLVerificationError,
 ): string {
   return JSON.stringify(
-    VerificationError$outboundSchema.parse(verificationError),
+    SAMLVerificationError$outboundSchema.parse(samlVerificationError),
   );
 }
 
-export function verificationErrorFromJSON(
+export function samlVerificationErrorFromJSON(
   jsonString: string,
-): SafeParseResult<VerificationError, SDKValidationError> {
+): SafeParseResult<SAMLVerificationError, SDKValidationError> {
   return safeParse(
     jsonString,
-    (x) => VerificationError$inboundSchema.parse(JSON.parse(x)),
-    `Failed to parse 'VerificationError' from JSON`,
+    (x) => SAMLVerificationError$inboundSchema.parse(JSON.parse(x)),
+    `Failed to parse 'SAMLVerificationError' from JSON`,
   );
 }
 

@@ -19,16 +19,16 @@ let value: OrganizationDomains = {
       verification: {
         status: "verified",
         strategy: "<value>",
-        attempts: 968972,
-        expireAt: 904949,
+        attempts: 994401,
+        expireAt: 451822,
       },
-      totalPendingInvitations: 296556,
-      totalPendingSuggestions: 992012,
-      createdAt: 249420,
-      updatedAt: 105906,
+      totalPendingInvitations: 70869,
+      totalPendingSuggestions: 292794,
+      createdAt: 152354,
+      updatedAt: 417486,
     },
   ],
-  totalCount: 950953,
+  totalCount: 131289,
 };
 ```
 

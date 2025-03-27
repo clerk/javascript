@@ -14,11 +14,11 @@ let value: Domains = {
       id: "<id>",
       name: "<value>",
       isSatellite: false,
-      frontendApiUrl: "https://which-fork.info/",
+      frontendApiUrl: "https://lustrous-wombat.com",
       developmentOrigin: "<value>",
     },
   ],
-  totalCount: 16328,
+  totalCount: 783235,
 };
 ```
 

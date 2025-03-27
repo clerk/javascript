@@ -8,9 +8,9 @@
 ```typescript
 const value: components.Web3Signature = {
   status: "verified",
-  strategy: "web3_okx_wallet_signature",
-  attempts: 231701,
-  expireAt: 949319,
+  strategy: "web3_metamask_signature",
+  attempts: 132487,
+  expireAt: 53427,
 };
 ```
 
@@ -20,8 +20,8 @@ const value: components.Web3Signature = {
 const value: components.Web3WalletVerificationAdmin = {
   status: "verified",
   strategy: "admin",
-  attempts: 941378,
-  expireAt: 799203,
+  attempts: 725595,
+  expireAt: 11427,
 };
 ```
 

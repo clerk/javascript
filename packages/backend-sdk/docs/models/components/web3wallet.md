@@ -11,11 +11,11 @@ let value: Web3Wallet = {
   verification: {
     status: "verified",
     strategy: "admin",
-    attempts: 874288,
-    expireAt: 293020,
+    attempts: 146946,
+    expireAt: 79522,
   },
-  createdAt: 848944,
-  updatedAt: 617877,
+  createdAt: 89603,
+  updatedAt: 672048,
 };
 ```
 
