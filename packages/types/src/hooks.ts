@@ -37,7 +37,7 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
-       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](/docs/users/user-impersonation).
+       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
        */
       actor: undefined;
       /**
