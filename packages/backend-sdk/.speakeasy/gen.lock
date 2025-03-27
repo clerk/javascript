@@ -3,10 +3,10 @@ id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
   docChecksum: e78c47dc718596c9bd5b05a9c21b8874
   docVersion: "2025-12-03"
-  speakeasyVersion: 1.525.0
+  speakeasyVersion: 1.525.1
   generationVersion: 2.562.2
-  releaseVersion: 0.3.0
-  configChecksum: 5bfb8019fcd0ced52eb07eed3614ff83
+  releaseVersion: 0.3.1
+  configChecksum: bebc834bc1aa68b90e55a7ab7cc12367
 features:
   typescript:
     additionalDependencies: 0.1.0

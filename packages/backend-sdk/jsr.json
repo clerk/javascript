@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "exports": {
     ".": "./src/index.ts",
     "./models/errors": "./src/models/errors/index.ts",
