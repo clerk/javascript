@@ -7,6 +7,7 @@ import { useRouter } from '../../router';
 import type { UserProfileCtx } from '../../types';
 import type { CustomPageContent } from '../../utils';
 import { createUserProfileCustomPages } from '../../utils';
+import { useEnvironment } from '../EnvironmentContext';
 
 type PagesType = {
   routes: NavbarRoute[];
@@ -26,6 +27,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
   const context = useContext(UserProfileContext);
   const { queryParams } = useRouter();
   const clerk = useClerk();
+  const environment = useEnvironment();
 
   if (!context || context.componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
@@ -34,7 +36,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
   const { componentName, customPages, ...ctx } = context;
 
   const pages = useMemo(() => {
-    return createUserProfileCustomPages(customPages || [], clerk);
+    return createUserProfileCustomPages(customPages || [], clerk, environment);
   }, [customPages]);
 
   return {

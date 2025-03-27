@@ -7,6 +7,7 @@ export const USER_PROFILE_NAVBAR_ROUTE_ID = {
 export const ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID = {
   GENERAL: 'general',
   MEMBERS: 'members',
+  BILLING: 'billing',
 };
 
 export const USER_BUTTON_ITEM_ID = {

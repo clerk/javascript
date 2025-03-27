@@ -10,6 +10,7 @@ exports[`Environment __internal_toSnapshot() 1`] = `
     "single_session_mode": true,
   },
   "commerce_settings": {
+    "enabled": false,
     "stripe_publishable_key": "",
   },
   "display_config": {
@@ -271,6 +272,7 @@ exports[`Environment __internal_toSnapshot() 1`] = `
 exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
   "__experimental_commerceSettings": __experimental_CommerceSettings {
+    "enabled": false,
     "pathRoot": "",
     "stripePublishableKey": "",
   },
@@ -497,6 +499,7 @@ Environment {
 exports[`Environment has the same initial properties 1`] = `
 Environment {
   "__experimental_commerceSettings": __experimental_CommerceSettings {
+    "enabled": false,
     "pathRoot": "",
     "stripePublishableKey": "",
   },

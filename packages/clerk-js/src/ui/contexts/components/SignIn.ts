@@ -32,7 +32,6 @@ export type SignInContextType = SignInCtx & {
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
   isCombinedFlow: boolean;
-  withSessionTasks: boolean;
 };
 
 export const SignInContext = createContext<SignInCtx | null>(null);
@@ -129,6 +128,7 @@ export const useSignInContext = (): SignInContextType => {
   return {
     ...(ctx as SignInCtx),
     transferable: ctx.transferable ?? true,
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signUpUrl,
     signInUrl,
@@ -144,6 +144,5 @@ export const useSignInContext = (): SignInContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    withSessionTasks: !!options.experimental?.withSessionTasks,
   };
 };

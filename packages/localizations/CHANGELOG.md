@@ -1,5 +1,30 @@
 # Change Log
 
+## 3.13.4
+
+### Patch Changes
+
+- Add billing page to `OrgProfile`, use new `usePlans` hook, and adds new subscription methods ([#5423](https://github.com/clerk/javascript/pull/5423)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`e20fb6b`](https://github.com/clerk/javascript/commit/e20fb6b397fb69c9d5af4e321267b82f12a5f127), [`77e6462`](https://github.com/clerk/javascript/commit/77e64628560cab688af214edb5922e67cd68a951)]:
+  - @clerk/types@4.50.1
+
+## 3.13.3
+
+### Patch Changes
+
+- Defines that the current password should be entered on password re-verifcation flow ([#5455](https://github.com/clerk/javascript/pull/5455)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+
+## 3.13.2
+
+### Patch Changes
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+
 ## 3.13.1
 
 ### Patch Changes

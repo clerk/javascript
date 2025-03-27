@@ -1,5 +1,58 @@
 # Change Log
 
+## 5.58.1
+
+### Patch Changes
+
+- Fallback to locally stored environment during an outage. ([#5420](https://github.com/clerk/javascript/pull/5420)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix Turnstile console warning when locale is used ([#5463](https://github.com/clerk/javascript/pull/5463)) by [@anagstef](https://github.com/anagstef)
+
+- Remove console.error from transfer flow ([#5462](https://github.com/clerk/javascript/pull/5462)) by [@anagstef](https://github.com/anagstef)
+
+- Add billing page to `OrgProfile`, use new `usePlans` hook, and adds new subscription methods ([#5423](https://github.com/clerk/javascript/pull/5423)) by [@aeliox](https://github.com/aeliox)
+
+- Refactor `<PricingTableDefault />` to use local sub components to align with `<PricingTableMatrix />` implementation and descriptors. ([#5450](https://github.com/clerk/javascript/pull/5450)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`e20fb6b`](https://github.com/clerk/javascript/commit/e20fb6b397fb69c9d5af4e321267b82f12a5f127), [`77e6462`](https://github.com/clerk/javascript/commit/77e64628560cab688af214edb5922e67cd68a951)]:
+  - @clerk/localizations@3.13.4
+  - @clerk/shared@3.2.3
+  - @clerk/types@4.50.1
+
+## 5.58.0
+
+### Minor Changes
+
+- Add support for the `oauthFlow` prop on `<SignIn />` and `<SignUp />`, allowing developers to opt-in to using a popup for OAuth authorization instead of redirects. ([#5239](https://github.com/clerk/javascript/pull/5239)) by [@dstaley](https://github.com/dstaley)
+
+  With the new `oauthFlow` prop, developers can opt-in to using a popup window instead of redirects for their OAuth flows by setting `oauthFlow` to `"popup"`. While we still recommend the default `"redirect"` for most scenarios, the `"popup"` option is useful in environments where the redirect flow does not currently work, such as when your application is embedded into an `iframe`. We also opt applications into the `"popup"` flow when we detect that your application is running on a domain that's typically embedded into an `iframe`, such as `loveable.app`.
+
+### Patch Changes
+
+- Load tasks based on environment settings ([#5422](https://github.com/clerk/javascript/pull/5422)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Handle the empty body on 204 responses from FAPI ([#5410](https://github.com/clerk/javascript/pull/5410)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`a9b618d`](https://github.com/clerk/javascript/commit/a9b618dfa97a0dacc462186c8b2588ad5ddb6902), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`a570b80`](https://github.com/clerk/javascript/commit/a570b804b32cf2bc2b329699a1f24bd34f4c4880), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+  - @clerk/shared@3.2.2
+  - @clerk/localizations@3.13.3
+
+## 5.57.4
+
+### Patch Changes
+
+- Fix lazy-loading of `BillingPage` in `UserProfile` ([#5445](https://github.com/clerk/javascript/pull/5445)) by [@aeliox](https://github.com/aeliox)
+
+- Remove Paypal option from `<CheckoutForm />` ([#5446](https://github.com/clerk/javascript/pull/5446)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Wrap nested `<Checkout />` component in its own AppearanceProvider to recieve its own appearance object. ([#5443](https://github.com/clerk/javascript/pull/5443)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+  - @clerk/localizations@3.13.2
+  - @clerk/shared@3.2.1
+
 ## 5.57.3
 
 ### Patch Changes
