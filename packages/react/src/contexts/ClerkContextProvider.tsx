@@ -29,7 +29,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
   React.useEffect(() => {
     return clerk.addListener(e => setState({ ...e }));
-  }, []);
+  }, [clerk]);
 
   const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);

@@ -63,6 +63,8 @@ export type SDKMetadata = {
   environment?: string;
 };
 
+export type Status = 'degraded' | 'error' | 'loading' | 'ready' | 'uninitialized';
+
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
@@ -109,6 +111,11 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * The current loading status of the Clerk SDK.
+   */
+  status: Status;
 
   /**
    * @internal
