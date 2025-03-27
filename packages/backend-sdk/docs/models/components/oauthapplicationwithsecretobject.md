@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { OAuthApplicationWithSecretObject } from '@clerk/backend-sdk/models/components';
+import { OAuthApplicationWithSecretObject } from "@clerk/backend-sdk/models/components";
 
-let value: OAuthApplicationWithSecretObject = 'oauth_application';
+let value: OAuthApplicationWithSecretObject = "oauth_application";
 ```
 
 ## Values
 
 ```typescript
-'oauth_application';
+"oauth_application"
 ```

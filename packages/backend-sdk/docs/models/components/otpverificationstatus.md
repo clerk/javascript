@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { OTPVerificationStatus } from '@clerk/backend-sdk/models/components';
+import { OTPVerificationStatus } from "@clerk/backend-sdk/models/components";
 
-let value: OTPVerificationStatus = 'verified';
+let value: OTPVerificationStatus = "verified";
 ```
 
 ## Values
 
 ```typescript
-'unverified' | 'verified' | 'failed' | 'expired';
+"unverified" | "verified" | "failed" | "expired"
 ```

@@ -3,11 +3,11 @@
 ## Example Usage
 
 ```typescript
-import { Admin } from '@clerk/backend-sdk/models/components';
+import { Admin } from "@clerk/backend-sdk/models/components";
 
 let value: Admin = {
-  status: 'verified',
-  strategy: 'admin',
+  status: "verified",
+  strategy: "admin",
   attempts: 367562,
   expireAt: 435865,
 };
@@ -15,10 +15,10 @@ let value: Admin = {
 
 ## Fields
 
-| Field              | Type                                                                                     | Required           | Description |
-| ------------------ | ---------------------------------------------------------------------------------------- | ------------------ | ----------- |
-| `status`           | [components.AdminVerificationStatus](../../models/components/adminverificationstatus.md) | :heavy_check_mark: | N/A         |
-| `strategy`         | [components.VerificationStrategy](../../models/components/verificationstrategy.md)       | :heavy_check_mark: | N/A         |
-| `attempts`         | _number_                                                                                 | :heavy_check_mark: | N/A         |
-| `expireAt`         | _number_                                                                                 | :heavy_check_mark: | N/A         |
-| `verifiedAtClient` | _string_                                                                                 | :heavy_minus_sign: | N/A         |
+| Field                                                                                    | Type                                                                                     | Required                                                                                 | Description                                                                              |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `status`                                                                                 | [components.AdminVerificationStatus](../../models/components/adminverificationstatus.md) | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `strategy`                                                                               | [components.VerificationStrategy](../../models/components/verificationstrategy.md)       | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `attempts`                                                                               | *number*                                                                                 | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `expireAt`                                                                               | *number*                                                                                 | :heavy_check_mark:                                                                       | N/A                                                                                      |
+| `verifiedAtClient`                                                                       | *string*                                                                                 | :heavy_minus_sign:                                                                       | N/A                                                                                      |

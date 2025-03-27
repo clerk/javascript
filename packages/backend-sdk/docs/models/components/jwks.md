@@ -5,13 +5,13 @@ Get the JSON Web Key Set
 ## Example Usage
 
 ```typescript
-import { Jwks } from '@clerk/backend-sdk/models/components';
+import { Jwks } from "@clerk/backend-sdk/models/components";
 
 let value: Jwks = {};
 ```
 
 ## Fields
 
-| Field  | Type                | Required           | Description |
-| ------ | ------------------- | ------------------ | ----------- |
-| `keys` | _components.Keys_[] | :heavy_minus_sign: | N/A         |
+| Field               | Type                | Required            | Description         |
+| ------------------- | ------------------- | ------------------- | ------------------- |
+| `keys`              | *components.Keys*[] | :heavy_minus_sign:  | N/A                 |

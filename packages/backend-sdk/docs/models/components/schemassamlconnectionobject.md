@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { SchemasSAMLConnectionObject } from '@clerk/backend-sdk/models/components';
+import { SchemasSAMLConnectionObject } from "@clerk/backend-sdk/models/components";
 
-let value: SchemasSAMLConnectionObject = 'saml_connection';
+let value: SchemasSAMLConnectionObject = "saml_connection";
 ```
 
 ## Values
 
 ```typescript
-'saml_connection';
+"saml_connection"
 ```

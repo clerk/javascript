@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { DeleteUserProfileImageRequest } from '@clerk/backend-sdk/models/operations';
+import { DeleteUserProfileImageRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: DeleteUserProfileImageRequest = {
-  userId: '<id>',
+  userId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field    | Type     | Required           | Description                                        |
-| -------- | -------- | ------------------ | -------------------------------------------------- |
-| `userId` | _string_ | :heavy_check_mark: | The ID of the user to delete the profile image for |
+| Field                                              | Type                                               | Required                                           | Description                                        |
+| -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- |
+| `userId`                                           | *string*                                           | :heavy_check_mark:                                 | The ID of the user to delete the profile image for |

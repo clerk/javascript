@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { AdminVerificationStatus } from '@clerk/backend-sdk/models/components';
+import { AdminVerificationStatus } from "@clerk/backend-sdk/models/components";
 
-let value: AdminVerificationStatus = 'verified';
+let value: AdminVerificationStatus = "verified";
 ```
 
 ## Values
 
 ```typescript
-'verified';
+"verified"
 ```

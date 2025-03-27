@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { DeleteBlocklistIdentifierRequest } from '@clerk/backend-sdk/models/operations';
+import { DeleteBlocklistIdentifierRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: DeleteBlocklistIdentifierRequest = {
-  identifierId: '<id>',
+  identifierId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field          | Type     | Required           | Description                                            |
-| -------------- | -------- | ------------------ | ------------------------------------------------------ |
-| `identifierId` | _string_ | :heavy_check_mark: | The ID of the identifier to delete from the block-list |
+| Field                                                  | Type                                                   | Required                                               | Description                                            |
+| ------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------ |
+| `identifierId`                                         | *string*                                               | :heavy_check_mark:                                     | The ID of the identifier to delete from the block-list |

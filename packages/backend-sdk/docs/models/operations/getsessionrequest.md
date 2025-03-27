@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { GetSessionRequest } from '@clerk/backend-sdk/models/operations';
+import { GetSessionRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: GetSessionRequest = {
-  sessionId: '<id>',
+  sessionId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field       | Type     | Required           | Description           |
-| ----------- | -------- | ------------------ | --------------------- |
-| `sessionId` | _string_ | :heavy_check_mark: | The ID of the session |
+| Field                 | Type                  | Required              | Description           |
+| --------------------- | --------------------- | --------------------- | --------------------- |
+| `sessionId`           | *string*              | :heavy_check_mark:    | The ID of the session |

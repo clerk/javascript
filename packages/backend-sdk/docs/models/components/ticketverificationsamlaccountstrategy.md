@@ -3,9 +3,9 @@
 ## Example Usage
 
 ```typescript
-import { TicketVerificationSAMLAccountStrategy } from '@clerk/backend-sdk/models/components';
+import { TicketVerificationSAMLAccountStrategy } from "@clerk/backend-sdk/models/components";
 
-let value: TicketVerificationSAMLAccountStrategy = 'ticket';
+let value: TicketVerificationSAMLAccountStrategy = "ticket";
 ```
 
 ## Values
@@ -13,5 +13,5 @@ let value: TicketVerificationSAMLAccountStrategy = 'ticket';
 This is an open enum. Unrecognized values will be captured as the `Unrecognized<string>` branded type.
 
 ```typescript
-'ticket' | Unrecognized<string>;
+"ticket" | Unrecognized<string>
 ```

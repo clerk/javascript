@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { SAMLVerificationStrategy } from '@clerk/backend-sdk/models/components';
+import { SAMLVerificationStrategy } from "@clerk/backend-sdk/models/components";
 
-let value: SAMLVerificationStrategy = 'saml';
+let value: SAMLVerificationStrategy = "saml";
 ```
 
 ## Values
 
 ```typescript
-'saml';
+"saml"
 ```

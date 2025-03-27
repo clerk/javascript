@@ -5,10 +5,10 @@ Success
 ## Example Usage
 
 ```typescript
-import { InstanceRestrictions } from '@clerk/backend-sdk/models/components';
+import { InstanceRestrictions } from "@clerk/backend-sdk/models/components";
 
 let value: InstanceRestrictions = {
-  object: 'instance_restrictions',
+  object: "instance_restrictions",
   allowlist: false,
   blocklist: false,
   blockEmailSubaddresses: false,
@@ -19,11 +19,11 @@ let value: InstanceRestrictions = {
 
 ## Fields
 
-| Field                         | Type                                                                                           | Required           | Description                                                                           |
-| ----------------------------- | ---------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------- |
-| `object`                      | [components.InstanceRestrictionsObject](../../models/components/instancerestrictionsobject.md) | :heavy_check_mark: | String representing the object's type. Objects of the same type share the same value. |
-| `allowlist`                   | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                   |
-| `blocklist`                   | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                   |
-| `blockEmailSubaddresses`      | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                   |
-| `blockDisposableEmailDomains` | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                   |
-| `ignoreDotsForGmailAddresses` | _boolean_                                                                                      | :heavy_check_mark: | N/A                                                                                   |
+| Field                                                                                          | Type                                                                                           | Required                                                                                       | Description                                                                                    |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `object`                                                                                       | [components.InstanceRestrictionsObject](../../models/components/instancerestrictionsobject.md) | :heavy_check_mark:                                                                             | String representing the object's type. Objects of the same type share the same value.          |
+| `allowlist`                                                                                    | *boolean*                                                                                      | :heavy_check_mark:                                                                             | N/A                                                                                            |
+| `blocklist`                                                                                    | *boolean*                                                                                      | :heavy_check_mark:                                                                             | N/A                                                                                            |
+| `blockEmailSubaddresses`                                                                       | *boolean*                                                                                      | :heavy_check_mark:                                                                             | N/A                                                                                            |
+| `blockDisposableEmailDomains`                                                                  | *boolean*                                                                                      | :heavy_check_mark:                                                                             | N/A                                                                                            |
+| `ignoreDotsForGmailAddresses`                                                                  | *boolean*                                                                                      | :heavy_check_mark:                                                                             | N/A                                                                                            |

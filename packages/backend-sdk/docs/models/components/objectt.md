@@ -2,16 +2,17 @@
 
 String representing the object's type. Objects of the same type share the same value.
 
+
 ## Example Usage
 
 ```typescript
-import { ObjectT } from '@clerk/backend-sdk/models/components';
+import { ObjectT } from "@clerk/backend-sdk/models/components";
 
-let value: ObjectT = 'client';
+let value: ObjectT = "client";
 ```
 
 ## Values
 
 ```typescript
-'client';
+"client"
 ```

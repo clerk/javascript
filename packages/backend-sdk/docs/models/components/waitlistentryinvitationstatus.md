@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { WaitlistEntryInvitationStatus } from '@clerk/backend-sdk/models/components';
+import { WaitlistEntryInvitationStatus } from "@clerk/backend-sdk/models/components";
 
-let value: WaitlistEntryInvitationStatus = 'pending';
+let value: WaitlistEntryInvitationStatus = "pending";
 ```
 
 ## Values
 
 ```typescript
-'pending' | 'accepted' | 'revoked' | 'expired';
+"pending" | "accepted" | "revoked" | "expired"
 ```

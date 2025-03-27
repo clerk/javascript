@@ -5,12 +5,12 @@
 ## Example Usage
 
 ```typescript
-import { SignUpExternalAccount } from '@clerk/backend-sdk/models/components';
+import { SignUpExternalAccount } from "@clerk/backend-sdk/models/components";
 
 let value: SignUpExternalAccount = {};
 ```
 
 ## Fields
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
+| Field       | Type        | Required    | Description |
+| ----------- | ----------- | ----------- | ----------- |

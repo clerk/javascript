@@ -3,21 +3,21 @@
 ## Example Usage
 
 ```typescript
-import { SchemasSAMLConnection } from '@clerk/backend-sdk/models/components';
+import { SchemasSAMLConnection } from "@clerk/backend-sdk/models/components";
 
 let value: SchemasSAMLConnection = {
-  object: 'saml_connection',
-  id: '<id>',
-  name: '<value>',
-  domain: 'lively-ectoderm.biz',
-  idpEntityId: '<id>',
-  idpSsoUrl: 'https://hidden-import.info',
-  idpCertificate: '<value>',
-  acsUrl: 'https://complicated-boyfriend.info',
-  spEntityId: '<id>',
-  spMetadataUrl: 'https://quick-witted-grouper.org',
+  object: "saml_connection",
+  id: "<id>",
+  name: "<value>",
+  domain: "lively-ectoderm.biz",
+  idpEntityId: "<id>",
+  idpSsoUrl: "https://hidden-import.info",
+  idpCertificate: "<value>",
+  acsUrl: "https://complicated-boyfriend.info",
+  spEntityId: "<id>",
+  spMetadataUrl: "https://quick-witted-grouper.org",
   active: false,
-  provider: '<value>',
+  provider: "<value>",
   userCount: 351893,
   syncUserAttributes: false,
   createdAt: 721407,
@@ -27,28 +27,28 @@ let value: SchemasSAMLConnection = {
 
 ## Fields
 
-| Field                              | Type                                                                                                   | Required           | Description                         |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------ | ----------------------------------- |
-| `object`                           | [components.SchemasSAMLConnectionObject](../../models/components/schemassamlconnectionobject.md)       | :heavy_check_mark: | N/A                                 |
-| `id`                               | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `name`                             | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `domain`                           | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `idpEntityId`                      | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `idpSsoUrl`                        | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `idpCertificate`                   | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `idpMetadataUrl`                   | _string_                                                                                               | :heavy_minus_sign: | N/A                                 |
-| `idpMetadata`                      | _string_                                                                                               | :heavy_minus_sign: | N/A                                 |
-| `acsUrl`                           | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `spEntityId`                       | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `spMetadataUrl`                    | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `organizationId`                   | _string_                                                                                               | :heavy_minus_sign: | N/A                                 |
-| `attributeMapping`                 | [components.SAMLConnectionAttributeMapping](../../models/components/samlconnectionattributemapping.md) | :heavy_minus_sign: | N/A                                 |
-| `active`                           | _boolean_                                                                                              | :heavy_check_mark: | N/A                                 |
-| `provider`                         | _string_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `userCount`                        | _number_                                                                                               | :heavy_check_mark: | N/A                                 |
-| `syncUserAttributes`               | _boolean_                                                                                              | :heavy_check_mark: | N/A                                 |
-| `allowSubdomains`                  | _boolean_                                                                                              | :heavy_minus_sign: | N/A                                 |
-| `allowIdpInitiated`                | _boolean_                                                                                              | :heavy_minus_sign: | N/A                                 |
-| `disableAdditionalIdentifications` | _boolean_                                                                                              | :heavy_minus_sign: | N/A                                 |
-| `createdAt`                        | _number_                                                                                               | :heavy_check_mark: | Unix timestamp of creation.<br/>    |
-| `updatedAt`                        | _number_                                                                                               | :heavy_check_mark: | Unix timestamp of last update.<br/> |
+| Field                                                                                                  | Type                                                                                                   | Required                                                                                               | Description                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `object`                                                                                               | [components.SchemasSAMLConnectionObject](../../models/components/schemassamlconnectionobject.md)       | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `id`                                                                                                   | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `name`                                                                                                 | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `domain`                                                                                               | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `idpEntityId`                                                                                          | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `idpSsoUrl`                                                                                            | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `idpCertificate`                                                                                       | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `idpMetadataUrl`                                                                                       | *string*                                                                                               | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `idpMetadata`                                                                                          | *string*                                                                                               | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `acsUrl`                                                                                               | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `spEntityId`                                                                                           | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `spMetadataUrl`                                                                                        | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `organizationId`                                                                                       | *string*                                                                                               | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `attributeMapping`                                                                                     | [components.SAMLConnectionAttributeMapping](../../models/components/samlconnectionattributemapping.md) | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `active`                                                                                               | *boolean*                                                                                              | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `provider`                                                                                             | *string*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `userCount`                                                                                            | *number*                                                                                               | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `syncUserAttributes`                                                                                   | *boolean*                                                                                              | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `allowSubdomains`                                                                                      | *boolean*                                                                                              | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `allowIdpInitiated`                                                                                    | *boolean*                                                                                              | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `disableAdditionalIdentifications`                                                                     | *boolean*                                                                                              | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |
+| `createdAt`                                                                                            | *number*                                                                                               | :heavy_check_mark:                                                                                     | Unix timestamp of creation.<br/>                                                                       |
+| `updatedAt`                                                                                            | *number*                                                                                               | :heavy_check_mark:                                                                                     | Unix timestamp of last update.<br/>                                                                    |

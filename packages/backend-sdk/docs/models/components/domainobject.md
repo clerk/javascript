@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { DomainObject } from '@clerk/backend-sdk/models/components';
+import { DomainObject } from "@clerk/backend-sdk/models/components";
 
-let value: DomainObject = 'domain';
+let value: DomainObject = "domain";
 ```
 
 ## Values
 
 ```typescript
-'domain';
+"domain"
 ```

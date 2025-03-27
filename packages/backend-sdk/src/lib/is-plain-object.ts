@@ -28,13 +28,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Taken from https://github.com/sindresorhus/is-plain-obj/blob/97f38e8836f86a642cce98fc6ab3058bc36df181/index.js
 
 export function isPlainObject(value: unknown): value is object {
-  if (typeof value !== 'object' || value === null) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
 
   const prototype = Object.getPrototypeOf(value);
   return (
-    (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) &&
+    (prototype === null ||
+      prototype === Object.prototype ||
+      Object.getPrototypeOf(prototype) === null) &&
     !(Symbol.toStringTag in value) &&
     !(Symbol.iterator in value)
   );

@@ -3,18 +3,18 @@
 ## Example Usage
 
 ```typescript
-import { SAMLAccount } from '@clerk/backend-sdk/models/components';
+import { SAMLAccount } from "@clerk/backend-sdk/models/components";
 
 let value: SAMLAccount = {
-  id: '<id>',
-  object: 'saml_account',
-  provider: '<value>',
+  id: "<id>",
+  object: "saml_account",
+  provider: "<value>",
   active: false,
-  emailAddress: 'Brendon_Hyatt18@yahoo.com',
+  emailAddress: "Brendon_Hyatt18@yahoo.com",
   verification: {
-    status: 'verified',
-    strategy: 'saml',
-    externalVerificationRedirectUrl: 'https://sniveling-republican.org',
+    status: "verified",
+    strategy: "saml",
+    externalVerificationRedirectUrl: "https://sniveling-republican.org",
     expireAt: 83422,
     attempts: 552193,
   },
@@ -23,16 +23,16 @@ let value: SAMLAccount = {
 
 ## Fields
 
-| Field            | Type                                                                         | Required           | Description                                                                                |
-| ---------------- | ---------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `id`             | _string_                                                                     | :heavy_check_mark: | N/A                                                                                        |
-| `object`         | [components.SAMLAccountObject](../../models/components/samlaccountobject.md) | :heavy_check_mark: | String representing the object's type. Objects of the same type share the same value.<br/> |
-| `provider`       | _string_                                                                     | :heavy_check_mark: | N/A                                                                                        |
-| `active`         | _boolean_                                                                    | :heavy_check_mark: | N/A                                                                                        |
-| `emailAddress`   | _string_                                                                     | :heavy_check_mark: | N/A                                                                                        |
-| `firstName`      | _string_                                                                     | :heavy_minus_sign: | N/A                                                                                        |
-| `lastName`       | _string_                                                                     | :heavy_minus_sign: | N/A                                                                                        |
-| `providerUserId` | _string_                                                                     | :heavy_minus_sign: | N/A                                                                                        |
-| `publicMetadata` | Record<string, _any_>                                                        | :heavy_minus_sign: | N/A                                                                                        |
-| `verification`   | _components.SAMLAccountVerification_                                         | :heavy_check_mark: | N/A                                                                                        |
-| `samlConnection` | _components.SamlConnection_                                                  | :heavy_minus_sign: | N/A                                                                                        |
+| Field                                                                                  | Type                                                                                   | Required                                                                               | Description                                                                            |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `id`                                                                                   | *string*                                                                               | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `object`                                                                               | [components.SAMLAccountObject](../../models/components/samlaccountobject.md)           | :heavy_check_mark:                                                                     | String representing the object's type. Objects of the same type share the same value.<br/> |
+| `provider`                                                                             | *string*                                                                               | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `active`                                                                               | *boolean*                                                                              | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `emailAddress`                                                                         | *string*                                                                               | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `firstName`                                                                            | *string*                                                                               | :heavy_minus_sign:                                                                     | N/A                                                                                    |
+| `lastName`                                                                             | *string*                                                                               | :heavy_minus_sign:                                                                     | N/A                                                                                    |
+| `providerUserId`                                                                       | *string*                                                                               | :heavy_minus_sign:                                                                     | N/A                                                                                    |
+| `publicMetadata`                                                                       | Record<string, *any*>                                                                  | :heavy_minus_sign:                                                                     | N/A                                                                                    |
+| `verification`                                                                         | *components.SAMLAccountVerification*                                                   | :heavy_check_mark:                                                                     | N/A                                                                                    |
+| `samlConnection`                                                                       | *components.SamlConnection*                                                            | :heavy_minus_sign:                                                                     | N/A                                                                                    |

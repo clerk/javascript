@@ -3,14 +3,14 @@
 ## Example Usage
 
 ```typescript
-import { CreateOrganizationInvitationBulkRequest } from '@clerk/backend-sdk/models/operations';
+import { CreateOrganizationInvitationBulkRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: CreateOrganizationInvitationBulkRequest = {
-  organizationId: '<id>',
+  organizationId: "<id>",
   requestBody: [
     {
-      emailAddress: 'Christa0@gmail.com',
-      role: '<value>',
+      emailAddress: "Christa0@gmail.com",
+      role: "<value>",
     },
   ],
 };
@@ -18,7 +18,7 @@ let value: CreateOrganizationInvitationBulkRequest = {
 
 ## Fields
 
-| Field            | Type                                                                                                                               | Required           | Description          |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------- |
-| `organizationId` | _string_                                                                                                                           | :heavy_check_mark: | The organization ID. |
-| `requestBody`    | [operations.CreateOrganizationInvitationBulkRequestBody](../../models/operations/createorganizationinvitationbulkrequestbody.md)[] | :heavy_check_mark: | N/A                  |
+| Field                                                                                                                              | Type                                                                                                                               | Required                                                                                                                           | Description                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `organizationId`                                                                                                                   | *string*                                                                                                                           | :heavy_check_mark:                                                                                                                 | The organization ID.                                                                                                               |
+| `requestBody`                                                                                                                      | [operations.CreateOrganizationInvitationBulkRequestBody](../../models/operations/createorganizationinvitationbulkrequestbody.md)[] | :heavy_check_mark:                                                                                                                 | N/A                                                                                                                                |

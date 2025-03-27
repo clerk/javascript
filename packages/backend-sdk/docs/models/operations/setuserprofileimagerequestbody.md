@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { SetUserProfileImageRequestBody } from '@clerk/backend-sdk/models/operations';
+import { SetUserProfileImageRequestBody } from "@clerk/backend-sdk/models/operations";
 
 // No examples available for this model
 ```
 
 ## Fields
 
-| Field  | Type                                                                                                                                                                                   | Required           | Description |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ----------- |
-| `file` | [File](https://developer.mozilla.org/en-US/docs/Web/API/File) \| [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) \| [operations.FileT](../../models/operations/filet.md) | :heavy_minus_sign: | N/A         |
+| Field                                                                                                                                                                                | Type                                                                                                                                                                                 | Required                                                                                                                                                                             | Description                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `file`                                                                                                                                                                               | [File](https://developer.mozilla.org/en-US/docs/Web/API/File) \| [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) \| [operations.FileT](../../models/operations/filet.md) | :heavy_minus_sign:                                                                                                                                                                   | N/A                                                                                                                                                                                  |

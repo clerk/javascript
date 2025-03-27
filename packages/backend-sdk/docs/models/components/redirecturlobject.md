@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { RedirectURLObject } from '@clerk/backend-sdk/models/components';
+import { RedirectURLObject } from "@clerk/backend-sdk/models/components";
 
-let value: RedirectURLObject = 'redirect_url';
+let value: RedirectURLObject = "redirect_url";
 ```
 
 ## Values
 
 ```typescript
-'redirect_url';
+"redirect_url"
 ```

@@ -9,17 +9,19 @@ export class APIError extends Error {
   constructor(
     message: string,
     public readonly rawResponse: Response,
-    public readonly body: string = '',
+    public readonly body: string = "",
   ) {
     const statusCode = rawResponse.status;
-    const contentType = rawResponse.headers.get('content-type') || '';
-    const bodyString = body.length > 0 ? `\n${body}` : '';
+    const contentType = rawResponse.headers.get("content-type") || "";
+    const bodyString = body.length > 0 ? `\n${body}` : "";
 
-    super(`${message}: Status ${statusCode} Content-Type ${contentType} Body ${bodyString}`);
+    super(
+      `${message}: Status ${statusCode} Content-Type ${contentType} Body ${bodyString}`,
+    );
 
     this.statusCode = statusCode;
     this.contentType = contentType;
 
-    this.name = 'APIError';
+    this.name = "APIError";
   }
 }

@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { ToggleTemplateDeliveryRequestBody } from '@clerk/backend-sdk/models/operations';
+import { ToggleTemplateDeliveryRequestBody } from "@clerk/backend-sdk/models/operations";
 
 let value: ToggleTemplateDeliveryRequestBody = {};
 ```
 
 ## Fields
 
-| Field              | Type      | Required           | Description                                                                       |
-| ------------------ | --------- | ------------------ | --------------------------------------------------------------------------------- |
-| `deliveredByClerk` | _boolean_ | :heavy_minus_sign: | Whether Clerk should deliver emails or SMS messages based on the current template |
+| Field                                                                             | Type                                                                              | Required                                                                          | Description                                                                       |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `deliveredByClerk`                                                                | *boolean*                                                                         | :heavy_minus_sign:                                                                | Whether Clerk should deliver emails or SMS messages based on the current template |

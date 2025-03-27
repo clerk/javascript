@@ -3,17 +3,17 @@
 ## Example Usage
 
 ```typescript
-import { UserWeb3WalletDeleteRequest } from '@clerk/backend-sdk/models/operations';
+import { UserWeb3WalletDeleteRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: UserWeb3WalletDeleteRequest = {
-  userId: '<id>',
-  web3WalletIdentificationId: '<id>',
+  userId: "<id>",
+  web3WalletIdentificationId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field                        | Type     | Required           | Description                                      |
-| ---------------------------- | -------- | ------------------ | ------------------------------------------------ |
-| `userId`                     | _string_ | :heavy_check_mark: | The ID of the user that owns the web3 wallet     |
-| `web3WalletIdentificationId` | _string_ | :heavy_check_mark: | The ID of the web3 wallet identity to be deleted |
+| Field                                            | Type                                             | Required                                         | Description                                      |
+| ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------ |
+| `userId`                                         | *string*                                         | :heavy_check_mark:                               | The ID of the user that owns the web3 wallet     |
+| `web3WalletIdentificationId`                     | *string*                                         | :heavy_check_mark:                               | The ID of the web3 wallet identity to be deleted |

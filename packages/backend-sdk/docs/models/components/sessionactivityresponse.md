@@ -3,25 +3,25 @@
 ## Example Usage
 
 ```typescript
-import { SessionActivityResponse } from '@clerk/backend-sdk/models/components';
+import { SessionActivityResponse } from "@clerk/backend-sdk/models/components";
 
 let value: SessionActivityResponse = {
-  object: '<value>',
-  id: '<id>',
+  object: "<value>",
+  id: "<id>",
   isMobile: false,
 };
 ```
 
 ## Fields
 
-| Field            | Type      | Required           | Description |
-| ---------------- | --------- | ------------------ | ----------- |
-| `object`         | _string_  | :heavy_check_mark: | N/A         |
-| `id`             | _string_  | :heavy_check_mark: | N/A         |
-| `deviceType`     | _string_  | :heavy_minus_sign: | N/A         |
-| `isMobile`       | _boolean_ | :heavy_check_mark: | N/A         |
-| `browserName`    | _string_  | :heavy_minus_sign: | N/A         |
-| `browserVersion` | _string_  | :heavy_minus_sign: | N/A         |
-| `ipAddress`      | _string_  | :heavy_minus_sign: | N/A         |
-| `city`           | _string_  | :heavy_minus_sign: | N/A         |
-| `country`        | _string_  | :heavy_minus_sign: | N/A         |
+| Field              | Type               | Required           | Description        |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| `object`           | *string*           | :heavy_check_mark: | N/A                |
+| `id`               | *string*           | :heavy_check_mark: | N/A                |
+| `deviceType`       | *string*           | :heavy_minus_sign: | N/A                |
+| `isMobile`         | *boolean*          | :heavy_check_mark: | N/A                |
+| `browserName`      | *string*           | :heavy_minus_sign: | N/A                |
+| `browserVersion`   | *string*           | :heavy_minus_sign: | N/A                |
+| `ipAddress`        | *string*           | :heavy_minus_sign: | N/A                |
+| `city`             | *string*           | :heavy_minus_sign: | N/A                |
+| `country`          | *string*           | :heavy_minus_sign: | N/A                |

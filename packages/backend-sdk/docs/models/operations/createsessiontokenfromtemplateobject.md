@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { CreateSessionTokenFromTemplateObject } from '@clerk/backend-sdk/models/operations';
+import { CreateSessionTokenFromTemplateObject } from "@clerk/backend-sdk/models/operations";
 
-let value: CreateSessionTokenFromTemplateObject = 'token';
+let value: CreateSessionTokenFromTemplateObject = "token";
 ```
 
 ## Values
 
 ```typescript
-'token';
+"token"
 ```
