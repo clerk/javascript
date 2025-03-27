@@ -4,21 +4,28 @@
   "username": null,
   "first_name": "John",
   "last_name": "Doe",
-  "profile_image_url": null,
+  "profile_image_url": "https://clerk.com/test.jpg",
   "image_url": "https://clerk.com",
   "primary_email_address_id": "idn_email_address",
   "primary_phone_number_id": "idn_phone_number",
+  "primary_web3_wallet_id": "idn_metamask",
   "password_enabled": false,
   "two_factor_enabled": true,
   "banned": false,
   "email_addresses": [
     {
+      "object": "email_address",
       "id": "idn_email_address",
       "email_address": "john.doe@clerk.test",
+      "reserved": true,
+      "created_at": 1611948436,
+      "updated_at": 1611948436,
       "verification": {
         "status": "verified",
         "strategy": "from_oauth_google",
-        "external_verification_redirect_url": null
+        "external_verification_redirect_url": null,
+        "attempts": 1,
+        "expire_at": 1613831855
       },
       "linked_to": [
         {
@@ -30,15 +37,19 @@
   ],
   "phone_numbers": [
     {
+      "object": "phone_number",
       "id": "idn_phone_number",
       "phone_number": "+311-555-2368",
       "reserved_for_second_factor": false,
+      "reserved": true,
+      "created_at": 1611948436,
+      "updated_at": 1611948436,
       "verification": {
         "status": "verified",
         "strategy": "phone_code",
         "external_verification_redirect_url": null,
         "attempts": 1,
-        "expireAt": 1613831855
+        "expire_at": 1613831855
       },
       "linked_to": []
     }
@@ -48,6 +59,8 @@
       "id": "idn_metamask",
       "object": "web3_wallet",
       "web3_wallet": "0x0000000000000000000000000000000000000000",
+      "created_at": 1611948436,
+      "updated_at": 1611948436,
       "verification": {
         "status": "verified",
         "strategy": "web3_metamask_signature",
@@ -89,7 +102,8 @@
         "status": "verified",
         "strategy": "saml",
         "attempts": null,
-        "expireAt": 1613831855
+        "expire_at": 1613831855,
+        "external_verification_redirect_url": null
       }
     }
   ],
