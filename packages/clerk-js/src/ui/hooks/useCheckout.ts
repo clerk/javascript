@@ -5,13 +5,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useFetch } from './useFetch';
 
 export const useCheckout = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod } = props;
+  const { planId, planPeriod, orgId } = props;
   const { __experimental_commerce } = useClerk();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
 
   const { data: initialCheckout, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
     planId,
     planPeriod,
+    orgId,
   });
 
   useEffect(() => {
