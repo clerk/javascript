@@ -18,7 +18,7 @@ export const CaptchaElement = () => {
   const { locale } = useLocalizations();
   const captchaTheme = parsedCaptcha?.theme;
   const captchaSize = parsedCaptcha?.size;
-  const captchaLanguage = parsedCaptcha?.language || locale;
+  const captchaLanguage = parsedCaptcha?.language || locale?.toLowerCase();
 
   useEffect(() => {
     if (!elementRef.current) return;
