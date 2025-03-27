@@ -15,7 +15,7 @@ export * from './api/resources/Webhooks';
  *
  * @param request - The incoming webhook request object
  * @param options - Optional configuration object
- * @param options.signingSecret - Custom webhook secret. If not provided, falls back to CLERK_WEBHOOK_SECRET env variable
+ * @param options.signingSecret - Custom webhook secret. If not provided, falls back to CLERK_SIGNING_SECRET env variable
  * @throws Will throw an error if the webhook signature verification fails
  * @returns A promise that resolves to the verified webhook event data
  *
