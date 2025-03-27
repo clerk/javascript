@@ -22,6 +22,28 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./webhooks": {
+      "import": {
+        "types": "./dist/types/webhooks.ts",
+        "default": "./dist/esm/webhooks.js"
+      },
+      "require": {
+        "types": "./dist/types/webhooks.ts",
+        "default": "./dist/webhooks.js"
+      }
+    }
+  },
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",

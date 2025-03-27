@@ -1,5 +1,6 @@
 import { isTruthy } from '@clerk/shared/underscore';
 import type { Request as ExpressRequest } from 'express';
+import type { IncomingMessage } from 'http';
 
 import type { ExpressRequestWithAuth } from './types';
 
@@ -35,4 +36,17 @@ export const loadApiEnv = () => {
       debug: isTruthy(process.env.CLERK_TELEMETRY_DEBUG),
     },
   };
+};
+
+export const incomingMessageToRequest = (req: IncomingMessage): Request => {
+  const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
+  // @ts-ignore Optimistic attempt to get the protocol in case
+  // req extends IncomingMessage in a useful way. No guarantee
+  // it'll work.
+  const protocol = req.connection?.encrypted ? 'https' : 'http';
+  const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  return new Request(dummyOriginReqUrl, {
+    method: req.method,
+    headers: new Headers(headers),
+  });
 };
