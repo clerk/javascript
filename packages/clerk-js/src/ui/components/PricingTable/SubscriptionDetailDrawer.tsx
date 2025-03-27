@@ -51,72 +51,7 @@ export function SubscriptionDetailDrawer({
   if (!subscription) {
     return null;
   }
-  const features = [
-    {
-      id: 'cfeat_2uapwNo0lHXMvNaMt0PFgd1V6Ps',
-      pathRoot: '',
-      name: 'Feature 1',
-      description: '',
-      slug: 'feature-1',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT5CevPPwmuFJhT5qR2UHO7l4',
-      pathRoot: '',
-      name: 'Feature 2',
-      description: '',
-      slug: 'feature-2',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT5zIQRIcRugQVl2Xnz2KXnli',
-      pathRoot: '',
-      name: 'Feature 3',
-      description: '',
-      slug: 'feature-3',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT6m2hnOSJ3qRERIfs1rD5bCc',
-      pathRoot: '',
-      name: 'Feature 4',
-      description: '',
-      slug: 'feature-4',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT7VaMzkn3gaCM1fH5ji8Jycl',
-      pathRoot: '',
-      name: 'Feature 5',
-      description: '',
-      slug: 'feature-5',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT8GyPDO9m3optnA8qPF5oCeX',
-      pathRoot: '',
-      name: 'Feature 6',
-      description: '',
-      slug: 'feature-6',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT90HapHS5U0xyCotqUSZJ9wm',
-      pathRoot: '',
-      name: 'Feature 7',
-      description: '',
-      slug: 'feature-7',
-      avatarUrl: '',
-    },
-    {
-      id: 'cfeat_2udT9nT2DEI4bsls80IdbgWBrZf',
-      pathRoot: '',
-      name: 'Feature 8',
-      description: 'This is an example description',
-      slug: 'feature-8',
-      avatarUrl: '',
-    },
-  ];
+  const features = subscription.plan.features;
   const hasFeatures = features.length > 0;
   const cancelSubscription = async () => {
     setCancelError(undefined);
@@ -310,7 +245,7 @@ interface HeaderProps {
 }
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
-  const { plan, planPeriod, setPlanPeriod, closeSlot } = props;
+  const { plan, planPeriod, closeSlot } = props;
   const { name, avatarUrl, subscriptionIdForCurrentSubscriber, annualMonthlyAmount } = plan;
   const getPlanFee = React.useMemo(() => {
     if (annualMonthlyAmount <= 0) {
