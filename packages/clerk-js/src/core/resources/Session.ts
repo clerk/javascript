@@ -97,7 +97,6 @@ export class Session extends BaseResource implements SessionResource {
     // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
     return retry(() => this._getToken(options), {
       factor: 1.55,
-      retryImmediately: false,
       initialDelay: 3 * 1000,
       maxDelayBetweenRetries: 50 * 1_000,
       jitter: false,
