@@ -18,7 +18,7 @@ generation:
     oAuth2ClientCredentialsEnabled: true
     oAuth2PasswordEnabled: true
 typescript:
-  version: 0.1.5
+  version: 0.3.0
   additionalDependencies:
     dependencies: {}
     devDependencies: {}
@@ -32,8 +32,8 @@ typescript:
     - --filter
     - '@clerk/backend-sdk'
   defaultErrorName: APIError
-  enableCustomCodeRegions: true
-  enableMCPServer: true
+  enableCustomCodeRegions: false
+  enableMCPServer: false
   enableReactQuery: false
   enumFormat: union
   envVarPrefix: CLERK

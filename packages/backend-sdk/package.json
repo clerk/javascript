@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-sdk",
-  "version": "0.1.5",
+  "version": "0.3.0",
   "author": "Speakeasy",
   "sideEffects": false,
   "type": "module",
@@ -87,25 +87,15 @@
   "main": "./dist/commonjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/commonjs/index.d.ts",
-  "bin": {
-    "mcp": "bin/mcp-server.js"
-  },
   "scripts": {
-    "build": "npm run build:mcp && tshy",
-    "build:mcp": "bun src/mcp-server/build.mts",
+    "build": "tshy",
     "lint": "eslint --cache --max-warnings=0 src",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@modelcontextprotocol/sdk": "^1.5.0",
-    "@stricli/core": "^1.1.1",
-    "@types/express": "^4.17.21",
-    "bun": "^1.2.2",
-    "bun-types": "^1.2.2",
     "eslint": "^9.19.0",
-    "express": "^4.21.2",
     "globals": "^15.14.0",
     "tshy": "^2.0.0",
     "typescript": "^5.4.5",
@@ -113,13 +103,7 @@
     "zod": "^3.23.4"
   },
   "peerDependencies": {
-    "@modelcontextprotocol/sdk": "^1.5.0",
     "zod": ">= 3"
-  },
-  "peerDependenciesMeta": {
-    "@modelcontextprotocol/sdk": {
-      "optional": true
-    }
   },
   "tshy": {
     "sourceDialects": [

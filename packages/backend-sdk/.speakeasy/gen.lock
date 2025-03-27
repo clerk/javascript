@@ -3,17 +3,16 @@ id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
   docChecksum: e78c47dc718596c9bd5b05a9c21b8874
   docVersion: "2025-12-03"
-  speakeasyVersion: 1.524.0
+  speakeasyVersion: 1.525.0
   generationVersion: 2.562.2
-  releaseVersion: 0.1.5
-  configChecksum: 364d81b084c7b083c5d7df3a071727d8
+  releaseVersion: 0.3.0
+  configChecksum: 5bfb8019fcd0ced52eb07eed3614ff83
 features:
   typescript:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
     constsAndDefaults: 0.1.11
     core: 3.21.4
-    customCodeRegions: 0.1.0
     defaultEnabledRetries: 0.1.0
     deprecations: 2.81.1
     devContainers: 2.90.0
@@ -24,7 +23,6 @@ features:
     globalSecurityFlattening: 0.1.0
     globalServerURLs: 2.82.4
     groups: 2.81.2
-    mcpServer: 0.9.0
     nameOverrides: 2.81.2
     nullables: 0.1.1
     openEnums: 0.1.1
@@ -601,149 +599,6 @@ generatedFiles:
   - src/lib/sdks.ts
   - src/lib/security.ts
   - src/lib/url.ts
-  - src/mcp-server/build.mts
-  - src/mcp-server/cli.ts
-  - src/mcp-server/cli/start/command.ts
-  - src/mcp-server/cli/start/impl.ts
-  - src/mcp-server/console-logger.ts
-  - src/mcp-server/extensions.ts
-  - src/mcp-server/mcp-server.ts
-  - src/mcp-server/prompts.ts
-  - src/mcp-server/resources.ts
-  - src/mcp-server/scopes.ts
-  - src/mcp-server/server.ts
-  - src/mcp-server/shared.ts
-  - src/mcp-server/tools.ts
-  - src/mcp-server/tools/actorTokensCreate.ts
-  - src/mcp-server/tools/actorTokensRevoke.ts
-  - src/mcp-server/tools/allowlistIdentifiersCreate.ts
-  - src/mcp-server/tools/allowlistIdentifiersDelete.ts
-  - src/mcp-server/tools/allowlistIdentifiersList.ts
-  - src/mcp-server/tools/betaFeaturesUpdateInstanceSettings.ts
-  - src/mcp-server/tools/betaFeaturesUpdateProductionInstanceDomain.ts
-  - src/mcp-server/tools/blocklistIdentifiersCreate.ts
-  - src/mcp-server/tools/blocklistIdentifiersDelete.ts
-  - src/mcp-server/tools/blocklistIdentifiersList.ts
-  - src/mcp-server/tools/clientsGet.ts
-  - src/mcp-server/tools/clientsList.ts
-  - src/mcp-server/tools/clientsVerify.ts
-  - src/mcp-server/tools/domainsAdd.ts
-  - src/mcp-server/tools/domainsDelete.ts
-  - src/mcp-server/tools/domainsList.ts
-  - src/mcp-server/tools/domainsUpdate.ts
-  - src/mcp-server/tools/emailAddressesCreate.ts
-  - src/mcp-server/tools/emailAddressesDelete.ts
-  - src/mcp-server/tools/emailAddressesGet.ts
-  - src/mcp-server/tools/emailAddressesUpdate.ts
-  - src/mcp-server/tools/emailAndSmsTemplatesUpsert.ts
-  - src/mcp-server/tools/emailSMSTemplatesGet.ts
-  - src/mcp-server/tools/emailSMSTemplatesList.ts
-  - src/mcp-server/tools/emailSMSTemplatesRevert.ts
-  - src/mcp-server/tools/emailSMSTemplatesToggleTemplateDelivery.ts
-  - src/mcp-server/tools/instanceSettingsChangeDomain.ts
-  - src/mcp-server/tools/instanceSettingsGet.ts
-  - src/mcp-server/tools/instanceSettingsUpdate.ts
-  - src/mcp-server/tools/instanceSettingsUpdateOrganizationSettings.ts
-  - src/mcp-server/tools/instanceSettingsUpdateRestrictions.ts
-  - src/mcp-server/tools/invitationsBulkCreate.ts
-  - src/mcp-server/tools/invitationsCreate.ts
-  - src/mcp-server/tools/invitationsList.ts
-  - src/mcp-server/tools/invitationsRevoke.ts
-  - src/mcp-server/tools/jwksGetJWKS.ts
-  - src/mcp-server/tools/jwtTemplatesCreate.ts
-  - src/mcp-server/tools/jwtTemplatesDelete.ts
-  - src/mcp-server/tools/jwtTemplatesGet.ts
-  - src/mcp-server/tools/jwtTemplatesList.ts
-  - src/mcp-server/tools/jwtTemplatesUpdate.ts
-  - src/mcp-server/tools/miscellaneousGetPublicInterstitial.ts
-  - src/mcp-server/tools/oauthApplicationsCreate.ts
-  - src/mcp-server/tools/oauthApplicationsDelete.ts
-  - src/mcp-server/tools/oauthApplicationsGet.ts
-  - src/mcp-server/tools/oauthApplicationsList.ts
-  - src/mcp-server/tools/oauthApplicationsRotateSecret.ts
-  - src/mcp-server/tools/oauthApplicationsUpdate.ts
-  - src/mcp-server/tools/organizationDomainsCreate.ts
-  - src/mcp-server/tools/organizationDomainsDelete.ts
-  - src/mcp-server/tools/organizationDomainsList.ts
-  - src/mcp-server/tools/organizationDomainsUpdate.ts
-  - src/mcp-server/tools/organizationInvitationsBulkCreate.ts
-  - src/mcp-server/tools/organizationInvitationsCreate.ts
-  - src/mcp-server/tools/organizationInvitationsGet.ts
-  - src/mcp-server/tools/organizationInvitationsGetAll.ts
-  - src/mcp-server/tools/organizationInvitationsList.ts
-  - src/mcp-server/tools/organizationInvitationsListPending.ts
-  - src/mcp-server/tools/organizationInvitationsRevoke.ts
-  - src/mcp-server/tools/organizationMembershipsCreate.ts
-  - src/mcp-server/tools/organizationMembershipsDelete.ts
-  - src/mcp-server/tools/organizationMembershipsList.ts
-  - src/mcp-server/tools/organizationMembershipsUpdate.ts
-  - src/mcp-server/tools/organizationMembershipsUpdateMetadata.ts
-  - src/mcp-server/tools/organizationsCreate.ts
-  - src/mcp-server/tools/organizationsDelete.ts
-  - src/mcp-server/tools/organizationsDeleteLogo.ts
-  - src/mcp-server/tools/organizationsGet.ts
-  - src/mcp-server/tools/organizationsList.ts
-  - src/mcp-server/tools/organizationsMergeMetadata.ts
-  - src/mcp-server/tools/organizationsUpdate.ts
-  - src/mcp-server/tools/organizationsUploadLogo.ts
-  - src/mcp-server/tools/phoneNumbersCreate.ts
-  - src/mcp-server/tools/phoneNumbersDelete.ts
-  - src/mcp-server/tools/phoneNumbersGet.ts
-  - src/mcp-server/tools/phoneNumbersUpdate.ts
-  - src/mcp-server/tools/proxyChecksVerify.ts
-  - src/mcp-server/tools/redirectUrlsCreate.ts
-  - src/mcp-server/tools/redirectUrlsDelete.ts
-  - src/mcp-server/tools/redirectUrlsGet.ts
-  - src/mcp-server/tools/redirectUrlsList.ts
-  - src/mcp-server/tools/samlConnectionsCreate.ts
-  - src/mcp-server/tools/samlConnectionsDelete.ts
-  - src/mcp-server/tools/samlConnectionsGet.ts
-  - src/mcp-server/tools/samlConnectionsList.ts
-  - src/mcp-server/tools/samlConnectionsUpdate.ts
-  - src/mcp-server/tools/sessionsCreate.ts
-  - src/mcp-server/tools/sessionsCreateToken.ts
-  - src/mcp-server/tools/sessionsCreateTokenFromTemplate.ts
-  - src/mcp-server/tools/sessionsGet.ts
-  - src/mcp-server/tools/sessionsList.ts
-  - src/mcp-server/tools/sessionsRefresh.ts
-  - src/mcp-server/tools/sessionsRevoke.ts
-  - src/mcp-server/tools/sessionsVerify.ts
-  - src/mcp-server/tools/signInTokensCreate.ts
-  - src/mcp-server/tools/signInTokensRevoke.ts
-  - src/mcp-server/tools/signUpsGet.ts
-  - src/mcp-server/tools/signUpsUpdate.ts
-  - src/mcp-server/tools/templatesPreview.ts
-  - src/mcp-server/tools/testingTokensCreate.ts
-  - src/mcp-server/tools/usersBan.ts
-  - src/mcp-server/tools/usersCount.ts
-  - src/mcp-server/tools/usersCreate.ts
-  - src/mcp-server/tools/usersDelete.ts
-  - src/mcp-server/tools/usersDeleteBackupCodes.ts
-  - src/mcp-server/tools/usersDeleteExternalAccount.ts
-  - src/mcp-server/tools/usersDeletePasskey.ts
-  - src/mcp-server/tools/usersDeleteProfileImage.ts
-  - src/mcp-server/tools/usersDeleteTOTP.ts
-  - src/mcp-server/tools/usersDeleteWeb3Wallet.ts
-  - src/mcp-server/tools/usersDisableMfa.ts
-  - src/mcp-server/tools/usersGet.ts
-  - src/mcp-server/tools/usersGetInstanceOrganizationMemberships.ts
-  - src/mcp-server/tools/usersGetOAuthAccessToken.ts
-  - src/mcp-server/tools/usersGetOrganizationInvitations.ts
-  - src/mcp-server/tools/usersGetOrganizationMemberships.ts
-  - src/mcp-server/tools/usersList.ts
-  - src/mcp-server/tools/usersLock.ts
-  - src/mcp-server/tools/usersSetProfileImage.ts
-  - src/mcp-server/tools/usersUnban.ts
-  - src/mcp-server/tools/usersUnlock.ts
-  - src/mcp-server/tools/usersUpdate.ts
-  - src/mcp-server/tools/usersUpdateMetadata.ts
-  - src/mcp-server/tools/usersVerifyPassword.ts
-  - src/mcp-server/tools/usersVerifyTotp.ts
-  - src/mcp-server/tools/waitlistEntriesCreate.ts
-  - src/mcp-server/tools/waitlistEntriesList.ts
-  - src/mcp-server/tools/webhooksCreateSvixApp.ts
-  - src/mcp-server/tools/webhooksDeleteSvixApp.ts
-  - src/mcp-server/tools/webhooksGenerateSvixAuthURL.ts
   - src/models/components/actortoken.ts
   - src/models/components/allowlistidentifier.ts
   - src/models/components/blocklistidentifier.ts
