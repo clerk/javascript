@@ -1,5 +1,17 @@
 # @clerk/expo-passkeys
 
+## 0.2.0
+
+### Minor Changes
+
+- Removed `expo-modules-core` from dependencies in favor of `expo` as a peer dependency to allow broader compatibility with Expo SDK versions `^50 || ^51 || ^52`. ([#5402](https://github.com/clerk/javascript/pull/5402)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`e20fb6b`](https://github.com/clerk/javascript/commit/e20fb6b397fb69c9d5af4e321267b82f12a5f127), [`77e6462`](https://github.com/clerk/javascript/commit/77e64628560cab688af214edb5922e67cd68a951)]:
+  - @clerk/shared@3.2.3
+  - @clerk/types@4.50.1
+
 ## 0.1.28
 
 ### Patch Changes
