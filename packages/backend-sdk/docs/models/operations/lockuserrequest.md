@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { LockUserRequest } from '@clerk/backend-sdk/models/operations';
+import { LockUserRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: LockUserRequest = {
-  userId: '<id>',
+  userId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field    | Type     | Required           | Description                |
-| -------- | -------- | ------------------ | -------------------------- |
-| `userId` | _string_ | :heavy_check_mark: | The ID of the user to lock |
+| Field                      | Type                       | Required                   | Description                |
+| -------------------------- | -------------------------- | -------------------------- | -------------------------- |
+| `userId`                   | *string*                   | :heavy_check_mark:         | The ID of the user to lock |

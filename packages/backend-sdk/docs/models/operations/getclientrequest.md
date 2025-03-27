@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { GetClientRequest } from '@clerk/backend-sdk/models/operations';
+import { GetClientRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: GetClientRequest = {
-  clientId: '<id>',
+  clientId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field      | Type     | Required           | Description |
-| ---------- | -------- | ------------------ | ----------- |
-| `clientId` | _string_ | :heavy_check_mark: | Client ID.  |
+| Field              | Type               | Required           | Description        |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| `clientId`         | *string*           | :heavy_check_mark: | Client ID.         |

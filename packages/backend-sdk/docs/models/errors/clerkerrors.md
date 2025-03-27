@@ -5,15 +5,15 @@ Request was not successful
 ## Example Usage
 
 ```typescript
-import { ClerkErrors } from '@clerk/backend-sdk/models/errors';
+import { ClerkErrors } from "@clerk/backend-sdk/models/errors";
 
 // No examples available for this model
 ```
 
 ## Fields
 
-| Field          | Type                                                             | Required           | Description |
-| -------------- | ---------------------------------------------------------------- | ------------------ | ----------- |
-| `errors`       | [components.ClerkError](../../models/components/clerkerror.md)[] | :heavy_check_mark: | N/A         |
-| `meta`         | [errors.Meta](../../models/errors/meta.md)                       | :heavy_minus_sign: | N/A         |
-| `clerkTraceId` | _string_                                                         | :heavy_minus_sign: | N/A         |
+| Field                                                            | Type                                                             | Required                                                         | Description                                                      |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `errors`                                                         | [components.ClerkError](../../models/components/clerkerror.md)[] | :heavy_check_mark:                                               | N/A                                                              |
+| `meta`                                                           | [errors.Meta](../../models/errors/meta.md)                       | :heavy_minus_sign:                                               | N/A                                                              |
+| `clerkTraceId`                                                   | *string*                                                         | :heavy_minus_sign:                                               | N/A                                                              |

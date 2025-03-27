@@ -1,27 +1,8 @@
 {
   "name": "@clerk/backend-sdk",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Speakeasy",
-  "sideEffects": false,
   "type": "module",
-  "scripts": {
-    "build": "tshy",
-    "lint": "eslint --cache --max-warnings=0 src",
-    "prepublishOnly": "npm run build"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@eslint/js": "^9.19.0",
-    "eslint": "^9.19.0",
-    "globals": "^15.14.0",
-    "tshy": "^2.0.0",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^8.22.0",
-    "zod": "^3.23.4"
-  },
-  "peerDependencies": {
-    "zod": ">= 3"
-  },
   "tshy": {
     "sourceDialects": [
       "@clerk/backend-sdk/source"
@@ -36,5 +17,26 @@
       "./*.js": "./src/*.ts",
       "./*": "./src/*.ts"
     }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "lint": "eslint --cache --max-warnings=0 src",
+    "build": "tshy",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "zod": ">= 3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "tshy": "^2.0.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.22.0",
+    "zod": "^3.23.4"
+  },
+  "dependencies": {
+    
   }
 }

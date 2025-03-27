@@ -1,19 +1,18 @@
 # Organizations
-
-(_organizations_)
+(*organizations*)
 
 ## Overview
 
 ### Available Operations
 
-- [list](#list) - Get a list of organizations for an instance
-- [create](#create) - Create an organization
-- [get](#get) - Retrieve an organization by ID or slug
-- [update](#update) - Update an organization
-- [delete](#delete) - Delete an organization
-- [mergeMetadata](#mergemetadata) - Merge and update metadata for an organization
-- [uploadLogo](#uploadlogo) - Upload a logo for the organization
-- [deleteLogo](#deletelogo) - Delete the organization's logo.
+* [list](#list) - Get a list of organizations for an instance
+* [create](#create) - Create an organization
+* [get](#get) - Retrieve an organization by ID or slug
+* [update](#update) - Update an organization
+* [delete](#delete) - Delete an organization
+* [mergeMetadata](#mergemetadata) - Merge and update metadata for an organization
+* [uploadLogo](#uploadlogo) - Upload a logo for the organization
+* [deleteLogo](#deletelogo) - Delete the organization's logo.
 
 ## list
 
@@ -25,10 +24,10 @@ Most recent organizations will be returned first.
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -46,13 +45,13 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsList } from '@clerk/backend-sdk/funcs/organizationsList.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsList } from "@clerk/backend-sdk/funcs/organizationsList.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -73,12 +72,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                       | Required           | Description                                                                                                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.ListOrganizationsRequest](../../models/operations/listorganizationsrequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                             | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)    | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                              | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.ListOrganizationsRequest](../../models/operations/listorganizationsrequest.md)                                                                                     | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -86,10 +85,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code   | Content Type     |
-| ------------------ | ------------- | ---------------- |
-| errors.ClerkErrors | 400, 403, 422 | application/json |
-| errors.APIError    | 4XX, 5XX      | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 400, 403, 422      | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## create
 
@@ -107,10 +106,10 @@ the next time they create a session, presuming they don't explicitly set a diffe
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -128,13 +127,13 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsCreate } from '@clerk/backend-sdk/funcs/organizationsCreate.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsCreate } from "@clerk/backend-sdk/funcs/organizationsCreate.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
@@ -155,12 +154,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                                 | Required           | Description                                                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.CreateOrganizationRequestBody](../../models/operations/createorganizationrequestbody.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                                       | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)              | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                        | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.CreateOrganizationRequestBody](../../models/operations/createorganizationrequestbody.md)                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -168,10 +167,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code   | Content Type     |
-| ------------------ | ------------- | ---------------- |
-| errors.ClerkErrors | 400, 403, 422 | application/json |
-| errors.APIError    | 4XX, 5XX      | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 400, 403, 422      | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## get
 
@@ -180,15 +179,15 @@ Fetches the organization whose ID or slug matches the provided `id_or_slug` URL 
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.get({
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   // Handle the result
@@ -203,18 +202,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsGet } from '@clerk/backend-sdk/funcs/organizationsGet.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsGet } from "@clerk/backend-sdk/funcs/organizationsGet.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsGet(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   if (!res.ok) {
@@ -232,12 +231,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                    | Required           | Description                                                                                                                                                                    |
-| ---------------------- | --------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.GetOrganizationRequest](../../models/operations/getorganizationrequest.md)  | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                          | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options) | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                           | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.GetOrganizationRequest](../../models/operations/getorganizationrequest.md)                                                                                         | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -245,10 +244,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code | Content Type     |
-| ------------------ | ----------- | ---------------- |
-| errors.ClerkErrors | 403, 404    | application/json |
-| errors.APIError    | 4XX, 5XX    | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 403, 404           | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## update
 
@@ -257,15 +256,15 @@ Updates an existing organization
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.update({
-    organizationId: '<id>',
+    organizationId: "<id>",
     requestBody: {},
   });
 
@@ -281,18 +280,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsUpdate } from '@clerk/backend-sdk/funcs/organizationsUpdate.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsUpdate } from "@clerk/backend-sdk/funcs/organizationsUpdate.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsUpdate(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
     requestBody: {},
   });
 
@@ -311,12 +310,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                         | Required           | Description                                                                                                                                                                    |
-| ---------------------- | -------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.UpdateOrganizationRequest](../../models/operations/updateorganizationrequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                               | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)      | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.UpdateOrganizationRequest](../../models/operations/updateorganizationrequest.md)                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -324,10 +323,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code   | Content Type     |
-| ------------------ | ------------- | ---------------- |
-| errors.ClerkErrors | 402, 404, 422 | application/json |
-| errors.APIError    | 4XX, 5XX      | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 402, 404, 422      | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## delete
 
@@ -338,15 +337,15 @@ This is not reversible.
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.delete({
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   // Handle the result
@@ -361,18 +360,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsDelete } from '@clerk/backend-sdk/funcs/organizationsDelete.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsDelete } from "@clerk/backend-sdk/funcs/organizationsDelete.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsDelete(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   if (!res.ok) {
@@ -390,12 +389,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                         | Required           | Description                                                                                                                                                                    |
-| ---------------------- | -------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.DeleteOrganizationRequest](../../models/operations/deleteorganizationrequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                               | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)      | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.DeleteOrganizationRequest](../../models/operations/deleteorganizationrequest.md)                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -403,10 +402,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code | Content Type     |
-| ------------------ | ----------- | ---------------- |
-| errors.ClerkErrors | 404         | application/json |
-| errors.APIError    | 4XX, 5XX    | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 404                | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## mergeMetadata
 
@@ -418,15 +417,15 @@ You can remove metadata keys at any level by setting their value to `null`.
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.mergeMetadata({
-    organizationId: '<id>',
+    organizationId: "<id>",
     requestBody: {},
   });
 
@@ -442,18 +441,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsMergeMetadata } from '@clerk/backend-sdk/funcs/organizationsMergeMetadata.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsMergeMetadata } from "@clerk/backend-sdk/funcs/organizationsMergeMetadata.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsMergeMetadata(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
     requestBody: {},
   });
 
@@ -472,12 +471,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                                       | Required           | Description                                                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.MergeOrganizationMetadataRequest](../../models/operations/mergeorganizationmetadatarequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                                             | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                    | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                              | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.MergeOrganizationMetadataRequest](../../models/operations/mergeorganizationmetadatarequest.md)                                                                     | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -485,10 +484,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type     |
-| ------------------ | ------------------ | ---------------- |
-| errors.ClerkErrors | 400, 401, 404, 422 | application/json |
-| errors.APIError    | 4XX, 5XX           | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 400, 401, 404, 422 | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## uploadLogo
 
@@ -500,15 +499,15 @@ Only the following file content types are supported: `image/jpeg`, `image/png`, 
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.uploadLogo({
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   // Handle the result
@@ -523,18 +522,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsUploadLogo } from '@clerk/backend-sdk/funcs/organizationsUploadLogo.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsUploadLogo } from "@clerk/backend-sdk/funcs/organizationsUploadLogo.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsUploadLogo(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   if (!res.ok) {
@@ -552,12 +551,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                                 | Required           | Description                                                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.UploadOrganizationLogoRequest](../../models/operations/uploadorganizationlogorequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                                       | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)              | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                        | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.UploadOrganizationLogoRequest](../../models/operations/uploadorganizationlogorequest.md)                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -565,10 +564,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type     |
-| ------------------ | ------------------ | ---------------- |
-| errors.ClerkErrors | 400, 403, 404, 413 | application/json |
-| errors.APIError    | 4XX, 5XX           | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 400, 403, 404, 413 | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |
 
 ## deleteLogo
 
@@ -577,15 +576,15 @@ Delete the organization's logo.
 ### Example Usage
 
 ```typescript
-import { Clerk } from '@clerk/backend-sdk';
+import { Clerk } from "@clerk/backend-sdk";
 
 const clerk = new Clerk({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const result = await clerk.organizations.deleteLogo({
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   // Handle the result
@@ -600,18 +599,18 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from '@clerk/backend-sdk/core.js';
-import { organizationsDeleteLogo } from '@clerk/backend-sdk/funcs/organizationsDeleteLogo.js';
+import { ClerkCore } from "@clerk/backend-sdk/core.js";
+import { organizationsDeleteLogo } from "@clerk/backend-sdk/funcs/organizationsDeleteLogo.js";
 
 // Use `ClerkCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const clerk = new ClerkCore({
-  bearerAuth: process.env['CLERK_BEARER_AUTH'] ?? '',
+  bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   const res = await organizationsDeleteLogo(clerk, {
-    organizationId: '<id>',
+    organizationId: "<id>",
   });
 
   if (!res.ok) {
@@ -629,12 +628,12 @@ run();
 
 ### Parameters
 
-| Parameter              | Type                                                                                                 | Required           | Description                                                                                                                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`              | [operations.DeleteOrganizationLogoRequest](../../models/operations/deleteorganizationlogorequest.md) | :heavy_check_mark: | The request object to use for the request.                                                                                                                                     |
-| `options`              | RequestOptions                                                                                       | :heavy_minus_sign: | Used to set various options for making HTTP requests.                                                                                                                          |
-| `options.fetchOptions` | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)              | :heavy_minus_sign: | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
-| `options.retries`      | [RetryConfig](../../lib/utils/retryconfig.md)                                                        | :heavy_minus_sign: | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
+| Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `request`                                                                                                                                                                      | [operations.DeleteOrganizationLogoRequest](../../models/operations/deleteorganizationlogorequest.md)                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
+| `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
+| `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
 
 ### Response
 
@@ -642,7 +641,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code | Content Type     |
-| ------------------ | ----------- | ---------------- |
-| errors.ClerkErrors | 404         | application/json |
-| errors.APIError    | 4XX, 5XX    | \*/\*            |
+| Error Type         | Status Code        | Content Type       |
+| ------------------ | ------------------ | ------------------ |
+| errors.ClerkErrors | 404                | application/json   |
+| errors.APIError    | 4XX, 5XX           | \*/\*              |

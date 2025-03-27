@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { RevokeSignInTokenRequest } from '@clerk/backend-sdk/models/operations';
+import { RevokeSignInTokenRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: RevokeSignInTokenRequest = {
-  signInTokenId: '<id>',
+  signInTokenId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field           | Type     | Required           | Description                               |
-| --------------- | -------- | ------------------ | ----------------------------------------- |
-| `signInTokenId` | _string_ | :heavy_check_mark: | The ID of the sign-in token to be revoked |
+| Field                                     | Type                                      | Required                                  | Description                               |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| `signInTokenId`                           | *string*                                  | :heavy_check_mark:                        | The ID of the sign-in token to be revoked |

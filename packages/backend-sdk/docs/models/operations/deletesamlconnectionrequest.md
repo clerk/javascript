@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { DeleteSAMLConnectionRequest } from '@clerk/backend-sdk/models/operations';
+import { DeleteSAMLConnectionRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: DeleteSAMLConnectionRequest = {
-  samlConnectionId: '<id>',
+  samlConnectionId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field              | Type     | Required           | Description                             |
-| ------------------ | -------- | ------------------ | --------------------------------------- |
-| `samlConnectionId` | _string_ | :heavy_check_mark: | The ID of the SAML Connection to delete |
+| Field                                   | Type                                    | Required                                | Description                             |
+| --------------------------------------- | --------------------------------------- | --------------------------------------- | --------------------------------------- |
+| `samlConnectionId`                      | *string*                                | :heavy_check_mark:                      | The ID of the SAML Connection to delete |

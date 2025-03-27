@@ -5,13 +5,13 @@ String representing the object's type. Objects of the same type share the same v
 ## Example Usage
 
 ```typescript
-import { InstanceObject } from '@clerk/backend-sdk/models/components';
+import { InstanceObject } from "@clerk/backend-sdk/models/components";
 
-let value: InstanceObject = 'instance';
+let value: InstanceObject = "instance";
 ```
 
 ## Values
 
 ```typescript
-'instance';
+"instance"
 ```

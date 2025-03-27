@@ -5,13 +5,13 @@ The type of template to revert
 ## Example Usage
 
 ```typescript
-import { RevertTemplatePathParamTemplateType } from '@clerk/backend-sdk/models/operations';
+import { RevertTemplatePathParamTemplateType } from "@clerk/backend-sdk/models/operations";
 
-let value: RevertTemplatePathParamTemplateType = 'email';
+let value: RevertTemplatePathParamTemplateType = "email";
 ```
 
 ## Values
 
 ```typescript
-'email' | 'sms';
+"email" | "sms"
 ```

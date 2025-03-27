@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { IdentifierType } from '@clerk/backend-sdk/models/components';
+import { IdentifierType } from "@clerk/backend-sdk/models/components";
 
-let value: IdentifierType = 'email_address';
+let value: IdentifierType = "email_address";
 ```
 
 ## Values
 
 ```typescript
-'email_address' | 'phone_number' | 'web3_wallet';
+"email_address" | "phone_number" | "web3_wallet"
 ```

@@ -3,18 +3,18 @@
 ## Example Usage
 
 ```typescript
-import { UsersGetOrganizationInvitationsRequest } from '@clerk/backend-sdk/models/operations';
+import { UsersGetOrganizationInvitationsRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: UsersGetOrganizationInvitationsRequest = {
-  userId: '<id>',
+  userId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field    | Type                                                                       | Required           | Description                                                                                                                                       |
-| -------- | -------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `userId` | _string_                                                                   | :heavy_check_mark: | The ID of the user whose organization invitations we want to retrieve                                                                             |
-| `limit`  | _number_                                                                   | :heavy_minus_sign: | Applies a limit to the number of results returned.<br/>Can be used for paginating the results together with `offset`.                             |
-| `offset` | _number_                                                                   | :heavy_minus_sign: | Skip the first `offset` results when paginating.<br/>Needs to be an integer greater or equal to zero.<br/>To be used in conjunction with `limit`. |
-| `status` | [operations.QueryParamStatus](../../models/operations/queryparamstatus.md) | :heavy_minus_sign: | Filter organization invitations based on their status                                                                                             |
+| Field                                                                                                                                     | Type                                                                                                                                      | Required                                                                                                                                  | Description                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `userId`                                                                                                                                  | *string*                                                                                                                                  | :heavy_check_mark:                                                                                                                        | The ID of the user whose organization invitations we want to retrieve                                                                     |
+| `limit`                                                                                                                                   | *number*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Applies a limit to the number of results returned.<br/>Can be used for paginating the results together with `offset`.                     |
+| `offset`                                                                                                                                  | *number*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Skip the first `offset` results when paginating.<br/>Needs to be an integer greater or equal to zero.<br/>To be used in conjunction with `limit`. |
+| `status`                                                                                                                                  | [operations.QueryParamStatus](../../models/operations/queryparamstatus.md)                                                                | :heavy_minus_sign:                                                                                                                        | Filter organization invitations based on their status                                                                                     |

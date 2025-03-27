@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { DeleteOrganizationRequest } from '@clerk/backend-sdk/models/operations';
+import { DeleteOrganizationRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: DeleteOrganizationRequest = {
-  organizationId: '<id>',
+  organizationId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field            | Type     | Required           | Description                          |
-| ---------------- | -------- | ------------------ | ------------------------------------ |
-| `organizationId` | _string_ | :heavy_check_mark: | The ID of the organization to delete |
+| Field                                | Type                                 | Required                             | Description                          |
+| ------------------------------------ | ------------------------------------ | ------------------------------------ | ------------------------------------ |
+| `organizationId`                     | *string*                             | :heavy_check_mark:                   | The ID of the organization to delete |

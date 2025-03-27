@@ -5,13 +5,13 @@ Filter organization invitations based on their status
 ## Example Usage
 
 ```typescript
-import { ListInstanceOrganizationInvitationsQueryParamStatus } from '@clerk/backend-sdk/models/operations';
+import { ListInstanceOrganizationInvitationsQueryParamStatus } from "@clerk/backend-sdk/models/operations";
 
-let value: ListInstanceOrganizationInvitationsQueryParamStatus = 'pending';
+let value: ListInstanceOrganizationInvitationsQueryParamStatus = "pending";
 ```
 
 ## Values
 
 ```typescript
-'pending' | 'accepted' | 'revoked';
+"pending" | "accepted" | "revoked"
 ```

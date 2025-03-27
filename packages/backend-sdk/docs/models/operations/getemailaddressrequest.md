@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { GetEmailAddressRequest } from '@clerk/backend-sdk/models/operations';
+import { GetEmailAddressRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: GetEmailAddressRequest = {
-  emailAddressId: '<id>',
+  emailAddressId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field            | Type     | Required           | Description                             |
-| ---------------- | -------- | ------------------ | --------------------------------------- |
-| `emailAddressId` | _string_ | :heavy_check_mark: | The ID of the email address to retrieve |
+| Field                                   | Type                                    | Required                                | Description                             |
+| --------------------------------------- | --------------------------------------- | --------------------------------------- | --------------------------------------- |
+| `emailAddressId`                        | *string*                                | :heavy_check_mark:                      | The ID of the email address to retrieve |

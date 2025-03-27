@@ -3,12 +3,12 @@
 ## Example Usage
 
 ```typescript
-import { ClerkErrorErrorMeta } from '@clerk/backend-sdk/models/components';
+import { ClerkErrorErrorMeta } from "@clerk/backend-sdk/models/components";
 
 let value: ClerkErrorErrorMeta = {};
 ```
 
 ## Fields
 
-| Field | Type | Required | Description |
-| ----- | ---- | -------- | ----------- |
+| Field       | Type        | Required    | Description |
+| ----------- | ----------- | ----------- | ----------- |

@@ -5,26 +5,26 @@ List of waitlist entries
 ## Example Usage
 
 ```typescript
-import { WaitlistEntries } from '@clerk/backend-sdk/models/components';
+import { WaitlistEntries } from "@clerk/backend-sdk/models/components";
 
 let value: WaitlistEntries = {
   data: [
     {
-      object: 'waitlist_entry',
-      id: '<id>',
-      emailAddress: 'Oma74@yahoo.com',
-      status: 'pending',
+      object: "waitlist_entry",
+      id: "<id>",
+      emailAddress: "Oma74@yahoo.com",
+      status: "pending",
       createdAt: 935833,
       updatedAt: 983427,
       invitation: {
-        object: 'invitation',
-        id: '<id>',
-        emailAddress: 'Geo_Paucek86@yahoo.com',
+        object: "invitation",
+        id: "<id>",
+        emailAddress: "Geo_Paucek86@yahoo.com",
         publicMetadata: {
-          key: '<value>',
+          "key": "<value>",
         },
         revoked: false,
-        status: 'pending',
+        status: "pending",
         createdAt: 497777,
         updatedAt: 581082,
       },
@@ -36,7 +36,7 @@ let value: WaitlistEntries = {
 
 ## Fields
 
-| Field        | Type                                                                   | Required           | Description                      |
-| ------------ | ---------------------------------------------------------------------- | ------------------ | -------------------------------- |
-| `data`       | [components.WaitlistEntry](../../models/components/waitlistentry.md)[] | :heavy_check_mark: | N/A                              |
-| `totalCount` | _number_                                                               | :heavy_check_mark: | Total number of waitlist entries |
+| Field                                                                  | Type                                                                   | Required                                                               | Description                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `data`                                                                 | [components.WaitlistEntry](../../models/components/waitlistentry.md)[] | :heavy_check_mark:                                                     | N/A                                                                    |
+| `totalCount`                                                           | *number*                                                               | :heavy_check_mark:                                                     | Total number of waitlist entries                                       |

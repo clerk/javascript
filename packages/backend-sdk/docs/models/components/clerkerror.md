@@ -3,21 +3,21 @@
 ## Example Usage
 
 ```typescript
-import { ClerkError } from '@clerk/backend-sdk/models/components';
+import { ClerkError } from "@clerk/backend-sdk/models/components";
 
 let value: ClerkError = {
-  message: '<value>',
-  longMessage: '<value>',
-  code: '<value>',
+  message: "<value>",
+  longMessage: "<value>",
+  code: "<value>",
 };
 ```
 
 ## Fields
 
-| Field          | Type                                               | Required           | Description |
-| -------------- | -------------------------------------------------- | ------------------ | ----------- |
-| `message`      | _string_                                           | :heavy_check_mark: | N/A         |
-| `longMessage`  | _string_                                           | :heavy_check_mark: | N/A         |
-| `code`         | _string_                                           | :heavy_check_mark: | N/A         |
-| `meta`         | [components.Meta](../../models/components/meta.md) | :heavy_minus_sign: | N/A         |
-| `clerkTraceId` | _string_                                           | :heavy_minus_sign: | N/A         |
+| Field                                              | Type                                               | Required                                           | Description                                        |
+| -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------- |
+| `message`                                          | *string*                                           | :heavy_check_mark:                                 | N/A                                                |
+| `longMessage`                                      | *string*                                           | :heavy_check_mark:                                 | N/A                                                |
+| `code`                                             | *string*                                           | :heavy_check_mark:                                 | N/A                                                |
+| `meta`                                             | [components.Meta](../../models/components/meta.md) | :heavy_minus_sign:                                 | N/A                                                |
+| `clerkTraceId`                                     | *string*                                           | :heavy_minus_sign:                                 | N/A                                                |

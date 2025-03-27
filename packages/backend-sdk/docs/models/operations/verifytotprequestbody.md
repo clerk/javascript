@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { VerifyTOTPRequestBody } from '@clerk/backend-sdk/models/operations';
+import { VerifyTOTPRequestBody } from "@clerk/backend-sdk/models/operations";
 
 let value: VerifyTOTPRequestBody = {
-  code: '<value>',
+  code: "<value>",
 };
 ```
 
 ## Fields
 
-| Field  | Type     | Required           | Description                       |
-| ------ | -------- | ------------------ | --------------------------------- |
-| `code` | _string_ | :heavy_check_mark: | The TOTP or backup code to verify |
+| Field                             | Type                              | Required                          | Description                       |
+| --------------------------------- | --------------------------------- | --------------------------------- | --------------------------------- |
+| `code`                            | *string*                          | :heavy_check_mark:                | The TOTP or backup code to verify |

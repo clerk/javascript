@@ -3,31 +3,31 @@
 ## Example Usage
 
 ```typescript
-import { JWKSEcdsaPublicKey } from '@clerk/backend-sdk/models/components';
+import { JWKSEcdsaPublicKey } from "@clerk/backend-sdk/models/components";
 
 let value: JWKSEcdsaPublicKey = {
-  kid: '<id>',
-  alg: '<value>',
-  use: '<value>',
-  kty: 'EC',
-  crv: '<value>',
-  x: '<value>',
-  y: '<value>',
+  kid: "<id>",
+  alg: "<value>",
+  use: "<value>",
+  kty: "EC",
+  crv: "<value>",
+  x: "<value>",
+  y: "<value>",
 };
 ```
 
 ## Fields
 
-| Field           | Type                                                                                 | Required           | Description |
-| --------------- | ------------------------------------------------------------------------------------ | ------------------ | ----------- |
-| `kid`           | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `alg`           | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `use`           | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `kty`           | [components.JWKSEcdsaPublicKeyKty](../../models/components/jwksecdsapublickeykty.md) | :heavy_check_mark: | N/A         |
-| `crv`           | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `x`             | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `y`             | _string_                                                                             | :heavy_check_mark: | N/A         |
-| `x5c`           | _string_[]                                                                           | :heavy_minus_sign: | N/A         |
-| `x5t`           | _string_                                                                             | :heavy_minus_sign: | N/A         |
-| `x5tNumberS256` | _string_                                                                             | :heavy_minus_sign: | N/A         |
-| `x5u`           | _string_                                                                             | :heavy_minus_sign: | N/A         |
+| Field                                                                                | Type                                                                                 | Required                                                                             | Description                                                                          |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `kid`                                                                                | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `alg`                                                                                | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `use`                                                                                | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `kty`                                                                                | [components.JWKSEcdsaPublicKeyKty](../../models/components/jwksecdsapublickeykty.md) | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `crv`                                                                                | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `x`                                                                                  | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `y`                                                                                  | *string*                                                                             | :heavy_check_mark:                                                                   | N/A                                                                                  |
+| `x5c`                                                                                | *string*[]                                                                           | :heavy_minus_sign:                                                                   | N/A                                                                                  |
+| `x5t`                                                                                | *string*                                                                             | :heavy_minus_sign:                                                                   | N/A                                                                                  |
+| `x5tNumberS256`                                                                      | *string*                                                                             | :heavy_minus_sign:                                                                   | N/A                                                                                  |
+| `x5u`                                                                                | *string*                                                                             | :heavy_minus_sign:                                                                   | N/A                                                                                  |

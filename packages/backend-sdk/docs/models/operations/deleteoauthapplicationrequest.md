@@ -3,15 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { DeleteOAuthApplicationRequest } from '@clerk/backend-sdk/models/operations';
+import { DeleteOAuthApplicationRequest } from "@clerk/backend-sdk/models/operations";
 
 let value: DeleteOAuthApplicationRequest = {
-  oauthApplicationId: '<id>',
+  oauthApplicationId: "<id>",
 };
 ```
 
 ## Fields
 
-| Field                | Type     | Required           | Description                               |
-| -------------------- | -------- | ------------------ | ----------------------------------------- |
-| `oauthApplicationId` | _string_ | :heavy_check_mark: | The ID of the OAuth application to delete |
+| Field                                     | Type                                      | Required                                  | Description                               |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| `oauthApplicationId`                      | *string*                                  | :heavy_check_mark:                        | The ID of the OAuth application to delete |

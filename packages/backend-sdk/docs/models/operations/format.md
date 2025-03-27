@@ -5,13 +5,13 @@ The format of the response.
 ## Example Usage
 
 ```typescript
-import { Format } from '@clerk/backend-sdk/models/operations';
+import { Format } from "@clerk/backend-sdk/models/operations";
 
-let value: Format = 'token';
+let value: Format = "token";
 ```
 
 ## Values
 
 ```typescript
-'token' | 'cookie';
+"token" | "cookie"
 ```

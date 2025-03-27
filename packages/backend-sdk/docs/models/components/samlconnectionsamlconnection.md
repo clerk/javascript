@@ -3,14 +3,14 @@
 ## Example Usage
 
 ```typescript
-import { SAMLConnectionSAMLConnection } from '@clerk/backend-sdk/models/components';
+import { SAMLConnectionSAMLConnection } from "@clerk/backend-sdk/models/components";
 
 let value: SAMLConnectionSAMLConnection = {
-  id: '<id>',
-  name: '<value>',
-  domain: 'minty-airman.biz',
+  id: "<id>",
+  name: "<value>",
+  domain: "minty-airman.biz",
   active: false,
-  provider: '<value>',
+  provider: "<value>",
   syncUserAttributes: false,
   createdAt: 424685,
   updatedAt: 374170,
@@ -19,16 +19,16 @@ let value: SAMLConnectionSAMLConnection = {
 
 ## Fields
 
-| Field                              | Type      | Required           | Description                         |
-| ---------------------------------- | --------- | ------------------ | ----------------------------------- |
-| `id`                               | _string_  | :heavy_check_mark: | N/A                                 |
-| `name`                             | _string_  | :heavy_check_mark: | N/A                                 |
-| `domain`                           | _string_  | :heavy_check_mark: | N/A                                 |
-| `active`                           | _boolean_ | :heavy_check_mark: | N/A                                 |
-| `provider`                         | _string_  | :heavy_check_mark: | N/A                                 |
-| `syncUserAttributes`               | _boolean_ | :heavy_check_mark: | N/A                                 |
-| `allowSubdomains`                  | _boolean_ | :heavy_minus_sign: | N/A                                 |
-| `allowIdpInitiated`                | _boolean_ | :heavy_minus_sign: | N/A                                 |
-| `disableAdditionalIdentifications` | _boolean_ | :heavy_minus_sign: | N/A                                 |
-| `createdAt`                        | _number_  | :heavy_check_mark: | Unix timestamp of creation.<br/>    |
-| `updatedAt`                        | _number_  | :heavy_check_mark: | Unix timestamp of last update.<br/> |
+| Field                              | Type                               | Required                           | Description                        |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| `id`                               | *string*                           | :heavy_check_mark:                 | N/A                                |
+| `name`                             | *string*                           | :heavy_check_mark:                 | N/A                                |
+| `domain`                           | *string*                           | :heavy_check_mark:                 | N/A                                |
+| `active`                           | *boolean*                          | :heavy_check_mark:                 | N/A                                |
+| `provider`                         | *string*                           | :heavy_check_mark:                 | N/A                                |
+| `syncUserAttributes`               | *boolean*                          | :heavy_check_mark:                 | N/A                                |
+| `allowSubdomains`                  | *boolean*                          | :heavy_minus_sign:                 | N/A                                |
+| `allowIdpInitiated`                | *boolean*                          | :heavy_minus_sign:                 | N/A                                |
+| `disableAdditionalIdentifications` | *boolean*                          | :heavy_minus_sign:                 | N/A                                |
+| `createdAt`                        | *number*                           | :heavy_check_mark:                 | Unix timestamp of creation.<br/>   |
+| `updatedAt`                        | *number*                           | :heavy_check_mark:                 | Unix timestamp of last update.<br/> |

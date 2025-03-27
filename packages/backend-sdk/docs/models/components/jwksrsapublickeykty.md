@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { JWKSRsaPublicKeyKty } from '@clerk/backend-sdk/models/components';
+import { JWKSRsaPublicKeyKty } from "@clerk/backend-sdk/models/components";
 
-let value: JWKSRsaPublicKeyKty = 'RSA';
+let value: JWKSRsaPublicKeyKty = "RSA";
 ```
 
 ## Values
 
 ```typescript
-'RSA';
+"RSA"
 ```

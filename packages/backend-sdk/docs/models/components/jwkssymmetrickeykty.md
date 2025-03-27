@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { JWKSSymmetricKeyKty } from '@clerk/backend-sdk/models/components';
+import { JWKSSymmetricKeyKty } from "@clerk/backend-sdk/models/components";
 
-let value: JWKSSymmetricKeyKty = 'oct';
+let value: JWKSSymmetricKeyKty = "oct";
 ```
 
 ## Values
 
 ```typescript
-'oct';
+"oct"
 ```

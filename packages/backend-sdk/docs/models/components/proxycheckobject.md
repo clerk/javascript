@@ -3,13 +3,13 @@
 ## Example Usage
 
 ```typescript
-import { ProxyCheckObject } from '@clerk/backend-sdk/models/components';
+import { ProxyCheckObject } from "@clerk/backend-sdk/models/components";
 
-let value: ProxyCheckObject = 'proxy_check';
+let value: ProxyCheckObject = "proxy_check";
 ```
 
 ## Values
 
 ```typescript
-'proxy_check';
+"proxy_check"
 ```
