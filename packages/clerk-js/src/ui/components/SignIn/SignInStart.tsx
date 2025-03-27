@@ -459,14 +459,10 @@ function SignInStartInternal(): JSX.Element {
           >
             <SocialButtonsReversibleContainerWithDivider>
               {hasSocialOrWeb3Buttons && (
-                <Col gap={6}>
-                  <SignInSocialButtons
-                    enableWeb3Providers
-                    enableOAuthProviders
-                  />
-                  {/* This is only needed for Web3 */}
-                  <CaptchaElement />
-                </Col>
+                <SignInSocialButtons
+                  enableWeb3Providers
+                  enableOAuthProviders
+                />
               )}
               {standardFormAttributes.length ? (
                 <Form.Root
@@ -485,6 +481,7 @@ function SignInStartInternal(): JSX.Element {
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                   </Col>
+                  <CaptchaElement />
                   <Form.SubmitButton hasArrow />
                 </Form.Root>
               ) : null}
@@ -499,6 +496,7 @@ function SignInStartInternal(): JSX.Element {
                   />
                 </Card.Action>
               )}
+            <CaptchaElement />
           </Col>
         </Card.Content>
         <Card.Footer>
