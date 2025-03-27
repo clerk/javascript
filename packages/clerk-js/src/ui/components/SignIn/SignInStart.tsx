@@ -481,8 +481,10 @@ function SignInStartInternal(): JSX.Element {
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                   </Col>
-                  <CaptchaElement />
-                  <Form.SubmitButton hasArrow />
+                  <Col center>
+                    <CaptchaElement />
+                    <Form.SubmitButton hasArrow />
+                  </Col>
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
@@ -496,7 +498,7 @@ function SignInStartInternal(): JSX.Element {
                   />
                 </Card.Action>
               )}
-            <CaptchaElement />
+            {!standardFormAttributes.length && <CaptchaElement />}
           </Col>
         </Card.Content>
         <Card.Footer>
