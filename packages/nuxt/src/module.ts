@@ -74,6 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
       clerk: {
         secretKey: undefined,
         jwtKey: undefined,
+        webhookSigningSecret: undefined,
       },
     });
 
