@@ -12,7 +12,13 @@ import type {
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
+/**
+ * @inline
+ */
 type CheckAuthorizationSignedOut = undefined;
+/**
+ * @inline
+ */
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**

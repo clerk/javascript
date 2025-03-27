@@ -96,7 +96,7 @@ If you want to run the `dev` script of an individual package, navigate to the fo
 
 Updating documentation is an important part of the contribution process. If you are changing existing behavior or adding a new feature, make sure [Clerk's documentation](https://github.com/clerk/clerk-docs) is also updated.
 
-To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
+To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately. When you use links inside the JSDoc comment, make sure that they are **absolute** links (e.g. `[Clerk docs](https://clerk.com/docs)`).
 
 ### Writing tests
 
