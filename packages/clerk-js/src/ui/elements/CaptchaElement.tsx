@@ -18,6 +18,8 @@ export const CaptchaElement = () => {
   const { locale } = useLocalizations();
   const captchaTheme = parsedCaptcha?.theme;
   const captchaSize = parsedCaptcha?.size;
+  // Turnstile expects the language to be lowercase, so we convert it here (e.g. 'en-US' -> 'en-us')
+  // Supported languages: https://developers.cloudflare.com/turnstile/reference/supported-languages
   const captchaLanguage = parsedCaptcha?.language || locale?.toLowerCase();
 
   useEffect(() => {
