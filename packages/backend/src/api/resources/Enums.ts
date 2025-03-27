@@ -1,26 +1,5 @@
 import type { OrganizationCustomRoleKey } from '@clerk/types';
 
-export type OAuthProvider =
-  | 'facebook'
-  | 'google'
-  | 'hubspot'
-  | 'github'
-  | 'tiktok'
-  | 'gitlab'
-  | 'discord'
-  | 'twitter'
-  | 'twitch'
-  | 'linkedin'
-  | 'linkedin_oidc'
-  | 'dropbox'
-  | 'bitbucket'
-  | 'microsoft'
-  | 'notion'
-  | 'apple'
-  | 'x';
-
-export type OAuthStrategy = `oauth_${OAuthProvider}`;
-
 export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';

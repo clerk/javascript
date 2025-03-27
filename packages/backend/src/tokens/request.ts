@@ -1,3 +1,4 @@
+import type { Cookies } from '@clerk/backend-sdk/models/components';
 import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
 import { match } from '@clerk/shared/pathToRegexp';
 import type { JwtPayload } from '@clerk/types';
@@ -18,7 +19,6 @@ import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
 import { verifyToken } from './verify';
-import { Cookies } from 'src/api/resources/Cookies';
 
 export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
@@ -284,20 +284,18 @@ ${error.getFullMessage()}`,
         request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
       };
 
-      // Perform the actual token refresh. (Prefer the experimental client, if it exists)
-      const response = options.__experimental_apiClient
-        ? await options.__experimental_apiClient.sessions.refresh({
-            sessionId: decodeResult.payload.sid,
-            requestBody: {
-              format: params.format,
-              // suffixedCookies: params.suffixed_cookies, // TODO: Implement suffixed cookies
-              expiredToken: params.expired_token,
-              refreshToken: params.refresh_token,
-              requestOrigin: params.request_origin,
-              requestHeaders: params.request_headers,
-            },
-          })
-        : await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, params);
+      // Perform the actual token refresh
+      const response = await options.apiClient.sessions.refresh({
+        sessionId: decodeResult.payload.sid,
+        requestBody: {
+          format: params.format,
+          // suffixedCookies: params.suffixed_cookies, // TODO: Doesn't seem to be handled in BAPI, but exists in the Backend SDK
+          expiredToken: params.expired_token,
+          refreshToken: params.refresh_token,
+          requestOrigin: params.request_origin,
+          requestHeaders: params.request_headers,
+        },
+      });
 
       return { data: (response as Cookies).cookies, error: null };
     } catch (err: any) {

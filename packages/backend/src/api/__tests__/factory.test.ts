@@ -1,13 +1,12 @@
-import { userToJSON } from '@clerk/backend-sdk/models/components';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import userJson from '../../fixtures/user.json';
 import { server, validateHeaders } from '../../mock-server';
-import { createExperimentalBackendApiClient } from '../factory';
+import { createBackendApiClient } from '../factory';
 
 describe('api.client', () => {
-  const apiClient = createExperimentalBackendApiClient({
+  const apiClient = createBackendApiClient({
     apiUrl: 'https://api.clerk.test',
     apiVersion: 'v1',
     secretKey: 'deadbeef',
@@ -23,29 +22,12 @@ describe('api.client', () => {
 
     const res = await apiClient.users.get({ userId: 'user_deadbeef' });
 
-    expect(res?.firstName).toBe('John');
-    expect(res?.lastName).toBe('Doe');
-    expect(res?.emailAddresses?.[0].emailAddress).toBe('john.doe@clerk.test');
-    expect(res?.phoneNumbers?.[0].phoneNumber).toBe('+311-555-2368');
-    // @ts-ignore - externalAccounts does not contain emailAddress TODO: Generation issue?
-    // expect(response.externalAccounts?.[0].emailAddress).toBe('john.doe@clerk.test');
-    expect(res?.publicMetadata?.zodiac_sign).toBe('leo');
-  });
-
-  it.only('executes a successful backend API request and returns the raw response', async () => {
-    server.use(
-      http.get(
-        `https://api.clerk.test/v1/users/:userId`,
-        validateHeaders(() => HttpResponse.json(userJson)),
-      ),
-    );
-
-    const res = await apiClient.users.get({ userId: 'user_foo' });
-
-    const raw = JSON.parse(userToJSON(res || {}));
-
-    expect(raw).toHaveProperty('first_name');
-    expect(raw).toHaveProperty('created_at');
+    expect(res.firstName).toBe('John');
+    expect(res.lastName).toBe('Doe');
+    expect(res.emailAddresses?.[0].emailAddress).toBe('john.doe@clerk.test');
+    expect(res.phoneNumbers?.[0].phoneNumber).toBe('+311-555-2368');
+    expect(res.externalAccounts?.[0].emailAddress).toBe('john.doe@clerk.test');
+    expect(res.publicMetadata?.zodiac_sign).toBe('leo');
   });
 
   it('executes a successful backend API request and extends getters off user model', async () => {
@@ -88,22 +70,22 @@ describe('api.client', () => {
       ),
     );
 
-    const { userList } = await apiClient.users.list({
+    const res = await apiClient.users.list({
       offset: 2,
       limit: 5,
       userId: ['user_cafebabe'],
     });
 
-    expect(userList?.[0].firstName).toBe('John');
-    expect(userList?.[0].id).toBe('user_cafebabe');
-    expect(userList?.length).toBe(1);
+    expect(res[0].firstName).toBe('John');
+    expect(res[0].id).toBe('user_cafebabe');
+    expect(res.length).toBe(1);
 
-    const { totalCount } = await apiClient.users.count({
+    const resCount = await apiClient.users.count({
       userId: ['user_cafebabe'],
     });
 
-    expect(totalCount?.object).toBe('total_count');
-    expect(totalCount?.totalCount).toBe(2);
+    expect(resCount.object).toBe('total_count');
+    expect(resCount.totalCount).toBe(2);
   });
 
   it('executes a successful backend API request for a paginated response', async () => {
@@ -256,8 +238,6 @@ describe('api.client', () => {
         },
       )
       .catch(err => err);
-
-    console.log('[RESPONSE]', res);
 
     // try {
     //   const res = await apiClient.users.get(

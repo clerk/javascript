@@ -3,7 +3,7 @@ import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type { SDKMetadata } from '@clerk/types';
 
 import type { ApiClient, CreateBackendApiOptions } from './api';
-import { createBackendApiClient, createExperimentalBackendApiClient } from './api';
+import { createBackendApiClient } from './api';
 import { withLegacyReturn } from './jwt/legacyReturn';
 import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
@@ -37,6 +37,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     ...(options.sdkMetadata ? { sdk: options.sdkMetadata.name, sdkVersion: options.sdkMetadata.version } : {}),
   });
 
+  // @ts-expect-error - TODO: Types work, but this doesn't seem to validate correctly
   return {
     ...apiClient,
     ...requestState,
@@ -44,94 +45,10 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   };
 }
 
-type ExperimentalBackendApiClient = ReturnType<typeof createExperimentalBackendApiClient>;
-
-// The current exported type resolves the following issue in packages importing createClerkClient
-// TS4023: Exported variable 'clerkClient' has or is using name 'AuthErrorReason' from external module "/packages/backend/dist/index" but cannot be named.
-export type ExperimentalClerkClient = {
-  telemetry: TelemetryCollector;
-  __experimental: ExperimentalBackendApiClient;
-} & ApiClient &
-  ReturnType<typeof createAuthenticateRequest>;
-
-export function createExperimentalClerkClient(options: ClerkOptions): ExperimentalClerkClient {
-  const client = createClerkClient(options);
-  const __experimental = createExperimentalBackendApiClient(options);
-
-  return {
-    ...client,
-    __experimental,
-  };
-}
-
 /**
  * General Types
  */
-export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
-/**
- * JSON types
- */
-export type {
-  AccountlessApplicationJSON,
-  ClerkResourceJSON,
-  TokenJSON,
-  AllowlistIdentifierJSON,
-  ClientJSON,
-  EmailJSON,
-  EmailAddressJSON,
-  ExternalAccountJSON,
-  IdentificationLinkJSON,
-  InvitationJSON,
-  OauthAccessTokenJSON,
-  OrganizationJSON,
-  OrganizationDomainJSON,
-  OrganizationDomainVerificationJSON,
-  OrganizationInvitationJSON,
-  PublicOrganizationDataJSON,
-  OrganizationMembershipJSON,
-  OrganizationMembershipPublicUserDataJSON,
-  PhoneNumberJSON,
-  RedirectUrlJSON,
-  SessionJSON,
-  SignInJSON,
-  SignInTokenJSON,
-  SignUpJSON,
-  SMSMessageJSON,
-  UserJSON,
-  VerificationJSON,
-  WaitlistEntryJSON,
-  Web3WalletJSON,
-  DeletedObjectJSON,
-  PaginatedResponseJSON,
-  TestingTokenJSON,
-} from './api/resources/JSON';
-
-/**
- * Resources
- */
-export type {
-  AccountlessApplication,
-  AllowlistIdentifier,
-  Client,
-  EmailAddress,
-  ExternalAccount,
-  Invitation,
-  OauthAccessToken,
-  Organization,
-  OrganizationDomain,
-  OrganizationDomainVerification,
-  OrganizationInvitation,
-  OrganizationMembership,
-  OrganizationMembershipPublicUserData,
-  PhoneNumber,
-  Session,
-  SignInToken,
-  SMSMessage,
-  Token,
-  User,
-  TestingToken,
-} from './api/resources';
 
 /**
  * Webhooks event types

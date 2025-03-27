@@ -1,4 +1,4 @@
-import type { ApiClient, ExperimentalBackendApiClient } from '../api';
+import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -44,7 +44,6 @@ export type AuthenticateRequestOptions = {
    * @internal
    */
   apiClient?: ApiClient;
-  __experimental_apiClient?: ExperimentalBackendApiClient;
 } & VerifyTokenOptions;
 
 /**
