@@ -1,15 +1,28 @@
 import type {
+  __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
 import { useState } from 'react';
+import * as React from 'react';
 
-import { Box, Button, descriptors, Heading, Text } from '../../customizables';
-import { Alert, Drawer } from '../../elements';
+import {
+  Badge,
+  Box,
+  Button,
+  descriptors,
+  Flex,
+  Heading,
+  Icon,
+  localizationKeys,
+  Span,
+  Text,
+} from '../../customizables';
+import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
+import { InformationCircle } from '../../icons';
 import { handleError } from '../../utils';
-import { PlanCardFeaturesList, PlanCardHeader } from './PlanCard';
 
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
 
@@ -38,7 +51,73 @@ export function SubscriptionDetailDrawer({
   if (!subscription) {
     return null;
   }
-  const hasFeatures = subscription.plan.features.length > 0;
+  const features = [
+    {
+      id: 'cfeat_2uapwNo0lHXMvNaMt0PFgd1V6Ps',
+      pathRoot: '',
+      name: 'Feature 1',
+      description: '',
+      slug: 'feature-1',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT5CevPPwmuFJhT5qR2UHO7l4',
+      pathRoot: '',
+      name: 'Feature 2',
+      description: '',
+      slug: 'feature-2',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT5zIQRIcRugQVl2Xnz2KXnli',
+      pathRoot: '',
+      name: 'Feature 3',
+      description: '',
+      slug: 'feature-3',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT6m2hnOSJ3qRERIfs1rD5bCc',
+      pathRoot: '',
+      name: 'Feature 4',
+      description: '',
+      slug: 'feature-4',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT7VaMzkn3gaCM1fH5ji8Jycl',
+      pathRoot: '',
+      name: 'Feature 5',
+      description: '',
+      slug: 'feature-5',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT8GyPDO9m3optnA8qPF5oCeX',
+      pathRoot: '',
+      name: 'Feature 6',
+      description: '',
+      slug: 'feature-6',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT90HapHS5U0xyCotqUSZJ9wm',
+      pathRoot: '',
+      name: 'Feature 7',
+      description: '',
+      slug: 'feature-7',
+      avatarUrl: '',
+    },
+    {
+      id: 'cfeat_2udT9nT2DEI4bsls80IdbgWBrZf',
+      pathRoot: '',
+      name: 'Feature 8',
+      description: 'This is an example description',
+      slug: 'feature-8',
+      avatarUrl: '',
+    },
+  ];
+  const hasFeatures = features.length > 0;
   const cancelSubscription = async () => {
     setCancelError(undefined);
     setIsSubmitting(true);
@@ -76,7 +155,7 @@ export function SubscriptionDetailDrawer({
               : null
           }
         >
-          <PlanCardHeader
+          <Header
             plan={subscription.plan}
             planPeriod={subscription.planPeriod}
             setPlanPeriod={setPlanPeriod}
@@ -87,14 +166,60 @@ export function SubscriptionDetailDrawer({
         {hasFeatures ? (
           <Drawer.Body>
             <Box
+              elementDescriptor={descriptors.subscriptionDetailFeaturesList}
+              as='ul'
+              role='list'
               sx={t => ({
+                display: 'grid',
+                rowGap: t.space.$4,
                 padding: t.space.$4,
               })}
             >
-              <PlanCardFeaturesList
-                plan={subscription.plan}
-                variant='avatar'
-              />
+              {features.map(feature => (
+                <Box
+                  key={feature.id}
+                  elementDescriptor={descriptors.subscriptionDetailFeaturesListItem}
+                  as='li'
+                  sx={t => ({
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: t.space.$3,
+                  })}
+                >
+                  {feature.avatarUrl ? (
+                    <Avatar
+                      size={_ => 24}
+                      title={feature.name}
+                      initials={feature.name[0]}
+                      rounded={false}
+                      imageUrl={feature.avatarUrl}
+                    />
+                  ) : null}
+                  <Span elementDescriptor={descriptors.subscriptionDetailFeaturesListItemContent}>
+                    <Text
+                      elementDescriptor={descriptors.subscriptionDetailFeaturesListItemTitle}
+                      colorScheme='body'
+                      sx={t => ({
+                        fontWeight: t.fontWeights.$medium,
+                      })}
+                    >
+                      {feature.name}
+                    </Text>
+                    {feature.description ? (
+                      <Text
+                        elementDescriptor={descriptors.subscriptionDetailFeaturesListItemDescription}
+                        colorScheme='secondary'
+                        sx={t => ({
+                          marginBlockStart: t.space.$0x25,
+                          fontSize: t.fontSizes.$xs,
+                        })}
+                      >
+                        {feature.description}
+                      </Text>
+                    ) : null}
+                  </Span>
+                </Box>
+              ))}
             </Box>
           </Drawer.Body>
         ) : null}
@@ -171,3 +296,180 @@ export function SubscriptionDetailDrawer({
     </Drawer.Root>
   );
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Header
+ * -----------------------------------------------------------------------------------------------*/
+
+interface HeaderProps {
+  plan: __experimental_CommercePlanResource;
+  isActivePlan?: boolean;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  closeSlot?: React.ReactNode;
+}
+
+const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
+  const { plan, planPeriod, setPlanPeriod, closeSlot } = props;
+  const { name, avatarUrl, subscriptionIdForCurrentSubscriber, annualMonthlyAmount } = plan;
+  const getPlanFee = React.useMemo(() => {
+    if (annualMonthlyAmount <= 0) {
+      return plan.amountFormatted;
+    }
+    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+  }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
+
+  return (
+    <Box
+      ref={ref}
+      elementDescriptor={descriptors.subscriptionDetailHeader}
+      sx={t => ({
+        width: '100%',
+        padding: t.space.$4,
+      })}
+    >
+      {avatarUrl || !!subscriptionIdForCurrentSubscriber || closeSlot ? (
+        <Box
+          elementDescriptor={descriptors.subscriptionDetailAvatarBadgeContainer}
+          sx={t => ({
+            marginBlockEnd: t.space.$3,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: t.space.$3,
+            float: !avatarUrl && !subscriptionIdForCurrentSubscriber ? 'right' : undefined,
+          })}
+        >
+          {avatarUrl ? (
+            <Avatar
+              boxElementDescriptor={descriptors.subscriptionDetailAvatar}
+              size={_ => 40}
+              title={name}
+              initials={name[0]}
+              rounded={false}
+              imageUrl={avatarUrl}
+            />
+          ) : null}
+          <ReversibleContainer reverse={!avatarUrl}>
+            {closeSlot}
+            {subscriptionIdForCurrentSubscriber ? (
+              <Span
+                elementDescriptor={descriptors.subscriptionDetailBadgeContainer}
+                sx={{
+                  flexBasis: closeSlot && avatarUrl ? '100%' : undefined,
+                }}
+              >
+                <Badge
+                  elementDescriptor={descriptors.subscriptionDetailBadge}
+                  localizationKey={localizationKeys('badge__currentPlan')}
+                  colorScheme='secondary'
+                />
+              </Span>
+            ) : null}
+          </ReversibleContainer>
+        </Box>
+      ) : null}
+      <Heading
+        elementDescriptor={descriptors.subscriptionDetailTitle}
+        as='h2'
+        textVariant='h2'
+      >
+        {plan.name}
+      </Heading>
+      {plan.description ? (
+        <Text
+          elementDescriptor={descriptors.subscriptionDetailDescription}
+          variant='subtitle'
+          colorScheme='secondary'
+        >
+          {plan.description}
+        </Text>
+      ) : null}
+      <Flex
+        elementDescriptor={descriptors.subscriptionDetailFeeContainer}
+        align='center'
+        wrap='wrap'
+        sx={t => ({
+          marginTop: t.space.$3,
+          columnGap: t.space.$1x5,
+        })}
+      >
+        {plan.hasBaseFee ? (
+          <>
+            <Text
+              elementDescriptor={descriptors.subscriptionDetailFee}
+              variant='h1'
+              colorScheme='body'
+            >
+              {plan.currencySymbol}
+              {getPlanFee}
+            </Text>
+            <Text
+              elementDescriptor={descriptors.subscriptionDetailFeePeriod}
+              variant='caption'
+              colorScheme='secondary'
+              sx={t => ({
+                textTransform: 'lowercase',
+                ':before': {
+                  content: '"/"',
+                  marginInlineEnd: t.space.$1,
+                },
+              })}
+              localizationKey={localizationKeys('__experimental_commerce.month')}
+            />
+            {annualMonthlyAmount > 0 ? (
+              <Box
+                elementDescriptor={descriptors.subscriptionDetailFeePeriodNotice}
+                sx={[
+                  _ => ({
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
+                  }),
+                ]}
+                // @ts-ignore - Needed until React 19 support
+                inert={planPeriod !== 'annual' ? 'true' : undefined}
+              >
+                <Box
+                  elementDescriptor={descriptors.subscriptionDetailFeePeriodNoticeInner}
+                  sx={{
+                    overflow: 'hidden',
+                    minHeight: 0,
+                  }}
+                >
+                  <Text
+                    elementDescriptor={descriptors.subscriptionDetailFeePeriodNoticeLabel}
+                    variant='caption'
+                    colorScheme='secondary'
+                    sx={t => ({
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      columnGap: t.space.$1,
+                    })}
+                  >
+                    <Icon
+                      icon={InformationCircle}
+                      colorScheme='neutral'
+                      size='sm'
+                      aria-hidden
+                    />{' '}
+                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+                  </Text>
+                </Box>
+              </Box>
+            ) : null}
+          </>
+        ) : (
+          <Text
+            elementDescriptor={descriptors.subscriptionDetailFee}
+            variant='h1'
+            localizationKey={localizationKeys('__experimental_commerce.free')}
+            colorScheme='body'
+          />
+        )}
+      </Flex>
+    </Box>
+  );
+});
