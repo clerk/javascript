@@ -9,6 +9,7 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
+import { eventBus, events } from '../../core/events';
 import { __experimental_CommerceSettings, AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
@@ -53,7 +54,12 @@ export class Environment extends BaseResource implements EnvironmentResource {
   }
 
   fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
-    return touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
+    const promise = touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
+
+    return promise.then(data => {
+      eventBus.dispatch(events.EnvironmentUpdate, null);
+      return data;
+    });
   }
 
   isDevelopmentOrStaging = (): boolean => {

@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { useOptions, useUserProfileContext } from '../../contexts';
+import { useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { SecurityPage } from './SecurityPage';
@@ -16,6 +16,7 @@ const BillingPage = lazy(() =>
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
   const { experimental } = useOptions();
+  const { __experimental_commerceSettings } = useEnvironment();
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
@@ -55,7 +56,7 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && (
+        {experimental?.commerce && __experimental_commerceSettings.enabled && (
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>

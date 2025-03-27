@@ -13,7 +13,7 @@ import {
 } from '../../elements';
 import { __experimental_PricingTable } from '../PricingTable';
 
-export const BillingPage = withCardStateProvider(() => {
+export const OrganizationBillingPage = withCardStateProvider(() => {
   const card = useCardState();
 
   return (
@@ -51,7 +51,9 @@ export const BillingPage = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
-              <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+              <__experimental_PricingTableContext.Provider
+                value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
+              >
                 <__experimental_PricingTable />
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
