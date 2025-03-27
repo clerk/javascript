@@ -81,11 +81,13 @@
       "email_address": "john.doe@clerk.test",
       "first_name": "John",
       "last_name": "Doe",
-      "avatar_url": null,
+      "avatar_url": "https://clerk.com/test.jpg",
       "username": "jdoe",
       "public_metadata": {},
       "label": null,
-      "verification": null
+      "verification": null,
+      "created_at": 1611948436,
+      "updated_at": 1611948436
     }
   ],
   "saml_accounts": [

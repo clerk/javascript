@@ -65,38 +65,3 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     debugRequestState,
   };
 }
-
-/**
- * @internal
- */
-export type CreateExperimentalAuthenticateRequestOptions = {
-  options: BuildTimeOptions;
-  apiClient: any;
-};
-
-/**
- * @internal
- */
-export function createExperimentalAuthenticateRequest(params: CreateExperimentalAuthenticateRequestOptions) {
-  const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
-  const apiClient = params.apiClient;
-
-  const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
-    const { apiUrl, apiVersion } = buildTimeOptions;
-    const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
-    return authenticateRequestOriginal(request, {
-      ...options,
-      ...runTimeOptions,
-      // We should add all the omitted props from options here (eg apiUrl / apiVersion)
-      // to avoid runtime options override them.
-      apiUrl,
-      apiVersion,
-      apiClient,
-    });
-  };
-
-  return {
-    authenticateRequest,
-    debugRequestState,
-  };
-}
