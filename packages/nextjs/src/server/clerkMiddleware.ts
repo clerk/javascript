@@ -26,6 +26,7 @@ import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
 import {
   assertKey,
+  createCSPHeader,
   decorateRequest,
   handleMultiDomainAndProxy,
   redirectAdapter,
@@ -195,18 +196,13 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
 
       if (options.injectCSP) {
-        const cspHeader = request.headers.get('content-security-policy');
-        if (cspHeader) {
-          logger.debug('Content-Security-Policy header detected');
-          const csp = cspHeader.split(',').map(directive => directive.trim());
-          const cspValues = csp
-            .map(directive => {
-              const [key, value] = directive.split(' ');
-              return `${key} ${value}`;
-            })
-            .join('; ');
-          setHeader(handlerResult, 'Content-Security-Policy', cspValues);
+        const existingCSP = handlerResult.headers.get('content-security-policy');
+        if (existingCSP) {
+          logger.debug('Existing Content-Security-Policy header detected');
         }
+
+        setHeader(handlerResult, 'Content-Security-Policy', createCSPHeader(existingCSP));
+        logger.debug('Clerk Content-Security-Policy header injected');
       }
 
       // TODO @nikos: we need to make this more generic

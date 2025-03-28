@@ -259,3 +259,71 @@ function decryptData(data: string, key: string) {
   const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }
+
+type CSPDirective =
+  | 'connect-src'
+  | 'default-src'
+  | 'form-action'
+  | 'frame-src'
+  | 'img-src'
+  | 'script-src'
+  | 'style-src'
+  | 'worker-src';
+
+type CSPValues = Record<CSPDirective, string[]>;
+
+const CLERK_CSP_VALUES: CSPValues = {
+  'connect-src': ['self', 'https://trusty-krill-94.clerk.accounts.dev'],
+  'default-src': ['self'],
+  'form-action': ['self'],
+  'frame-src': ['self', 'https://challenges.cloudflare.com'],
+  'img-src': ['self', 'https://img.clerk.com'],
+  'script-src': [
+    'self',
+    'strict-dynamic',
+    'https:',
+    'http:',
+    process.env.NODE_ENV === 'production' ? '' : 'unsafe-eval',
+  ],
+  'style-src': ['self'],
+  'worker-src': ['self', 'blob:'],
+};
+
+export function createCSPHeader(cspHeader?: string | null) {
+  // Start with default Clerk CSP values
+  const mergedCSP = { ...CLERK_CSP_VALUES } as CSPValues;
+  const customDirectives = new Map<string, string[]>();
+
+  // Parse and merge custom CSP values if provided
+  if (cspHeader) {
+    const directives = parseCSPHeader(cspHeader);
+    directives.forEach(directive => {
+      const [key, ...values] = directive.split(' ');
+      if (key) {
+        if (key in CLERK_CSP_VALUES) {
+          // Merge with Clerk defaults
+          mergedCSP[key as CSPDirective] = values;
+        } else {
+          // Store custom directives
+          customDirectives.set(key, values);
+        }
+      }
+    });
+  }
+
+  // Convert merged CSP object to header string, including custom directives
+  const clerkDirectives = Object.entries(mergedCSP).map(([key, values]) => `${key} ${values.join(' ')}`);
+
+  const additionalDirectives = Array.from(customDirectives.entries()).map(
+    ([key, values]) => `${key} ${values.join(' ')}`,
+  );
+
+  return [...clerkDirectives, ...additionalDirectives].join('; ');
+}
+
+function parseCSPHeader(cspHeader?: string) {
+  if (cspHeader) {
+    return cspHeader.split(',').map(directive => directive.trim());
+  }
+  return [];
+}
