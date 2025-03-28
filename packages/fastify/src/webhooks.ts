@@ -22,5 +22,8 @@ export * from '@clerk/backend/webhooks';
  */
 export async function verifyWebhook(req: FastifyRequest, options?: VerifyWebhookOptions) {
   const webRequest = fastifyRequestToRequest(req);
-  return verifyWebhookBase(webRequest, options);
+  const clonedRequest = new Request(webRequest, {
+    body: JSON.stringify(req.body),
+  });
+  return verifyWebhookBase(clonedRequest, options);
 }

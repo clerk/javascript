@@ -22,5 +22,8 @@ export * from '@clerk/backend/webhooks';
  */
 export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhookOptions) {
   const webRequest = incomingMessageToRequest(req);
-  return verifyWebhookBase(webRequest, options);
+  const clonedRequest = new Request(webRequest, {
+    body: req.body,
+  });
+  return verifyWebhookBase(clonedRequest, options);
 }
