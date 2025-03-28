@@ -24,11 +24,11 @@ describe('createCSPHeader', () => {
 
     // The script-src directive should contain both the default values and new values, with 'self' quoted
     const resultDirectives = result.split('; ');
-    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src'));
+    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src')) ?? '';
     expect(scriptSrcDirective).toBeDefined();
 
     // Verify it contains all expected values exactly once
-    const values = new Set(scriptSrcDirective!.replace('script-src ', '').split(' '));
+    const values = new Set(scriptSrcDirective.replace('script-src ', '').split(' '));
     expect(values).toContain("'self'");
     expect(values).toContain('strict-dynamic');
     expect(values).toContain('https:');
