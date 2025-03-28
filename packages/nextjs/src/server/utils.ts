@@ -283,7 +283,7 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
     'strict-dynamic',
     'https:',
     'http:',
-    process.env.NODE_ENV === 'production' ? '' : 'unsafe-eval',
+    ...(process.env.NODE_ENV !== 'production' ? ['unsafe-eval'] : []),
   ],
   'style-src': ['self'],
   'worker-src': ['self', 'blob:'],
