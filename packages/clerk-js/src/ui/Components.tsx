@@ -308,16 +308,6 @@ const Components = (props: ComponentsProps) => {
          */
         handleCloseModalForExperimentalUserVerification();
 
-        // if (name === 'checkout') {
-        //   return {
-        //     ...s,
-        //     [`${name}Modal`]: {
-        //       visited: true,
-        //       props: null,
-        //     },
-        //   };
-        // }
-
         return { ...s, [`${name}Modal`]: null };
       });
     };
@@ -348,20 +338,6 @@ const Components = (props: ComponentsProps) => {
       } else {
         setState(s => ({ ...s, [`${name}Modal`]: props }));
       }
-
-      // if ('afterVerificationCancelled' in props) {
-      //   handleCloseModalForExperimentalUserVerification();
-      // } else if (name === 'checkout') {
-      //   setState(s => ({
-      //     ...s,
-      //     [`${name}Modal`]: {
-      //       visited: true,
-      //       props,
-      //     },
-      //   }));
-      // } else {
-      //   setState(s => ({ ...s, [`${name}Modal`]: props }));
-      // }
     };
 
     componentsControls.mountImpersonationFab = () => {
@@ -547,6 +523,24 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedCheckoutDrawer = checkoutDrawer.props && (
+    <LazyDrawerRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'checkout' as any}
+      componentAppearance={{}}
+      flowName={'checkout'}
+      open={checkoutDrawer.open}
+      onOpenChange={() => componentsControls.closeDrawer('checkout')}
+      componentName={'Checkout'}
+      portalId={checkoutDrawer.props.portalId}
+    >
+      <Checkout
+        planId={checkoutDrawer.props.planId}
+        planPeriod={checkoutDrawer.props.planPeriod}
+      />
+    </LazyDrawerRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -577,23 +571,7 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {checkoutDrawer.props ? (
-          <LazyDrawerRenderer
-            globalAppearance={state.appearance}
-            appearanceKey={'checkout' as any}
-            componentAppearance={{}}
-            flowName={'checkout'}
-            open={checkoutDrawer.open}
-            onOpenChange={() => componentsControls.closeDrawer('checkout')}
-            componentName={'Checkout'}
-            portalId={checkoutDrawer.props?.portalId}
-          >
-            <Checkout
-              planId={checkoutDrawer.props?.planId}
-              planPeriod={checkoutDrawer.props?.planPeriod}
-            />
-          </LazyDrawerRenderer>
-        ) : null}
+        {mountedCheckoutDrawer}
 
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>

@@ -1523,6 +1523,7 @@ export type __experimental_CheckoutProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   orgId?: string;
   onSubscriptionComplete?: () => void;
+  portalId?: string;
 };
 
 export interface HandleEmailLinkVerificationParams {

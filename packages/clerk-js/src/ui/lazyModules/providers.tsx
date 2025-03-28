@@ -139,11 +139,9 @@ type LazyDrawerRendererProps = React.PropsWithChildren<
   {
     componentName: ClerkComponentName;
     flowName?: FlowMetadata['flow'];
-    startPath?: string;
     open: DrawerProps['open'];
-    onOpenChange?: DrawerProps['onOpenChange'];
+    onOpenChange: DrawerProps['onOpenChange'];
     portalId?: string;
-    onExternalNavigate?: () => void;
   } & AppearanceProviderProps
 >;
 
@@ -159,7 +157,7 @@ export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
           <InternalThemeProvider>
             <DrawerRoot
               open={props.open}
-              onOpenChange={() => props.onOpenChange?.(false)}
+              onOpenChange={props.onOpenChange}
               strategy={props.portalId ? 'absolute' : 'fixed'}
               portalProps={{
                 id: props.portalId ? props.portalId : undefined,

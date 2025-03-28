@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -106,7 +105,6 @@ function Card(props: CardProps) {
   const { id, slug, subscriptionIdForCurrentSubscriber, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
-  const clerk = useClerk();
 
   return (
     <Box
