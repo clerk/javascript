@@ -196,14 +196,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
 
       if (options.injectCSP) {
-        const existingCSP = handlerResult.headers.get('content-security-policy');
-        if (existingCSP) {
-          logger.debug('CSP - existing', () => ({
-            existingCSP,
-          }));
-        }
-
-        const csp = createCSPHeader(request.nextUrl.origin, existingCSP);
+        const csp = createCSPHeader(request.nextUrl.origin, handlerResult.headers.get('content-security-policy'));
 
         setHeader(handlerResult, 'Content-Security-Policy', csp);
 
