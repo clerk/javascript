@@ -55,11 +55,13 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   useFetch(
-    () =>
-      signIn
-        ?.prepareFirstFactor(props.factor)
-        .then(() => props.onFactorPrepare())
-        .catch(err => handleError(err, [], card.setError)),
+    shouldAvoidPrepare
+      ? undefined
+      : () =>
+          signIn
+            ?.prepareFirstFactor(props.factor)
+            .then(() => props.onFactorPrepare())
+            .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signIn.prepareFirstFactor',
       factor: props.factor,
