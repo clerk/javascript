@@ -182,11 +182,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (
-    props?: __experimental_CheckoutProps & {
-      portalId?: string;
-    },
-  ) => void;
+  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
