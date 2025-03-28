@@ -23,6 +23,5 @@ export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => 
 };
 
 export const disabledCommerceFeature: ComponentGuard = (_, environment) => {
-  return false;
   return !environment?.__experimental_commerceSettings.enabled;
 };
