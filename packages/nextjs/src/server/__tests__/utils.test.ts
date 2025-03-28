@@ -69,7 +69,7 @@ describe('createCSPHeader', () => {
     expect(scriptSrcValues).toContain('http:');
     expect(scriptSrcValues).toContain('new-value');
 
-    expect(result).toContain("style-src 'self'");
+    expect(result).toContain("style-src 'self' 'unsafe-inline'");
     expect(result).toContain("worker-src 'self' blob:");
     expect(result).toContain("new-directive 'self' value1 value2 'none'");
 

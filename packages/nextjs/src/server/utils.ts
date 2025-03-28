@@ -285,7 +285,7 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
     'unsafe-inline',
     ...(process.env.NODE_ENV !== 'production' ? ['unsafe-eval'] : []),
   ],
-  'style-src': ['self'],
+  'style-src': ['self', 'unsafe-inline'],
   'worker-src': ['self', 'blob:'],
 };
 
