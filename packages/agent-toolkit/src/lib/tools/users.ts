@@ -29,10 +29,12 @@ const getUser = ClerkTool({
   parameters: z.object({
     userId: z.string().describe('(string): The userId of the User to retrieve.'),
   }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.users.getUser(context.userId || params.userId);
-    return prunePrivateData(context, res.raw);
-  },
+  execute:
+    (clerkClient, context) =>
+    async ({ userId }) => {
+      const res = await clerkClient.users.get({ userId: context.userId || userId });
+      return prunePrivateData(context, res);
+    },
 });
 
 const getUserCount = ClerkTool({
@@ -43,8 +45,8 @@ const getUserCount = ClerkTool({
     This tool takes no parameters and is an efficient way to get just the count without retrieving user details.
   `,
   parameters: z.object({}),
-  execute: (clerkClient, _) => async () => {
-    return await clerkClient.users.getCount();
+  execute: (clerkClient, _) => async params => {
+    return await clerkClient.users.count(params); // TODO: Make params optional (OpenAPI)
   },
 });
 
@@ -67,11 +69,15 @@ const updateUserPublicMetadata = ClerkTool({
       .record(z.string(), z.any())
       .describe('(Record<string,any>): The public metadata to set or update. Use null values to remove specific keys.'),
   }),
-  execute: (clerkClient, context) => async params => {
-    const { userId, metadata } = params;
-    const res = await clerkClient.users.updateUserMetadata(context.userId || userId, { publicMetadata: metadata });
-    return prunePrivateData(context, res.raw);
-  },
+  execute:
+    (clerkClient, context) =>
+    async ({ userId, metadata: publicMetadata }) => {
+      const res = await clerkClient.users.updateMetadata({
+        userId: context.userId || userId,
+        requestBody: { publicMetadata },
+      });
+      return prunePrivateData(context, res);
+    },
 });
 
 const updateUserUnsafeMetadata = ClerkTool({
@@ -94,11 +100,16 @@ const updateUserUnsafeMetadata = ClerkTool({
       .record(z.string(), z.any())
       .describe('(Record<string,any>): The unsafe metadata to set or update. Use null values to remove specific keys.'),
   }),
-  execute: (clerkClient, context) => async params => {
-    const { userId, metadata } = params;
-    const res = await clerkClient.users.updateUserMetadata(context.userId || userId, { unsafeMetadata: metadata });
-    return prunePrivateData(context, res.raw);
-  },
+  execute:
+    (clerkClient, context) =>
+    async ({ userId, metadata: unsafeMetadata }) => {
+      const res = await clerkClient.users.updateMetadata({
+        userId: context.userId || userId,
+        requestBody: { unsafeMetadata },
+      });
+
+      return prunePrivateData(context, res);
+    },
 });
 
 const updateUser = ClerkTool({
@@ -125,11 +136,15 @@ const updateUser = ClerkTool({
     username: z.string().optional().describe('(string): New username for the user'),
     profileImageUrl: z.string().optional().describe('(string): URL for the user profile image'),
   }),
-  execute: (clerkClient, context) => async params => {
-    const { userId, ...updateParams } = params;
-    const res = await clerkClient.users.updateUser(context.userId || userId, updateParams);
-    return prunePrivateData(context, res.raw);
-  },
+  execute:
+    (clerkClient, context) =>
+    async ({ userId, ...requestBody }) => {
+      const res = await clerkClient.users.update({
+        userId: context.userId || userId,
+        requestBody,
+      });
+      return prunePrivateData(context, res);
+    },
 });
 
 export const users = {
