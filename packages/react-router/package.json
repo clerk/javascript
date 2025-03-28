@@ -41,6 +41,10 @@
     "./errors": {
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
+    },
+    "./webhooks": {
+      "types": "./dist/webhooks.d.ts",
+      "default": "./dist/webhooks.js"
     }
   },
   "main": "dist/index.js",
@@ -56,6 +60,9 @@
       ],
       "api.server": [
         "dist/api/index.d.ts"
+      ],
+      "webhooks": [
+        "dist/webhooks.d.ts"
       ]
     }
   },

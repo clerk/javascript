@@ -4,12 +4,11 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { RequestHandler, Response } from 'express';
-import type { IncomingMessage } from 'http';
 
 import { clerkClient as defaultClerkClient } from './clerkClient';
 import { satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from './errors';
 import type { AuthenticateRequestParams, ClerkMiddlewareOptions, ExpressRequestWithAuth } from './types';
-import { loadApiEnv, loadClientEnv } from './utils';
+import { incomingMessageToRequest, loadApiEnv, loadClientEnv } from './utils';
 
 export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, request, options } = opts;
@@ -47,19 +46,6 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
     isSatellite,
     domain,
     signInUrl,
-  });
-};
-
-const incomingMessageToRequest = (req: IncomingMessage): Request => {
-  const headers = Object.keys(req.headers).reduce((acc, key) => Object.assign(acc, { [key]: req?.headers[key] }), {});
-  // @ts-ignore Optimistic attempt to get the protocol in case
-  // req extends IncomingMessage in a useful way. No guarantee
-  // it'll work.
-  const protocol = req.connection?.encrypted ? 'https' : 'http';
-  const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
-  return new Request(dummyOriginReqUrl, {
-    method: req.method,
-    headers: new Headers(headers),
   });
 };
 
