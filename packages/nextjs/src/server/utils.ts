@@ -312,13 +312,21 @@ export function createCSPHeader(cspHeader?: string | null) {
             // If 'none' is specified, it overrides all other values
             mergedCSP[key as CSPDirective] = new Set(['none']);
           } else {
-            // Otherwise merge and deduplicate values
-            values.forEach(v => mergedCSP[key as CSPDirective].add(v));
+            // Otherwise merge and deduplicate values, handling 'self' consistently
+            values.forEach(v => {
+              // Remove quotes if present, then normalize
+              const unquoted = v.replace(/^'|'$/g, '');
+              mergedCSP[key as CSPDirective].add(unquoted);
+            });
           }
         } else {
           // For custom directives not in CLERK_CSP_VALUES
           const existingValues = customDirectives.get(key) || new Set<string>();
-          values.forEach(v => existingValues.add(v));
+          values.forEach(v => {
+            // Handle 'self' quoting for custom directives too
+            const unquoted = v.replace(/^'|'$/g, '');
+            existingValues.add(unquoted);
+          });
           customDirectives.set(key, existingValues);
         }
       }

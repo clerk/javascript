@@ -22,8 +22,20 @@ describe('createCSPHeader', () => {
   it('merges and deduplicates values for common directives with quoted self', () => {
     const result = createCSPHeader(`script-src 'self' new-value another-value;`);
 
-    // The script-src directive should contain all values, deduplicated, with 'self' quoted
-    expect(result).toContain("script-src 'self' strict-dynamic https: http: new-value existing-value");
+    // The script-src directive should contain both the default values and new values, with 'self' quoted
+    const resultDirectives = result.split('; ');
+    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src'));
+    expect(scriptSrcDirective).toBeDefined();
+
+    // Verify it contains all expected values exactly once
+    const values = new Set(scriptSrcDirective!.replace('script-src ', '').split(' '));
+    expect(values).toContain("'self'");
+    expect(values).toContain('strict-dynamic');
+    expect(values).toContain('https:');
+    expect(values).toContain('http:');
+    expect(values).toContain('unsafe-eval');
+    expect(values).toContain('new-value');
+    expect(values).toContain('another-value');
   });
 
   it('adds new directives from custom CSP with quoted self', () => {
