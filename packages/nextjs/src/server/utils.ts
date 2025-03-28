@@ -327,11 +327,17 @@ export function createCSPHeader(cspHeader?: string | null) {
 
   // Convert merged CSP Sets back to arrays for output
   const clerkDirectives = Object.entries(mergedCSP).map(
-    ([key, valueSet]) => `${key} ${Array.from(valueSet).join(' ')}`,
+    ([key, valueSet]) =>
+      `${key} ${Array.from(valueSet)
+        .map(v => (v === 'self' ? "'self'" : v))
+        .join(' ')}`,
   );
 
   const additionalDirectives = Array.from(customDirectives.entries()).map(
-    ([key, values]) => `${key} ${Array.from(values).join(' ')}`,
+    ([key, values]) =>
+      `${key} ${Array.from(values)
+        .map(v => (v === 'self' ? "'self'" : v))
+        .join(' ')}`,
   );
 
   // Join all directives with semicolons
