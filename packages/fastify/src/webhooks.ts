@@ -22,6 +22,8 @@ export * from '@clerk/backend/webhooks';
  */
 export async function verifyWebhook(req: FastifyRequest, options?: VerifyWebhookOptions) {
   const webRequest = fastifyRequestToRequest(req);
+  // Cloning instead of implementing the body inside fastifyRequestToRequest
+  // to make it more predictable
   const clonedRequest = new Request(webRequest, {
     body: JSON.stringify(req.body),
   });

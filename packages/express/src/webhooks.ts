@@ -22,6 +22,8 @@ export * from '@clerk/backend/webhooks';
  */
 export async function verifyWebhook(req: ExpressRequest, options?: VerifyWebhookOptions) {
   const webRequest = incomingMessageToRequest(req);
+  // Cloning instead of implementing the body inside incomingMessageToRequest
+  // to make it more predictable
   const clonedRequest = new Request(webRequest, {
     body: req.body,
   });
