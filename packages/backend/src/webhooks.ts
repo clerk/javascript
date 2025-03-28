@@ -60,8 +60,8 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
   const body = await request.text();
 
   return sivx.verify(body, {
-    svix_id: svixId,
-    svix_timestamp: svixTimestamp,
-    svix_signature: svixSignature,
+    'svix-id': svixId,
+    'svix-timestamp': svixTimestamp,
+    'svix-signature': svixSignature,
   }) as WebhookEvent;
 }
