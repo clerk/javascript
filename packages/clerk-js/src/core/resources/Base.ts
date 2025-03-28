@@ -127,10 +127,15 @@ export abstract class BaseResource {
 
       assertProductionKeysOnDev(status, errors);
 
-      throw new ClerkAPIResponseError(message || statusText, {
-        data: errors,
-        status: status,
-      });
+      const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = { data: errors, status };
+      if (status === 429 && headers) {
+        const retryAfter = headers.get('retry-after');
+        if (retryAfter) {
+          apiResponseOptions.retryAfter = parseInt(retryAfter, 10);
+        }
+      }
+
+      throw new ClerkAPIResponseError(message || statusText, apiResponseOptions);
     }
 
     return null;
