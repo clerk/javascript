@@ -1,44 +1,33 @@
-import {
-  AccountlessApplicationAPI,
-  AllowlistIdentifierAPI,
-  ClientAPI,
-  DomainAPI,
-  EmailAddressAPI,
-  InvitationAPI,
-  OrganizationAPI,
-  PhoneNumberAPI,
-  RedirectUrlAPI,
-  SamlConnectionAPI,
-  SessionAPI,
-  SignInTokenAPI,
-  TestingTokenAPI,
-  UserAPI,
-} from './endpoints';
-import { buildRequest } from './request';
+import { Clerk as BackendApiClient } from '@clerk/backend-sdk';
 
-export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
+import { joinPaths } from '../util/path';
+
+export type CreateBackendApiOptions = {
+  /* Secret Key */
+  secretKey?: string;
+  /* Backend API URL */
+  apiUrl?: string;
+  /* Backend API version */
+  apiVersion?: string;
+  /* Library/SDK name */
+  userAgent?: string;
+  /**
+   * Allow requests without specifying a secret key. In most cases this should be set to `false`.
+   * Defaults to `true`.
+   */
+  requireSecretKey?: boolean;
+};
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
 
 export function createBackendApiClient(options: CreateBackendApiOptions) {
-  const request = buildRequest(options);
+  const serverURL = options.apiUrl ? joinPaths(options.apiUrl, options.apiVersion) : undefined;
 
-  return {
-    __experimental_accountlessApplications: new AccountlessApplicationAPI(
-      buildRequest({ ...options, requireSecretKey: false }),
-    ),
-    allowlistIdentifiers: new AllowlistIdentifierAPI(request),
-    clients: new ClientAPI(request),
-    emailAddresses: new EmailAddressAPI(request),
-    invitations: new InvitationAPI(request),
-    organizations: new OrganizationAPI(request),
-    phoneNumbers: new PhoneNumberAPI(request),
-    redirectUrls: new RedirectUrlAPI(request),
-    sessions: new SessionAPI(request),
-    signInTokens: new SignInTokenAPI(request),
-    users: new UserAPI(request),
-    domains: new DomainAPI(request),
-    samlConnections: new SamlConnectionAPI(request),
-    testingTokens: new TestingTokenAPI(request),
-  };
+  const api = new BackendApiClient({
+    bearerAuth: options.secretKey,
+    serverURL,
+    // userAgent: options.userAgent, // TODO: Add dynamic user agent
+  });
+
+  return api;
 }

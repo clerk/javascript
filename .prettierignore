@@ -21,3 +21,4 @@ playground
 packages/backend/tests/**/*.js
 /**/CHANGELOG.md
 renovate.json5
+packages/backend-sdk/**/*

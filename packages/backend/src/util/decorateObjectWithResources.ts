@@ -1,4 +1,6 @@
-import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
+import type { Organization, Session, User } from '@clerk/backend-sdk/models/components';
+
+import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthObject } from '../tokens/authObjects';
 
@@ -28,9 +30,9 @@ export const decorateObjectWithResources = async <T extends object>(
   const { sessions, users, organizations } = createBackendApiClient({ ...opts });
 
   const [sessionResp, userResp, organizationResp] = await Promise.all([
-    loadSession && sessionId ? sessions.getSession(sessionId) : Promise.resolve(undefined),
-    loadUser && userId ? users.getUser(userId) : Promise.resolve(undefined),
-    loadOrganization && orgId ? organizations.getOrganization({ organizationId: orgId }) : Promise.resolve(undefined),
+    loadSession && sessionId ? sessions.get({ sessionId }) : Promise.resolve(undefined),
+    loadUser && userId ? users.get({ userId }) : Promise.resolve(undefined),
+    loadOrganization && orgId ? organizations.get({ organizationId: orgId }) : Promise.resolve(undefined),
   ]);
 
   const resources = stripPrivateDataFromObject({
@@ -52,7 +54,7 @@ export function stripPrivateDataFromObject<T extends WithResources<object>>(auth
   return { ...authObject, user, organization };
 }
 
-function prunePrivateMetadata(resource?: { private_metadata: any } | { privateMetadata: any } | null) {
+function prunePrivateMetadata(resource?: { private_metadata?: any } | { privateMetadata?: any } | null) {
   // Delete sensitive private metadata from resource before rendering in SSR
   if (resource) {
     if ('privateMetadata' in resource) {

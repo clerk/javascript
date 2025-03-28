@@ -1007,7 +1007,7 @@ describe('tokens.authenticateRequest(options)', () => {
       );
 
       // return cookies from endpoint
-      const refreshSession = vi.fn(() => ({
+      const refresh = vi.fn(() => ({
         object: 'cookies',
         cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
       }));
@@ -1023,7 +1023,7 @@ describe('tokens.authenticateRequest(options)', () => {
         mockOptions({
           secretKey: 'test_deadbeef',
           publishableKey: PK_LIVE,
-          apiClient: { sessions: { refreshSession } },
+          apiClient: { sessions: { refresh } },
         }),
       );
 
@@ -1032,7 +1032,7 @@ describe('tokens.authenticateRequest(options)', () => {
       expect(requestState.headers.getSetCookie()).toContain(
         `__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`,
       );
-      expect(refreshSession).toHaveBeenCalled();
+      expect(refresh).toHaveBeenCalled();
     });
 
     test('does not try to refresh if refresh token does not exist', async () => {
@@ -1043,7 +1043,7 @@ describe('tokens.authenticateRequest(options)', () => {
       );
 
       // return cookies from endpoint
-      const refreshSession = vi.fn(() => ({
+      const refresh = vi.fn(() => ({
         object: 'cookies',
         cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
       }));
@@ -1059,15 +1059,15 @@ describe('tokens.authenticateRequest(options)', () => {
         mockOptions({
           secretKey: 'test_deadbeef',
           publishableKey: PK_LIVE,
-          apiClient: { sessions: { refreshSession } },
+          apiClient: { sessions: { refresh } },
         }),
       );
-      expect(refreshSession).not.toHaveBeenCalled();
+      expect(refresh).not.toHaveBeenCalled();
     });
 
     test('does not try to refresh if refresh exists but token is not expired', async () => {
       // return cookies from endpoint
-      const refreshSession = vi.fn(() => ({
+      const refresh = vi.fn(() => ({
         object: 'cookies',
         cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
       }));
@@ -1084,11 +1084,11 @@ describe('tokens.authenticateRequest(options)', () => {
         mockOptions({
           secretKey: 'test_deadbeef',
           publishableKey: PK_LIVE,
-          apiClient: { sessions: { refreshSession } },
+          apiClient: { sessions: { refresh } },
         }),
       );
 
-      expect(refreshSession).not.toHaveBeenCalled();
+      expect(refresh).not.toHaveBeenCalled();
     });
 
     test('uses suffixed refresh cookie even if un-suffixed is present', async () => {
@@ -1099,7 +1099,7 @@ describe('tokens.authenticateRequest(options)', () => {
       );
 
       // return cookies from endpoint
-      const refreshSession = vi.fn(() => ({
+      const refresh = vi.fn(() => ({
         object: 'cookies',
         cookies: [`__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`],
       }));
@@ -1120,7 +1120,7 @@ describe('tokens.authenticateRequest(options)', () => {
         mockOptions({
           secretKey: 'test_deadbeef',
           publishableKey: PK_LIVE,
-          apiClient: { sessions: { refreshSession } },
+          apiClient: { sessions: { refresh } },
         }),
       );
 
@@ -1129,7 +1129,7 @@ describe('tokens.authenticateRequest(options)', () => {
       expect(requestState.headers.getSetCookie()).toContain(
         `__session_MqCvchyS=${mockJwt}; Path=/; Secure; SameSite=Lax`,
       );
-      expect(refreshSession).toHaveBeenCalled();
+      expect(refresh).toHaveBeenCalled();
     });
   });
 });

@@ -96,6 +96,7 @@
     "test:watch:cloudflare-miniflare": "vitest watch --environment miniflare"
   },
   "dependencies": {
+    "@clerk/backend-sdk": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "cookie": "1.0.2",

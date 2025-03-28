@@ -27,17 +27,17 @@ export type ClerkClient = {
   ReturnType<typeof createAuthenticateRequest>;
 
 export function createClerkClient(options: ClerkOptions): ClerkClient {
-  const opts = { ...options };
-  const apiClient = createBackendApiClient(opts);
-  const requestState = createAuthenticateRequest({ options: opts, apiClient });
+  const apiClient = createBackendApiClient(options);
+  const requestState = createAuthenticateRequest({ options, apiClient });
   const telemetry = new TelemetryCollector({
     ...options.telemetry,
-    publishableKey: opts.publishableKey,
-    secretKey: opts.secretKey,
+    publishableKey: options.publishableKey,
+    secretKey: options.secretKey,
     samplingRate: 0.1,
-    ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
+    ...(options.sdkMetadata ? { sdk: options.sdkMetadata.name, sdkVersion: options.sdkMetadata.version } : {}),
   });
 
+  // @ts-expect-error - TODO: Types work, but this doesn't seem to validate correctly
   return {
     ...apiClient,
     ...requestState,
@@ -48,71 +48,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
 /**
  * General Types
  */
-export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
-/**
- * JSON types
- */
-export type {
-  AccountlessApplicationJSON,
-  ClerkResourceJSON,
-  TokenJSON,
-  AllowlistIdentifierJSON,
-  ClientJSON,
-  EmailJSON,
-  EmailAddressJSON,
-  ExternalAccountJSON,
-  IdentificationLinkJSON,
-  InvitationJSON,
-  OauthAccessTokenJSON,
-  OrganizationJSON,
-  OrganizationDomainJSON,
-  OrganizationDomainVerificationJSON,
-  OrganizationInvitationJSON,
-  PublicOrganizationDataJSON,
-  OrganizationMembershipJSON,
-  OrganizationMembershipPublicUserDataJSON,
-  PhoneNumberJSON,
-  RedirectUrlJSON,
-  SessionJSON,
-  SignInJSON,
-  SignInTokenJSON,
-  SignUpJSON,
-  SMSMessageJSON,
-  UserJSON,
-  VerificationJSON,
-  WaitlistEntryJSON,
-  Web3WalletJSON,
-  DeletedObjectJSON,
-  PaginatedResponseJSON,
-  TestingTokenJSON,
-} from './api/resources/JSON';
-
-/**
- * Resources
- */
-export type {
-  AccountlessApplication,
-  AllowlistIdentifier,
-  Client,
-  EmailAddress,
-  ExternalAccount,
-  Invitation,
-  OauthAccessToken,
-  Organization,
-  OrganizationDomain,
-  OrganizationDomainVerification,
-  OrganizationInvitation,
-  OrganizationMembership,
-  OrganizationMembershipPublicUserData,
-  PhoneNumber,
-  Session,
-  SignInToken,
-  SMSMessage,
-  Token,
-  User,
-  TestingToken,
-} from './api/resources';
 
 /**
  * Webhooks event types
