@@ -20,7 +20,7 @@ import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
-import { common, InternalThemeProvider } from '../styledSystem';
+import { common } from '../styledSystem';
 import { colors } from '../utils';
 import { IconButton } from './IconButton';
 
@@ -54,7 +54,7 @@ export const useDrawerContext = () => {
  * Drawer.Root
  * -----------------------------------------------------------------------------------------------*/
 
-interface RootProps {
+interface DRootProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -86,7 +86,7 @@ function Root({
   floatingProps,
   portalProps,
   dismissProps,
-}: RootProps) {
+}: DRootProps) {
   const { refs, context } = useFloating({
     open,
     onOpenChange,
@@ -102,21 +102,19 @@ function Root({
   ]);
 
   return (
-    <InternalThemeProvider>
-      <DrawerContext.Provider
-        value={{
-          isOpen: open,
-          setIsOpen: onOpenChange,
-          strategy,
-          portalProps: portalProps || {},
-          refs,
-          context,
-          getFloatingProps,
-        }}
-      >
-        {children}
-      </DrawerContext.Provider>
-    </InternalThemeProvider>
+    <DrawerContext.Provider
+      value={{
+        isOpen: open,
+        setIsOpen: onOpenChange,
+        strategy,
+        portalProps: portalProps || {},
+        refs,
+        context,
+        getFloatingProps,
+      }}
+    >
+      {children}
+    </DrawerContext.Provider>
   );
 }
 

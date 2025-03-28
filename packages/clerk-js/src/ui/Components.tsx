@@ -1,6 +1,7 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -24,6 +25,7 @@ import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
+  Checkout,
   CreateOrganizationModal,
   ImpersonationFab,
   KeylessPrompt,
@@ -37,6 +39,7 @@ import {
 } from './lazyModules/components';
 import {
   LazyComponentRenderer,
+  LazyDrawerRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -71,7 +74,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'checkout',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -82,7 +86,9 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : UserProfileProps,
+            : T extends 'checkout'
+              ? __experimental_CheckoutProps
+              : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -94,7 +100,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'checkout',
     options?: {
       notify?: boolean;
     },
@@ -131,6 +138,10 @@ interface ComponentsState {
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
+  checkoutModal: {
+    visited: boolean;
+    props: null | __experimental_CheckoutProps;
+  };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -212,6 +223,10 @@ const Components = (props: ComponentsProps) => {
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
+    checkoutModal: {
+      visited: false,
+      props: null,
+    },
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -226,6 +241,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
+    checkoutModal,
     nodes,
   } = state;
 
@@ -286,6 +302,16 @@ const Components = (props: ComponentsProps) => {
          */
         handleCloseModalForExperimentalUserVerification();
 
+        if (name === 'checkout') {
+          return {
+            ...s,
+            [`${name}Modal`]: {
+              visited: true,
+              props: null,
+            },
+          };
+        }
+
         return { ...s, [`${name}Modal`]: null };
       });
     };
@@ -313,6 +339,14 @@ const Components = (props: ComponentsProps) => {
 
       if ('afterVerificationCancelled' in props) {
         handleCloseModalForExperimentalUserVerification();
+      } else if (name === 'checkout') {
+        setState(s => ({
+          ...s,
+          [`${name}Modal`]: {
+            visited: true,
+            props,
+          },
+        }));
       } else {
         setState(s => ({ ...s, [`${name}Modal`]: props }));
       }
@@ -511,6 +545,19 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
+        {checkoutModal.visited ? (
+          <LazyDrawerRenderer
+            open={!!checkoutModal.props}
+            globalAppearance={state.appearance}
+            appearanceKey={'checkout' as any}
+            componentAppearance={{}}
+            flowName={'checkout'}
+            onClose={() => componentsControls.closeModal('checkout')}
+            componentName={'Checkout'}
+          >
+            <Checkout />
+          </LazyDrawerRenderer>
+        ) : null}
 
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>

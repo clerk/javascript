@@ -267,7 +267,7 @@ function appearanceVariableOptions() {
       experimental: { commerce: true },
     });
     renderCurrentRoute();
-    updateVariables();
+    // updateVariables();
   } else {
     console.error(`Unknown route: "${route}".`);
   }

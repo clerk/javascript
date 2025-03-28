@@ -14,7 +14,11 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
+import type {
+  __experimental_CommerceNamespace,
+  __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriptionPlanPeriod,
+} from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -177,6 +181,21 @@ export interface Clerk {
    * Closes the Clerk SignIn modal.
    */
   closeSignIn: () => void;
+
+  /**
+   * Opens the Clerk Checkout component in a drawer.
+   * @param props Optional checkout configuration parameters.
+   */
+  __internal_openCheckout: (
+    props?: __experimental_CheckoutProps & {
+      plan: __experimental_CommercePlanResource;
+    },
+  ) => void;
+
+  /**
+   * Closes the Clerk Checkout drawer.
+   */
+  __internal_closeCheckout: () => void;
 
   /**
    * Opens the Clerk UserVerification component in a modal.

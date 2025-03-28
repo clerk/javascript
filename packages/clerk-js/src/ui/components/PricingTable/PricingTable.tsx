@@ -8,10 +8,9 @@ import type {
 import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
+import { usePricingTableContext } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { usePlans } from '../../hooks';
-import { __experimental_Checkout } from '../Checkout';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
@@ -74,7 +73,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         appearanceKey='checkout'
         appearance={props.checkoutProps?.appearance}
       >
-        <__experimental_CheckoutContext.Provider
+        {/* <__experimental_CheckoutContext.Provider
           value={{
             componentName: 'Checkout',
             mode,
@@ -82,7 +81,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
             setIsOpen: setShowCheckout,
           }}
         >
-          {/*TODO: Used by InvisibleRootBox, can we simplify? */}
           <div>
             {checkoutPlan && (
               <__experimental_Checkout
@@ -93,7 +91,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
               />
             )}
           </div>
-        </__experimental_CheckoutContext.Provider>
+        </__experimental_CheckoutContext.Provider> */}
         <SubscriptionDetailDrawer
           isOpen={showSubscriptionDetailDrawer}
           setIsOpen={setShowSubscriptionDetailDrawer}

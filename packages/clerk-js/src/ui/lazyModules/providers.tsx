@@ -2,7 +2,7 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
-import type { FlowMetadata } from '../elements';
+import type { Drawer, FlowMetadata } from '../elements';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -20,6 +20,7 @@ const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal }
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+const DrawerRoot = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Root })));
 const OrganizationSwitcherPrefetch = lazy(() =>
   import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
     default: m.OrganizationSwitcherPrefetch,
@@ -124,6 +125,42 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
                 props.children
               )}
             </Modal>
+          </InternalThemeProvider>
+        </FlowMetadataProvider>
+      </AppearanceProvider>
+    </Suspense>
+  );
+};
+
+type DrawerProps = Parameters<typeof Drawer.Root>[0];
+
+type LazyDrawerRendererProps = React.PropsWithChildren<
+  {
+    componentName: ClerkComponentName;
+    flowName?: FlowMetadata['flow'];
+    startPath?: string;
+    onClose?: DrawerProps['onOpenChange'];
+    open: DrawerProps['open'];
+    onExternalNavigate?: () => void;
+  } & AppearanceProviderProps
+>;
+
+export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
+  return (
+    <Suspense fallback={''}>
+      <AppearanceProvider
+        globalAppearance={props.globalAppearance}
+        appearanceKey={props.appearanceKey}
+        appearance={props.componentAppearance}
+      >
+        <FlowMetadataProvider flow={props.flowName || ('' as any)}>
+          <InternalThemeProvider>
+            <DrawerRoot
+              open={props.open}
+              onOpenChange={() => props.onClose?.(false)}
+            >
+              {props.children}
+            </DrawerRoot>
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>

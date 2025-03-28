@@ -13,6 +13,7 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
@@ -508,6 +509,18 @@ export class Clerk implements ClerkInterface {
   public closeSignIn = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
+  };
+
+  public __internal_openCheckout = (props?: __experimental_CheckoutProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'Checkout' })
+      .then(controls => controls.openModal('checkout', props || {}));
+  };
+
+  public __internal_closeCheckout = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('checkout'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
@@ -2066,6 +2079,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
+    console.log('Dwadawdawda');
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()
