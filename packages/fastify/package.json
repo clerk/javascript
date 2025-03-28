@@ -25,21 +25,21 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/index.ts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/esm/index.js"
       },
       "require": {
-        "types": "./dist/types/index.ts",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/index.js"
       }
     },
     "./webhooks": {
       "import": {
-        "types": "./dist/types/webhooks.ts",
+        "types": "./dist/types/webhooks.d.ts",
         "default": "./dist/esm/webhooks.js"
       },
       "require": {
-        "types": "./dist/types/webhooks.ts",
+        "types": "./dist/types/webhooks.d.ts",
         "default": "./dist/webhooks.js"
       }
     }

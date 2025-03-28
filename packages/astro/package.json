@@ -56,8 +56,8 @@
       "default": "./dist/server/index.js"
     },
     "./webhooks": {
-      "types": "./dist/webhooks/index.d.ts",
-      "default": "./dist/webhooks/index.js"
+      "types": "./dist/webhooks.d.ts",
+      "default": "./dist/webhooks.js"
     },
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",
