@@ -306,8 +306,10 @@ export function createCSPHeader(host: string, cspHeader?: string | null) {
   );
   const customDirectives = new Map<string, Set<string>>();
 
+  const parsedHost = parseHost(host);
+
   // Add host to connect-src, img-src, and frame-src
-  mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(host);
+  mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(parsedHost);
 
   // Parse and merge custom CSP values if provided
   if (cspHeader) {
@@ -359,6 +361,24 @@ export function createCSPHeader(host: string, cspHeader?: string | null) {
 
   // Join all directives with semicolons
   return [...clerkDirectives, ...additionalDirectives].join('; ');
+}
+
+function parseHost(input: string): string {
+  let hostname = input;
+  try {
+    if (input.startsWith('http://') || input.startsWith('https://')) {
+      hostname = new URL(input).hostname;
+    }
+  } catch {
+    // If URL parsing fails, assume input is already a hostname
+    hostname = input;
+  }
+  const parts = hostname.split('.');
+  if (parts.length >= 2) {
+    // Retain only the last two segments (domain and TLD) and add the 'clerk' subdomain
+    hostname = 'clerk.' + parts.slice(-2).join('.');
+  }
+  return hostname;
 }
 
 function parseCSPHeader(cspHeader?: string) {
