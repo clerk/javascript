@@ -14,11 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type {
-  __experimental_CommerceNamespace,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-} from './commerce';
+import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -188,7 +184,7 @@ export interface Clerk {
    */
   __internal_openCheckout: (
     props?: __experimental_CheckoutProps & {
-      plan: __experimental_CommercePlanResource;
+      portalId?: string;
     },
   ) => void;
 

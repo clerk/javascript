@@ -2079,7 +2079,6 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    console.log('Dwadawdawda');
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()

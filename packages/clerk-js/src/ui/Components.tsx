@@ -19,6 +19,7 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
+import { PROFILE_CARD_SCROLLBOX_ID } from './constants';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
@@ -547,15 +548,19 @@ const Components = (props: ComponentsProps) => {
         {blankCaptchaModal && mountedBlankCaptchaModal}
         {checkoutModal.visited ? (
           <LazyDrawerRenderer
-            open={!!checkoutModal.props}
             globalAppearance={state.appearance}
             appearanceKey={'checkout' as any}
             componentAppearance={{}}
             flowName={'checkout'}
-            onClose={() => componentsControls.closeModal('checkout')}
+            open={!!checkoutModal.props}
+            onOpenChange={() => componentsControls.closeModal('checkout')}
             componentName={'Checkout'}
+            portalId={PROFILE_CARD_SCROLLBOX_ID}
           >
-            <Checkout />
+            <Checkout
+              planId={checkoutModal.props?.planId}
+              planPeriod={checkoutModal.props?.planPeriod}
+            />
           </LazyDrawerRenderer>
         ) : null}
 

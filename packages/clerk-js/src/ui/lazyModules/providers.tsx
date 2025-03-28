@@ -21,6 +21,7 @@ const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ defa
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 const DrawerRoot = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Root })));
+const DrawerOverlay = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Overlay })));
 const OrganizationSwitcherPrefetch = lazy(() =>
   import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
     default: m.OrganizationSwitcherPrefetch,
@@ -139,8 +140,9 @@ type LazyDrawerRendererProps = React.PropsWithChildren<
     componentName: ClerkComponentName;
     flowName?: FlowMetadata['flow'];
     startPath?: string;
-    onClose?: DrawerProps['onOpenChange'];
     open: DrawerProps['open'];
+    onOpenChange?: DrawerProps['onOpenChange'];
+    portalId?: string;
     onExternalNavigate?: () => void;
   } & AppearanceProviderProps
 >;
@@ -157,8 +159,13 @@ export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
           <InternalThemeProvider>
             <DrawerRoot
               open={props.open}
-              onOpenChange={() => props.onClose?.(false)}
+              onOpenChange={() => props.onOpenChange?.(false)}
+              strategy={props.portalId ? 'absolute' : 'fixed'}
+              portalProps={{
+                id: props.portalId ? props.portalId : undefined,
+              }}
             >
+              <DrawerOverlay />
               {props.children}
             </DrawerRoot>
           </InternalThemeProvider>
