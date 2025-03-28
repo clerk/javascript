@@ -272,7 +272,7 @@ type CSPDirective =
 
 type CSPValues = Record<CSPDirective, string[]>;
 
-export const CLERK_CSP_VALUES: CSPValues = {
+export const CLERK_CSP_DIRECTIVES: CSPValues = {
   'connect-src': ['self', 'https://trusty-krill-94.clerk.accounts.dev'],
   'default-src': ['self'],
   'form-action': ['self'],
@@ -291,7 +291,7 @@ export const CLERK_CSP_VALUES: CSPValues = {
 
 export function createCSPHeader(cspHeader?: string | null) {
   // Start with default Clerk CSP values, converted to Sets for easier merging
-  const mergedCSP = Object.entries(CLERK_CSP_VALUES).reduce(
+  const mergedCSP = Object.entries(CLERK_CSP_DIRECTIVES).reduce(
     (acc, [key, values]) => {
       acc[key as CSPDirective] = new Set(values);
       return acc;
@@ -306,7 +306,7 @@ export function createCSPHeader(cspHeader?: string | null) {
     directives.forEach(directive => {
       const [key, ...values] = directive.split(' ');
       if (key && values.length > 0) {
-        if (key in CLERK_CSP_VALUES) {
+        if (key in CLERK_CSP_DIRECTIVES) {
           // For existing directives in CLERK_CSP_VALUES
           if (values.includes('none')) {
             // If 'none' is specified, it overrides all other values
@@ -345,12 +345,10 @@ export function createCSPHeader(cspHeader?: string | null) {
 }
 
 function parseCSPHeader(cspHeader?: string) {
-  if (cspHeader) {
-    // Split by semicolons and trim each directive
-    return cspHeader
-      .split(';')
-      .map(directive => directive.trim())
-      .filter(Boolean);
-  }
-  return [];
+  return cspHeader
+    ? cspHeader
+        .split(';')
+        .map(directive => directive.trim())
+        .filter(Boolean)
+    : [];
 }
