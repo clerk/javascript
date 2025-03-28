@@ -2,13 +2,13 @@ import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { errorThrower } from 'src/util/shared';
 import { Webhook } from 'svix';
 
-import type { WebhookEvent } from './api';
+import type { WebhookEvent } from './api/resources/Webhooks';
 
 export type VerifyWebhookOptions = {
   signingSecret?: string;
 };
 
-export type { WebhookEvent };
+export * from './api/resources/Webhooks';
 
 /**
  * Verifies the authenticity of a webhook request using Svix.
