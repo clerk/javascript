@@ -515,12 +515,12 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
-      .then(controls => controls.openModal('checkout', props || {}));
+      .then(controls => controls.openDrawer('checkout', props || {}));
   };
 
   public __internal_closeCheckout = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('checkout'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {

@@ -6,7 +6,6 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import {
   Badge,
   Box,
@@ -182,12 +181,7 @@ function Card(props: CardProps) {
                 : localizationKeys('__experimental_commerce.getStarted')
             }
             onClick={() => {
-              clerk.__internal_openCheckout({
-                planId: plan.id,
-                planPeriod: planPeriod,
-                portalId: PROFILE_CARD_SCROLLBOX_ID,
-              });
-              // onSelect(plan);
+              onSelect(plan);
             }}
           />
         </Box>

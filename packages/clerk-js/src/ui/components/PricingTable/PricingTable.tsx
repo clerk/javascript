@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -17,17 +17,15 @@ import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
 export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { organization } = useOrganization();
+  // const { organization } = useOrganization();
   const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
   const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
-  const [checkoutPlan, setCheckoutPlan] = useState<__experimental_CommercePlanResource>();
   const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
 
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showSubscriptionDetailDrawer, setShowSubscriptionDetailDrawer] = useState(false);
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
@@ -39,8 +37,13 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
       setDetailSubscription(activeSubscription);
       setShowSubscriptionDetailDrawer(true);
     } else {
-      setCheckoutPlan(plan);
-      setShowCheckout(true);
+      clerk.__internal_openCheckout({
+        planId: plan.id,
+        planPeriod,
+        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+        // orgId: subscriberType === 'org' ? organization?.id : undefined,
+        // onSubscriptionComplete: onSubscriptionChange
+      });
     }
   };
 
@@ -73,25 +76,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         appearanceKey='checkout'
         appearance={props.checkoutProps?.appearance}
       >
-        {/* <__experimental_CheckoutContext.Provider
-          value={{
-            componentName: 'Checkout',
-            mode,
-            isOpen: showCheckout,
-            setIsOpen: setShowCheckout,
-          }}
-        >
-          <div>
-            {checkoutPlan && (
-              <__experimental_Checkout
-                planPeriod={planPeriod}
-                planId={checkoutPlan.id}
-                orgId={subscriberType === 'org' ? organization?.id : undefined}
-                onSubscriptionComplete={onSubscriptionChange}
-              />
-            )}
-          </div>
-        </__experimental_CheckoutContext.Provider> */}
         <SubscriptionDetailDrawer
           isOpen={showSubscriptionDetailDrawer}
           setIsOpen={setShowSubscriptionDetailDrawer}

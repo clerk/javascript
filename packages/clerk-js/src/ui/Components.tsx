@@ -19,7 +19,6 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
-import { PROFILE_CARD_SCROLLBOX_ID } from './constants';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
@@ -75,8 +74,7 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha'
-      | 'checkout',
+      | 'blankCaptcha',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -87,9 +85,7 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : T extends 'checkout'
-              ? __experimental_CheckoutProps
-              : UserProfileProps,
+            : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -101,8 +97,17 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha'
-      | 'checkout',
+      | 'blankCaptcha',
+    options?: {
+      notify?: boolean;
+    },
+  ) => void;
+  openDrawer: <T extends 'checkout'>(
+    drawer: T,
+    props: T extends 'checkout' ? __experimental_CheckoutProps : never,
+  ) => void;
+  closeDrawer: (
+    drawer: 'checkout',
     options?: {
       notify?: boolean;
     },
@@ -139,8 +144,8 @@ interface ComponentsState {
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
-  checkoutModal: {
-    visited: boolean;
+  checkoutDrawer: {
+    open: false;
     props: null | __experimental_CheckoutProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
@@ -224,8 +229,8 @@ const Components = (props: ComponentsProps) => {
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
-    checkoutModal: {
-      visited: false,
+    checkoutDrawer: {
+      open: false,
       props: null,
     },
     nodes: new Map(),
@@ -242,7 +247,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
-    checkoutModal,
+    checkoutDrawer,
     nodes,
   } = state;
 
@@ -303,15 +308,15 @@ const Components = (props: ComponentsProps) => {
          */
         handleCloseModalForExperimentalUserVerification();
 
-        if (name === 'checkout') {
-          return {
-            ...s,
-            [`${name}Modal`]: {
-              visited: true,
-              props: null,
-            },
-          };
-        }
+        // if (name === 'checkout') {
+        //   return {
+        //     ...s,
+        //     [`${name}Modal`]: {
+        //       visited: true,
+        //       props: null,
+        //     },
+        //   };
+        // }
 
         return { ...s, [`${name}Modal`]: null };
       });
@@ -340,21 +345,47 @@ const Components = (props: ComponentsProps) => {
 
       if ('afterVerificationCancelled' in props) {
         handleCloseModalForExperimentalUserVerification();
-      } else if (name === 'checkout') {
-        setState(s => ({
-          ...s,
-          [`${name}Modal`]: {
-            visited: true,
-            props,
-          },
-        }));
       } else {
         setState(s => ({ ...s, [`${name}Modal`]: props }));
       }
+
+      // if ('afterVerificationCancelled' in props) {
+      //   handleCloseModalForExperimentalUserVerification();
+      // } else if (name === 'checkout') {
+      //   setState(s => ({
+      //     ...s,
+      //     [`${name}Modal`]: {
+      //       visited: true,
+      //       props,
+      //     },
+      //   }));
+      // } else {
+      //   setState(s => ({ ...s, [`${name}Modal`]: props }));
+      // }
     };
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.openDrawer = (name, props) => {
+      setState(s => ({
+        ...s,
+        [`${name}Drawer`]: {
+          open: true,
+          props,
+        },
+      }));
+    };
+
+    componentsControls.closeDrawer = name => {
+      setState(s => ({
+        ...s,
+        [`${name}Drawer`]: {
+          ...s[`${name}Drawer`],
+          open: false,
+        },
+      }));
     };
 
     componentsControls.prefetch = component => {
@@ -546,20 +577,20 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {checkoutModal.visited ? (
+        {checkoutDrawer.props ? (
           <LazyDrawerRenderer
             globalAppearance={state.appearance}
             appearanceKey={'checkout' as any}
             componentAppearance={{}}
             flowName={'checkout'}
-            open={!!checkoutModal.props}
-            onOpenChange={() => componentsControls.closeModal('checkout')}
+            open={checkoutDrawer.open}
+            onOpenChange={() => componentsControls.closeDrawer('checkout')}
             componentName={'Checkout'}
-            portalId={PROFILE_CARD_SCROLLBOX_ID}
+            portalId={checkoutDrawer.props?.portalId}
           >
             <Checkout
-              planId={checkoutModal.props?.planId}
-              planPeriod={checkoutModal.props?.planPeriod}
+              planId={checkoutDrawer.props?.planId}
+              planPeriod={checkoutDrawer.props?.planPeriod}
             />
           </LazyDrawerRenderer>
         ) : null}
