@@ -295,7 +295,7 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
  */
 const CSP_KEYWORDS = ['self', 'none', 'strict-dynamic', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline'];
 
-export function createCSPHeader(cspHeader?: string | null) {
+export function createCSPHeader(host: string, cspHeader?: string | null) {
   // Start with default Clerk CSP values, converted to Sets for easier merging
   const mergedCSP = Object.entries(CLERK_CSP_DIRECTIVES).reduce(
     (acc, [key, values]) => {
@@ -305,6 +305,9 @@ export function createCSPHeader(cspHeader?: string | null) {
     {} as Record<CSPDirective, Set<string>>,
   );
   const customDirectives = new Map<string, Set<string>>();
+
+  // Add host to connect-src, img-src, and frame-src
+  mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(host);
 
   // Parse and merge custom CSP values if provided
   if (cspHeader) {

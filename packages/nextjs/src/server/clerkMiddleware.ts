@@ -201,7 +201,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
           logger.debug('Existing Content-Security-Policy header detected');
         }
 
-        setHeader(handlerResult, 'Content-Security-Policy', createCSPHeader(existingCSP));
+        const host = request.nextUrl.origin;
+        setHeader(handlerResult, 'Content-Security-Policy', createCSPHeader(host, existingCSP));
         logger.debug('Clerk Content-Security-Policy header injected');
       }
 

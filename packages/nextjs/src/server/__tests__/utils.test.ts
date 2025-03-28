@@ -4,7 +4,7 @@ import { createCSPHeader } from '../utils';
 
 describe('createCSPHeader', () => {
   it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
-    const result = createCSPHeader('custom-directive new-value;');
+    const result = createCSPHeader('example.com', 'custom-directive new-value;');
 
     // Each directive should be present exactly as defined in CLERK_CSP_VALUES with special keywords quoted
     expect(result).toContain("connect-src 'self' https://trusty-krill-94.clerk.accounts.dev");
@@ -12,15 +12,28 @@ describe('createCSPHeader', () => {
     expect(result).toContain("form-action 'self'");
     expect(result).toContain("frame-src 'self' https://challenges.cloudflare.com");
     expect(result).toContain("img-src 'self' https://img.clerk.com");
-    expect(result).toContain("style-src 'self'");
+    expect(result).toContain("style-src 'self' 'unsafe-inline'");
     expect(result).toContain("worker-src 'self' blob:");
 
     // script-src varies based on NODE_ENV, so we check for common values
     expect(result).toContain("script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'");
   });
 
+  it('includes the host in relevant CSP directives when provided', () => {
+    const host = 'https://example.com';
+    const result = createCSPHeader(host, '');
+
+    // Verify host is added to connect-src, img-src, and frame-src
+    expect(result).toContain(`connect-src 'self' ${host} https://trusty-krill-94.clerk.accounts.dev`);
+    expect(result).toContain(`img-src 'self' ${host} https://img.clerk.com`);
+    expect(result).toContain(`frame-src 'self' ${host} https://challenges.cloudflare.com`);
+  });
+
   it('merges and deduplicates values for common directives with special keywords quoted', () => {
-    const result = createCSPHeader(`script-src 'self' new-value another-value 'unsafe-inline' 'unsafe-eval';`);
+    const result = createCSPHeader(
+      'example.com',
+      `script-src 'self' new-value another-value 'unsafe-inline' 'unsafe-eval';`,
+    );
 
     // The script-src directive should contain both the default values and new values, with special keywords quoted
     const resultDirectives = result.split('; ');
@@ -39,14 +52,17 @@ describe('createCSPHeader', () => {
   });
 
   it('adds new directives from custom CSP with special keywords quoted', () => {
-    const result = createCSPHeader(`new-directive 'self' value1 value2 'none' 'unsafe-inline';`);
+    const result = createCSPHeader('example.com', `new-directive 'self' value1 value2 'none' 'unsafe-inline';`);
 
     // The new directive should be added exactly as specified, with special keywords quoted
     expect(result).toContain("new-directive 'self' value1 value2 'none' 'unsafe-inline'");
   });
 
   it('produces a complete CSP header with all expected directives and special keywords quoted', () => {
-    const result = createCSPHeader(`script-src new-value 'unsafe-inline'; new-directive 'self' value1 value2 'none'`);
+    const result = createCSPHeader(
+      'example.com',
+      `script-src new-value 'unsafe-inline'; new-directive 'self' value1 value2 'none'`,
+    );
 
     // Verify all directives are present with their exact values, with special keywords quoted
     expect(result).toContain("connect-src 'self' https://trusty-krill-94.clerk.accounts.dev");
@@ -78,10 +94,13 @@ describe('createCSPHeader', () => {
   });
 
   it('handles special keywords consistently regardless of input quoting', () => {
-    const result = createCSPHeader(`
+    const result = createCSPHeader(
+      'example.com',
+      `
       script-src self unsafe-inline unsafe-eval;
       new-directive none self unsafe-inline
-    `);
+    `,
+    );
 
     // Verify that special keywords are always quoted in output, regardless of input format
     const resultDirectives = result.split('; ');
@@ -101,5 +120,20 @@ describe('createCSPHeader', () => {
     expect(newDirectiveValues).toContain("'none'");
     expect(newDirectiveValues).toContain("'self'");
     expect(newDirectiveValues).toContain("'unsafe-inline'");
+  });
+
+  it('combines host with existing CSP values correctly', () => {
+    const host = 'https://example.com';
+    const existingCSP = `
+      connect-src 'self' https://api.example.com;
+      img-src 'self' https://images.example.com;
+      frame-src 'self' https://frames.example.com;
+    `;
+    const result = createCSPHeader(host, existingCSP);
+
+    // Verify host is added while preserving existing values
+    expect(result).toContain(`connect-src 'self' ${host} https://api.example.com`);
+    expect(result).toContain(`img-src 'self' ${host} https://images.example.com`);
+    expect(result).toContain(`frame-src 'self' ${host} https://frames.example.com`);
   });
 });
