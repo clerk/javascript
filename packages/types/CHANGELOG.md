@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.50.2
+
+### Patch Changes
+
+- Remove usage of `<PlanCard />` from `<SubscriptionDetailDrawer />`. ([#5469](https://github.com/clerk/javascript/pull/5469)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.50.1
 
 ### Patch Changes
