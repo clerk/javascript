@@ -85,7 +85,7 @@ describe('createCSPHeader', () => {
 
     // Verify that special keywords are always quoted in output, regardless of input format
     const resultDirectives = result.split('; ');
-    
+
     // Verify script-src directive has properly quoted keywords
     const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src')) ?? '';
     expect(scriptSrcDirective).toBeDefined();
@@ -93,7 +93,7 @@ describe('createCSPHeader', () => {
     expect(scriptSrcValues).toContain("'self'");
     expect(scriptSrcValues).toContain("'unsafe-inline'");
     expect(scriptSrcValues).toContain("'unsafe-eval'");
-    
+
     // Verify new-directive has properly quoted keywords
     const newDirective = resultDirectives.find(d => d.startsWith('new-directive')) ?? '';
     expect(newDirective).toBeDefined();
