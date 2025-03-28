@@ -196,7 +196,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
 
       if (options.injectCSP) {
-        const csp = createCSPHeader(request.nextUrl.origin, handlerResult.headers.get('content-security-policy'));
+        const csp = createCSPHeader(
+          clerkRequest.clerkUrl.toString(),
+          handlerResult.headers.get('content-security-policy'),
+        );
 
         setHeader(handlerResult, 'Content-Security-Policy', csp);
 

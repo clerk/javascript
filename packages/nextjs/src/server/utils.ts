@@ -273,7 +273,7 @@ type CSPDirective =
 type CSPValues = Record<CSPDirective, string[]>;
 
 export const CLERK_CSP_DIRECTIVES: CSPValues = {
-  'connect-src': ['self', 'https://trusty-krill-94.clerk.accounts.dev'],
+  'connect-src': ['self'],
   'default-src': ['self'],
   'form-action': ['self'],
   'frame-src': ['self', 'https://challenges.cloudflare.com'],
@@ -293,7 +293,7 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
  * Keywords that should be quoted in the CSP header.
  * @internal
  */
-const CSP_KEYWORDS = ['self', 'none', 'strict-dynamic', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline'];
+const CSP_KEYWORDS = ['none', 'self', 'strict-dynamic', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline'];
 
 export function createCSPHeader(host: string, cspHeader?: string | null) {
   // Start with default Clerk CSP values, converted to Sets for easier merging
