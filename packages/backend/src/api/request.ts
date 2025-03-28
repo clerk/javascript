@@ -7,7 +7,6 @@ import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
-import { parse } from 'path/win32';
 
 export type ClerkBackendApiRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
