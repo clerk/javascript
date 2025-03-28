@@ -337,14 +337,14 @@ export function createCSPHeader(cspHeader?: string | null) {
   const clerkDirectives = Object.entries(mergedCSP).map(
     ([key, valueSet]) =>
       `${key} ${Array.from(valueSet)
-        .map(v => (v === 'self' ? "'self'" : v))
+        .map(v => (['self', 'none', 'unsafe-inline', 'unsafe-eval'].includes(v) ? `'${v}'` : v))
         .join(' ')}`,
   );
 
   const additionalDirectives = Array.from(customDirectives.entries()).map(
     ([key, values]) =>
       `${key} ${Array.from(values)
-        .map(v => (v === 'self' ? "'self'" : v))
+        .map(v => (['self', 'none', 'unsafe-inline', 'unsafe-eval'].includes(v) ? `'${v}'` : v))
         .join(' ')}`,
   );
 
