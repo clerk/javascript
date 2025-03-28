@@ -22,6 +22,7 @@ import {
 } from '../../customizables';
 import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
 import { InformationCircle } from '../../icons';
+import { InternalThemeProvider } from '../../styledSystem';
 import { handleError } from '../../utils';
 
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
@@ -71,164 +72,166 @@ export function SubscriptionDetailDrawer({
   };
 
   return (
-    <Drawer.Root
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      strategy={strategy}
-      portalProps={portalProps}
-    >
-      <Drawer.Overlay />
-      <Drawer.Content>
-        <Drawer.Header
-          sx={t =>
-            !hasFeatures
-              ? {
-                  flex: 1,
-                  borderBottomWidth: 0,
-                  background: t.colors.$colorBackground,
-                }
-              : null
-          }
-        >
-          <Header
-            plan={subscription.plan}
-            planPeriod={subscription.planPeriod}
-            setPlanPeriod={setPlanPeriod}
-            closeSlot={<Drawer.Close />}
-          />
-        </Drawer.Header>
+    <InternalThemeProvider>
+      <Drawer.Root
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        strategy={strategy}
+        portalProps={portalProps}
+      >
+        <Drawer.Overlay />
+        <Drawer.Content>
+          <Drawer.Header
+            sx={t =>
+              !hasFeatures
+                ? {
+                    flex: 1,
+                    borderBottomWidth: 0,
+                    background: t.colors.$colorBackground,
+                  }
+                : null
+            }
+          >
+            <Header
+              plan={subscription.plan}
+              planPeriod={subscription.planPeriod}
+              setPlanPeriod={setPlanPeriod}
+              closeSlot={<Drawer.Close />}
+            />
+          </Drawer.Header>
 
-        {hasFeatures ? (
-          <Drawer.Body>
-            <Box
-              elementDescriptor={descriptors.subscriptionDetailFeaturesList}
-              as='ul'
-              role='list'
-              sx={t => ({
-                display: 'grid',
-                rowGap: t.space.$4,
-                padding: t.space.$4,
-              })}
-            >
-              {features.map(feature => (
-                <Box
-                  key={feature.id}
-                  elementDescriptor={descriptors.subscriptionDetailFeaturesListItem}
-                  as='li'
-                  sx={t => ({
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: t.space.$3,
-                  })}
-                >
-                  {feature.avatarUrl ? (
-                    <Avatar
-                      size={_ => 24}
-                      title={feature.name}
-                      initials={feature.name[0]}
-                      rounded={false}
-                      imageUrl={feature.avatarUrl}
-                    />
-                  ) : null}
-                  <Span elementDescriptor={descriptors.subscriptionDetailFeaturesListItemContent}>
-                    <Text
-                      elementDescriptor={descriptors.subscriptionDetailFeaturesListItemTitle}
-                      colorScheme='body'
-                      sx={t => ({
-                        fontWeight: t.fontWeights.$medium,
-                      })}
-                    >
-                      {feature.name}
-                    </Text>
-                    {feature.description ? (
+          {hasFeatures ? (
+            <Drawer.Body>
+              <Box
+                elementDescriptor={descriptors.subscriptionDetailFeaturesList}
+                as='ul'
+                role='list'
+                sx={t => ({
+                  display: 'grid',
+                  rowGap: t.space.$4,
+                  padding: t.space.$4,
+                })}
+              >
+                {features.map(feature => (
+                  <Box
+                    key={feature.id}
+                    elementDescriptor={descriptors.subscriptionDetailFeaturesListItem}
+                    as='li'
+                    sx={t => ({
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: t.space.$3,
+                    })}
+                  >
+                    {feature.avatarUrl ? (
+                      <Avatar
+                        size={_ => 24}
+                        title={feature.name}
+                        initials={feature.name[0]}
+                        rounded={false}
+                        imageUrl={feature.avatarUrl}
+                      />
+                    ) : null}
+                    <Span elementDescriptor={descriptors.subscriptionDetailFeaturesListItemContent}>
                       <Text
-                        elementDescriptor={descriptors.subscriptionDetailFeaturesListItemDescription}
-                        colorScheme='secondary'
+                        elementDescriptor={descriptors.subscriptionDetailFeaturesListItemTitle}
+                        colorScheme='body'
                         sx={t => ({
-                          marginBlockStart: t.space.$0x25,
-                          fontSize: t.fontSizes.$xs,
+                          fontWeight: t.fontWeights.$medium,
                         })}
                       >
-                        {feature.description}
+                        {feature.name}
                       </Text>
-                    ) : null}
-                  </Span>
-                </Box>
-              ))}
-            </Box>
-          </Drawer.Body>
-        ) : null}
+                      {feature.description ? (
+                        <Text
+                          elementDescriptor={descriptors.subscriptionDetailFeaturesListItemDescription}
+                          colorScheme='secondary'
+                          sx={t => ({
+                            marginBlockStart: t.space.$0x25,
+                            fontSize: t.fontSizes.$xs,
+                          })}
+                        >
+                          {feature.description}
+                        </Text>
+                      ) : null}
+                    </Span>
+                  </Box>
+                ))}
+              </Box>
+            </Drawer.Body>
+          ) : null}
 
-        <Drawer.Footer>
-          <Button
-            variant='bordered'
-            colorScheme='secondary'
-            size='sm'
-            textVariant='buttonLarge'
-            block
-            onClick={() => setShowConfirmation(true)}
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Cancel Subscription
-          </Button>
-        </Drawer.Footer>
+          <Drawer.Footer>
+            <Button
+              variant='bordered'
+              colorScheme='secondary'
+              size='sm'
+              textVariant='buttonLarge'
+              block
+              onClick={() => setShowConfirmation(true)}
+            >
+              {/* TODO(@COMMERCE): needs localization */}
+              Cancel Subscription
+            </Button>
+          </Drawer.Footer>
 
-        <Drawer.Confirmation
-          open={showConfirmation}
-          onOpenChange={setShowConfirmation}
-          actionsSlot={
-            <>
-              {!isSubmitting && (
+          <Drawer.Confirmation
+            open={showConfirmation}
+            onOpenChange={setShowConfirmation}
+            actionsSlot={
+              <>
+                {!isSubmitting && (
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    textVariant='buttonLarge'
+                    onClick={() => {
+                      setCancelError(undefined);
+                      setShowConfirmation(false);
+                    }}
+                  >
+                    {/* TODO(@COMMERCE): needs localization */}
+                    Keep Subscription
+                  </Button>
+                )}
                 <Button
-                  variant='ghost'
+                  variant='solid'
+                  colorScheme='danger'
                   size='sm'
                   textVariant='buttonLarge'
-                  onClick={() => {
-                    setCancelError(undefined);
-                    setShowConfirmation(false);
-                  }}
+                  isLoading={isSubmitting}
+                  onClick={cancelSubscription}
                 >
                   {/* TODO(@COMMERCE): needs localization */}
-                  Keep Subscription
+                  Cancel Subscription
                 </Button>
-              )}
-              <Button
-                variant='solid'
-                colorScheme='danger'
-                size='sm'
-                textVariant='buttonLarge'
-                isLoading={isSubmitting}
-                onClick={cancelSubscription}
-              >
-                {/* TODO(@COMMERCE): needs localization */}
-                Cancel Subscription
-              </Button>
-            </>
-          }
-        >
-          <Heading
-            elementDescriptor={descriptors.drawerConfirmationTitle}
-            as='h2'
-            textVariant='h3'
+              </>
+            }
           >
-            {/* TODO(@COMMERCE): needs localization */}
-            Cancel {subscription.plan.name} Subscription?
-          </Heading>
-          <Text
-            elementDescriptor={descriptors.drawerConfirmationDescription}
-            colorScheme='secondary'
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            You can keep using &ldquo;{subscription.plan.name}&rdquo; features until [DATE], after which you will no
-            longer have access.
-          </Text>
-          {cancelError && (
-            // TODO(@COMMERCE): needs localization
-            <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
-          )}
-        </Drawer.Confirmation>
-      </Drawer.Content>
-    </Drawer.Root>
+            <Heading
+              elementDescriptor={descriptors.drawerConfirmationTitle}
+              as='h2'
+              textVariant='h3'
+            >
+              {/* TODO(@COMMERCE): needs localization */}
+              Cancel {subscription.plan.name} Subscription?
+            </Heading>
+            <Text
+              elementDescriptor={descriptors.drawerConfirmationDescription}
+              colorScheme='secondary'
+            >
+              {/* TODO(@COMMERCE): needs localization */}
+              You can keep using &ldquo;{subscription.plan.name}&rdquo; features until [DATE], after which you will no
+              longer have access.
+            </Text>
+            {cancelError && (
+              // TODO(@COMMERCE): needs localization
+              <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
+            )}
+          </Drawer.Confirmation>
+        </Drawer.Content>
+      </Drawer.Root>
+    </InternalThemeProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import { inBrowser } from '@clerk/shared/browser';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
@@ -108,6 +109,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
+  private preopenCheckout?: null | __experimental_CheckoutProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -471,6 +473,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openSignIn(this.preopenSignIn);
     }
 
+    if (this.preopenCheckout !== null) {
+      clerkjs.__internal_openCheckout(this.preopenCheckout);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -646,6 +652,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
+    }
+  };
+
+  __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_openCheckout(props);
+    } else {
+      this.preopenCheckout = props;
+    }
+  };
+
+  __internal_closeCheckout = () => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_closeCheckout();
+    } else {
+      this.preopenCheckout = null;
     }
   };
 

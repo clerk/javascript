@@ -179,6 +179,17 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
+   * Opens the Clerk Checkout component in a drawer.
+   * @param props Optional checkout configuration parameters.
+   */
+  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+
+  /**
+   * Closes the Clerk Checkout drawer.
+   */
+  __internal_closeCheckout: () => void;
+
+  /**
    * Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
@@ -1508,6 +1519,7 @@ export type __experimental_CheckoutProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   orgId?: string;
   onSubscriptionComplete?: () => void;
+  portalId?: string;
 };
 
 export interface HandleEmailLinkVerificationParams {
