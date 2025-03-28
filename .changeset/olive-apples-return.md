@@ -43,4 +43,4 @@ export async function POST(req: Request) {
 }
 ```
 
-For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data#create-the-endpoint).
+For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data).
