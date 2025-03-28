@@ -3,78 +3,40 @@ import { describe, expect, it } from 'vitest';
 import { CLERK_CSP_VALUES, createCSPHeader } from '../utils';
 
 describe('createCSPHeader', () => {
-  it('returns default Clerk CSP values when no header is provided', () => {
-    const result = createCSPHeader();
+  it('preserves all original CLERK_CSP_VALUES directives', () => {
+    const result = createCSPHeader('custom-directive new-value');
     const resultDirectives = result.split('; ');
 
-    // Verify all required Clerk directives are present
+    // All original directives should be present
     Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
-      expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
+      const directiveString = `${directive} ${values.join(' ')}`;
+      expect(resultDirectives).toContain(directiveString);
     });
   });
 
-  it('merges custom directives with Clerk defaults', () => {
-    const customHeader = 'default-src none; script-src self unsafe-inline';
-    const result = createCSPHeader(customHeader);
+  it('merges and deduplicates values for common directives', () => {
+    const result = createCSPHeader('script-src new-value existing-value');
     const resultDirectives = result.split('; ');
 
-    // Verify custom values override Clerk defaults
-    expect(resultDirectives).toContain('default-src none');
-    expect(resultDirectives).toContain('script-src self unsafe-inline');
+    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src')) ?? '';
+    expect(scriptSrcDirective).toBeDefined();
 
-    // Verify other Clerk defaults remain unchanged
-    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
-      if (directive !== 'default-src' && directive !== 'script-src') {
-        expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
-      }
+    // Should contain both original and new values, deduplicated
+    const values = scriptSrcDirective.replace('script-src ', '').split(' ');
+    const uniqueValues = new Set(values);
+    expect(values.length).toBe(uniqueValues.size);
+
+    // Should contain both original and new values
+    CLERK_CSP_VALUES['script-src'].forEach(value => {
+      expect(values).toContain(value);
     });
+    expect(values).toContain('new-value');
   });
 
-  it('preserves custom directives not in Clerk defaults', () => {
-    const customHeader = 'custom-directive value; another-directive test';
-    const result = createCSPHeader(customHeader);
+  it('adds new directives from custom CSP', () => {
+    const result = createCSPHeader('new-directive value1 value2');
     const resultDirectives = result.split('; ');
 
-    // Verify custom directives are preserved
-    expect(resultDirectives).toContain('custom-directive value');
-    expect(resultDirectives).toContain('another-directive test');
-
-    // Verify all Clerk defaults are present
-    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
-      expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
-    });
-  });
-
-  it('handles multiple directives and values correctly', () => {
-    const customHeader = 'default-src none; script-src self unsafe-inline; custom-directive value';
-    const result = createCSPHeader(customHeader);
-    const resultDirectives = result.split('; ');
-
-    // Verify all directives are present with correct values
-    expect(resultDirectives).toContain('default-src none');
-    expect(resultDirectives).toContain('script-src self unsafe-inline');
-    expect(resultDirectives).toContain('custom-directive value');
-
-    // Verify total number of directives (Clerk defaults + custom)
-    const expectedDirectiveCount = Object.keys(CLERK_CSP_VALUES).length + 1; // +1 for custom-directive
-    expect(resultDirectives).toHaveLength(expectedDirectiveCount);
-  });
-
-  it('handles empty or invalid input gracefully', () => {
-    const emptyResult = createCSPHeader('');
-    const emptyDirectives = emptyResult.split('; ');
-
-    // Verify empty input returns all Clerk defaults
-    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
-      expect(emptyDirectives).toContain(`${directive} ${values.join(' ')}`);
-    });
-
-    const invalidResult = createCSPHeader('invalid-directive');
-    const invalidDirectives = invalidResult.split('; ');
-
-    // Verify invalid input returns all Clerk defaults
-    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
-      expect(invalidDirectives).toContain(`${directive} ${values.join(' ')}`);
-    });
+    expect(resultDirectives).toContain('new-directive value1 value2');
   });
 });

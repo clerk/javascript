@@ -290,40 +290,53 @@ export const CLERK_CSP_VALUES: CSPValues = {
 };
 
 export function createCSPHeader(cspHeader?: string | null) {
-  // Start with default Clerk CSP values
-  const mergedCSP = { ...CLERK_CSP_VALUES } as CSPValues;
-  const customDirectives = new Map<string, string[]>();
+  // Start with default Clerk CSP values, converted to Sets for easier merging
+  const mergedCSP = Object.entries(CLERK_CSP_VALUES).reduce((acc, [key, values]) => {
+    acc[key as CSPDirective] = new Set(values);
+    return acc;
+  }, {} as Record<CSPDirective, Set<string>>);
+  const customDirectives = new Map<string, Set<string>>();
 
   // Parse and merge custom CSP values if provided
   if (cspHeader) {
     const directives = parseCSPHeader(cspHeader);
     directives.forEach(directive => {
       const [key, ...values] = directive.split(' ');
-      if (key) {
+      if (key && values.length > 0) {
         if (key in CLERK_CSP_VALUES) {
-          // Merge with Clerk defaults
-          mergedCSP[key as CSPDirective] = values;
+          // For existing directives in CLERK_CSP_VALUES
+          if (values.includes('none')) {
+            // If 'none' is specified, it overrides all other values
+            mergedCSP[key as CSPDirective] = new Set(['none']);
+          } else {
+            // Otherwise merge and deduplicate values
+            values.forEach(v => mergedCSP[key as CSPDirective].add(v));
+          }
         } else {
-          // Store custom directives
-          customDirectives.set(key, values);
+          // For custom directives not in CLERK_CSP_VALUES
+          const existingValues = customDirectives.get(key) || new Set<string>();
+          values.forEach(v => existingValues.add(v));
+          customDirectives.set(key, existingValues);
         }
       }
     });
   }
 
-  // Convert merged CSP object to header string, including custom directives
-  const clerkDirectives = Object.entries(mergedCSP).map(([key, values]) => `${key} ${values.join(' ')}`);
+  // Convert merged CSP Sets back to arrays for output
+  const clerkDirectives = Object.entries(mergedCSP)
+    .map(([key, valueSet]) => `${key} ${Array.from(valueSet).join(' ')}`);
 
-  const additionalDirectives = Array.from(customDirectives.entries()).map(
-    ([key, values]) => `${key} ${values.join(' ')}`,
-  );
+  const additionalDirectives = Array.from(customDirectives.entries())
+    .map(([key, values]) => `${key} ${Array.from(values).join(' ')}`);
 
+  // Join all directives with semicolons
   return [...clerkDirectives, ...additionalDirectives].join('; ');
 }
 
 function parseCSPHeader(cspHeader?: string) {
   if (cspHeader) {
-    return cspHeader.split(',').map(directive => directive.trim());
+    // Split by semicolons and trim each directive
+    return cspHeader.split(';').map(directive => directive.trim()).filter(Boolean);
   }
   return [];
 }
