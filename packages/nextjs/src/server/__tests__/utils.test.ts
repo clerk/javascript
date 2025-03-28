@@ -16,7 +16,7 @@ describe('createCSPHeader', () => {
     expect(result).toContain("worker-src 'self' blob:");
 
     // script-src varies based on NODE_ENV, so we check for common values
-    expect(result).toContain("script-src 'self' strict-dynamic https: http:");
+    expect(result).toContain("script-src 'self' https: http:");
   });
 
   it('merges and deduplicates values for common directives with quoted self', () => {
@@ -30,12 +30,14 @@ describe('createCSPHeader', () => {
     // Verify it contains all expected values exactly once
     const values = new Set(scriptSrcDirective.replace('script-src ', '').split(' '));
     expect(values).toContain("'self'");
-    expect(values).toContain('strict-dynamic');
     expect(values).toContain('https:');
     expect(values).toContain('http:');
     expect(values).toContain('unsafe-eval');
     expect(values).toContain('new-value');
     expect(values).toContain('another-value');
+
+    // Make sure strict-dynamic is not present
+    expect(values).not.toContain('strict-dynamic');
   });
 
   it('adds new directives from custom CSP with quoted self', () => {
@@ -54,10 +56,13 @@ describe('createCSPHeader', () => {
     expect(result).toContain("form-action 'self'");
     expect(result).toContain("frame-src 'self' https://challenges.cloudflare.com");
     expect(result).toContain("img-src 'self' https://img.clerk.com");
-    expect(result).toContain("script-src 'self' strict-dynamic https: http: unsafe-eval new-value");
+    expect(result).toContain("script-src 'self' https: http: unsafe-eval new-value");
     expect(result).toContain("style-src 'self'");
     expect(result).toContain("worker-src 'self' blob:");
     expect(result).toContain("new-directive 'self' value1 value2");
+
+    // Make sure strict-dynamic is not present
+    expect(result).not.toContain('strict-dynamic');
 
     // Verify the header format (directives separated by semicolons)
     expect(result).toMatch(/^[^;]+(; [^;]+)*$/);

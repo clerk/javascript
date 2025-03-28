@@ -278,13 +278,7 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
   'form-action': ['self'],
   'frame-src': ['self', 'https://challenges.cloudflare.com'],
   'img-src': ['self', 'https://img.clerk.com'],
-  'script-src': [
-    'self',
-    'strict-dynamic',
-    'https:',
-    'http:',
-    ...(process.env.NODE_ENV !== 'production' ? ['unsafe-eval'] : []),
-  ],
+  'script-src': ['self', 'https:', 'http:', ...(process.env.NODE_ENV !== 'production' ? ['unsafe-eval'] : [])],
   'style-src': ['self'],
   'worker-src': ['self', 'blob:'],
 };
