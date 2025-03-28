@@ -291,10 +291,13 @@ export const CLERK_CSP_VALUES: CSPValues = {
 
 export function createCSPHeader(cspHeader?: string | null) {
   // Start with default Clerk CSP values, converted to Sets for easier merging
-  const mergedCSP = Object.entries(CLERK_CSP_VALUES).reduce((acc, [key, values]) => {
-    acc[key as CSPDirective] = new Set(values);
-    return acc;
-  }, {} as Record<CSPDirective, Set<string>>);
+  const mergedCSP = Object.entries(CLERK_CSP_VALUES).reduce(
+    (acc, [key, values]) => {
+      acc[key as CSPDirective] = new Set(values);
+      return acc;
+    },
+    {} as Record<CSPDirective, Set<string>>,
+  );
   const customDirectives = new Map<string, Set<string>>();
 
   // Parse and merge custom CSP values if provided
@@ -323,11 +326,13 @@ export function createCSPHeader(cspHeader?: string | null) {
   }
 
   // Convert merged CSP Sets back to arrays for output
-  const clerkDirectives = Object.entries(mergedCSP)
-    .map(([key, valueSet]) => `${key} ${Array.from(valueSet).join(' ')}`);
+  const clerkDirectives = Object.entries(mergedCSP).map(
+    ([key, valueSet]) => `${key} ${Array.from(valueSet).join(' ')}`,
+  );
 
-  const additionalDirectives = Array.from(customDirectives.entries())
-    .map(([key, values]) => `${key} ${Array.from(values).join(' ')}`);
+  const additionalDirectives = Array.from(customDirectives.entries()).map(
+    ([key, values]) => `${key} ${Array.from(values).join(' ')}`,
+  );
 
   // Join all directives with semicolons
   return [...clerkDirectives, ...additionalDirectives].join('; ');
@@ -336,7 +341,10 @@ export function createCSPHeader(cspHeader?: string | null) {
 function parseCSPHeader(cspHeader?: string) {
   if (cspHeader) {
     // Split by semicolons and trim each directive
-    return cspHeader.split(';').map(directive => directive.trim()).filter(Boolean);
+    return cspHeader
+      .split(';')
+      .map(directive => directive.trim())
+      .filter(Boolean);
   }
   return [];
 }
