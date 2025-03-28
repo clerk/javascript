@@ -56,7 +56,19 @@ describe('createCSPHeader', () => {
     expect(result).toContain("form-action 'self'");
     expect(result).toContain("frame-src 'self' https://challenges.cloudflare.com");
     expect(result).toContain("img-src 'self' https://img.clerk.com");
-    expect(result).toContain("script-src 'self' https: http: unsafe-eval new-value");
+    // Extract the script-src directive and check for each expected value individually
+    const resultDirectives = result.split('; ');
+    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src')) ?? '';
+    expect(scriptSrcDirective).toBeDefined();
+    
+    // Verify it contains all expected values regardless of order
+    const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
+    expect(scriptSrcValues).toContain("'self'");
+    expect(scriptSrcValues).toContain("https:");
+    expect(scriptSrcValues).toContain("http:");
+    expect(scriptSrcValues).toContain("unsafe-eval");
+    expect(scriptSrcValues).toContain("unsafe-inline");
+    expect(scriptSrcValues).toContain("new-value");
     expect(result).toContain("style-src 'self'");
     expect(result).toContain("worker-src 'self' blob:");
     expect(result).toContain("new-directive 'self' value1 value2");
