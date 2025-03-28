@@ -289,6 +289,12 @@ export const CLERK_CSP_DIRECTIVES: CSPValues = {
   'worker-src': ['self', 'blob:'],
 };
 
+/**
+ * Keywords that should be quoted in the CSP header.
+ * @internal
+ */
+const CSP_KEYWORDS = ['self', 'none', 'strict-dynamic', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline'];
+
 export function createCSPHeader(cspHeader?: string | null) {
   // Start with default Clerk CSP values, converted to Sets for easier merging
   const mergedCSP = Object.entries(CLERK_CSP_DIRECTIVES).reduce(
@@ -312,7 +318,7 @@ export function createCSPHeader(cspHeader?: string | null) {
             // If 'none' is specified, it overrides all other values
             mergedCSP[key as CSPDirective] = new Set(['none']);
           } else {
-            // Otherwise merge and deduplicate values, handling 'self' consistently
+            // Otherwise merge and deduplicate values, handling CSP keywords consistently
             values.forEach(v => {
               // Remove quotes if present, then normalize
               const unquoted = v.replace(/^'|'$/g, '');
@@ -323,7 +329,7 @@ export function createCSPHeader(cspHeader?: string | null) {
           // For custom directives not in CLERK_CSP_VALUES
           const existingValues = customDirectives.get(key) || new Set<string>();
           values.forEach(v => {
-            // Handle 'self' quoting for custom directives too
+            // Handle CSP keywords quoting for custom directives too
             const unquoted = v.replace(/^'|'$/g, '');
             existingValues.add(unquoted);
           });
@@ -337,14 +343,14 @@ export function createCSPHeader(cspHeader?: string | null) {
   const clerkDirectives = Object.entries(mergedCSP).map(
     ([key, valueSet]) =>
       `${key} ${Array.from(valueSet)
-        .map(v => (['self', 'none', 'unsafe-inline', 'unsafe-eval'].includes(v) ? `'${v}'` : v))
+        .map(v => (CSP_KEYWORDS.includes(v) ? `'${v}'` : v))
         .join(' ')}`,
   );
 
   const additionalDirectives = Array.from(customDirectives.entries()).map(
     ([key, values]) =>
       `${key} ${Array.from(values)
-        .map(v => (['self', 'none', 'unsafe-inline', 'unsafe-eval'].includes(v) ? `'${v}'` : v))
+        .map(v => (CSP_KEYWORDS.includes(v) ? `'${v}'` : v))
         .join(' ')}`,
   );
 
