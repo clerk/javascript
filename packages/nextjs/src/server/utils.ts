@@ -272,7 +272,7 @@ type CSPDirective =
 
 type CSPValues = Record<CSPDirective, string[]>;
 
-const CLERK_CSP_VALUES: CSPValues = {
+export const CLERK_CSP_VALUES: CSPValues = {
   'connect-src': ['self', 'https://trusty-krill-94.clerk.accounts.dev'],
   'default-src': ['self'],
   'form-action': ['self'],

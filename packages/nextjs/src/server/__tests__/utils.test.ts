@@ -1,63 +1,80 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCSPHeader } from '../utils';
+import { CLERK_CSP_VALUES, createCSPHeader } from '../utils';
 
 describe('createCSPHeader', () => {
-  it('should return default Clerk CSP values when no header is provided', () => {
+  it('returns default Clerk CSP values when no header is provided', () => {
     const result = createCSPHeader();
+    const resultDirectives = result.split('; ');
 
-    // Check for essential Clerk directives
-    expect(result).toContain('default-src self');
-    expect(result).toContain('connect-src self https://trusty-krill-94.clerk.accounts.dev');
-    expect(result).toContain('script-src self strict-dynamic https: http:');
-    expect(result).toContain('img-src self https://img.clerk.com');
+    // Verify all required Clerk directives are present
+    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
+      expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
+    });
   });
 
-  it('should merge custom directives with Clerk defaults', () => {
+  it('merges custom directives with Clerk defaults', () => {
     const customHeader = 'default-src none; script-src self unsafe-inline';
     const result = createCSPHeader(customHeader);
+    const resultDirectives = result.split('; ');
 
-    // Check that custom values override Clerk defaults
-    expect(result).toContain('default-src none');
-    expect(result).toContain('script-src self unsafe-inline');
+    // Verify custom values override Clerk defaults
+    expect(resultDirectives).toContain('default-src none');
+    expect(resultDirectives).toContain('script-src self unsafe-inline');
 
-    // Check that other Clerk defaults are still present
-    expect(result).toContain('connect-src self https://trusty-krill-94.clerk.accounts.dev');
-    expect(result).toContain('img-src self https://img.clerk.com');
+    // Verify other Clerk defaults remain unchanged
+    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
+      if (directive !== 'default-src' && directive !== 'script-src') {
+        expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
+      }
+    });
   });
 
-  it('should preserve custom directives not in Clerk defaults', () => {
+  it('preserves custom directives not in Clerk defaults', () => {
     const customHeader = 'custom-directive value; another-directive test';
     const result = createCSPHeader(customHeader);
+    const resultDirectives = result.split('; ');
 
-    // Check that custom directives are preserved
-    expect(result).toContain('custom-directive value');
-    expect(result).toContain('another-directive test');
+    // Verify custom directives are preserved
+    expect(resultDirectives).toContain('custom-directive value');
+    expect(resultDirectives).toContain('another-directive test');
 
-    // Check that Clerk defaults are still present
-    expect(result).toContain('default-src self');
-    expect(result).toContain('connect-src self https://trusty-krill-94.clerk.accounts.dev');
+    // Verify all Clerk defaults are present
+    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
+      expect(resultDirectives).toContain(`${directive} ${values.join(' ')}`);
+    });
   });
 
-  it('should handle multiple directives and values correctly', () => {
+  it('handles multiple directives and values correctly', () => {
     const customHeader = 'default-src none; script-src self unsafe-inline; custom-directive value';
     const result = createCSPHeader(customHeader);
+    const resultDirectives = result.split('; ');
 
-    expect(result).toContain('default-src none');
-    expect(result).toContain('script-src self unsafe-inline');
-    expect(result).toContain('custom-directive value');
+    // Verify all directives are present with correct values
+    expect(resultDirectives).toContain('default-src none');
+    expect(resultDirectives).toContain('script-src self unsafe-inline');
+    expect(resultDirectives).toContain('custom-directive value');
 
-    // All 8 default CSP directives are preserved (even when overridden) + 2 modified/custom directives
-    expect(result.split('; ')).toHaveLength(10);
+    // Verify total number of directives (Clerk defaults + custom)
+    const expectedDirectiveCount = Object.keys(CLERK_CSP_VALUES).length + 1; // +1 for custom-directive
+    expect(resultDirectives).toHaveLength(expectedDirectiveCount);
   });
 
-  it('should handle empty or invalid input gracefully', () => {
+  it('handles empty or invalid input gracefully', () => {
     const emptyResult = createCSPHeader('');
-    expect(emptyResult).toBeTruthy();
-    expect(emptyResult).toContain('default-src self');
+    const emptyDirectives = emptyResult.split('; ');
+
+    // Verify empty input returns all Clerk defaults
+    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
+      expect(emptyDirectives).toContain(`${directive} ${values.join(' ')}`);
+    });
 
     const invalidResult = createCSPHeader('invalid-directive');
-    expect(invalidResult).toBeTruthy();
-    expect(invalidResult).toContain('default-src self');
+    const invalidDirectives = invalidResult.split('; ');
+
+    // Verify invalid input returns all Clerk defaults
+    Object.entries(CLERK_CSP_VALUES).forEach(([directive, values]) => {
+      expect(invalidDirectives).toContain(`${directive} ${values.join(' ')}`);
+    });
   });
 });
