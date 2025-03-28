@@ -198,12 +198,18 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       if (options.injectCSP) {
         const existingCSP = handlerResult.headers.get('content-security-policy');
         if (existingCSP) {
-          logger.debug('Existing Content-Security-Policy header detected');
+          logger.debug('CSP - existing', () => ({
+            existingCSP,
+          }));
         }
 
-        const host = request.nextUrl.origin;
-        setHeader(handlerResult, 'Content-Security-Policy', createCSPHeader(host, existingCSP));
-        logger.debug('Clerk Content-Security-Policy header injected');
+        const csp = createCSPHeader(request.nextUrl.origin, existingCSP);
+
+        setHeader(handlerResult, 'Content-Security-Policy', csp);
+
+        logger.debug('CSP', () => ({
+          csp,
+        }));
       }
 
       // TODO @nikos: we need to make this more generic
