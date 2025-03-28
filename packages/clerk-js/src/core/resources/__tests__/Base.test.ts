@@ -35,4 +35,25 @@ describe('BaseResource', () => {
     console.dir(errResponse);
     expect(errResponse.retryAfter).toBe(60);
   });
+
+  it('does not populate retryAfter on invalid header', async () => {
+    BaseResource.clerk = {
+      // @ts-expect-error - We're not about to mock the entire FapiClient
+      getFapiClient: () => {
+        return {
+          request: jest.fn().mockResolvedValue({
+            payload: {},
+            status: 429,
+            statusText: 'Too Many Requests',
+            headers: new Headers({ 'Retry-After': 'abcd' }),
+          }),
+        };
+      },
+      __internal_setCountry: jest.fn(),
+    };
+    const resource = new TestResource();
+    const errResponse = await resource.fetch().catch(err => err);
+    console.dir(errResponse);
+    expect(errResponse.retryAfter).toBe(undefined);
+  });
 });

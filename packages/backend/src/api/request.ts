@@ -7,6 +7,7 @@ import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
+import { parse } from 'path/win32';
 
 export type ClerkBackendApiRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
@@ -185,7 +186,12 @@ function getTraceId(data: unknown, headers?: Headers): string {
 
 function getRetryAfter(headers?: Headers): number | undefined {
   const retryAfter = headers?.get('Retry-After');
-  return retryAfter ? parseInt(retryAfter, 10) : undefined;
+  if (!retryAfter) return;
+
+  const value = parseInt(retryAfter, 10);
+  if (isNaN(value)) return;
+
+  return value;
 }
 
 function parseErrors(data: unknown): ClerkAPIError[] {

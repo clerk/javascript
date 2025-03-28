@@ -131,7 +131,10 @@ export abstract class BaseResource {
       if (status === 429 && headers) {
         const retryAfter = headers.get('retry-after');
         if (retryAfter) {
-          apiResponseOptions.retryAfter = parseInt(retryAfter, 10);
+          const value = parseInt(retryAfter, 10);
+          if (!isNaN(value)) {
+            apiResponseOptions.retryAfter = value;
+          }
         }
       }
 
