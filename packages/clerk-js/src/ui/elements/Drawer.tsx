@@ -54,7 +54,7 @@ export const useDrawerContext = () => {
  * Drawer.Root
  * -----------------------------------------------------------------------------------------------*/
 
-interface DRootProps {
+interface RootProps {
   children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -86,7 +86,7 @@ function Root({
   floatingProps,
   portalProps,
   dismissProps,
-}: DRootProps) {
+}: RootProps) {
   const { refs, context } = useFloating({
     open,
     onOpenChange,
