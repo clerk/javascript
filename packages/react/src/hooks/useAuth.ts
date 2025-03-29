@@ -12,12 +12,13 @@ import { createGetToken, createSignOut } from './utils';
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
+ * <If sdk="nextjs">
+ * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
+ * </If>
+ *
  * @param [initialAuthState] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
  *
  * @example
- *
- * > [!NOTE]
- * > For frameworks like Next.js that support multiple ways of rendering its content, it might be preferable to use the [`auth()`](https://clerk.com/docs/references/nextjs/auth) helper instead of `useAuth()`. This depends on if you want to use React Server Components, SSR, or client-side rendering. Learn more in the [rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) guide. If you only want to access data on the client-side, `useAuth()` is sufficient.
  *
  * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
  *

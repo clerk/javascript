@@ -15,7 +15,7 @@ export type MultiDomainAndOrProxy =
        */
       isSatellite?: never;
       /**
-       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       * **Required for applications that run behind a reverse proxy**. The URL that Clerk will proxy requests to. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
        */
       proxyUrl?: never | string | ((url: URL) => string);
       /**
@@ -41,7 +41,7 @@ export type MultiDomainAndOrProxyPrimitives =
        */
       isSatellite?: never;
       /**
-       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       * **Required for applications that run behind a reverse proxy**. The URL that Clerk will proxy requests to. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
        */
       proxyUrl?: never | string;
       /**
@@ -63,7 +63,7 @@ export type MultiDomainAndOrProxyPrimitives =
 export type DomainOrProxyUrl =
   | {
       /**
-       * The URL that Clerk will proxy requests to. Required for applications that run behind a reverse proxy. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
+       * **Required for applications that run behind a reverse proxy**. The URL that Clerk will proxy requests to. Can be either a relative path (`/__clerk`) or a full URL (`https://<your-domain>/__clerk`).
        */
       proxyUrl?: never;
       /**

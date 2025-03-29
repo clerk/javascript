@@ -76,7 +76,7 @@ export type SignOutOptions = {
    */
   sessionId?: string;
   /**
-   * Specify a redirect URL to navigate after sign out is complete.
+   * Specify a redirect URL to navigate to after sign out is complete.
    */
   redirectUrl?: string;
 };
@@ -677,30 +677,30 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     signUpUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if identifier verification is required.
      */
     firstFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if 2FA is enabled.
      */
     secondFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if the user is required to reset their password.
      */
     resetPasswordUrl?: string;
     /**
-     * Full URL or path to navigate after an incomplete sign up.
+     * Full URL or path to navigate to after an incomplete sign up.
      */
     continueSignUpUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting email verification.
+     * Full URL or path to navigate to after requesting email verification.
      */
     verifyEmailAddressUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting phone verification.
+     * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
   };
@@ -980,14 +980,14 @@ export type RoutingOptions =
 
 export type SignInProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -1125,14 +1125,14 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
 
 export type SignUpProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -1224,7 +1224,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
@@ -1282,23 +1282,23 @@ export type UserButtonProps = UserButtonProfileMode & {
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
-   * Full URL or path to navigate after sign out is complete
+   * Full URL or path to navigate to after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterSignOutUrl?: string;
   /**
-   * Full URL or path to navigate after signing out the current user is complete.
+   * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
    * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**
-   * Full URL or path to navigate on "Add another account" action.
+   * Full URL or path to navigate to on "Add another account" action.
    * Multi-session mode only.
    */
   signInUrl?: string;
   /**
-   * Full URL or path to navigate after successful account change.
+   * Full URL or path to navigate to after successful account change.
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
@@ -1360,20 +1360,20 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     hidePersonal?: boolean;
     /**
-     * Full URL or path to navigate after a successful organization switch.
+     * Full URL or path to navigate to after a successful organization switch.
      * @default undefined
      * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
      */
     afterSwitchOrganizationUrl?: string;
     /**
-     * Full URL or path to navigate after creating a new organization.
+     * Full URL or path to navigate to after creating a new organization.
      * @default undefined
      */
     afterCreateOrganizationUrl?:
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful organization selection.
+     * Full URL or path to navigate to after a successful organization selection.
      * Accepts a function that returns URL or path
      * @default undefined`
      */
@@ -1381,7 +1381,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful selection of personal workspace.
+     * Full URL or path to navigate to after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
      * @default undefined
      */
@@ -1417,14 +1417,14 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Full URL or path to navigate after a successful organization selection.
+   * Full URL or path to navigate to after a successful organization selection.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1452,7 +1452,7 @@ export type OrganizationListProps = {
    */
   hidePersonal?: boolean;
   /**
-   * Full URL or path to navigate after a successful selection of personal workspace.
+   * Full URL or path to navigate to after a successful selection of personal workspace.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1466,7 +1466,7 @@ export type OrganizationListProps = {
 
 export type WaitlistProps = {
   /**
-   * Full URL or path to navigate after join waitlist.
+   * Full URL or path to navigate to after join waitlist.
    */
   afterJoinWaitlistUrl?: string;
   /**
@@ -1512,12 +1512,12 @@ export type __experimental_CheckoutProps = {
 
 export interface HandleEmailLinkVerificationParams {
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on completed sign up or sign in on the same device.
    */
   redirectUrlComplete?: string;
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on the same device, but not completed sign in or sign up.
    */
   redirectUrl?: string;
@@ -1626,7 +1626,7 @@ export interface AuthenticateWithGoogleOneTapParams {
 
 export interface NextTaskParams {
   /**
-   * Full URL or path to navigate after successfully resolving all tasks
+   * Full URL or path to navigate to after successfully resolving all tasks
    * @default undefined
    */
   redirectUrlComplete?: string;
