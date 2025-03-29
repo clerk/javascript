@@ -5,31 +5,50 @@ import { createCSPHeader } from '../utils';
 describe('createCSPHeader', () => {
   it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
     const result = createCSPHeader('example.com', 'custom-directive new-value;');
-
-    // Each directive should be present exactly as defined in CLERK_CSP_VALUES with special keywords quoted
-    expect(result).toContain("connect-src 'self' https://trusty-krill-94.clerk.accounts.dev");
-    expect(result).toContain("default-src 'self'");
-    expect(result).toContain("form-action 'self'");
-    expect(result).toContain("frame-src 'self' https://challenges.cloudflare.com");
-    expect(result).toContain("img-src 'self' https://img.clerk.com");
-    expect(result).toContain("style-src 'self' 'unsafe-inline'");
-    expect(result).toContain("worker-src 'self' blob:");
-
+    
+    // Split the result into individual directives for precise testing
+    const directives = result.split('; ');
+    
+    // Check each directive individually with exact matches
+    expect(directives).toContainEqual("connect-src 'self' *.clerk.accounts.dev clerk.example.com");
+    expect(directives).toContainEqual("default-src 'self'");
+    expect(directives).toContainEqual("form-action 'self'");
+    expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com");
+    expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+    expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+    expect(directives).toContainEqual("worker-src 'self' blob:");
+    expect(directives).toContainEqual("custom-directive new-value");
+    
     // script-src varies based on NODE_ENV, so we check for common values
-    expect(result).toContain("script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'");
+    const scriptSrc = directives.find(d => d.startsWith('script-src'));
+    expect(scriptSrc).toBeDefined();
+    expect(scriptSrc).toContain("'self'");
+    expect(scriptSrc).toContain("https:");
+    expect(scriptSrc).toContain("http:");
+    expect(scriptSrc).toContain("'unsafe-inline'");
+    expect(scriptSrc).toContain("'unsafe-eval'");
   });
 
-  it('includes the host in relevant CSP directives when provided', () => {
+  it('properly converts host to clerk subdomain in CSP directives', () => {
     const host = 'https://example.com';
     const result = createCSPHeader(host, '');
-
-    // Verify host is added to connect-src, img-src, and frame-src
-    expect(result).toContain(`connect-src 'self' ${host} https://trusty-krill-94.clerk.accounts.dev`);
-    expect(result).toContain(`img-src 'self' ${host} https://img.clerk.com`);
-    expect(result).toContain(`frame-src 'self' ${host} https://challenges.cloudflare.com`);
+    
+    // Split the result into individual directives for precise testing
+    const directives = result.split('; ');
+    
+    // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
+    expect(directives).toContainEqual(`connect-src 'self' *.clerk.accounts.dev clerk.example.com`);
+    expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
+    expect(directives).toContainEqual(`frame-src 'self' https://challenges.cloudflare.com`);
+    
+    // Check that other directives are present but don't contain the clerk subdomain
+    expect(directives).toContainEqual(`default-src 'self'`);
+    expect(directives).toContainEqual(`form-action 'self'`);
+    expect(directives).toContainEqual(`style-src 'self' 'unsafe-inline'`);
+    expect(directives).toContainEqual(`worker-src 'self' blob:`);
   });
 
-  it('merges and deduplicates values for common directives with special keywords quoted', () => {
+  it('merges and deduplicates values for existing directives while preserving special keywords', () => {
     const result = createCSPHeader(
       'example.com',
       `script-src 'self' new-value another-value 'unsafe-inline' 'unsafe-eval';`,
@@ -51,7 +70,7 @@ describe('createCSPHeader', () => {
     expect(values).toContain('another-value');
   });
 
-  it('adds new directives from custom CSP with special keywords quoted', () => {
+  it('correctly adds new directives from custom CSP and preserves special keyword quoting', () => {
     const result = createCSPHeader('example.com', `new-directive 'self' value1 value2 'none' 'unsafe-inline';`);
 
     // The new directive should be added exactly as specified, with special keywords quoted
@@ -64,16 +83,21 @@ describe('createCSPHeader', () => {
       `script-src new-value 'unsafe-inline'; new-directive 'self' value1 value2 'none'`,
     );
 
+    // Split the result into individual directives for precise testing
+    const directives = result.split('; ');
+
     // Verify all directives are present with their exact values, with special keywords quoted
-    expect(result).toContain("connect-src 'self' https://trusty-krill-94.clerk.accounts.dev");
-    expect(result).toContain("default-src 'self'");
-    expect(result).toContain("form-action 'self'");
-    expect(result).toContain("frame-src 'self' https://challenges.cloudflare.com");
-    expect(result).toContain("img-src 'self' https://img.clerk.com");
+    expect(directives).toContainEqual("connect-src 'self' *.clerk.accounts.dev clerk.example.com");
+    expect(directives).toContainEqual("default-src 'self'");
+    expect(directives).toContainEqual("form-action 'self'");
+    expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com");
+    expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+    expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+    expect(directives).toContainEqual("worker-src 'self' blob:");
+    expect(directives).toContainEqual("new-directive 'self' value1 value2 'none'");
 
     // Extract the script-src directive and check for each expected value individually
-    const resultDirectives = result.split('; ');
-    const scriptSrcDirective = resultDirectives.find(d => d.startsWith('script-src')) ?? '';
+    const scriptSrcDirective = directives.find(d => d.startsWith('script-src')) ?? '';
     expect(scriptSrcDirective).toBeDefined();
 
     // Verify it contains all expected values regardless of order
@@ -85,15 +109,11 @@ describe('createCSPHeader', () => {
     expect(scriptSrcValues).toContain('http:');
     expect(scriptSrcValues).toContain('new-value');
 
-    expect(result).toContain("style-src 'self' 'unsafe-inline'");
-    expect(result).toContain("worker-src 'self' blob:");
-    expect(result).toContain("new-directive 'self' value1 value2 'none'");
-
     // Verify the header format (directives separated by semicolons)
     expect(result).toMatch(/^[^;]+(; [^;]+)*$/);
   });
 
-  it('handles special keywords consistently regardless of input quoting', () => {
+  it('automatically quotes special keywords in CSP directives regardless of input format', () => {
     const result = createCSPHeader(
       'example.com',
       `
@@ -122,7 +142,7 @@ describe('createCSPHeader', () => {
     expect(newDirectiveValues).toContain("'unsafe-inline'");
   });
 
-  it('combines host with existing CSP values correctly', () => {
+  it('correctly merges clerk subdomain with existing CSP values', () => {
     const host = 'https://example.com';
     const existingCSP = `
       connect-src 'self' https://api.example.com;
@@ -131,9 +151,19 @@ describe('createCSPHeader', () => {
     `;
     const result = createCSPHeader(host, existingCSP);
 
-    // Verify host is added while preserving existing values
-    expect(result).toContain(`connect-src 'self' ${host} https://api.example.com`);
-    expect(result).toContain(`img-src 'self' ${host} https://images.example.com`);
-    expect(result).toContain(`frame-src 'self' ${host} https://frames.example.com`);
+    // Split the result into individual directives for precise testing
+    const directives = result.split('; ');
+
+    // Verify clerk subdomain is added while preserving existing values
+    // Check complete directive strings for exact matches
+    expect(directives).toContainEqual(`connect-src 'self' *.clerk.accounts.dev clerk.example.com https://api.example.com`);
+    expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com https://images.example.com`);
+    expect(directives).toContainEqual(`frame-src 'self' https://challenges.cloudflare.com https://frames.example.com`);
+    
+    // Verify other directives are present and unchanged
+    expect(directives).toContainEqual(`default-src 'self'`);
+    expect(directives).toContainEqual(`form-action 'self'`);
+    expect(directives).toContainEqual(`style-src 'self' 'unsafe-inline'`);
+    expect(directives).toContainEqual(`worker-src 'self' blob:`);
   });
 });
