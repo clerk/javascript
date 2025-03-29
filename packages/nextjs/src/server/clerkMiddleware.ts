@@ -26,6 +26,7 @@ import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
 import {
   assertKey,
+  createCSPHeader,
   decorateRequest,
   handleMultiDomainAndProxy,
   redirectAdapter,
@@ -57,6 +58,11 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * If true, additional debug information will be logged to the console.
    */
   debug?: boolean;
+
+  /**
+   * When true, automatically injects a Content-Security-Policy header compatible with Clerk.
+   */
+  injectCSP?: boolean;
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -186,6 +192,19 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
+      }
+
+      if (options.injectCSP) {
+        const csp = createCSPHeader(
+          clerkRequest.clerkUrl.toString(),
+          handlerResult.headers.get('content-security-policy'),
+        );
+
+        setHeader(handlerResult, 'Content-Security-Policy', csp);
+
+        logger.debug('CSP', () => ({
+          csp,
+        }));
       }
 
       // TODO @nikos: we need to make this more generic

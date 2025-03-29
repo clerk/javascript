@@ -259,3 +259,133 @@ function decryptData(data: string, key: string) {
   const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }
+
+type CSPDirective =
+  | 'connect-src'
+  | 'default-src'
+  | 'form-action'
+  | 'frame-src'
+  | 'img-src'
+  | 'script-src'
+  | 'style-src'
+  | 'worker-src';
+
+type CSPValues = Record<CSPDirective, string[]>;
+
+export const CLERK_CSP_DIRECTIVES: CSPValues = {
+  'connect-src': ['self'],
+  'default-src': ['self'],
+  'form-action': ['self'],
+  'frame-src': ['self', 'https://challenges.cloudflare.com'],
+  'img-src': ['self', 'https://img.clerk.com'],
+  'script-src': [
+    'self',
+    'https:',
+    'http:',
+    'unsafe-inline',
+    ...(process.env.NODE_ENV !== 'production' ? ['unsafe-eval'] : []),
+  ],
+  'style-src': ['self', 'unsafe-inline'],
+  'worker-src': ['self', 'blob:'],
+};
+
+/**
+ * Keywords that should be quoted in the CSP header.
+ * @internal
+ */
+const CSP_KEYWORDS = ['none', 'self', 'strict-dynamic', 'unsafe-eval', 'unsafe-hashes', 'unsafe-inline'];
+
+export function createCSPHeader(host: string, cspHeader?: string | null) {
+  // Start with default Clerk CSP values, converted to Sets for easier merging
+  const mergedCSP = Object.entries(CLERK_CSP_DIRECTIVES).reduce(
+    (acc, [key, values]) => {
+      acc[key as CSPDirective] = new Set(values);
+      return acc;
+    },
+    {} as Record<CSPDirective, Set<string>>,
+  );
+  const customDirectives = new Map<string, Set<string>>();
+
+  const parsedHost = parseHost(host);
+
+  // Add host to connect-src, img-src, and frame-src
+  mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(parsedHost);
+
+  // Parse and merge custom CSP values if provided
+  if (cspHeader) {
+    const directives = parseCSPHeader(cspHeader);
+    directives.forEach(directive => {
+      const [key, ...values] = directive.split(' ');
+      if (key && values.length > 0) {
+        if (key in CLERK_CSP_DIRECTIVES) {
+          // For existing directives in CLERK_CSP_VALUES
+          if (values.includes('none')) {
+            // If 'none' is specified, it overrides all other values
+            mergedCSP[key as CSPDirective] = new Set(['none']);
+          } else {
+            // Otherwise merge and deduplicate values, handling CSP keywords consistently
+            values.forEach(v => {
+              // Remove quotes if present, then normalize
+              const unquoted = v.replace(/^'|'$/g, '');
+              mergedCSP[key as CSPDirective].add(unquoted);
+            });
+          }
+        } else {
+          // For custom directives not in CLERK_CSP_VALUES
+          const existingValues = customDirectives.get(key) || new Set<string>();
+          values.forEach(v => {
+            // Handle CSP keywords quoting for custom directives too
+            const unquoted = v.replace(/^'|'$/g, '');
+            existingValues.add(unquoted);
+          });
+          customDirectives.set(key, existingValues);
+        }
+      }
+    });
+  }
+
+  // Convert merged CSP Sets back to arrays for output
+  const clerkDirectives = Object.entries(mergedCSP).map(
+    ([key, valueSet]) =>
+      `${key} ${Array.from(valueSet)
+        .map(v => (CSP_KEYWORDS.includes(v) ? `'${v}'` : v))
+        .join(' ')}`,
+  );
+
+  const additionalDirectives = Array.from(customDirectives.entries()).map(
+    ([key, values]) =>
+      `${key} ${Array.from(values)
+        .map(v => (CSP_KEYWORDS.includes(v) ? `'${v}'` : v))
+        .join(' ')}`,
+  );
+
+  // Join all directives with semicolons
+  return [...clerkDirectives, ...additionalDirectives].join('; ');
+}
+
+function parseHost(input: string): string {
+  let hostname = input;
+  try {
+    if (input.startsWith('http://') || input.startsWith('https://')) {
+      hostname = new URL(input).hostname;
+    }
+  } catch {
+    // If URL parsing fails, assume input is already a hostname
+    hostname = input;
+  }
+  const parts = hostname.split('.');
+  if (parts.length >= 2) {
+    // Retain only the last two segments (domain and TLD) and add the 'clerk' subdomain
+    hostname = 'clerk.' + parts.slice(-2).join('.');
+  }
+  return hostname;
+}
+
+function parseCSPHeader(cspHeader?: string) {
+  return cspHeader
+    ? cspHeader
+        .split(';')
+        .map(directive => directive.trim())
+        .filter(Boolean)
+    : [];
+}
