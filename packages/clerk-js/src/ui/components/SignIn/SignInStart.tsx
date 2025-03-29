@@ -20,6 +20,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
@@ -480,7 +481,10 @@ function SignInStartInternal(): JSX.Element {
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                   </Col>
-                  <Form.SubmitButton hasArrow />
+                  <Col center>
+                    <CaptchaElement />
+                    <Form.SubmitButton hasArrow />
+                  </Col>
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
@@ -494,6 +498,7 @@ function SignInStartInternal(): JSX.Element {
                   />
                 </Card.Action>
               )}
+            {!standardFormAttributes.length && <CaptchaElement />}
           </Col>
         </Card.Content>
         <Card.Footer>
