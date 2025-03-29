@@ -99,6 +99,7 @@ export const auth: AuthFn = async () => {
       publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
       signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
       signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
+      sessionStatus: authObject.sessionStatus,
     }).redirectToSignIn({
       returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
     });

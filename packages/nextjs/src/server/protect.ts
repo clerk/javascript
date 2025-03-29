@@ -91,6 +91,13 @@ export function createProtect(opts: {
     };
 
     /**
+     * User has with pending session status, indicating tasks to resolve
+     */
+    if (authObject.sessionStatus === 'pending') {
+      return handleUnauthenticated();
+    }
+
+    /**
      * User is not authenticated
      */
     if (!authObject.userId) {

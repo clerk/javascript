@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
@@ -38,6 +38,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         email: fakeUser.email,
         password: fakeUser.password,
       });
+      await u.po.expect.toBeSignedIn();
+
+      // Redirects back to tasks when accessing protected route by `auth.protect`
+      await u.page.goToRelative('/page-protected');
+      expect(page.url()).toContain('tasks');
 
       // Resolves task
       await u.po.sessionTask.resolveForceOrganizationSelectionTask(fakeOrganization);
