@@ -41,7 +41,7 @@ export function PricingTableMatrix({
   const pricingTableMatrixId = React.useId();
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
-  const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
+  const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
       : 'none',
@@ -258,7 +258,7 @@ export function PricingTableMatrix({
                                     display: 'grid',
                                     gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
                                   }),
-                                  planCardFeePeriodNoticeAnimation,
+                                  feePeriodNoticeAnimation,
                                 ]}
                                 // @ts-ignore - Needed until React 19 support
                                 inert={planPeriod !== 'annual' ? 'true' : undefined}

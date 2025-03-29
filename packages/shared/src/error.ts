@@ -25,6 +25,7 @@ interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
   clerkTraceId?: string;
+  retryAfter?: number;
 }
 
 // For a comprehensive Metamask error list, please see
@@ -119,10 +120,11 @@ export class ClerkAPIResponseError extends Error {
   status: number;
   message: string;
   clerkTraceId?: string;
+  retryAfter?: number;
 
   errors: ClerkAPIError[];
 
-  constructor(message: string, { data, status, clerkTraceId }: ClerkAPIResponseOptions) {
+  constructor(message: string, { data, status, clerkTraceId, retryAfter }: ClerkAPIResponseOptions) {
     super(message);
 
     Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
@@ -130,6 +132,7 @@ export class ClerkAPIResponseError extends Error {
     this.status = status;
     this.message = message;
     this.clerkTraceId = clerkTraceId;
+    this.retryAfter = retryAfter;
     this.clerkError = true;
     this.errors = parseErrors(data);
   }

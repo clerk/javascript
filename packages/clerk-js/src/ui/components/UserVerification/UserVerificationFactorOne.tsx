@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { useEnvironment } from '../../contexts';
@@ -29,6 +29,13 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
+  'password',
+  'email_code',
+  'phone_code',
+  'passkey',
+] as const;
+
 export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
@@ -39,7 +46,11 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const sessionVerification = data!;
 
   const availableFactors = useMemo(() => {
-    return sessionVerification.supportedFirstFactors?.sort(sortByPrimaryFactor) || null;
+    return (
+      sessionVerification.supportedFirstFactors
+        ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        ?.sort(sortByPrimaryFactor) || null
+    );
   }, [sessionVerification.supportedFirstFactors]);
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
 

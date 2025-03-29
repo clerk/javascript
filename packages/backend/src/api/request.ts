@@ -38,6 +38,7 @@ export type ClerkBackendApiResponse<T> =
       clerkTraceId?: string;
       status?: number;
       statusText?: string;
+      retryAfter?: number;
     };
 
 export type RequestFunction = ReturnType<typeof buildRequest>;
@@ -135,6 +136,7 @@ export function buildRequest(options: BuildRequestOptions) {
           status: res?.status,
           statusText: res?.statusText,
           clerkTraceId: getTraceId(responseBody, res?.headers),
+          retryAfter: getRetryAfter(res?.headers),
         };
       }
 
@@ -162,6 +164,7 @@ export function buildRequest(options: BuildRequestOptions) {
         status: res?.status,
         statusText: res?.statusText,
         clerkTraceId: getTraceId(err, res?.headers),
+        retryAfter: getRetryAfter(res?.headers),
       };
     }
   };
@@ -180,6 +183,16 @@ function getTraceId(data: unknown, headers?: Headers): string {
   return cfRay || '';
 }
 
+function getRetryAfter(headers?: Headers): number | undefined {
+  const retryAfter = headers?.get('Retry-After');
+  if (!retryAfter) return;
+
+  const value = parseInt(retryAfter, 10);
+  if (isNaN(value)) return;
+
+  return value;
+}
+
 function parseErrors(data: unknown): ClerkAPIError[] {
   if (!!data && typeof data === 'object' && 'errors' in data) {
     const errors = data.errors as ClerkAPIErrorJSON[];
@@ -193,7 +206,7 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 // TODO(dimkl): Will be probably be dropped in next major version
 function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
   return async (...args) => {
-    const { data, errors, totalCount, status, statusText, clerkTraceId } = await cb(...args);
+    const { data, errors, totalCount, status, statusText, clerkTraceId, retryAfter } = await cb(...args);
     if (errors) {
       // instead of passing `data: errors`, we have set the `error.errors` because
       // the errors returned from callback is already parsed and passing them as `data`
@@ -202,6 +215,7 @@ function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
         data: [],
         status,
         clerkTraceId,
+        retryAfter,
       });
       error.errors = errors;
       throw error;

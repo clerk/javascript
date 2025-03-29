@@ -65,6 +65,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     {
       name: 'signIn.prepareFirstFactor',
       factor: props.factor,
+      id: signIn.id,
     },
     {
       staleTime: 100,

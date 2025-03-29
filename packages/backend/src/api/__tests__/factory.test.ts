@@ -152,6 +152,38 @@ describe('api.client', () => {
     expect(errResponse.clerkTraceId).toBe('mock_cf_ray');
   });
 
+  it('executes a failed backend API request and includes Retry-After header', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json({ errors: [] }, { status: 429, headers: { 'retry-after': '123' } });
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(429);
+    expect(errResponse.retryAfter).toBe(123);
+  });
+
+  it('executes a failed backend API request and ignores invalid Retry-After header', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json({ errors: [] }, { status: 429, headers: { 'retry-after': 'abc' } });
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(429);
+    expect(errResponse.retryAfter).toBe(undefined);
+  });
+
   it('executes a successful backend API request to delete a domain', async () => {
     const DOMAIN_ID = 'dmn_123';
     server.use(
