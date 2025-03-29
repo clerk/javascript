@@ -1,14 +1,29 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createCSPHeader } from '../utils';
 
+// Mock process.env
+vi.mock('process', () => ({
+  env: {
+    NODE_ENV: 'test',
+  },
+}));
+
 describe('createCSPHeader', () => {
+  beforeEach(() => {
+    vi.stubEnv('NODE_ENV', 'test');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
     const result = createCSPHeader('example.com', 'custom-directive new-value;');
-    
+
     // Split the result into individual directives for precise testing
     const directives = result.split('; ');
-    
+
     // Check each directive individually with exact matches
     expect(directives).toContainEqual("connect-src 'self' *.clerk.accounts.dev clerk.example.com");
     expect(directives).toContainEqual("default-src 'self'");
@@ -17,30 +32,72 @@ describe('createCSPHeader', () => {
     expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
     expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
     expect(directives).toContainEqual("worker-src 'self' blob:");
-    expect(directives).toContainEqual("custom-directive new-value");
-    
+    expect(directives).toContainEqual('custom-directive new-value');
+
     // script-src varies based on NODE_ENV, so we check for common values
     const scriptSrc = directives.find(d => d.startsWith('script-src'));
     expect(scriptSrc).toBeDefined();
     expect(scriptSrc).toContain("'self'");
-    expect(scriptSrc).toContain("https:");
-    expect(scriptSrc).toContain("http:");
+    expect(scriptSrc).toContain('https:');
+    expect(scriptSrc).toContain('http:');
     expect(scriptSrc).toContain("'unsafe-inline'");
+    // 'unsafe-eval' depends on NODE_ENV, so we verify conditionally
+    if (process.env.NODE_ENV !== 'production') {
+      expect(scriptSrc).toContain("'unsafe-eval'");
+    }
+  });
+
+  it('includes script-src with development-specific values when NODE_ENV is not production', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+
+    const result = createCSPHeader('example.com', '');
+    const directives = result.split('; ');
+
+    const scriptSrc = directives.find(d => d.startsWith('script-src'));
+    expect(scriptSrc).toBeDefined();
+
+    // In development, script-src should include 'unsafe-eval'
     expect(scriptSrc).toContain("'unsafe-eval'");
+    expect(scriptSrc).toContain("'self'");
+    expect(scriptSrc).toContain('https:');
+    expect(scriptSrc).toContain('http:');
+    expect(scriptSrc).toContain("'unsafe-inline'");
+  });
+
+  it('includes script-src without unsafe-eval when NODE_ENV is production', () => {
+    // Mock NODE_ENV as production
+    vi.stubEnv('NODE_ENV', 'production');
+
+    const result = createCSPHeader('example.com', '');
+    const directives = result.split('; ');
+
+    // Extract the script-src directive
+    const scriptSrc = directives.find(d => d.startsWith('script-src'));
+    expect(scriptSrc).toBeDefined();
+
+    // In production, script-src should NOT include 'unsafe-eval'
+    // Since we're looking at the implementation, we know 'unsafe-eval' is only added when NOT in production
+    // From lines 281-287 of utils.ts, we can see that 'unsafe-eval' is present in all environments except production
+    expect(scriptSrc).toContain("'self'");
+    expect(scriptSrc).toContain('https:');
+    expect(scriptSrc).toContain('http:');
+    expect(scriptSrc).toContain("'unsafe-inline'");
+    // In this case we're not checking for absence because the actual implementation always includes it
+    expect(scriptSrc).not.toContain("'unsafe-eval'");
   });
 
   it('properly converts host to clerk subdomain in CSP directives', () => {
     const host = 'https://example.com';
     const result = createCSPHeader(host, '');
-    
+
     // Split the result into individual directives for precise testing
     const directives = result.split('; ');
-    
+
     // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
     expect(directives).toContainEqual(`connect-src 'self' *.clerk.accounts.dev clerk.example.com`);
     expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
     expect(directives).toContainEqual(`frame-src 'self' https://challenges.cloudflare.com`);
-    
+
     // Check that other directives are present but don't contain the clerk subdomain
     expect(directives).toContainEqual(`default-src 'self'`);
     expect(directives).toContainEqual(`form-action 'self'`);
@@ -156,10 +213,12 @@ describe('createCSPHeader', () => {
 
     // Verify clerk subdomain is added while preserving existing values
     // Check complete directive strings for exact matches
-    expect(directives).toContainEqual(`connect-src 'self' *.clerk.accounts.dev clerk.example.com https://api.example.com`);
+    expect(directives).toContainEqual(
+      `connect-src 'self' *.clerk.accounts.dev clerk.example.com https://api.example.com`,
+    );
     expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com https://images.example.com`);
     expect(directives).toContainEqual(`frame-src 'self' https://challenges.cloudflare.com https://frames.example.com`);
-    
+
     // Verify other directives are present and unchanged
     expect(directives).toContainEqual(`default-src 'self'`);
     expect(directives).toContainEqual(`form-action 'self'`);
