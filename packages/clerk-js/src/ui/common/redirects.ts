@@ -54,6 +54,10 @@ export function buildSSOCallbackURL(
   ctx: Partial<SignInContextType | SignUpContextType>,
   baseUrl: string | undefined = '',
 ): string {
+  if ('ssoCallbackUrl' in ctx && ctx.ssoCallbackUrl) {
+    return ctx.ssoCallbackUrl;
+  }
+
   const { routing, authQueryString, path } = ctx;
   return buildRedirectUrl({
     routing,
