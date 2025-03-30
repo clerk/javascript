@@ -77,6 +77,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               as='h2'
               textVariant='h2'
             >
+              {/* TODO(@COMMERCE): needs localization */}
               Payment was successful!
             </Heading>
             <Text

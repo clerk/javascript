@@ -13,6 +13,7 @@ export const enUS: LocalizationResource = {
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
+  badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
   badge__requiresAction: 'Requires action',
@@ -668,6 +669,14 @@ export const enUS: LocalizationResource = {
         headerTitle__plans: 'Plans',
       },
       title: 'Billing & Payments',
+      paymentSourcesSection: {
+        title: 'Available options',
+        addButton: 'Add new payment source',
+        saveButton: 'Save Payment Information',
+        cancelButton: 'Cancel',
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+      },
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',

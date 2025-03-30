@@ -6,48 +6,25 @@ import type {
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Form, Icon, Text, useAppearance } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, Icon, Text } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
-import { handleError, normalizeColorString } from '../../utils';
+import { handleError } from '../../utils';
+import { AddPaymentSource } from '../Commerce';
 
 export const CheckoutForm = ({
-  stripe,
   checkout,
   onCheckoutComplete,
 }: {
-  stripe: Stripe | null;
   checkout: __experimental_CommerceCheckoutResource;
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals } = checkout;
-  const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
-  const elementsAppearance: StripeAppearance = {
-    variables: {
-      colorPrimary: normalizeColorString(colors.$primary500),
-      colorBackground: normalizeColorString(colors.$colorInputBackground),
-      colorText: normalizeColorString(colors.$colorText),
-      colorTextSecondary: normalizeColorString(colors.$colorTextSecondary),
-      colorSuccess: normalizeColorString(colors.$success500),
-      colorDanger: normalizeColorString(colors.$danger500),
-      colorWarning: normalizeColorString(colors.$warning500),
-      fontWeightNormal: fontWeights.$normal.toString(),
-      fontWeightMedium: fontWeights.$medium.toString(),
-      fontWeightBold: fontWeights.$bold.toString(),
-      fontSizeXl: fontSizes.$xl,
-      fontSizeLg: fontSizes.$lg,
-      fontSizeSm: fontSizes.$md,
-      fontSizeXs: fontSizes.$sm,
-      borderRadius: radii.$md,
-      spacingUnit: space.$1,
-    },
-  };
+
   return (
     <Drawer.Body>
       <Box
@@ -95,17 +72,10 @@ export const CheckoutForm = ({
         </LineItems.Root>
       </Box>
 
-      {stripe && (
-        <Elements
-          stripe={stripe}
-          options={{ clientSecret: checkout.externalClientSecret, appearance: elementsAppearance }}
-        >
-          <CheckoutFormElements
-            checkout={checkout}
-            onCheckoutComplete={onCheckoutComplete}
-          />
-        </Elements>
-      )}
+      <CheckoutFormElements
+        checkout={checkout}
+        onCheckoutComplete={onCheckoutComplete}
+      />
     </Drawer.Body>
   );
 };
@@ -117,8 +87,6 @@ const CheckoutFormElements = ({
   checkout: __experimental_CommerceCheckoutResource;
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
-  const stripe = useStripe();
-  const elements = useElements();
   const { __experimental_commerce } = useClerk();
   const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
   const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState(true);
@@ -160,39 +128,8 @@ const CheckoutFormElements = ({
     }
   };
 
-  const onStripeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!stripe || !elements) {
-      return;
-    }
-    setIsSubmitting(true);
-    setSubmitError(undefined);
-
-    try {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error) {
-        return;
-      }
-
-      const paymentSource = await __experimental_commerce.addPaymentSource({
-        gateway: 'stripe',
-        paymentMethod: 'card',
-        paymentToken: setupIntent.payment_method as string,
-      });
-
-      await confirmCheckout({ paymentSourceId: paymentSource.id });
-    } catch (error) {
-      console.log(error);
-      handleError(error, [], setSubmitError);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
+    await confirmCheckout({ paymentSourceId: paymentSource.id });
   };
 
   return (
@@ -241,11 +178,11 @@ const CheckoutFormElements = ({
         {/* TODO(@Commerce): needs localization */}
         <Disclosure.Trigger text='Add a New Payment Source' />
         <Disclosure.Content>
-          <StripePaymentMethods
-            totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
-            onStripeSubmit={onStripeSubmit}
+          <AddPaymentSource
+            checkout={checkout}
+            onSuccess={onAddPaymentSourceSuccess}
             onExpand={didExpandStripePaymentMethods}
-            isSubmitting={isSubmitting}
+            submitButtonText={`Pay ${(checkout.totals.totalDueNow || checkout.totals.grandTotal).currencySymbol}${(checkout.totals.totalDueNow || checkout.totals.grandTotal).amountFormatted}`}
           />
         </Disclosure.Content>
       </Disclosure.Root>
@@ -345,97 +282,6 @@ const PaymentSourceMethods = ({
         Pay {totalDueNow.currencySymbol}
         {totalDueNow.amountFormatted}
       </Button>
-    </Form>
-  );
-};
-
-const StripePaymentMethods = ({
-  totalDueNow,
-  onStripeSubmit,
-  onExpand,
-  isSubmitting,
-}: {
-  totalDueNow: __experimental_CommerceMoney;
-  onStripeSubmit: React.FormEventHandler<HTMLFormElement>;
-  onExpand: () => void;
-  isSubmitting: boolean;
-}) => {
-  const [collapsed, setCollapsed] = useState(true);
-
-  useEffect(() => {
-    if (!collapsed) {
-      onExpand();
-    }
-  }, [collapsed, onExpand]);
-
-  return (
-    <Form
-      onSubmit={onStripeSubmit}
-      sx={t => ({
-        display: 'flex',
-        flexDirection: 'column',
-        rowGap: t.space.$3,
-      })}
-    >
-      {collapsed ? (
-        <>
-          <Button
-            elementId={descriptors.button.setId('applePay')}
-            variant='unstyled'
-            size='md'
-            textVariant={'buttonLarge'}
-            sx={{
-              width: '100%',
-              backgroundColor: 'black',
-              color: 'white',
-            }}
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Pay with ApplePay
-          </Button>
-          <Button
-            elementId={descriptors.button.setId('gPay')}
-            variant='unstyled'
-            size='md'
-            textVariant={'buttonLarge'}
-            block
-            sx={{
-              backgroundColor: 'black',
-              color: 'white',
-            }}
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Pay with GPay
-          </Button>
-          <Button
-            colorScheme='secondary'
-            variant='bordered'
-            size='md'
-            textVariant={'buttonLarge'}
-            block
-            onClick={() => setCollapsed(false)}
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            More Payment Methods
-          </Button>
-        </>
-      ) : (
-        <>
-          <PaymentElement />
-          <Button
-            type='submit'
-            colorScheme='primary'
-            size='sm'
-            textVariant={'buttonLarge'}
-            block
-            isLoading={isSubmitting}
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Pay {totalDueNow.currencySymbol}
-            {totalDueNow.amountFormatted}
-          </Button>
-        </>
-      )}
     </Form>
   );
 };

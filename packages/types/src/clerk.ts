@@ -5,6 +5,7 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PaymentSourcesTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
@@ -1508,6 +1509,11 @@ export type __experimental_CheckoutProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   orgId?: string;
   onSubscriptionComplete?: () => void;
+};
+
+export type __experimental_PaymentSourcesProps = {
+  appearance?: PaymentSourcesTheme;
+  orgId?: string;
 };
 
 export interface HandleEmailLinkVerificationParams {

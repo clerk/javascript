@@ -88,6 +88,7 @@ type _LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
+  badge__expired: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -660,6 +661,14 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
         headerTitle__paymentSources: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        addButton: LocalizationValue;
+        saveButton: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
       };
     };
   };
