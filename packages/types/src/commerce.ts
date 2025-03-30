@@ -90,6 +90,7 @@ export interface __experimental_CommercePaymentSourceResource extends ClerkResou
   cardType: string;
   isDefault: boolean;
   status: __experimental_CommercePaymentSourceStatus;
+  remove: () => Promise<DeletedObjectResource>;
 }
 
 export interface __experimental_CommerceInitializedPaymentSourceResource extends ClerkResource {

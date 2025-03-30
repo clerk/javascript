@@ -4,9 +4,10 @@ import type {
   __experimental_CommercePaymentSourceJSON,
   __experimental_CommercePaymentSourceResource,
   __experimental_CommercePaymentSourceStatus,
+  DeletedObjectJSON,
 } from '@clerk/types';
 
-import { BaseResource } from './internal';
+import { BaseResource, DeletedObject } from './internal';
 
 export class __experimental_CommercePaymentSource
   extends BaseResource
@@ -36,6 +37,17 @@ export class __experimental_CommercePaymentSource
     this.isDefault = false;
     this.status = data.status;
     return this;
+  }
+
+  public async remove() {
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/payment_sources/${this.id}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
   }
 }
 

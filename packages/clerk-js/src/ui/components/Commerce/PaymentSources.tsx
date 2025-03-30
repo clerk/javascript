@@ -7,6 +7,7 @@ import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
 import { CreditCard } from '../../icons';
+import { handleError } from '../../utils';
 import { AddPaymentSource } from './AddPaymentSource';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
@@ -97,7 +98,10 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
                       />
                     )}
                   </Flex>
-                  <PaymentSourceMenu paymentSource={paymentSource} />
+                  <PaymentSourceMenu
+                    paymentSource={paymentSource}
+                    revalidate={revalidate}
+                  />
                 </ProfileSection.Item>
               ))}
               <Action.Trigger value='add'>
@@ -121,17 +125,31 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
   );
 };
 
-const PaymentSourceMenu = ({ paymentSource }: { paymentSource: __experimental_CommercePaymentSourceResource }) => {
+const PaymentSourceMenu = ({
+  paymentSource,
+  revalidate,
+}: {
+  paymentSource: __experimental_CommercePaymentSourceResource;
+  revalidate: () => void;
+}) => {
   const card = useCardState();
-  const { __experimental_commerce } = useClerk();
+
+  const removePaymentSource = async () => {
+    await paymentSource
+      .remove()
+      .then(() => {
+        revalidate();
+      })
+      .catch((error: Error) => {
+        handleError(error, [], card.setError);
+      });
+  };
 
   const actions = [
     {
       label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
-      onClick: () => {
-        // TODO: Implement remove payment source
-      },
+      onClick: removePaymentSource,
     },
   ];
 
