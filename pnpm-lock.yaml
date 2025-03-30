@@ -352,7 +352,7 @@ importers:
         version: 0.11.3
     devDependencies:
       astro:
-        specifier: ^5.5.3
+        specifier: ^5.5.5
         version: 5.5.5(@types/node@22.13.10)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.36.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.2)(yaml@2.7.0)
 
   packages/backend:
