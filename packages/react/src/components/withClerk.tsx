@@ -20,6 +20,8 @@ export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
 
     const clerk = useIsomorphicClerkContext();
 
+    console.log('[withClerk]', clerk.loaded);
+
     if (!clerk.loaded && !options?.renderWhileLoading) {
       return null;
     }

@@ -3,7 +3,7 @@
 export {
   ClerkLoaded,
   ClerkLoading,
-  ClerkLifecycle,
+  ClerkStatus,
   SignedOut,
   SignedIn,
   Protect,

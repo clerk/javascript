@@ -1,6 +1,7 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
+  Clerk as ClerkInterface,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -39,19 +40,21 @@ type PropsWithChildrenFunction<P, T> = P & {
   children?: React.ReactNode | ((item: T) => React.ReactNode);
 };
 
-export const ClerkLifecycle = ({
+export const ClerkStatus = ({
   status,
   children,
 }: PropsWithChildrenFunction<
-  { status?: 'loading' | 'loading-failed' | 'ready' | 'degraded' },
-  'loading' | 'loading-failed' | 'ready' | 'degraded'
+  {
+    status?: ClerkInterface['status'];
+  },
+  ClerkInterface['status']
 >) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  const toRender = typeof children === 'function' ? children(isomorphicClerk.lifecycleState) : children;
+  const toRender = typeof children === 'function' ? children(isomorphicClerk.status) : children;
 
-  if (isomorphicClerk.lifecycleState === status && !!status) {
+  if (isomorphicClerk.status === status && !!status) {
     return status ? toRender : null;
   }
 

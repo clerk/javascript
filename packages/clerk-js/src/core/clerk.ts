@@ -66,6 +66,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  StatusListenerCallback,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -200,8 +201,10 @@ export class Clerk implements ClerkInterface {
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
   #loaded = false;
+  #status: ClerkInterface['status'] = 'loading';
 
   #listeners: Array<(emission: Resources) => void> = [];
+  #statusListeners: Array<(status: Clerk['status']) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
@@ -246,8 +249,16 @@ export class Clerk implements ClerkInterface {
     return Clerk.sdkMetadata;
   }
 
+  /**
+   * @deprecated
+   */
   get loaded(): boolean {
-    return this.#loaded;
+    return this.status === 'degraded' || this.status === 'ready';
+    // return this.#loaded;
+  }
+
+  get status(): ClerkInterface['status'] {
+    return this.#status;
   }
 
   get isSatellite(): boolean {
@@ -1162,6 +1173,30 @@ export class Clerk implements ClerkInterface {
       this.#listeners = this.#listeners.filter(l => l !== listener);
     };
     return unsubscribe;
+  };
+
+  public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
+    console.log('[addStatusListener js]', listener);
+    this.#statusListeners.push(listener);
+    // emit instantly
+    listener(this.status);
+
+    return () => {
+      this.#statusListeners = this.#statusListeners.filter(l => l !== listener);
+    };
+  };
+
+  public __internal_setStatus = (status: Clerk['status'], opts = { notify: true }): void => {
+    console.log('[__internal_setStatus js]', status);
+    this.#status = status;
+    if (!opts?.notify) {
+      return;
+    }
+
+    for (const listener of this.#statusListeners) {
+      console.log('__internal_setStatus notifying', listener);
+      listener(status);
+    }
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2110,6 +2145,8 @@ export class Clerk implements ClerkInterface {
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
+    let initializationDegradedCounter = 0;
+
     let retries = 0;
     while (retries < 2) {
       retries++;
@@ -2121,6 +2158,7 @@ export class Clerk implements ClerkInterface {
             this.updateEnvironment(res);
           })
           .catch(e => {
+            ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
               null,
@@ -2145,6 +2183,8 @@ export class Clerk implements ClerkInterface {
                 // bubble it up
                 throw e;
               }
+
+              ++initializationDegradedCounter;
 
               const jwtInCookie = this.#authService?.getSessionCookie();
               const localClient = createClientFromJwt(jwtInCookie);
@@ -2229,6 +2269,14 @@ export class Clerk implements ClerkInterface {
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
+
+    console.log('[initializationDegradedCounter]', initializationDegradedCounter);
+    if (initializationDegradedCounter > 0) {
+      this.__internal_setStatus('degraded');
+      // `status === "degraded"` means `loaded === false`
+      return false;
+    }
+    this.__internal_setStatus('ready');
     return true;
   };
 

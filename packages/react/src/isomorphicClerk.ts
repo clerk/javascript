@@ -36,6 +36,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  StatusListenerCallback,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -100,8 +101,8 @@ type IsomorphicLoadedClerk = Without<
   __experimental_commerce: __experimental_CommerceNamespace | undefined;
 };
 
-type LifecycleStatus = 'loading' | 'loading-failed' | 'ready' | 'degraded';
-type InternalLifecycleStatus = LifecycleStatus | 'loaded';
+// type LifecycleStatus = 'loading' | 'loading-failed' | 'ready' | 'degraded';
+// type InternalLifecycleStatus = LifecycleStatus | 'loaded';
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
@@ -135,12 +136,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nativeUnsubscribe?: UnsubscribeCallback;
     }
   >();
-  private loadedListeners: Array<() => void> = [];
-  private lifecycleListeners: Array<(status: LifecycleStatus) => void> = [];
-  private internalLifecycleListeners: Array<(status: InternalLifecycleStatus) => void> = [];
 
-  lifecycleState: LifecycleStatus = 'loading';
-  internalLifecycleState: InternalLifecycleStatus = 'loading';
+  private premountAddStatusListenerCalls = new Map<
+    StatusListenerCallback,
+    {
+      unsubscribe: UnsubscribeCallback;
+      nativeUnsubscribe?: UnsubscribeCallback;
+    }
+  >();
+  private loadedListeners: Array<() => void> = [];
+  // private statusListeners: Array<(status: Clerk['status']) => void> = [];
+  // private internalLifecycleListeners: Array<(status: InternalLifecycleStatus) => void> = [];
+
+  #status: Clerk['status'] = 'loading';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
@@ -153,11 +161,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    * @deprecated
    */
   get loaded(): boolean {
-    return this.lifecycleState === 'ready';
+    return this.clerkjs?.loaded || false;
   }
 
   private get scriptLLoaded(): boolean {
-    return this.internalLifecycleState === 'ready';
+    return this.loaded;
+    // return this.status === 'ready';
+  }
+
+  get status(): Clerk['status'] {
+    return this.clerkjs?.status || this.#status;
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -373,7 +386,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
-    if (this.mode !== 'browser' || this.lifecycleState === 'ready') {
+    if (this.mode !== 'browser' || this.status === 'ready') {
       return;
     }
 
@@ -405,12 +418,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             domain: this.domain,
           } as any);
 
-          this.setLifecycleAndNotify('loaded');
+          // this.setLifecycleAndNotify('loaded');
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
-          this.setLifecycleAndNotify('loaded');
+          // this.setLifecycleAndNotify('loaded');
           if (!c.loaded) {
             await c.load(this.options);
           }
@@ -432,53 +445,60 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         if (!global.Clerk) {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
-        this.setLifecycleAndNotify('loaded');
+        // this.setLifecycleAndNotify('loaded');
         await global.Clerk.load(this.options);
       }
 
-      if (global.Clerk?.loaded) {
-        return this.hydrateClerkJS(global.Clerk);
-      }
-      return;
+      // if (['ready', 'degraded'].includes(global.Clerk?.status || '') || global.Clerk?.loaded) {
+      return this.hydrateClerkJS(global.Clerk);
+      // }
+      // return;
     } catch (err) {
       const error = err as Error;
-      this.setLifecycleAndNotify('loading-failed');
+      this.__internal_setStatus('error');
       console.error(error.stack || error.message || error);
       return;
     }
   }
 
-  public setLifecycleAndNotify = (status: InternalLifecycleStatus) => {
-    this.internalLifecycleState = status;
-    for (const listener of this.internalLifecycleListeners) {
-      listener(status);
-    }
-
-    if (status === 'loaded') {
-      return;
-    }
-
-    this.lifecycleState = status;
-    for (const listener of this.lifecycleListeners) {
-      listener(status);
+  public __internal_setStatus = (status: Clerk['status']) => {
+    console.log('[__internal_setStatus]', status);
+    if (this.clerkjs) {
+      return this.clerkjs.__internal_setStatus?.(status);
+    } else {
+      this.#status = status;
+      for (const listener of this.premountAddStatusListenerCalls.keys()) {
+        listener(status);
+      }
     }
   };
 
-  public onLifecycle = (listener: (status: LifecycleStatus) => void) => {
-    this.lifecycleListeners.push(listener);
-    listener(this.lifecycleState);
-    return () => {
-      this.lifecycleListeners = this.lifecycleListeners.filter(l => l !== listener);
-    };
+  public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
+    // notify immediately
+    listener(this.status);
+    if (this.clerkjs) {
+      return this.clerkjs.addStatusListener?.(listener);
+    } else {
+      listener(this.status);
+      const unsubscribe = () => {
+        const listenerHandlers = this.premountAddStatusListenerCalls.get(listener);
+        if (listenerHandlers) {
+          listenerHandlers.nativeUnsubscribe?.();
+          this.premountAddStatusListenerCalls.delete(listener);
+        }
+      };
+      this.premountAddStatusListenerCalls.set(listener, { unsubscribe, nativeUnsubscribe: undefined });
+      return unsubscribe;
+    }
   };
 
-  public internalOnLifecycle = (listener: (status: InternalLifecycleStatus) => void) => {
-    this.internalLifecycleListeners.push(listener);
-    listener(this.internalLifecycleState);
-    return () => {
-      this.internalLifecycleListeners = this.internalLifecycleListeners.filter(l => l !== listener);
-    };
-  };
+  // public internalOnLifecycle = (listener: (status: InternalLifecycleStatus) => void) => {
+  //   this.internalLifecycleListeners.push(listener);
+  //   listener(this.internalLifecycleState);
+  //   return () => {
+  //     this.internalLifecycleListeners = this.internalLifecycleListeners.filter(l => l !== listener);
+  //   };
+  // };
 
   /**
    * @deprecated
@@ -497,11 +517,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    * @deprecated
    */
   public emitLoaded = () => {
+    console.log('emit loaded');
     this.loadedListeners.forEach(cb => cb());
     this.loadedListeners = [];
   };
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+    console.log('hydrateClerkJS');
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
@@ -511,6 +533,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
       listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
+    });
+    console.log('....hydrating');
+
+    console.log('[premountAddStatusListenerCalls]', this.premountAddStatusListenerCalls);
+    this.premountAddStatusListenerCalls.forEach((listenerHandlers, listener) => {
+      // NOTE: Access with `?.` to avoid breaking usage with older clerk-js versions.
+      listenerHandlers.nativeUnsubscribe = clerkjs.addStatusListener?.(listener);
     });
 
     if (this.preopenSignIn !== null) {
@@ -572,8 +601,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.premountPricingTableNodes.forEach((props, node) => {
       clerkjs.__experimental_mountPricingTable(node, props);
     });
+
+    // if (this.clerkjs.loaded || this.status === 'ready' || this.status === 'degraded') {
     this.emitLoaded();
-    this.setLifecycleAndNotify('ready');
+    // }
+
     return this.clerkjs;
   };
 
@@ -823,7 +855,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.scriptLLoaded) {
       this.clerkjs.__experimental_mountPricingTable(node, props);
     } else {
       this.premountPricingTableNodes.set(node, props);
@@ -831,7 +863,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __experimental_unmountPricingTable = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.scriptLLoaded) {
       this.clerkjs.__experimental_unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
