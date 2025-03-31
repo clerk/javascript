@@ -43,7 +43,7 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
-       * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
        */
       actor: undefined;
       /**
