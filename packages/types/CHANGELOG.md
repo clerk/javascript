@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.50.1
+
+### Patch Changes
+
+- Add billing page to `OrgProfile`, use new `usePlans` hook, and adds new subscription methods ([#5423](https://github.com/clerk/javascript/pull/5423)) by [@aeliox](https://github.com/aeliox)
+
+- Refactor `<PricingTableDefault />` to use local sub components to align with `<PricingTableMatrix />` implementation and descriptors. ([#5450](https://github.com/clerk/javascript/pull/5450)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.50.0
 
 ### Minor Changes

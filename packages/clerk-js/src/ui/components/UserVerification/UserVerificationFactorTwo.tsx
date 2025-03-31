@@ -7,6 +7,7 @@ import { determineStartingSignInSecondFactor } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
+import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
@@ -22,12 +23,24 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
+  'phone_code',
+  'totp',
+  'backup_code',
+] as const;
+
 export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
 
-  const availableFactors = sessionVerification.supportedSecondFactors;
+  const availableFactors = useMemo(() => {
+    return (
+      sessionVerification.supportedSecondFactors
+        ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        ?.sort(sortByPrimaryFactor) || null
+    );
+  }, [sessionVerification.supportedSecondFactors]);
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [currentFactor, setCurrentFactor] = React.useState<SessionVerificationSecondFactor | null>(

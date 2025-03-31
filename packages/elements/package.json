@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.7",
+  "version": "0.23.8",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -84,8 +84,8 @@
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",
     "concurrently": "^8.2.2",
-    "next": "14.2.25",
-    "type-fest": "^4.37.0"
+    "next": "14.2.26",
+    "type-fest": "^4.38.0"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3 || ^15",
