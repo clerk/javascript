@@ -225,16 +225,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.waitForSelector('.cl-organizationSwitcherPopoverCard', { state: 'visible' });
     await u.page.locator('.cl-button__manageOrganization').click();
 
-    // Check if custom pages and links are visible
-    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+    // Get the organization profile dialog
+    const dialog = u.page.getByRole('dialog');
+
+    // Check if custom pages and links are visible within the dialog
+    await expect(dialog.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /Homepage/i })).toBeVisible();
 
     // Navigate to custom page
-    await u.page.getByRole('button', { name: /Terms/i }).click();
-    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+    await dialog.getByRole('button', { name: /Terms/i }).click();
+    await expect(dialog.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
 
     // Click custom link and check navigation
-    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await dialog.getByRole('button', { name: /Homepage/i }).click();
     await u.page.waitForAppUrl('/');
   });
 
@@ -296,5 +299,24 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
 
     await fakeAdmin.deleteIfExists();
+  });
+
+  test('Update Clerk options on the fly with updateClerkOptions()', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Navigate and wait for sign-in component to load
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+
+    // Verify initial English state
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
+
+    // Change to French and verify
+    await u.page.locator('select').selectOption({ label: 'French' });
+    await expect(u.page.getByText('pour continuer vers')).toBeVisible();
+
+    // Revert to English and verify
+    await u.page.locator('select').selectOption({ label: 'English' });
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
   });
 });

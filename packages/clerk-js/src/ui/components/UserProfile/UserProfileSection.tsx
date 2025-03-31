@@ -24,7 +24,7 @@ export const UserProfileSection = () => {
     return null;
   }
 
-  const { username, primaryEmailAddress, primaryPhoneNumber, ...userWithoutIdentifiers } = user;
+  const { username, primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet, ...userWithoutIdentifiers } = user;
 
   return (
     <ProfileSection.Root

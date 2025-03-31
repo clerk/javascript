@@ -31,7 +31,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
-export function _SignInFactorOne(): JSX.Element {
+function SignInFactorOneInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
@@ -210,4 +210,4 @@ export function _SignInFactorOne(): JSX.Element {
   }
 }
 
-export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(_SignInFactorOne));
+export const SignInFactorOne = withRedirectToAfterSignIn(withCardStateProvider(SignInFactorOneInternal));

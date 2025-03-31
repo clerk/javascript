@@ -5,7 +5,12 @@ import { createContext, useContext, useMemo } from 'react';
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  buildRedirectUrl,
+  buildSessionTaskRedirectUrl,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -22,6 +27,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
+  sessionTaskUrl: string | null;
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
@@ -107,8 +113,16 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
+  const sessionTaskUrl = buildSessionTaskRedirectUrl({
+    task: clerk.session?.currentTask,
+    path: ctx.path,
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+  });
+
   return {
     ...ctx,
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signInUrl,
     signUpUrl,
@@ -118,6 +132,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    sessionTaskUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },

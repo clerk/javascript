@@ -1,4 +1,6 @@
 import type {
+  __experimental_CommerceSubscriptionResource,
+  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
   GetDomainsParams,
   GetInvitationsParams,
@@ -22,28 +24,60 @@ import {
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
-type UseOrganizationParams = {
+/**
+ * @interface
+ */
+export type UseOrganizationParams = {
   /**
-   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `enrollmentMode` property of type [`OrganizationEnrollmentMode`](https://clerk.com/docs/references/react/use-organization#organization-enrollment-mode) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `enrollmentMode`: A string that filters the domains by the provided enrollment mode.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
-   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `status` property of type [`OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization#organization-invitation-status) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   * If set to `true`, all default properties will be used. Otherwise, accepts an object with the following optional properties:
+   *
+   * - `status`: A string that filters the membership requests by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
-   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `role` property of type [`OrganizationCustomRoleKey[]`](https://clerk.com/docs/references/react/use-organization#organization-custome-role-key) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `role`: An array of [`OrganizationCustomRoleKey`](/docs/references/javascript/types/organization-custom-role-key).
+   * - `query`: A string that filters the memberships by the provided string.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
-   * If set to `true`, all default properties will be used. Otherwise, accepts an object with an optional `status` property of type [`OrganizationInvitationStatus`](https://clerk.com/docs/references/react/use-organization#organization-invitation-status) and any of the properties described in [Shared properties](https://clerk.com/docs/references/react/use-organization#shared-properties).
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `status`: A string that filters the invitations by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
+  /**
+   * If set to `true`, all default properties will be used.
+   *
+   * Otherwise, accepts an object with the following optional properties:
+   *
+   * - `status`: A string that filters the subscriptions by the provided status.
+   * - Any of the properties described in [Shared properties](#shared-properties).
+   */
+  subscriptions?: true | PaginatedHookConfig<__experimental_GetSubscriptionsParams>;
 };
 
-type UseOrganization = <T extends UseOrganizationParams>(
-  params?: T,
-) =>
+/**
+ * @interface
+ */
+export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -73,77 +107,44 @@ type UseOrganization = <T extends UseOrganizationParams>(
        * Includes a paginated list of the organization's invitations.
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
+      /**
+       * Includes a paginated list of the organization's subscriptions.
+       */
+      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: true;
-      /**
-       * The currently active organization.
-       */
       organization: OrganizationResource;
-      /**
-       * The current organization membership.
-       */
       membership: undefined;
-      /**
-       * Includes a paginated list of the organization's domains.
-       */
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
-      /**
-       * Includes a paginated list of the organization's membership requests.
-       */
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
-      /**
-       * Includes a paginated list of the organization's memberships.
-       */
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
-      /**
-       * Includes a paginated list of the organization's invitations.
-       */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
+      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
     }
   | {
-      /**
-       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
-       */
       isLoaded: boolean;
-      /**
-       * The currently active organization.
-       */
       organization: OrganizationResource | null;
-      /**
-       * The current organization membership.
-       */
       membership: OrganizationMembershipResource | null | undefined;
-      /**
-       * Includes a paginated list of the organization's domains.
-       */
       domains: PaginatedResources<
         OrganizationDomainResource,
         T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
-      /**
-       * Includes a paginated list of the organization's membership requests.
-       */
       membershipRequests: PaginatedResources<
         OrganizationMembershipRequestResource,
         T['membershipRequests'] extends { infinite: true } ? true : false
       > | null;
-      /**
-       * Includes a paginated list of the organization's memberships.
-       */
       memberships: PaginatedResources<
         OrganizationMembershipResource,
         T['memberships'] extends { infinite: true } ? true : false
       > | null;
-      /**
-       * Includes a paginated list of the organization's invitations.
-       */
       invitations: PaginatedResources<
         OrganizationInvitationResource,
         T['invitations'] extends { infinite: true } ? true : false
+      > | null;
+      subscriptions: PaginatedResources<
+        __experimental_CommerceSubscriptionResource,
+        T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
 
@@ -167,13 +168,134 @@ const undefinedPaginatedResource = {
 
 /**
  * The `useOrganization()` hook retrieves attributes of the currently active organization.
+ *
+ * @example
+ * ### Expand and paginate attributes
+ *
+ * To keep network usage to a minimum, developers are required to opt-in by specifying which resource they need to fetch and paginate through. By default, the `memberships`, `invitations`, `membershipRequests`, and `domains` attributes are not populated. You must pass `true` or an object with the desired properties to fetch and paginate the data.
+ *
+ * ```tsx
+ * // invitations.data will never be populated.
+ * const { invitations } = useOrganization()
+ *
+ * // Use default values to fetch invitations, such as initialPage = 1 and pageSize = 10
+ * const { invitations } = useOrganization({
+ *   invitations: true,
+ * })
+ *
+ * // Pass your own values to fetch invitations
+ * const { invitations } = useOrganization({
+ *   invitations: {
+ *     pageSize: 20,
+ *     initialPage: 2, // skips the first page
+ *   },
+ * })
+ *
+ * // Aggregate pages in order to render an infinite list
+ * const { invitations } = useOrganization({
+ *   invitations: {
+ *     infinite: true,
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ * ### Infinite pagination
+ *
+ * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+ *
+ * ```tsx
+ * import { useOrganization } from '@clerk/clerk-react'
+ *
+ * export default function MemberList() {
+ *   const { memberships } = useOrganization({
+ *     memberships: {
+ *       infinite: true, // Append new data to the existing list
+ *       keepPreviousData: true, // Persist the cached data until the new data has been fetched
+ *     },
+ *   })
+ *
+ *   if (!memberships) {
+ *     // Handle loading state
+ *     return null
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <h2>Organization members</h2>
+ *       <ul>
+ *         {memberships.data?.map((membership) => (
+ *           <li key={membership.id}>
+ *             {membership.publicUserData.firstName} {membership.publicUserData.lastName} <
+ *             {membership.publicUserData.identifier}> :: {membership.role}
+ *           </li>
+ *         ))}
+ *       </ul>
+ *
+ *       <button
+ *         disabled={!memberships.hasNextPage} // Disable the button if there are no more available pages to be fetched
+ *         onClick={memberships.fetchNext}
+ *       >
+ *         Load more
+ *       </button>
+ *     </div>
+ *   )
+ * }
+ * ```
+ *
+ * @example
+ * ### Simple pagination
+ *
+ * The following example demonstrates how to use the `fetchPrevious` and `fetchNext` helper functions to paginate through the data. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Previous page" or "Next page" button is clicked, the `fetchPrevious` or `fetchNext` helper function will be called to fetch the previous or next page of memberships.
+ *
+ * Notice the difference between this example's pagination and the infinite pagination example above.
+ *
+ * ```tsx
+ * import { useOrganization } from '@clerk/clerk-react'
+ *
+ * export default function MemberList() {
+ *   const { memberships } = useOrganization({
+ *     memberships: {
+ *       keepPreviousData: true, // Persist the cached data until the new data has been fetched
+ *     },
+ *   })
+ *
+ *   if (!memberships) {
+ *     // Handle loading state
+ *     return null
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <h2>Organization members</h2>
+ *       <ul>
+ *         {memberships.data?.map((membership) => (
+ *           <li key={membership.id}>
+ *             {membership.publicUserData.firstName} {membership.publicUserData.lastName} <
+ *             {membership.publicUserData.identifier}> :: {membership.role}
+ *           </li>
+ *         ))}
+ *       </ul>
+ *
+ *       <button disabled={!memberships.hasPreviousPage} onClick={memberships.fetchPrevious}>
+ *         Previous page
+ *       </button>
+ *
+ *       <button disabled={!memberships.hasNextPage} onClick={memberships.fetchNext}>
+ *         Next page
+ *       </button>
+ *     </div>
+ *   )
+ * }
+ * ```
  */
-export const useOrganization: UseOrganization = params => {
+export function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
   const {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
+    subscriptions: subscriptionsListParams,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
@@ -210,6 +332,14 @@ export const useOrganization: UseOrganization = params => {
     initialPage: 1,
     pageSize: 10,
     status: ['pending'],
+    keepPreviousData: false,
+    infinite: false,
+  });
+
+  const subscriptionsSafeValues = useWithSafeValues(subscriptionsListParams, {
+    initialPage: 1,
+    pageSize: 10,
+    status: undefined,
     keepPreviousData: false,
     infinite: false,
   });
@@ -253,6 +383,15 @@ export const useOrganization: UseOrganization = params => {
           initialPage: invitationsSafeValues.initialPage,
           pageSize: invitationsSafeValues.pageSize,
           status: invitationsSafeValues.status,
+        };
+
+  const subscriptionsParams =
+    typeof subscriptionsListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: subscriptionsSafeValues.initialPage,
+          pageSize: subscriptionsSafeValues.pageSize,
+          status: subscriptionsSafeValues.status,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
@@ -320,6 +459,25 @@ export const useOrganization: UseOrganization = params => {
     },
   );
 
+  const subscriptions = usePagesOrInfinite<
+    __experimental_GetSubscriptionsParams,
+    ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>
+  >(
+    {
+      ...subscriptionsParams,
+    },
+    organization?.__experimental_getSubscriptions,
+    {
+      keepPreviousData: subscriptionsSafeValues.keepPreviousData,
+      infinite: subscriptionsSafeValues.infinite,
+      enabled: !!subscriptionsParams,
+    },
+    {
+      type: 'subscriptions',
+      organizationId: organization?.id,
+    },
+  );
+
   if (organization === undefined) {
     return {
       isLoaded: false,
@@ -329,6 +487,7 @@ export const useOrganization: UseOrganization = params => {
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
+      subscriptions: undefinedPaginatedResource,
     };
   }
 
@@ -341,6 +500,7 @@ export const useOrganization: UseOrganization = params => {
       membershipRequests: null,
       memberships: null,
       invitations: null,
+      subscriptions: null,
     };
   }
 
@@ -354,16 +514,19 @@ export const useOrganization: UseOrganization = params => {
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
+      subscriptions: undefinedPaginatedResource,
     };
   }
 
   return {
     isLoaded: clerk.loaded,
     organization,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
     domains,
     membershipRequests,
     memberships,
     invitations,
+    subscriptions,
   };
-};
+}

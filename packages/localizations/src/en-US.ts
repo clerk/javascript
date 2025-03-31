@@ -2,7 +2,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  __experimental_commerce: {
+    billedAnnually: 'Billed annually',
+    free: 'Free',
+    getStarted: 'Get started',
+    manageMembership: 'Manage membership',
+    month: 'Month',
+    switchPlan: 'Switch to this plan',
+  },
   backButton: 'Back',
+  badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -163,6 +172,7 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+      billing: 'Billing',
     },
     profilePage: {
       dangerSection: {
@@ -266,6 +276,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__passkey: 'Use your passkey',
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -293,9 +304,15 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
+    passkey: {
+      blockButton__passkey: 'Use your passkey',
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Use your passkey',
+    },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
@@ -644,6 +661,14 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__plans: 'Plans',
+      },
+      title: 'Billing & Payments',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -767,6 +792,7 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -864,9 +890,9 @@ export const enUS: LocalizationResource = {
         },
       },
       passkeysSection: {
-        primaryButton: 'Add a passkey',
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: 'Add a passkey',
         title: 'Passkeys',
       },
       passwordSection: {
@@ -893,6 +919,7 @@ export const enUS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
+        detailsAction__nonPrimary: 'Set as primary',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },

@@ -14,7 +14,8 @@ type FlowMetadata = {
     | 'organizationList'
     | 'oneTap'
     | 'blankCaptcha'
-    | 'waitlist';
+    | 'waitlist'
+    | 'checkout';
   part?:
     | 'start'
     | 'emailCode'
@@ -32,6 +33,7 @@ type FlowMetadata = {
     | 'passwordPwnedMethods'
     | 'havingTrouble'
     | 'ssoCallback'
+    | 'popupCallback'
     | 'popover'
     | 'complete'
     | 'accountSwitcher';

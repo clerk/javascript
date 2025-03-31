@@ -47,7 +47,7 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
 import type {
@@ -70,7 +70,13 @@ import type {
 import type { CreateEmailLinkFlowReturn, StartEmailLinkFlowParams, VerificationResource } from './verification';
 import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
+/**
+ * The `SignIn` object holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
+ */
 export interface SignInResource extends ClerkResource {
+  /**
+   * The current status of the sign-in.
+   */
   status: SignInStatus | null;
   /**
    * @deprecated This attribute will be removed in the next major version
@@ -97,6 +103,8 @@ export interface SignInResource extends ClerkResource {
   attemptSecondFactor: (params: AttemptSecondFactorParams) => Promise<SignInResource>;
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
+
+  authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
 
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 

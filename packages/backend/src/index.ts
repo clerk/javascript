@@ -34,6 +34,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     ...options.telemetry,
     publishableKey: opts.publishableKey,
     secretKey: opts.secretKey,
+    samplingRate: 0.1,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
   });
 
@@ -80,6 +81,7 @@ export type {
   SMSMessageJSON,
   UserJSON,
   VerificationJSON,
+  WaitlistEntryJSON,
   Web3WalletJSON,
   DeletedObjectJSON,
   PaginatedResponseJSON,
@@ -126,6 +128,7 @@ export type {
   SessionWebhookEvent,
   SMSWebhookEvent,
   UserWebhookEvent,
+  WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
 } from './api/resources/Webhooks';

@@ -1,8 +1,9 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { is4xxError } from '@clerk/shared/error';
+import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
+import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type {
-  ActJWTClaim,
+  ActClaim,
   CheckAuthorization,
   EmailCodeConfig,
   GetToken,
@@ -25,7 +26,12 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { clerkInvalidStrategy } from '../errors';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '../../utils/passkeys';
+import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
@@ -39,7 +45,7 @@ export class Session extends BaseResource implements SessionResource {
   lastActiveAt!: Date;
   lastActiveToken!: TokenResource | null;
   lastActiveOrganizationId!: string | null;
-  actor!: ActJWTClaim | null;
+  actor!: ActClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
   factorVerificationAge: [number, number] | null = null;
@@ -86,8 +92,17 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
+    // This will retry the getToken call if it fails with a non-4xx error
+    // We're going to trigger 8 retries in the span of ~3 minutes,
+    // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
     return retry(() => this._getToken(options), {
-      shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
+      factor: 1.55,
+      initialDelay: 3 * 1000,
+      maxDelayBetweenRetries: 50 * 1_000,
+      jitter: false,
+      shouldRetry: (error, iterationsCount) => {
+        return !is4xxError(error) && iterationsCount <= 8;
+      },
     });
   };
 
@@ -150,6 +165,9 @@ export class Session extends BaseResource implements SessionResource {
           default: factor.default,
         } as PhoneCodeConfig;
         break;
+      case 'passkey':
+        config = {};
+        break;
       default:
         clerkInvalidStrategy('Session.prepareFirstFactorVerification', (factor as any).strategy);
     }
@@ -171,15 +189,66 @@ export class Session extends BaseResource implements SessionResource {
   attemptFirstFactorVerification = async (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ): Promise<SessionVerificationResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey': {
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      }
+      default:
+        config = { ...attemptFactor };
+    }
+
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
-        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
     return new SessionVerification(json);
+  };
+
+  verifyWithPasskey = async (): Promise<SessionVerificationResource> => {
+    const prepareResponse = await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+
+    const { nonce = null } = prepareResponse.firstFactorVerification;
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    const isWebAuthnSupported = Session.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = Session.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyOptions('get');
+    }
+
+    const { publicKeyCredential, error } = await webAuthnGetCredential({
+      publicKeyOptions,
+      conditionalUI: false,
+    });
+
+    if (!publicKeyCredential) {
+      throw error;
+    }
+
+    return this.attemptFirstFactorVerification({
+      strategy: 'passkey',
+      publicKeyCredential,
+    });
   };
 
   prepareSecondFactorVerification = async (
@@ -197,13 +266,13 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   attemptSecondFactorVerification = async (
-    params: SessionVerifyAttemptSecondFactorParams,
+    attemptFactor: SessionVerifyAttemptSecondFactorParams,
   ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
-        body: params as any,
+        body: attemptFactor as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -222,11 +291,11 @@ export class Session extends BaseResource implements SessionResource {
     this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
-    this.actor = data.actor;
+    this.actor = data.actor || null;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.user = new User(data.user);
-    this.tasks = data.tasks;
+    this.tasks = data.tasks || null;
 
     if (data.public_user_data) {
       this.publicUserData = new PublicUserData(data.public_user_data);
@@ -302,5 +371,10 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
     });
+  }
+
+  get currentTask() {
+    const [task] = this.tasks ?? [];
+    return task;
   }
 }

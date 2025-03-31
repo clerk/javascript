@@ -1,22 +1,20 @@
-import type { ClerkClient } from '@clerk/backend';
-import type { SignedInAuthObject } from '@clerk/backend/internal';
+import type { AuthObject, ClerkClient } from '@clerk/backend';
 
 import type { ClerkTool } from './clerk-tool';
 
-export type SdkAdapter<T> = (clerkClient: ClerkClient, context: ToolkitContext, clerkTool: ClerkTool) => T;
-
-export type ToolkitContext = {
-  /**
-   * The userId of the currently signed-in user.
-   * This is used to scope the tools to a specific user.
-   */
-  userId?: string;
+export type ToolkitParams = {
   /**
    * All JWT claims of the current session.
-   * This is used to scope the tools to a specific session or to make the LLM
-   * aware of the sessions details.
+   * This is used to scope the tools of this toolkit to a specific session/ user/ organization for
+   * security reasons, or to make the LLM aware of the session details without requiring the LLM to
+   * use tools to fetch the session details.
+   *
+   * @default {}
    */
-  sessionClaims?: SignedInAuthObject['sessionClaims'];
+  authContext?: Pick<
+    AuthObject,
+    'userId' | 'sessionId' | 'sessionClaims' | 'orgId' | 'orgRole' | 'orgSlug' | 'orgPermissions' | 'actor'
+  >;
   /**
    * Whether to explicitly allow private metadata access.
    * By default, private metadata are pruned from all resources, before
@@ -28,10 +26,21 @@ export type ToolkitContext = {
   allowPrivateMetadata?: boolean;
 };
 
-export type CreateClerkToolkitParams = {
+export type ToolsContext = Partial<ToolkitParams['authContext']> & Omit<ToolkitParams, 'authContext'>;
+
+export type CreateClerkToolkitParams = ToolkitParams & {
+  /**
+   * The Clerk client to use for all API calls,
+   * useful if you want to override the default client.
+   * This is commonly used when managing environment variables using special tooling
+   * or when multiple Clerk instances are used in the same application.
+   *
+   * @default undefined
+   */
   clerkClient?: ClerkClient;
-  context?: ToolkitContext;
 };
+
+export type SdkAdapter<T> = (clerkClient: ClerkClient, params: ToolkitParams, clerkTool: ClerkTool) => T;
 
 export type ClerkToolkitBase = {
   /**

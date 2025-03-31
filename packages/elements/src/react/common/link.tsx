@@ -36,6 +36,7 @@ export function Link({ navigate, children, ...rest }: LinkProps) {
   const router = useClerkRouter();
   const clerk = useClerk();
   const destinationUrl = router.makeDestinationUrlWithPreservedQueryParameters(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     clerk.__internal_getOption(paths[navigate])!,
   );
 

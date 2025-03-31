@@ -22,18 +22,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
 
   test('sign out through all open tabs at once', async ({ page, context }) => {
     const mainTab = createTestUtils({ app, page, context });
-    await mainTab.page.addInitScript(() => {
-      /**
-       * Playwright may define connection incorrectly, we are overriding to null
-       */
-      if (
-        navigator.onLine &&
-        // @ts-expect-error Cannot find `connection`
-        (navigator?.connection?.rtt === 0 || navigator?.downlink?.rtt === 0)
-      ) {
-        Object.defineProperty(Object.getPrototypeOf(navigator), 'connection', { value: null });
-      }
-    });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
     await mainTab.po.signIn.continue();
@@ -79,6 +67,28 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
 
     const client_id_after_sign_out = await u.page.locator('p[data-clerk-id]').innerHTML();
     expect(client_id).toEqual(client_id_after_sign_out);
+  });
+
+  test('Protected routes do not persist after sign out', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    // Skip react vite tests
+    if (!app.name.includes('next')) {
+      return;
+    }
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
+    await u.page.getByTestId('protected').waitFor();
+    await u.page.getByRole('link', { name: 'Home' }).click();
+    await u.page.getByRole('button', { name: 'Open user button' }).click();
+
+    await u.page.getByRole('menuitem', { name: 'Sign out' }).click();
+    await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
+    await u.page.waitForURL(url => url.href.includes('/sign-in?redirect_url'));
   });
 });
 

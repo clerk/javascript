@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Natrag',
+  badge__currentPlan: undefined,
   badge__default: 'Zadano',
   badge__otherImpersonatorDevice: 'Drugi uređaj za oponašanje',
   badge__primary: 'Primarno',
@@ -129,6 +138,7 @@ export const hrHR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozovi',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -276,6 +286,7 @@ export const hrHR: LocalizationResource = {
       actionText: 'Nemate ništa od ovoga?',
       blockButton__backupCode: 'Koristite rezervni kod',
       blockButton__emailCode: 'Pošalji kod e-poštom na {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Nastavite s vašom lozinkom',
       blockButton__phoneCode: 'Pošalji SMS kod na {{identifier}}',
       blockButton__totp: 'Koristite vašu aplikaciju za autentifikaciju',
@@ -302,6 +313,11 @@ export const hrHR: LocalizationResource = {
       message: 'Ne može se nastaviti s verifikacijom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',
       title: 'Ne može se verificirati vaš račun',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Koristite drugu metodu',
@@ -653,6 +669,14 @@ export const hrHR: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih računa',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -775,6 +799,7 @@ export const hrHR: LocalizationResource = {
     mobileButton__menu: 'Izbornik',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljajte informacijama vašeg računa.',
       security: 'Sigurnost',
       title: 'Račun',
@@ -874,6 +899,7 @@ export const hrHR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Pristupni ključevi',
       },
       passwordSection: {
@@ -900,6 +926,7 @@ export const hrHR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ukloni novčanik',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Poveži novčanik',
         title: 'Web3 novčanici',
       },

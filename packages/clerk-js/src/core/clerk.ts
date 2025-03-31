@@ -13,6 +13,9 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CommerceNamespace,
+  __experimental_PricingTableProps,
+  __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -38,10 +41,12 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   NavigateOptions,
+  NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PendingSessionResource,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -78,6 +83,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledCommerceFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -86,7 +92,6 @@ import {
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
-  ignoreEventValue,
   inActiveBrowserTab,
   inBrowser,
   isDevAccountPortalOrigin,
@@ -102,8 +107,8 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { createOfflineScheduler } from '../utils/offlineScheduler';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
@@ -121,6 +126,8 @@ import {
 import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
+import { createClientFromJwt } from './jwt-client';
+import { __experimental_Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -130,7 +137,10 @@ import {
   Organization,
   Waitlist,
 } from './resources/internal';
+import { navigateToTask } from './sessionTasks';
 import { warnings } from './warnings';
+
+type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -166,6 +176,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
+  private static _commerce: __experimental_CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -195,7 +206,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
-  #sessionTouchOfflineScheduler = createOfflineScheduler();
+  #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -288,6 +299,19 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
+  get __experimental_commerce(): __experimental_CommerceNamespace {
+    if (!this.#options.experimental?.commerce) {
+      throw new Error(
+        'Clerk: commerce functionality is currently in an experimental state. To enable, pass `experimental.commerce = true`.',
+      );
+    }
+
+    if (!Clerk._commerce) {
+      Clerk._commerce = new __experimental_Commerce();
+    }
+    return Clerk._commerce;
+  }
+
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
     return this.#options[key];
   }
@@ -299,9 +323,6 @@ export class Clerk implements ClerkInterface {
   public constructor(key: string, options?: DomainOrProxyUrl) {
     key = (key || '').trim();
 
-    this.#domain = options?.domain;
-    this.#proxyUrl = options?.proxyUrl;
-
     if (!key) {
       return errorThrower.throwMissingPublishableKeyError();
     }
@@ -312,8 +333,11 @@ export class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
-    this.#publishableKey = key;
+    this.#domain = options?.domain;
+    this.#proxyUrl = options?.proxyUrl;
+    this.environment = Environment.getInstance();
     this.#instanceType = publishableKey.instanceType;
+    this.#publishableKey = key;
 
     this.#fapiClient = createFapiClient({
       domain: this.domain,
@@ -376,28 +400,56 @@ export class Clerk implements ClerkInterface {
     if (!this.client || this.client.sessions.length === 0) {
       return;
     }
+
+    const onBeforeSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+        ? window.__unstable__onBeforeSetActive
+        : noop;
+
+    const onAfterSetActive: SetActiveHook =
+      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+        ? window.__unstable__onAfterSetActive
+        : noop;
+
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
 
     const redirectUrl = opts?.redirectUrl || this.buildAfterSignOutUrl();
+    const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-    const handleSetActive = () => {
-      const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
+    const executeSignOut = async () => {
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out.
       eventBus.dispatch(events.UserSignOut, null);
-      if (signOutCallback) {
-        return this.setActive({
-          session: null,
-          beforeEmit: ignoreEventValue(signOutCallback),
-        });
+      // Clean up cookies
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+
+      this.#setTransitiveState();
+
+      await tracker.track(async () => {
+        if (signOutCallback) {
+          await signOutCallback();
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
+
+      if (tracker.isUnloading()) {
+        return;
       }
 
-      return this.setActive({
-        session: null,
-        redirectUrl,
-      });
+      this.#setAccessors();
+      this.#emit();
+
+      await onAfterSetActive();
     };
 
+    /**
+     * Clears the router cache for `@clerk/nextjs` on all routes except the current one.
+     * Note: Calling `onBeforeSetActive` before signing out, allows for new RSC prefetch requests to render as signed in.
+     * Since we are calling `onBeforeSetActive` before signing out, we should NOT pass `"sign-out"`.
+     */
+    await onBeforeSetActive();
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       if (this.#options.experimental?.persistClient ?? true) {
         await this.client.removeSessions();
@@ -405,14 +457,19 @@ export class Clerk implements ClerkInterface {
         await this.client.destroy();
       }
 
-      return handleSetActive();
+      await executeSignOut();
+
+      return;
     }
 
+    // Multi-session handling
     const session = this.client.signedInSessions.find(s => s.id === opts.sessionId);
     const shouldSignOutCurrent = session?.id && this.session?.id === session.id;
+
     await session?.remove();
+
     if (shouldSignOutCurrent) {
-      return handleSetActive();
+      await executeSignOut();
     }
   };
 
@@ -769,7 +826,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationSwitcher', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -803,7 +865,12 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
+    this.telemetry?.record(
+      eventPrebuiltComponentMounted('OrganizationList', {
+        ...props,
+        forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
+      }),
+    );
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -854,6 +921,37 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (disabledCommerceFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
+          code: 'cannot_render_commerce_disabled',
+        });
+      }
+      return;
+    }
+    void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
+      controls.mountComponent({
+        name: 'PricingTable',
+        appearanceKey: 'pricingTable',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+  };
+
+  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -868,7 +966,6 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    type SetActiveHook = () => void | Promise<void>;
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
@@ -905,11 +1002,19 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    if (newSession?.status === 'pending') {
+      await this.#handlePendingSession(newSession);
+      return;
+    }
+
     if (session?.lastActiveToken) {
       eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
     }
 
-    await onBeforeSetActive();
+    /**
+     * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
+     */
+    await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -930,42 +1035,114 @@ export class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
     if (beforeEmit) {
       deprecated(
         'Clerk.setActive({beforeEmit})',
         'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
       );
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-      await beforeEmit(newSession);
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        this.#setTransitiveState();
+        await beforeEmit(newSession);
+      });
     }
 
     if (redirectUrl && !beforeEmit) {
-      beforeUnloadTracker?.startTracking();
-      this.#setTransitiveState();
-
-      if (this.client.isEligibleForTouch()) {
-        const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-
-        await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
-      } else {
-        await this.navigate(redirectUrl);
-      }
-
-      beforeUnloadTracker?.stopTracking();
+      await tracker.track(async () => {
+        if (!this.client) {
+          // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+          return;
+        }
+        this.#setTransitiveState();
+        if (this.client.isEligibleForTouch()) {
+          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        } else {
+          await this.navigate(redirectUrl);
+        }
+      });
     }
 
-    //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker?.isUnloading()) {
+    //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
+    if (tracker.isUnloading()) {
       return;
     }
 
     this.#setAccessors(newSession);
-
     this.#emit();
     await onAfterSetActive();
+  };
+
+  #handlePendingSession = async (session: PendingSessionResource) => {
+    if (!this.environment) {
+      return;
+    }
+
+    let newSession: SignedInSessionResource | null = session;
+
+    // Handles multi-session scenario when switching between `pending` sessions
+    // and satisfying task requirements such as organization selection
+    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+      await this.#touchCurrentSession(session);
+      newSession = this.#getSessionFromClient(session.id) ?? session;
+    }
+
+    // Syncs __session and __client_uat, in case the `pending` session
+    // has expired, it needs to trigger a sign-out
+    const token = await session.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
+
+    if (newSession?.currentTask) {
+      await navigateToTask(session.currentTask.key, {
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+        options: this.#options,
+        environment: this.environment,
+      });
+
+      // Delay updating session accessors until active status transition to prevent premature component unmounting.
+      // This is particularly important when SignIn components are wrapped in SignedOut components,
+      // as early state updates could cause unwanted unmounting during the transition.
+      this.#setAccessors(session);
+    }
+
+    this.#emit();
+  };
+
+  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+    const session = await this.session?.reload();
+    if (!session || !this.environment) {
+      return;
+    }
+
+    if (session.status === 'pending') {
+      await navigateToTask(session.currentTask.key, {
+        options: this.#options,
+        environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
+      });
+      return;
+    }
+
+    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+
+    this.#setTransitiveState();
+
+    await tracker.track(async () => {
+      await this.navigate(redirectUrlComplete ?? defaultRedirectUrlComplete);
+    });
+
+    if (tracker.isUnloading()) {
+      return;
+    }
+
+    this.#setAccessors(session);
+    this.#emit();
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -993,6 +1170,12 @@ export class Clerk implements ClerkInterface {
       this.#navigationListeners = this.#navigationListeners.filter(l => l !== listener);
     };
     return unsubscribe;
+  };
+
+  public __internal_setComponentNavigationContext = (context: __internal_ComponentNavigationContext) => {
+    this.#componentNavigationContext = context;
+
+    return () => (this.#componentNavigationContext = null);
   };
 
   public navigate = async (to: string | undefined, options?: NavigateOptions): Promise<unknown> => {
@@ -1316,6 +1499,23 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
+    // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
+    // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
+    // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
+    if (!window.opener) {
+      try {
+        await signIn.reload();
+      } catch {
+        // This can be safely ignored
+      }
+      try {
+        await signUp.reload();
+      } catch {
+        // This can be safely ignored
+      }
+    }
+
     const { displayConfig } = this.environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1545,8 +1745,11 @@ export class Clerk implements ClerkInterface {
       }
       return this.setActive({ session: null });
     } catch (err) {
-      // Handle the 403 Forbidden
-      if (err.status === 403) {
+      // `/client` can fail with either a 401, a 403, 500 or network errors.
+      // 401 is already handled internally in our fetcher.
+      // 403 means that the client is blocked, signing out the user is the only option.
+      // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
+      if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
         return this.setActive({ session: null });
       } else {
         throw err;
@@ -1559,6 +1762,7 @@ export class Clerk implements ClerkInterface {
   ): Promise<SignInResource | SignUpResource> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Google One Tap');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this.client!.signIn; // TODO: Remove not null assertion
     }
 
@@ -1868,6 +2072,7 @@ export class Clerk implements ClerkInterface {
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
 
     /**
@@ -1914,12 +2119,56 @@ export class Clerk implements ClerkInterface {
           .fetch({ touch: shouldTouchEnv })
           .then(res => {
             this.updateEnvironment(res);
+          })
+          .catch(e => {
+            const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+              CLERK_ENVIRONMENT_STORAGE_ENTRY,
+              null,
+            );
+
+            if (!environmentSnapshot) {
+              throw e;
+            }
+
+            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
-        const initClient = () => {
+        const initClient = async () => {
           return Client.getOrCreateInstance()
             .fetch()
-            .then(res => this.updateClient(res));
+            .then(res => this.updateClient(res))
+            .catch(async e => {
+              /**
+               * Only handle non 4xx errors, like 5xx errors and network errors.
+               */
+              if (is4xxError(e)) {
+                // bubble it up
+                throw e;
+              }
+
+              const jwtInCookie = this.#authService?.getSessionCookie();
+              const localClient = createClientFromJwt(jwtInCookie);
+
+              this.updateClient(localClient);
+
+              /**
+               * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
+               * We want to avoid having the below `getToken()` retrying at the same time as the poller.
+               */
+              this.#authService?.stopPollingForToken();
+
+              // Attempt to grab a fresh token
+              await this.session
+                ?.getToken({ skipCache: true })
+                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
+                .catch(() => null)
+                .finally(() => {
+                  this.#authService?.startPollingForToken();
+                });
+
+              // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
+              return null;
+            });
         };
 
         const initComponents = () => {
@@ -1932,16 +2181,23 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        await Promise.all([initEnvironmentPromise, initClient()]).catch(async e => {
-          // limit the changes for this specific error for now
-          if (isClerkAPIResponseError(e) && e.errors[0].code === 'requires_captcha') {
-            await initEnvironmentPromise;
+        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+
+        if (clientResult.status === 'rejected') {
+          const e = clientResult.reason;
+
+          if (isError(e, 'requires_captcha')) {
+            if (envResult.status === 'rejected') {
+              await initEnvironmentPromise;
+            }
             initComponents();
             await initClient();
           } else {
             throw e;
           }
-        });
+        }
+
+        await initEnvironmentPromise;
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
@@ -2045,16 +2301,12 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      const performTouch = () => {
-        if (this.#touchThrottledUntil > Date.now()) {
-          return;
-        }
-        this.#touchThrottledUntil = Date.now() + 5_000;
+      if (this.#touchThrottledUntil > Date.now()) {
+        return;
+      }
+      this.#touchThrottledUntil = Date.now() + 5_000;
 
-        return this.#touchCurrentSession(this.session);
-      };
-
-      this.#sessionTouchOfflineScheduler.schedule(performTouch);
+      void this.#touchCurrentSession(this.session);
     });
 
     /**
@@ -2071,6 +2323,15 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
+
+    eventBus.on(events.EnvironmentUpdate, () => {
+      // Cache the environment snapshot for 24 hours
+      SafeLocalStorage.setItem(
+        CLERK_ENVIRONMENT_STORAGE_ENTRY,
+        this.environment?.__internal_toSnapshot(),
+        24 * 60 * 60 * 1_000,
+      );
     });
   };
 
@@ -2106,6 +2367,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  /**
+   * Temporarily clears the accessors before emitting changes to React context state.
+   * This is used during transitions like sign-out or session changes to prevent UI flickers
+   * such as unexpected unmount of control components
+   */
   #setTransitiveState = () => {
     this.session = undefined;
     this.organization = undefined;
@@ -2123,15 +2389,11 @@ export class Clerk implements ClerkInterface {
   #setAccessors = (session?: SignedInSessionResource | null) => {
     this.session = session || null;
     this.organization = this.#getLastActiveOrganizationFromSession();
-    this.#aliasUser();
+    this.user = this.session ? this.session.user : null;
   };
 
   #getSessionFromClient = (sessionId: string | undefined): SignedInSessionResource | null => {
     return this.client?.signedInSessions.find(x => x.id === sessionId) || null;
-  };
-
-  #aliasUser = () => {
-    this.user = this.session ? this.session.user : null;
   };
 
   #handleImpersonationFab = () => {
@@ -2169,7 +2431,7 @@ export class Clerk implements ClerkInterface {
 
     let signInOrUpUrl = this.#options[key] || this.environment.displayConfig[key];
     if (this.#isCombinedSignInOrUpFlow()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- The isCombinedSignInOrUpFlow() function checks for the existence of signInUrl
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       signInOrUpUrl = this.#options.signInUrl!;
     }
     const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();

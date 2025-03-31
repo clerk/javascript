@@ -172,7 +172,11 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
-  const hasSignedInSessions = client.signedInSessions && client.signedInSessions.length > 0;
+
+  const hasSignedInSessions = client.signedInSessions
+    ? client.signedInSessions.length > 0
+    : // Compat for clerk-js<5.54.0 (which was released with the `signedInSessions` property)
+      client.activeSessions && client.activeSessions.length > 0;
 
   React.useEffect(() => {
     if (session === null && hasSignedInSessions) {
@@ -194,6 +198,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 }, 'RedirectToSignUp');
 
 /**
+ * @function
  * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
@@ -206,6 +211,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 }, 'RedirectToUserProfile');
 
 /**
+ * @function
  * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
@@ -218,6 +224,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 }, 'RedirectToOrganizationProfile');
 
 /**
+ * @function
  * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {

@@ -18,7 +18,7 @@ jobs:
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-      TURBO_REMOTE_ONLY: true
+      TURBO_CACHE: remote:rw
     permissions:
       contents: read
       id-token: write
@@ -62,16 +62,13 @@ jobs:
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-            if (clerkjsVersion.includes('canary')) {
-              console.log('clerk-js changed, will notify clerk/cloudflare-workers');
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
-                repo: 'cloudflare-workers',
-                workflow_id: 'release-canary-clerkjs-proxy.yml',
+                repo: 'sdk-infra-workers',
+                workflow_id: 'update-clerkjs.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
               })
-            }
 
             if (nextjsVersion.includes('canary')) {
               console.log('clerk/nextjs changed, will notify clerk/accounts');

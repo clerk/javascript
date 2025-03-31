@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
+import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import type { SignUpContextType } from '../../contexts';
@@ -13,12 +14,17 @@ import {
   withCoreSessionSwitchGuard,
 } from '../../contexts';
 import { Flow } from '../../customizables';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { SignUpContinue } from '../SignUp/SignUpContinue';
-import { SignUpSSOCallback } from '../SignUp/SignUpSSOCallback';
-import { SignUpStart } from '../SignUp/SignUpStart';
-import { SignUpVerifyEmail } from '../SignUp/SignUpVerifyEmail';
-import { SignUpVerifyPhone } from '../SignUp/SignUpVerifyPhone';
+import { useFetch } from '../../hooks';
+import { usePreloadTasks } from '../../hooks/usePreloadTasks';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import {
+  LazySignUpContinue,
+  LazySignUpSSOCallback,
+  LazySignUpStart,
+  LazySignUpVerifyEmail,
+  LazySignUpVerifyPhone,
+  preloadSignUp,
+} from './lazy-sign-up';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
@@ -76,22 +82,23 @@ function SignInRoutes(): JSX.Element {
             redirectUrl='../factor-two'
           />
         </Route>
+
         {signInContext.isCombinedFlow && (
           <Route path='create'>
             <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}
             >
-              <SignUpVerifyEmail />
+              <LazySignUpVerifyEmail />
             </Route>
             <Route
               path='verify-phone-number'
               canActivate={clerk => !!clerk.client.signUp.phoneNumber}
             >
-              <SignUpVerifyPhone />
+              <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <SignUpSSOCallback
+              <LazySignUpSSOCallback
                 signUpUrl={signUpContext.signUpUrl}
                 signInUrl={signUpContext.signInUrl}
                 signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
@@ -115,23 +122,29 @@ function SignInRoutes(): JSX.Element {
                 path='verify-email-address'
                 canActivate={clerk => !!clerk.client.signUp.emailAddress}
               >
-                <SignUpVerifyEmail />
+                <LazySignUpVerifyEmail />
               </Route>
               <Route
                 path='verify-phone-number'
                 canActivate={clerk => !!clerk.client.signUp.phoneNumber}
               >
-                <SignUpVerifyPhone />
+                <LazySignUpVerifyPhone />
+              </Route>
+              <Route path='tasks'>
+                <LazySessionTasks />
               </Route>
               <Route index>
-                <SignUpContinue />
+                <LazySignUpContinue />
               </Route>
             </Route>
             <Route index>
-              <SignUpStart />
+              <LazySignUpStart />
             </Route>
           </Route>
         )}
+        <Route path='tasks'>
+          <LazySessionTasks />
+        </Route>
         <Route index>
           <SignInStart />
         </Route>
@@ -143,7 +156,13 @@ function SignInRoutes(): JSX.Element {
   );
 }
 
+const usePreloadSignUp = (enabled = false) =>
+  useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
+
 function SignInRoot() {
+  const { __internal_setComponentNavigationContext } = useClerk();
+  const { navigate, indexPath } = useRouter();
+
   const signInContext = useSignInContext();
   const normalizedSignUpContext = {
     componentName: 'SignUp',
@@ -155,6 +174,17 @@ function SignInRoot() {
     unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
   } as SignUpContextType;
+
+  /**
+   * Preload Sign Up when in Combined Flow.
+   */
+  usePreloadSignUp(signInContext.isCombinedFlow);
+
+  usePreloadTasks();
+
+  React.useEffect(() => {
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+  }, [indexPath, navigate]);
 
   return (
     <SignUpContext.Provider value={normalizedSignUpContext}>

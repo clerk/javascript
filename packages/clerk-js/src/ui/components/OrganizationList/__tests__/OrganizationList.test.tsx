@@ -185,6 +185,24 @@ describe('OrganizationList', () => {
         expect(queryByRole('button', { name: 'Join' })).not.toBeInTheDocument();
       });
     });
+
+    describe('with force organization selection setting on environment', () => {
+      it('does not show the personal account', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withForceOrganizationSelection();
+          f.withUser({
+            email_addresses: ['test@clerk.com'],
+            organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
+          });
+        });
+        const { queryByText } = render(<OrganizationList />, { wrapper });
+
+        await waitFor(() => {
+          expect(queryByText('Personal account')).not.toBeInTheDocument();
+        });
+      });
+    });
   });
 
   describe('CreateOrganization', () => {

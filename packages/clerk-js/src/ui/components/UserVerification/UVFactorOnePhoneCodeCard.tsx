@@ -15,6 +15,7 @@ export const UVFactorOnePhoneCodeCard = (props: UVFactorOnePhoneCodeCardProps) =
         cardSubtitle={localizationKeys('reverification.phoneCode.subtitle')}
         inputLabel={localizationKeys('reverification.phoneCode.formTitle')}
         resendButton={localizationKeys('reverification.phoneCode.resendButton')}
+        showAlternativeMethods={props.showAlternativeMethods}
       />
     </Flow.Part>
   );

@@ -1,5 +1,5 @@
 import type {
-  ActJWTClaim,
+  ActClaim,
   CheckAuthorizationWithCustomPermissions,
   Clerk,
   GetToken,
@@ -24,6 +24,7 @@ const clerkLoaded = () => {
   return new Promise<Clerk>(resolve => {
     $csrState.subscribe(({ isLoaded }) => {
       if (isLoaded) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         resolve($clerk.get()!);
       }
     });
@@ -85,7 +86,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -98,7 +99,7 @@ type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;

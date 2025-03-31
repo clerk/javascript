@@ -21,7 +21,7 @@ type CheckOrgAuthorization = (
   { orgId, orgRole, orgPermissions }: AuthorizationOptions,
 ) => boolean | null;
 
-type CheckStepUpAuthorization = (
+type CheckReverificationAuthorization = (
   params: {
     reverification?: ReverificationConfig;
   },
@@ -103,12 +103,12 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
 };
 
 /**
- * Evaluates if the user meets step-up authentication requirements.
+ * Evaluates if the user meets re-verification authentication requirements.
  * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
  * @returns null, if requirements or verification data are missing.
  */
-const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVerificationAge }) => {
+const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
   if (!params.reverification || !factorVerificationAge) {
     return null;
   }
@@ -138,7 +138,7 @@ const checkStepUpAuthorization: CheckStepUpAuthorization = (params, { factorVeri
 
 /**
  * Creates a function for comprehensive user authorization checks.
- * Combines organization-level and step-up authentication checks.
+ * Combines organization-level and reverification authentication checks.
  * The returned function authorizes if both checks pass, or if at least one passes
  * when the other is indeterminate. Fails if userId is missing.
  */
@@ -149,13 +149,13 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
     }
 
     const orgAuthorization = checkOrgAuthorization(params, options);
-    const stepUpAuthorization = checkStepUpAuthorization(params, options);
+    const reverificationAuthorization = checkReverificationAuthorization(params, options);
 
-    if ([orgAuthorization, stepUpAuthorization].some(a => a === null)) {
-      return [orgAuthorization, stepUpAuthorization].some(a => a === true);
+    if ([orgAuthorization, reverificationAuthorization].some(a => a === null)) {
+      return [orgAuthorization, reverificationAuthorization].some(a => a === true);
     }
 
-    return [orgAuthorization, stepUpAuthorization].every(a => a === true);
+    return [orgAuthorization, reverificationAuthorization].every(a => a === true);
   };
 };
 

@@ -1,5 +1,330 @@
 # Change Log
 
+## 5.58.1
+
+### Patch Changes
+
+- Fallback to locally stored environment during an outage. ([#5420](https://github.com/clerk/javascript/pull/5420)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix Turnstile console warning when locale is used ([#5463](https://github.com/clerk/javascript/pull/5463)) by [@anagstef](https://github.com/anagstef)
+
+- Remove console.error from transfer flow ([#5462](https://github.com/clerk/javascript/pull/5462)) by [@anagstef](https://github.com/anagstef)
+
+- Add billing page to `OrgProfile`, use new `usePlans` hook, and adds new subscription methods ([#5423](https://github.com/clerk/javascript/pull/5423)) by [@aeliox](https://github.com/aeliox)
+
+- Refactor `<PricingTableDefault />` to use local sub components to align with `<PricingTableMatrix />` implementation and descriptors. ([#5450](https://github.com/clerk/javascript/pull/5450)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`e20fb6b`](https://github.com/clerk/javascript/commit/e20fb6b397fb69c9d5af4e321267b82f12a5f127), [`77e6462`](https://github.com/clerk/javascript/commit/77e64628560cab688af214edb5922e67cd68a951)]:
+  - @clerk/localizations@3.13.4
+  - @clerk/shared@3.2.3
+  - @clerk/types@4.50.1
+
+## 5.58.0
+
+### Minor Changes
+
+- Add support for the `oauthFlow` prop on `<SignIn />` and `<SignUp />`, allowing developers to opt-in to using a popup for OAuth authorization instead of redirects. ([#5239](https://github.com/clerk/javascript/pull/5239)) by [@dstaley](https://github.com/dstaley)
+
+  With the new `oauthFlow` prop, developers can opt-in to using a popup window instead of redirects for their OAuth flows by setting `oauthFlow` to `"popup"`. While we still recommend the default `"redirect"` for most scenarios, the `"popup"` option is useful in environments where the redirect flow does not currently work, such as when your application is embedded into an `iframe`. We also opt applications into the `"popup"` flow when we detect that your application is running on a domain that's typically embedded into an `iframe`, such as `loveable.app`.
+
+### Patch Changes
+
+- Load tasks based on environment settings ([#5422](https://github.com/clerk/javascript/pull/5422)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Handle the empty body on 204 responses from FAPI ([#5410](https://github.com/clerk/javascript/pull/5410)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`a9b618d`](https://github.com/clerk/javascript/commit/a9b618dfa97a0dacc462186c8b2588ad5ddb6902), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`a570b80`](https://github.com/clerk/javascript/commit/a570b804b32cf2bc2b329699a1f24bd34f4c4880), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+  - @clerk/shared@3.2.2
+  - @clerk/localizations@3.13.3
+
+## 5.57.4
+
+### Patch Changes
+
+- Fix lazy-loading of `BillingPage` in `UserProfile` ([#5445](https://github.com/clerk/javascript/pull/5445)) by [@aeliox](https://github.com/aeliox)
+
+- Remove Paypal option from `<CheckoutForm />` ([#5446](https://github.com/clerk/javascript/pull/5446)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Wrap nested `<Checkout />` component in its own AppearanceProvider to recieve its own appearance object. ([#5443](https://github.com/clerk/javascript/pull/5443)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/types@4.49.2
+  - @clerk/localizations@3.13.2
+  - @clerk/shared@3.2.1
+
+## 5.57.3
+
+### Patch Changes
+
+- Pass appearance variables to stripe elements. ([#5346](https://github.com/clerk/javascript/pull/5346)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.57.2
+
+### Patch Changes
+
+- Add background color to `<PricingTableMatrix />` elements to ensure sticky elements cover the scrollable content. ([#5417](https://github.com/clerk/javascript/pull/5417)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Use a new signUp attempt on SignUp component when there is no ticket flow and a phone number is provided to prevent rate-limiting issues. ([#5415](https://github.com/clerk/javascript/pull/5415)) by [@anagstef](https://github.com/anagstef)
+
+- Add `matrix` layout option to `<PricingTable />` component. ([#5393](https://github.com/clerk/javascript/pull/5393)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/shared@3.2.0
+
+## 5.57.1
+
+### Patch Changes
+
+- Fix issue where unverified field weren't showing up when ToS was enabled ([#5404](https://github.com/clerk/javascript/pull/5404)) by [@octoper](https://github.com/octoper)
+
+- Lazy-loads experimental components within `UserProfile`, preventing unnecessary code from loading. ([#5409](https://github.com/clerk/javascript/pull/5409)) by [@aeliox](https://github.com/aeliox)
+
+- Fix an edge case where `window.Clerk` is re-assigned if the Clerk script is injected multiple times. ([#5406](https://github.com/clerk/javascript/pull/5406)) by [@brkalow](https://github.com/brkalow)
+
+- Export `isReverificationCancelledError` error helper ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+- Introduce `__experimental_nextTask` method for navigating to next tasks on a after-auth flow ([#5377](https://github.com/clerk/javascript/pull/5377)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update the resiliency logic for failed client attempts to allow the creation of a dev browser. ([#5411](https://github.com/clerk/javascript/pull/5411)) by [@panteliselef](https://github.com/panteliselef)
+
+- This introducing changes to `useReverification`, the changes include removing the array and returning the fetcher directly and also the dropping the options `throwOnCancel` and `onCancel` in favour of always throwing the cancellation error. ([#5396](https://github.com/clerk/javascript/pull/5396)) by [@octoper](https://github.com/octoper)
+
+  ```tsx {{ filename: 'src/components/MyButton.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData);
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+  These changes are also adding a new handler in options called `onNeedsReverification`, which can be used to create a custom UI
+  to handle re-verification flow. When the handler is passed the default UI our AIO components provide will not be triggered so you will have to create and handle the re-verification process.
+
+  ```tsx {{ filename: 'src/components/MyButtonCustom.tsx' }}
+  import { useReverification } from '@clerk/clerk-react';
+  import { isReverificationCancelledError } from '@clerk/clerk-react/error';
+
+  type MyData = {
+    balance: number;
+  };
+
+  export function MyButton() {
+    const fetchMyData = () => fetch('/api/balance').then(res => res.json() as Promise<MyData>);
+    const enhancedFetcher = useReverification(fetchMyData, {
+      onNeedsReverification: ({ complete, cancel, level }) => {
+        // e.g open a modal here and handle the re-verification flow
+      },
+    });
+
+    const handleClick = async () => {
+      try {
+        const myData = await enhancedFetcher();
+        //     ^ is typed as `MyData`
+      } catch (e) {
+        // Handle error returned from the fetcher here
+
+        // You can also handle cancellation with the following
+        if (isReverificationCancelledError(err)) {
+          // Handle the cancellation error here
+        }
+      }
+    };
+
+    return <button onClick={handleClick}>Update User</button>;
+  }
+  ```
+
+- Updated dependencies [[`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d)]:
+  - @clerk/types@4.49.1
+  - @clerk/shared@3.1.0
+  - @clerk/localizations@3.13.1
+
+## 5.57.0
+
+### Minor Changes
+
+- Navigate to tasks on after sign-in/sign-up ([#5280](https://github.com/clerk/javascript/pull/5280)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Improve the resilience of the SDK against situations where the /v1/environment endpoint is not reachable. This is achieved by allowing the initialization of the environment with default values. ([#5287](https://github.com/clerk/javascript/pull/5287)) by [@jacekradko](https://github.com/jacekradko)
+
+- Allow user set primary web3 wallet in `<UserProfile />` when more than one web3 wallets presented ([#5353](https://github.com/clerk/javascript/pull/5353)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Deprecate out of date jwt types in favour of existing that are up-to-date. ([#5354](https://github.com/clerk/javascript/pull/5354)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `<CheckoutForm />` select positioning and option text color. ([#5356](https://github.com/clerk/javascript/pull/5356)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add support for localizationKeys within commerce components. ([#5390](https://github.com/clerk/javascript/pull/5390)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Default `<Drawer.Confirmation />` to `alertdialog` role. ([#5383](https://github.com/clerk/javascript/pull/5383)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Simplify plan card avatar badge container styling. ([#5355](https://github.com/clerk/javascript/pull/5355)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `<Drawer.Confirmation />` component to be used within Commerce cancel subscription flow. ([#5376](https://github.com/clerk/javascript/pull/5376)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Hide personal workspace options when organization selection is enforced ([#5391](https://github.com/clerk/javascript/pull/5391)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Allow token refresh when Client failed to resolve. ([#5345](https://github.com/clerk/javascript/pull/5345)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce experimental billing APIs and components ([#5248](https://github.com/clerk/javascript/pull/5248)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `<Drawer />` component and update commerce components implementations to make use of it. ([#5337](https://github.com/clerk/javascript/pull/5337)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update floating-ui packages to latest. ([#5341](https://github.com/clerk/javascript/pull/5341)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally render the avatar and badge components within PlanCard. ([#5348](https://github.com/clerk/javascript/pull/5348)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- When a C2 is not signed-in, redirect them to sign-in from the `<PlanCard />`. ([#5349](https://github.com/clerk/javascript/pull/5349)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update plan feed rendering within `<PlanCard />` to only render `annualMonthlyAmount` when it's greater than 0. ([#5357](https://github.com/clerk/javascript/pull/5357)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adjust the `<Drawer />` enter/exit animations timing and easings. ([#5369](https://github.com/clerk/javascript/pull/5369)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor `<Checkout />` components to apply descriptors and ensure styling is properly connected to theming layer. ([#5359](https://github.com/clerk/javascript/pull/5359)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `<PlanCardFeaturesList/>` variants to render the avatar and description fields within `<PlanDetailsDrawer />`. ([#5379](https://github.com/clerk/javascript/pull/5379)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`725918d`](https://github.com/clerk/javascript/commit/725918df2e74cea15e9b748aaf103a52df8e8500), [`91d0f0b`](https://github.com/clerk/javascript/commit/91d0f0b0dccab7168ad4dc06c8629808938c235f), [`9572bf5`](https://github.com/clerk/javascript/commit/9572bf5bdfb7dc309ec8714989b98ab12174965b), [`39bbc51`](https://github.com/clerk/javascript/commit/39bbc5189a33dc6cebdc269ac2184dc4ffff2534), [`3dddcda`](https://github.com/clerk/javascript/commit/3dddcda191d8f8d6a9b02464f1f6374d3c6aacb9), [`7524943`](https://github.com/clerk/javascript/commit/7524943300d7e693d61cc1820b520abfadec1c64), [`150b5c8`](https://github.com/clerk/javascript/commit/150b5c89477abb0feab15e0a886179473f653cac), [`23c931e`](https://github.com/clerk/javascript/commit/23c931e9e95e6de992549ad499b477aca9a9c344), [`730262f`](https://github.com/clerk/javascript/commit/730262f0f973923c8749b09078c80c2fc966a8ec), [`0b18bb1`](https://github.com/clerk/javascript/commit/0b18bb1fe6fa3ded97547bb6b4d2c73030aad329), [`021bc5f`](https://github.com/clerk/javascript/commit/021bc5f40044d34e49956ce3c9b61d833d815b42), [`1a61390`](https://github.com/clerk/javascript/commit/1a61390d3482bd4af58508b972ad89dea56fa224)]:
+  - @clerk/types@4.49.0
+  - @clerk/shared@3.0.2
+  - @clerk/localizations@3.13.0
+
+## 5.56.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Removes legal consent checkbox from sign-up start card when only social or web3 strategies are enabled. ([#5289](https://github.com/clerk/javascript/pull/5289)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Make use of native browser navigator locks property to avoid needing to use localstorage or cookies. ([#5156](https://github.com/clerk/javascript/pull/5156)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- When a user passes `withSignUp={false}` we should opt out of combined flow even when `signUpUrl` is undefined. ([#5286](https://github.com/clerk/javascript/pull/5286)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- fix(clerk-js): Correctly show alternative methods for user re-verification card ([#5164](https://github.com/clerk/javascript/pull/5164)) by [@octoper](https://github.com/octoper)
+
+- Remove the Primary Web3 wallet from user preview section, in the `<UserProfile/>` ([#5319](https://github.com/clerk/javascript/pull/5319)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Handle pwned password error during sign in instant password submit. ([#5298](https://github.com/clerk/javascript/pull/5298)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`1427c92069483f3f0880739c4ca5b418872e5d38`](https://github.com/clerk/javascript/commit/1427c92069483f3f0880739c4ca5b418872e5d38), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`657af338e7464162419189dde9cd6696a0622e41`](https://github.com/clerk/javascript/commit/657af338e7464162419189dde9cd6696a0622e41), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+  - @clerk/localizations@3.12.0
+
+## 5.55.1
+
+### Patch Changes
+
+- Updated dependencies [[`aefaf48071cc7df172011febb4a870526be89d24`](https://github.com/clerk/javascript/commit/aefaf48071cc7df172011febb4a870526be89d24)]:
+  - @clerk/localizations@3.11.1
+
+## 5.55.0
+
+### Minor Changes
+
+- Lazily load components related to `<SignUp>` functionality when used with the combined flow in `<SignIn>`. ([#5237](https://github.com/clerk/javascript/pull/5237)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Revert offlineScheduler ([#5279](https://github.com/clerk/javascript/pull/5279)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Display validation error in `<Waitlist />` for email address field correctly ([#5243](https://github.com/clerk/javascript/pull/5243)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`ae53f31442b661c291c4b4cc4cc5152df6c6aa47`](https://github.com/clerk/javascript/commit/ae53f31442b661c291c4b4cc4cc5152df6c6aa47), [`02defeda4d73de9cf34904d76590fd98d4abd3a9`](https://github.com/clerk/javascript/commit/02defeda4d73de9cf34904d76590fd98d4abd3a9), [`79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3`](https://github.com/clerk/javascript/commit/79169b18d3d7fe8ccd7b0c1d13d782ef627e7cd3), [`f18318179180b1f95690a4982ba44df9de1c57ab`](https://github.com/clerk/javascript/commit/f18318179180b1f95690a4982ba44df9de1c57ab)]:
+  - @clerk/localizations@3.11.0
+
+## 5.54.2
+
+### Patch Changes
+
+- Fixes a bug in `Clerk.signOut()` that was preventing the after sign out redirect from occurring in Next.js v15. ([#5171](https://github.com/clerk/javascript/pull/5171)) by [@brkalow](https://github.com/brkalow)
+
+## 5.54.1
+
+### Patch Changes
+
+- Fix modal issues by inlining scroll locking mechanism instead of using `<FloatingOverlay/>` which caused issues in Chromium based browsers ([#5244](https://github.com/clerk/javascript/pull/5244)) by [@octoper](https://github.com/octoper)
+
+## 5.54.0
+
+### Minor Changes
+
+- Introduce the `appearance.captcha` property for the CAPTCHA widget ([#5184](https://github.com/clerk/javascript/pull/5184)) by [@anagstef](https://github.com/anagstef)
+
+- Track usage of modal UI Components as part of telemetry. ([#5185](https://github.com/clerk/javascript/pull/5185)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Initialize new `pending` session status as an signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  - Deprecate `Clerk.client.activeSessions` in favor of `Clerk.client.signedInSessions`
+  - Introduce `Clerk.isSignedIn` property as an explicit signed-in state check, instead of `!!Clerk.session` or `!!Clerk.user`:
+
+  ```ts
+  - if (Clerk.user) {
+  + if (Clerk.isSignedIn) {
+    // Mount user button component
+    document.getElementById('signed-in').innerHTML = `
+      <div id="user-button"></div>
+    `
+
+    const userbuttonDiv = document.getElementById('user-button')
+
+    clerk.mountUserButton(userbuttonDiv)
+  }
+  ```
+
+### Patch Changes
+
+- Set input primitive placeholder color. ([#5157](https://github.com/clerk/javascript/pull/5157)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix issue where scroll lock was not restored correctly when multiple modals were opening ([#5233](https://github.com/clerk/javascript/pull/5233)) by [@octoper](https://github.com/octoper)
+
+- Refactor social button row distribution calculation to prevent overlapping on page load. ([#5213](https://github.com/clerk/javascript/pull/5213)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove full width from OrgProfile members search input. ([#5126](https://github.com/clerk/javascript/pull/5126)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve compatibility with Safari 12 by removing modern JavaScript syntax. ([#5228](https://github.com/clerk/javascript/pull/5228)) by [@dstaley](https://github.com/dstaley)
+
+- Bug fix: Broadcast a sign out event to all opened tabs when `Clerk.signOut()` or `User.delete()` is called. ([#5133](https://github.com/clerk/javascript/pull/5133)) by [@panteliselef](https://github.com/panteliselef)
+
+- Initialize `tasks` on `Session` resource ([#5170](https://github.com/clerk/javascript/pull/5170)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Pass the `action` property to Turnstile ([#5199](https://github.com/clerk/javascript/pull/5199)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/localizations@3.10.8
+
 ## 5.53.0
 
 ### Minor Changes

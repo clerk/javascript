@@ -25,7 +25,7 @@ import {
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpContinue() {
+function SignUpContinueInternal() {
   const card = useCardState();
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -59,7 +59,7 @@ function _SignUpContinue() {
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
+    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || signUp.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
@@ -91,8 +91,13 @@ function _SignUpContinue() {
   } as const;
 
   const onlyLegalConsentMissing = useMemo(
-    () => signUp.missingFields && signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
-    [signUp.missingFields],
+    () =>
+      signUp.missingFields &&
+      signUp.missingFields.length === 1 &&
+      signUp.missingFields[0] === 'legal_accepted' &&
+      signUp.unverifiedFields &&
+      signUp.unverifiedFields.length === 0,
+    [signUp.missingFields, signUp.unverifiedFields],
   );
 
   useEffect(() => {
@@ -242,4 +247,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withCardStateProvider(_SignUpContinue);
+export const SignUpContinue = withCardStateProvider(SignUpContinueInternal);

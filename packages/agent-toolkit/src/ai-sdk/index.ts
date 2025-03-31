@@ -1,10 +1,13 @@
-import { clerkClient as _clerkClient } from '../lib/clerk-client';
-import { defaultToolkitContext } from '../lib/constants';
+import { defaultCreateClerkToolkitParams } from '../lib/constants';
 import { injectSessionClaims } from '../lib/inject-session-claims';
 import { flatTools, tools } from '../lib/tools';
 import type { ClerkToolkitBase, CreateClerkToolkitParams } from '../lib/types';
 import { shallowTransform } from '../lib/utils';
 import { adapter } from './adapter';
+
+type AdaptedTools = {
+  [key in keyof typeof tools]: () => { [tool in keyof (typeof tools)[key]]: ReturnType<typeof adapter> };
+};
 
 export type ClerkToolkit = ClerkToolkitBase & {
   /**
@@ -16,9 +19,7 @@ export type ClerkToolkit = ClerkToolkitBase & {
    * As a result, we also recommend to use the fine-grained tool categories, for example, `toolkit.users` instead.
    */
   allTools: () => { [key in keyof typeof flatTools]: ReturnType<typeof adapter> };
-} & {
-  [key in keyof typeof tools]: () => { [tool in keyof (typeof tools)[key]]: ReturnType<typeof adapter> };
-};
+} & AdaptedTools;
 
 /**
  * Creates a Clerk toolkit with the given parameters.
@@ -26,23 +27,24 @@ export type ClerkToolkit = ClerkToolkitBase & {
  * For more details, refer to the [package's docs](https://github.com/clerk/javascript/blob/main/packages/agent-toolkit/README.md).
  */
 export const createClerkToolkit = async (params: CreateClerkToolkitParams = {}): Promise<ClerkToolkit> => {
-  const clerkClient = params.clerkClient || _clerkClient;
-  const context = params.context || defaultToolkitContext;
+  const { clerkClient, ...rest } = { ...defaultCreateClerkToolkitParams, ...params };
 
   const adaptedTools = shallowTransform(tools, toolSection => {
     return () =>
       shallowTransform(toolSection, t => {
-        return adapter(clerkClient, context, t);
+        return adapter(clerkClient, rest, t);
       });
-  });
+  }) as AdaptedTools;
 
   const allTools = () => {
-    return shallowTransform(flatTools, t => adapter(clerkClient, context, t));
+    return shallowTransform(flatTools, t => adapter(clerkClient, rest, t));
   };
 
-  return {
+  adaptedTools.organizations();
+
+  return Promise.resolve({
     ...adaptedTools,
     allTools,
-    injectSessionClaims: injectSessionClaims(context),
-  };
+    injectSessionClaims: injectSessionClaims(rest),
+  });
 };

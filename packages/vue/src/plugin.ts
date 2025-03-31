@@ -27,8 +27,8 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * app.mount('#app')
  * ```
  */
-export const clerkPlugin: Plugin = {
-  install(app, options: PluginOptions) {
+export const clerkPlugin: Plugin<[PluginOptions]> = {
+  install(app, options) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
     const { initialState } = options;
 
@@ -36,7 +36,7 @@ export const clerkPlugin: Plugin = {
     const clerk = shallowRef<Clerk | null>(null);
 
     const resources = ref<Resources>({
-      client: {} as ClientResource,
+      client: undefined as unknown as ClientResource,
       session: undefined,
       user: undefined,
       organization: undefined,
@@ -68,8 +68,8 @@ export const clerkPlugin: Plugin = {
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));
 
     const authCtx = computed(() => {
-      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions } = derivedState.value;
-      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions };
+      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions, sessionStatus } = derivedState.value;
+      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, sessionStatus };
     });
     const clientCtx = computed(() => resources.value.client);
     const userCtx = computed(() => derivedState.value.user);

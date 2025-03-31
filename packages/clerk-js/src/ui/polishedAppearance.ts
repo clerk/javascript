@@ -145,6 +145,16 @@ export const polishedAppearance: Appearance = {
             ].toString(),
           },
         },
+        '&[data-variant="bordered"]': {
+          borderWidth: 0,
+          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+          '&:focus': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+            ].toString(),
+          },
+        },
       },
       badge: {
         borderWidth: 0,
@@ -211,12 +221,25 @@ export const polishedAppearance: Appearance = {
         borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
+      drawerContent: {
+        borderWidth: 0,
+        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+      },
       popoverBox: {
         borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
       card: {
         ...cardContentStyles(theme),
+      },
+      pricingTableCard: {
+        '&[data-variant="default"]': {
+          borderWidth: 0,
+          boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
+        },
+        '&[data-variant="compact"]': {
+          boxShadow: 'none',
+        },
       },
       scrollBox: {
         ...cardContentStyles(theme),

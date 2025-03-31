@@ -1,10 +1,9 @@
-import { isBrowserOnline } from '@clerk/shared/browser';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
-import { createOfflineScheduler } from '../../utils/offlineScheduler';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -41,7 +40,6 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
-  private sessionRefreshOfflineScheduler = createOfflineScheduler();
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
@@ -112,11 +110,18 @@ export class AuthCookieService {
     this.devBrowser.clear();
   }
 
-  private startPollingForToken() {
+  public startPollingForToken() {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
+      this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+  }
+
+  public stopPollingForToken() {
+    if (this.poller) {
+      this.poller.stopPollingForSessionToken();
+      this.poller = null;
+    }
   }
 
   private refreshTokenOnFocus() {
@@ -128,7 +133,7 @@ export class AuthCookieService {
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
         // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
-        this.sessionRefreshOfflineScheduler.schedule(() => this.refreshSessionToken({ updateCookieImmediately: true }));
+        void this.refreshSessionToken({ updateCookieImmediately: true });
       }
     });
   }
@@ -139,10 +144,6 @@ export class AuthCookieService {
     updateCookieImmediately?: boolean;
   } = {}): Promise<void> {
     if (!this.clerk.session) {
-      return;
-    }
-
-    if (!isBrowserOnline()) {
       return;
     }
 
@@ -180,22 +181,18 @@ export class AuthCookieService {
   }
 
   private handleGetTokenError(e: any) {
-    //throw if not a clerk error
-    if (!isClerkAPIResponseError(e)) {
+    //throw if not a clerk api error (aka fapi error) and not a network error
+    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e)) {
       clerkCoreErrorTokenRefreshFailed(e.message || e);
     }
 
     //sign user out if a 4XX error
     if (is4xxError(e)) {
-      void this.clerk.handleUnauthenticated();
+      void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
-
-    if (isNetworkError(e)) {
-      return;
-    }
-
-    clerkCoreErrorTokenRefreshFailed(e.toString());
+    // Treat any other error as a noop
+    // TODO(debug-logs): Once debug logs is available log this error.
   }
 
   /**
@@ -222,5 +219,9 @@ export class AuthCookieService {
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  public getSessionCookie() {
+    return this.sessionCookie.get();
   }
 }

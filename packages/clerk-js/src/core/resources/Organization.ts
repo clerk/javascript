@@ -1,4 +1,7 @@
 import type {
+  __experimental_CommerceSubscriptionJSON,
+  __experimental_CommerceSubscriptionResource,
+  __experimental_GetSubscriptionsParams,
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
@@ -28,7 +31,12 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
+import {
+  __experimental_CommerceSubscription,
+  BaseResource,
+  OrganizationInvitation,
+  OrganizationMembership,
+} from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -229,6 +237,29 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
+  __experimental_getSubscriptions = async (
+    getSubscriptionsParams?: __experimental_GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/subscriptions`,
+        method: 'GET',
+        search: convertPageToOffsetSearchParams(getSubscriptionsParams),
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: subscriptions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
+
+      return {
+        total_count,
+        data: subscriptions.map(subscription => new __experimental_CommerceSubscription(subscription)),
+      };
+    });
+  };
+
   destroy = async (): Promise<void> => {
     return this._baseDelete();
   };
@@ -269,13 +300,13 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.id = data.id;
     this.name = data.name;
     this.slug = data.slug;
-    this.imageUrl = data.image_url;
-    this.hasImage = data.has_image;
-    this.publicMetadata = data.public_metadata;
-    this.membersCount = data.members_count;
-    this.pendingInvitationsCount = data.pending_invitations_count;
-    this.maxAllowedMemberships = data.max_allowed_memberships;
-    this.adminDeleteEnabled = data.admin_delete_enabled;
+    this.imageUrl = data.image_url || '';
+    this.hasImage = data.has_image || false;
+    this.publicMetadata = data.public_metadata || {};
+    this.membersCount = data.members_count || 0;
+    this.pendingInvitationsCount = data.pending_invitations_count || 0;
+    this.maxAllowedMemberships = data.max_allowed_memberships || 0;
+    this.adminDeleteEnabled = data.admin_delete_enabled || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;

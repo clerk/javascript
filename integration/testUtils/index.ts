@@ -7,7 +7,9 @@ import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
+import { createOrganizationsService } from './organizationsService';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
+import { createSessionTaskComponentPageObject } from './sessionTaskPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
@@ -50,11 +52,21 @@ const createExpectPageObject = ({ page }: TestArgs) => {
         return !!window.Clerk?.user;
       });
     },
+    toHaveResolvedTask: async () => {
+      return page.waitForFunction(() => {
+        return !window.Clerk?.session?.currentTask;
+      });
+    },
   };
 };
 
 const createClerkUtils = ({ page }: TestArgs) => {
   return {
+    toBeLoaded: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.loaded;
+      });
+    },
     getClientSideUser: () => {
       return page.evaluate(() => {
         return window.Clerk?.user;
@@ -82,6 +94,7 @@ export const createTestUtils = <
     email: createEmailService(),
     users: createUserService(clerkClient),
     invitations: createInvitationService(clerkClient),
+    organizations: createOrganizationsService(clerkClient),
     clerk: clerkClient,
   };
 
@@ -101,6 +114,7 @@ export const createTestUtils = <
     userButton: createUserButtonPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
+    sessionTask: createSessionTaskComponentPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     clerk: createClerkUtils(testArgs),
   };

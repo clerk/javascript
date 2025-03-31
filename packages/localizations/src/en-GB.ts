@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Back',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -130,6 +139,7 @@ export const enGB: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -277,6 +287,7 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -304,9 +315,14 @@ export const enGB: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
@@ -655,6 +671,14 @@ export const enGB: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -778,6 +802,7 @@ export const enGB: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -877,6 +902,7 @@ export const enGB: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -903,6 +929,7 @@ export const enGB: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },

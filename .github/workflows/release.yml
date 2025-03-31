@@ -82,8 +82,8 @@ jobs:
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
-                repo: 'cloudflare-workers',
-                workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
+                repo: 'sdk-infra-workers',
+                workflow_id: 'update-clerkjs.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
               })

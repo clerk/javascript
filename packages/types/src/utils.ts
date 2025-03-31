@@ -83,6 +83,7 @@ type IsSerializable<T> = T extends Function ? false : true;
 
 /**
  * Excludes any non-serializable prop from an object
+ * @hidden
  */
 export type Serializable<T> = {
   [K in keyof T as IsSerializable<T[K]> extends true ? K : never]: T[K];
@@ -91,6 +92,7 @@ export type Serializable<T> = {
 /**
  * Enables autocompletion for a union type, while keeping the ability to use any string
  * or type of `T`
+ * @internal
  */
 export type Autocomplete<U extends T, T = string> = U | (T & Record<never, never>);
 

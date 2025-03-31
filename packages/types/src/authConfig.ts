@@ -11,5 +11,9 @@ export interface AuthConfigResource extends ClerkResource {
    * Defaults to `null`.
    */
   claimedAt: Date | null;
+  /**
+   * Whether Reverification is enabled at the instance level.
+   */
+  reverification: boolean;
   __internal_toSnapshot: () => AuthConfigJSONSnapshot;
 }

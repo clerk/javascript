@@ -94,17 +94,16 @@ interface ClerkMiddleware {
 /**
  * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
  */
-// @ts-expect-error TS is not happy here. Will dig into it
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
+export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddlewareReturn => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
+  const middleware = clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
@@ -143,6 +142,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
+
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Basic ')) {
+        logger.debug('Basic Auth detected');
+      }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
@@ -224,7 +228,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       }
 
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
@@ -258,7 +262,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     // eg, export default clerkMiddleware(auth => { ... });
     return nextMiddleware;
   });
-};
+
+  return middleware;
+}) as ClerkMiddleware;
 
 const parseRequestAndEvent = (args: unknown[]) => {
   return [args[0] instanceof Request ? args[0] : undefined, args[0] instanceof Request ? args[1] : undefined] as [

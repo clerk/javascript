@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Enrere',
+  badge__currentPlan: undefined,
   badge__default: 'Per defecte',
   badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
   badge__primary: 'Principal',
@@ -129,6 +138,7 @@ export const caES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convida',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Elimina membre',
         tableHeader__actions: undefined,
@@ -277,6 +287,7 @@ export const caES: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -300,6 +311,11 @@ export const caES: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -648,6 +664,14 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -774,6 +798,7 @@ export const caES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la informació del teu compte.',
       security: 'Seguretat',
       title: 'Compte',
@@ -874,6 +899,7 @@ export const caES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -900,6 +926,7 @@ export const caES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Elimina cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteres Web3',
         title: 'Carteres Web3',
       },

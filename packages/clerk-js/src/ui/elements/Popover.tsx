@@ -5,15 +5,29 @@ import React from 'react';
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
-  nodeId: string;
+  nodeId?: string;
   isOpen?: boolean;
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
+  /**
+   * Determines whether outside elements are inert when modal is enabled. This enables pointer modality without a backdrop.
+   * @default false
+   */
+  outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
   portal?: boolean;
 }>;
 
 export const Popover = (props: PopoverProps) => {
-  const { context, initialFocus, order = ['reference', 'content'], nodeId, isOpen, portal = true, children } = props;
+  const {
+    context,
+    initialFocus,
+    outsideElementsInert = false,
+    order = ['reference', 'content'],
+    nodeId,
+    isOpen,
+    portal = true,
+    children,
+  } = props;
 
   if (portal) {
     return (
@@ -23,6 +37,7 @@ export const Popover = (props: PopoverProps) => {
             <FloatingFocusManager
               context={context}
               initialFocus={initialFocus}
+              outsideElementsInert={outsideElementsInert}
               order={order}
             >
               <>{children}</>

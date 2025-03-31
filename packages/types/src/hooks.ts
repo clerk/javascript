@@ -2,7 +2,7 @@ import type { OrganizationCustomRoleKey } from 'organizationMembership';
 import type { SignInResource } from 'signIn';
 
 import type { SetActive, SignOut } from './clerk';
-import type { ActJWTClaim } from './jwt';
+import type { ActClaim } from './jwtv2';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -16,8 +16,7 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * Return values of the `useAuth()` hook
- * @interface
+ * @inline
  */
 export type UseAuthReturn =
   | {
@@ -46,6 +45,9 @@ export type UseAuthReturn =
        * The ID for the current session.
        */
       sessionId: undefined;
+      /**
+       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
+       */
       actor: undefined;
       /**
        * The ID of the user's active organization.
@@ -64,7 +66,7 @@ export type UseAuthReturn =
        */
       has: CheckAuthorizationSignedOut;
       /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk/clerk#sign-out).
+       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#sign-out).
        */
       signOut: SignOut;
       /**
@@ -90,7 +92,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -103,7 +105,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
-      actor: ActJWTClaim | null;
+      actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;
@@ -113,8 +115,7 @@ export type UseAuthReturn =
     };
 
 /**
- * Return values of the `useSignIn()` hook
- * @interface
+ * @inline
  */
 export type UseSignInReturn =
   | {
@@ -138,8 +139,7 @@ export type UseSignInReturn =
     };
 
 /**
- * Return values of the `useSignUp()` hook
- * @interface
+ * @inline
  */
 export type UseSignUpReturn =
   | {
@@ -163,8 +163,7 @@ export type UseSignUpReturn =
     };
 
 /**
- * Return values of the `useSession()` hook
- * @interface
+ * @inline
  */
 export type UseSessionReturn =
   | {
@@ -193,8 +192,7 @@ export type UseSessionReturn =
     };
 
 /**
- * Return values of the `useSessionList()` hook
- * @interface
+ * @inline
  */
 export type UseSessionListReturn =
   | {
@@ -218,8 +216,7 @@ export type UseSessionListReturn =
     };
 
 /**
- * Return values of the `useUser()` hook
- * @interface
+ * @inline
  */
 export type UseUserReturn =
   | {
@@ -228,11 +225,11 @@ export type UseUserReturn =
        */
       isLoaded: false;
       /**
-       * A boolean that indicates whether a user is currently signed in.
+       * A boolean that returns `true` if the user is signed in.
        */
       isSignedIn: undefined;
       /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }
