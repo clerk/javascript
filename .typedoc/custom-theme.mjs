@@ -370,6 +370,52 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
         return `<code>${result}</code>`;
       },
+      /**
+       * Copied from default theme / source code. This ensures that everything is wrapped in a single codeblock (not individual ones). If there are function overloads they will be split by a `; `.
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/6cde68da7bdc048aa81f0fb2467034ae675c7e60/packages/typedoc-plugin-markdown/src/theme/context/partials/type.reflection.function.ts
+       * @param {import('typedoc').SignatureReflection[]} model
+       * @param {{ forceParameterType: boolean }} [options]
+       */
+      functionType: (model, options) => {
+        const functions = model.map(fn => {
+          const typeParams = fn.typeParameters
+            ? `${this.helpers.getAngleBracket('<')}${fn.typeParameters
+                .map(typeParameter => typeParameter.name)
+                .join(', ')}${this.helpers.getAngleBracket('>')}`
+            : '';
+          const showParameterType = options?.forceParameterType || this.options.getValue('expandParameters');
+
+          const params = fn.parameters
+            ? fn.parameters.map(param => {
+                const paramType = this.partials.someType(/** @type {import('typedoc').SomeType} */ param.type);
+                const paramItem = [
+                  `${param.flags?.isRest ? '...' : ''}${param.name}${param.flags?.isOptional ? '?' : ''}`,
+                ];
+                if (showParameterType) {
+                  paramItem.push(paramType);
+                }
+                return paramItem.join(': ');
+              })
+            : [];
+          const returns = this.partials.someType(/** @type {import('typedoc').SomeType} */ fn.type);
+          return typeParams + `(${params.join(', ')}) => ${returns}`;
+        });
+
+        const cleanOutput = functions
+          .map(fn => {
+            return (
+              fn
+                // Remove any backticks
+                .replace(/`/g, '')
+                // Remove any `<code>` and `</code>` tags
+                .replace(/<code>/g, '')
+                .replace(/<\/code>/g, '')
+            );
+          })
+          .join('; ');
+
+        return `<code>${cleanOutput}</code>`;
+      },
     };
   }
 }
@@ -387,7 +433,6 @@ function heading(level, text) {
 /**
  * Create an unordered list from an array of items
  * @param {string[]} items
- * @returns
  */
 function unorderedList(items) {
   return items.map(item => `- ${item}`).join('\n');

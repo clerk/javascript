@@ -226,7 +226,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }

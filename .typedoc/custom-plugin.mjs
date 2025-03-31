@@ -26,6 +26,7 @@ const LINK_REPLACEMENTS = [
   ['session-resource', '/docs/references/javascript/session'],
   ['signed-in-session-resource', '/docs/references/javascript/session'],
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
+  ['user-resource', '/docs/references/javascript/user'],
 ];
 
 /**

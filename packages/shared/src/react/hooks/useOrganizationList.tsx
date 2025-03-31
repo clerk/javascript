@@ -98,7 +98,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
     }
   | {
       isLoaded: boolean;
-      createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
+      createOrganization: (CreateOrganizationParams: CreateOrganizationParams) => Promise<OrganizationResource>;
       setActive: SetActive;
       userMemberships: PaginatedResources<
         OrganizationMembershipResource,

@@ -1575,10 +1575,17 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * @inline
+ * Parameters for the `createOrganization()` method.
+ * @interface
  */
 export interface CreateOrganizationParams {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug?: string;
 }
 

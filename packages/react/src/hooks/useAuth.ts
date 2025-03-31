@@ -14,6 +14,8 @@ import { createGetToken, createSignOut } from './utils';
  *
  * @param [initialAuthState] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
  *
+ * @function
+ *
  * @example
  *
  * > [!NOTE]
