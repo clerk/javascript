@@ -44,6 +44,15 @@ function getRelativeLinkReplacements() {
   });
 }
 
+function getUnlinkedTypesReplacements() {
+  return [
+    {
+      pattern: /\(setActiveParams\)/g,
+      replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',
+    },
+  ];
+}
+
 /**
  * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
  */
@@ -53,6 +62,14 @@ export function load(app) {
     const linkReplacements = getRelativeLinkReplacements();
 
     for (const { pattern, replace } of linkReplacements) {
+      if (output.contents) {
+        output.contents = output.contents.replace(pattern, replace);
+      }
+    }
+
+    const unlinkedTypesReplacements = getUnlinkedTypesReplacements();
+
+    for (const { pattern, replace } of unlinkedTypesReplacements) {
       if (output.contents) {
         output.contents = output.contents.replace(pattern, replace);
       }
