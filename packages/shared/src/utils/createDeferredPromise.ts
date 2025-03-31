@@ -5,7 +5,7 @@ type Callback = (val?: any) => void;
 /**
  * Create a promise that can be resolved or rejected from
  * outside the Promise constructor callback
- * @internal
+ * A ES6 compatible utility that implements `Promise.withResolvers`
  */
 export const createDeferredPromise = () => {
   let resolve: Callback = noop;
