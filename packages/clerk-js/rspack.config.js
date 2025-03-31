@@ -15,6 +15,7 @@ const variants = {
   clerkBrowser: 'clerk.browser',
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
+  clerkLegacyBrowser: 'clerk.legacy.browser',
 };
 
 const variantToSourceFile = {
@@ -23,6 +24,7 @@ const variantToSourceFile = {
   [variants.clerkBrowser]: './src/index.browser.ts',
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
+  [variants.clerkLegacyBrowser]: './src/index.browser.ts',
 };
 
 /**
@@ -148,8 +150,8 @@ const svgLoader = () => {
   };
 };
 
-/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderProd = () => {
+/** @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
+const typescriptLoaderProd = ({ targets, useCoreJs = false }) => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
@@ -158,7 +160,13 @@ const typescriptLoaderProd = () => {
         loader: 'builtin:swc-loader',
         options: {
           env: {
-            targets: packageJSON.browserslist,
+            targets,
+            ...(useCoreJs
+              ? {
+                  mode: 'usage',
+                  coreJs: '3.41.0',
+                }
+              : {}),
           },
           jsc: {
             parser: {
@@ -180,12 +188,20 @@ const typescriptLoaderProd = () => {
     },
     {
       test: /\.m?js$/,
+      exclude: /node_modules[\\/]core-js/,
       use: {
         loader: 'builtin:swc-loader',
         options: {
           env: {
-            targets: packageJSON.browserslist,
+            targets,
+            ...(useCoreJs
+              ? {
+                  mode: 'usage',
+                  coreJs: '3.41.0',
+                }
+              : {}),
           },
+          isModule: 'unknown',
         },
       },
     },
@@ -223,24 +239,24 @@ const typescriptLoaderDev = () => {
 
 /**
  * Used for production builds that have dynamicly loaded chunks.
- * @type { () => (import('@rspack/core').Configuration) }
+ * @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
  * */
-const commonForProdChunked = () => {
+const commonForProdChunked = ({ targets, useCoreJs = false }) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd()],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
 
 /**
  * Used for production builds that combine all files into one single file (such as for Chrome Extensions).
- * @type { () => (import('@rspack/core').Configuration) }
+ * @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
  * */
-const commonForProdBundled = () => {
+const commonForProdBundled = ({ targets, useCoreJs = false }) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd()],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -280,6 +296,14 @@ const commonForProd = () => {
       //   minChunkSize: 10000,
       // })
     ],
+    resolve: {
+      alias: {
+        // SWC will inject imports to `core-js` into the source files that utilize polyfilled functions. Because we
+        // use pnpm, imports from other packages (like `packages/shared`) will not resolve. This alias forces rspack
+        // to resolve all `core-js` imports to the version we have installed in `clerk-js`.
+        'core-js': path.dirname(require.resolve('core-js/package.json')),
+      },
+    },
   };
 };
 
@@ -330,14 +354,21 @@ const prodConfig = ({ mode, env, analysis }) => {
       : {},
     common({ mode }),
     commonForProd(),
-    commonForProdChunked(),
+    commonForProdChunked({ targets: packageJSON.browserslist }),
+  );
+
+  const clerkLegacyBrowser = merge(
+    entryForVariant(variants.clerkLegacyBrowser),
+    common({ mode }),
+    commonForProd(),
+    commonForProdChunked({ targets: packageJSON.legacybrowserslist, useCoreJs: true }),
   );
 
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
     commonForProd(),
-    commonForProdChunked(),
+    commonForProdChunked({ targets: packageJSON.browserslist }),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
     // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
     // chunking in our browser bundles.
@@ -356,54 +387,66 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkHeadlessBrowser),
     common({ mode }),
     commonForProd(),
-    commonForProdChunked(),
+    commonForProdChunked({ targets: packageJSON.browserslist }),
     // externalsForHeadless(),
   );
 
-  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
-    experiments: {
-      outputModule: true,
+  const clerkEsm = merge(
+    entryForVariant(variants.clerk),
+    common({ mode }),
+    commonForProd(),
+    commonForProdBundled({ targets: packageJSON.browserslist }),
+    {
+      experiments: {
+        outputModule: true,
+      },
+      output: {
+        filename: '[name].mjs',
+        libraryTarget: 'module',
+      },
+      plugins: [
+        // Include the lazy chunks in the bundle as well
+        // so that the final bundle can be imported and bundled again
+        // by a different bundler, eg the webpack instance used by react-scripts
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
     },
-    output: {
-      filename: '[name].mjs',
-      libraryTarget: 'module',
-    },
-    plugins: [
-      // Include the lazy chunks in the bundle as well
-      // so that the final bundle can be imported and bundled again
-      // by a different bundler, eg the webpack instance used by react-scripts
-      new rspack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
-    ],
-    optimization: {
-      splitChunks: false,
-    },
-  });
+  );
 
-  const clerkCjs = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), commonForProdBundled(), {
-    output: {
-      filename: '[name].js',
-      libraryTarget: 'commonjs',
+  const clerkCjs = merge(
+    entryForVariant(variants.clerk),
+    common({ mode }),
+    commonForProd(),
+    commonForProdBundled({ targets: packageJSON.browserslist }),
+    {
+      output: {
+        filename: '[name].js',
+        libraryTarget: 'commonjs',
+      },
+      plugins: [
+        // Include the lazy chunks in the bundle as well
+        // so that the final bundle can be imported and bundled again
+        // by a different bundler, eg the webpack instance used by react-scripts
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
     },
-    plugins: [
-      // Include the lazy chunks in the bundle as well
-      // so that the final bundle can be imported and bundled again
-      // by a different bundler, eg the webpack instance used by react-scripts
-      new rspack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
-    ],
-    optimization: {
-      splitChunks: false,
-    },
-  });
+  );
 
   const clerkEsmNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
     common({ mode, disableRHC: true }),
     commonForProd(),
-    commonForProdBundled(),
+    commonForProdBundled({ targets: packageJSON.browserslist }),
     {
       experiments: {
         outputModule: true,
@@ -430,7 +473,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkNoRHC),
     common({ mode, disableRHC: true }),
     commonForProd(),
-    commonForProdBundled(),
+    commonForProdBundled({ targets: packageJSON.browserslist }),
     {
       output: {
         filename: '[name].js',
@@ -455,7 +498,16 @@ const prodConfig = ({ mode, env, analysis }) => {
     return [clerkBrowser];
   }
 
-  return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkEsmNoRHC, clerkCjs, clerkCjsNoRHC];
+  return [
+    clerkBrowser,
+    clerkLegacyBrowser,
+    clerkHeadless,
+    clerkHeadlessBrowser,
+    clerkEsm,
+    clerkEsmNoRHC,
+    clerkCjs,
+    clerkCjsNoRHC,
+  ];
 };
 
 /**
