@@ -14,7 +14,7 @@ import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from '../Commerce';
+import { AddPaymentSource } from '../PaymentSources';
 
 export const CheckoutForm = ({
   checkout,

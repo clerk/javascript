@@ -11,7 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
-import { __experimental_PaymentSources } from '../Commerce';
+import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
 
 export const BillingPage = withCardStateProvider(() => {
