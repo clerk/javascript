@@ -101,9 +101,6 @@ type IsomorphicLoadedClerk = Without<
   __experimental_commerce: __experimental_CommerceNamespace | undefined;
 };
 
-// type LifecycleStatus = 'loading' | 'loading-failed' | 'ready' | 'degraded';
-// type InternalLifecycleStatus = LifecycleStatus | 'loaded';
-
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
   private readonly options: IsomorphicClerkOptions;
@@ -145,8 +142,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   >();
   private loadedListeners: Array<() => void> = [];
-  // private statusListeners: Array<(status: Clerk['status']) => void> = [];
-  // private internalLifecycleListeners: Array<(status: InternalLifecycleStatus) => void> = [];
 
   #status: Clerk['status'] = 'loading';
   #domain: DomainOrProxyUrl['domain'];
@@ -166,7 +161,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   private get scriptLLoaded(): boolean {
     return this.loaded;
-    // return this.status === 'ready';
   }
 
   get status(): Clerk['status'] {
@@ -449,10 +443,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         await global.Clerk.load(this.options);
       }
 
-      // if (['ready', 'degraded'].includes(global.Clerk?.status || '') || global.Clerk?.loaded) {
-      return this.hydrateClerkJS(global.Clerk);
-      // }
-      // return;
+      if (['ready', 'degraded'].includes(global.Clerk?.status || '') || global.Clerk?.loaded) {
+        return this.hydrateClerkJS(global.Clerk);
+      }
+      return;
     } catch (err) {
       const error = err as Error;
       this.__internal_setStatus('error');
@@ -462,8 +456,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   public __internal_setStatus = (status: Clerk['status']) => {
-    console.log('[__internal_setStatus]', status);
     if (this.clerkjs) {
+      // NOTE: Access with `?.` to avoid breaking usage with older clerk-js versions.
       return this.clerkjs.__internal_setStatus?.(status);
     } else {
       this.#status = status;
@@ -474,11 +468,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
-    // notify immediately
-    listener(this.status);
     if (this.clerkjs) {
       return this.clerkjs.addStatusListener?.(listener);
     } else {
+      // notify immediately
       listener(this.status);
       const unsubscribe = () => {
         const listenerHandlers = this.premountAddStatusListenerCalls.get(listener);
@@ -491,14 +484,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return unsubscribe;
     }
   };
-
-  // public internalOnLifecycle = (listener: (status: InternalLifecycleStatus) => void) => {
-  //   this.internalLifecycleListeners.push(listener);
-  //   listener(this.internalLifecycleState);
-  //   return () => {
-  //     this.internalLifecycleListeners = this.internalLifecycleListeners.filter(l => l !== listener);
-  //   };
-  // };
 
   /**
    * @deprecated
@@ -517,13 +502,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    * @deprecated
    */
   public emitLoaded = () => {
-    console.log('emit loaded');
     this.loadedListeners.forEach(cb => cb());
     this.loadedListeners = [];
   };
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
-    console.log('hydrateClerkJS');
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
@@ -534,9 +517,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
       listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
     });
-    console.log('....hydrating');
 
-    console.log('[premountAddStatusListenerCalls]', this.premountAddStatusListenerCalls);
     this.premountAddStatusListenerCalls.forEach((listenerHandlers, listener) => {
       // NOTE: Access with `?.` to avoid breaking usage with older clerk-js versions.
       listenerHandlers.nativeUnsubscribe = clerkjs.addStatusListener?.(listener);
@@ -602,10 +583,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__experimental_mountPricingTable(node, props);
     });
 
-    // if (this.clerkjs.loaded || this.status === 'ready' || this.status === 'degraded') {
     this.emitLoaded();
-    // }
-
     return this.clerkjs;
   };
 

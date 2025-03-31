@@ -5,7 +5,7 @@ import type { IsomorphicClerk } from '../isomorphicClerk';
  */
 const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
   return new Promise<void>(resolve => {
-    isomorphicClerk.onLifecycle(status => {
+    isomorphicClerk.addStatusListener(status => {
       if (status === 'ready') {
         resolve();
       }
