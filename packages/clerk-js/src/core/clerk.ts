@@ -2220,6 +2220,7 @@ export class Clerk implements ClerkInterface {
 
           if (isError(e, 'requires_captcha')) {
             if (envResult.status === 'rejected') {
+              // TODO(resiliency): Instead of throwing make status as degraded and loaded true
               await initEnvironmentPromise;
             }
             initComponents();
@@ -2229,6 +2230,7 @@ export class Clerk implements ClerkInterface {
           }
         }
 
+        // TODO(resiliency): Instead of throwing make status as degraded and loaded true
         await initEnvironmentPromise;
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
@@ -2264,8 +2266,9 @@ export class Clerk implements ClerkInterface {
 
     if (initializationDegradedCounter > 0) {
       this.__internal_setStatus('degraded');
+    } else {
+      this.__internal_setStatus('ready');
     }
-    this.__internal_setStatus('ready');
     return true;
   };
 
