@@ -45,7 +45,7 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force --no-cache
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
