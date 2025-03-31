@@ -11,6 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { createCSPHeader } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -57,6 +58,11 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * If true, additional debug information will be logged to the console.
    */
   debug?: boolean;
+
+  /**
+   * When set to 'standard' or 'strict-dynamic', automatically injects a Content-Security-Policy header compatible with Clerk.
+   */
+  injectCSP?: 'standard' | 'strict-dynamic';
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -186,6 +192,25 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
+      }
+      if (options.injectCSP) {
+        const result = createCSPHeader(
+          options.injectCSP,
+          clerkRequest.clerkUrl.toString(),
+          handlerResult.headers.get('Content-Security-Policy'),
+        );
+        const { nonce } = result;
+        const csp = result.header;
+
+        setHeader(handlerResult, 'Content-Security-Policy', csp);
+        if (nonce) {
+          setHeader(handlerResult, 'X-Nonce', nonce);
+        }
+
+        logger.debug('CSP', () => ({
+          csp,
+          nonce,
+        }));
       }
 
       // TODO @nikos: we need to make this more generic
