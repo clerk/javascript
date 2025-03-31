@@ -83,6 +83,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledCommerceFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -106,6 +107,7 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
+import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
@@ -921,6 +923,14 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledCommerceFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
+          code: 'cannot_render_commerce_disabled',
+        });
+      }
+      return;
+    }
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
         name: 'PricingTable',
@@ -1086,7 +1096,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (newSession?.currentTask) {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         globalNavigate: this.navigate,
         componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
@@ -1109,7 +1119,7 @@ export class Clerk implements ClerkInterface {
     }
 
     if (session.status === 'pending') {
-      await navigateToTask(session.currentTask, {
+      await navigateToTask(session.currentTask.key, {
         options: this.#options,
         environment: this.environment,
         globalNavigate: this.navigate,
@@ -1489,6 +1499,23 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
+    // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
+    // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
+    // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
+    if (!window.opener) {
+      try {
+        await signIn.reload();
+      } catch {
+        // This can be safely ignored
+      }
+      try {
+        await signUp.reload();
+      } catch {
+        // This can be safely ignored
+      }
+    }
+
     const { displayConfig } = this.environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1718,8 +1745,11 @@ export class Clerk implements ClerkInterface {
       }
       return this.setActive({ session: null });
     } catch (err) {
-      // Handle the 403 Forbidden
-      if (err.status === 403) {
+      // `/client` can fail with either a 401, a 403, 500 or network errors.
+      // 401 is already handled internally in our fetcher.
+      // 403 means that the client is blocked, signing out the user is the only option.
+      // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
+      if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
         return this.setActive({ session: null });
       } else {
         throw err;
@@ -2089,6 +2119,18 @@ export class Clerk implements ClerkInterface {
           .fetch({ touch: shouldTouchEnv })
           .then(res => {
             this.updateEnvironment(res);
+          })
+          .catch(e => {
+            const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
+              CLERK_ENVIRONMENT_STORAGE_ENTRY,
+              null,
+            );
+
+            if (!environmentSnapshot) {
+              throw e;
+            }
+
+            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
         const initClient = async () => {
@@ -2109,8 +2151,20 @@ export class Clerk implements ClerkInterface {
 
               this.updateClient(localClient);
 
-              // Always grab a fresh token
-              await this.session?.getToken({ skipCache: true });
+              /**
+               * In most scenarios we want the poller to stop while we are fetching a fresh token during an outage.
+               * We want to avoid having the below `getToken()` retrying at the same time as the poller.
+               */
+              this.#authService?.stopPollingForToken();
+
+              // Attempt to grab a fresh token
+              await this.session
+                ?.getToken({ skipCache: true })
+                // If the token fetch fails, let Clerk be marked as loaded and leave it up to the poller.
+                .catch(() => null)
+                .finally(() => {
+                  this.#authService?.startPollingForToken();
+                });
 
               // Allows for Clerk to be marked as loaded with the client and session created from the JWT.
               return null;
@@ -2128,6 +2182,7 @@ export class Clerk implements ClerkInterface {
         };
 
         const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
@@ -2141,6 +2196,8 @@ export class Clerk implements ClerkInterface {
             throw e;
           }
         }
+
+        await initEnvironmentPromise;
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
@@ -2266,6 +2323,15 @@ export class Clerk implements ClerkInterface {
      */
     eventBus.on(events.UserSignOut, () => {
       this.#broadcastChannel?.postMessage({ type: 'signout' });
+    });
+
+    eventBus.on(events.EnvironmentUpdate, () => {
+      // Cache the environment snapshot for 24 hours
+      SafeLocalStorage.setItem(
+        CLERK_ENVIRONMENT_STORAGE_ENTRY,
+        this.environment?.__internal_toSnapshot(),
+        24 * 60 * 60 * 1_000,
+      );
     });
   };
 

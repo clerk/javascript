@@ -1,4 +1,5 @@
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
+import type { SessionStatus } from './session';
 
 export interface Jwt {
   header: JwtHeader;
@@ -109,6 +110,11 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   fva?: [fistFactorAge: number, secondFactorAge: number];
 
   /**
+   * Session status
+   */
+  sts?: SessionStatusClaim;
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
@@ -122,3 +128,8 @@ export interface ActClaim {
   sub: string;
   [x: string]: unknown;
 }
+
+/**
+ * Session status
+ */
+export type SessionStatusClaim = Extract<SessionStatus, 'active' | 'pending'>;

@@ -9,21 +9,29 @@ export class SessionCookiePoller {
   private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
   private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
+  // Disallows for multiple `startPollingForSessionToken()` calls before `callback` is executed.
+  private initiated = false;
 
-  public startPollingForSessionToken(cb: () => unknown): void {
-    if (this.timerId) {
+  public startPollingForSessionToken(cb: () => Promise<unknown>): void {
+    if (this.timerId || this.initiated) {
       return;
     }
 
-    this.timerId = this.workerTimers.setInterval(() => {
-      void this.lock.acquireLockAndRun(cb);
-    }, INTERVAL_IN_MS);
+    const run = async () => {
+      this.initiated = true;
+      await this.lock.acquireLockAndRun(cb);
+      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+    };
+
+    void run();
   }
 
   public stopPollingForSessionToken(): void {
-    if (this.timerId) {
-      this.workerTimers.clearInterval(this.timerId);
+    // Note: `timerId` can be 0.
+    if (this.timerId != null) {
+      this.workerTimers.clearTimeout(this.timerId);
       this.timerId = null;
     }
+    this.initiated = false;
   }
 }

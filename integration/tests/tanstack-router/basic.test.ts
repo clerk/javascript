@@ -5,7 +5,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
-  'basic tests for TanStack Router @tanstack-router',
+  'basic tests for TanStack Router @tanstack-react-router',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 

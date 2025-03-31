@@ -7,6 +7,8 @@ type UseSession = () => UseSessionReturn;
 /**
  * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/references/javascript/session) object, as well as helpers for setting the active session.
  *
+ * @function
+ *
  * @example
  * ### Access the `Session` object
  *

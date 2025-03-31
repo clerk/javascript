@@ -83,6 +83,8 @@ export type AuthenticateWithRedirectParams = {
   legalAccepted?: boolean;
 };
 
+export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
+
 export type RedirectUrlProp = {
   /**
    * Full URL or path to navigate to after a successful action.

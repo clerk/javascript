@@ -1,4 +1,4 @@
-import type { __experimental_CommercePlanResource } from '@clerk/types';
+import type { __experimental_CommercePlanResource, __experimental_CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import {
@@ -19,13 +19,12 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 import { colors } from '../../utils';
-import type { PlanPeriod } from './PlanCard';
 
 interface PricingTableMatrixProps {
   plans: __experimental_CommercePlanResource[];
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: PlanPeriod;
-  setPlanPeriod: (val: PlanPeriod) => void;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource) => void;
 }
 
@@ -42,7 +41,7 @@ export function PricingTableMatrix({
   const pricingTableMatrixId = React.useId();
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
-  const planCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
+  const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
       : 'none',
@@ -133,7 +132,7 @@ export function PricingTableMatrix({
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as PlanPeriod)}
+                      onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'
@@ -259,7 +258,7 @@ export function PricingTableMatrix({
                                     display: 'grid',
                                     gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
                                   }),
-                                  planCardFeePeriodNoticeAnimation,
+                                  feePeriodNoticeAnimation,
                                 ]}
                                 // @ts-ignore - Needed until React 19 support
                                 inert={planPeriod !== 'annual' ? 'true' : undefined}
@@ -326,7 +325,9 @@ export function PricingTableMatrix({
                           onSelect(plan);
                         }}
                         localizationKey={
-                          plan.isActiveForPayer ? 'Manage' : localizationKeys('__experimental_commerce.getStarted')
+                          plan.subscriptionIdForCurrentSubscriber
+                            ? 'Manage'
+                            : localizationKeys('__experimental_commerce.getStarted')
                         }
                       />
                     </Box>
