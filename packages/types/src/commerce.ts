@@ -67,7 +67,7 @@ export interface __experimental_CommerceFeatureResource extends ClerkResource {
   avatarUrl: string;
 }
 
-export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 'pending' | 'disconnected';
+export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 'disconnected';
 
 export interface __experimental_InitializePaymentSourceParams {
   gateway: 'stripe' | 'paypal';

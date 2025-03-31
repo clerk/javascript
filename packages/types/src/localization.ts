@@ -669,6 +669,12 @@ type _LocalizationResource = {
         cancelButton: LocalizationValue;
         actionLabel__default: LocalizationValue;
         actionLabel__remove: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
       };
     };
   };

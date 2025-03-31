@@ -676,6 +676,13 @@ export const enUS: LocalizationResource = {
         cancelButton: 'Cancel',
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
+        removeResource: {
+          title: 'Remove payment source',
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+        },
       },
     },
     backupCodePage: {
