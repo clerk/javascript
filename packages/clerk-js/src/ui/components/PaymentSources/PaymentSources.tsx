@@ -47,9 +47,12 @@ const RemoveScreen = ({
   }
 
   const removePaymentSource = async () => {
-    await paymentSource.remove().catch((error: Error) => {
-      handleError(error, [], card.setError);
-    });
+    await paymentSource
+      .remove()
+      .then(revalidate)
+      .catch((error: Error) => {
+        handleError(error, [], card.setError);
+      });
   };
 
   return (
@@ -71,10 +74,7 @@ const RemoveScreen = ({
         },
       )}
       deleteResource={removePaymentSource}
-      onSuccess={() => {
-        revalidate();
-        close();
-      }}
+      onSuccess={close}
       onReset={close}
     />
   );
@@ -165,9 +165,7 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
               <Action.Trigger value='add'>
                 <ProfileSection.ArrowButton
                   id='paymentSources'
-                  localizationKey={localizationKeys(
-                    'userProfile.__experimental_billingPage.paymentSourcesSection.addButton',
-                  )}
+                  localizationKey={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
                 />
               </Action.Trigger>
               <Action.Open value='add'>

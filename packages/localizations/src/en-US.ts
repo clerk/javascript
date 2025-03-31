@@ -671,11 +671,13 @@ export const enUS: LocalizationResource = {
       title: 'Billing & Payments',
       paymentSourcesSection: {
         title: 'Available options',
-        addButton: 'Add new payment source',
-        saveButton: 'Save Payment Information',
+        add: 'Add new payment source',
+        addSubtitle: 'Add a new payment source to your account.',
         cancelButton: 'Cancel',
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
         removeResource: {
           title: 'Remove payment source',
           messageLine1: '{{identifier}} will be removed from this account.',

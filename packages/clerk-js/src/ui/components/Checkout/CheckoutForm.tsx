@@ -8,7 +8,7 @@ import type {
 } from '@clerk/types';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Form, Icon, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, Icon, localizationKeys, Text } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown, CreditCard } from '../../icons';
@@ -182,7 +182,12 @@ const CheckoutFormElements = ({
             checkout={checkout}
             onSuccess={onAddPaymentSourceSuccess}
             onExpand={didExpandStripePaymentMethods}
-            submitButtonText={`Pay ${(checkout.totals.totalDueNow || checkout.totals.grandTotal).currencySymbol}${(checkout.totals.totalDueNow || checkout.totals.grandTotal).amountFormatted}`}
+            submitLabel={localizationKeys(
+              'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+              {
+                amount: `${(checkout.totals.totalDueNow || checkout.totals.grandTotal).currencySymbol}${(checkout.totals.totalDueNow || checkout.totals.grandTotal).amountFormatted}`,
+              },
+            )}
           />
         </Disclosure.Content>
       </Disclosure.Root>

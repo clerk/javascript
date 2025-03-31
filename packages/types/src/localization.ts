@@ -664,11 +664,13 @@ type _LocalizationResource = {
       };
       paymentSourcesSection: {
         title: LocalizationValue;
-        addButton: LocalizationValue;
-        saveButton: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
         cancelButton: LocalizationValue;
         actionLabel__default: LocalizationValue;
         actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
         removeResource: {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
