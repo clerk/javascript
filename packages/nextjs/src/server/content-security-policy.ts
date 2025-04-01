@@ -251,17 +251,17 @@ export function generateNonce() {
 
 /**
  * Creates a merged CSP state with all necessary directives
- * @param host - The host to include in CSP
- * @param nonce - Optional nonce for strict-dynamic mode
  * @param mode - The CSP mode to use
+ * @param host - The host to include in CSP
  * @param customDirectives - Optional custom directives to merge with
+ * @param nonce - Optional nonce for strict-dynamic mode
  * @returns Merged CSPDirectiveSet
  */
 function createMergedCSP(
+  mode: CSPMode,
   host: string,
-  nonce?: string,
-  mode: CSPMode = 'standard',
   customDirectives?: Record<string, string | string[]>,
+  nonce?: string,
 ): Record<string, Set<string>> {
   // Initialize with default Clerk CSP values
   const mergedCSP = CSPDirectiveManager.createDefaultDirectives();
@@ -319,10 +319,9 @@ export function createCSPHeader(
   customDirectives?: Record<string, string | string[]>,
 ): CSPHeaderResult {
   const nonce = mode === 'strict-dynamic' ? generateNonce() : undefined;
-  const mergedCSP = createMergedCSP(host, nonce, mode, customDirectives);
 
   return {
-    header: formatCSPHeader(mergedCSP),
+    header: formatCSPHeader(createMergedCSP(mode, host, customDirectives, nonce)),
     nonce,
   };
 }

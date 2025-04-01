@@ -11,7 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
-import { createCSPHeader } from './content-security-policy';
+import { createCSPHeader, type CSPMode } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -60,17 +60,17 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
 
   /**
-   * When set, automatically injects a Content-Security-Policy header compatible with Clerk.
+   * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
-  injectCSP?: {
+  contentSecurityPolicy?: {
     /**
      * The CSP mode to use - either 'standard' or 'strict-dynamic'
      */
-    mode: 'standard' | 'strict-dynamic';
+    mode: CSPMode;
     /**
      * Custom CSP directives to merge with Clerk's default directives
      */
-    directives?: Record<string, string | string[]>;
+    directives?: Record<string, string[]>;
   };
 };
 
@@ -207,11 +207,11 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
-      if (options.injectCSP) {
+      if (options.contentSecurityPolicy) {
         const result = createCSPHeader(
-          options.injectCSP.mode,
+          options.contentSecurityPolicy.mode,
           clerkRequest.clerkUrl.toString(),
-          options.injectCSP.directives,
+          options.contentSecurityPolicy.directives,
         );
         const { nonce } = result;
         const csp = result.header;
