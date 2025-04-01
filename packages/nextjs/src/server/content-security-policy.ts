@@ -272,10 +272,11 @@ function parseHost(input: string): string {
  * Generates a secure random nonce for CSP headers
  * @returns A base64-encoded random nonce
  */
-export function generateNonce() {
-  const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array));
+export function generateNonce(): string {
+  const randomBytes = new Uint8Array(16);
+  crypto.getRandomValues(randomBytes);
+  const binaryString = Array.from(randomBytes, byte => String.fromCharCode(byte)).join('');
+  return btoa(binaryString);
 }
 
 /**
