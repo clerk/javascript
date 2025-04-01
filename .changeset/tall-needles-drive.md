@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Update secured by clerk link
+Update secured by clerk link URL.
