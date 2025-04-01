@@ -154,6 +154,11 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         logger.debug('Basic Auth detected');
       }
 
+      const cspHeader = request.headers.get('Content-Security-Policy');
+      if (cspHeader) {
+        logger.debug('Content-Security-Policy detected');
+      }
+
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
         createAuthenticateRequestOptions(clerkRequest, options),
