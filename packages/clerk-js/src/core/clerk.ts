@@ -317,6 +317,11 @@ export class Clerk implements ClerkInterface {
   }
 
   get isSignedIn(): boolean {
+    const hasPendingSession = this?.session?.status === 'pending';
+    if (hasPendingSession) {
+      return false;
+    }
+
     return !!this.session;
   }
 
