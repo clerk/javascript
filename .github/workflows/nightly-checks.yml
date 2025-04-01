@@ -8,7 +8,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 30 }}
+    timeout-minutes: 30
 
     strategy:
       matrix:
