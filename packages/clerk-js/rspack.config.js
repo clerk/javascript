@@ -361,7 +361,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkLegacyBrowser),
     common({ mode }),
     commonForProd(),
-    commonForProdChunked({ targets: packageJSON.legacybrowserslist, useCoreJs: true }),
+    commonForProdChunked({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
 
   const clerkHeadless = merge(
