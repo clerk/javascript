@@ -231,9 +231,10 @@ describe('CSP Header Utils', () => {
     });
 
     it('automatically quotes special keywords in CSP directives regardless of input format', () => {
+      vi.stubEnv('NODE_ENV', 'development');
       const customDirectives = {
-        'script-src': ['self', 'unsafe-inline', 'unsafe-eval'],
-        'new-directive': ['none', 'self', 'unsafe-inline'],
+        'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
+        'new-directive': ['none'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -246,14 +247,20 @@ describe('CSP Header Utils', () => {
       const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
       expect(scriptSrcValues).toContain("'self'");
       expect(scriptSrcValues).toContain("'unsafe-inline'");
+      expect(scriptSrcValues).toContain("'unsafe-eval'");
+      expect(scriptSrcValues).toContain("custom-domain.com");
+      // Verify default values for standard mode
+      expect(scriptSrcValues).toContain("http:");
+      expect(scriptSrcValues).toContain("https:");
 
-      // Verify new-directive has properly quoted keywords
+      // Verify new-directive has properly quoted keywords and is the sole value
       const newDirective = resultDirectives.find((d: string) => d.startsWith('new-directive')) ?? '';
       expect(newDirective).toBeDefined();
       const newDirectiveValues = newDirective.replace('new-directive ', '').split(' ');
       expect(newDirectiveValues).toContain("'none'");
-      expect(newDirectiveValues).toContain("'self'");
-      expect(newDirectiveValues).toContain("'unsafe-inline'");
+      expect(newDirectiveValues).toHaveLength(1);
+      
+      vi.stubEnv('NODE_ENV', 'production');
     });
 
     it('correctly merges clerk subdomain with existing CSP values', () => {
