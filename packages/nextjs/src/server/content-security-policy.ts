@@ -223,25 +223,26 @@ function formatCSPHeader(mergedCSP: Record<string, Set<string>>): string {
 
   return orderedEntries
     .map(([key, values]) => {
-      // Sort values according to specific order
-      const sortedValues = Array.from(values).sort((a, b) => {
-        const formattedA = CSPDirectiveManager.formatValue(a);
-        const formattedB = CSPDirectiveManager.formatValue(b);
+      // Map each value to an object with its formatted version to avoid repeated formatting
+      const valueObjs = Array.from(values).map(v => ({
+        raw: v,
+        formatted: CSPDirectiveManager.formatValue(v),
+      }));
 
-        // If both values are in orderMap, sort by their order
-        if (orderMap[formattedA] && orderMap[formattedB]) {
-          return orderMap[formattedA] - orderMap[formattedB];
+      // Sort based on formatted values using orderMap and alphabetical order
+      valueObjs.sort((a, b) => {
+        if (orderMap[a.formatted] && orderMap[b.formatted]) {
+          return orderMap[a.formatted] - orderMap[b.formatted];
         }
-
-        // If only one value is in orderMap, it should come first
-        if (orderMap[formattedA]) return -1;
-        if (orderMap[formattedB]) return 1;
-
-        // Otherwise, sort alphabetically
-        return formattedA.localeCompare(formattedB);
+        if (orderMap[a.formatted]) return -1;
+        if (orderMap[b.formatted]) return 1;
+        return a.formatted.localeCompare(b.formatted);
       });
 
-      return `${key} ${sortedValues.map(v => CSPDirectiveManager.formatValue(v)).join(' ')}`;
+      // Extract the formatted values without calling formatValue again
+      const sortedFormattedValues = valueObjs.map(item => item.formatted);
+
+      return `${key} ${sortedFormattedValues.join(' ')}`;
     })
     .join('; ');
 }

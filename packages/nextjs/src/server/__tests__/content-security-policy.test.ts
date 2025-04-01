@@ -54,9 +54,9 @@ describe('CSP Header Utils', () => {
 
     it('should handle custom directives as an object', () => {
       const customDirectives = {
-        'default-src': "'none'",
+        'default-src': ["'none'"],
         'img-src': ["'self'", 'https://example.com'],
-        'custom-directive': "'value'",
+        'custom-directive': ["'value'"],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -81,7 +81,7 @@ describe('CSP Header Utils', () => {
 
     it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
       const customDirectives = {
-        'custom-directive': 'new-value',
+        'custom-directive': ['new-value'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
