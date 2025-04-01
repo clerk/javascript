@@ -1,4 +1,5 @@
 export * from './createDeferredPromise';
+export * from './allSettled';
 export { isStaging } from './instance';
 export { logErrorInDevMode } from './logErrorInDevMode';
 export { noop } from './noop';
