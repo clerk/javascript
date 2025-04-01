@@ -28,7 +28,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSUrl?: string;
   /**
-   * If your web application only uses Control components, you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   * If your web application only uses [Control Components](https://clerk.com/docs/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
    */
   clerkJSVariant?: 'headless' | '';
   /**

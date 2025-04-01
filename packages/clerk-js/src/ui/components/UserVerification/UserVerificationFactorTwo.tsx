@@ -23,13 +23,23 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
+  'phone_code',
+  'totp',
+  'backup_code',
+] as const;
+
 export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
 
   const availableFactors = useMemo(() => {
-    return sessionVerification.supportedSecondFactors?.sort(sortByPrimaryFactor) || null;
+    return (
+      sessionVerification.supportedSecondFactors
+        ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        ?.sort(sortByPrimaryFactor) || null
+    );
   }, [sessionVerification.supportedSecondFactors]);
 
   const lastPreparedFactorKeyRef = React.useRef('');

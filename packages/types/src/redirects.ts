@@ -2,14 +2,14 @@ import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy } from './strat
 
 export type AfterSignOutUrl = {
   /**
-   * Full URL or path to navigate after successful sign out.
+   * Full URL or path to navigate to after successful sign out.
    */
   afterSignOutUrl?: string | null;
 };
 
 export type AfterMultiSessionSingleSignOutUrl = {
   /**
-   * Full URL or path to navigate after signing out the current user is complete.
+   * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
    */
   afterMultiSessionSingleSignOutUrl?: string | null;
@@ -52,7 +52,7 @@ export type AuthenticateWithRedirectParams = {
   redirectUrl: string;
 
   /**
-   * Full URL or path to navigate after the OAuth or SAML flow completes.
+   * Full URL or path to navigate to after the OAuth or SAML flow completes.
    */
   redirectUrlComplete: string;
 
@@ -87,7 +87,7 @@ export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { pop
 
 export type RedirectUrlProp = {
   /**
-   * Full URL or path to navigate after a successful action.
+   * Full URL or path to navigate to after a successful action.
    */
   redirectUrl?: string | null;
 };

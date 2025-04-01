@@ -4,7 +4,12 @@ import type { ClerkResource } from './resource';
 
 export interface __experimental_CommerceNamespace {
   __experimental_billing: __experimental_CommerceBillingNamespace;
-  getPaymentSources: () => Promise<ClerkPaginatedResponse<__experimental_CommercePaymentSourceResource>>;
+  getPaymentSources: (
+    params: __experimental_GetPaymentSourcesParams,
+  ) => Promise<ClerkPaginatedResponse<__experimental_CommercePaymentSourceResource>>;
+  initializePaymentSource: (
+    params: __experimental_InitializePaymentSourceParams,
+  ) => Promise<__experimental_CommerceInitializedPaymentSourceResource>;
   addPaymentSource: (
     params: __experimental_AddPaymentSourceParams,
   ) => Promise<__experimental_CommercePaymentSourceResource>;
@@ -62,10 +67,19 @@ export interface __experimental_CommerceFeatureResource extends ClerkResource {
   avatarUrl: string;
 }
 
+export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 'disconnected';
+
+export interface __experimental_InitializePaymentSourceParams {
+  gateway: 'stripe' | 'paypal';
+}
+
 export interface __experimental_AddPaymentSourceParams {
   gateway: 'stripe' | 'paypal';
-  paymentMethod: string;
   paymentToken: string;
+}
+
+export interface __experimental_GetPaymentSourcesParams {
+  orgId?: string;
 }
 
 export interface __experimental_CommercePaymentSourceResource extends ClerkResource {
@@ -73,6 +87,14 @@ export interface __experimental_CommercePaymentSourceResource extends ClerkResou
   last4: string;
   paymentMethod: string;
   cardType: string;
+  isDefault: boolean;
+  status: __experimental_CommercePaymentSourceStatus;
+  remove: () => Promise<DeletedObjectResource>;
+}
+
+export interface __experimental_CommerceInitializedPaymentSourceResource extends ClerkResource {
+  externalClientSecret: string;
+  externalGatewayId: string;
 }
 
 export interface __experimental_CommerceInvoiceResource extends ClerkResource {
