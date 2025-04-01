@@ -183,10 +183,11 @@ function formatCSPHeader(mergedCSP: Record<string, Set<string>>): string {
   const orderMap: Record<string, number> = {
     "'none'": 1,
     "'self'": 2,
-    "'unsafe-eval'": 3,
-    "'unsafe-inline'": 4,
-    'http:': 5,
-    'https:': 6,
+    "'strict-dynamic'": 3,
+    "'unsafe-eval'": 4,
+    "'unsafe-inline'": 5,
+    'http:': 6,
+    'https:': 7,
   };
 
   // Sort directives to ensure consistent order
