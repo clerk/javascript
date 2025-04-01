@@ -141,7 +141,7 @@
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
-    "std-env": "^3.7.0",
+    "std-env": "^3.8.1",
     "swr": "^2.3.3"
   },
   "devDependencies": {
