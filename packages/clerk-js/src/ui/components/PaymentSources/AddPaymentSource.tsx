@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
-import { Alert, Form, FormButtons, FormContainer } from '../../elements';
+import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
 import { animations } from '../../styledSystem';
@@ -126,153 +126,150 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   );
 };
 
-const AddPaymentSourceForm = ({
-  submitLabel,
-  onSuccess,
-  onExpand,
-  cancelAction,
-  cancelButtonText,
-  isCheckout,
-}: AddPaymentSourceFormProps) => {
-  const { __experimental_commerce } = useClerk();
-  const stripe = useStripe();
-  const elements = useElements();
-  const [collapsed, setCollapsed] = useState(true);
-  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+const AddPaymentSourceForm = withCardStateProvider(
+  ({ submitLabel, onSuccess, onExpand, cancelAction, cancelButtonText, isCheckout }: AddPaymentSourceFormProps) => {
+    const { __experimental_commerce } = useClerk();
+    const stripe = useStripe();
+    const elements = useElements();
+    const [collapsed, setCollapsed] = useState(true);
+    const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  useEffect(() => {
-    if (!collapsed) {
-      onExpand?.();
-    }
-  }, [collapsed, onExpand]);
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!stripe || !elements) {
-      return;
-    }
-    setSubmitError(undefined);
-
-    try {
-      const { setupIntent, error } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: '', // TODO(@COMMERCE): need to figure this out
-        },
-        redirect: 'if_required',
-      });
-      if (error) {
-        return; // just return, since stripe will handle the error
+    useEffect(() => {
+      if (!collapsed) {
+        onExpand?.();
       }
+    }, [collapsed, onExpand]);
 
-      const paymentSource = await __experimental_commerce.addPaymentSource({
-        gateway: 'stripe',
-        paymentToken: setupIntent.payment_method as string,
-      });
-
-      void onSuccess(paymentSource);
-    } catch (error) {
-      void handleError(error, [], setSubmitError);
-    }
-  };
-
-  return (
-    <FormContainer
-      headerTitle={
-        !isCheckout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!stripe || !elements) {
+        return;
       }
-      headerSubtitle={
-        !isCheckout
-          ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
-          : undefined
+      setSubmitError(undefined);
+
+      try {
+        const { setupIntent, error } = await stripe.confirmSetup({
+          elements,
+          confirmParams: {
+            return_url: '', // TODO(@COMMERCE): need to figure this out
+          },
+          redirect: 'if_required',
+        });
+        if (error) {
+          return; // just return, since stripe will handle the error
+        }
+
+        const paymentSource = await __experimental_commerce.addPaymentSource({
+          gateway: 'stripe',
+          paymentToken: setupIntent.payment_method as string,
+        });
+
+        void onSuccess(paymentSource);
+      } catch (error) {
+        void handleError(error, [], setSubmitError);
       }
-    >
-      <Form.Root
-        onSubmit={onSubmit}
-        sx={t => ({
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: t.space.$3,
-        })}
+    };
+
+    return (
+      <FormContainer
+        headerTitle={
+          !isCheckout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
+        }
+        headerSubtitle={
+          !isCheckout
+            ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
+            : undefined
+        }
       >
-        {collapsed ? (
-          <>
-            <Button
-              elementId={descriptors.button.setId('applePay')}
-              variant='unstyled'
-              size='md'
-              textVariant={'buttonLarge'}
-              sx={{
-                width: '100%',
-                backgroundColor: 'black',
-                color: 'white',
-              }}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Pay with ApplePay
-            </Button>
-            <Button
-              elementId={descriptors.button.setId('gPay')}
-              variant='unstyled'
-              size='md'
-              textVariant={'buttonLarge'}
-              block
-              sx={{
-                backgroundColor: 'black',
-                color: 'white',
-              }}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Pay with GPay
-            </Button>
-            <Button
-              colorScheme='secondary'
-              variant='bordered'
-              size='md'
-              textVariant={'buttonLarge'}
-              block
-              onClick={() => setCollapsed(false)}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              More Payment Methods
-            </Button>
-            {cancelAction ? (
+        <Form.Root
+          onSubmit={onSubmit}
+          sx={t => ({
+            display: 'flex',
+            flexDirection: 'column',
+            rowGap: t.space.$3,
+          })}
+        >
+          {collapsed ? (
+            <>
               <Button
-                variant='ghost'
+                elementId={descriptors.button.setId('applePay')}
+                variant='unstyled'
+                size='md'
+                textVariant={'buttonLarge'}
+                sx={{
+                  width: '100%',
+                  backgroundColor: 'black',
+                  color: 'white',
+                }}
+              >
+                {/* TODO(@COMMERCE): needs localization */}
+                Pay with ApplePay
+              </Button>
+              <Button
+                elementId={descriptors.button.setId('gPay')}
+                variant='unstyled'
                 size='md'
                 textVariant={'buttonLarge'}
                 block
-                onClick={cancelAction}
+                sx={{
+                  backgroundColor: 'black',
+                  color: 'white',
+                }}
               >
-                {cancelButtonText ?? 'Cancel'}
+                {/* TODO(@COMMERCE): needs localization */}
+                Pay with GPay
               </Button>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <PaymentElement options={{ layout: { type: 'tabs', defaultCollapsed: false } }} />
-            {submitError && (
-              <Alert
-                variant='danger'
-                sx={t => ({
-                  animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
-                })}
+              <Button
+                colorScheme='secondary'
+                variant='bordered'
+                size='md'
+                textVariant={'buttonLarge'}
+                block
+                onClick={() => setCollapsed(false)}
               >
-                {typeof submitError === 'string' ? submitError : submitError.message}
-              </Alert>
-            )}
-            <FormButtons
-              submitLabel={
-                submitLabel ??
-                localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add')
-              }
-              onReset={cancelAction}
-              hideReset={!cancelAction}
-              sx={{ flex: isCheckout ? 1 : undefined }}
-            />
-          </>
-        )}
-      </Form.Root>
-    </FormContainer>
-  );
-};
+                {/* TODO(@COMMERCE): needs localization */}
+                More Payment Methods
+              </Button>
+              {cancelAction ? (
+                <Button
+                  variant='ghost'
+                  size='md'
+                  textVariant={'buttonLarge'}
+                  block
+                  onClick={cancelAction}
+                >
+                  {cancelButtonText ?? 'Cancel'}
+                </Button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <PaymentElement options={{ layout: { type: 'tabs', defaultCollapsed: false } }} />
+              {submitError && (
+                <Alert
+                  variant='danger'
+                  sx={t => ({
+                    animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
+                  })}
+                >
+                  {typeof submitError === 'string' ? submitError : submitError.message}
+                </Alert>
+              )}
+              <FormButtons
+                submitLabel={
+                  submitLabel ??
+                  localizationKeys(
+                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add',
+                  )
+                }
+                onReset={cancelAction}
+                hideReset={!cancelAction}
+                sx={{ flex: isCheckout ? 1 : undefined }}
+              />
+            </>
+          )}
+        </Form.Root>
+      </FormContainer>
+    );
+  },
+);

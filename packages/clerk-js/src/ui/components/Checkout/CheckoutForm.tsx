@@ -16,6 +16,8 @@ import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource } from '../PaymentSources';
 
+const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+
 export const CheckoutForm = ({
   checkout,
   onCheckoutComplete,
@@ -214,7 +216,7 @@ const PaymentSourceMethods = ({
     return paymentSources.map(source => {
       return {
         value: source.id,
-        label: `${source.cardType} ⋯ ${source.last4}`,
+        label: `${capitalize(source.cardType)} ⋯ ${source.last4}`,
       };
     });
   }, [paymentSources]);
@@ -261,7 +263,7 @@ const PaymentSourceMethods = ({
                 as='span'
                 colorScheme='body'
               >
-                {selectedPaymentSource.cardType} ⋯ {selectedPaymentSource.last4}
+                {capitalize(selectedPaymentSource.cardType)} ⋯ {selectedPaymentSource.last4}
               </Text>
             </Flex>
           )}
