@@ -11,7 +11,3 @@ export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invita
 export type OrganizationMembershipRole = OrganizationCustomRoleKey;
 
 export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';
-
-export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
-
-export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

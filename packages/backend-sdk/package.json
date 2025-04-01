@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend-sdk",
-  "version": "0.3.4",
+  "version": "0.3.6",
   "author": "Speakeasy",
   "type": "module",
   "tshy": {

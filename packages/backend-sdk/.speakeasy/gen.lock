@@ -3,10 +3,10 @@ id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
   docChecksum: 006512cb58837e8d69c2cec95facfb52
   docVersion: "2025-12-03"
-  speakeasyVersion: 1.525.1
-  generationVersion: 2.562.2
-  releaseVersion: 0.3.4
-  configChecksum: 520b4b3d9b5fda37a9c5058facc7f8ea
+  speakeasyVersion: 1.526.6
+  generationVersion: 2.563.1
+  releaseVersion: 0.3.6
+  configChecksum: 1d208495f30d70c9d55734968b0a846e
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -684,7 +684,6 @@ generatedFiles:
   - src/models/components/testingtoken.ts
   - src/models/components/token.ts
   - src/models/components/totalcount.ts
-  - src/models/components/user.ts
   - src/models/components/waitlistentries.ts
   - src/models/components/waitlistentry.ts
   - src/models/components/web3wallet.ts

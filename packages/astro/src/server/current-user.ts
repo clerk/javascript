@@ -11,6 +11,6 @@ export const createCurrentUser = (req: Request, context: APIContext) => {
       return null;
     }
 
-    return clerkClient(context).users.getUser(userId);
+    return clerkClient(context).users.get({ userId });
   };
 };

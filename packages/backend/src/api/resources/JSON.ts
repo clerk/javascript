@@ -1,12 +1,12 @@
+import type { InvitationStatus, SignUpStatus } from '@clerk/backend-sdk/models/components';
+
 import type {
-  InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
   OrganizationEnrollmentMode,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpStatus,
 } from './Enums';
 
 export const ObjectType = {

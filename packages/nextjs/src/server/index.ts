@@ -10,17 +10,6 @@ export { clerkClient } from './clerkClient';
  * Webhook-specific exports
  */
 export type {
-  DeletedObjectJSON,
-  EmailJSON,
-  OrganizationJSON,
-  OrganizationDomainJSON,
-  OrganizationDomainVerificationJSON,
-  OrganizationInvitationJSON,
-  OrganizationMembershipJSON,
-  SessionJSON,
-  SMSMessageJSON,
-  UserJSON,
-  WaitlistEntryJSON,
   WebhookEvent,
   WebhookEventType,
   UserWebhookEvent,

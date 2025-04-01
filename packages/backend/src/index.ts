@@ -73,3 +73,34 @@ export type {
  * Auth objects
  */
 export type { AuthObject } from './tokens/authObjects';
+
+/**
+ * Resources
+ */
+export type {
+  AllowlistIdentifier,
+  Client,
+  EmailAddress,
+  ExternalAccount,
+  Invitation,
+  Organization,
+  OrganizationDomain,
+  OrganizationInvitation,
+  OrganizationMembership,
+  OrganizationMembershipPublicUserData,
+  PhoneNumber,
+  Session,
+  SignInToken,
+  Token,
+  User,
+} from '@clerk/backend-sdk/models/components';
+
+/**
+ * Enums
+ */
+export type { OrganizationMembershipRole } from './api/resources/Enums';
+
+/**
+ * Enums
+ */
+export type { AccountlessApplication, OauthAccessToken, SMSMessage } from './api/resources';

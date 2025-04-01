@@ -15,8 +15,10 @@ export const createOrganizationsService = (clerkClient: ClerkClient) => {
       name: faker.commerce.department(),
     }),
     deleteAll: async () => {
-      const organizations = await clerkClient.organizations.getOrganizationList();
-      const bulkDeletionPromises = organizations.data.map(({ id }) => clerkClient.organizations.deleteOrganization(id));
+      const organizations = await clerkClient.organizations.list({});
+      const bulkDeletionPromises = organizations.data.map(({ id }) =>
+        clerkClient.organizations.delete({ organizationId: id }),
+      );
       await Promise.all(bulkDeletionPromises);
     },
   };

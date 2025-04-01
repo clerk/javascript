@@ -144,7 +144,7 @@ import express from 'express';
 const app = express();
 
 app.get('/users', requireAuth, async (req, res) => {
-  const users = await clerkClient.users.getUserList();
+  const users = await clerkClient.users.list();
   return res.json({ users });
 });
 ```
