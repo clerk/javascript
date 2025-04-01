@@ -222,7 +222,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // and move the logic in clerk/backend
       if (requestState.headers) {
         requestState.headers.forEach((value, key) => {
-          handlerResult.headers.append(key, value);
+          if (key === 'Content-Security-Policy') {
+            logger.debug('Content-Security-Policy detected', () => ({
+              value,
+            }));
+          } else {
+            handlerResult.headers.append(key, value);
+          }
         });
       }
 
