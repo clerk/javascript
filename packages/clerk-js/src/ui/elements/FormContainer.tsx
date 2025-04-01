@@ -1,7 +1,8 @@
 import type { LocalizationKey } from '../customizables';
-import { Col, descriptors } from '../customizables';
+import { Col, descriptors, Icon } from '../customizables';
+import { Close as CloseIcon } from '../icons';
 import type { PropsOfComponent } from '../styledSystem';
-import { Card, Header, useCardState } from './index';
+import { Card, Header, IconButton, useCardState } from './index';
 
 export type FormProps = {
   onSuccess: () => void;
@@ -13,6 +14,7 @@ type PageProps = PropsOfComponent<typeof Col> & {
   headerTitleTextVariant?: PropsOfComponent<typeof Header.Title>['textVariant'];
   headerSubtitle?: LocalizationKey;
   headerSubtitleTextVariant?: PropsOfComponent<typeof Header.Subtitle>['variant'];
+  onReset?: () => void;
 };
 
 export const FormContainer = (props: PageProps) => {
@@ -34,6 +36,24 @@ export const FormContainer = (props: PageProps) => {
       {...rest}
       sx={[sx]}
     >
+      <IconButton
+        elementDescriptor={descriptors.drawerClose}
+        variant='ghost'
+        aria-label='Close drawer'
+        onClick={() => rest.onReset?.()}
+        icon={
+          <Icon
+            icon={CloseIcon}
+            size='sm'
+          />
+        }
+        sx={t => ({
+          flexShrink: 0,
+          position: 'absolute',
+          top: t.space.$3,
+          right: t.space.$3,
+        })}
+      />
       {(headerTitle || headerSubtitle) && (
         <Header.Root>
           {headerTitle && (

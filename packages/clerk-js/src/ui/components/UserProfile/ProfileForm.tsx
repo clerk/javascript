@@ -82,7 +82,10 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.profilePage.title')}>
+    <FormContainer
+      headerTitle={localizationKeys('userProfile.profilePage.title')}
+      onReset={onReset}
+    >
       {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
       <Form.Root
@@ -95,28 +98,29 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
           onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
         />
         {(showFirstName || showLastName) && (
-          <Form.ControlRow elementId='name'>
-            {showFirstName && (
-              <Form.PlainInput
-                {...firstNameField.props}
-                isDisabled={nameEditDisabled}
-                autoFocus
-              />
-            )}
-            {showLastName && (
-              <Form.PlainInput
-                {...lastNameField.props}
-                isDisabled={nameEditDisabled}
-                autoFocus={!showFirstName}
-              />
-            )}
-          </Form.ControlRow>
+          <>
+            <Form.ControlRow elementId='name'>
+              {showFirstName && (
+                <Form.PlainInput
+                  {...firstNameField.props}
+                  isDisabled={nameEditDisabled}
+                  autoFocus
+                />
+              )}
+              {showLastName && (
+                <Form.PlainInput
+                  {...lastNameField.props}
+                  isDisabled={nameEditDisabled}
+                  autoFocus={!showFirstName}
+                />
+              )}
+            </Form.ControlRow>
+            <FormButtons
+              isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
+              onReset={onReset}
+            />
+          </>
         )}
-
-        <FormButtons
-          isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
-          onReset={onReset}
-        />
       </Form.Root>
     </FormContainer>
   );
