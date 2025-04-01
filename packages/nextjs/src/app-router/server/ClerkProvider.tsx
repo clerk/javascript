@@ -20,7 +20,12 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
 });
 
 const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
-  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
+  const headersList = await headers();
+  const nonce = headersList.get('X-Nonce');
+  return nonce
+    ? nonce
+    : // Fallback to extracting from CSP header
+      getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
 export async function ClerkProvider(
