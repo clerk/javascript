@@ -25,6 +25,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          turbo-cache: 'local:'
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -45,7 +46,7 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force --no-cache
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
