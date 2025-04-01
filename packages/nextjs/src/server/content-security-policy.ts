@@ -2,14 +2,42 @@
  * Type representing valid CSP directives
  */
 export type CSPDirective =
+  // Default resource directives
   | 'connect-src'
   | 'default-src'
-  | 'form-action'
-  | 'frame-src'
+  | 'font-src'
   | 'img-src'
+  | 'media-src'
+  | 'object-src'
   | 'script-src'
   | 'style-src'
-  | 'worker-src';
+  // Framing and navigation directives
+  | 'base-uri'
+  | 'child-src'
+  | 'form-action'
+  | 'frame-ancestors'
+  | 'frame-src'
+  | 'manifest-src'
+  | 'navigate-to'
+  | 'prefetch-src'
+  | 'worker-src'
+  // Sandbox and plugin directives
+  | 'plugin-types'
+  | 'require-sri-for'
+  | 'sandbox'
+  // Trusted types and upgrade directives
+  | 'block-all-mixed-content'
+  | 'require-trusted-types-for'
+  | 'trusted-types'
+  | 'upgrade-insecure-requests'
+  // Reporting directives
+  | 'report-to'
+  | 'report-uri'
+  // CSP Level 3 additional directives
+  | 'script-src-attr'
+  | 'script-src-elem'
+  | 'style-src-attr'
+  | 'style-src-elem';
 
 /**
  * Type representing the CSP mode
