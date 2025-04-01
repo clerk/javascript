@@ -11,7 +11,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Button, descriptors, localizationKeys, useAppearance } from '../../customizables';
+import { Button, descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
@@ -27,7 +27,9 @@ type AddPaymentSourceProps = {
   onExpand?: () => void;
 };
 
-type AddPaymentSourceFormProps = Omit<AddPaymentSourceProps, 'checkout'>;
+type AddPaymentSourceFormProps = {
+  isCheckout?: boolean;
+} & Omit<AddPaymentSourceProps, 'checkout'>;
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { checkout, submitLabel, onSuccess, onExpand, cancelAction, cancelButtonText } = props;
@@ -61,7 +63,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   // if we have a checkout, we can use the checkout's client secret and gateway id
   // otherwise, we need to initialize a new payment source
-  const { data: initializedPaymentSource } = useFetch(
+  const { data: initializedPaymentSource, invalidate } = useFetch(
     !checkout ? __experimental_commerce.initializePaymentSource : undefined,
     {
       gateway: 'stripe',
@@ -82,7 +84,30 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     }
   }, [externalGatewayId, __experimental_commerceSettings]);
 
-  if (!stripe || !externalClientSecret) return null;
+  // invalidate the initialized payment source when the component unmounts
+  useEffect(() => {
+    return invalidate;
+  }, [invalidate]);
+
+  if (!stripe || !externalClientSecret) {
+    return (
+      <Flex
+        direction={'row'}
+        align={'center'}
+        justify={'center'}
+        sx={t => ({
+          width: '100%',
+          minHeight: t.sizes.$60,
+        })}
+      >
+        <Spinner
+          size={'lg'}
+          colorScheme={'primary'}
+          elementDescriptor={descriptors.spinner}
+        />
+      </Flex>
+    );
+  }
 
   return (
     <Elements
@@ -95,6 +120,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         onExpand={onExpand}
         cancelAction={cancelAction}
         cancelButtonText={cancelButtonText}
+        isCheckout={!!checkout}
       />
     </Elements>
   );
@@ -106,6 +132,7 @@ const AddPaymentSourceForm = ({
   onExpand,
   cancelAction,
   cancelButtonText,
+  isCheckout,
 }: AddPaymentSourceFormProps) => {
   const { __experimental_commerce } = useClerk();
   const stripe = useStripe();
@@ -135,7 +162,7 @@ const AddPaymentSourceForm = ({
         redirect: 'if_required',
       });
       if (error) {
-        return handleError(new Error(error.message), [], setSubmitError);
+        return; // just return, since stripe will handle the error
       }
 
       const paymentSource = await __experimental_commerce.addPaymentSource({
@@ -152,8 +179,14 @@ const AddPaymentSourceForm = ({
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
-      headerSubtitle={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')}
+      headerTitle={
+        !isCheckout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
+      }
+      headerSubtitle={
+        !isCheckout
+          ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
+          : undefined
+      }
     >
       <Form.Root
         onSubmit={onSubmit}
@@ -235,6 +268,8 @@ const AddPaymentSourceForm = ({
                 localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add')
               }
               onReset={cancelAction}
+              hideReset={!cancelAction}
+              sx={{ flex: isCheckout ? 1 : undefined }}
             />
           </>
         )}

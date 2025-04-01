@@ -3,7 +3,7 @@ import type { __experimental_CommercePaymentSourceResource, __experimental_Payme
 import { Fragment, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { Badge, descriptors, Flex, Icon, localizationKeys, Spinner, Text } from '../../customizables';
+import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -84,7 +84,7 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
   const { orgId } = props;
   const { __experimental_commerce } = useClerk();
 
-  const { data, isLoading, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, { orgId });
+  const { data, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, { orgId });
   const { data: paymentSources } = data || { data: [] };
 
   return (
@@ -96,85 +96,65 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
     >
       <Action.Root>
         <ProfileSection.ItemList id='paymentSources'>
-          {isLoading ? (
-            <Flex
-              direction={'row'}
-              align={'center'}
-              justify={'center'}
-              sx={t => ({
-                width: '100%',
-                minHeight: t.sizes.$60,
-              })}
-            >
-              <Spinner
-                size={'lg'}
-                colorScheme={'primary'}
-                elementDescriptor={descriptors.spinner}
-              />
-            </Flex>
-          ) : (
-            <>
-              {paymentSources.map(paymentSource => (
-                <Fragment key={paymentSource.id}>
-                  <ProfileSection.Item id='paymentSources'>
-                    <Flex
-                      sx={{ overflow: 'hidden' }}
-                      gap={2}
-                      align='baseline'
-                    >
-                      {paymentSource.paymentMethod === 'card' && (
-                        <Icon
-                          icon={CreditCard}
-                          sx={{ alignSelf: 'center' }}
-                        />
-                      )}
-                      <Text
-                        sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
-                        truncate
-                      >
-                        {paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod}
-                      </Text>
-                      <Text
-                        sx={t => ({ color: t.colors.$colorTextSecondary })}
-                        variant='caption'
-                        truncate
-                      >
-                        {paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}
-                      </Text>
-                      {paymentSource.isDefault && <Badge localizationKey={localizationKeys('badge__default')} />}
-                      {paymentSource.status === 'expired' && (
-                        <Badge
-                          colorScheme='danger'
-                          localizationKey={localizationKeys('badge__expired')}
-                        />
-                      )}
-                    </Flex>
-                    <PaymentSourceMenu paymentSource={paymentSource} />
-                  </ProfileSection.Item>
+          {paymentSources.map(paymentSource => (
+            <Fragment key={paymentSource.id}>
+              <ProfileSection.Item id='paymentSources'>
+                <Flex
+                  sx={{ overflow: 'hidden' }}
+                  gap={2}
+                  align='baseline'
+                >
+                  {paymentSource.paymentMethod === 'card' && (
+                    <Icon
+                      icon={CreditCard}
+                      sx={{ alignSelf: 'center' }}
+                    />
+                  )}
+                  <Text
+                    sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
+                    truncate
+                  >
+                    {paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod}
+                  </Text>
+                  <Text
+                    sx={t => ({ color: t.colors.$colorTextSecondary })}
+                    variant='caption'
+                    truncate
+                  >
+                    {paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}
+                  </Text>
+                  {paymentSource.isDefault && <Badge localizationKey={localizationKeys('badge__default')} />}
+                  {paymentSource.status === 'expired' && (
+                    <Badge
+                      colorScheme='danger'
+                      localizationKey={localizationKeys('badge__expired')}
+                    />
+                  )}
+                </Flex>
+                <PaymentSourceMenu paymentSource={paymentSource} />
+              </ProfileSection.Item>
 
-                  <Action.Open value={`remove-${paymentSource.id}`}>
-                    <Action.Card variant='destructive'>
-                      <RemoveScreen
-                        paymentSource={paymentSource}
-                        revalidate={revalidate}
-                      />
-                    </Action.Card>
-                  </Action.Open>
-                </Fragment>
-              ))}
-              <Action.Trigger value='add'>
-                <ProfileSection.ArrowButton
-                  id='paymentSources'
-                  localizationKey={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
-                />
-              </Action.Trigger>
-              <Action.Open value='add'>
-                <Action.Card>
-                  <AddScreen onSuccess={revalidate} />
+              <Action.Open value={`remove-${paymentSource.id}`}>
+                <Action.Card variant='destructive'>
+                  <RemoveScreen
+                    paymentSource={paymentSource}
+                    revalidate={revalidate}
+                  />
                 </Action.Card>
               </Action.Open>
-            </>
-          )}
+            </Fragment>
+          ))}
+          <Action.Trigger value='add'>
+            <ProfileSection.ArrowButton
+              id='paymentSources'
+              localizationKey={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
+            />
+          </Action.Trigger>
+          <Action.Open value='add'>
+            <Action.Card>
+              <AddScreen onSuccess={revalidate} />
+            </Action.Card>
+          </Action.Open>
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
