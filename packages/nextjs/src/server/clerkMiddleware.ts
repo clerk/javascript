@@ -211,7 +211,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         const result = createCSPHeader(
           options.injectCSP.mode,
           clerkRequest.clerkUrl.toString(),
-          undefined,
           options.injectCSP.directives,
         );
         const { nonce } = result;

@@ -239,18 +239,6 @@ function parseHost(input: string): string {
 }
 
 /**
- * Parses a CSP header string into an array of directives
- * @param cspHeader - The CSP header string to parse
- * @returns Array of directive strings
- */
-function parseCSPHeader(cspHeader: string): string[] {
-  return cspHeader
-    .split(';')
-    .map(directive => directive.trim())
-    .filter(Boolean);
-}
-
-/**
  * Generates a secure random nonce for CSP headers
  * @returns A base64-encoded random nonce
  */
@@ -273,7 +261,7 @@ function createMergedCSP(
   nonce?: string,
   mode: CSPMode = 'standard',
   customDirectives?: Record<string, string | string[]>,
-): CSPDirectiveSet {
+): Record<string, Set<string>> {
   // Initialize with default Clerk CSP values
   const mergedCSP = CSPDirectiveManager.createDefaultDirectives();
 
@@ -291,6 +279,9 @@ function createMergedCSP(
     }
   }
 
+  // Create a separate map for custom directives
+  const customDirectivesMap = new Map<string, Set<string>>();
+
   // Add custom directives if provided
   if (customDirectives) {
     Object.entries(customDirectives).forEach(([key, values]) => {
@@ -298,12 +289,20 @@ function createMergedCSP(
       if (CSPDirectiveManager.DEFAULT_DIRECTIVES[key as CSPDirective]) {
         handleExistingDirective(mergedCSP, key as CSPDirective, valuesArray);
       } else {
-        handleCustomDirective(mergedCSP as any, key, valuesArray);
+        handleCustomDirective(customDirectivesMap, key, valuesArray);
       }
     });
   }
 
-  return mergedCSP;
+  // Combine standard directives with custom directives
+  const finalCSP: Record<string, Set<string>> = { ...mergedCSP };
+
+  // Add custom directives to the final result
+  customDirectivesMap.forEach((values, key) => {
+    finalCSP[key] = values;
+  });
+
+  return finalCSP;
 }
 
 /**
