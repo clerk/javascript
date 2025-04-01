@@ -60,9 +60,18 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
 
   /**
-   * When set to 'standard' or 'strict-dynamic', automatically injects a Content-Security-Policy header compatible with Clerk.
+   * When set, automatically injects a Content-Security-Policy header compatible with Clerk.
    */
-  injectCSP?: 'standard' | 'strict-dynamic';
+  injectCSP?: {
+    /**
+     * The CSP mode to use - either 'standard' or 'strict-dynamic'
+     */
+    mode: 'standard' | 'strict-dynamic';
+    /**
+     * Custom CSP directives to merge with Clerk's default directives
+     */
+    directives?: Record<string, string | string[]>;
+  };
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -200,9 +209,10 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       }
       if (options.injectCSP) {
         const result = createCSPHeader(
-          options.injectCSP,
+          options.injectCSP.mode,
           clerkRequest.clerkUrl.toString(),
-          handlerResult.headers.get('Content-Security-Policy'),
+          undefined,
+          options.injectCSP.directives,
         );
         const { nonce } = result;
         const csp = result.header;

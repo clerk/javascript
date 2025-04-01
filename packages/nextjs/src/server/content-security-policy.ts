@@ -261,77 +261,23 @@ export function generateNonce() {
 }
 
 /**
- * Merges custom CSP directives with existing ones
- * @param mergedCSP - The current merged CSP state
- * @param customCSP - The custom CSP header to merge
- * @returns Updated CSPDirectiveSet
- */
-function mergeCustomCSP(mergedCSP: CSPDirectiveSet, customCSP: string): CSPDirectiveSet {
-  const directives = parseCSPHeader(customCSP);
-  const customDirectives = new Map<string, Set<string>>();
-
-  directives.forEach(directive => {
-    const [key, ...values] = directive.split(' ');
-    if (!key || values.length === 0) return;
-
-    if (key in CSPDirectiveManager.DEFAULT_DIRECTIVES) {
-      handleExistingDirective(mergedCSP, key as CSPDirective, values);
-    } else {
-      handleCustomDirective(customDirectives, key, values);
-    }
-  });
-
-  // Add custom directives to the merged CSP object
-  addCustomDirectivesToMergedCSP(mergedCSP, customDirectives);
-
-  return mergedCSP;
-}
-
-/**
- * Adds custom directives to the merged CSP state
- * @param mergedCSP - The current merged CSP state
- * @param customDirectives - Map of custom directives to add
- */
-function addCustomDirectivesToMergedCSP(mergedCSP: CSPDirectiveSet, customDirectives: Map<string, Set<string>>) {
-  for (const [directive, values] of customDirectives.entries()) {
-    // Ensure we don't override existing values if they exist
-    if (directive in mergedCSP) {
-      const existingValues = mergedCSP[directive as CSPDirective];
-      const newSet = new Set<string>();
-      // First add existing values
-      existingValues.forEach(value => newSet.add(value));
-      // Then add new values, which will automatically deduplicate
-      values.forEach(value => newSet.add(value));
-      (mergedCSP as Record<string, Set<string>>)[directive] = newSet;
-    } else {
-      (mergedCSP as Record<string, Set<string>>)[directive] = values;
-    }
-  }
-}
-
-/**
  * Creates a merged CSP state with all necessary directives
  * @param host - The host to include in CSP
- * @param existingCSP - Optional existing CSP header to merge
  * @param nonce - Optional nonce for strict-dynamic mode
  * @param mode - The CSP mode to use
+ * @param customDirectives - Optional custom directives to merge with
  * @returns Merged CSPDirectiveSet
  */
 function createMergedCSP(
   host: string,
-  existingCSP?: string | null,
   nonce?: string,
   mode: CSPMode = 'standard',
+  customDirectives?: Record<string, string | string[]>,
 ): CSPDirectiveSet {
   // Initialize with default Clerk CSP values
   const mergedCSP = CSPDirectiveManager.createDefaultDirectives();
 
-  // First, merge any existing CSP if provided
-  if (existingCSP) {
-    mergeCustomCSP(mergedCSP, existingCSP);
-  }
-
-  // Then add Clerk-specific values
+  // Add Clerk-specific values
   const parsedHost = parseHost(host);
   mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(parsedHost);
 
@@ -345,6 +291,18 @@ function createMergedCSP(
     }
   }
 
+  // Add custom directives if provided
+  if (customDirectives) {
+    Object.entries(customDirectives).forEach(([key, values]) => {
+      const valuesArray = Array.isArray(values) ? values : [values];
+      if (CSPDirectiveManager.DEFAULT_DIRECTIVES[key as CSPDirective]) {
+        handleExistingDirective(mergedCSP, key as CSPDirective, valuesArray);
+      } else {
+        handleCustomDirective(mergedCSP as any, key, valuesArray);
+      }
+    });
+  }
+
   return mergedCSP;
 }
 
@@ -352,12 +310,16 @@ function createMergedCSP(
  * Creates a Content Security Policy (CSP) header with the specified mode and host
  * @param mode - The CSP mode to use ('standard' or 'strict-dynamic')
  * @param host - The host to include in the CSP
- * @param existingCSP - Optional existing CSP header to merge with
+ * @param customDirectives - Optional custom directives to merge with
  * @returns Object containing the formatted CSP header and nonce (if in strict-dynamic mode)
  */
-export function createCSPHeader(mode: CSPMode, host: string, existingCSP?: string | null): CSPHeaderResult {
+export function createCSPHeader(
+  mode: CSPMode,
+  host: string,
+  customDirectives?: Record<string, string | string[]>,
+): CSPHeaderResult {
   const nonce = mode === 'strict-dynamic' ? generateNonce() : undefined;
-  const mergedCSP = createMergedCSP(host, existingCSP, nonce, mode);
+  const mergedCSP = createMergedCSP(host, nonce, mode, customDirectives);
 
   return {
     header: formatCSPHeader(mergedCSP),
