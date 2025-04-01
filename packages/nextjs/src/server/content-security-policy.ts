@@ -47,7 +47,7 @@ export type CSPMode = 'standard' | 'strict-dynamic';
 /**
  * Type representing CSP values as a record of directives to string arrays
  */
-type CSPValues = Record<CSPDirective, string[]>;
+type CSPValues = Partial<Record<CSPDirective, string[]>>;
 
 /**
  * Type representing CSP directives as a record of directives to Sets of strings
@@ -288,7 +288,7 @@ export function generateNonce() {
 function createMergedCSP(
   mode: CSPMode,
   host: string,
-  customDirectives?: Record<string, string | string[]>,
+  customDirectives?: Record<string, string[]>,
   nonce?: string,
 ): Record<string, Set<string>> {
   // Initialize with default Clerk CSP values
@@ -344,7 +344,7 @@ function createMergedCSP(
 export function createCSPHeader(
   mode: CSPMode,
   host: string,
-  customDirectives?: Record<string, string | string[]>,
+  customDirectives?: Record<string, string[]>,
 ): CSPHeaderResult {
   const nonce = mode === 'strict-dynamic' ? generateNonce() : undefined;
 
