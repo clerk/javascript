@@ -248,10 +248,10 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcValues).toContain("'self'");
       expect(scriptSrcValues).toContain("'unsafe-inline'");
       expect(scriptSrcValues).toContain("'unsafe-eval'");
-      expect(scriptSrcValues).toContain("custom-domain.com");
+      expect(scriptSrcValues).toContain('custom-domain.com');
       // Verify default values for standard mode
-      expect(scriptSrcValues).toContain("http:");
-      expect(scriptSrcValues).toContain("https:");
+      expect(scriptSrcValues).toContain('http:');
+      expect(scriptSrcValues).toContain('https:');
 
       // Verify new-directive has properly quoted keywords and is the sole value
       const newDirective = resultDirectives.find((d: string) => d.startsWith('new-directive')) ?? '';
@@ -259,7 +259,7 @@ describe('CSP Header Utils', () => {
       const newDirectiveValues = newDirective.replace('new-directive ', '').split(' ');
       expect(newDirectiveValues).toContain("'none'");
       expect(newDirectiveValues).toHaveLength(1);
-      
+
       vi.stubEnv('NODE_ENV', 'production');
     });
 
