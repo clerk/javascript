@@ -75,7 +75,6 @@ export interface __experimental_InitializePaymentSourceParams {
 
 export interface __experimental_AddPaymentSourceParams {
   gateway: 'stripe' | 'paypal';
-  paymentMethod: string;
   paymentToken: string;
 }
 

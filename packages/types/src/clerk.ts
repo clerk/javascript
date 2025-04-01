@@ -5,7 +5,6 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
-  PaymentSourcesTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
@@ -1512,7 +1511,6 @@ export type __experimental_CheckoutProps = {
 };
 
 export type __experimental_PaymentSourcesProps = {
-  appearance?: PaymentSourcesTheme;
   orgId?: string;
 };
 

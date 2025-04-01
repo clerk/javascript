@@ -167,7 +167,6 @@ const AddPaymentSourceForm = ({
 
       const paymentSource = await __experimental_commerce.addPaymentSource({
         gateway: 'stripe',
-        paymentMethod: 'card', // TODO(@Commerce): need to use the real value?
         paymentToken: setupIntent.payment_method as string,
       });
 
