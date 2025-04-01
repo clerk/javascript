@@ -20,11 +20,11 @@ The speakeasy CLI allows you to generate more usage snippets. Here's how:
 - To generate a sample for a specific operation by providing an operation ID, use:
 
 ```
-speakeasy generate usage -s https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-12-03.yml -l typescript -i {INPUT_OPERATION_ID} -o ./samples
+speakeasy generate usage -s https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml -l typescript -i {INPUT_OPERATION_ID} -o ./samples
 ```
 
 - To generate samples for an entire namespace (like a tag or group name), use:
 
 ```
-speakeasy generate usage -s https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-12-03.yml -l typescript -n {INPUT_TAG_NAME} -o ./samples
+speakeasy generate usage -s https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml -l typescript -n {INPUT_TAG_NAME} -o ./samples
 ```

@@ -2,26 +2,26 @@ speakeasyVersion: 1.526.6
 sources:
     Clerk Backend API:
         sourceNamespace: clerk-backend-api
-        sourceRevisionDigest: sha256:6c4731226c081c469bcc33bf95366d176e2ffcd61d6b35bc2f02e33cd50e907f
-        sourceBlobDigest: sha256:1399addfb46eeb59570430abf44d52218716c082c89dbb73ec34a9e4f002b9a6
+        sourceRevisionDigest: sha256:dc706b5b5084db846634c9308cc8c7d759b7767f3f7c5e7bbabadb65eb0cda8b
+        sourceBlobDigest: sha256:50f811d52e5bff2fa5ace57211a92d2c56dc9745eea76c9829ed181e0e341640
         tags:
             - latest
-            - "2025-12-03"
+            - "2025-03-12"
 targets:
     clerk:
         source: Clerk Backend API
         sourceNamespace: clerk-backend-api
-        sourceRevisionDigest: sha256:6c4731226c081c469bcc33bf95366d176e2ffcd61d6b35bc2f02e33cd50e907f
-        sourceBlobDigest: sha256:1399addfb46eeb59570430abf44d52218716c082c89dbb73ec34a9e4f002b9a6
+        sourceRevisionDigest: sha256:dc706b5b5084db846634c9308cc8c7d759b7767f3f7c5e7bbabadb65eb0cda8b
+        sourceBlobDigest: sha256:50f811d52e5bff2fa5ace57211a92d2c56dc9745eea76c9829ed181e0e341640
         codeSamplesNamespace: clerk-backend-api-typescript-code-samples
-        codeSamplesRevisionDigest: sha256:4d2a0b611ffd7c05aa32c7a92b1f22d2bbeb2cdc2405f2695dcf6a066cf23fcc
+        codeSamplesRevisionDigest: sha256:68d5d436205d289c518a079b81ca3c07f46805d85a6c94f6ae504a8a8dd26c13
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
     sources:
         Clerk Backend API:
             inputs:
-                - location: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-12-03.yml
+                - location: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml
             registry:
                 location: registry.speakeasyapi.dev/clerk/clerk/clerk-backend-api
     targets:
