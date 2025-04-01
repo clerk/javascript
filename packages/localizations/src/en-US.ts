@@ -1,129 +1,173 @@
+import a from '@characters/a';
+import A from '@characters/a-uppercase';
+import b from '@characters/b';
+import B from '@characters/b-uppercase';
+import c from '@characters/c';
+import C from '@characters/c-uppercase';
+import d from '@characters/d';
+import D from '@characters/d-uppercase';
+import e from '@characters/e';
+import E from '@characters/e-uppercase';
+import f from '@characters/f';
+import F from '@characters/f-uppercase';
+import g from '@characters/g';
+import G from '@characters/g-uppercase';
+import h from '@characters/h';
+import H from '@characters/h-uppercase';
+import i from '@characters/i';
+import I from '@characters/i-uppercase';
+import j from '@characters/j';
+import J from '@characters/j-uppercase';
+import k from '@characters/k';
+import l from '@characters/l';
+import L from '@characters/l-uppercase';
+import m from '@characters/m';
+import M from '@characters/m-uppercase';
+import n from '@characters/n';
+import N from '@characters/n-uppercase';
+import o from '@characters/o';
+import O from '@characters/o-uppercase';
+import p from '@characters/p';
+import P from '@characters/p-uppercase';
+import q from '@characters/q';
+import r from '@characters/r';
+import R from '@characters/r-uppercase';
+import s from '@characters/s';
+import S from '@characters/s-uppercase';
+import t from '@characters/t';
+import T from '@characters/t-uppercase';
+import u from '@characters/u';
+import U from '@characters/u-uppercase';
+import v from '@characters/v';
+import V from '@characters/v-uppercase';
+import w from '@characters/w';
+import W from '@characters/w-uppercase';
+import x from '@characters/x';
+import y from '@characters/y';
+import Y from '@characters/y-uppercase';
+import z from '@characters/z';
 import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
-  locale: 'en-US',
+  locale: `${e}${n}-${U}${S}`,
   __experimental_commerce: {
-    billedAnnually: 'Billed annually',
-    free: 'Free',
-    getStarted: 'Get started',
-    manageMembership: 'Manage membership',
-    month: 'Month',
-    switchPlan: 'Switch to this plan',
+    billedAnnually: `${B}${i}${l}${l}${e}${d} ${a}${n}${n}${u}${a}${l}${l}${y}`,
+    free: `${F}${r}${e}${e}`,
+    getStarted: `${G}${e}${t} ${s}${t}${a}${r}${t}${e}${d}`,
+    manageMembership: `${M}${a}${n}${a}${g}${e} ${m}${e}${m}${b}${e}${r}${s}${h}${i}${p}`,
+    month: `${M}${o}${n}${t}${h}`,
+    switchPlan: `${S}${w}${i}${t}${c}${h} ${t}${o} ${t}${h}${i}${s} ${p}${l}${a}${n}`,
   },
-  backButton: 'Back',
-  badge__currentPlan: 'Current Plan',
-  badge__default: 'Default',
-  badge__otherImpersonatorDevice: 'Other impersonator device',
-  badge__primary: 'Primary',
-  badge__requiresAction: 'Requires action',
-  badge__thisDevice: 'This device',
-  badge__unverified: 'Unverified',
-  badge__userDevice: 'User device',
-  badge__you: 'You',
+  backButton: `${B}${a}${c}${k}`,
+  badge__currentPlan: `${C}${u}${r}${r}${e}${n}${t} ${P}${l}${a}${n}`,
+  badge__default: `${D}${e}${f}${a}${u}${l}${t}`,
+  badge__otherImpersonatorDevice: `${O}${t}${h}${e}${r} ${i}${m}${p}${e}${r}${s}${o}${n}${a}${t}${o}${r} ${d}${e}${v}${i}${c}${e}`,
+  badge__primary: `${P}${r}${i}${m}${a}${r}${y}`,
+  badge__requiresAction: `${R}${e}${q}${u}${i}${r}${e}${s} ${a}${c}${t}${i}${o}${n}`,
+  badge__thisDevice: `${T}${h}${i}${s} ${d}${e}${v}${i}${c}${e}`,
+  badge__unverified: `${U}${n}${v}${e}${r}${i}${f}${i}${e}${d}`,
+  badge__userDevice: `${U}${s}${e}${r} ${d}${e}${v}${i}${c}${e}`,
+  badge__you: `${Y}${o}${u}`,
   createOrganization: {
-    formButtonSubmit: 'Create organization',
+    formButtonSubmit: `${C}${r}${e}${a}${t}${e} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
     invitePage: {
-      formButtonReset: 'Skip',
+      formButtonReset: `${S}${k}${i}${p}`,
     },
-    title: 'Create organization',
+    title: `${C}${r}${e}${a}${t}${e} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
   },
   dates: {
-    lastDay: "Yesterday at {{ date | timeString('en-US') }}",
-    next6Days: "{{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
-    nextDay: "Tomorrow at {{ date | timeString('en-US') }}",
-    numeric: "{{ date | numeric('en-US') }}",
-    previous6Days: "Last {{ date | weekday('en-US','long') }} at {{ date | timeString('en-US') }}",
-    sameDay: "Today at {{ date | timeString('en-US') }}",
+    lastDay: `${Y}${e}${s}${t}${e}${r}${d}${a}${y} ${a}${t} {{ ${d}${a}${t}${e} | ${t}${i}${m}${e}${S}${t}${r}${i}${n}${g}('${e}${n}-${U}${S}') }}`,
+    next6Days: `{{ ${d}${a}${t}${e} | ${w}${e}${e}${k}${d}${a}${y}('${e}${n}-${U}${S}','${l}${o}${n}${g}') }} ${a}${t} {{ ${d}${a}${t}${e} | ${t}${i}${m}${e}${S}${t}${r}${i}${n}${g}('${e}${n}-${U}${S}') }}`,
+    nextDay: `${T}${o}${m}${o}${r}${r}${o}${w} ${a}${t} {{ ${d}${a}${t}${e} | ${t}${i}${m}${e}${S}${t}${r}${i}${n}${g}('${e}${n}-${U}${S}') }}`,
+    numeric: `{{ ${d}${a}${t}${e} | ${n}${u}${m}${e}${r}${i}${c}('${e}${n}-${U}${S}') }}`,
+    previous6Days: `${L}${a}${s}${t} {{ ${d}${a}${t}${e} | ${w}${e}${e}${k}${d}${a}${y}('${e}${n}-${U}${S}','${l}${o}${n}${g}') }} ${a}${t} {{ ${d}${a}${t}${e} | ${t}${i}${m}${e}${S}${t}${r}${i}${n}${g}('${e}${n}-${U}${S}') }}`,
+    sameDay: `${T}${o}${d}${a}${y} ${a}${t} {{ ${d}${a}${t}${e} | ${t}${i}${m}${e}${S}${t}${r}${i}${n}${g}('${e}${n}-${U}${S}') }}`,
   },
-  dividerText: 'or',
-  footerActionLink__useAnotherMethod: 'Use another method',
-  footerPageLink__help: 'Help',
-  footerPageLink__privacy: 'Privacy',
-  footerPageLink__terms: 'Terms',
-  formButtonPrimary: 'Continue',
-  formButtonPrimary__verify: 'Verify',
-  formFieldAction__forgotPassword: 'Forgot password?',
-  formFieldError__matchingPasswords: 'Passwords match.',
-  formFieldError__notMatchingPasswords: "Passwords don't match.",
-  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
-  formFieldHintText__optional: 'Optional',
-  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
-  formFieldInputPlaceholder__backupCode: 'Enter backup code',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
-  formFieldInputPlaceholder__emailAddress: 'Enter your email address',
-  formFieldInputPlaceholder__emailAddress_username: 'Enter email or username',
-  formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
-  formFieldInputPlaceholder__firstName: 'First name',
-  formFieldInputPlaceholder__lastName: 'Last name',
-  formFieldInputPlaceholder__organizationDomain: 'example.com',
-  formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
-  formFieldInputPlaceholder__organizationName: 'Organization name',
-  formFieldInputPlaceholder__organizationSlug: 'my-org',
-  formFieldInputPlaceholder__password: 'Enter your password',
-  formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  dividerText: `${o}${r}`,
+  footerActionLink__useAnotherMethod: `${U}${s}${e} ${a}${n}${o}${t}${h}${e}${r} ${m}${e}${t}${h}${o}${d}`,
+  footerPageLink__help: `${H}${e}${l}${p}`,
+  footerPageLink__privacy: `${P}${r}${i}${v}${a}${c}${y}`,
+  footerPageLink__terms: `${T}${e}${r}${m}${s}`,
+  formButtonPrimary: `${C}${o}${n}${t}${i}${n}${u}${e}`,
+  formButtonPrimary__verify: `${V}${e}${r}${i}${f}${y}`,
+  formFieldAction__forgotPassword: `${F}${o}${r}${g}${o}${t} ${p}${a}${s}${s}${w}${o}${r}${d}?`,
+  formFieldError__matchingPasswords: `${P}${a}${s}${s}${w}${o}${r}${d}${s} ${m}${a}${t}${c}${h}.`,
+  formFieldError__notMatchingPasswords: `${P}${a}${s}${s}${w}${o}${r}${d}${s} ${d}${o}${n}'${t} ${m}${a}${t}${c}${h}.`,
+  formFieldError__verificationLinkExpired: `${T}${h}${e} ${v}${e}${r}${i}${f}${i}${c}${a}${t}${i}${o}${n} ${l}${i}${n}${k} ${e}${x}${p}${i}${r}${e}${d}. ${P}${l}${e}${a}${s}${e} ${r}${e}${q}${u}${e}${s}${t} ${a} ${n}${e}${w} ${l}${i}${n}${k}.`,
+  formFieldHintText__optional: `${O}${p}${t}${i}${o}${n}${a}${l}`,
+  formFieldHintText__slug: `${A} ${s}${l}${u}${g} ${i}${s} ${a} ${h}${u}${m}${a}${n}-${r}${e}${a}${d}${a}${b}${l}${e} ${I}${D} ${t}${h}${a}${t} ${m}${u}${s}${t} ${b}${e} ${u}${n}${i}${q}${u}${e}. ${I}${t}’${s} ${o}${f}${t}${e}${n} ${u}${s}${e}${d} ${i}${n} ${U}${R}${L}${s}.`,
+  formFieldInputPlaceholder__backupCode: `${E}${n}${t}${e}${r} ${b}${a}${c}${k}${u}${p} ${c}${o}${d}${e}`,
+  formFieldInputPlaceholder__confirmDeletionUserAccount: `${D}${e}${l}${e}${t}${e} ${a}${c}${c}${o}${u}${n}${t}`,
+  formFieldInputPlaceholder__emailAddress: `${E}${n}${t}${e}${r} ${y}${o}${u}${r} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}`,
+  formFieldInputPlaceholder__emailAddress_username: `${E}${n}${t}${e}${r} ${e}${m}${a}${i}${l} ${o}${r} ${u}${s}${e}${r}${n}${a}${m}${e}`,
+  formFieldInputPlaceholder__emailAddresses: `${e}${x}${a}${m}${p}${l}${e}@${e}${m}${a}${i}${l}.${c}${o}${m}, ${e}${x}${a}${m}${p}${l}${e}2@${e}${m}${a}${i}${l}.${c}${o}${m}`,
+  formFieldInputPlaceholder__firstName: `${F}${i}${r}${s}${t} ${n}${a}${m}${e}`,
+  formFieldInputPlaceholder__lastName: `${L}${a}${s}${t} ${n}${a}${m}${e}`,
+  formFieldInputPlaceholder__organizationDomain: `${e}${x}${a}${m}${p}${l}${e}.${c}${o}${m}`,
+  formFieldInputPlaceholder__organizationDomainEmailAddress: `${y}${o}${u}@${e}${x}${a}${m}${p}${l}${e}.${c}${o}${m}`,
+  formFieldInputPlaceholder__organizationName: `${O}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n} ${n}${a}${m}${e}`,
+  formFieldInputPlaceholder__organizationSlug: `${m}${y}-${o}${r}${g}`,
+  formFieldInputPlaceholder__password: `${E}${n}${t}${e}${r} ${y}${o}${u}${r} ${p}${a}${s}${s}${w}${o}${r}${d}`,
+  formFieldInputPlaceholder__phoneNumber: `${E}${n}${t}${e}${r} ${y}${o}${u}${r} ${p}${h}${o}${n}${e} ${n}${u}${m}${b}${e}${r}`,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
-  formFieldLabel__backupCode: 'Backup code',
-  formFieldLabel__confirmDeletion: 'Confirmation',
-  formFieldLabel__confirmPassword: 'Confirm password',
-  formFieldLabel__currentPassword: 'Current password',
-  formFieldLabel__emailAddress: 'Email address',
-  formFieldLabel__emailAddress_username: 'Email address or username',
-  formFieldLabel__emailAddresses: 'Email addresses',
-  formFieldLabel__firstName: 'First name',
-  formFieldLabel__lastName: 'Last name',
-  formFieldLabel__newPassword: 'New password',
-  formFieldLabel__organizationDomain: 'Domain',
-  formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
-  formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
-  formFieldLabel__organizationDomainEmailAddressDescription:
-    'Enter an email address under this domain to receive a code and verify this domain.',
-  formFieldLabel__organizationName: 'Name',
-  formFieldLabel__organizationSlug: 'Slug',
-  formFieldLabel__passkeyName: 'Name of passkey',
-  formFieldLabel__password: 'Password',
-  formFieldLabel__phoneNumber: 'Phone number',
-  formFieldLabel__role: 'Role',
-  formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
-  formFieldLabel__username: 'Username',
+  formFieldLabel__automaticInvitations: `${E}${n}${a}${b}${l}${e} ${a}${u}${t}${o}${m}${a}${t}${i}${c} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s} ${f}${o}${r} ${t}${h}${i}${s} ${d}${o}${m}${a}${i}${n}`,
+  formFieldLabel__backupCode: `${B}${a}${c}${k}${u}${p} ${c}${o}${d}${e}`,
+  formFieldLabel__confirmDeletion: `${C}${o}${n}${f}${i}${r}${m}${a}${t}${i}${o}${n}`,
+  formFieldLabel__confirmPassword: `${C}${o}${n}${f}${i}${r}${m} ${p}${a}${s}${s}${w}${o}${r}${d}`,
+  formFieldLabel__currentPassword: `${C}${u}${r}${r}${e}${n}${t} ${p}${a}${s}${s}${w}${o}${r}${d}`,
+  formFieldLabel__emailAddress: `${E}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}`,
+  formFieldLabel__emailAddress_username: `${E}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s} ${o}${r} ${u}${s}${e}${r}${n}${a}${m}${e}`,
+  formFieldLabel__emailAddresses: `${E}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}${e}${s}`,
+  formFieldLabel__firstName: `${F}${i}${r}${s}${t} ${n}${a}${m}${e}`,
+  formFieldLabel__lastName: `${L}${a}${s}${t} ${n}${a}${m}${e}`,
+  formFieldLabel__newPassword: `${N}${e}${w} ${p}${a}${s}${s}${w}${o}${r}${d}`,
+  formFieldLabel__organizationDomain: `${D}${o}${m}${a}${i}${n}`,
+  formFieldLabel__organizationDomainDeletePending: `${D}${e}${l}${e}${t}${e} ${p}${e}${n}${d}${i}${n}${g} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s} ${a}${n}${d} ${s}${u}${g}${g}${e}${s}${t}${i}${o}${n}${s}`,
+  formFieldLabel__organizationDomainEmailAddress: `${V}${e}${r}${i}${f}${i}${c}${a}${t}${i}${o}${n} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}`,
+  formFieldLabel__organizationDomainEmailAddressDescription: `${E}${n}${t}${e}${r} ${a}${n} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s} ${u}${n}${d}${e}${r} ${t}${h}${i}${s} ${d}${o}${m}${a}${i}${n} ${t}${o} ${r}${e}${c}${e}${i}${v}${e} ${a} ${c}${o}${d}${e} ${a}${n}${d} ${v}${e}${r}${i}${f}${y} ${t}${h}${i}${s} ${d}${o}${m}${a}${i}${n}.`,
+  formFieldLabel__organizationName: `${N}${a}${m}${e}`,
+  formFieldLabel__organizationSlug: `${S}${l}${u}${g}`,
+  formFieldLabel__passkeyName: `${N}${a}${m}${e} ${o}${f} ${p}${a}${s}${s}${k}${e}${y}`,
+  formFieldLabel__password: `${P}${a}${s}${s}${w}${o}${r}${d}`,
+  formFieldLabel__phoneNumber: `${P}${h}${o}${n}${e} ${n}${u}${m}${b}${e}${r}`,
+  formFieldLabel__role: `${R}${o}${l}${e}`,
+  formFieldLabel__signOutOfOtherSessions: `${S}${i}${g}${n} ${o}${u}${t} ${o}${f} ${a}${l}${l} ${o}${t}${h}${e}${r} ${d}${e}${v}${i}${c}${e}${s}`,
+  formFieldLabel__username: `${U}${s}${e}${r}${n}${a}${m}${e}`,
   impersonationFab: {
-    action__signOut: 'Sign out',
-    title: 'Signed in as {{identifier}}',
+    action__signOut: `${S}${i}${g}${n} ${o}${u}${t}`,
+    title: `${S}${i}${g}${n}${e}${d} ${i}${n} ${a}${s} {{${i}${d}${e}${n}${t}${i}${f}${i}${e}${r}}}`,
   },
-  maintenanceMode:
-    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
-  membershipRole__admin: 'Admin',
-  membershipRole__basicMember: 'Member',
-  membershipRole__guestMember: 'Guest',
+  maintenanceMode: `${W}${e} ${a}${r}${e} ${c}${u}${r}${r}${e}${n}${t}${l}${y} ${u}${n}${d}${e}${r}${g}${o}${i}${n}${g} ${m}${a}${i}${n}${t}${e}${n}${a}${n}${c}${e}, ${b}${u}${t} ${d}${o}${n}'${t} ${w}${o}${r}${r}${y}, ${i}${t} ${s}${h}${o}${u}${l}${d}${n}'${t} ${t}${a}${k}${e} ${m}${o}${r}${e} ${t}${h}${a}${n} ${a} ${f}${e}${w} ${m}${i}${n}${u}${t}${e}${s}.`,
+  membershipRole__admin: `${A}${d}${m}${i}${n}`,
+  membershipRole__basicMember: `${M}${e}${m}${b}${e}${r}`,
+  membershipRole__guestMember: `${G}${u}${e}${s}${t}`,
   organizationList: {
-    action__createOrganization: 'Create organization',
-    action__invitationAccept: 'Join',
-    action__suggestionsAccept: 'Request to join',
-    createOrganization: 'Create Organization',
-    invitationAcceptedLabel: 'Joined',
-    subtitle: 'to continue to {{applicationName}}',
-    suggestionsAcceptedLabel: 'Pending approval',
-    title: 'Choose an account',
-    titleWithoutPersonal: 'Choose an organization',
+    action__createOrganization: `${C}${r}${e}${a}${t}${e} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
+    action__invitationAccept: `${J}${o}${i}${n}`,
+    action__suggestionsAccept: `${R}${e}${q}${u}${e}${s}${t} ${t}${o} ${j}${o}${i}${n}`,
+    createOrganization: `${C}${r}${e}${a}${t}${e} ${O}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
+    invitationAcceptedLabel: `${J}${o}${i}${n}${e}${d}`,
+    subtitle: `${t}${o} ${c}${o}${n}${t}${i}${n}${u}${e} ${t}${o} {{${a}${p}${p}${l}${i}${c}${a}${t}${i}${o}${n}${N}${a}${m}${e}}}`,
+    suggestionsAcceptedLabel: `${P}${e}${n}${d}${i}${n}${g} ${a}${p}${p}${r}${o}${v}${a}${l}`,
+    title: `${C}${h}${o}${o}${s}${e} ${a}${n} ${a}${c}${c}${o}${u}${n}${t}`,
+    titleWithoutPersonal: `${C}${h}${o}${o}${s}${e} ${a}${n} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
   },
   organizationProfile: {
-    badge__automaticInvitation: 'Automatic invitations',
-    badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'No automatic enrollment',
-    badge__unverified: 'Unverified',
+    badge__automaticInvitation: `${A}${u}${t}${o}${m}${a}${t}${i}${c} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s}`,
+    badge__automaticSuggestion: `${A}${u}${t}${o}${m}${a}${t}${i}${c} ${s}${u}${g}${g}${e}${s}${t}${i}${o}${n}${s}`,
+    badge__manualInvitation: `${N}${o} ${a}${u}${t}${o}${m}${a}${t}${i}${c} ${e}${n}${r}${o}${l}${l}${m}${e}${n}${t}`,
+    badge__unverified: `${U}${n}${v}${e}${r}${i}${f}${i}${e}${d}`,
     createDomainPage: {
-      subtitle:
-        'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
-      title: 'Add domain',
+      subtitle: `${A}${d}${d} ${t}${h}${e} ${d}${o}${m}${a}${i}${n} ${t}${o} ${v}${e}${r}${i}${f}${y}. ${U}${s}${e}${r}${s} ${w}${i}${t}${h} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}${e}${s} ${a}${t} ${t}${h}${i}${s} ${d}${o}${m}${a}${i}${n} ${c}${a}${n} ${j}${o}${i}${n} ${t}${h}${e} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n} ${a}${u}${t}${o}${m}${a}${t}${i}${c}${a}${l}${l}${y} ${o}${r} ${r}${e}${q}${u}${e}${s}${t} ${t}${o} ${j}${o}${i}${n}.`,
+      title: `${A}${d}${d} ${d}${o}${m}${a}${i}${n}`,
     },
     invitePage: {
-      detailsTitle__inviteFailed:
-        'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
-      formButtonPrimary__continue: 'Send invitations',
-      selectDropdown__role: 'Select role',
-      subtitle: 'Enter or paste one or more email addresses, separated by spaces or commas.',
-      successMessage: 'Invitations successfully sent',
-      title: 'Invite new members',
+      detailsTitle__inviteFailed: `${T}${h}${e} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s} ${c}${o}${u}${l}${d} ${n}${o}${t} ${b}${e} ${s}${e}${n}${t}. ${T}${h}${e}${r}${e} ${a}${r}${e} ${a}${l}${r}${e}${a}${d}${y} ${p}${e}${n}${d}${i}${n}${g} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s} ${f}${o}${r} ${t}${h}${e} ${f}${o}${l}${l}${o}${w}${i}${n}${g} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}${e}${s}: {{${e}${m}${a}${i}${l}_${a}${d}${d}${r}${e}${s}${s}${e}${s}}}.`,
+      formButtonPrimary__continue: `${S}${e}${n}${d} ${i}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s}`,
+      selectDropdown__role: `${S}${e}${l}${e}${c}${t} ${r}${o}${l}${e}`,
+      subtitle: `${E}${n}${t}${e}${r} ${o}${r} ${p}${a}${s}${t}${e} ${o}${n}${e} ${o}${r} ${m}${o}${r}${e} ${e}${m}${a}${i}${l} ${a}${d}${d}${r}${e}${s}${s}${e}${s}, ${s}${e}${p}${a}${r}${a}${t}${e}${d} ${b}${y} ${s}${p}${a}${c}${e}${s} ${o}${r} ${c}${o}${m}${m}${a}${s}.`,
+      successMessage: `${I}${n}${v}${i}${t}${a}${t}${i}${o}${n}${s} ${s}${u}${c}${c}${e}${s}${s}${f}${u}${l}${l}${y} ${s}${e}${n}${t}`,
+      title: `${I}${n}${v}${i}${t}${e} ${n}${e}${w} ${m}${e}${m}${b}${e}${r}${s}`,
     },
     membersPage: {
       action__invite: 'Invite',
@@ -168,12 +212,12 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
-      description: 'Manage your organization.',
-      general: 'General',
-      members: 'Members',
-      title: 'Organization',
-      billing: 'Billing',
-    },
+      description: `${M}${a}${n}${a}${g}${e} ${y}${o}${u}${r} ${o}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}.`,
+      general: `${G}${e}${n}${e}${r}${a}${l}`,
+      members: `${M}${e}${m}${b}${e}${r}${s}`,
+      title: `${O}${r}${g}${a}${n}${i}${z}${a}${t}${i}${o}${n}`,
+      billing: `${B}${i}${l}${l}${i}${n}${g}`,
+    } as any,
     profilePage: {
       dangerSection: {
         deleteOrganization: {

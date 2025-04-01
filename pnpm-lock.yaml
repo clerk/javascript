@@ -704,6 +704,162 @@ importers:
 
   packages/localizations:
     dependencies:
+      '@characters/a':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/a-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/b':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/b-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/c':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/c-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/d':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/d-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/e':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/e-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/f':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/f-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/g':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/g-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/h':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/h-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/i':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/i-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/j':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/j-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/k':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/k-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/l':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/l-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/m':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/m-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/n':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/n-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/o':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/o-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/p':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/p-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/q':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/q-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/r':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/r-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/s':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/s-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/t':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/t-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/u':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/u-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/v':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/v-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/w':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/w-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/x':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/x-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/y':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/y-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/z':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@characters/z-uppercase':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@clerk/types':
         specifier: workspace:^
         version: link:../types
@@ -2011,6 +2167,162 @@ packages:
 
   '@changesets/write@0.4.0':
     resolution: {integrity: sha512-CdTLvIOPiCNuH71pyDu3rA+Q0n65cmAbXnwWH84rKGiFumFzkmHNT8KHTMEchcxN+Kl8I54xGUhJ7l3E7X396Q==}
+
+  '@characters/a-uppercase@2.1.0':
+    resolution: {integrity: sha512-MA5ALTx+HyHZ2btDZCgwLXxxqgBhQA+CmdOF28JltoRSS0IMeaEBEzX9iz3Ao+9ROMFu3rLN1JLA4LRFpbQYEQ==}
+
+  '@characters/a@2.1.0':
+    resolution: {integrity: sha512-XqJ3vWspxq9xyAMX4ZKZDqyiMlT/dXq8pLOm8tF9BENL4iUGTILNuU/NUt17DU2ilJXIcUzu1ZqQ0Aw9wfrEaA==}
+
+  '@characters/b-uppercase@2.1.0':
+    resolution: {integrity: sha512-lTw9nvsAMEqV4sYyopt4e1Dwt/qqp7MlzLK4WdUHhrOkSZXOhzV5625hamQz9BQOelGto8S+YfJL4YrCZUOm6w==}
+
+  '@characters/b@2.1.0':
+    resolution: {integrity: sha512-OF44Qu25mcq0tPbWbDgU9OvRExo2+BT1sZ2Uey7izg7mUqjHqaiWd7XfbcZaj5LDjUD5Y8up5iAFeJJaza3Eqw==}
+
+  '@characters/c-uppercase@2.1.0':
+    resolution: {integrity: sha512-SfNxz+QxfqqsDPTGCnCFZyVWEIe57FoQU8hgw4dIHpYawplLx1CqhHyGh5dzOEXx8LpGmNBvif6czdoc/Q0kAA==}
+
+  '@characters/c@2.1.0':
+    resolution: {integrity: sha512-ABbaG04cCmJq15wjgKbpI+fwut84laSZ5fPUFEO4mua9cwR3yccUIdw/kJZZc3zV2c/q4Yw6VH1q7jgva2QKcg==}
+
+  '@characters/d-uppercase@2.1.0':
+    resolution: {integrity: sha512-2kG7W7yrZzaK+JxF1TAAChU2CbuP0kmDgdisJfHrhQerRfgflK2ECnOHvmLEpGO//cyEN+MKSWmAXE8EUlLRmQ==}
+
+  '@characters/d@2.1.0':
+    resolution: {integrity: sha512-veNvIW4Vy9rc08XGpQhp57J5+tVaAmma+k8zQCDPO7NpatBNbEK1VqiKRlblBFsgKMwE8FT1iimyxAQ1wCENOw==}
+
+  '@characters/e-uppercase@2.1.0':
+    resolution: {integrity: sha512-qKlRd/eME5t61AXzCEiLMDleFJ/m5Ctp/CXufiPabqbn3QuY2KqBEjeUywqGhJU78zFuBpKrnqXJhzhHhqrU+g==}
+
+  '@characters/e@2.1.0':
+    resolution: {integrity: sha512-/iuuVJ4WcNTuzL0naqHiPvCUumXy5GBwdwRJRKSiYp5M32k+xYjSTGrep68Rx6UCVoSAa5jQZ/sNZEQSET34nQ==}
+
+  '@characters/f-uppercase@2.1.0':
+    resolution: {integrity: sha512-/wvbYsuAL5nGTwx1P1ViL2+lrSkqnQh2mAqEM4H2wGLpFQaf9/F1DvRSgReVYfq30Wh1EJFUrx0B5n8YD4NTnA==}
+
+  '@characters/f@2.1.0':
+    resolution: {integrity: sha512-zguyRul9pffbMF77DCMwSm+xvqOsAaKjO9BpFf4GhnQB9ohT54FWBHxiNBa38aR7D+3PSd26ZsGqFIHdipdWmQ==}
+
+  '@characters/g-uppercase@2.1.0':
+    resolution: {integrity: sha512-Q9HMKuB6BOij1sX/TMewaflICnN1JngylkVAoeW8+1z3iw0EHHZAPNtxbqaoEGhq3n6dSiJiKTIor7GNgMT1Yg==}
+
+  '@characters/g@2.1.0':
+    resolution: {integrity: sha512-zyga23nEFienkdBaU2TkHpVqX+209XsM/Hjp6x/61+hOJoXpXjHrm9gbEjsQ8wu436M83CKlm+qHXzQOc8q8DQ==}
+
+  '@characters/h-uppercase@2.1.0':
+    resolution: {integrity: sha512-1z7oqKAjzr7gyEI90bl/cFHw93X8Ah7lJnh4IRN5c+7FZUrEukR3J5+hRAmMlnsv9s/bW38CaxYwIANKFv1nSQ==}
+
+  '@characters/h@2.1.0':
+    resolution: {integrity: sha512-sJXXyIWmblN2mZXU2u0dL5R2JmQzs7Gp1bwdsRtkRe6zCOHtutEnvhXbhdrARpLc9Oq+ftQo6nsR7UkqzMPU8Q==}
+
+  '@characters/i-uppercase@2.1.0':
+    resolution: {integrity: sha512-Eb1Swk2p6oeUNYbBwUbIT4fX41qWfeYufCH9IK0RQjJnXhO8MgVVMT0du/9SkPMNnpZ3roWHobtUdRM2oa/UtQ==}
+
+  '@characters/i@2.1.0':
+    resolution: {integrity: sha512-T7kDa+BdXriceSpdmzSLAjMxb/j6s+k0+5ABATRysaNqzyjHCnfHnX2jwUBLC/xZ8mDHTI8lksQVBJu2+N4ADA==}
+
+  '@characters/j-uppercase@2.1.0':
+    resolution: {integrity: sha512-aRSlbj5/kGrJDrGcM98I/A1RWLTpXoaJOUjC+hsp6uLZYgh7FTK2S1io+vHNlNEFxCsphS9Us3MJXM7QztoI4w==}
+
+  '@characters/j@2.1.0':
+    resolution: {integrity: sha512-W4z5wRDF4+RZ14cHuAtC70dKDNvGvervea7MrBQgXJzGuX4u0CROiwPApDuxaIir3jGAGiIVoahGFY6zxFnU7A==}
+
+  '@characters/k-uppercase@2.1.0':
+    resolution: {integrity: sha512-G8DzQTldkOY+nGSHoVK4r7UTob2Vf0txqJ8YBIZzq4UxbG4iEXh0UqaweOoPBjEzWsMHdtiJK64MoQfY6qivtg==}
+
+  '@characters/k@2.1.0':
+    resolution: {integrity: sha512-2JvYH0pJZPOmdqN6oxWbxlWjR/qvq23+3is6W9XVLkAEdPs2rczjKyuacU3gGdMdGdTyAA9vUIUHRrl47Ky/+Q==}
+
+  '@characters/l-uppercase@2.1.0':
+    resolution: {integrity: sha512-a1zzNe25yR2DjszjE2o0HyTjurF04vnoFiAKbDr7dpmRl5gL3VptxmoUVxyKNXHDkAX5UJnm/BpJnkEe2CK6pA==}
+
+  '@characters/l@2.1.0':
+    resolution: {integrity: sha512-h5ymv8+nkD0msxVxVn9uXZFhWh1fGtRCDbHyvofIbK9sYgYEgxQir/w///MHSMk5EQ9m27uXfY1Un2pWjUfZfg==}
+
+  '@characters/m-uppercase@2.1.0':
+    resolution: {integrity: sha512-Yo9gwLMBXlhnPBU0x6bqgmluZoRb24dwqw7458hhi4Cf4pdFSvsnfZ9L+vEhTk7rgYkpLLOrpnatr9D9dKDQ6Q==}
+
+  '@characters/m@2.1.0':
+    resolution: {integrity: sha512-YfMGE1krX877Qdo+5ofQbnEuGV9JO5axh7XcxeFsBzW6iuDAjUPBvdNt57fXAjG1YNGwrKXXDoPnI4pLqBhkgw==}
+
+  '@characters/n-uppercase@2.1.0':
+    resolution: {integrity: sha512-uBsK505OIa32TaTkKVshRhuVqYUDJkwf/taS421DE5WEWVbSGP6Km4BWvdwbY8vyImJ4/XGsG666h/qu21wMvw==}
+
+  '@characters/n@2.1.0':
+    resolution: {integrity: sha512-hljKDG1zDeCN98Jh13kPbQUf9IkWxcqzgHxGgfG3wvp7YOv/kH23MemdJptqbLGQqS+cFy2KAFBUSs/sQzbi3w==}
+
+  '@characters/o-uppercase@2.1.0':
+    resolution: {integrity: sha512-geO/SlK3p4cBSoFebsRC803VjMLK1uVEZsJ+V6A9Ma6r35rGGPXIgt6tvJzaKnbi9I5epcoyQ74aaiT/1eJ/cg==}
+
+  '@characters/o@2.1.0':
+    resolution: {integrity: sha512-RUbYmQueJj8wZu0I+GEW/Akn1gidfwQWsfn0sQE20gV3zawTOrllfPzKr2fkeMdggPV7JZ3XdSl0PBcXYgzZOw==}
+
+  '@characters/p-uppercase@2.1.0':
+    resolution: {integrity: sha512-SR5uRbw4SD26lszwq38rfAuNapXMpwlb64GgOk/FBWUCTu2wH2gK7vi9sBudCqLPltzm+Q+lM9wVezLk9Ior9Q==}
+
+  '@characters/p@2.1.0':
+    resolution: {integrity: sha512-Zljo3HyZc1LJtYpYPMXM+AburbOqDb3E6Vd4FROY4R0pH+dSafglBALHl845AU0e8fyQKYP9UnaiW08kKAHU9g==}
+
+  '@characters/q-uppercase@2.1.0':
+    resolution: {integrity: sha512-BjZWR3aH/g8Qn2Ov8l4+4UhR8N7PbxJ34ncW08fzNj4ZeuOryVaJum0Tu3VNhqbAOIwX7lN7+CUiHflE/oJlNg==}
+
+  '@characters/q@2.1.0':
+    resolution: {integrity: sha512-DtrTyS0BgD4YBetUxxG9XE86xoxcbwNyAekinwC+/zo4EDUrd/YG+Ns9JVm9rNFRpVBa5eFfeGvdhWVLnNeZtA==}
+
+  '@characters/r-uppercase@2.1.0':
+    resolution: {integrity: sha512-korGphDcQUaki3USP3oVgFMD3NUnVIRTmaGojj5Q+dHAKgvVbLTTwO7h0yhdJ1+5hgES44rDxkZuWmDy6QbIvw==}
+
+  '@characters/r@2.1.0':
+    resolution: {integrity: sha512-8tCnbNu7jLek2GIswI2QQktKkp98TvFU4rNNwbpARCwyHx0EiEkqdfKc55nFB2pMinEp1hBDg85n4I4zBl1/3g==}
+
+  '@characters/s-uppercase@2.1.0':
+    resolution: {integrity: sha512-Wy1IrrqAazE2oY7C1WDmVI7jPJKuTYsfBjwZAMLydQIhCNtb9lgOASdcNYLyeqepgSYXlNWOjZKgLWhB15/keA==}
+
+  '@characters/s@2.1.0':
+    resolution: {integrity: sha512-BtbjHr45ra3sM1rciNXa9yeNMYvMwZliJ5GNsmx6i05ZVpeJusViaPrGkFx7SC5TlE0MIwX5gQWfp19nHJe6zQ==}
+
+  '@characters/t-uppercase@2.1.0':
+    resolution: {integrity: sha512-VJ7Ya0UxPUGvjbieYzXuj8bDOKUJRZ6Ev6co0q+mnqzKcx21t4ng1NqdBlyg7+vr72CssDDCEjNgq8QB642NHA==}
+
+  '@characters/t@2.1.0':
+    resolution: {integrity: sha512-Ta4r8ks87rb9Ne7aRY19VCEFJZAysaQL/BeehB7H1Ruu7NSoiFf0hAzYK7mwVrjbqidFURvGoN0gGv2ZghiMNA==}
+
+  '@characters/u-uppercase@2.1.0':
+    resolution: {integrity: sha512-29jJbpP170afmGtiJW5tSrTFLA2SlN09dljdgYTSkLdWZpAZOMAkg4hdB9Vo6WlC9VRigq0izuri9aEAag/Aew==}
+
+  '@characters/u@2.1.0':
+    resolution: {integrity: sha512-JGgrXZRHx064tU+GnEZvNTjm3Udz1En7/S1sB71M0KPv1HD92n+y++Usv6f8nyhWJUZzZ5nJgYN+0rFZjULBvA==}
+
+  '@characters/v-uppercase@2.1.0':
+    resolution: {integrity: sha512-NIwFXx+f4t7BAK/zadcrERWHI3q/m910GRDdpUz0X2zhAzzY1NCh6n8Q3siTXTywa9drFtk1Qn3MJoP15dlEdw==}
+
+  '@characters/v@2.1.0':
+    resolution: {integrity: sha512-rHXUqdtYaNwsz5vdxcsXuYblLTFQu8Lj3ePCI1zmMLt4essSyZtEBtUVJyTKn3Gd12xDnlCVeWV3B83olE9CMg==}
+
+  '@characters/w-uppercase@2.1.0':
+    resolution: {integrity: sha512-JTHYmpIFFMPFbgaeKKsxMC6z6MbMOLiCTkvRVv4Pm8YKkQvelZRvBJk7t9VsYSVO1o/7Yu1+zlWamzhpd7cIFw==}
+
+  '@characters/w@2.1.0':
+    resolution: {integrity: sha512-TAFjni39LLXwWPfTDaK7HREMJvNFIT1yye4te5oUQ3yi590U7ZXGXYZGoqAJSbT6jX0Ab3h4Fbyo8s0MdQt9hw==}
+
+  '@characters/x-uppercase@2.1.0':
+    resolution: {integrity: sha512-h3kxpw7ZUxqccirV/NwSoa7pQI3BrFq+IyEHhhtZilyNNQQktcBTD+5GyowatA4rxxPgK9xJ8lhUGKoE2+mi3Q==}
+
+  '@characters/x@2.1.0':
+    resolution: {integrity: sha512-a8mJB4C7V4orUwxMGV49tTmIIZzeHvbBAeCU7wOobxoqZynyFzWi2wOGEfGFcH5kLkkgPrumJ6LplFoSqH6D5A==}
+
+  '@characters/y-uppercase@2.1.0':
+    resolution: {integrity: sha512-0N/OY7O7sMWtEVlw6UPICC7yBYf6JI0u8oAnbf9JXsVvTVvLVkdYl2i10nMWAEuKHy+/LXss8O1MhDD3XWF3aw==}
+
+  '@characters/y@2.1.0':
+    resolution: {integrity: sha512-nkIYC76rZZWEWnk1a2HdDkmd5GXqCcnz47AB7zrIPibcYbhCyg/MPC8ajzoLGPwZISZx7Vr7EgiLYN0apllILg==}
+
+  '@characters/z-uppercase@2.1.0':
+    resolution: {integrity: sha512-MSRBnp/9UNzU81uYa695Smm3x18OxVubC6s/GsFn4+HamGS10u4VpXfhO68KxMEHcs1n7mg7OT+339EcMJ77eg==}
+
+  '@characters/z@2.1.0':
+    resolution: {integrity: sha512-ajDS+LVWXSN7EAGaC15J/RAqJJwSgma245AA75xLbOIErIm9gzfzMnVEUizgW30LoVuO7IHh668EDJHmXWY+Tw==}
 
   '@cloudflare/kv-asset-handler@0.4.0':
     resolution: {integrity: sha512-+tv3z+SPp+gqTIcImN9o0hqE9xyfQjI1XD9pL6NuKjua9B1y7mNYv0S9cP+QEbA4ppVgGZEmKOvHX5G5Ei1CVA==}
@@ -15817,6 +16129,110 @@ snapshots:
       fs-extra: 7.0.1
       human-id: 4.1.1
       prettier: 2.8.8
+
+  '@characters/a-uppercase@2.1.0': {}
+
+  '@characters/a@2.1.0': {}
+
+  '@characters/b-uppercase@2.1.0': {}
+
+  '@characters/b@2.1.0': {}
+
+  '@characters/c-uppercase@2.1.0': {}
+
+  '@characters/c@2.1.0': {}
+
+  '@characters/d-uppercase@2.1.0': {}
+
+  '@characters/d@2.1.0': {}
+
+  '@characters/e-uppercase@2.1.0': {}
+
+  '@characters/e@2.1.0': {}
+
+  '@characters/f-uppercase@2.1.0': {}
+
+  '@characters/f@2.1.0': {}
+
+  '@characters/g-uppercase@2.1.0': {}
+
+  '@characters/g@2.1.0': {}
+
+  '@characters/h-uppercase@2.1.0': {}
+
+  '@characters/h@2.1.0': {}
+
+  '@characters/i-uppercase@2.1.0': {}
+
+  '@characters/i@2.1.0': {}
+
+  '@characters/j-uppercase@2.1.0': {}
+
+  '@characters/j@2.1.0': {}
+
+  '@characters/k-uppercase@2.1.0': {}
+
+  '@characters/k@2.1.0': {}
+
+  '@characters/l-uppercase@2.1.0': {}
+
+  '@characters/l@2.1.0': {}
+
+  '@characters/m-uppercase@2.1.0': {}
+
+  '@characters/m@2.1.0': {}
+
+  '@characters/n-uppercase@2.1.0': {}
+
+  '@characters/n@2.1.0': {}
+
+  '@characters/o-uppercase@2.1.0': {}
+
+  '@characters/o@2.1.0': {}
+
+  '@characters/p-uppercase@2.1.0': {}
+
+  '@characters/p@2.1.0': {}
+
+  '@characters/q-uppercase@2.1.0': {}
+
+  '@characters/q@2.1.0': {}
+
+  '@characters/r-uppercase@2.1.0': {}
+
+  '@characters/r@2.1.0': {}
+
+  '@characters/s-uppercase@2.1.0': {}
+
+  '@characters/s@2.1.0': {}
+
+  '@characters/t-uppercase@2.1.0': {}
+
+  '@characters/t@2.1.0': {}
+
+  '@characters/u-uppercase@2.1.0': {}
+
+  '@characters/u@2.1.0': {}
+
+  '@characters/v-uppercase@2.1.0': {}
+
+  '@characters/v@2.1.0': {}
+
+  '@characters/w-uppercase@2.1.0': {}
+
+  '@characters/w@2.1.0': {}
+
+  '@characters/x-uppercase@2.1.0': {}
+
+  '@characters/x@2.1.0': {}
+
+  '@characters/y-uppercase@2.1.0': {}
+
+  '@characters/y@2.1.0': {}
+
+  '@characters/z-uppercase@2.1.0': {}
+
+  '@characters/z@2.1.0': {}
 
   '@cloudflare/kv-asset-handler@0.4.0':
     dependencies:
