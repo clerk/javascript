@@ -189,7 +189,7 @@ type AuthStateOptions = {
  */
 const resolveAuthState = ({
   authContext: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
-  options: { treatPendingAsSignedOut },
+  options: { treatPendingAsSignedOut = true },
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
     return {
