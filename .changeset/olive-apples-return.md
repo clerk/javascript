@@ -17,7 +17,7 @@ To get started, install [`svix`](https://www.npmjs.com/package/svix), which Cler
 npm install svix
 ```
 
-Then in your webhook route handler, import `verifyWebhook` from your preferred SDK (this example uses Next.js):
+Then in your webhook route handler, import `verifyWebhook()` from your preferred SDK (this example uses Next.js):
 
 ```ts
 // app/api/webhooks/route.ts
