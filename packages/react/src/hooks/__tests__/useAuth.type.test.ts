@@ -1,7 +1,9 @@
+import type { PendingSessionOptions } from '@clerk/types';
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type { useAuth } from '../useAuth';
 
+type UseAuthParameters = Parameters<typeof useAuth>[0];
 type HasFunction = Exclude<ReturnType<typeof useAuth>['has'], undefined>;
 type ParamsOfHas = Parameters<HasFunction>[0];
 
@@ -109,6 +111,20 @@ describe('useAuth type tests', () => {
           afterMinutes: 10,
         },
       } as const).not.toMatchTypeOf<ParamsOfHas>();
+    });
+  });
+
+  describe('with parameters', () => {
+    it('allows passing any auth state object', () => {
+      expectTypeOf({ orgId: null }).toMatchTypeOf<UseAuthParameters>();
+    });
+
+    it('do not allow invalid option types', () => {
+      const invalidValue = 5;
+      expectTypeOf({ treatPendingAsSignedOut: invalidValue } satisfies Record<
+        keyof PendingSessionOptions,
+        any
+      >).toMatchTypeOf<UseAuthParameters>();
     });
   });
 });
