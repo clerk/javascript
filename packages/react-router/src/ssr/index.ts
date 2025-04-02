@@ -15,7 +15,7 @@ export type {
   EmailAddress,
   ExternalAccount,
   Invitation,
-  OauthAccessToken,
+  OAuthAccessToken,
   Organization,
   OrganizationDomain,
   OrganizationInvitation,
@@ -24,7 +24,6 @@ export type {
   PhoneNumber,
   Session,
   SignInToken,
-  SMSMessage,
   Token,
   User,
 } from '@clerk/backend';

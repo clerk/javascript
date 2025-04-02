@@ -40,7 +40,10 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   return;
 }
 
-export async function createOrReadKeylessAction(): Promise<null | Omit<AccountlessApplication, 'secretKey'>> {
+export async function createOrReadKeylessAction(): Promise<null | Omit<
+  AccountlessApplication,
+  'object' | 'secretKey'
+>> {
   if (!canUseKeyless) {
     return null;
   }

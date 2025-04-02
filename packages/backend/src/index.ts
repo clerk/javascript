@@ -78,11 +78,13 @@ export type { AuthObject } from './tokens/authObjects';
  * Resources
  */
 export type {
+  AccountlessApplication,
   AllowlistIdentifier,
   Client,
   EmailAddress,
   ExternalAccount,
   Invitation,
+  OAuthAccessToken,
   Organization,
   OrganizationDomain,
   OrganizationInvitation,
@@ -99,8 +101,3 @@ export type {
  * Enums
  */
 export type { OrganizationMembershipRole } from './api/resources/Enums';
-
-/**
- * Enums
- */
-export type { AccountlessApplication, OauthAccessToken, SMSMessage } from './api/resources';
