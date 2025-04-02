@@ -200,9 +200,7 @@ export class Clerk implements ClerkInterface {
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
-  #loaded = false;
   #status: ClerkInterface['status'] = 'loading';
-
   #listeners: Array<(emission: Resources) => void> = [];
   #statusListeners: Array<(status: Clerk['status']) => void> = [];
   #navigationListeners: Array<() => void> = [];
@@ -393,9 +391,9 @@ export class Clerk implements ClerkInterface {
     }
 
     if (this.#options.standardBrowser) {
-      this.#loaded = await this.#loadInStandardBrowser();
+      await this.#loadInStandardBrowser();
     } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
+      await this.#loadInNonStandardBrowser();
     }
   };
 
