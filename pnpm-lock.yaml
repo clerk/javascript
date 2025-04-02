@@ -393,10 +393,10 @@ importers:
     devDependencies:
       '@eslint/js':
         specifier: ^9.19.0
-        version: 9.22.0
+        version: 9.23.0
       eslint:
         specifier: ^9.19.0
-        version: 9.22.0(jiti@2.4.2)
+        version: 9.23.0(jiti@2.4.2)
       globals:
         specifier: ^15.14.0
         version: 15.15.0
@@ -408,7 +408,7 @@ importers:
         version: 5.8.2
       typescript-eslint:
         specifier: ^8.22.0
-        version: 8.26.1(eslint@9.22.0(jiti@2.4.2))(typescript@5.8.2)
+        version: 8.28.0(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.2)
       zod:
         specifier: ^3.23.4
         version: 3.24.2
@@ -2990,7 +2990,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.22':
     resolution: {integrity: sha512-sOttVuk/8gdnsiSeDpnRNpLgBJHLbyQQC0QBGd2iHpr/x6xSYpgoRO6AqwAwGtQsk4ZEPZ83ulvccei1IIPdwg==}
