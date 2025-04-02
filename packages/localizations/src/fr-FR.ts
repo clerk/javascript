@@ -531,8 +531,7 @@ export const frFR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "J'accepte la Politique de confidentialité.",
         label__onlyTermsOfService: "J'accepte les Conditions d'utilisation.",
-        label__termsOfServiceAndPrivacyPolicy:
-          "J'accepte les Conditions d'utilisation et la Politique de confidentialité.",
+        label__termsOfServiceAndPrivacyPolicy: `J'accepte les {{ termsOfServiceLink || link("Conditions d'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.`,
       },
       continue: {
         subtitle: 'Lisez et acceptez les conditions pour continuer.',
