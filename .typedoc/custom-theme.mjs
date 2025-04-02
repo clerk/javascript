@@ -37,7 +37,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       ...superPartials,
       /**
        * Copied from default theme / source code. This hides the return type heading over the table from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/9fe11dcbee410a5747427dbe0439b9b18dfce0a2/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number }} options
        */
@@ -84,9 +84,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section and the signature title from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signature.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/9fe11dcbee410a5747427dbe0439b9b18dfce0a2/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signature.ts
        * @param {import('typedoc').SignatureReflection} model
-       * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean }} options
+       * @param {{ headingLevel: number, nested?: boolean, accessor?: string, multipleSignatures?: boolean; hideTitle?: boolean }} options
        */
       signature: (model, options) => {
         const md = [];
@@ -162,7 +162,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.memberWithGroups.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/9fe11dcbee410a5747427dbe0439b9b18dfce0a2/packages/typedoc-plugin-markdown/src/theme/context/partials/member.memberWithGroups.ts
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number }} options
        */
@@ -220,10 +220,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         }
 
         if ('signatures' in model && model.signatures?.length) {
+          const multipleSignatures = model.signatures?.length > 1;
           model.signatures.forEach(signature => {
+            if (multipleSignatures) {
+              md.push(heading(options.headingLevel, i18n.kind_call_signature()));
+            }
             md.push(
               this.partials.signature(signature, {
-                headingLevel: options.headingLevel,
+                headingLevel: multipleSignatures ? options.headingLevel + 1 : options.headingLevel,
               }),
             );
           });
@@ -232,7 +236,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         if (model.indexSignatures?.length) {
           md.push(heading(options.headingLevel, i18n.theme_indexable()));
           model.indexSignatures.forEach(indexSignature => {
-            md.push(this.partials.indexSignature(indexSignature));
+            md.push(
+              this.partials.indexSignature(indexSignature, {
+                headingLevel: options.headingLevel + 1,
+              }),
+            );
           });
         }
 
@@ -374,9 +382,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * Copied from default theme / source code. This ensures that everything is wrapped in a single codeblock (not individual ones). If there are function overloads they will be split by a `; `.
        * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/6cde68da7bdc048aa81f0fb2467034ae675c7e60/packages/typedoc-plugin-markdown/src/theme/context/partials/type.reflection.function.ts
        * @param {import('typedoc').SignatureReflection[]} model
-       * @param {{ forceParameterType: boolean }} [options]
+       * @param {{ forceParameterType?: boolean; typeSeparator?: string }} [options]
        */
       functionType: (model, options) => {
+        const shouldFormat = this.options.getValue('useCodeBlocks');
+        const typeSeparator = options?.typeSeparator || ' => ';
         const functions = model.map(fn => {
           const typeParams = fn.typeParameters
             ? `${this.helpers.getAngleBracket('<')}${fn.typeParameters
@@ -398,7 +408,10 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               })
             : [];
           const returns = this.partials.someType(/** @type {import('typedoc').SomeType} */ fn.type);
-          return typeParams + `(${params.join(', ')}) => ${returns}`;
+          return (
+            typeParams +
+            `${shouldFormat && model.length > 1 ? '  ' : ''}(${params.join(', ')})${typeSeparator}${returns}`
+          );
         });
 
         const cleanOutput = functions
@@ -412,7 +425,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
                 .replace(/<\/code>/g, '')
             );
           })
-          .join('; ');
+          .join(shouldFormat ? ';\n' : '; ');
 
         return `<code>${cleanOutput}</code>`;
       },
