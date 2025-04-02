@@ -9,7 +9,7 @@
 "@clerk/tanstack-react-start": minor
 ---
 
-Introduced `verifyWebhook` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and full-stack SDKs.
+Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and fullstack SDKs.
 
 To get started, install [`svix`](https://www.npmjs.com/package/svix), which Clerk uses to verify its webhooks:
 
