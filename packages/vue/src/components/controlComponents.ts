@@ -4,6 +4,7 @@ import type {
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PendingSessionOptions,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -13,14 +14,14 @@ import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
 import { useClerkLoaded } from '../utils/useClerkLoaded';
 
-export const SignedIn = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value ? slots.default?.() : null);
 });
 
-export const SignedOut = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedOut = defineComponent(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value === null ? slots.default?.() : null);
 });
@@ -105,7 +106,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps =
+export type ProtectProps = (
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -125,7 +126,9 @@ export type ProtectProps =
       condition?: never;
       role?: never;
       permission?: never;
-    };
+    }
+) &
+  PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth();
