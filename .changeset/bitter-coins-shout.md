@@ -3,5 +3,3 @@
 ---
 
 Fix brief flashes of auth state during authentication operations
-
-
