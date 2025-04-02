@@ -12,7 +12,7 @@ export type PluginOptions = LoadClerkJsScriptOptions;
 /**
  * Checks if the state update from Clerk is a transitive state during auth operations.
  * This occurs when Clerk's #setTransitiveState is called, setting all values except
- * client to undefined. We skip these updates to prevent unnecessary re-renders.
+ * client to undefined. We skip these updates to prevent undefined state flickers.
  */
 const isTransitiveState = (payload: Resources, currentClient: ClientResource | undefined) => {
   return (
