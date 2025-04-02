@@ -10,6 +10,7 @@ import type {
   SessionVerificationLevel,
   SessionVerificationTypes,
   SignOut,
+  UseAuthReturn,
 } from '@clerk/types';
 
 type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
@@ -186,10 +187,10 @@ type AuthStateOptions = {
  * preventing duplication across different packages
  * @internal
  */
-export const resolveAuthState = ({
+const resolveAuthState = ({
   authContext: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
   options: { treatPendingAsSignedOut },
-}: AuthStateOptions) => {
+}: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
     return {
       isLoaded: false,
@@ -203,7 +204,7 @@ export const resolveAuthState = ({
       has: undefined,
       signOut,
       getToken,
-    };
+    } as const;
   }
 
   if (sessionId === null && userId === null) {
@@ -219,15 +220,15 @@ export const resolveAuthState = ({
       has: () => false,
       signOut,
       getToken,
-    };
+    } as const;
   }
 
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
     return {
       isLoaded: true,
       isSignedIn: false,
-      sessionId,
-      userId,
+      sessionId: null,
+      userId: null,
       actor: null,
       orgId: null,
       orgRole: null,
@@ -235,7 +236,7 @@ export const resolveAuthState = ({
       has: () => false,
       signOut,
       getToken,
-    };
+    } as const;
   }
 
   if (!!sessionId && !!userId && !!orgId && !!orgRole) {
@@ -251,7 +252,7 @@ export const resolveAuthState = ({
       has,
       signOut,
       getToken,
-    };
+    } as const;
   }
 
   if (!!sessionId && !!userId && !orgId) {
@@ -267,8 +268,8 @@ export const resolveAuthState = ({
       has: () => false,
       signOut,
       getToken,
-    };
+    } as const;
   }
 };
 
-export { createCheckAuthorization, validateReverificationConfig };
+export { createCheckAuthorization, validateReverificationConfig, resolveAuthState };
