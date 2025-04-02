@@ -181,5 +181,5 @@ export function useDerivedAuth(authObject: any, options: PendingSessionOptions =
     return errorThrower.throw(invalidStateError);
   }
 
-  return errorThrower.throw(invalidStateError);
+  return payload;
 }

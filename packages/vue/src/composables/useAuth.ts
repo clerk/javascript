@@ -125,7 +125,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
       return errorThrower.throw(invalidStateError);
     }
 
-    return errorThrower.throw(invalidStateError);
+    return payload;
   });
 
   return toComputedRefs(result);
