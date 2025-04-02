@@ -173,7 +173,7 @@ export function useDerivedAuth(authObject: any, options: PendingSessionOptions =
       has: derivedHas,
     },
     options: {
-      treatPendingAsSignedOut: treatPendingAsSignedOut ?? options.treatPendingAsSignedOut,
+      treatPendingAsSignedOut: treatPendingAsSignedOut ?? options.treatPendingAsSignedOut ?? true,
     },
   });
 
