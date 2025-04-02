@@ -1,6 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
@@ -181,6 +181,11 @@ export class AuthCookieService {
   }
 
   private handleGetTokenError(e: any) {
+    //early return if not a clerk api error (aka fapi error) and not a network error
+    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e) && !isNetworkError(e)) {
+      return;
+    }
+
     //sign user out if a 4XX error
     if (is4xxError(e)) {
       void this.clerk.handleUnauthenticated().catch(noop);
@@ -190,8 +195,10 @@ export class AuthCookieService {
     // The poller failed to fetch a fresh session token, update status to `degraded`.
     this.clerk.__internal_setStatus('degraded');
 
+    // --------
     // Treat any other error as a noop
     // TODO(debug-logs): Once debug logs is available log this error.
+    // --------
   }
 
   /**

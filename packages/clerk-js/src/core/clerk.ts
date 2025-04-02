@@ -11,7 +11,7 @@ import {
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
@@ -2211,7 +2211,7 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+        const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
 
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;

@@ -93,7 +93,7 @@ export const CardClerkAndPagesTag = React.memo(
 const LogoMarkIconLink = () => {
   return (
     <Link
-      href='https://www.clerk.com?utm_source=clerk&utm_medium=components'
+      href='https://go.clerk.com/components'
       colorScheme='inherit'
       isExternal
       aria-label='Clerk logo'

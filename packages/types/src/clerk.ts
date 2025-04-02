@@ -1529,6 +1529,10 @@ export type __experimental_CheckoutProps = {
   onSubscriptionComplete?: () => void;
 };
 
+export type __experimental_PaymentSourcesProps = {
+  orgId?: string;
+};
+
 export interface HandleEmailLinkVerificationParams {
   /**
    * Full URL or path to navigate to after successful magic link verification
