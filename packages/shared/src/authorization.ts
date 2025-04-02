@@ -1,10 +1,15 @@
 import type {
+  ActClaim,
   CheckAuthorizationWithCustomPermissions,
+  GetToken,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PendingSessionOptions,
   ReverificationConfig,
+  SessionStatusClaim,
   SessionVerificationLevel,
   SessionVerificationTypes,
+  SignOut,
 } from '@clerk/types';
 
 type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
@@ -157,6 +162,113 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
 
     return [orgAuthorization, reverificationAuthorization].every(a => a === true);
   };
+};
+
+type AuthStateOptions = {
+  authContext: {
+    userId?: string | null;
+    sessionId?: string | null;
+    sessionStatus?: SessionStatusClaim | null;
+    actor?: ActClaim | null;
+    orgId?: string | null;
+    orgRole?: OrganizationCustomRoleKey | null;
+    orgSlug?: string | null;
+    orgPermissions?: OrganizationCustomPermissionKey[] | null;
+    getToken: GetToken;
+    signOut: SignOut;
+    has: (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => boolean;
+  };
+  options: PendingSessionOptions;
+};
+
+/**
+ * Shared utility function that centralizes auth state resolution logic,
+ * preventing duplication across different packages
+ * @internal
+ */
+export const resolveAuthState = ({
+  authContext: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
+  options: { treatPendingAsSignedOut },
+}: AuthStateOptions) => {
+  if (sessionId === undefined && userId === undefined) {
+    return {
+      isLoaded: false,
+      isSignedIn: undefined,
+      sessionId,
+      userId,
+      actor: undefined,
+      orgId: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      has: undefined,
+      signOut,
+      getToken,
+    };
+  }
+
+  if (sessionId === null && userId === null) {
+    return {
+      isLoaded: true,
+      isSignedIn: false,
+      sessionId,
+      userId,
+      actor: null,
+      orgId: null,
+      orgRole: null,
+      orgSlug: null,
+      has: () => false,
+      signOut,
+      getToken,
+    };
+  }
+
+  if (treatPendingAsSignedOut && sessionStatus === 'pending') {
+    return {
+      isLoaded: true,
+      isSignedIn: false,
+      sessionId,
+      userId,
+      actor: null,
+      orgId: null,
+      orgRole: null,
+      orgSlug: null,
+      has: () => false,
+      signOut,
+      getToken,
+    };
+  }
+
+  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+    return {
+      isLoaded: true,
+      isSignedIn: true,
+      sessionId,
+      userId,
+      actor: actor || null,
+      orgId,
+      orgRole,
+      orgSlug: orgSlug || null,
+      has,
+      signOut,
+      getToken,
+    };
+  }
+
+  if (!!sessionId && !!userId && !orgId) {
+    return {
+      isLoaded: true,
+      isSignedIn: true,
+      sessionId,
+      userId,
+      actor: actor || null,
+      orgId: null,
+      orgRole: null,
+      orgSlug: null,
+      has: () => false,
+      signOut,
+      getToken,
+    };
+  }
 };
 
 export { createCheckAuthorization, validateReverificationConfig };
