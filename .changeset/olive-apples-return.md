@@ -13,7 +13,7 @@ Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests
 
 To get started, install [`svix`](https://www.npmjs.com/package/svix), which Clerk uses to verify its webhooks:
 
-```ts
+```shell
 npm install svix
 ```
 
