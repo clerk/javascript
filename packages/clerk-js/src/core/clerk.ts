@@ -112,7 +112,13 @@ import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
+import {
+  CLERK_SATELLITE_URL,
+  CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNCED,
+  ERROR_CODES,
+  SESSION_STORAGE_AUTH_WITH_POPUP_KEY,
+} from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -1507,11 +1513,23 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    let shouldRefreshResources = false;
+    try {
+      const hasCalledAuthWithPopup = sessionStorage.getItem(SESSION_STORAGE_AUTH_WITH_POPUP_KEY);
+      if (hasCalledAuthWithPopup) {
+        shouldRefreshResources = true;
+      }
+    } catch {
+      // In the event that sessionStorage is disabled, assume the resource needs to be refreshed. Refreshing when not
+      // needed doesn't break anything, but it does cause 405 network errors.
+      shouldRefreshResources = true;
+    }
+
     // If `handleRedirectCallback` is called on a window without an opener property (such as when the OAuth flow popup
     // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
     // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
     // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
-    if (!window.opener) {
+    if (!window.opener && shouldRefreshResources) {
       try {
         await signIn.reload();
       } catch {
