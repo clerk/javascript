@@ -1,5 +1,4 @@
 import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
-import { useOptionsContext } from '@clerk/shared/react';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -144,8 +143,9 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
  * ```
  */
 export function useDerivedAuth(authObject: any, options: PendingSessionOptions = {}): UseAuthReturn {
-  const optionsContext = useOptionsContext();
-  const treatPendingAsSignedOut = options.treatPendingAsSignedOut ?? optionsContext?.treatPendingAsSignedOut;
+  const clerk = useIsomorphicClerkContext();
+  const treatPendingAsSignedOut =
+    options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut') ?? true;
 
   const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
@@ -173,7 +173,7 @@ export function useDerivedAuth(authObject: any, options: PendingSessionOptions =
       has: derivedHas,
     },
     options: {
-      treatPendingAsSignedOut: treatPendingAsSignedOut ?? options.treatPendingAsSignedOut ?? true,
+      treatPendingAsSignedOut,
     },
   });
 
