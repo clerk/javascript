@@ -54,7 +54,7 @@ export function PromisifiedAuthProvider({
  * }
  * ```
  */
-export function usePromisifiedAuth() {
+export function usePromisifiedAuth(options: Parameters<typeof useAuth>[0]) {
   const isPagesRouter = useRouter();
   const valueFromContext = React.useContext(PromisifiedAuthContext);
 
@@ -68,12 +68,12 @@ export function usePromisifiedAuth() {
   if (typeof window === 'undefined') {
     // Pages router should always use useAuth as it is able to grab initial auth state from context during SSR.
     if (isPagesRouter) {
-      return useAuth();
+      return useAuth(options);
     }
 
     // We don't need to deal with Clerk being loaded here
-    return useDerivedAuth(resolvedData);
+    return useDerivedAuth({ ...resolvedData, ...options });
   } else {
-    return useAuth(resolvedData);
+    return useAuth({ ...resolvedData, ...options });
   }
 }
