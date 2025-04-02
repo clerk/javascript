@@ -11,5 +11,5 @@ let value: Status = "active";
 ## Values
 
 ```typescript
-"active" | "revoked" | "ended" | "expired" | "removed" | "abandoned" | "replaced"
+"active" | "revoked" | "ended" | "expired" | "removed" | "abandoned" | "replaced" | "pending"
 ```

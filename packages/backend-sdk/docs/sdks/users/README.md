@@ -1145,7 +1145,7 @@ run();
 
 ### Response
 
-**Promise\<[operations.ResponseBody[]](../../models/.md)\>**
+**Promise\<[components.OAuthAccessToken[]](../../models/.md)\>**
 
 ### Errors
 

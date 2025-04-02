@@ -290,7 +290,7 @@ export class Users extends ClientSDK {
   async getOAuthAccessToken(
     request: operations.GetOAuthAccessTokenRequest,
     options?: RequestOptions,
-  ): Promise<Array<operations.ResponseBody>> {
+  ): Promise<Array<components.OAuthAccessToken>> {
     return unwrapAsync(usersGetOAuthAccessToken(
       this,
       request,

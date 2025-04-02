@@ -12,6 +12,7 @@ import { Domains } from "./domains.js";
 import { EmailAddresses } from "./emailaddresses.js";
 import { EmailAndSmsTemplates } from "./emailandsmstemplates.js";
 import { EmailSMSTemplates } from "./emailsmstemplates.js";
+import { ExperimentalAccountlessApplications } from "./experimentalaccountlessapplications.js";
 import { InstanceSettings } from "./instancesettings.js";
 import { Invitations } from "./invitations.js";
 import { Jwks } from "./jwks.js";
@@ -201,5 +202,12 @@ export class Clerk extends ClientSDK {
   private _waitlistEntries?: WaitlistEntries;
   get waitlistEntries(): WaitlistEntries {
     return (this._waitlistEntries ??= new WaitlistEntries(this._options));
+  }
+
+  private _experimentalAccountlessApplications?:
+    ExperimentalAccountlessApplications;
+  get experimentalAccountlessApplications(): ExperimentalAccountlessApplications {
+    return (this._experimentalAccountlessApplications ??=
+      new ExperimentalAccountlessApplications(this._options));
   }
 }

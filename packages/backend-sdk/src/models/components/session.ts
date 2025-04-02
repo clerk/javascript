@@ -14,6 +14,12 @@ import {
   SessionActivityResponse$Outbound,
   SessionActivityResponse$outboundSchema,
 } from "./sessionactivityresponse.js";
+import {
+  SessionTask,
+  SessionTask$inboundSchema,
+  SessionTask$Outbound,
+  SessionTask$outboundSchema,
+} from "./sessiontask.js";
 
 /**
  * String representing the object's type. Objects of the same type share the same value.
@@ -40,6 +46,7 @@ export const Status = {
   Removed: "removed",
   Abandoned: "abandoned",
   Replaced: "replaced",
+  Pending: "pending",
 } as const;
 export type Status = ClosedEnum<typeof Status>;
 
@@ -82,6 +89,7 @@ export type Session = {
    * @remarks
    */
   createdAt: number;
+  tasks?: Array<SessionTask> | null | undefined;
 };
 
 /** @internal */
@@ -182,6 +190,7 @@ export const Session$inboundSchema: z.ZodType<Session, z.ZodTypeDef, unknown> =
     abandon_at: z.number().int(),
     updated_at: z.number().int(),
     created_at: z.number().int(),
+    tasks: z.nullable(z.array(SessionTask$inboundSchema)).optional(),
   }).transform((v) => {
     return remap$(v, {
       "user_id": "userId",
@@ -211,6 +220,7 @@ export type Session$Outbound = {
   abandon_at: number;
   updated_at: number;
   created_at: number;
+  tasks?: Array<SessionTask$Outbound> | null | undefined;
 };
 
 /** @internal */
@@ -232,6 +242,7 @@ export const Session$outboundSchema: z.ZodType<
   abandonAt: z.number().int(),
   updatedAt: z.number().int(),
   createdAt: z.number().int(),
+  tasks: z.nullable(z.array(SessionTask$outboundSchema)).optional(),
 }).transform((v) => {
   return remap$(v, {
     userId: "user_id",

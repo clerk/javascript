@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
-  docChecksum: cb4ca82b1fda1cf47778ef86f6237f11
+  docChecksum: ebe67a4999504f7a2339d58f1957ce1f
   docVersion: "2025-03-12"
-  speakeasyVersion: 1.526.6
-  generationVersion: 2.563.1
-  releaseVersion: 0.3.7
-  configChecksum: d57c076772aa718dd06c6c572b6662db
+  speakeasyVersion: 1.527.1
+  generationVersion: 2.564.5
+  releaseVersion: 0.3.8
+  configChecksum: d1a6b02727321b602183db9181bf3ef7
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -41,6 +41,8 @@ generatedFiles:
   - RUNTIMES.md
   - USAGE.md
   - docs/lib/utils/retryconfig.md
+  - docs/models/components/accountlessapplication.md
+  - docs/models/components/accountlessapplicationobject.md
   - docs/models/components/actor.md
   - docs/models/components/actortoken.md
   - docs/models/components/actortokenactor.md
@@ -127,6 +129,8 @@ generatedFiles:
   - docs/models/components/nextaction.md
   - docs/models/components/nonce.md
   - docs/models/components/oauth.md
+  - docs/models/components/oauthaccesstoken.md
+  - docs/models/components/oauthaccesstokenobject.md
   - docs/models/components/oauthapplication.md
   - docs/models/components/oauthapplicationobject.md
   - docs/models/components/oauthapplications.md
@@ -195,6 +199,7 @@ generatedFiles:
   - docs/models/components/sessionactivityresponse.md
   - docs/models/components/sessionobject.md
   - docs/models/components/sessionrefresh.md
+  - docs/models/components/sessiontask.md
   - docs/models/components/signintoken.md
   - docs/models/components/signintokenobject.md
   - docs/models/components/signintokenstatus.md
@@ -358,7 +363,6 @@ generatedFiles:
   - docs/models/operations/refreshsessionrequest.md
   - docs/models/operations/refreshsessionrequestbody.md
   - docs/models/operations/requestbody.md
-  - docs/models/operations/responsebody.md
   - docs/models/operations/reverttemplatepathparamtemplatetype.md
   - docs/models/operations/reverttemplaterequest.md
   - docs/models/operations/revokeactortokenrequest.md
@@ -441,6 +445,7 @@ generatedFiles:
   - docs/sdks/emailaddresses/README.md
   - docs/sdks/emailandsmstemplates/README.md
   - docs/sdks/emailsmstemplates/README.md
+  - docs/sdks/experimentalaccountlessapplications/README.md
   - docs/sdks/instancesettings/README.md
   - docs/sdks/invitations/README.md
   - docs/sdks/jwks/README.md
@@ -493,6 +498,8 @@ generatedFiles:
   - src/funcs/emailSMSTemplatesList.ts
   - src/funcs/emailSMSTemplatesRevert.ts
   - src/funcs/emailSMSTemplatesToggleTemplateDelivery.ts
+  - src/funcs/experimentalAccountlessApplicationsComplete.ts
+  - src/funcs/experimentalAccountlessApplicationsCreate.ts
   - src/funcs/instanceSettingsChangeDomain.ts
   - src/funcs/instanceSettingsGet.ts
   - src/funcs/instanceSettingsUpdate.ts
@@ -617,6 +624,7 @@ generatedFiles:
   - src/lib/sdks.ts
   - src/lib/security.ts
   - src/lib/url.ts
+  - src/models/components/accountlessapplication.ts
   - src/models/components/actortoken.ts
   - src/models/components/allowlistidentifier.ts
   - src/models/components/blocklistidentifier.ts
@@ -646,6 +654,7 @@ generatedFiles:
   - src/models/components/jwksrsapublickey.ts
   - src/models/components/jwkssymmetrickey.ts
   - src/models/components/jwttemplate.ts
+  - src/models/components/oauthaccesstoken.ts
   - src/models/components/oauthapplication.ts
   - src/models/components/oauthapplications.ts
   - src/models/components/oauthapplicationwithsecret.ts
@@ -675,6 +684,7 @@ generatedFiles:
   - src/models/components/session.ts
   - src/models/components/sessionactivityresponse.ts
   - src/models/components/sessionrefresh.ts
+  - src/models/components/sessiontask.ts
   - src/models/components/signintoken.ts
   - src/models/components/signup.ts
   - src/models/components/signupverification.ts
@@ -824,6 +834,7 @@ generatedFiles:
   - src/sdk/emailaddresses.ts
   - src/sdk/emailandsmstemplates.ts
   - src/sdk/emailsmstemplates.ts
+  - src/sdk/experimentalaccountlessapplications.ts
   - src/sdk/index.ts
   - src/sdk/instancesettings.ts
   - src/sdk/invitations.ts
@@ -2145,5 +2156,19 @@ examples:
           application/json: {"object": "cookies", "cookies": ["<value>", "<value>", "<value>"]}
         "400":
           application/json: {"errors": []}
+  CreateAccountlessApplication:
+    speakeasy-default-create-accountless-application:
+      responses:
+        "200":
+          application/json: {"object": "accountless_application", "publishable_key": "<value>"}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CompleteAccountlessApplication:
+    speakeasy-default-complete-accountless-application:
+      responses:
+        "200":
+          application/json: {"object": "accountless_application", "publishable_key": "<value>"}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
 examplesVersion: 1.0.0
 generatedTests: {}
