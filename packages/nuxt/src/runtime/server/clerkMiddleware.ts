@@ -101,7 +101,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     const authObject = requestState.toAuth();
     const authHandler = () => authObject;
 
-    const auth = new Proxy(Object.assign(authObject, authHandler), {
+    const auth = new Proxy(Object.assign(authHandler, authObject), {
       get(target, prop: string, receiver) {
         deprecated('event.context.auth', 'Use `event.context.auth()` as a function instead.');
 
