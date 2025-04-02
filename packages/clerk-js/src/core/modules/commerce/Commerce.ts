@@ -1,12 +1,19 @@
 import type {
   __experimental_AddPaymentSourceParams,
   __experimental_CommerceBillingNamespace,
+  __experimental_CommerceInitializedPaymentSourceJSON,
   __experimental_CommerceNamespace,
   __experimental_CommercePaymentSourceJSON,
+  __experimental_GetPaymentSourcesParams,
+  __experimental_InitializePaymentSourceParams,
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
-import { __experimental_CommercePaymentSource, BaseResource } from '../../resources/internal';
+import {
+  __experimental_CommerceInitializedPaymentSource,
+  __experimental_CommercePaymentSource,
+  BaseResource,
+} from '../../resources/internal';
 import { __experimental_CommerceBilling } from './CommerceBilling';
 
 export class __experimental_Commerce implements __experimental_CommerceNamespace {
@@ -19,6 +26,17 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
     return __experimental_Commerce._billing;
   }
 
+  initializePaymentSource = async (params: __experimental_InitializePaymentSourceParams) => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/me/commerce/payment_sources/initialize`,
+        method: 'POST',
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_CommerceInitializedPaymentSourceJSON;
+    return new __experimental_CommerceInitializedPaymentSource(json);
+  };
+
   addPaymentSource = async (params: __experimental_AddPaymentSourceParams) => {
     const json = (
       await BaseResource._fetch({
@@ -30,10 +48,11 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
     return new __experimental_CommercePaymentSource(json);
   };
 
-  getPaymentSources = async () => {
+  getPaymentSources = async (params: __experimental_GetPaymentSourcesParams) => {
     return await BaseResource._fetch({
       path: `/me/commerce/payment_sources`,
       method: 'GET',
+      search: { orgId: params.orgId || '' },
     }).then(res => {
       const { data: paymentSources, total_count } =
         res as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;

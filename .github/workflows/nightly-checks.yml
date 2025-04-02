@@ -8,7 +8,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_EXTENDED && fromJSON(vars.TIMEOUT_MINUTES_EXTENDED) || 30 }}
 
     strategy:
       matrix:
@@ -25,7 +25,6 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-cache: 'local:'
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
@@ -46,16 +45,16 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: 'canary'
+          E2E_NPM_FORCE: 'true'
+          E2E_REACT_DOM_VERSION: '19.1.0'
+          E2E_REACT_VERSION: '19.1.0'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
-          E2E_NEXTJS_VERSION: 'canary'
-          E2E_REACT_VERSION: '19.0.0-beta-04b058868c-20240508'
-          E2E_REACT_DOM_VERSION: '19.0.0-beta-04b058868c-20240508'
-          E2E_NPM_FORCE: 'true'
 
       - name: Report Status
         if: always()
