@@ -8,11 +8,11 @@ import type {
   UseAuthReturn,
 } from '@clerk/types';
 import type { Store, StoreValue } from 'nanostores';
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore, $clerkStore } from '../stores/external';
+import { $authStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 
 /**
