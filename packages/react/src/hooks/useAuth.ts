@@ -145,7 +145,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 export function useDerivedAuth(authObject: any, options: PendingSessionOptions = {}): UseAuthReturn {
   const clerk = useIsomorphicClerkContext();
   const treatPendingAsSignedOut =
-    options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut') ?? true;
+    options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut');
 
   const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
