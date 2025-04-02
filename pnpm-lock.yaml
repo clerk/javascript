@@ -2966,7 +2966,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.22':
     resolution: {integrity: sha512-sOttVuk/8gdnsiSeDpnRNpLgBJHLbyQQC0QBGd2iHpr/x6xSYpgoRO6AqwAwGtQsk4ZEPZ83ulvccei1IIPdwg==}
@@ -29817,7 +29817,7 @@ snapshots:
   svix@1.62.0:
     dependencies:
       '@stablelib/base64': 1.0.1
-      '@types/node': 22.13.10
+      '@types/node': 22.13.14
       es6-promise: 4.2.8
       fast-sha256: 1.3.0
       svix-fetch: 3.0.0
