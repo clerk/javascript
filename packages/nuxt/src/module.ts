@@ -26,7 +26,7 @@ export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'route
    * import { clerkMiddleware } from '@clerk/nuxt/server'
    *
    * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth)
+   *   console.log('auth', event.context.auth())
    * })
    * ```
    */
@@ -99,14 +99,18 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // Adds TS support for `event.context.auth` in event handlers
+    // Adds TS support for `event.context.auth()` in event handlers
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
         getContents: () => `import type { AuthObject } from '@clerk/backend';
+          interface AuthObjectHandler extends AuthObject {
+            (): AuthObject;
+          }
+
           declare module 'h3' {
             interface H3EventContext {
-              auth: AuthObject;
+              auth: AuthObjectHandler;
             }
           }
         `,
