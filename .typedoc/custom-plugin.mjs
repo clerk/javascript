@@ -27,6 +27,7 @@ const LINK_REPLACEMENTS = [
   ['signed-in-session-resource', '/docs/references/javascript/session'],
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
   ['user-resource', '/docs/references/javascript/user'],
+  ['session-status-claim', '/docs/references/javascript/types/session-status'],
 ];
 
 /**
@@ -39,7 +40,7 @@ const LINK_REPLACEMENTS = [
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      pattern: new RegExp(`\\((?:\\.{1,2}\\/)+.*?${fileName}\\.mdx\\)`, 'g'),
+      pattern: new RegExp(`\\((?:\\.{1,2}\\/)+[^()]*?${fileName}\\.mdx\\)`, 'g'),
       replace: `(${newPath})`,
     };
   });
@@ -50,6 +51,10 @@ function getUnlinkedTypesReplacements() {
     {
       pattern: /\(setActiveParams\)/g,
       replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',
+    },
+    {
+      pattern: /`_LocalizationResource`/g,
+      replace: '[Localization](/docs/customization/localization)',
     },
   ];
 }
