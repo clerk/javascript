@@ -116,6 +116,12 @@ type JWTPayloadBase = {
   sts?: SessionStatusClaim;
 
   /**
+   * Feature claims this represent features, you can have multiple features in the same claim. e.g.: "impersonation,emails"
+   * @experimental
+   */
+  fea?: string | null;
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;

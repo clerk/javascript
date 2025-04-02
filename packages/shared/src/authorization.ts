@@ -20,11 +20,17 @@ type AuthorizationOptions = {
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
   factorVerificationAge: [number, number] | null;
+  features: string | null | undefined;
 };
 
 type CheckOrgAuthorization = (
   params: { role?: OrganizationCustomRoleKey; permission?: OrganizationCustomPermissionKey },
   { orgId, orgRole, orgPermissions }: AuthorizationOptions,
+) => boolean | null;
+
+type CheckFeatureAuthorization = (
+  params: { __experimental_feature?: string },
+  { features }: AuthorizationOptions,
 ) => boolean | null;
 
 type CheckReverificationAuthorization = (
@@ -82,6 +88,25 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   if (params.role) {
     return orgRole === params.role;
   }
+  return null;
+};
+
+const checkFeatureAuthorization: CheckFeatureAuthorization = (param, options) => {
+  const { __experimental_feature: feature } = param;
+  const { features } = options;
+
+  if (!feature) {
+    return null;
+  }
+
+  if (!features) {
+    return null;
+  }
+
+  if (typeof features === 'string') {
+    return features.split(',').includes(feature);
+  }
+
   return null;
 };
 
@@ -156,6 +181,11 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
 
     const orgAuthorization = checkOrgAuthorization(params, options);
     const reverificationAuthorization = checkReverificationAuthorization(params, options);
+    const featureAuthorization = checkFeatureAuthorization(params, options);
+
+    if (featureAuthorization) {
+      return featureAuthorization;
+    }
 
     if ([orgAuthorization, reverificationAuthorization].some(a => a === null)) {
       return [orgAuthorization, reverificationAuthorization].some(a => a === true);
