@@ -49,7 +49,7 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
  * loadClerkJsScript({ publishableKey: 'pk_' });
  */
 const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-sacript]');
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   const existingScriptTimeout = opts?.existingScriptTimeout ?? 2_000;
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -76,21 +76,22 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
        * Avoid waiting indefinitely, cancel the attempt for the existing script and continue with "loadScript" below.
        */
       timeoutId = setTimeout(() => {
-        reject(FAILED_TO_LOAD_ERROR);
+        // We don't add a cause because we want to retry loading manually
+        reject();
       }, existingScriptTimeout);
     });
 
     const loaded = await attemptExisting
       .then(() => true)
       .catch(msg => {
-        if (msg === FAILED_TO_LOAD_ERROR) {
-          throw msg;
+        if (msg) {
+          throw new Error(msg);
         }
         return false;
       });
 
     if (loaded) {
-      return;
+      return existingScript;
     }
   }
 
