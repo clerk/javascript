@@ -130,7 +130,7 @@ describe('useDerivedAuth', () => {
     expect(current.has?.({ permission: 'test' })).toBe(false);
   });
 
-  it('with `treatPendingAsSignedOut` option, returns signed in state when session has pending status', () => {
+  it('with `treatPendingAsSignedOut: true` option, returns signed out state when session has pending status', () => {
     const authObject = {
       sessionId: 'session123',
       sessionStatus: 'pending',
@@ -146,6 +146,35 @@ describe('useDerivedAuth', () => {
     const {
       result: { current },
     } = renderHook(() => useDerivedAuth(authObject, { treatPendingAsSignedOut: true }));
+
+    expect(current.isLoaded).toBe(true);
+    expect(current.isSignedIn).toBe(false);
+    expect(current.sessionId).toBeNull();
+    expect(current.userId).toBeNull();
+    expect(current.actor).toBeNull();
+    expect(current.orgId).toBeNull();
+    expect(current.orgRole).toBeNull();
+    expect(current.orgSlug).toBeNull();
+    expect(current.has).toBeInstanceOf(Function);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
+  });
+
+  it('with `treatPendingAsSignedOut: false` option, returns signed in state when session has pending status', () => {
+    const authObject = {
+      sessionId: 'session123',
+      sessionStatus: 'pending',
+      userId: 'user123',
+      actor: 'actor123',
+      orgId: 'org123',
+      orgRole: 'admin',
+      orgSlug: 'my-org',
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject, { treatPendingAsSignedOut: false }));
 
     expect(current.isLoaded).toBe(true);
     expect(current.isSignedIn).toBe(true);
