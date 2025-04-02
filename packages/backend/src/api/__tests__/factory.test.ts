@@ -333,11 +333,13 @@ describe('api.client', () => {
             {
               object: 'oauth_access_token',
               external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
+              provider_user_id: 'foo',
               token: '<token>',
               provider: 'oauth_google',
               public_metadata: {},
               label: null,
               scopes: ['email', 'profile'],
+              expires_at: 1742849028,
             },
           ]);
 
