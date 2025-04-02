@@ -87,6 +87,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
+
   let authContext = authContextFromHook;
 
   if (authContext.sessionId === undefined && authContext.userId === undefined) {
@@ -112,7 +113,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
       orgPermissions,
       factorVerificationAge,
     },
-    { treatPendingAsSignedOut },
+    { treatPendingAsSignedOut: treatPendingAsSignedOut },
   );
 };
 
@@ -142,11 +143,10 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
  * } = useDerivedAuth(authObject);
  * ```
  */
-export function useDerivedAuth(authObject: any, options: PendingSessionOptions = {}): UseAuthReturn {
-  const clerk = useIsomorphicClerkContext();
-  const treatPendingAsSignedOut =
-    options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut');
-
+export function useDerivedAuth(
+  authObject: any,
+  { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
+): UseAuthReturn {
   const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
   const derivedHas = useCallback(

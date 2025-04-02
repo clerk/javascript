@@ -116,8 +116,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
         has,
       },
       options: {
-        treatPendingAsSignedOut:
-          treatPendingAsSignedOut ?? clerk.value?.__internal_getOption('treatPendingAsSignedOut'),
+        treatPendingAsSignedOut,
       },
     });
 
