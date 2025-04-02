@@ -1,7 +1,6 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
@@ -80,14 +79,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, options] = parseHandlerAndOptions(args);
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
-
-    clerkClient(event).telemetry.record(
-      eventMethodCalled('clerkMiddleware', {
-        handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
-      }),
-    );
 
     const requestState = await clerkClient(event).authenticateRequest(clerkRequest, options);
 
