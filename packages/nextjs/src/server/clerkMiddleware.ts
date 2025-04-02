@@ -10,7 +10,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
-import { createCSPHeader, type CSPMode } from './content-security-policy';
+import { createCSPHeader, type CSPDirective, type CSPMode } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -69,7 +69,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
     /**
      * Custom CSP directives to merge with Clerk's default directives
      */
-    directives?: Record<string, string[]>;
+    directives?: Record<CSPDirective, string[]>;
   };
 };
 
