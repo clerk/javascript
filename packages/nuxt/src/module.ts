@@ -104,11 +104,11 @@ export default defineNuxtModule<ModuleOptions>({
       {
         filename: 'types/clerk.d.ts',
         getContents: () => `import type { AuthObject } from '@clerk/backend';
-          interface AuthObjectHandler extends AuthObject {
-            (): AuthObject;
-          }
-
           declare module 'h3' {
+            type AuthObjectHandler = AuthObject & {
+              (): AuthObject;
+            }
+
             interface H3EventContext {
               auth: AuthObjectHandler;
             }
