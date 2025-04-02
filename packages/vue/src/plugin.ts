@@ -10,6 +10,21 @@ import { ClerkInjectionKey } from './keys';
 export type PluginOptions = LoadClerkJsScriptOptions;
 
 /**
+ * Checks if the state update from Clerk is a transitive state during auth operations.
+ * This occurs when Clerk's #setTransitiveState is called, setting all values except
+ * client to undefined. We skip these updates to prevent unnecessary re-renders.
+ */
+const isTransitiveState = (payload: Resources, currentClient: ClientResource | undefined) => {
+  return (
+    payload.client &&
+    payload.session === undefined &&
+    payload.user === undefined &&
+    payload.organization === undefined &&
+    Boolean(currentClient)
+  );
+};
+
+/**
  * Vue plugin for integrating Clerk.
  *
  * @example
@@ -55,6 +70,9 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
         loaded.value = true;
 
         clerk.value.addListener(payload => {
+          if (isTransitiveState(payload, resources.value.client)) {
+            return;
+          }
           resources.value = payload;
         });
 
