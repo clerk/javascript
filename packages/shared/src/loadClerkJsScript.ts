@@ -85,7 +85,8 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
       .then(() => true)
       .catch(msg => {
         if (msg) {
-          throw new Error(msg);
+          // TODO: Align with `throw new Error(FAILED_TO_LOAD_ERROR)` in the next major
+          throw msg;
         }
         return false;
       });
