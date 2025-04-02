@@ -12,7 +12,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore, $clerkStore } from '../stores/external';
+import { $authStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 
 /**
@@ -85,8 +85,6 @@ type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
 export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   const authContext = useStore($authStore);
 
-  const clerk = useStore($clerkStore);
-
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
 
@@ -125,7 +123,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
       has,
     },
     options: {
-      treatPendingAsSignedOut: treatPendingAsSignedOut ?? clerk?.__internal_getOption('treatPendingAsSignedOut'),
+      treatPendingAsSignedOut,
     },
   });
 
