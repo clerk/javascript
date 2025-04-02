@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
-import { buildClerkJsScriptAttributes, clerkJsScriptUrl } from '@clerk/clerk-react/internal';
+import { clerkJsScriptUrl } from '@clerk/clerk-react/internal';
 import NextScript from 'next/script';
 import React from 'react';
 
@@ -30,6 +30,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
     nonce,
   };
   const scriptUrl = clerkJsScriptUrl(options);
+  console.log(scriptUrl);
 
   /**
    * Notes:
@@ -38,18 +39,62 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
    * Using the `nextjs/script` for App Router with the `beforeInteractive` strategy will throw an error because our custom script will be mounted outside the `html` tag.
    */
   const Script = props.router === 'app' ? 'script' : NextScript;
+  console.log(Script);
 
   return (
-    <Script
-      src={scriptUrl}
-      data-clerk-js-script
-      async
-      // `nextjs/script` will add defer by default and does not get removed when we async is true
-      defer={props.router === 'pages' ? false : undefined}
-      crossOrigin='anonymous'
-      strategy={props.router === 'pages' ? 'beforeInteractive' : undefined}
-      {...buildClerkJsScriptAttributes(options)}
-    />
+    <>
+      <script>
+        {`
+        function() {
+          const s = document.createElement('script');
+          window.__clerk_script_promise = new Promise((res,rej)=> {
+          })
+          script.setAttribute('crossorigin', 'anonymous');
+          script.setAttribute('data-clerk-js-script', 'true');
+          script.async = true;
+          script.defer = false;
+
+          script.addEventListener('load', () => {
+            //script.remove();
+            //resolve(script);
+            console.log("oantelos")
+          });
+
+          script.addEventListener('error', () => {
+            //script.remove();
+            //reject();
+            console.log("nahahahaa")
+          });
+
+          script.src = "${scriptUrl}";
+          //script.nonce = nonce;
+          //beforeLoad?.(script);
+          script.setAttribute('data-clerk-publishable-key', "${publishableKey}")
+          document.head.appendChild(script);
+        }
+
+
+
+      `}
+      </script>
+
+      {/* <Script
+        src={scriptUrl}
+        data-clerk-js-script
+        async
+        // `nextjs/script` will add defer by default and does not get removed when we async is true
+        defer={props.router === 'pages' ? false : undefined}
+        crossOrigin='anonymous'
+        strategy={props.router === 'pages' ? 'beforeInteractive' : undefined}
+        onLoad={()=>{
+          console.log("Congrats")
+        }}
+        onError={()=>{
+          console.log("why this ?")
+        }}
+        {...buildClerkJsScriptAttributes(options)}
+      /> */}
+    </>
   );
 }
 
