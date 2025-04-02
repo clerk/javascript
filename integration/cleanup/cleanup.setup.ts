@@ -17,14 +17,14 @@ setup('cleanup instances ', async () => {
   for (const entry of entries) {
     console.log(`Cleanup for ${entry.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
     const clerkClient = createClerkClient({ secretKey: entry.secretKey });
-    const { data: users } = await clerkClient.users.getUserList({
+    const users = await clerkClient.users.list({
       orderBy: '-created_at',
       query: 'clerkcookie',
       limit: 150,
     });
 
     const { data: orgs } = await clerkClient.organizations
-      .getOrganizationList({
+      .list({
         limit: 150,
       })
       .catch(() => ({ data: [] }));
@@ -41,7 +41,7 @@ setup('cleanup instances ', async () => {
               user.createdAt,
             ).toISOString()})`,
           );
-          return clerkClient.users.deleteUser(user.id);
+          return clerkClient.users.delete({ userId: user.id });
         }),
       );
       await new Promise(r => setTimeout(r, 1000));
@@ -52,7 +52,7 @@ setup('cleanup instances ', async () => {
       await Promise.all(
         batch.map(org => {
           console.log(`Cleaning up org ${org.id} (${org.name}) (${new Date(org.createdAt).toISOString()})`);
-          return clerkClient.organizations.deleteOrganization(org.id);
+          return clerkClient.organizations.delete({ organizationId: org.id });
         }),
       );
       await new Promise(r => setTimeout(r, 1000));

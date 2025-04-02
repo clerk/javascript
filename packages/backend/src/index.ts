@@ -37,7 +37,6 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     ...(options.sdkMetadata ? { sdk: options.sdkMetadata.name, sdkVersion: options.sdkMetadata.version } : {}),
   });
 
-  // @ts-expect-error - TODO: Types work, but this doesn't seem to validate correctly
   return {
     ...apiClient,
     ...requestState,

@@ -29,10 +29,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
       fakeViewer = m.services.users.createFakeUser();
       const viewer = await m.services.users.createBapiUser(fakeViewer);
-      await m.services.clerk.organizations.createOrganizationMembership({
+      await m.services.clerk.organizationMemberships.create({
         organizationId: fakeOrganization.organization.id,
-        role: 'org:viewer' as OrganizationMembershipRole,
-        userId: viewer.id,
+        requestBody: {
+          role: 'org:viewer' as OrganizationMembershipRole,
+          userId: viewer.id,
+        },
       });
     });
 

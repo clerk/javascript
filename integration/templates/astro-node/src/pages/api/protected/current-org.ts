@@ -19,7 +19,7 @@ export const GET: APIRoute = async context => {
 
   return new Response(
     JSON.stringify(
-      await clerkClient(context).organizations.getOrganization({
+      await clerkClient(context).organizations.get({
         organizationId: orgId,
       }),
     ),

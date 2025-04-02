@@ -8,7 +8,7 @@ export const GET: APIRoute = async context => {
   if (auth().has({ role: 'admin' })) {
     return new Response(
       JSON.stringify(
-        await clerkClient(context).organizations.getOrganization({
+        await clerkClient(context).organizations.get({
           organizationId: auth().orgId!,
         }),
       ),
