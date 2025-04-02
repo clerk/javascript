@@ -54,6 +54,11 @@ export function buildSSOCallbackURL(
   ctx: Partial<SignInContextType | SignUpContextType>,
   baseUrl: string | undefined = '',
 ): string {
+  // If the context contains an SSO callback URL, use it instead of building a new one, as it likely contains the
+  // combined flow path.
+  if ('ssoCallbackUrl' in ctx && ctx.ssoCallbackUrl) {
+    return ctx.ssoCallbackUrl;
+  }
   const { routing, authQueryString, path } = ctx;
   return buildRedirectUrl({
     routing,
