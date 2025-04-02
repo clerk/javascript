@@ -663,7 +663,7 @@ export interface Clerk {
 
   /**
    * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
-   * initiatied outside of the Clerk class.
+   * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
 }
