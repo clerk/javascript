@@ -270,7 +270,7 @@ describe('api.client', () => {
       ),
     );
 
-    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+    const errResponse = await apiClient.users.get({ userId: 'user_deadbeef' }).catch(err => err);
 
     expect(errResponse.status).toBe(429);
     expect(errResponse.retryAfter).toBe(123);
@@ -286,7 +286,7 @@ describe('api.client', () => {
       ),
     );
 
-    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+    const errResponse = await apiClient.users.get({ userId: 'user_deadbeef' }).catch(err => err);
 
     expect(errResponse.status).toBe(429);
     expect(errResponse.retryAfter).toBe(undefined);

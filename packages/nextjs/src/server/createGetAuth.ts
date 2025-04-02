@@ -140,7 +140,7 @@ export const createSyncGetAuth = ({
  *
  *   const client = await clerkClient()
  *
- *   const user = userId ? await client.users.getUser(userId) : null
+ *   const user = userId ? await client.users.get({ userId }) : null
  *
  *   return res.status(200).json({})
  * }

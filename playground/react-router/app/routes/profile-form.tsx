@@ -12,7 +12,7 @@ export async function action(args: Route.ActionArgs) {
 
   const formData = await args.request.formData()
   const name = await formData.get('name')
-  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.getUser(userId)
+  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.get({ userId })
 
   return {
     name,

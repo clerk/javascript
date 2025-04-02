@@ -133,7 +133,7 @@ app.get('/path', requireAuth, hasPermission, (req, res) => res.json(req.auth));
 
 ### `clerkClient`
 
-[Clerk's JavaScript Backend SDK](/docs/references/backend/overview) exposes Clerk's Backend API resources and low-level authentication utilities for JavaScript environments. For example, if you wanted to get a list of all users in your application, instead of creating a fetch to Clerk's `https://api.clerk.com/v1/users` endpoint, you can use the `users.getUserList()` method provided by the JavaScript Backend SDK.
+[Clerk's JavaScript Backend SDK](/docs/references/backend/overview) exposes Clerk's Backend API resources and low-level authentication utilities for JavaScript environments. For example, if you wanted to get a list of all users in your application, instead of creating a fetch to Clerk's `https://api.clerk.com/v1/users` endpoint, you can use the `users.list()` method provided by the JavaScript Backend SDK.
 
 All resource operations are mounted as sub-APIs on the `clerkClient` object. See the [reference documentation](/docs/references/backend/overview#usage) for more information.
 

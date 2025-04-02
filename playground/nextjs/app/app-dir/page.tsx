@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default async function Page() {
   const { userId } = await auth();
   const currentUser_ = await currentUser();
-  const user = userId ? await (await clerkClient()).users.getUser(userId) : null;
+  const user = userId ? await (await clerkClient()).users.get({ userId }) : null;
 
   return (
     <main>
