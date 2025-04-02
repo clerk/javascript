@@ -1,4 +1,4 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -147,20 +147,7 @@ export function useDerivedAuth(authObject: any, options: PendingSessionOptions =
   const treatPendingAsSignedOut =
     options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut');
 
-  const {
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    has,
-    signOut,
-    sessionStatus,
-    getToken,
-    orgPermissions,
-    factorVerificationAge,
-  } = authObject ?? {};
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -178,84 +165,20 @@ export function useDerivedAuth(authObject: any, options: PendingSessionOptions =
     [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
   );
 
-  if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: undefined,
-      orgId: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      has: undefined,
-      signOut,
+  const payload = resolveAuthState({
+    authContext: {
+      ...authObject,
       getToken,
-    };
-  }
-
-  if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
       signOut,
-      getToken,
-    };
-  }
-
-  if (treatPendingAsSignedOut && sessionStatus === 'pending') {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
-      signOut,
-      getToken,
-    };
-  }
-
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId,
-      orgRole,
-      orgSlug: orgSlug || null,
       has: derivedHas,
-      signOut,
-      getToken,
-    };
-  }
+    },
+    options: {
+      treatPendingAsSignedOut: treatPendingAsSignedOut ?? clerk?.__internal_getOption('treatPendingAsSignedOut'),
+    },
+  });
 
-  if (!!sessionId && !!userId && !orgId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: derivedHas,
-      signOut,
-      getToken,
-    };
+  if (!payload) {
+    return errorThrower.throw(invalidStateError);
   }
 
   return errorThrower.throw(invalidStateError);
