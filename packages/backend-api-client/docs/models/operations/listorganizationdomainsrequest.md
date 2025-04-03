@@ -1,0 +1,21 @@
+# ListOrganizationDomainsRequest
+
+## Example Usage
+
+```typescript
+import { ListOrganizationDomainsRequest } from "@clerk/backend-api-client/models/operations";
+
+let value: ListOrganizationDomainsRequest = {
+  organizationId: "<id>",
+};
+```
+
+## Fields
+
+| Field                                                                                                                                     | Type                                                                                                                                      | Required                                                                                                                                  | Description                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `organizationId`                                                                                                                          | *string*                                                                                                                                  | :heavy_check_mark:                                                                                                                        | The organization ID.                                                                                                                      |
+| `verified`                                                                                                                                | *string*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Filter domains by their verification status. `true` or `false`                                                                            |
+| `enrollmentMode`                                                                                                                          | *string*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Filter domains by their enrollment mode                                                                                                   |
+| `limit`                                                                                                                                   | *number*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Applies a limit to the number of results returned.<br/>Can be used for paginating the results together with `offset`.                     |
+| `offset`                                                                                                                                  | *number*                                                                                                                                  | :heavy_minus_sign:                                                                                                                        | Skip the first `offset` results when paginating.<br/>Needs to be an integer greater or equal to zero.<br/>To be used in conjunction with `limit`. |

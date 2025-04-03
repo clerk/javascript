@@ -1,0 +1,17 @@
+# RevokeSessionRequest
+
+## Example Usage
+
+```typescript
+import { RevokeSessionRequest } from "@clerk/backend-api-client/models/operations";
+
+let value: RevokeSessionRequest = {
+  sessionId: "<id>",
+};
+```
+
+## Fields
+
+| Field                 | Type                  | Required              | Description           |
+| --------------------- | --------------------- | --------------------- | --------------------- |
+| `sessionId`           | *string*              | :heavy_check_mark:    | The ID of the session |

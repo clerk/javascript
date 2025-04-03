@@ -1,0 +1,36 @@
+speakeasyVersion: 1.528.1
+sources:
+    Clerk Backend API:
+        sourceNamespace: clerk-backend-api
+        sourceRevisionDigest: sha256:aadc81a76753dea4f3a2b30e78dc0b9a45c2bd7fddee0694865eac0be0651d0d
+        sourceBlobDigest: sha256:7443b1a32312fba6bf40c5423a8982ccf1dde0d0e4c0cae30b3ad6235ae98785
+        tags:
+            - latest
+            - "2025-03-12"
+targets:
+    clerk:
+        source: Clerk Backend API
+        sourceNamespace: clerk-backend-api
+        sourceRevisionDigest: sha256:aadc81a76753dea4f3a2b30e78dc0b9a45c2bd7fddee0694865eac0be0651d0d
+        sourceBlobDigest: sha256:7443b1a32312fba6bf40c5423a8982ccf1dde0d0e4c0cae30b3ad6235ae98785
+        codeSamplesNamespace: clerk-backend-api-typescript-code-samples
+        codeSamplesRevisionDigest: sha256:111dc748e61cfa12c3b841060b69cd6eb1e7aad9757f3b2b482789d8dde8fbfd
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        Clerk Backend API:
+            inputs:
+                - location: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml
+            registry:
+                location: registry.speakeasyapi.dev/clerk/clerk/clerk-backend-api
+    targets:
+        clerk:
+            target: typescript
+            source: Clerk Backend API
+            codeSamples:
+                registry:
+                    location: registry.speakeasyapi.dev/clerk/clerk/clerk-backend-api-typescript-code-samples
+                labelOverride:
+                    fixedValue: Typescript (SDK)
+                blocking: false

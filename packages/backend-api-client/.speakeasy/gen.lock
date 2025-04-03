@@ -1,0 +1,2174 @@
+lockVersion: 2.0.0
+id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
+management:
+  docChecksum: ebe67a4999504f7a2339d58f1957ce1f
+  docVersion: "2025-03-12"
+  speakeasyVersion: 1.528.1
+  generationVersion: 2.565.1
+  releaseVersion: 0.3.10
+  configChecksum: 670d0662120cf58bfc279dc725382511
+features:
+  typescript:
+    additionalDependencies: 0.1.0
+    additionalProperties: 0.1.1
+    constsAndDefaults: 0.1.11
+    core: 3.21.4
+    defaultEnabledRetries: 0.1.0
+    deprecations: 2.81.1
+    devContainers: 2.90.0
+    enumUnions: 0.1.0
+    envVarSecurityUsage: 0.1.2
+    globalSecurity: 2.82.13
+    globalSecurityCallbacks: 0.1.0
+    globalSecurityFlattening: 0.1.0
+    globalServerURLs: 2.82.4
+    groups: 2.81.2
+    nameOverrides: 2.81.2
+    nullables: 0.1.1
+    openEnums: 0.1.1
+    responseFormat: 0.2.3
+    retries: 2.83.0
+    sdkHooks: 0.2.0
+    unions: 2.85.8
+    uploadStreams: 0.1.0
+generatedFiles:
+  - .devcontainer/README.md
+  - .devcontainer/devcontainer.json
+  - .devcontainer/setup.sh
+  - .gitattributes
+  - .npmignore
+  - FUNCTIONS.md
+  - RUNTIMES.md
+  - USAGE.md
+  - docs/lib/utils/retryconfig.md
+  - docs/models/components/accountlessapplication.md
+  - docs/models/components/accountlessapplicationobject.md
+  - docs/models/components/actor.md
+  - docs/models/components/actortoken.md
+  - docs/models/components/actortokenactor.md
+  - docs/models/components/actortokenobject.md
+  - docs/models/components/actortokenstatus.md
+  - docs/models/components/admin.md
+  - docs/models/components/adminverificationphonenumberstatus.md
+  - docs/models/components/adminverificationstatus.md
+  - docs/models/components/adminverificationstrategy.md
+  - docs/models/components/adminverificationweb3walletstatus.md
+  - docs/models/components/adminverificationweb3walletstrategy.md
+  - docs/models/components/allowlistidentifier.md
+  - docs/models/components/allowlistidentifierobject.md
+  - docs/models/components/blocklistidentifier.md
+  - docs/models/components/blocklistidentifieridentifiertype.md
+  - docs/models/components/blocklistidentifierobject.md
+  - docs/models/components/blocklistidentifiers.md
+  - docs/models/components/claims.md
+  - docs/models/components/clerkerror.md
+  - docs/models/components/clerkerrorerrorexternalaccountwithverificationmeta.md
+  - docs/models/components/clerkerrorerrormeta.md
+  - docs/models/components/clerkerrorerrorsamlaccountmeta.md
+  - docs/models/components/client.md
+  - docs/models/components/cnametarget.md
+  - docs/models/components/cookies.md
+  - docs/models/components/cookiesobject.md
+  - docs/models/components/crv.md
+  - docs/models/components/deletedobject.md
+  - docs/models/components/domain.md
+  - docs/models/components/domainobject.md
+  - docs/models/components/domains.md
+  - docs/models/components/domainsenrollmentmodes.md
+  - docs/models/components/emailaddress.md
+  - docs/models/components/emailaddressobject.md
+  - docs/models/components/enrollmentmode.md
+  - docs/models/components/errorclerkerror.md
+  - docs/models/components/errormeta.md
+  - docs/models/components/errort.md
+  - docs/models/components/externalaccount.md
+  - docs/models/components/externalaccountwithverification.md
+  - docs/models/components/externalaccountwithverificationobject.md
+  - docs/models/components/externalaccountwithverificationverification.md
+  - docs/models/components/fromoauth.md
+  - docs/models/components/fromoauthverificationstatus.md
+  - docs/models/components/googleonetap.md
+  - docs/models/components/googleonetaperrorclerkerror.md
+  - docs/models/components/googleonetapverificationerror.md
+  - docs/models/components/googleonetapverificationstatus.md
+  - docs/models/components/googleonetapverificationstrategy.md
+  - docs/models/components/identificationlink.md
+  - docs/models/components/identifiertype.md
+  - docs/models/components/instance.md
+  - docs/models/components/instanceobject.md
+  - docs/models/components/instancerestrictions.md
+  - docs/models/components/instancerestrictionsobject.md
+  - docs/models/components/instancesettings.md
+  - docs/models/components/instancesettingsobject.md
+  - docs/models/components/invitation.md
+  - docs/models/components/invitationobject.md
+  - docs/models/components/invitationrevoked.md
+  - docs/models/components/invitationrevokedobject.md
+  - docs/models/components/invitationrevokedstatus.md
+  - docs/models/components/invitationstatus.md
+  - docs/models/components/jwks.md
+  - docs/models/components/jwksecdsaprivatekey.md
+  - docs/models/components/jwksecdsaprivatekeykty.md
+  - docs/models/components/jwksecdsapublickey.md
+  - docs/models/components/jwksecdsapublickeykty.md
+  - docs/models/components/jwksed25519privatekey.md
+  - docs/models/components/jwksed25519privatekeycrv.md
+  - docs/models/components/jwksed25519privatekeykty.md
+  - docs/models/components/jwksed25519publickey.md
+  - docs/models/components/jwksrsaprivatekey.md
+  - docs/models/components/jwksrsaprivatekeykty.md
+  - docs/models/components/jwksrsapublickey.md
+  - docs/models/components/jwksrsapublickeykty.md
+  - docs/models/components/jwkssymmetrickey.md
+  - docs/models/components/jwkssymmetrickeykty.md
+  - docs/models/components/jwttemplate.md
+  - docs/models/components/jwttemplateobject.md
+  - docs/models/components/keys.md
+  - docs/models/components/kty.md
+  - docs/models/components/meta.md
+  - docs/models/components/nextaction.md
+  - docs/models/components/nonce.md
+  - docs/models/components/oauth.md
+  - docs/models/components/oauthaccesstoken.md
+  - docs/models/components/oauthaccesstokenobject.md
+  - docs/models/components/oauthapplication.md
+  - docs/models/components/oauthapplicationobject.md
+  - docs/models/components/oauthapplications.md
+  - docs/models/components/oauthapplicationwithsecret.md
+  - docs/models/components/oauthapplicationwithsecretobject.md
+  - docs/models/components/oautherrorclerkerror.md
+  - docs/models/components/oauthverificationstatus.md
+  - docs/models/components/objectt.md
+  - docs/models/components/organization.md
+  - docs/models/components/organizationdomain.md
+  - docs/models/components/organizationdomainobject.md
+  - docs/models/components/organizationdomains.md
+  - docs/models/components/organizationdomainstatus.md
+  - docs/models/components/organizationdomainverification.md
+  - docs/models/components/organizationinvitation.md
+  - docs/models/components/organizationinvitationobject.md
+  - docs/models/components/organizationinvitationpublicorganizationdata.md
+  - docs/models/components/organizationinvitations.md
+  - docs/models/components/organizationinvitationswithpublicorganizationdata.md
+  - docs/models/components/organizationinvitationwithpublicorganizationdata.md
+  - docs/models/components/organizationinvitationwithpublicorganizationdataobject.md
+  - docs/models/components/organizationmembership.md
+  - docs/models/components/organizationmembershipobject.md
+  - docs/models/components/organizationmembershiporganization.md
+  - docs/models/components/organizationmembershiporganizationobject.md
+  - docs/models/components/organizationmembershippublicuserdata.md
+  - docs/models/components/organizationmemberships.md
+  - docs/models/components/organizationobject.md
+  - docs/models/components/organizations.md
+  - docs/models/components/organizationsettings.md
+  - docs/models/components/organizationsettingsobject.md
+  - docs/models/components/organizationwithlogo.md
+  - docs/models/components/organizationwithlogoobject.md
+  - docs/models/components/otp.md
+  - docs/models/components/otpverificationstatus.md
+  - docs/models/components/otpverificationstrategy.md
+  - docs/models/components/passkey.md
+  - docs/models/components/passkeyverificationstatus.md
+  - docs/models/components/passkeyverificationstrategy.md
+  - docs/models/components/phonenumber.md
+  - docs/models/components/phonenumberobject.md
+  - docs/models/components/phonenumberverification.md
+  - docs/models/components/proxycheck.md
+  - docs/models/components/proxycheckobject.md
+  - docs/models/components/redirecturl.md
+  - docs/models/components/redirecturlobject.md
+  - docs/models/components/saml.md
+  - docs/models/components/samlaccount.md
+  - docs/models/components/samlaccountobject.md
+  - docs/models/components/samlaccountverification.md
+  - docs/models/components/samlconnection.md
+  - docs/models/components/samlconnectionattributemapping.md
+  - docs/models/components/samlconnections.md
+  - docs/models/components/samlconnectionsamlconnection.md
+  - docs/models/components/samlerrorclerkerror.md
+  - docs/models/components/samlverificationerror.md
+  - docs/models/components/samlverificationstatus.md
+  - docs/models/components/samlverificationstrategy.md
+  - docs/models/components/schemaspasskey.md
+  - docs/models/components/schemaspasskeyobject.md
+  - docs/models/components/schemaspasskeyverification.md
+  - docs/models/components/schemassamlconnection.md
+  - docs/models/components/schemassamlconnectionobject.md
+  - docs/models/components/security.md
+  - docs/models/components/session.md
+  - docs/models/components/sessionactivityresponse.md
+  - docs/models/components/sessionobject.md
+  - docs/models/components/sessionrefresh.md
+  - docs/models/components/sessiontask.md
+  - docs/models/components/signintoken.md
+  - docs/models/components/signintokenobject.md
+  - docs/models/components/signintokenstatus.md
+  - docs/models/components/signup.md
+  - docs/models/components/signupexternalaccount.md
+  - docs/models/components/signupobject.md
+  - docs/models/components/signupstatus.md
+  - docs/models/components/signupverification.md
+  - docs/models/components/signupverifications.md
+  - docs/models/components/status.md
+  - docs/models/components/strategy.md
+  - docs/models/components/svixurl.md
+  - docs/models/components/template.md
+  - docs/models/components/templateobject.md
+  - docs/models/components/testingtoken.md
+  - docs/models/components/testingtokenobject.md
+  - docs/models/components/ticket.md
+  - docs/models/components/ticketverificationsamlaccountstatus.md
+  - docs/models/components/ticketverificationsamlaccountstrategy.md
+  - docs/models/components/ticketverificationstatus.md
+  - docs/models/components/ticketverificationstrategy.md
+  - docs/models/components/token.md
+  - docs/models/components/tokenobject.md
+  - docs/models/components/totalcount.md
+  - docs/models/components/totalcountobject.md
+  - docs/models/components/user.md
+  - docs/models/components/userobject.md
+  - docs/models/components/verification.md
+  - docs/models/components/verificationadmin.md
+  - docs/models/components/verificationerror.md
+  - docs/models/components/verificationotp.md
+  - docs/models/components/verificationstatus.md
+  - docs/models/components/verificationstrategy.md
+  - docs/models/components/verificationticket.md
+  - docs/models/components/waitlistentries.md
+  - docs/models/components/waitlistentry.md
+  - docs/models/components/waitlistentryinvitation.md
+  - docs/models/components/waitlistentryinvitationobject.md
+  - docs/models/components/waitlistentryinvitationstatus.md
+  - docs/models/components/waitlistentryobject.md
+  - docs/models/components/waitlistentrystatus.md
+  - docs/models/components/web3signature.md
+  - docs/models/components/web3signatureverificationstatus.md
+  - docs/models/components/web3signatureverificationstrategy.md
+  - docs/models/components/web3wallet.md
+  - docs/models/components/web3walletobject.md
+  - docs/models/components/web3walletverification.md
+  - docs/models/components/web3walletverificationadmin.md
+  - docs/models/errors/clerkerrors.md
+  - docs/models/errors/meta.md
+  - docs/models/operations/actor.md
+  - docs/models/operations/adddomainrequestbody.md
+  - docs/models/operations/attributemapping.md
+  - docs/models/operations/banuserrequest.md
+  - docs/models/operations/changeproductioninstancedomainrequestbody.md
+  - docs/models/operations/claims.md
+  - docs/models/operations/codetype.md
+  - docs/models/operations/createactortokenrequestbody.md
+  - docs/models/operations/createallowlistidentifierrequestbody.md
+  - docs/models/operations/createblocklistidentifierrequestbody.md
+  - docs/models/operations/createbulkinvitationstemplateslug.md
+  - docs/models/operations/createemailaddressrequestbody.md
+  - docs/models/operations/createinvitationrequestbody.md
+  - docs/models/operations/createjwttemplaterequestbody.md
+  - docs/models/operations/createoauthapplicationrequestbody.md
+  - docs/models/operations/createorganizationdomainrequest.md
+  - docs/models/operations/createorganizationdomainrequestbody.md
+  - docs/models/operations/createorganizationinvitationbulkrequest.md
+  - docs/models/operations/createorganizationinvitationbulkrequestbody.md
+  - docs/models/operations/createorganizationinvitationrequest.md
+  - docs/models/operations/createorganizationinvitationrequestbody.md
+  - docs/models/operations/createorganizationmembershiprequest.md
+  - docs/models/operations/createorganizationmembershiprequestbody.md
+  - docs/models/operations/createorganizationrequestbody.md
+  - docs/models/operations/createphonenumberrequestbody.md
+  - docs/models/operations/createredirecturlrequestbody.md
+  - docs/models/operations/createsamlconnectionrequestbody.md
+  - docs/models/operations/createsessionrequestbody.md
+  - docs/models/operations/createsessiontokenfromtemplateobject.md
+  - docs/models/operations/createsessiontokenfromtemplaterequest.md
+  - docs/models/operations/createsessiontokenfromtemplaterequestbody.md
+  - docs/models/operations/createsessiontokenfromtemplateresponsebody.md
+  - docs/models/operations/createsessiontokenrequest.md
+  - docs/models/operations/createsessiontokenrequestbody.md
+  - docs/models/operations/createsessiontokenresponsebody.md
+  - docs/models/operations/createsignintokenrequestbody.md
+  - docs/models/operations/createuserrequestbody.md
+  - docs/models/operations/createwaitlistentryrequestbody.md
+  - docs/models/operations/deleteallowlistidentifierrequest.md
+  - docs/models/operations/deletebackupcoderequest.md
+  - docs/models/operations/deletebackupcoderesponsebody.md
+  - docs/models/operations/deleteblocklistidentifierrequest.md
+  - docs/models/operations/deletedomainrequest.md
+  - docs/models/operations/deleteemailaddressrequest.md
+  - docs/models/operations/deleteexternalaccountrequest.md
+  - docs/models/operations/deletejwttemplaterequest.md
+  - docs/models/operations/deleteoauthapplicationrequest.md
+  - docs/models/operations/deleteorganizationdomainrequest.md
+  - docs/models/operations/deleteorganizationlogorequest.md
+  - docs/models/operations/deleteorganizationmembershiprequest.md
+  - docs/models/operations/deleteorganizationrequest.md
+  - docs/models/operations/deletephonenumberrequest.md
+  - docs/models/operations/deleteredirecturlrequest.md
+  - docs/models/operations/deletesamlconnectionrequest.md
+  - docs/models/operations/deletetotprequest.md
+  - docs/models/operations/deletetotpresponsebody.md
+  - docs/models/operations/deleteuserprofileimagerequest.md
+  - docs/models/operations/deleteuserrequest.md
+  - docs/models/operations/disablemfarequest.md
+  - docs/models/operations/disablemfaresponsebody.md
+  - docs/models/operations/filet.md
+  - docs/models/operations/format.md
+  - docs/models/operations/getclientlistrequest.md
+  - docs/models/operations/getclientrequest.md
+  - docs/models/operations/getemailaddressrequest.md
+  - docs/models/operations/getjwttemplaterequest.md
+  - docs/models/operations/getoauthaccesstokenrequest.md
+  - docs/models/operations/getoauthapplicationrequest.md
+  - docs/models/operations/getorganizationinvitationrequest.md
+  - docs/models/operations/getorganizationrequest.md
+  - docs/models/operations/getphonenumberrequest.md
+  - docs/models/operations/getpublicinterstitialrequest.md
+  - docs/models/operations/getredirecturlrequest.md
+  - docs/models/operations/getsamlconnectionrequest.md
+  - docs/models/operations/getsessionlistrequest.md
+  - docs/models/operations/getsessionrequest.md
+  - docs/models/operations/getsignuprequest.md
+  - docs/models/operations/gettemplatelistrequest.md
+  - docs/models/operations/gettemplaterequest.md
+  - docs/models/operations/getuserlistrequest.md
+  - docs/models/operations/getuserrequest.md
+  - docs/models/operations/getuserscountrequest.md
+  - docs/models/operations/instancegetorganizationmembershipsrequest.md
+  - docs/models/operations/listallowlistidentifiersrequest.md
+  - docs/models/operations/listinstanceorganizationinvitationsqueryparamstatus.md
+  - docs/models/operations/listinstanceorganizationinvitationsrequest.md
+  - docs/models/operations/listinvitationsqueryparamstatus.md
+  - docs/models/operations/listinvitationsrequest.md
+  - docs/models/operations/listjwttemplatesrequest.md
+  - docs/models/operations/listoauthapplicationsrequest.md
+  - docs/models/operations/listorganizationdomainsrequest.md
+  - docs/models/operations/listorganizationinvitationsqueryparamstatus.md
+  - docs/models/operations/listorganizationinvitationsrequest.md
+  - docs/models/operations/listorganizationmembershipsrequest.md
+  - docs/models/operations/listorganizationsrequest.md
+  - docs/models/operations/listpendingorganizationinvitationsrequest.md
+  - docs/models/operations/listredirecturlsrequest.md
+  - docs/models/operations/listsamlconnectionsrequest.md
+  - docs/models/operations/listwaitlistentriesqueryparamstatus.md
+  - docs/models/operations/listwaitlistentriesrequest.md
+  - docs/models/operations/lockuserrequest.md
+  - docs/models/operations/mergeorganizationmetadatarequest.md
+  - docs/models/operations/mergeorganizationmetadatarequestbody.md
+  - docs/models/operations/objectt.md
+  - docs/models/operations/pathparamtemplatetype.md
+  - docs/models/operations/previewtemplaterequest.md
+  - docs/models/operations/previewtemplaterequestbody.md
+  - docs/models/operations/previewtemplateresponsebody.md
+  - docs/models/operations/provider.md
+  - docs/models/operations/queryparamstatus.md
+  - docs/models/operations/refreshsessionrequest.md
+  - docs/models/operations/refreshsessionrequestbody.md
+  - docs/models/operations/requestbody.md
+  - docs/models/operations/reverttemplatepathparamtemplatetype.md
+  - docs/models/operations/reverttemplaterequest.md
+  - docs/models/operations/revokeactortokenrequest.md
+  - docs/models/operations/revokeinvitationrequest.md
+  - docs/models/operations/revokeorganizationinvitationrequest.md
+  - docs/models/operations/revokeorganizationinvitationrequestbody.md
+  - docs/models/operations/revokesessionrequest.md
+  - docs/models/operations/revokesignintokenrequest.md
+  - docs/models/operations/rotateoauthapplicationsecretrequest.md
+  - docs/models/operations/setuserprofileimagerequest.md
+  - docs/models/operations/setuserprofileimagerequestbody.md
+  - docs/models/operations/status.md
+  - docs/models/operations/templateslug.md
+  - docs/models/operations/templatetype.md
+  - docs/models/operations/toggletemplatedeliverypathparamtemplatetype.md
+  - docs/models/operations/toggletemplatedeliveryrequest.md
+  - docs/models/operations/toggletemplatedeliveryrequestbody.md
+  - docs/models/operations/unbanuserrequest.md
+  - docs/models/operations/unlockuserrequest.md
+  - docs/models/operations/updatedomainrequest.md
+  - docs/models/operations/updatedomainrequestbody.md
+  - docs/models/operations/updateemailaddressrequest.md
+  - docs/models/operations/updateemailaddressrequestbody.md
+  - docs/models/operations/updateinstanceauthconfigrequestbody.md
+  - docs/models/operations/updateinstanceorganizationsettingsrequestbody.md
+  - docs/models/operations/updateinstancerequestbody.md
+  - docs/models/operations/updateinstancerestrictionsrequestbody.md
+  - docs/models/operations/updatejwttemplateclaims.md
+  - docs/models/operations/updatejwttemplaterequest.md
+  - docs/models/operations/updatejwttemplaterequestbody.md
+  - docs/models/operations/updateoauthapplicationrequest.md
+  - docs/models/operations/updateoauthapplicationrequestbody.md
+  - docs/models/operations/updateorganizationdomainrequest.md
+  - docs/models/operations/updateorganizationdomainrequestbody.md
+  - docs/models/operations/updateorganizationmembershipmetadatarequest.md
+  - docs/models/operations/updateorganizationmembershipmetadatarequestbody.md
+  - docs/models/operations/updateorganizationmembershiprequest.md
+  - docs/models/operations/updateorganizationmembershiprequestbody.md
+  - docs/models/operations/updateorganizationrequest.md
+  - docs/models/operations/updateorganizationrequestbody.md
+  - docs/models/operations/updatephonenumberrequest.md
+  - docs/models/operations/updatephonenumberrequestbody.md
+  - docs/models/operations/updateproductioninstancedomainrequestbody.md
+  - docs/models/operations/updatesamlconnectionattributemapping.md
+  - docs/models/operations/updatesamlconnectionrequest.md
+  - docs/models/operations/updatesamlconnectionrequestbody.md
+  - docs/models/operations/updatesignuprequest.md
+  - docs/models/operations/updatesignuprequestbody.md
+  - docs/models/operations/updateusermetadatarequest.md
+  - docs/models/operations/updateusermetadatarequestbody.md
+  - docs/models/operations/updateuserrequest.md
+  - docs/models/operations/updateuserrequestbody.md
+  - docs/models/operations/uploadorganizationlogofile.md
+  - docs/models/operations/uploadorganizationlogorequest.md
+  - docs/models/operations/uploadorganizationlogorequestbody.md
+  - docs/models/operations/upserttemplatepathparamtemplatetype.md
+  - docs/models/operations/upserttemplaterequest.md
+  - docs/models/operations/upserttemplaterequestbody.md
+  - docs/models/operations/userpasskeydeleterequest.md
+  - docs/models/operations/usersgetorganizationinvitationsrequest.md
+  - docs/models/operations/usersgetorganizationmembershipsrequest.md
+  - docs/models/operations/userweb3walletdeleterequest.md
+  - docs/models/operations/verifyclientrequestbody.md
+  - docs/models/operations/verifydomainproxyrequestbody.md
+  - docs/models/operations/verifypasswordrequest.md
+  - docs/models/operations/verifypasswordrequestbody.md
+  - docs/models/operations/verifypasswordresponsebody.md
+  - docs/models/operations/verifysessionrequest.md
+  - docs/models/operations/verifysessionrequestbody.md
+  - docs/models/operations/verifytotprequest.md
+  - docs/models/operations/verifytotprequestbody.md
+  - docs/models/operations/verifytotpresponsebody.md
+  - docs/sdks/actortokens/README.md
+  - docs/sdks/allowlistidentifiers/README.md
+  - docs/sdks/betafeatures/README.md
+  - docs/sdks/blocklistidentifiers/README.md
+  - docs/sdks/clerk/README.md
+  - docs/sdks/clients/README.md
+  - docs/sdks/domains/README.md
+  - docs/sdks/emailaddresses/README.md
+  - docs/sdks/emailandsmstemplates/README.md
+  - docs/sdks/emailsmstemplates/README.md
+  - docs/sdks/experimentalaccountlessapplications/README.md
+  - docs/sdks/instancesettings/README.md
+  - docs/sdks/invitations/README.md
+  - docs/sdks/jwks/README.md
+  - docs/sdks/jwttemplates/README.md
+  - docs/sdks/miscellaneous/README.md
+  - docs/sdks/oauthapplications/README.md
+  - docs/sdks/organizationdomains/README.md
+  - docs/sdks/organizationinvitations/README.md
+  - docs/sdks/organizationmemberships/README.md
+  - docs/sdks/organizations/README.md
+  - docs/sdks/phonenumbers/README.md
+  - docs/sdks/proxychecks/README.md
+  - docs/sdks/redirecturls/README.md
+  - docs/sdks/samlconnections/README.md
+  - docs/sdks/sessions/README.md
+  - docs/sdks/signintokens/README.md
+  - docs/sdks/signups/README.md
+  - docs/sdks/templates/README.md
+  - docs/sdks/testingtokens/README.md
+  - docs/sdks/users/README.md
+  - docs/sdks/waitlistentries/README.md
+  - docs/sdks/webhooks/README.md
+  - eslint.config.mjs
+  - jsr.json
+  - package.json
+  - src/core.ts
+  - src/funcs/actorTokensCreate.ts
+  - src/funcs/actorTokensRevoke.ts
+  - src/funcs/allowlistIdentifiersCreate.ts
+  - src/funcs/allowlistIdentifiersDelete.ts
+  - src/funcs/allowlistIdentifiersList.ts
+  - src/funcs/betaFeaturesUpdateInstanceSettings.ts
+  - src/funcs/betaFeaturesUpdateProductionInstanceDomain.ts
+  - src/funcs/blocklistIdentifiersCreate.ts
+  - src/funcs/blocklistIdentifiersDelete.ts
+  - src/funcs/blocklistIdentifiersList.ts
+  - src/funcs/clientsGet.ts
+  - src/funcs/clientsList.ts
+  - src/funcs/clientsVerify.ts
+  - src/funcs/domainsAdd.ts
+  - src/funcs/domainsDelete.ts
+  - src/funcs/domainsList.ts
+  - src/funcs/domainsUpdate.ts
+  - src/funcs/emailAddressesCreate.ts
+  - src/funcs/emailAddressesDelete.ts
+  - src/funcs/emailAddressesGet.ts
+  - src/funcs/emailAddressesUpdate.ts
+  - src/funcs/emailAndSmsTemplatesUpsert.ts
+  - src/funcs/emailSMSTemplatesGet.ts
+  - src/funcs/emailSMSTemplatesList.ts
+  - src/funcs/emailSMSTemplatesRevert.ts
+  - src/funcs/emailSMSTemplatesToggleTemplateDelivery.ts
+  - src/funcs/experimentalAccountlessApplicationsComplete.ts
+  - src/funcs/experimentalAccountlessApplicationsCreate.ts
+  - src/funcs/instanceSettingsChangeDomain.ts
+  - src/funcs/instanceSettingsGet.ts
+  - src/funcs/instanceSettingsUpdate.ts
+  - src/funcs/instanceSettingsUpdateOrganizationSettings.ts
+  - src/funcs/instanceSettingsUpdateRestrictions.ts
+  - src/funcs/invitationsBulkCreate.ts
+  - src/funcs/invitationsCreate.ts
+  - src/funcs/invitationsList.ts
+  - src/funcs/invitationsRevoke.ts
+  - src/funcs/jwksGetJWKS.ts
+  - src/funcs/jwtTemplatesCreate.ts
+  - src/funcs/jwtTemplatesDelete.ts
+  - src/funcs/jwtTemplatesGet.ts
+  - src/funcs/jwtTemplatesList.ts
+  - src/funcs/jwtTemplatesUpdate.ts
+  - src/funcs/miscellaneousGetPublicInterstitial.ts
+  - src/funcs/oauthApplicationsCreate.ts
+  - src/funcs/oauthApplicationsDelete.ts
+  - src/funcs/oauthApplicationsGet.ts
+  - src/funcs/oauthApplicationsList.ts
+  - src/funcs/oauthApplicationsRotateSecret.ts
+  - src/funcs/oauthApplicationsUpdate.ts
+  - src/funcs/organizationDomainsCreate.ts
+  - src/funcs/organizationDomainsDelete.ts
+  - src/funcs/organizationDomainsList.ts
+  - src/funcs/organizationDomainsUpdate.ts
+  - src/funcs/organizationInvitationsBulkCreate.ts
+  - src/funcs/organizationInvitationsCreate.ts
+  - src/funcs/organizationInvitationsGet.ts
+  - src/funcs/organizationInvitationsGetAll.ts
+  - src/funcs/organizationInvitationsList.ts
+  - src/funcs/organizationInvitationsListPending.ts
+  - src/funcs/organizationInvitationsRevoke.ts
+  - src/funcs/organizationMembershipsCreate.ts
+  - src/funcs/organizationMembershipsDelete.ts
+  - src/funcs/organizationMembershipsList.ts
+  - src/funcs/organizationMembershipsUpdate.ts
+  - src/funcs/organizationMembershipsUpdateMetadata.ts
+  - src/funcs/organizationsCreate.ts
+  - src/funcs/organizationsDelete.ts
+  - src/funcs/organizationsDeleteLogo.ts
+  - src/funcs/organizationsGet.ts
+  - src/funcs/organizationsList.ts
+  - src/funcs/organizationsMergeMetadata.ts
+  - src/funcs/organizationsUpdate.ts
+  - src/funcs/organizationsUploadLogo.ts
+  - src/funcs/phoneNumbersCreate.ts
+  - src/funcs/phoneNumbersDelete.ts
+  - src/funcs/phoneNumbersGet.ts
+  - src/funcs/phoneNumbersUpdate.ts
+  - src/funcs/proxyChecksVerify.ts
+  - src/funcs/redirectUrlsCreate.ts
+  - src/funcs/redirectUrlsDelete.ts
+  - src/funcs/redirectUrlsGet.ts
+  - src/funcs/redirectUrlsList.ts
+  - src/funcs/samlConnectionsCreate.ts
+  - src/funcs/samlConnectionsDelete.ts
+  - src/funcs/samlConnectionsGet.ts
+  - src/funcs/samlConnectionsList.ts
+  - src/funcs/samlConnectionsUpdate.ts
+  - src/funcs/sessionsCreate.ts
+  - src/funcs/sessionsCreateToken.ts
+  - src/funcs/sessionsCreateTokenFromTemplate.ts
+  - src/funcs/sessionsGet.ts
+  - src/funcs/sessionsList.ts
+  - src/funcs/sessionsRefresh.ts
+  - src/funcs/sessionsRevoke.ts
+  - src/funcs/sessionsVerify.ts
+  - src/funcs/signInTokensCreate.ts
+  - src/funcs/signInTokensRevoke.ts
+  - src/funcs/signUpsGet.ts
+  - src/funcs/signUpsUpdate.ts
+  - src/funcs/templatesPreview.ts
+  - src/funcs/testingTokensCreate.ts
+  - src/funcs/usersBan.ts
+  - src/funcs/usersCount.ts
+  - src/funcs/usersCreate.ts
+  - src/funcs/usersDelete.ts
+  - src/funcs/usersDeleteBackupCodes.ts
+  - src/funcs/usersDeleteExternalAccount.ts
+  - src/funcs/usersDeletePasskey.ts
+  - src/funcs/usersDeleteProfileImage.ts
+  - src/funcs/usersDeleteTOTP.ts
+  - src/funcs/usersDeleteWeb3Wallet.ts
+  - src/funcs/usersDisableMfa.ts
+  - src/funcs/usersGet.ts
+  - src/funcs/usersGetInstanceOrganizationMemberships.ts
+  - src/funcs/usersGetOAuthAccessToken.ts
+  - src/funcs/usersGetOrganizationInvitations.ts
+  - src/funcs/usersGetOrganizationMemberships.ts
+  - src/funcs/usersList.ts
+  - src/funcs/usersLock.ts
+  - src/funcs/usersSetProfileImage.ts
+  - src/funcs/usersUnban.ts
+  - src/funcs/usersUnlock.ts
+  - src/funcs/usersUpdate.ts
+  - src/funcs/usersUpdateMetadata.ts
+  - src/funcs/usersVerifyPassword.ts
+  - src/funcs/usersVerifyTotp.ts
+  - src/funcs/waitlistEntriesCreate.ts
+  - src/funcs/waitlistEntriesList.ts
+  - src/funcs/webhooksCreateSvixApp.ts
+  - src/funcs/webhooksDeleteSvixApp.ts
+  - src/funcs/webhooksGenerateSvixAuthURL.ts
+  - src/hooks/hooks.ts
+  - src/hooks/index.ts
+  - src/hooks/types.ts
+  - src/index.ts
+  - src/lib/base64.ts
+  - src/lib/config.ts
+  - src/lib/dlv.ts
+  - src/lib/encodings.ts
+  - src/lib/env.ts
+  - src/lib/files.ts
+  - src/lib/http.ts
+  - src/lib/is-plain-object.ts
+  - src/lib/logger.ts
+  - src/lib/matchers.ts
+  - src/lib/primitives.ts
+  - src/lib/retries.ts
+  - src/lib/schemas.ts
+  - src/lib/sdks.ts
+  - src/lib/security.ts
+  - src/lib/url.ts
+  - src/models/components/accountlessapplication.ts
+  - src/models/components/actortoken.ts
+  - src/models/components/allowlistidentifier.ts
+  - src/models/components/blocklistidentifier.ts
+  - src/models/components/blocklistidentifiers.ts
+  - src/models/components/clerkerror.ts
+  - src/models/components/client.ts
+  - src/models/components/cnametarget.ts
+  - src/models/components/cookies.ts
+  - src/models/components/deletedobject.ts
+  - src/models/components/domain.ts
+  - src/models/components/domains.ts
+  - src/models/components/emailaddress.ts
+  - src/models/components/externalaccountwithverification.ts
+  - src/models/components/identificationlink.ts
+  - src/models/components/index.ts
+  - src/models/components/instance.ts
+  - src/models/components/instancerestrictions.ts
+  - src/models/components/instancesettings.ts
+  - src/models/components/invitation.ts
+  - src/models/components/invitationrevoked.ts
+  - src/models/components/jwks.ts
+  - src/models/components/jwksecdsaprivatekey.ts
+  - src/models/components/jwksecdsapublickey.ts
+  - src/models/components/jwksed25519privatekey.ts
+  - src/models/components/jwksed25519publickey.ts
+  - src/models/components/jwksrsaprivatekey.ts
+  - src/models/components/jwksrsapublickey.ts
+  - src/models/components/jwkssymmetrickey.ts
+  - src/models/components/jwttemplate.ts
+  - src/models/components/oauthaccesstoken.ts
+  - src/models/components/oauthapplication.ts
+  - src/models/components/oauthapplications.ts
+  - src/models/components/oauthapplicationwithsecret.ts
+  - src/models/components/organization.ts
+  - src/models/components/organizationdomain.ts
+  - src/models/components/organizationdomains.ts
+  - src/models/components/organizationinvitation.ts
+  - src/models/components/organizationinvitationpublicorganizationdata.ts
+  - src/models/components/organizationinvitations.ts
+  - src/models/components/organizationinvitationswithpublicorganizationdata.ts
+  - src/models/components/organizationinvitationwithpublicorganizationdata.ts
+  - src/models/components/organizationmembership.ts
+  - src/models/components/organizationmembershippublicuserdata.ts
+  - src/models/components/organizationmemberships.ts
+  - src/models/components/organizations.ts
+  - src/models/components/organizationsettings.ts
+  - src/models/components/organizationwithlogo.ts
+  - src/models/components/phonenumber.ts
+  - src/models/components/proxycheck.ts
+  - src/models/components/redirecturl.ts
+  - src/models/components/samlaccount.ts
+  - src/models/components/samlconnectionattributemapping.ts
+  - src/models/components/samlconnections.ts
+  - src/models/components/schemaspasskey.ts
+  - src/models/components/schemassamlconnection.ts
+  - src/models/components/security.ts
+  - src/models/components/session.ts
+  - src/models/components/sessionactivityresponse.ts
+  - src/models/components/sessionrefresh.ts
+  - src/models/components/sessiontask.ts
+  - src/models/components/signintoken.ts
+  - src/models/components/signup.ts
+  - src/models/components/signupverification.ts
+  - src/models/components/signupverifications.ts
+  - src/models/components/svixurl.ts
+  - src/models/components/template.ts
+  - src/models/components/testingtoken.ts
+  - src/models/components/token.ts
+  - src/models/components/totalcount.ts
+  - src/models/components/waitlistentries.ts
+  - src/models/components/waitlistentry.ts
+  - src/models/components/web3wallet.ts
+  - src/models/errors/apierror.ts
+  - src/models/errors/clerkerrors.ts
+  - src/models/errors/httpclienterrors.ts
+  - src/models/errors/index.ts
+  - src/models/errors/sdkvalidationerror.ts
+  - src/models/operations/adddomain.ts
+  - src/models/operations/banuser.ts
+  - src/models/operations/changeproductioninstancedomain.ts
+  - src/models/operations/createactortoken.ts
+  - src/models/operations/createallowlistidentifier.ts
+  - src/models/operations/createblocklistidentifier.ts
+  - src/models/operations/createbulkinvitations.ts
+  - src/models/operations/createemailaddress.ts
+  - src/models/operations/createinvitation.ts
+  - src/models/operations/createjwttemplate.ts
+  - src/models/operations/createoauthapplication.ts
+  - src/models/operations/createorganization.ts
+  - src/models/operations/createorganizationdomain.ts
+  - src/models/operations/createorganizationinvitation.ts
+  - src/models/operations/createorganizationinvitationbulk.ts
+  - src/models/operations/createorganizationmembership.ts
+  - src/models/operations/createphonenumber.ts
+  - src/models/operations/createredirecturl.ts
+  - src/models/operations/createsamlconnection.ts
+  - src/models/operations/createsession.ts
+  - src/models/operations/createsessiontoken.ts
+  - src/models/operations/createsessiontokenfromtemplate.ts
+  - src/models/operations/createsignintoken.ts
+  - src/models/operations/createuser.ts
+  - src/models/operations/createwaitlistentry.ts
+  - src/models/operations/deleteallowlistidentifier.ts
+  - src/models/operations/deletebackupcode.ts
+  - src/models/operations/deleteblocklistidentifier.ts
+  - src/models/operations/deletedomain.ts
+  - src/models/operations/deleteemailaddress.ts
+  - src/models/operations/deleteexternalaccount.ts
+  - src/models/operations/deletejwttemplate.ts
+  - src/models/operations/deleteoauthapplication.ts
+  - src/models/operations/deleteorganization.ts
+  - src/models/operations/deleteorganizationdomain.ts
+  - src/models/operations/deleteorganizationlogo.ts
+  - src/models/operations/deleteorganizationmembership.ts
+  - src/models/operations/deletephonenumber.ts
+  - src/models/operations/deleteredirecturl.ts
+  - src/models/operations/deletesamlconnection.ts
+  - src/models/operations/deletetotp.ts
+  - src/models/operations/deleteuser.ts
+  - src/models/operations/deleteuserprofileimage.ts
+  - src/models/operations/disablemfa.ts
+  - src/models/operations/getclient.ts
+  - src/models/operations/getclientlist.ts
+  - src/models/operations/getemailaddress.ts
+  - src/models/operations/getjwttemplate.ts
+  - src/models/operations/getoauthaccesstoken.ts
+  - src/models/operations/getoauthapplication.ts
+  - src/models/operations/getorganization.ts
+  - src/models/operations/getorganizationinvitation.ts
+  - src/models/operations/getphonenumber.ts
+  - src/models/operations/getpublicinterstitial.ts
+  - src/models/operations/getredirecturl.ts
+  - src/models/operations/getsamlconnection.ts
+  - src/models/operations/getsession.ts
+  - src/models/operations/getsessionlist.ts
+  - src/models/operations/getsignup.ts
+  - src/models/operations/gettemplate.ts
+  - src/models/operations/gettemplatelist.ts
+  - src/models/operations/getuser.ts
+  - src/models/operations/getuserlist.ts
+  - src/models/operations/getuserscount.ts
+  - src/models/operations/index.ts
+  - src/models/operations/instancegetorganizationmemberships.ts
+  - src/models/operations/listallowlistidentifiers.ts
+  - src/models/operations/listinstanceorganizationinvitations.ts
+  - src/models/operations/listinvitations.ts
+  - src/models/operations/listjwttemplates.ts
+  - src/models/operations/listoauthapplications.ts
+  - src/models/operations/listorganizationdomains.ts
+  - src/models/operations/listorganizationinvitations.ts
+  - src/models/operations/listorganizationmemberships.ts
+  - src/models/operations/listorganizations.ts
+  - src/models/operations/listpendingorganizationinvitations.ts
+  - src/models/operations/listredirecturls.ts
+  - src/models/operations/listsamlconnections.ts
+  - src/models/operations/listwaitlistentries.ts
+  - src/models/operations/lockuser.ts
+  - src/models/operations/mergeorganizationmetadata.ts
+  - src/models/operations/previewtemplate.ts
+  - src/models/operations/refreshsession.ts
+  - src/models/operations/reverttemplate.ts
+  - src/models/operations/revokeactortoken.ts
+  - src/models/operations/revokeinvitation.ts
+  - src/models/operations/revokeorganizationinvitation.ts
+  - src/models/operations/revokesession.ts
+  - src/models/operations/revokesignintoken.ts
+  - src/models/operations/rotateoauthapplicationsecret.ts
+  - src/models/operations/setuserprofileimage.ts
+  - src/models/operations/toggletemplatedelivery.ts
+  - src/models/operations/unbanuser.ts
+  - src/models/operations/unlockuser.ts
+  - src/models/operations/updatedomain.ts
+  - src/models/operations/updateemailaddress.ts
+  - src/models/operations/updateinstance.ts
+  - src/models/operations/updateinstanceauthconfig.ts
+  - src/models/operations/updateinstanceorganizationsettings.ts
+  - src/models/operations/updateinstancerestrictions.ts
+  - src/models/operations/updatejwttemplate.ts
+  - src/models/operations/updateoauthapplication.ts
+  - src/models/operations/updateorganization.ts
+  - src/models/operations/updateorganizationdomain.ts
+  - src/models/operations/updateorganizationmembership.ts
+  - src/models/operations/updateorganizationmembershipmetadata.ts
+  - src/models/operations/updatephonenumber.ts
+  - src/models/operations/updateproductioninstancedomain.ts
+  - src/models/operations/updatesamlconnection.ts
+  - src/models/operations/updatesignup.ts
+  - src/models/operations/updateuser.ts
+  - src/models/operations/updateusermetadata.ts
+  - src/models/operations/uploadorganizationlogo.ts
+  - src/models/operations/upserttemplate.ts
+  - src/models/operations/userpasskeydelete.ts
+  - src/models/operations/usersgetorganizationinvitations.ts
+  - src/models/operations/usersgetorganizationmemberships.ts
+  - src/models/operations/userweb3walletdelete.ts
+  - src/models/operations/verifyclient.ts
+  - src/models/operations/verifydomainproxy.ts
+  - src/models/operations/verifypassword.ts
+  - src/models/operations/verifysession.ts
+  - src/models/operations/verifytotp.ts
+  - src/sdk/actortokens.ts
+  - src/sdk/allowlistidentifiers.ts
+  - src/sdk/betafeatures.ts
+  - src/sdk/blocklistidentifiers.ts
+  - src/sdk/clients.ts
+  - src/sdk/domains.ts
+  - src/sdk/emailaddresses.ts
+  - src/sdk/emailandsmstemplates.ts
+  - src/sdk/emailsmstemplates.ts
+  - src/sdk/experimentalaccountlessapplications.ts
+  - src/sdk/index.ts
+  - src/sdk/instancesettings.ts
+  - src/sdk/invitations.ts
+  - src/sdk/jwks.ts
+  - src/sdk/jwttemplates.ts
+  - src/sdk/miscellaneous.ts
+  - src/sdk/oauthapplications.ts
+  - src/sdk/organizationdomains.ts
+  - src/sdk/organizationinvitations.ts
+  - src/sdk/organizationmemberships.ts
+  - src/sdk/organizations.ts
+  - src/sdk/phonenumbers.ts
+  - src/sdk/proxychecks.ts
+  - src/sdk/redirecturls.ts
+  - src/sdk/samlconnections.ts
+  - src/sdk/sdk.ts
+  - src/sdk/sessions.ts
+  - src/sdk/signintokens.ts
+  - src/sdk/signups.ts
+  - src/sdk/templates.ts
+  - src/sdk/testingtokens.ts
+  - src/sdk/users.ts
+  - src/sdk/waitlistentries.ts
+  - src/sdk/webhooks.ts
+  - src/types/async.ts
+  - src/types/blobs.ts
+  - src/types/constdatetime.ts
+  - src/types/enums.ts
+  - src/types/fp.ts
+  - src/types/index.ts
+  - src/types/operations.ts
+  - src/types/rfcdate.ts
+  - src/types/streams.ts
+  - tsconfig.json
+examples:
+  GetPublicInterstitial: {}
+  GetJWKS:
+    speakeasy-default-get-JWKS:
+      responses:
+        "200":
+          application/json: {}
+  GetClientList:
+    speakeasy-default-get-client-list:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 229716, "expire_at": 152837, "abandon_at": 635532, "updated_at": 639387, "created_at": 17577}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 86140, "expire_at": 68504, "abandon_at": 687960, "updated_at": 509883, "created_at": 633911}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 7468, "created_at": 54607}, {"object": "client", "id": "<id>", "session_ids": ["<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "active", "last_active_at": 931165, "expire_at": 567445, "abandon_at": 876407, "updated_at": 490078, "created_at": 51681}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 322596, "created_at": 860596}, {"object": "client", "id": "<id>", "session_ids": [], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "ended", "last_active_at": 913465, "expire_at": 173090, "abandon_at": 75058, "updated_at": 897069, "created_at": 135572}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 425334, "expire_at": 432930, "abandon_at": 480616, "updated_at": 103421, "created_at": 523875}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 410206, "expire_at": 863466, "abandon_at": 307390, "updated_at": 392057, "created_at": 113486}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 181118, "created_at": 913851}]
+        "400":
+          application/json: {"errors": []}
+  VerifyClient:
+    speakeasy-default-verify-client:
+      responses:
+        "200":
+          application/json: {"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>", "<value>"], "sessions": [], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 187097, "created_at": 227138}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetClient:
+    speakeasy-default-get-client:
+      parameters:
+        path:
+          client_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 521235, "expire_at": 969961, "abandon_at": 458049, "updated_at": 450824, "created_at": 262795}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 937146, "expire_at": 438142, "abandon_at": 801373, "updated_at": 78888, "created_at": 219956}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 313464, "created_at": 94589}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateEmailAddress:
+    speakeasy-default-create-email-address:
+      responses:
+        "200":
+          application/json: {"object": "email_address", "email_address": "Loyal79@yahoo.com", "reserved": true, "verification": {"status": "unverified", "strategy": "reset_password_email_code", "expire_at": 586220, "attempts": 816588}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 957409, "updated_at": 357021}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetEmailAddress:
+    speakeasy-default-get-email-address:
+      parameters:
+        path:
+          email_address_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "email_address", "email_address": "Keeley_Lebsack@hotmail.com", "reserved": true, "verification": {"status": "expired", "strategy": "email_code", "attempts": 801373, "expire_at": 78888}, "linked_to": [], "created_at": 313464, "updated_at": 94589}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteEmailAddress:
+    speakeasy-default-delete-email-address:
+      parameters:
+        path:
+          email_address_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateEmailAddress:
+    speakeasy-default-update-email-address:
+      parameters:
+        path:
+          email_address_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "email_address", "email_address": "Lavern48@hotmail.com", "reserved": true, "verification": {"status": "verified", "strategy": "ticket", "expire_at": 249440, "attempts": 311507}, "linked_to": [], "created_at": 789275, "updated_at": 889838}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreatePhoneNumber:
+    speakeasy-default-create-phone-number:
+      responses:
+        "200":
+          application/json: {"object": "phone_number", "phone_number": "741.279.0107 x857", "reserved": false, "verification": {"status": "verified", "strategy": "phone_code", "attempts": 230313, "expire_at": 211337}, "linked_to": [], "created_at": 322997, "updated_at": 185693}
+        "400":
+          application/json: {"errors": []}
+  GetPhoneNumber:
+    speakeasy-default-get-phone-number:
+      parameters:
+        path:
+          phone_number_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "phone_number", "phone_number": "655.944.2294 x8023", "reserved": true, "verification": {"status": "verified", "strategy": "admin", "attempts": 805876, "expire_at": 380699}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 608535, "updated_at": 550965}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeletePhoneNumber:
+    speakeasy-default-delete-phone-number:
+      parameters:
+        path:
+          phone_number_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdatePhoneNumber:
+    speakeasy-default-update-phone-number:
+      parameters:
+        path:
+          phone_number_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "phone_number", "phone_number": "(639) 749-0843 x21783", "reserved": true, "verification": {"status": "verified", "strategy": "admin", "attempts": 693508, "expire_at": 404265}, "linked_to": [], "created_at": 756247, "updated_at": 810877}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetSessionList:
+    speakeasy-default-get-session-list:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 678317, "expire_at": 177706, "abandon_at": 229716, "updated_at": 152837, "created_at": 635532}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 17577, "expire_at": 718303, "abandon_at": 86140, "updated_at": 68504, "created_at": 687960}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 633911, "expire_at": 7468, "abandon_at": 54607, "updated_at": 367745, "created_at": 485729}]
+        "400":
+          application/json: {"errors": []}
+  createSession:
+    speakeasy-default-create-session:
+      responses:
+        "200":
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 638424, "expire_at": 417458, "abandon_at": 134365, "updated_at": 69025, "created_at": 796474}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetSession:
+    speakeasy-default-get-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 558834, "expire_at": 544221, "abandon_at": 521235, "updated_at": 969961, "created_at": 458049}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  RevokeSession:
+    speakeasy-default-revoke-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "replaced", "last_active_at": 32810, "expire_at": 124611, "abandon_at": 182898, "updated_at": 968343, "created_at": 551462}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  VerifySession:
+    speakeasy-default-verify-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 189595, "expire_at": 187097, "abandon_at": 227138, "updated_at": 756755, "created_at": 394054}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateSessionToken:
+    speakeasy-default-create-session-token:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "401":
+          application/json: {"errors": []}
+  CreateSessionTokenFromTemplate:
+    speakeasy-default-create-session-token-from-template:
+      parameters:
+        path:
+          session_id: "<id>"
+          template_name: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "401":
+          application/json: {"errors": []}
+  GetTemplateList:
+    speakeasy-default-get-template-list:
+      parameters:
+        path:
+          template_type: "sms"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{}, {}]
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetTemplate:
+    speakeasy-default-get-template:
+      parameters:
+        path:
+          template_type: "sms"
+          slug: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  RevertTemplate:
+    speakeasy-default-revert-template:
+      parameters:
+        path:
+          template_type: "email"
+          slug: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ToggleTemplateDelivery:
+    speakeasy-default-toggle-template-delivery:
+      parameters:
+        path:
+          template_type: "sms"
+          slug: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpsertTemplate:
+    speakeasy-default-upsert-template:
+      parameters:
+        path:
+          template_type: "sms"
+          slug: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  PreviewTemplate:
+    speakeasy-default-preview-template:
+      parameters:
+        path:
+          template_type: "<value>"
+          slug: "<value>"
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetUserList:
+    "":
+      parameters:
+        query:
+          last_active_at_before: 1700690400000
+          last_active_at_after: 1700690400000
+          last_active_at_since: 1700690400000
+          created_at_before: 1730160000000
+          created_at_after: 1730160000000
+          limit: 10
+          offset: 0
+          order_by: "-created_at"
+      responses:
+        "200":
+          application/json: [{"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}, {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}, {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}]
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateUser:
+    speakeasy-default-create-user:
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetUsersCount:
+    "":
+      parameters:
+        query:
+          last_active_at_before: 1700690400000
+          last_active_at_after: 1700690400000
+          last_active_at_since: 1700690400000
+          created_at_before: 1730160000000
+          created_at_after: 1730160000000
+      responses:
+        "200":
+          application/json: {"object": "total_count", "total_count": 264166}
+        "422":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetUser:
+    speakeasy-default-get-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateUser:
+    speakeasy-default-update-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      requestBody:
+        application/json: {"notify_primary_email_address_changed": false}
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteUser:
+    speakeasy-default-delete-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  BanUser:
+    speakeasy-default-ban-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UnbanUser:
+    speakeasy-default-unban-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  LockUser:
+    speakeasy-default-lock-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "403":
+          application/json: {"errors": []}
+  UnlockUser:
+    speakeasy-default-unlock-user:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  SetUserProfileImage:
+    speakeasy-default-set-user-profile-image:
+      parameters:
+        path:
+          user_id: "<id>"
+      requestBody:
+        multipart/form-data: {}
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteUserProfileImage:
+    speakeasy-default-delete-user-profile-image:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "404":
+          application/json: {"errors": []}
+  UpdateUserMetadata:
+    speakeasy-default-update-user-metadata:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"last_active_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetOAuthAccessToken:
+    speakeasy-default-get-O-auth-access-token:
+      parameters:
+        path:
+          user_id: "<id>"
+          provider: "<value>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{}]
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UsersGetOrganizationMemberships:
+    speakeasy-default-users-get-organization-memberships:
+      parameters:
+        path:
+          user_id: "<id>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>"], "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 607840, "admin_delete_enabled": true, "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>"}, "created_at": 806899, "updated_at": 927368}, "created_at": 215937, "updated_at": 24169}], "total_count": 365919}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UsersGetOrganizationInvitations:
+    speakeasy-default-users-get-organization-invitations:
+      parameters:
+        path:
+          user_id: "<id>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization_invitation", "id": "<id>", "email_address": "Earline.Torphy72@yahoo.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>"}, "url": "https://hungry-middle.com/", "expires_at": 800337, "created_at": 613383, "updated_at": 653624}], "total_count": 985977}
+        "400":
+          application/json: {"errors": []}
+  VerifyPassword:
+    speakeasy-default-verify-password:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "500":
+          application/json: {"errors": []}
+  VerifyTOTP:
+    speakeasy-default-verify-TOTP:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DisableMFA:
+    speakeasy-default-disable-MFA:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteBackupCode:
+    speakeasy-default-delete-backup-code:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": []}
+  UserPasskeyDelete:
+    speakeasy-default-user-passkey-delete:
+      parameters:
+        path:
+          user_id: "<id>"
+          passkey_identification_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": true}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": []}
+  UserWeb3WalletDelete:
+    speakeasy-default-user-web3-wallet-delete:
+      parameters:
+        path:
+          user_id: "<id>"
+          web3_wallet_identification_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": []}
+  DeleteTOTP:
+    speakeasy-default-delete-TOTP:
+      parameters:
+        path:
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteExternalAccount:
+    speakeasy-default-delete-external-account:
+      parameters:
+        path:
+          user_id: "<id>"
+          external_account_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  InstanceGetOrganizationMemberships:
+    speakeasy-default-instance-get-organization-memberships:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>", "<value>"], "public_metadata": {"key": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 635866, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>"}, "private_metadata": {}, "created_at": 501889, "updated_at": 965535}, "created_at": 799300, "updated_at": 820213}, {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": [], "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 294748, "admin_delete_enabled": true, "public_metadata": {}, "private_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "created_at": 66373, "updated_at": 712011}, "created_at": 473009, "updated_at": 237643}, {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>"], "public_metadata": {"key": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 406231, "admin_delete_enabled": false, "public_metadata": {"key": "<value>"}, "private_metadata": {"key": "<value>"}, "created_at": 568864, "updated_at": 111287}, "created_at": 772776, "updated_at": 142565}], "total_count": 676524}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": []}
+  CreateInvitation:
+    speakeasy-default-create-invitation:
+      responses:
+        "200":
+          application/json: {"object": "invitation", "id": "<id>", "email_address": "Loyal79@yahoo.com", "public_metadata": {}, "revoked": false, "status": "pending", "created_at": 169727, "updated_at": 89964}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListInvitations:
+    speakeasy-default-list-invitations:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{"object": "invitation", "id": "<id>", "email_address": "Marie.Fay@yahoo.com", "public_metadata": {}, "revoked": false, "status": "pending", "created_at": 718303, "updated_at": 86140}, {"object": "invitation", "id": "<id>", "email_address": "Martin.Nader@gmail.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 73227, "updated_at": 931165}, {"object": "invitation", "id": "<id>", "email_address": "Selina.Bechtelar86@yahoo.com", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "revoked": false, "status": "pending", "created_at": 424367, "updated_at": 913465}]
+  CreateBulkInvitations:
+    speakeasy-default-create-bulk-invitations:
+      responses:
+        "200":
+          application/json: [{"object": "invitation", "id": "<id>", "email_address": "Tony91@hotmail.com", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "revoked": false, "status": "pending", "created_at": 638790, "updated_at": 397401}]
+        "400":
+          application/json: {"errors": []}
+  RevokeInvitation:
+    speakeasy-default-revoke-invitation:
+      parameters:
+        path:
+          invitation_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "invitation", "id": "<id>", "email_address": "Alexane55@hotmail.com", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "revoked": true, "status": "revoked", "created_at": 58977, "updated_at": 519292}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListInstanceOrganizationInvitations:
+    speakeasy-default-list-instance-organization-invitations:
+      parameters:
+        query:
+          order_by: "-created_at"
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization_invitation", "id": "<id>", "email_address": "Lavinia.Armstrong62@gmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "url": "https://critical-daddy.org", "expires_at": 177843, "created_at": 485966, "updated_at": 254768}], "total_count": 626900}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateOrganizationInvitation:
+    speakeasy-default-create-organization-invitation:
+      parameters:
+        path:
+          organization_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "organization_invitation", "id": "<id>", "email_address": "Loyal79@yahoo.com", "role": "<value>", "role_name": "<value>", "public_metadata": {}, "url": "https://brisk-seafood.net/", "expires_at": 586220, "created_at": 752438, "updated_at": 957409}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListOrganizationInvitations:
+    speakeasy-default-list-organization-invitations:
+      parameters:
+        path:
+          organization_id: "<id>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization_invitation", "id": "<id>", "email_address": "Marie.Fay@yahoo.com", "role": "<value>", "role_name": "<value>", "public_metadata": {}, "url": "https://breakable-bathrobe.net", "expires_at": 509883, "created_at": 633911, "updated_at": 7468}, {"object": "organization_invitation", "id": "<id>", "email_address": "Fredy56@gmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>"}, "url": "https://glorious-strategy.com/", "expires_at": 897196, "created_at": 424367, "updated_at": 913465}, {"object": "organization_invitation", "id": "<id>", "email_address": "Aracely.Collins@gmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>"}, "url": "https://moist-sprinkles.info/", "expires_at": 863466, "created_at": 307390, "updated_at": 392057}], "total_count": 113486}
+        "400":
+          application/json: {"errors": []}
+  CreateOrganizationInvitationBulk:
+    speakeasy-default-create-organization-invitation-bulk:
+      parameters:
+        path:
+          organization_id: "<id>"
+      requestBody:
+        application/json: []
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization_invitation", "id": "<id>", "email_address": "Uriah96@hotmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>", "key1": "<value>"}, "url": "https://angelic-muscat.com/", "expires_at": 872291, "created_at": 792231, "updated_at": 862483}, {"object": "organization_invitation", "id": "<id>", "email_address": "Ellsworth_Kulas77@yahoo.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "url": "https://majestic-minion.net", "expires_at": 337155, "created_at": 213941, "updated_at": 709942}, {"object": "organization_invitation", "id": "<id>", "email_address": "Moriah.Kemmer@hotmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>", "key1": "<value>"}, "url": "https://pale-casement.com", "expires_at": 167531, "created_at": 894498, "updated_at": 568216}], "total_count": 225647}
+        "400":
+          application/json: {"errors": []}
+  ListPendingOrganizationInvitations:
+    speakeasy-default-list-pending-organization-invitations:
+      parameters:
+        path:
+          organization_id: "<id>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [], "total_count": 847073}
+        "400":
+          application/json: {"errors": []}
+  GetOrganizationInvitation:
+    speakeasy-default-get-organization-invitation:
+      parameters:
+        path:
+          organization_id: "<id>"
+          invitation_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "organization_invitation", "id": "<id>", "email_address": "Keeley_Lebsack@hotmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>"}, "url": "https://warm-hundred.net/", "expires_at": 78888, "created_at": 219956, "updated_at": 313464}
+        "400":
+          application/json: {"errors": []}
+  RevokeOrganizationInvitation:
+    speakeasy-default-revoke-organization-invitation:
+      parameters:
+        path:
+          organization_id: "<id>"
+          invitation_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "organization_invitation", "id": "<id>", "email_address": "Alexane55@hotmail.com", "role": "<value>", "role_name": "<value>", "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "url": "https://miserable-membership.net/", "expires_at": 323448, "created_at": 273971, "updated_at": 708761}
+        "400":
+          application/json: {"errors": []}
+  ListAllowlistIdentifiers:
+    speakeasy-default-list-allowlist-identifiers:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{}, {}, {}]
+        "401":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateAllowlistIdentifier:
+    speakeasy-default-create-allowlist-identifier:
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteAllowlistIdentifier:
+    speakeasy-default-delete-allowlist-identifier:
+      parameters:
+        path:
+          identifier_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListBlocklistIdentifiers:
+    speakeasy-default-list-blocklist-identifiers:
+      responses:
+        "200":
+          application/json: {"data": [{}, {}, {}], "total_count": 547272}
+        "401":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateBlocklistIdentifier:
+    speakeasy-default-create-blocklist-identifier:
+      responses:
+        "200":
+          application/json: {}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteBlocklistIdentifier:
+    speakeasy-default-delete-blocklist-identifier:
+      parameters:
+        path:
+          identifier_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateInstanceAuthConfig:
+    speakeasy-default-update-instance-auth-config:
+      responses:
+        "200":
+          application/json: {}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateProductionInstanceDomain:
+    speakeasy-default-update-production-instance-domain:
+      responses:
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateActorToken:
+    speakeasy-default-create-actor-token:
+      requestBody:
+        application/json: {"user_id": "<id>", "actor": {"sub": "user_2OEpKhcCN1Lat9NQ0G6puh7q5Rb"}, "expires_in_seconds": 3600, "session_max_duration_in_seconds": 1800}
+      responses:
+        "200":
+          application/json: {"object": "actor_token", "id": "<id>", "status": "accepted", "user_id": "<id>", "actor": {}, "created_at": 638424, "updated_at": 417458}
+        "400":
+          application/json: {"errors": []}
+  RevokeActorToken:
+    speakeasy-default-revoke-actor-token:
+      parameters:
+        path:
+          actor_token_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "actor_token", "id": "<id>", "status": "revoked", "user_id": "<id>", "actor": {}, "created_at": 32810, "updated_at": 124611}
+        "400":
+          application/json: {"errors": []}
+  ListDomains:
+    speakeasy-default-list-domains:
+      responses:
+        "200":
+          application/json: {"data": [{"object": "domain", "id": "<id>", "name": "<value>", "is_satellite": false, "frontend_api_url": "https://definite-deer.com", "development_origin": "<value>"}, {"object": "domain", "id": "<id>", "name": "<value>", "is_satellite": false, "frontend_api_url": "https://agile-publicity.com", "development_origin": "<value>"}, {"object": "domain", "id": "<id>", "name": "<value>", "is_satellite": true, "frontend_api_url": "https://memorable-overcoat.com", "development_origin": "<value>"}], "total_count": 54607}
+  AddDomain:
+    speakeasy-default-add-domain:
+      responses:
+        "200":
+          application/json: {"object": "domain", "id": "<id>", "name": "<value>", "is_satellite": false, "frontend_api_url": "https://super-validity.name", "development_origin": "<value>"}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteDomain:
+    speakeasy-default-delete-domain:
+      parameters:
+        path:
+          domain_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateDomain:
+    speakeasy-default-update-domain:
+      parameters:
+        path:
+          domain_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "domain", "id": "<id>", "name": "<value>", "is_satellite": false, "frontend_api_url": "https://grown-worth.name", "development_origin": "<value>"}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetInstance:
+    speakeasy-default-get-instance:
+      responses:
+        "200":
+          application/json: {"object": "instance", "id": "<id>", "environment_type": "development", "allowed_origins": ["http://localhost:3000", "https://some-domain"]}
+  UpdateInstance:
+    speakeasy-default-update-instance:
+      responses:
+        "422":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateInstanceRestrictions:
+    speakeasy-default-update-instance-restrictions:
+      responses:
+        "200":
+          application/json: {"object": "instance_restrictions", "allowlist": true, "blocklist": true, "block_email_subaddresses": false, "block_disposable_email_domains": true, "ignore_dots_for_gmail_addresses": true}
+        "402":
+          application/json: {"errors": []}
+  ChangeProductionInstanceDomain:
+    speakeasy-default-change-production-instance-domain:
+      responses:
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateInstanceOrganizationSettings:
+    speakeasy-default-update-instance-organization-settings:
+      responses:
+        "200":
+          application/json: {"object": "organization_settings", "enabled": false, "max_allowed_memberships": 58305, "max_allowed_roles": 239621, "max_allowed_permissions": 948067, "creator_role": "<value>", "admin_delete_enabled": true, "domains_enabled": false, "domains_enrollment_modes": ["automatic_suggestion", "manual_invitation"], "domains_default_role": "<value>"}
+        "400":
+          application/json: {"errors": []}
+  CreateSvixApp:
+    speakeasy-default-create-svix-app:
+      responses:
+        "200":
+          application/json: {"svix_url": "https://motionless-tentacle.org"}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteSvixApp:
+    speakeasy-default-delete-svix-app:
+      responses:
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GenerateSvixAuthURL:
+    speakeasy-default-generate-svix-auth-URL:
+      responses:
+        "200":
+          application/json: {"svix_url": "https://self-reliant-reboot.com"}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListJWTTemplates:
+    speakeasy-default-list-JWT-templates:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 547272, "allowed_clock_skew": 678317, "custom_signing_key": true, "signing_algorithm": "<value>", "created_at": 229716, "updated_at": 152837}, {"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 635532, "allowed_clock_skew": 639387, "custom_signing_key": true, "signing_algorithm": "<value>", "created_at": 718303, "updated_at": 86140}, {"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 68504, "allowed_clock_skew": 687960, "custom_signing_key": false, "signing_algorithm": "<value>", "created_at": 633911, "updated_at": 7468}]
+  CreateJWTTemplate:
+    speakeasy-default-create-JWT-template:
+      responses:
+        "200":
+          application/json: {"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 486589, "allowed_clock_skew": 638424, "custom_signing_key": true, "signing_algorithm": "<value>", "created_at": 134365, "updated_at": 69025}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetJWTTemplate:
+    speakeasy-default-get-JWT-template:
+      parameters:
+        path:
+          template_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 700347, "allowed_clock_skew": 558834, "custom_signing_key": false, "signing_algorithm": "<value>", "created_at": 521235, "updated_at": 969961}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateJWTTemplate:
+    speakeasy-default-update-JWT-template:
+      parameters:
+        path:
+          template_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "jwt_template", "id": "<id>", "name": "<value>", "claims": {}, "lifetime": 857478, "allowed_clock_skew": 597129, "custom_signing_key": true, "signing_algorithm": "<value>", "created_at": 991464, "updated_at": 627690}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteJWTTemplate:
+    speakeasy-default-delete-JWT-template:
+      parameters:
+        path:
+          template_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListOrganizations:
+    speakeasy-default-list-organizations:
+      parameters:
+        query:
+          order_by: "-created_at"
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 547272, "admin_delete_enabled": false, "public_metadata": {}, "private_metadata": {}, "created_at": 152837, "updated_at": 635532}, {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 639387, "admin_delete_enabled": true, "public_metadata": {"key": "<value>", "key1": "<value>"}, "private_metadata": {}, "created_at": 68504, "updated_at": 687960}, {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 509883, "admin_delete_enabled": false, "public_metadata": {}, "private_metadata": {}, "created_at": 367745, "updated_at": 485729}], "total_count": 73227}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateOrganization:
+    speakeasy-default-create-organization:
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 486589, "admin_delete_enabled": false, "public_metadata": {"key": "<value>"}, "private_metadata": {}, "created_at": 69025, "updated_at": 796474}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetOrganization:
+    speakeasy-default-get-organization:
+      parameters:
+        path:
+          organization_id: "<id>"
+        query: {}
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 700347, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>"}, "created_at": 969961, "updated_at": 458049}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateOrganization:
+    speakeasy-default-update-organization:
+      parameters:
+        path:
+          organization_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 857478, "admin_delete_enabled": false, "public_metadata": {"key": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "created_at": 627690, "updated_at": 488852}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteOrganization:
+    speakeasy-default-delete-organization:
+      parameters:
+        path:
+          organization_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  MergeOrganizationMetadata:
+    speakeasy-default-merge-organization-metadata:
+      parameters:
+        path:
+          organization_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 897387, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "private_metadata": {}, "created_at": 413751, "updated_at": 574784}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UploadOrganizationLogo:
+    speakeasy-default-upload-organization-logo:
+      parameters:
+        path:
+          organization_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 23224, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "created_at": 909136, "updated_at": 206636, "image_url": "https://friendly-toaster.info", "has_image": true}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteOrganizationLogo:
+    speakeasy-default-delete-organization-logo:
+      parameters:
+        path:
+          organization_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 882224, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "private_metadata": {"key": "<value>"}, "created_at": 569486, "updated_at": 370947}
+        "404":
+          application/json: {"errors": []}
+  CreateOrganizationMembership:
+    speakeasy-default-create-organization-membership:
+      parameters:
+        path:
+          organization_id: "<id>"
+      requestBody:
+        application/json: {"user_id": "<id>", "role": "<value>"}
+      responses:
+        "200":
+          application/json: {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>"], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 417458, "admin_delete_enabled": true, "public_metadata": {}, "private_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "created_at": 951062, "updated_at": 86}, "created_at": 169727, "updated_at": 89964}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListOrganizationMemberships:
+    "":
+      parameters:
+        path:
+          organization_id: "<id>"
+        query:
+          last_active_at_before: 1700690400000
+          last_active_at_after: 1700690400000
+          created_at_before: 1730160000000
+          created_at_after: 1730160000000
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>"], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 177706, "admin_delete_enabled": true, "public_metadata": {}, "private_metadata": {"key": "<value>", "key1": "<value>"}, "created_at": 639387, "updated_at": 17577}, "created_at": 718303, "updated_at": 86140}, {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": [], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 509883, "admin_delete_enabled": false, "public_metadata": {}, "private_metadata": {}, "created_at": 367745, "updated_at": 485729}, "created_at": 73227, "updated_at": 931165}, {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>"], "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 490078, "admin_delete_enabled": true, "public_metadata": {"key": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "created_at": 18278, "updated_at": 897196}, "created_at": 424367, "updated_at": 913465}], "total_count": 173090}
+        "401":
+          application/json: {"errors": []}
+  UpdateOrganizationMembership:
+    speakeasy-default-update-organization-membership:
+      parameters:
+        path:
+          organization_id: "<id>"
+          user_id: "<id>"
+      requestBody:
+        application/json: {"role": "<value>"}
+      responses:
+        "200":
+          application/json: {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>", "<value>"], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 344620, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>"}, "private_metadata": {"key": "<value>"}, "created_at": 984008, "updated_at": 54062}, "created_at": 896501, "updated_at": 446863}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteOrganizationMembership:
+    speakeasy-default-delete-organization-membership:
+      parameters:
+        path:
+          organization_id: "<id>"
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>"], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 386564, "admin_delete_enabled": false, "public_metadata": {"key": "<value>", "key1": "<value>", "key2": "<value>"}, "private_metadata": {"key": "<value>", "key1": "<value>"}, "created_at": 108105, "updated_at": 673978}, "created_at": 635816, "updated_at": 2184}
+        "401":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateOrganizationMembershipMetadata:
+    speakeasy-default-update-organization-membership-metadata:
+      parameters:
+        path:
+          organization_id: "<id>"
+          user_id: "<id>"
+      responses:
+        "200":
+          application/json: {"id": "<id>", "object": "organization_membership", "role": "<value>", "permissions": ["<value>", "<value>"], "public_metadata": {"key": "<value>", "key1": "<value>"}, "organization": {"object": "organization", "id": "<id>", "name": "<value>", "slug": "<value>", "max_allowed_memberships": 86760, "admin_delete_enabled": false, "public_metadata": {}, "private_metadata": {}, "created_at": 661662, "updated_at": 801120}, "created_at": 600782, "updated_at": 57214}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateOrganizationDomain:
+    speakeasy-default-create-organization-domain:
+      parameters:
+        path:
+          organization_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "organization_domain", "id": "<id>", "organization_id": "<id>", "name": "<value>", "enrollment_mode": "automatic_invitation", "affiliation_email_address": "<value>", "verification": {"status": "verified", "strategy": "<value>", "attempts": 417458, "expire_at": 134365}, "total_pending_invitations": 69025, "total_pending_suggestions": 796474, "created_at": 951062, "updated_at": 86}
+        "400":
+          application/json: {"errors": []}
+  ListOrganizationDomains:
+    speakeasy-default-list-organization-domains:
+      parameters:
+        path:
+          organization_id: "<id>"
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "organization_domain", "id": "<id>", "organization_id": "<id>", "name": "<value>", "enrollment_mode": "automatic_invitation", "affiliation_email_address": "<value>", "verification": {"status": "verified", "strategy": "<value>", "attempts": 177706, "expire_at": 229716}, "total_pending_invitations": 152837, "total_pending_suggestions": 635532, "created_at": 639387, "updated_at": 17577}, {"object": "organization_domain", "id": "<id>", "organization_id": "<id>", "name": "<value>", "enrollment_mode": "automatic_suggestion", "affiliation_email_address": "<value>", "verification": {"status": "unverified", "strategy": "<value>", "attempts": 68504, "expire_at": 687960}, "total_pending_invitations": 509883, "total_pending_suggestions": 633911, "created_at": 7468, "updated_at": 54607}, {"object": "organization_domain", "id": "<id>", "organization_id": "<id>", "name": "<value>", "enrollment_mode": "automatic_invitation", "affiliation_email_address": "<value>", "verification": {"status": "unverified", "strategy": "<value>", "attempts": 73227, "expire_at": 931165}, "total_pending_invitations": 567445, "total_pending_suggestions": 876407, "created_at": 490078, "updated_at": 51681}], "total_count": 322596}
+        "401":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateOrganizationDomain:
+    speakeasy-default-update-organization-domain:
+      parameters:
+        path:
+          organization_id: "<id>"
+          domain_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "organization_domain", "id": "<id>", "organization_id": "<id>", "name": "<value>", "enrollment_mode": "automatic_suggestion", "affiliation_email_address": "<value>", "verification": {"status": "verified", "strategy": "<value>", "attempts": 344620, "expire_at": 991464}, "total_pending_invitations": 627690, "total_pending_suggestions": 488852, "created_at": 984008, "updated_at": 54062}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteOrganizationDomain:
+    speakeasy-default-delete-organization-domain:
+      parameters:
+        path:
+          organization_id: "<id>"
+          domain_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  VerifyDomainProxy:
+    speakeasy-default-verify-domain-proxy:
+      responses:
+        "200":
+          application/json: {"object": "proxy_check", "id": "<id>", "domain_id": "<id>", "last_run_at": 788892, "proxy_url": "https://deserted-deduction.net/", "successful": true, "created_at": 259923, "updated_at": 68427}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListRedirectURLs:
+    speakeasy-default-list-redirect-UR-ls:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: [{"object": "redirect_url", "id": "<id>", "url": "https://remorseful-concentration.biz", "created_at": 152837, "updated_at": 635532}, {"object": "redirect_url", "id": "<id>", "url": "https://agile-publicity.com", "created_at": 68504, "updated_at": 687960}, {"object": "redirect_url", "id": "<id>", "url": "https://pricey-accountability.com", "created_at": 367745, "updated_at": 485729}]
+  CreateRedirectURL:
+    speakeasy-default-create-redirect-URL:
+      responses:
+        "200":
+          application/json: {"object": "redirect_url", "id": "<id>", "url": "https://probable-heating.com/", "created_at": 69025, "updated_at": 796474}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetRedirectURL:
+    speakeasy-default-get-redirect-URL:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "redirect_url", "id": "<id>", "url": "https://normal-making.name", "created_at": 969961, "updated_at": 458049}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteRedirectURL:
+    speakeasy-default-delete-redirect-URL:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "404":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateSignInToken:
+    speakeasy-default-create-sign-in-token:
+      responses:
+        "200":
+          application/json: {"object": "sign_in_token", "id": "<id>", "status": "accepted", "user_id": "<id>", "created_at": 638424, "updated_at": 417458}
+        "404":
+          application/json: {"errors": []}
+  RevokeSignInToken:
+    speakeasy-default-revoke-sign-in-token:
+      parameters:
+        path:
+          sign_in_token_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "sign_in_token", "id": "<id>", "status": "revoked", "user_id": "<id>", "created_at": 32810, "updated_at": 124611}
+        "400":
+          application/json: {"errors": []}
+  GetSignUp:
+    speakeasy-default-get-sign-up:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "sign_up_attempt", "id": "<id>", "status": "abandoned", "required_fields": ["<value>", "<value>"], "optional_fields": ["<value>", "<value>"], "missing_fields": ["<value>", "<value>"], "unverified_fields": ["<value>", "<value>", "<value>"], "verifications": {"email_address": {}, "phone_number": {}, "web3_wallet": {}, "external_account": {}}, "username": "Jade.Gislason", "email_address": "Arielle55@hotmail.com", "phone_number": "1-765-431-2727 x779", "web3_wallet": "<value>", "password_enabled": true, "first_name": "Alexandrine", "last_name": "Kilback-Kassulke", "custom_action": true, "external_id": "<id>", "created_session_id": "<id>", "created_user_id": "<id>", "abandon_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "403":
+          application/json: {"errors": []}
+  UpdateSignUp:
+    speakeasy-default-update-sign-up:
+      parameters:
+        path:
+          id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "sign_up_attempt", "id": "<id>", "status": "abandoned", "required_fields": ["<value>", "<value>"], "optional_fields": ["<value>"], "missing_fields": ["<value>", "<value>", "<value>"], "unverified_fields": ["<value>", "<value>"], "verifications": {"email_address": {}, "phone_number": {}, "web3_wallet": {}, "external_account": {}}, "username": "Jeffry.Becker-Treutel31", "email_address": "Patience77@gmail.com", "phone_number": "1-278-551-2388 x875", "web3_wallet": "<value>", "password_enabled": true, "first_name": "Kathleen", "last_name": "Larkin", "custom_action": false, "external_id": "<id>", "created_session_id": "<id>", "created_user_id": "<id>", "abandon_at": 1700690400000, "legal_accepted_at": 1700690400000}
+        "403":
+          application/json: {"errors": []}
+  ListOAuthApplications:
+    speakeasy-default-list-O-auth-applications:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": false, "scopes": "<value>", "redirect_uris": ["<value>", "<value>"], "callback_url": "https://energetic-circumference.name/", "authorize_url": "https://agile-publicity.com", "token_fetch_url": "https://roasted-language.name/", "user_info_url": "https://awful-fund.info/", "discovery_url": "https://victorious-merit.org/", "token_introspection_url": "https://average-fedora.org/", "created_at": 18278, "updated_at": 897196}, {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": true, "scopes": "<value>", "redirect_uris": ["<value>", "<value>", "<value>"], "callback_url": "https://blue-technologist.com/", "authorize_url": "https://instructive-hospitalization.info/", "token_fetch_url": "https://moist-sprinkles.info/", "user_info_url": "https://funny-grandson.com", "discovery_url": "https://unwilling-almighty.name/", "token_introspection_url": "https://urban-blossom.net", "created_at": 567701, "updated_at": 838930}, {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": false, "scopes": "<value>", "redirect_uris": ["<value>", "<value>", "<value>"], "callback_url": "https://dark-bench.org/", "authorize_url": "https://coordinated-phrase.biz", "token_fetch_url": "https://necessary-basket.com", "user_info_url": "https://yellowish-representation.biz/", "discovery_url": "https://bustling-plastic.info/", "token_introspection_url": "https://stunning-vanadyl.net/", "created_at": 505778, "updated_at": 948614}], "total_count": 900109}
+        "400":
+          application/json: {"errors": []}
+  CreateOAuthApplication:
+    speakeasy-default-create-O-auth-application:
+      requestBody:
+        application/json: {"name": "<value>", "scopes": "profile email public_metadata"}
+      responses:
+        "200":
+          application/json: {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": true, "scopes": "<value>", "redirect_uris": ["<value>", "<value>"], "callback_url": "https://concerned-battle.net/", "authorize_url": "https://abandoned-comestible.com", "token_fetch_url": "https://substantial-morbidity.net", "user_info_url": "https://harmful-disposer.com", "discovery_url": "https://each-barracks.biz/", "token_introspection_url": "https://blind-breastplate.name/", "created_at": 339236, "updated_at": 36521}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  GetOAuthApplication:
+    speakeasy-default-get-O-auth-application:
+      parameters:
+        path:
+          oauth_application_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": false, "scopes": "<value>", "redirect_uris": ["<value>", "<value>"], "callback_url": "https://misguided-violin.info", "authorize_url": "https://fatal-custom.org/", "token_fetch_url": "https://stiff-bidet.biz/", "user_info_url": "https://burdensome-marketplace.net/", "discovery_url": "https://similar-nucleotidase.name/", "token_introspection_url": "https://glossy-concentration.biz/", "created_at": 780262, "updated_at": 284041}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateOAuthApplication:
+    speakeasy-default-update-O-auth-application:
+      parameters:
+        path:
+          oauth_application_id: "<id>"
+      requestBody:
+        application/json: {"scopes": "profile email public_metadata private_metadata"}
+      responses:
+        "200":
+          application/json: {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": false, "scopes": "<value>", "redirect_uris": ["<value>", "<value>"], "callback_url": "https://yearly-order.info/", "authorize_url": "https://awful-technician.info", "token_fetch_url": "https://extra-large-chapel.net/", "user_info_url": "https://front-injunction.net", "discovery_url": "https://impressionable-almighty.net", "token_introspection_url": "https://joyful-knight.com", "created_at": 232374, "updated_at": 352933}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  DeleteOAuthApplication:
+    speakeasy-default-delete-O-auth-application:
+      parameters:
+        path:
+          oauth_application_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  RotateOAuthApplicationSecret:
+    speakeasy-default-rotate-O-auth-application-secret:
+      parameters:
+        path:
+          oauth_application_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "oauth_application", "id": "<id>", "instance_id": "<id>", "name": "<value>", "client_id": "<id>", "public": false, "scopes": "<value>", "redirect_uris": [], "callback_url": "https://vibrant-concentration.org", "authorize_url": "https://right-hippodrome.net", "token_fetch_url": "https://dismal-casement.org/", "user_info_url": "https://monthly-mantua.name/", "discovery_url": "https://sunny-passport.com", "token_introspection_url": "https://subtle-cornet.com", "created_at": 740726, "updated_at": 589500}
+        "403":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  ListSAMLConnections:
+    speakeasy-default-list-SAML-connections:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+      responses:
+        "200":
+          application/json: {"data": [{"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "neglected-plastic.biz", "idp_entity_id": "<id>", "idp_sso_url": "https://crooked-overload.name/", "idp_certificate": "<value>", "acs_url": "https://secret-bob.com/", "sp_entity_id": "<id>", "sp_metadata_url": "https://memorable-overcoat.com", "active": true, "provider": "<value>", "user_count": 367745, "sync_user_attributes": true, "created_at": 73227, "updated_at": 931165}, {"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "odd-sustenance.info", "idp_entity_id": "<id>", "idp_sso_url": "https://glorious-strategy.com/", "idp_certificate": "<value>", "acs_url": "https://insistent-tinderbox.biz", "sp_entity_id": "<id>", "sp_metadata_url": "https://unpleasant-chairperson.info/", "active": true, "provider": "<value>", "user_count": 432930, "sync_user_attributes": true, "created_at": 103421, "updated_at": 523875}, {"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "tempting-handle.org", "idp_entity_id": "<id>", "idp_sso_url": "https://imaginative-cap.biz/", "idp_certificate": "<value>", "acs_url": "https://animated-ostrich.org", "sp_entity_id": "<id>", "sp_metadata_url": "https://bowed-poppy.name", "active": false, "provider": "<value>", "user_count": 816637, "sync_user_attributes": false, "created_at": 81309, "updated_at": 164965}], "total_count": 73973}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateSAMLConnection:
+    speakeasy-default-create-SAML-connection:
+      responses:
+        "200":
+          application/json: {"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "low-packaging.info", "idp_entity_id": "<id>", "idp_sso_url": "https://black-and-white-secrecy.org/", "idp_certificate": "<value>", "acs_url": "https://deafening-bonnet.net/", "sp_entity_id": "<id>", "sp_metadata_url": "https://outrageous-resolve.org", "active": true, "provider": "<value>", "user_count": 259629, "sync_user_attributes": true, "created_at": 230313, "updated_at": 211337}
+        "402":
+          application/json: {"errors": []}
+  GetSAMLConnection:
+    speakeasy-default-get-SAML-connection:
+      parameters:
+        path:
+          saml_connection_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "rural-mathematics.name", "idp_entity_id": "<id>", "idp_sso_url": "https://willing-impostor.info", "idp_certificate": "<value>", "acs_url": "https://earnest-tuber.info/", "sp_entity_id": "<id>", "sp_metadata_url": "https://boiling-dash.biz", "active": true, "provider": "<value>", "user_count": 552582, "sync_user_attributes": false, "created_at": 380699, "updated_at": 746585}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  UpdateSAMLConnection:
+    speakeasy-default-update-SAML-connection:
+      parameters:
+        path:
+          saml_connection_id: "<id>"
+      requestBody:
+        application/json: {}
+      responses:
+        "200":
+          application/json: {"object": "saml_connection", "id": "<id>", "name": "<value>", "domain": "tinted-nectarine.info", "idp_entity_id": "<id>", "idp_sso_url": "https://powerless-juggernaut.org", "idp_certificate": "<value>", "acs_url": "https://unlucky-hydrolyze.biz/", "sp_entity_id": "<id>", "sp_metadata_url": "https://cool-scout.org/", "active": true, "provider": "<value>", "user_count": 464385, "sync_user_attributes": false, "created_at": 693508, "updated_at": 404265}
+        "402":
+          application/json: {"errors": []}
+  DeleteSAMLConnection:
+    speakeasy-default-delete-SAML-connection:
+      parameters:
+        path:
+          saml_connection_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "<value>", "deleted": false}
+        "402":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CreateTestingToken:
+    speakeasy-default-create-testing-token:
+      responses:
+        "200":
+          application/json: {"object": "testing_token", "token": "1713877200-c_2J2MvPu9PnXcuhbPZNao0LOXqK9A7YrnBn0HmIWxy", "expires_at": 1713880800}
+  ListWaitlistEntries:
+    speakeasy-default-list-waitlist-entries:
+      parameters:
+        query:
+          limit: 10
+          offset: 0
+          order_by: "-created_at"
+      responses:
+        "200":
+          application/json: {"data": [{"object": "waitlist_entry", "id": "<id>", "email_address": "Marie.Fay@yahoo.com", "status": "pending", "created_at": 17577, "updated_at": 718303, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Annetta_Langosh0@gmail.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 485729, "updated_at": 73227}}, {"object": "waitlist_entry", "id": "<id>", "email_address": "Kenyatta32@hotmail.com", "status": "pending", "created_at": 18278, "updated_at": 897196, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Tate_Blanda@yahoo.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 432930, "updated_at": 480616}}, {"object": "waitlist_entry", "id": "<id>", "email_address": "Jude_Jenkins@gmail.com", "status": "pending", "created_at": 113486, "updated_at": 181118, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Alexie8@hotmail.com", "public_metadata": {"key": "<value>", "key1": "<value>"}, "revoked": false, "status": "pending", "created_at": 838930, "updated_at": 816637}}], "total_count": 996014}
+  CreateWaitlistEntry:
+    speakeasy-default-create-waitlist-entry:
+      responses:
+        "200":
+          application/json: {"object": "waitlist_entry", "id": "<id>", "email_address": "Loyal79@yahoo.com", "status": "pending", "created_at": 86, "updated_at": 169727, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Pearl_McGlynn@gmail.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 17759, "updated_at": 230313}}
+        "400":
+          application/json: {"errors": []}
+  RefreshSession:
+    speakeasy-default-refresh-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "cookies", "cookies": ["<value>", "<value>", "<value>"]}
+        "400":
+          application/json: {"errors": []}
+  CreateAccountlessApplication:
+    speakeasy-default-create-accountless-application:
+      responses:
+        "200":
+          application/json: {"object": "accountless_application", "publishable_key": "<value>"}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  CompleteAccountlessApplication:
+    speakeasy-default-complete-accountless-application:
+      responses:
+        "200":
+          application/json: {"object": "accountless_application", "publishable_key": "<value>"}
+        "500":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+examplesVersion: 1.0.0
+generatedTests: {}
