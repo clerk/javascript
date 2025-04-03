@@ -27,7 +27,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-export type SignedInAuthObjectProperties = {
+type SignedInAuthObjectProperties = {
   sessionClaims: JwtPayload;
   sessionId: string;
   sessionStatus: SessionStatusClaim | null;
