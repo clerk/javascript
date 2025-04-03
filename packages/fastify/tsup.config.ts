@@ -6,7 +6,7 @@ export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
 
   return {
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/webhooks.ts'],
     onSuccess: 'tsc',
     minify: isProd,
     clean: true,
