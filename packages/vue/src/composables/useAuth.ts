@@ -80,8 +80,8 @@ type UseAuth = (options?: PendingSessionOptions) => ToComputedRefs<UseAuthReturn
  *   </div>
  * </template>
  */
-export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
-  const { clerk, authCtx, treatPendingAsSignedOut } = useClerkContext();
+export const useAuth: UseAuth = (options = {}) => {
+  const { clerk, authCtx, ...contextOptions } = useClerkContext();
 
   const getToken: GetToken = createGetToken(clerk);
   const signOut: SignOut = createSignOut(clerk);
@@ -117,7 +117,9 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
       },
       options: {
         treatPendingAsSignedOut:
-          treatPendingAsSignedOut ?? clerk.value?.__internal_getOption('treatPendingAsSignedOut'),
+          options.treatPendingAsSignedOut ??
+          contextOptions.treatPendingAsSignedOut ??
+          clerk.value?.__internal_getOption?.('treatPendingAsSignedOut'),
       },
     });
 

@@ -3,7 +3,7 @@ import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
 import type { Clerk, ClientResource, Resources } from '@clerk/types';
 import type { Plugin } from 'vue';
-import { computed, ref, shallowRef, shallowRef, triggerRef } from 'vue';
+import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
 
@@ -84,7 +84,7 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       userCtx,
       organizationCtx,
       treatPendingAsSignedOut:
-        options.treatPendingAsSignedOut ?? clerk.value?.__internal_getOption('treatPendingAsSignedOut'),
+        options.treatPendingAsSignedOut ?? clerk.value?.__internal_getOption?.('treatPendingAsSignedOut'),
     });
   },
 };

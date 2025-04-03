@@ -125,7 +125,10 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
     },
     options: {
       treatPendingAsSignedOut:
-        treatPendingAsSignedOut ?? clerkContext?.__internal_getOption?.('treatPendingAsSignedOut'),
+        // Fallback from option provided via SSR / CSR contexts
+        treatPendingAsSignedOut ??
+        clerkContext?.__internal_getOption?.('treatPendingAsSignedOut') ??
+        import.meta.env.PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT,
     },
   });
 
