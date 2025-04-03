@@ -109,7 +109,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
     },
     {
       treatPendingAsSignedOut:
-        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption('treatPendingAsSignedOut'),
+        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption?.('treatPendingAsSignedOut'),
     },
   );
 };
