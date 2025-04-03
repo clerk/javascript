@@ -222,27 +222,6 @@ function formatCSPHeader(mergedCSP: Record<string, Set<string>>): string {
 }
 
 /**
- * Parses a host string to extract the clerk subdomain
- * @param input - The host string to parse
- * @returns The formatted clerk subdomain
- */
-function parseHost(input: string): string {
-  let hostname = input;
-  try {
-    if (input.startsWith('http://') || input.startsWith('https://')) {
-      hostname = new URL(input).hostname;
-    }
-  } catch {
-    hostname = input;
-  }
-  const parts = hostname.split('.');
-  if (parts.length >= 2) {
-    hostname = 'clerk.' + parts.slice(-2).join('.');
-  }
-  return hostname;
-}
-
-/**
  * Generates a secure random nonce for CSP headers
  * @returns A base64-encoded random nonce
  */
@@ -269,8 +248,7 @@ function createMergedCSP(
 ): Record<string, Set<string>> {
   // Initialize with default Clerk CSP values
   const mergedCSP = CSPDirectiveManager.createDefaultDirectives();
-  const parsedHost = parseHost(host);
-  mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(parsedHost);
+  mergedCSP['connect-src'].add(host);
 
   // Handle strict-dynamic mode specific changes
   if (mode === 'strict-dynamic') {
@@ -307,7 +285,7 @@ function createMergedCSP(
 /**
  * Creates a Content Security Policy (CSP) header with the specified mode and host
  * @param mode - The CSP mode to use ('standard' or 'strict-dynamic')
- * @param host - The host to include in the CSP
+ * @param host - The host to include in the CSP (parsed from publishableKey)
  * @param customDirectives - Optional custom directives to merge with
  * @returns Object containing the formatted CSP header and nonce (if in strict-dynamic mode)
  */

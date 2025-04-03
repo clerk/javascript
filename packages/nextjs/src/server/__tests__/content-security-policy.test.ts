@@ -18,7 +18,7 @@ describe('CSP Header Utils', () => {
   });
 
   describe('createCSPHeader', () => {
-    const testHost = 'example.com';
+    const testHost = 'clerk.example.com';
 
     it('should create a standard CSP header with default directives', () => {
       const result = createCSPHeader('standard', testHost);
@@ -27,7 +27,7 @@ describe('CSP Header Utils', () => {
 
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
@@ -91,15 +91,6 @@ describe('CSP Header Utils', () => {
       expect(result.header).toContain('custom-directive value');
     });
 
-    it('should handle different host formats', () => {
-      const hosts = ['example.com', 'https://example.com', 'http://example.com', 'sub.example.com'];
-
-      hosts.forEach(host => {
-        const result = createCSPHeader('standard', host);
-        expect(result.header).toContain('clerk.example.com');
-      });
-    });
-
     it('should handle development environment specific directives', () => {
       const result = createCSPHeader('standard', testHost);
       const directives = result.header.split('; ');
@@ -126,7 +117,7 @@ describe('CSP Header Utils', () => {
 
       // Check each directive individually with exact matches
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
@@ -171,7 +162,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('properly converts host to clerk subdomain in CSP directives', () => {
-      const host = 'https://example.com';
+      const host = 'clerk.example.com';
       const result = createCSPHeader('standard', host);
 
       // Split the result into individual directives for precise testing
@@ -179,7 +170,7 @@ describe('CSP Header Utils', () => {
 
       // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
       expect(directives).toContainEqual(
-        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com`,
+        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com`,
       );
       expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
       expect(directives).toContainEqual(
@@ -242,7 +233,7 @@ describe('CSP Header Utils', () => {
 
       // Verify all directives are present with their exact values, with special keywords quoted
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
@@ -323,7 +314,7 @@ describe('CSP Header Utils', () => {
 
       // Verify clerk subdomain is added while preserving existing values
       expect(directives).toContainEqual(
-        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com https://api.example.com`,
+        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
       );
       // Verify all required domains are present in the img-src directive
       const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
@@ -361,7 +352,7 @@ describe('CSP Header Utils', () => {
 
       // Other directives should still be present
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");

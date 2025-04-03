@@ -1,6 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -201,7 +202,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       if (options.contentSecurityPolicy) {
         const result = createCSPHeader(
           options.contentSecurityPolicy.mode,
-          clerkRequest.clerkUrl.toString(),
+          (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
           options.contentSecurityPolicy.directives,
         );
         const { nonce } = result;
