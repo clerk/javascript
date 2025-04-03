@@ -25,11 +25,11 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        return { captchaError: e?.message || e };
       });
     }
 
-    return undefined;
+    return { captchaError: 'invisible_captcha_unsupported' };
   }
 
   /**
@@ -55,11 +55,11 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        return { captchaError: e?.message || e };
       });
     }
 
-    return {};
+    return { captchaError: 'captcha_unsupported' };
   }
 
   /**
