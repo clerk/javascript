@@ -123,7 +123,7 @@ export type JWTPayloadBase = {
 
 export type VersionedJwtPayload =
   | {
-      ver: undefined;
+      ver?: undefined;
 
       /**
        *
