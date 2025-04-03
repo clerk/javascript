@@ -20,7 +20,7 @@ export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAs
   return () => (userId.value ? slots.default?.() : null);
 });
 
-export const SignedOut = defineComponent(({ treatPendingAsSignedOut }, { slots }) => {
+export const SignedOut = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
   const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value === null ? slots.default?.() : null);
