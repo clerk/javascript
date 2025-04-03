@@ -1,8 +1,8 @@
-import type { UseSessionReturn } from '@clerk/types';
+import type { PendingSessionOptions, UseSessionReturn } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useOptionsContext, useSessionContext } from '../contexts';
 
-type UseSession = () => UseSessionReturn;
+type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
 
 /**
  * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/references/javascript/session) object, as well as helpers for setting the active session.
@@ -48,16 +48,21 @@ type UseSession = () => UseSessionReturn;
  * </Tab>
  * </Tabs>
  */
-export const useSession: UseSession = () => {
+export const useSession: UseSession = (options = {}) => {
   useAssertWrappedByClerkProvider('useSession');
 
   const session = useSessionContext();
+  const optionsContext = useOptionsContext();
 
   if (session === undefined) {
     return { isLoaded: false, isSignedIn: undefined, session: undefined };
   }
 
-  if (session === null) {
+  const pendingAsSignedOut =
+    session?.status === 'pending' &&
+    (options.treatPendingAsSignedOut ?? optionsContext.treatPendingAsSignedOut ?? true);
+  const isSignedOut = session === null || pendingAsSignedOut;
+  if (isSignedOut) {
     return { isLoaded: true, isSignedIn: false, session: null };
   }
 
