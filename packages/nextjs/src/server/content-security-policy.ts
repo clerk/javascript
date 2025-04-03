@@ -194,46 +194,20 @@ function handleCustomDirective(customDirectives: Map<string, Set<string>>, key: 
 }
 
 /**
- * Formats the CSP header string with proper ordering and formatting
+ * Applies formatting to the CSP header
  * @param mergedCSP - The merged CSP state to format
  * @returns Formatted CSP header string
  */
 function formatCSPHeader(mergedCSP: Record<string, Set<string>>): string {
-  const orderMap: Record<string, number> = {
-    "'none'": 1,
-    "'self'": 2,
-    "'strict-dynamic'": 3,
-    "'unsafe-eval'": 4,
-    "'unsafe-inline'": 5,
-    'http:': 6,
-    'https:': 7,
-  };
-
-  // Sort directives to ensure consistent order
-  const orderedEntries = Object.entries(mergedCSP).sort(([a], [b]) => a.localeCompare(b));
-
-  return orderedEntries
+  return Object.entries(mergedCSP)
+    .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, values]) => {
-      // Map each value to an object with its formatted version to avoid repeated formatting
       const valueObjs = Array.from(values).map(v => ({
         raw: v,
         formatted: CSPDirectiveManager.formatValue(v),
       }));
 
-      // Sort based on formatted values using orderMap and alphabetical order
-      valueObjs.sort((a, b) => {
-        if (orderMap[a.formatted] && orderMap[b.formatted]) {
-          return orderMap[a.formatted] - orderMap[b.formatted];
-        }
-        if (orderMap[a.formatted]) return -1;
-        if (orderMap[b.formatted]) return 1;
-        return a.formatted.localeCompare(b.formatted);
-      });
-
-      // Extract the formatted values without calling formatValue again
-      const sortedFormattedValues = valueObjs.map(item => item.formatted);
-
-      return `${key} ${sortedFormattedValues.join(' ')}`;
+      return `${key} ${valueObjs.map(item => item.formatted).join(' ')}`;
     })
     .join('; ');
 }

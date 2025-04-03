@@ -25,7 +25,15 @@ describe('CSP Header Utils', () => {
 
       expect(result.header).toContain("default-src 'self'");
       expect(result.header).toContain("connect-src 'self' *.clerk.accounts.dev clerk.example.com");
-      expect(result.header).toContain("script-src 'self' 'unsafe-eval' 'unsafe-inline' http: https:");
+      // Use toContainEqual to verify that all required values are present in the script-src directive
+      // We only care about the presence of values, not their order
+      const scriptSrcDirective = result.header.split(';').find(directive => directive.trim().startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      expect(scriptSrcDirective).toContain("'self'");
+      expect(scriptSrcDirective).toContain("'unsafe-eval'");
+      expect(scriptSrcDirective).toContain("'unsafe-inline'");
+      expect(scriptSrcDirective).toContain('https:');
+      expect(scriptSrcDirective).toContain('http:');
       expect(result.header).toContain("style-src 'self' 'unsafe-inline'");
       expect(result.header).toContain("img-src 'self' https://img.clerk.com");
       expect(result.header).toContain("frame-src 'self' https://challenges.cloudflare.com");
@@ -61,7 +69,13 @@ describe('CSP Header Utils', () => {
       const result = createCSPHeader('standard', testHost, customDirectives);
 
       expect(result.header).toContain("default-src 'none'");
-      expect(result.header).toContain("img-src 'self' https://example.com");
+      // Check for the presence of all required values in the img-src directive
+      const directives = result.header.split('; ');
+      const imgSrcDirective = directives.find(d => d.startsWith('img-src'));
+      expect(imgSrcDirective).toBeDefined();
+      expect(imgSrcDirective).toContain("'self'");
+      expect(imgSrcDirective).toContain('https://img.clerk.com');
+      expect(imgSrcDirective).toContain('https://example.com');
       expect(result.header).toContain("custom-directive 'value'");
     });
 
@@ -76,7 +90,14 @@ describe('CSP Header Utils', () => {
 
     it('should handle development environment specific directives', () => {
       const result = createCSPHeader('standard', testHost);
-      expect(result.header).toContain("script-src 'self' 'unsafe-eval' 'unsafe-inline' http: https:");
+      const directives = result.header.split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      expect(scriptSrcDirective).toContain("'self'");
+      expect(scriptSrcDirective).toContain("'unsafe-eval'");
+      expect(scriptSrcDirective).toContain("'unsafe-inline'");
+      expect(scriptSrcDirective).toContain('https:');
+      expect(scriptSrcDirective).toContain('http:');
     });
 
     it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
@@ -277,7 +298,12 @@ describe('CSP Header Utils', () => {
       expect(directives).toContainEqual(
         `connect-src 'self' *.clerk.accounts.dev clerk.example.com https://api.example.com`,
       );
-      expect(directives).toContainEqual(`img-src 'self' https://images.example.com https://img.clerk.com`);
+      // Verify all required domains are present in the img-src directive
+      const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
+      expect(imgSrcDirective).toBeDefined();
+      expect(imgSrcDirective).toContain("'self'");
+      expect(imgSrcDirective).toContain('https://img.clerk.com');
+      expect(imgSrcDirective).toContain('https://images.example.com');
       expect(directives).toContainEqual(
         `frame-src 'self' https://challenges.cloudflare.com https://frames.example.com`,
       );
