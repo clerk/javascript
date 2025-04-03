@@ -131,7 +131,7 @@ export type ProtectProps = (
   PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
-  const { isLoaded, has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   return () => {
     /**
