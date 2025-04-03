@@ -91,6 +91,13 @@ export function createProtect(opts: {
     };
 
     /**
+     * Redirects the user back to the tasks URL if their session status is pending
+     */
+    if (authObject.sessionStatus === 'pending') {
+      return handleUnauthenticated();
+    }
+
+    /**
      * User is not authenticated
      */
     if (!authObject.userId) {
