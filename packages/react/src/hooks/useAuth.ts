@@ -17,7 +17,8 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { createGetToken, createSignOut } from './utils';
 
 type Nullish<T> = T | undefined | null;
-type UseAuthOptions = Nullish<Record<string, any> | PendingSessionOptions>;
+type InitialAuthState = Record<string, any>;
+type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
@@ -94,9 +95,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
-
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
@@ -104,18 +103,14 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   return useDerivedAuth(
     {
-      sessionId,
-      userId,
-      actor,
-      orgId,
-      orgSlug,
-      orgRole,
+      ...authContext,
       getToken,
       signOut,
-      orgPermissions,
-      factorVerificationAge,
     },
-    { treatPendingAsSignedOut },
+    {
+      treatPendingAsSignedOut:
+        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption('treatPendingAsSignedOut'),
+    },
   );
 };
 
