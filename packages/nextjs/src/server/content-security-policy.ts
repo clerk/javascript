@@ -80,7 +80,13 @@ class CSPDirectiveManager {
 
   /** Default CSP directives and their values */
   static readonly DEFAULT_DIRECTIVES: CSPValues = {
-    'connect-src': ['self', 'https://api.stripe.com', 'https://maps.googleapis.com'],
+    'connect-src': [
+      'self',
+      'https://clerk-telemetry.com',
+      'https://*.clerk-telemetry.com',
+      'https://api.stripe.com',
+      'https://maps.googleapis.com',
+    ],
     'default-src': ['self'],
     'form-action': ['self'],
     'frame-src': [

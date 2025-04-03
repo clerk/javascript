@@ -27,7 +27,7 @@ describe('CSP Header Utils', () => {
 
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("form-action 'self'");
       expect(directives).toContainEqual(
@@ -117,7 +117,7 @@ describe('CSP Header Utils', () => {
 
       // Check each directive individually with exact matches
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
@@ -170,7 +170,7 @@ describe('CSP Header Utils', () => {
 
       // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
       expect(directives).toContainEqual(
-        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com`,
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com`,
       );
       expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
       expect(directives).toContainEqual(
@@ -233,7 +233,7 @@ describe('CSP Header Utils', () => {
 
       // Verify all directives are present with their exact values, with special keywords quoted
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
@@ -314,7 +314,7 @@ describe('CSP Header Utils', () => {
 
       // Verify clerk subdomain is added while preserving existing values
       expect(directives).toContainEqual(
-        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
       );
       // Verify all required domains are present in the img-src directive
       const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
@@ -352,7 +352,7 @@ describe('CSP Header Utils', () => {
 
       // Other directives should still be present
       expect(directives).toContainEqual(
-        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
       );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
