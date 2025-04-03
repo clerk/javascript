@@ -195,8 +195,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#proxyUrl || '';
   }
 
+  /**
+   * Accesses private options from the `Clerk` instance and defaults to
+   * `IsomorphicClerk` options when in SSR context.
+   *  @internal
+   */
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
-    return this.clerkjs?.__internal_getOption(key);
+    return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
   }
 
   constructor(options: IsomorphicClerkOptions) {
