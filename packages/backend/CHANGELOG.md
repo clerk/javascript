@@ -1,5 +1,48 @@
 # Change Log
 
+## 1.26.0
+
+### Minor Changes
+
+- Expose `retryAfter` value on `ClerkAPIResponseError` for 429 responses. ([#5480](https://github.com/clerk/javascript/pull/5480)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and fullstack SDKs. ([#5468](https://github.com/clerk/javascript/pull/5468)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  To get started, install [`svix`](https://www.npmjs.com/package/svix), which Clerk uses to verify its webhooks:
+
+  ```shell
+  npm install svix
+  ```
+
+  Then in your webhook route handler, import `verifyWebhook()` from the Backend SDK:
+
+  ```ts
+  // app/api/webhooks/route.ts
+  import { verifyWebhook } from '@clerk/backend/webhooks';
+
+  try {
+    const evt = await verifyWebhook(req);
+
+    // Do something with payload
+    const { id } = evt.data;
+    const eventType = evt.type;
+    console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
+    console.log('Webhook payload:', body);
+  } catch (err) {
+    console.error('Error: Could not verify webhook:', err);
+  }
+  ```
+
+  For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data).
+
+- Redirect to tasks on `auth.protect` and `auth.redirectToSignIn` ([#5440](https://github.com/clerk/javascript/pull/5440)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`60a9a51`](https://github.com/clerk/javascript/commit/60a9a51dff7d59e7397536586cf1cfe029bc021b), [`e984494`](https://github.com/clerk/javascript/commit/e984494416dda9a6f04acaaba61f8c2683090961), [`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`38828ae`](https://github.com/clerk/javascript/commit/38828ae58d6d4e8e3c60945284930179b2b6bb40), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a), [`619cde8`](https://github.com/clerk/javascript/commit/619cde8c532d635d910ebbc08ad6abcc025694b4)]:
+  - @clerk/shared@3.3.0
+  - @clerk/types@4.50.2
+
 ## 1.25.8
 
 ### Patch Changes

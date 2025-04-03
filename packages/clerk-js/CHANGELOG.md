@@ -1,5 +1,48 @@
 # Change Log
 
+## 5.59.0
+
+### Minor Changes
+
+- Improve session refresh logic. ([#5397](https://github.com/clerk/javascript/pull/5397)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Switched from interval-based polling to timeout-based polling, ensuring retries for a `getToken()` call complete before the next poll begins.
+  - `Clerk.handleUnauthenticated()` now sets the session to null when a `/client` request returns a `500` status code, preventing infinite request loops.
+  - Improved error handling: If the `/client` request fails during initialization, the poller stops, a dummy client is created, a manual request to `/tokens` is attempted, and polling resumes.
+
+- Expose `retryAfter` value on `ClerkAPIResponseError` for 429 responses. ([#5480](https://github.com/clerk/javascript/pull/5480)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove non-actionable error from Session poller. ([#5494](https://github.com/clerk/javascript/pull/5494)) by [@panteliselef](https://github.com/panteliselef)
+
+- Treat pending sessions as signed-out by default in `Clerk.isSignedIn` ([#5505](https://github.com/clerk/javascript/pull/5505)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- add v0 preview domain to opt-in to pop-up auth flow ([#5502](https://github.com/clerk/javascript/pull/5502)) by [@mwickett](https://github.com/mwickett)
+
+- Fix sign in prepare first factor cache key ([#5474](https://github.com/clerk/javascript/pull/5474)) by [@octoper](https://github.com/octoper)
+
+- Create a utility that implements `Promise.allSettled` with ES6/ES2015 compatibility. ([#5491](https://github.com/clerk/javascript/pull/5491)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove usage of `<PlanCard />` from `<SubscriptionDetailDrawer />`. ([#5469](https://github.com/clerk/javascript/pull/5469)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add payment source section to `UserProfile` ([#5492](https://github.com/clerk/javascript/pull/5492)) by [@aeliox](https://github.com/aeliox)
+
+- Update secured by clerk link URL. ([#5504](https://github.com/clerk/javascript/pull/5504)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Emit captcha errors if the turnstile fails to execute ([#5520](https://github.com/clerk/javascript/pull/5520)) by [@anagstef](https://github.com/anagstef)
+
+- - Sorting available factors so factors with primary will always be on top ([#5465](https://github.com/clerk/javascript/pull/5465)) by [@octoper](https://github.com/octoper)
+
+  - Allows to set primary phone number action when reverification is enabled
+
+- Filters out non supported strategies for reverification ([#5475](https://github.com/clerk/javascript/pull/5475)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`60a9a51`](https://github.com/clerk/javascript/commit/60a9a51dff7d59e7397536586cf1cfe029bc021b), [`e984494`](https://github.com/clerk/javascript/commit/e984494416dda9a6f04acaaba61f8c2683090961), [`67d34eb`](https://github.com/clerk/javascript/commit/67d34eb28b42ab0b111ed7ff03edc55668fddd3d), [`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`38828ae`](https://github.com/clerk/javascript/commit/38828ae58d6d4e8e3c60945284930179b2b6bb40), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a), [`619cde8`](https://github.com/clerk/javascript/commit/619cde8c532d635d910ebbc08ad6abcc025694b4)]:
+  - @clerk/shared@3.3.0
+  - @clerk/localizations@3.13.5
+  - @clerk/types@4.50.2
+
 ## 5.58.1
 
 ### Patch Changes
