@@ -1,5 +1,5 @@
 ---
-"@clerk/nextjs": minor
+'@clerk/nuxt': minor
 ---
 
 Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and fullstack SDKs.
@@ -10,15 +10,15 @@ To get started, install [`svix`](https://www.npmjs.com/package/svix), which Cler
 npm install svix
 ```
 
-Then in your webhook route handler, import `verifyWebhook()` from the Next.js SDK:
+Then in your webhook route handler, import `verifyWebhook()` from the Nuxt SDK:
 
 ```ts
-// app/api/webhooks/route.ts
-import { verifyWebhook } from '@clerk/nextjs/webhooks';
+// server/api/webhooks.post.ts
+import { verifyWebhook } from '@clerk/nuxt/webhooks';
 
-export async function POST(req: Request) {
+export default eventHandler(async (event) => {
   try {
-    const evt = await verifyWebhook(req);
+    const evt = await verifyWebhook(event);
 
     // Do something with payload
     const { id } = evt.data;
@@ -26,14 +26,13 @@ export async function POST(req: Request) {
     console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
     console.log('Webhook payload:', body);
 
-    return new Response('Webhook received', { status: 200 });
+    return 'Webhook received'
   } catch (err) {
     console.error('Error: Could not verify webhook:', err);
-    return new Response('Error: Verification error', {
-      status: 400,
-    });
+    setResponseStatus(event, 400)
+    return 'Error: Verification error';
   }
-}
+})
 ```
 
 For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data).
