@@ -116,7 +116,7 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   );
 
   const payload = resolveAuthState({
-    authContext: {
+    authObject: {
       ...authContext,
       getToken,
       signOut,
