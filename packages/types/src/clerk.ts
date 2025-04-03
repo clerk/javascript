@@ -437,8 +437,18 @@ export interface Clerk {
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
+  /**
+   * Register a listener that triggers a callback each time Clerk updates its status.
+   * @param callback Callback function receiving latest Clerk status
+   * @returns - Unsubscribe callback
+   */
   addStatusListener: (listener: StatusListenerCallback) => UnsubscribeCallback;
 
+  /**
+   * Updates the status of Clerk singleton based on the provided argument.
+   * By default, it notifies subscribers wit the new status.
+   * @internal
+   */
   __internal_setStatus: (status: Status, opts?: { notify: boolean }) => void;
 
   /**

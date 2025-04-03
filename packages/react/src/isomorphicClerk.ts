@@ -388,7 +388,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
-    if (this.mode !== 'browser' || this.status === 'ready') {
+    if (this.mode !== 'browser' || this.loaded) {
       return;
     }
 
@@ -420,12 +420,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             domain: this.domain,
           } as any);
 
-          // this.setLifecycleAndNotify('loaded');
           await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
-          // this.setLifecycleAndNotify('loaded');
           if (!c.loaded) {
             await c.load(this.options);
           }
@@ -447,7 +445,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         if (!global.Clerk) {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
-        // this.setLifecycleAndNotify('loaded');
         await global.Clerk.load(this.options);
       }
 
@@ -464,8 +461,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   public __internal_setStatus = (status: Clerk['status']) => {
+    // Support older clerk-js versions.
     if (this.clerkjs?.__internal_setStatus) {
-      // NOTE: Access with `?.` to avoid breaking usage with older clerk-js versions.
       return this.clerkjs.__internal_setStatus(status);
     } else {
       this.#status = status;
@@ -476,6 +473,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
+    // Support older clerk-js versions.
     if (this.clerkjs?.addStatusListener) {
       return this.clerkjs.addStatusListener(listener);
     } else {

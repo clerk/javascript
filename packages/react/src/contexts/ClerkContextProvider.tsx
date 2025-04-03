@@ -116,9 +116,5 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     };
   }, []);
 
-  return {
-    isomorphicClerk,
-    clerkStatus,
-    // clerkLoaded: loaded
-  };
+  return { isomorphicClerk, clerkStatus };
 };
