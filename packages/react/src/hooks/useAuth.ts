@@ -1,4 +1,5 @@
 import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -98,6 +99,8 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
+
+  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
 
   return useDerivedAuth(
     {
