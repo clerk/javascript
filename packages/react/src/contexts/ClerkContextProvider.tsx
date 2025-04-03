@@ -20,7 +20,7 @@ const isClerkJSOperational = (status: Clerk['status']) => ['ready', 'degraded'].
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus, clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -33,8 +33,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
-  const derivedState = deriveState(isClerkJSOperational(clerkStatus) ?? clerkLoaded, state, initialState);
-  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkStatus, clerkLoaded]);
+  const derivedState = deriveState(isClerkJSOperational(clerkStatus), state, initialState);
+  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkStatus]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const {
@@ -94,7 +94,6 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
   const [clerkStatus, setStatus] = React.useState(isomorphicClerk.status);
-  const [loaded, setLoaded] = React.useState(isomorphicClerk.loaded);
 
   React.useEffect(() => {
     void isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
@@ -106,12 +105,8 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
 
   useEffect(() => {
     const unsub = isomorphicClerk.addStatusListener(setStatus);
-    return () => {
-      unsub();
-    };
+    return () => unsub();
   }, []);
-
-  useEffect(() => isomorphicClerk.addOnLoaded(() => setLoaded(true)), []);
 
   React.useEffect(() => {
     return () => {
@@ -121,5 +116,9 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     };
   }, []);
 
-  return { isomorphicClerk, clerkStatus, clerkLoaded: loaded };
+  return {
+    isomorphicClerk,
+    clerkStatus,
+    // clerkLoaded: loaded
+  };
 };

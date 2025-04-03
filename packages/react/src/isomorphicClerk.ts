@@ -451,7 +451,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         await global.Clerk.load(this.options);
       }
 
-      if (['ready', 'degraded'].includes(global.Clerk?.status || '') || global.Clerk?.loaded) {
+      if (global.Clerk?.loaded) {
         return this.hydrateClerkJS(global.Clerk);
       }
       return;
@@ -464,9 +464,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   public __internal_setStatus = (status: Clerk['status']) => {
-    if (this.clerkjs) {
+    if (this.clerkjs?.__internal_setStatus) {
       // NOTE: Access with `?.` to avoid breaking usage with older clerk-js versions.
-      return this.clerkjs.__internal_setStatus?.(status);
+      return this.clerkjs.__internal_setStatus(status);
     } else {
       this.#status = status;
       for (const listener of this.premountAddStatusListenerCalls.keys()) {
@@ -476,8 +476,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
-    if (this.clerkjs) {
-      return this.clerkjs.addStatusListener?.(listener);
+    if (this.clerkjs?.addStatusListener) {
+      return this.clerkjs.addStatusListener(listener);
     } else {
       // notify immediately
       listener(this.status);
@@ -494,7 +494,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   /**
-   * @deprecated
+   * @deprecated Please use `addStatusListener`. This api will be removed in the next major.
    */
   public addOnLoaded = (cb: () => void) => {
     this.loadedListeners.push(cb);
@@ -507,7 +507,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   /**
-   * @deprecated
+   * @deprecated Please use `__internal_setStatus`. This api will be removed in the next major.
    */
   public emitLoaded = () => {
     this.loadedListeners.forEach(cb => cb());
@@ -590,6 +590,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.premountPricingTableNodes.forEach((props, node) => {
       clerkjs.__experimental_mountPricingTable(node, props);
     });
+
+    /**
+     * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
+     */
+    if (typeof this.clerkjs.status === 'undefined') {
+      this.__internal_setStatus('ready');
+    }
 
     this.emitLoaded();
     return this.clerkjs;
