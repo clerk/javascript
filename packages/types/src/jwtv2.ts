@@ -47,6 +47,7 @@ export type JWTPayloadBase = {
    * Encoded token supporting the `getRawString` method.
    */
   __raw: string;
+
   /**
    * JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).
    */
@@ -133,11 +134,7 @@ export type VersionedJwtPayload =
   | {
       ver: 2;
 
-      /**
-       * @deprecated - TODO - replace this with new org permissions claim
-       * Active organization permissions.
-       */
-      org_permissions?: OrganizationCustomPermissionKey[];
+      // TODO: include the the version 2 claims here
     };
 
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
