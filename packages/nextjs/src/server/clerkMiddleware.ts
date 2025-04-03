@@ -157,7 +157,9 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const cspHeader = request.headers.get('Content-Security-Policy');
       if (cspHeader) {
-        logger.debug('Content-Security-Policy detected');
+        logger.debug('Content-Security-Policy detected', () => ({
+          value: cspHeader,
+        }));
       }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
