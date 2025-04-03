@@ -134,7 +134,7 @@ export type VersionedJwtPayload =
   | {
       ver: 2;
 
-      // TODO: include the the version 2 claims here
+      // TODO: include the version 2 claims here
     };
 
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
