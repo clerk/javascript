@@ -1,5 +1,5 @@
 /**
- * Type representing valid CSP directives
+ * Valid CSP directives according to the CSP Level 3 specification
  */
 export type CSPDirective =
   // Default resource directives
@@ -40,22 +40,25 @@ export type CSPDirective =
   | 'style-src-elem';
 
 /**
- * Type representing the CSP mode
+ * The mode to use for generating the CSP header
+ *
+ * - `standard`: Standard CSP mode
+ * - `strict-dynamic`: Strict-dynamic mode, also generates a nonce
  */
 export type CSPMode = 'standard' | 'strict-dynamic';
 
 /**
- * Type representing CSP values as a record of directives to string arrays
+ * Partial record of directives and their values
  */
 type CSPValues = Partial<Record<CSPDirective, string[]>>;
 
 /**
- * Type representing CSP directives as a record of directives to Sets of strings
+ * Directives and their values
  */
 type CSPDirectiveSet = Record<CSPDirective, Set<string>>;
 
 /**
- * Interface representing the result of creating a CSP header
+ * Return type for createCSPHeader
  */
 export interface CSPHeaderResult {
   /** The formatted CSP header string */
@@ -64,9 +67,6 @@ export interface CSPHeaderResult {
   nonce?: string;
 }
 
-/**
- * Class responsible for managing CSP directives and their values
- */
 class CSPDirectiveManager {
   /** Set of special keywords that require quoting in CSP directives */
   private static readonly KEYWORDS = new Set([
@@ -151,30 +151,22 @@ class CSPDirectiveManager {
  * @param values - New values to merge
  */
 function handleExistingDirective(mergedCSP: CSPDirectiveSet, key: CSPDirective, values: string[]) {
-  // Special case for 'none' value - it should replace all other values
+  // None overrides all other values
   if (values.includes("'none'") || values.includes('none')) {
     mergedCSP[key] = new Set(["'none'"]);
     return;
   }
 
   // For existing directives, merge the values rather than replacing
-  // Use a Set to deduplicate values
   const deduplicatedSet = new Set<string>();
 
-  // First add existing values after formatting them
   mergedCSP[key].forEach(value => {
     deduplicatedSet.add(CSPDirectiveManager.formatValue(value));
   });
 
-  // Then add new values after formatting them
   values.forEach(value => {
     deduplicatedSet.add(CSPDirectiveManager.formatValue(value));
   });
-
-  // If this is script-src in production, make sure we don't add unsafe-eval
-  if (key === 'script-src' && process.env.NODE_ENV === 'production') {
-    deduplicatedSet.delete("'unsafe-eval'");
-  }
 
   mergedCSP[key] = deduplicatedSet;
 }
@@ -186,13 +178,12 @@ function handleExistingDirective(mergedCSP: CSPDirectiveSet, key: CSPDirective, 
  * @param values - Values for the directive
  */
 function handleCustomDirective(customDirectives: Map<string, Set<string>>, key: string, values: string[]) {
-  // Special case for 'none' value - it should replace all other values
+  // None overrides all other values
   if (values.includes("'none'") || values.includes('none')) {
     customDirectives.set(key, new Set(["'none'"]));
     return;
   }
 
-  // For all other cases, create a new set with formatted values
   const formattedValues = new Set<string>();
   values.forEach(value => {
     const formattedValue = CSPDirectiveManager.formatValue(value);
@@ -295,8 +286,6 @@ function createMergedCSP(
 ): Record<string, Set<string>> {
   // Initialize with default Clerk CSP values
   const mergedCSP = CSPDirectiveManager.createDefaultDirectives();
-
-  // Add Clerk-specific values
   const parsedHost = parseHost(host);
   mergedCSP['connect-src'].add('*.clerk.accounts.dev').add(parsedHost);
 
@@ -310,10 +299,8 @@ function createMergedCSP(
     }
   }
 
-  // Create a separate map for custom directives
-  const customDirectivesMap = new Map<string, Set<string>>();
-
   // Add custom directives if provided
+  const customDirectivesMap = new Map<string, Set<string>>();
   if (customDirectives) {
     Object.entries(customDirectives).forEach(([key, values]) => {
       const valuesArray = Array.isArray(values) ? values : [values];
@@ -327,8 +314,6 @@ function createMergedCSP(
 
   // Combine standard directives with custom directives
   const finalCSP: Record<string, Set<string>> = { ...mergedCSP };
-
-  // Add custom directives to the final result
   customDirectivesMap.forEach((values, key) => {
     finalCSP[key] = values;
   });
