@@ -166,7 +166,7 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
 };
 
 type AuthStateOptions = {
-  authContext: {
+  authObject: {
     userId?: string | null;
     sessionId?: string | null;
     sessionStatus?: SessionStatusClaim | null;
@@ -188,7 +188,7 @@ type AuthStateOptions = {
  * @internal
  */
 const resolveAuthState = ({
-  authContext: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
+  authObject: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
   options: { treatPendingAsSignedOut = true },
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
@@ -265,7 +265,7 @@ const resolveAuthState = ({
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      has,
       signOut,
       getToken,
     } as const;

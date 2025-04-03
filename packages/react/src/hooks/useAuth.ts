@@ -87,7 +87,6 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
-
   let authContext = authContextFromHook;
 
   if (authContext.sessionId === undefined && authContext.userId === undefined) {
@@ -113,7 +112,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
       orgPermissions,
       factorVerificationAge,
     },
-    { treatPendingAsSignedOut: treatPendingAsSignedOut },
+    { treatPendingAsSignedOut },
   );
 };
 
@@ -162,11 +161,11 @@ export function useDerivedAuth(
         factorVerificationAge,
       })(params);
     },
-    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
   );
 
   const payload = resolveAuthState({
-    authContext: {
+    authObject: {
       ...authObject,
       getToken,
       signOut,
