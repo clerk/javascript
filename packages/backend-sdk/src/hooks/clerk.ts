@@ -66,6 +66,7 @@ export class AfterError implements AfterErrorHook {
         status: response?.status || 500,
         statusText: response?.statusText || '',
         clerkTraceId: this.getTraceId(error, response?.headers),
+        retryAfter: this.getRetryAfter(response?.headers),
       },
     };
   }
@@ -77,5 +78,15 @@ export class AfterError implements AfterErrorHook {
 
     const cfRay = headers?.get('cf-ray');
     return cfRay || '';
+  }
+
+  private getRetryAfter(headers?: Headers): number | undefined {
+    const retryAfter = headers?.get('Retry-After');
+    if (!retryAfter) return;
+  
+    const value = parseInt(retryAfter, 10);
+    if (isNaN(value)) return;
+  
+    return value;
   }
 }
