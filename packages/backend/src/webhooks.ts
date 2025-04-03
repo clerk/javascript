@@ -54,7 +54,9 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
   const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER);
 
   if (!secret) {
-    return errorThrower.throw('Missing signing secret. Please add it to your environment variables.');
+    return errorThrower.throw(
+      'Missing webhook signing secret. Set the CLERK_WEBHOOK_SIGNING_SECRET environment variable with the webhook secret from the Clerk Dashboard.',
+    );
   }
 
   if (!svixId || !svixTimestamp || !svixSignature) {

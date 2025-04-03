@@ -61,7 +61,9 @@ describe('verifyWebhook', () => {
       }),
     });
 
-    await expect(verifyWebhook(mockRequest)).rejects.toThrow('@clerk/backend: Missing signing secret');
+    await expect(verifyWebhook(mockRequest)).rejects.toThrow(
+      'Missing webhook signing secret. Set the CLERK_WEBHOOK_SIGNING_SECRET environment variable with the webhook secret from the Clerk Dashboard.',
+    );
   });
 
   it('validates webhook request requirements', async () => {
