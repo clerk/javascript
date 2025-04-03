@@ -227,9 +227,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             logger.debug('Content-Security-Policy detected', () => ({
               value,
             }));
-          } else {
-            handlerResult.headers.append(key, value);
           }
+          handlerResult.headers.append(key, value);
         });
       }
 
