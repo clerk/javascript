@@ -61,7 +61,7 @@ export const useSession: UseSession = (options = {}) => {
 
   const pendingAsSignedOut =
     session?.status === 'pending' &&
-    (options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut') ?? true);
+    (options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut'));
   const isSignedOut = session === null || pendingAsSignedOut;
   if (isSignedOut) {
     return { isLoaded: true, isSignedIn: false, session: null };
