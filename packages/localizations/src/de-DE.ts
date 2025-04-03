@@ -17,7 +17,7 @@ export const deDE: LocalizationResource = {
   __experimental_commerce: {
     billedAnnually: 'Jährlich abgerechnet',
     free: 'Kostenlos',
-    getStarted: 'Loslegen',
+    getStarted: 'Jetzt starten',
     manageMembership: 'Mitgliedschaft verwalten',
     month: 'Monat',
     switchPlan: 'Zu diesem Plan wechseln',
@@ -318,10 +318,10 @@ export const deDE: LocalizationResource = {
       title: 'Keine verfügbaren Methoden',
     },
     passkey: {
-      blockButton__passkey: 'Benutzen Sie Ihren Passkey',
+      blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       subtitle:
         'Die Verwendung Ihres Passkeys bestätigt Ihre Identität. Ihr Gerät kann nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen.',
-      title: 'Benutzen Sie Ihren Passkey',
+      title: 'Verwenden Sie Ihren Passkey',
     },
     password: {
       actionLink: 'Passwort zurücksetzen',
