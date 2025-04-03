@@ -212,7 +212,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           setHeader(handlerResult, 'X-Nonce', nonce);
         }
 
-        logger.debug('CSP', () => ({
+        logger.debug('Clerk generated CSP', () => ({
           csp,
           nonce,
         }));
