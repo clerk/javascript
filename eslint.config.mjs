@@ -116,6 +116,7 @@ export default tseslint.config([
       'vitest.workspace.mjs',
       // package specific ignores
       'packages/astro/src/astro-components/**/*.ts',
+      'packages/backend-api-client/**/*',
       'packages/backend/src/runtime/**/*',
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
