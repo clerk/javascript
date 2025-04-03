@@ -295,11 +295,7 @@ function createMergedCSP(
  * @param customDirectives - Optional custom directives to merge with
  * @returns Object containing the formatted CSP header and nonce (if in strict-dynamic mode)
  */
-export function createCSPHeader(
-  mode: CSPMode,
-  host: string,
-  customDirectives?: Record<string, string[]>,
-): CSPHeaderResult {
+export function createCSPHeader(mode: CSPMode, host: string, customDirectives?: CSPValues): CSPHeaderResult {
   const nonce = mode === 'strict-dynamic' ? generateNonce() : undefined;
 
   return {

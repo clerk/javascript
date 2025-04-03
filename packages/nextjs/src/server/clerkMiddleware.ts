@@ -70,7 +70,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
     /**
      * Custom CSP directives to merge with Clerk's default directives
      */
-    directives?: Record<CSPDirective, string[]>;
+    directives?: Partial<Record<CSPDirective, string[]>>;
   };
 };
 
