@@ -1,11 +1,15 @@
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
-import type { Clerk } from './resources/internal';
+import { Clerk, ClerkRuntimeError } from './resources/internal';
 import { Client, isClerkAPIResponseError } from './resources/internal';
 
 export class FraudProtection {
   private static instance: FraudProtection;
 
   private inflightException: Promise<unknown> | null = null;
+
+  private captchaRetryCount = 0;
+  private readonly MAX_RETRY_ATTEMPTS = 5;
+  private hasReachedDeadend = false;
 
   public static getInstance(): FraudProtection {
     if (!FraudProtection.instance) {
@@ -20,6 +24,13 @@ export class FraudProtection {
   ) {}
 
   public async execute<T extends () => Promise<any>, R = Awaited<ReturnType<T>>>(clerk: Clerk, cb: T): Promise<R> {
+    if (this.hasReachedDeadend) {
+      throw new ClerkRuntimeError(
+        'Failed security challenge. Please try again with a different browser or refresh the page.',
+        { code: 'requires_captcha_failed' },
+      );
+    }
+
     try {
       if (this.inflightException) {
         await this.inflightException;
@@ -47,10 +58,16 @@ export class FraudProtection {
       let resolve: any;
       this.inflightException = new Promise<unknown>(r => (resolve = r));
 
-      const captchaParams = await this.managedChallenge(clerk);
-
       try {
+        const captchaParams = await this.managedChallenge(clerk);
         await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
+        this.captchaRetryCount = 0; // Reset the retry count on success
+      } catch (err) {
+        this.captchaRetryCount++;
+        if (this.captchaRetryCount > this.MAX_RETRY_ATTEMPTS) {
+          this.hasReachedDeadend = true;
+        }
+        throw err;
       } finally {
         // Resolve the exception placeholder promise so that other exceptions can be handled
         resolve();
