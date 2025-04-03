@@ -4,10 +4,10 @@ import type {
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PendingSessionOptions,
 } from '@clerk/types';
 import React from 'react';
 
-import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
@@ -15,20 +15,20 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children }: React.PropsWithChildren<unknown>) => {
+export const SignedIn = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
   useAssertWrappedByClerkProvider('SignedIn');
 
-  const { userId } = useAuthContext();
+  const { userId } = useAuth({ treatPendingAsSignedOut });
   if (userId) {
     return children;
   }
   return null;
 };
 
-export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
+export const SignedOut = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
   useAssertWrappedByClerkProvider('SignedOut');
 
-  const { userId } = useAuthContext();
+  const { userId } = useAuth({ treatPendingAsSignedOut });
   if (userId === null) {
     return children;
   }
@@ -79,7 +79,7 @@ export type ProtectProps = React.PropsWithChildren<
       }
   ) & {
     fallback?: React.ReactNode;
-  }
+  } & PendingSessionOptions
 >;
 
 /**
@@ -94,10 +94,10 @@ export type ProtectProps = React.PropsWithChildren<
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
+export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
   useAssertWrappedByClerkProvider('Protect');
 
-  const { isLoaded, has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
 
   /**
    * Avoid flickering children or fallback while clerk is loading sessionId or userId
