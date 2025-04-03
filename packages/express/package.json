@@ -33,12 +33,23 @@
         "default": "./dist/index.js"
       }
     },
+    "./webhooks": {
+      "import": {
+        "types": "./dist/webhooks.d.mts",
+        "default": "./dist/webhooks.mjs"
+      },
+      "require": {
+        "types": "./dist/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      }
+    },
     "./env": "./env.d.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
     "dist",
+    "webhooks",
     "env.d.ts"
   ],
   "scripts": {
