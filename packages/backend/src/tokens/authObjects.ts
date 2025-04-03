@@ -27,7 +27,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-export type SignedInAuthObject = {
+export type SignedInAuthObjectProperties = {
   sessionClaims: JwtPayload;
   sessionId: string;
   sessionStatus: SessionStatusClaim | null;
@@ -43,6 +43,12 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+};
+
+/**
+ * @internal
+ */
+export type SignedInAuthObject = SignedInAuthObjectProperties & {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -86,6 +92,30 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
   };
 };
 
+const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthObjectProperties => {
+  // fva can be undefined for instances that have not opt-in
+  const factorVerificationAge = claims.fva ?? null;
+
+  // sts can be undefined for instances that have not opt-in
+  const sessionStatus = claims.sts ?? null;
+
+  // TODO: replace this when the new claim for org permissions is added
+  const orgPermissions = claims.ver === undefined ? claims.org_permissions : undefined;
+
+  return {
+    sessionClaims: claims,
+    sessionId: claims.sid,
+    sessionStatus,
+    actor: claims.act,
+    userId: claims.sub,
+    orgId: claims.org_id,
+    orgRole: claims.org_role,
+    orgSlug: claims.org_slug,
+    orgPermissions,
+    factorVerificationAge,
+  };
+};
+
 /**
  * @internal
  */
@@ -94,32 +124,14 @@ export function signedInAuthObject(
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
-  const {
-    act: actor,
-    sid: sessionId,
-    org_id: orgId,
-    org_role: orgRole,
-    org_slug: orgSlug,
-    sub: userId,
-    org_permissions: orgPermissions,
-    fva,
-    sts,
-  } = sessionClaims;
+  const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
+    generateSignedInAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
-
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = fva ?? null;
-
-  // sts can be undefined for instances that have not opt-in
-  const sessionStatus = sts ?? null;
-
-  // TODO(jwt-versioning): need to dynamically create SignedInAuthObject based on the JWT version
-  // and the claims that are present in the JWT. For now we are still on v1.
 
   return {
     actor,
