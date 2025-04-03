@@ -412,14 +412,62 @@ interface CardFeaturesListProps {
   isCompact?: boolean;
 }
 
+const INITIAL_FEATURES_COUNT = 3;
+
+interface FeatureListItemProps {
+  feature: __experimental_CommercePlanResource['features'][number];
+}
+
+const FeatureListItem = React.memo(({ feature }: FeatureListItemProps) => (
+  <Box
+    elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
+    elementId={descriptors.pricingTableCardFeaturesListItem.setId(feature.slug)}
+    key={feature.id}
+    as='li'
+    sx={t => ({
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: t.space.$2,
+    })}
+  >
+    <Icon
+      icon={Check}
+      colorScheme='neutral'
+      size='sm'
+      aria-hidden
+      sx={t => ({
+        transform: `translateY(${t.space.$0x25})`,
+      })}
+    />
+    <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
+      <Text
+        elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
+        colorScheme='body'
+        sx={t => ({
+          fontWeight: t.fontWeights.$normal,
+        })}
+      >
+        {feature.name}
+      </Text>
+    </Span>
+  </Box>
+));
+
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
   const { plan, isCompact } = props;
   const totalFeatures = plan.features.length;
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
-  const canToggleFeatures = isCompact && totalFeatures > 3;
+  const canToggleFeatures = isCompact && totalFeatures > INITIAL_FEATURES_COUNT;
+
+  const displayedFeatures = React.useMemo(
+    () => plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : INITIAL_FEATURES_COUNT),
+    [plan.features, showAllFeatures, canToggleFeatures, totalFeatures],
+  );
+
   const toggleFeatures = () => {
     setShowAllFeatures(prev => !prev);
   };
+
   return (
     <Box
       ref={ref}
@@ -435,51 +483,25 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
         data-variant={isCompact ? 'compact' : 'default'}
         as='ul'
         role='list'
+        aria-label='Features list'
         sx={t => ({
           display: 'grid',
           flex: '1',
           rowGap: isCompact ? t.space.$2 : t.space.$3,
         })}
       >
-        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
-            elementId={descriptors.pricingTableCardFeaturesListItem.setId(feature.slug)}
+        {displayedFeatures.map(feature => (
+          <FeatureListItem
             key={feature.id}
-            as='li'
-            sx={t => ({
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: t.space.$2,
-            })}
-          >
-            <Icon
-              icon={Check}
-              colorScheme='neutral'
-              size='sm'
-              aria-hidden
-              sx={t => ({
-                transform: `translateY(${t.space.$0x25})`,
-              })}
-            />
-            <Span elementDescriptor={descriptors.pricingTableCardFeaturesListItemContent}>
-              <Text
-                elementDescriptor={descriptors.pricingTableCardFeaturesListItemTitle}
-                colorScheme='body'
-                sx={t => ({
-                  fontWeight: t.fontWeights.$normal,
-                })}
-              >
-                {feature.name}
-              </Text>
-            </Span>
-          </Box>
+            feature={feature}
+          />
         ))}
       </Box>
       {canToggleFeatures && (
         <SimpleButton
           onClick={toggleFeatures}
           variant='link'
+          aria-expanded={showAllFeatures}
           sx={t => ({
             marginBlockStart: t.space.$2,
             gap: t.space.$1,
@@ -491,7 +513,6 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             size='md'
             aria-hidden
           />
-          {/* TODO(@Commerce): needs localization */}
           {showAllFeatures ? 'Hide features' : 'See all features'}
         </SimpleButton>
       )}

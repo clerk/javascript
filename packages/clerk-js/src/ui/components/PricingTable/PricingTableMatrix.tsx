@@ -60,7 +60,7 @@ export function PricingTableMatrix({
     plans.forEach(({ features }) => {
       features.forEach(({ name }) => featuresSet.add(name));
     });
-    return Array.from(featuresSet);
+    return Array.from(featuresSet).sort((a, b) => a.localeCompare(b));
   }, [plans]);
 
   if (!plans.length) {
