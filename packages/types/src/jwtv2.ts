@@ -123,7 +123,7 @@ type JWTPayloadBase = {
 
 export type VersionedJwtPayload =
   | {
-      ver?: undefined;
+      ver?: never;
 
       /**
        *
@@ -134,6 +134,7 @@ export type VersionedJwtPayload =
   | {
       ver: 2;
 
+      org_permissions?: never;
       // TODO: include the version 2 claims here
     };
 

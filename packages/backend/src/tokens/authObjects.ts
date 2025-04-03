@@ -101,7 +101,7 @@ const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthO
 
   // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
   // anything since the JWT v2 is not yet available
-  const orgPermissions = claims.org_permissions as OrganizationCustomPermissionKey[];
+  const orgPermissions = claims.org_permissions;
 
   return {
     sessionClaims: claims,
