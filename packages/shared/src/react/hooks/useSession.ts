@@ -1,6 +1,7 @@
 import type { PendingSessionOptions, UseSessionReturn } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useOptionsContext, useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts';
+import { useClerk } from './useClerk';
 
 type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
 
@@ -52,7 +53,7 @@ export const useSession: UseSession = (options = {}) => {
   useAssertWrappedByClerkProvider('useSession');
 
   const session = useSessionContext();
-  const optionsContext = useOptionsContext();
+  const clerk = useClerk();
 
   if (session === undefined) {
     return { isLoaded: false, isSignedIn: undefined, session: undefined };
@@ -60,7 +61,7 @@ export const useSession: UseSession = (options = {}) => {
 
   const pendingAsSignedOut =
     session?.status === 'pending' &&
-    (options.treatPendingAsSignedOut ?? optionsContext.treatPendingAsSignedOut ?? true);
+    (options.treatPendingAsSignedOut ?? clerk.__internal_getOption('treatPendingAsSignedOut') ?? true);
   const isSignedOut = session === null || pendingAsSignedOut;
   if (isSignedOut) {
     return { isLoaded: true, isSignedIn: false, session: null };
