@@ -134,11 +134,15 @@ async function loadCaptchaFromCloudflareURL() {
 }
 
 function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
-  const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
-  const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
-  const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
+  try {
+    const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
+    const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
+    const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
 
-  return { theme, language, size };
+    return { theme, language, size };
+  } catch {
+    return { theme: undefined, language: undefined, size: undefined };
+  }
 }
 
 /*

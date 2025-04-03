@@ -1,9 +1,5 @@
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
-import type { Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
 
-import { useEnvironment } from '../../contexts';
 import { Alert, Spinner } from '../../customizables';
 import { useCheckout } from '../../hooks';
 import { CheckoutComplete } from './CheckoutComplete';
@@ -11,30 +7,12 @@ import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod, orgId, onSubscriptionComplete } = props;
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-  const { __experimental_commerceSettings } = useEnvironment();
 
   const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
     planPeriod,
     orgId,
   });
-
-  useEffect(() => {
-    if (
-      !stripePromiseRef.current &&
-      checkout?.externalGatewayId &&
-      __experimental_commerceSettings.stripePublishableKey
-    ) {
-      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-        stripeAccount: checkout.externalGatewayId,
-      });
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
     updateCheckout(newCheckout);
@@ -73,7 +51,6 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   return (
     <CheckoutForm
-      stripe={stripe}
       checkout={checkout}
       onCheckoutComplete={onCheckoutComplete}
     />

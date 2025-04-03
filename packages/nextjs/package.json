@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.12.12",
+  "version": "6.13.0",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -44,13 +44,19 @@
       "types": "./dist/types/internal.d.ts",
       "import": "./dist/esm/internal.js",
       "require": "./dist/cjs/internal.js"
+    },
+    "./webhooks": {
+      "types": "./dist/types/webhooks.d.ts",
+      "import": "./dist/esm/webhooks.js",
+      "require": "./dist/cjs/webhooks.js"
     }
   },
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "server",
-    "errors"
+    "errors",
+    "webhooks"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
@@ -75,7 +81,7 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "14.2.25"
+    "next": "14.2.26"
   },
   "peerDependencies": {
     "next": "^13.5.7 || ^14.2.25 || ^15.2.3",

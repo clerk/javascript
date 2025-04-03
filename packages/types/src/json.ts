@@ -3,6 +3,7 @@
  */
 
 import type {
+  __experimental_CommercePaymentSourceStatus,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionStatus,
 } from './commerce';
@@ -625,6 +626,13 @@ export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJ
   last4: string;
   payment_method: string;
   card_type: string;
+  status: __experimental_CommercePaymentSourceStatus;
+}
+
+export interface __experimental_CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_source_initialize';
+  external_client_secret: string;
+  external_gateway_id: string;
 }
 
 export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {

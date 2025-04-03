@@ -1,4 +1,20 @@
+import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
+
+const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
+
+function fillLocalizationSelect() {
+  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
+
+  for (const locale of AVAILABLE_LOCALES) {
+    if (locale === 'enUS') {
+      select.add(new Option(locale, locale, true, true));
+      continue;
+    }
+
+    select.add(new Option(locale, locale));
+  }
+}
 
 interface ComponentPropsControl {
   setProps: (props: unknown) => void;
@@ -100,7 +116,7 @@ function mountIndex(element: HTMLDivElement) {
   element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
-function mountOpenSignInButton(element: HTMLDivElement, props) {
+function mountOpenSignInButton(element: HTMLDivElement, props: any) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign In';
   button.onclick = () => {
@@ -109,7 +125,7 @@ function mountOpenSignInButton(element: HTMLDivElement, props) {
   element.appendChild(button);
 }
 
-function mountOpenSignUpButton(element: HTMLDivElement, props) {
+function mountOpenSignUpButton(element: HTMLDivElement, props: any) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign Up';
   button.onclick = () => {
@@ -169,7 +185,7 @@ function appearanceVariableOptions() {
   });
 
   const updateVariables = () => {
-    Clerk.__unstable__updateProps({
+    void Clerk.__unstable__updateProps({
       appearance: {
         variables: Object.fromEntries(
           Object.entries(variableInputs).map(([key, input]) => {
@@ -195,9 +211,55 @@ function appearanceVariableOptions() {
   return { updateVariables };
 }
 
-(async () => {
+function otherOptions() {
   assertClerkIsLoaded(Clerk);
+
+  const resetOtherOptionsBtn = document.getElementById('resetOtherOptionsBtn');
+
+  const otherOptionsInputs: Record<string, HTMLSelectElement> = {
+    localization: document.getElementById('localizationSelect') as HTMLSelectElement,
+  };
+
+  Object.entries(otherOptionsInputs).forEach(([key, input]) => {
+    const savedValue = sessionStorage.getItem(key);
+    if (savedValue) {
+      input.value = savedValue;
+    }
+  });
+
+  const updateOtherOptions = () => {
+    void Clerk.__unstable__updateProps({
+      options: Object.fromEntries(
+        Object.entries(otherOptionsInputs).map(([key, input]) => {
+          sessionStorage.setItem(key, input.value);
+
+          if (key === 'localization') {
+            return [key, l[input.value as keyof typeof l]];
+          }
+
+          return [key, input.value];
+        }),
+      ),
+    });
+  };
+
+  Object.values(otherOptionsInputs).forEach(input => {
+    input.addEventListener('change', updateOtherOptions);
+  });
+
+  resetOtherOptionsBtn?.addEventListener('click', () => {
+    otherOptionsInputs.localization.value = 'enUS';
+    updateOtherOptions();
+  });
+
+  return { updateOtherOptions };
+}
+
+void (async () => {
+  assertClerkIsLoaded(Clerk);
+  fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
+  const { updateOtherOptions } = otherOptions();
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
   document.addEventListener('keydown', e => {
@@ -238,7 +300,7 @@ function appearanceVariableOptions() {
       Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
     },
     '/keyless': () => {
-      Clerk.__unstable__updateProps({
+      void Clerk.__unstable__updateProps({
         options: {
           __internal_keyless_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
           __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
@@ -256,7 +318,7 @@ function appearanceVariableOptions() {
     },
   };
 
-  const route = window.location.pathname;
+  const route = window.location.pathname as keyof typeof routes;
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
@@ -268,6 +330,7 @@ function appearanceVariableOptions() {
     });
     renderCurrentRoute();
     updateVariables();
+    updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);
   }

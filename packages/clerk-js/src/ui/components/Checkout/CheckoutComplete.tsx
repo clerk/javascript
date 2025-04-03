@@ -4,6 +4,8 @@ import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text }
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { Check } from '../../icons';
 
+const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+
 export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
   const { setIsOpen } = useDrawerContext();
 
@@ -76,6 +78,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               as='h2'
               textVariant='h2'
             >
+              {/* TODO(@COMMERCE): needs localization */}
               Payment was successful!
             </Heading>
             <Text
@@ -112,7 +115,9 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             <LineItems.Title title='Payment method' />
             <LineItems.Description
               text={
-                checkout.paymentSource ? `${checkout.paymentSource.cardType} ⋯ ${checkout.paymentSource.last4}` : '–'
+                checkout.paymentSource
+                  ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
+                  : '–'
               }
             />
           </LineItems.Group>
