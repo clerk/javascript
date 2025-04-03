@@ -31,6 +31,7 @@ export interface VueClerkInjectionKeyType {
   sessionCtx: ComputedRef<SignedInSessionResource | null | undefined>;
   userCtx: ComputedRef<UserResource | null | undefined>;
   organizationCtx: ComputedRef<OrganizationResource | null | undefined>;
+  treatPendingAsSignedOut?: boolean;
 }
 
 // Copied from `@clerk/clerk-react`
