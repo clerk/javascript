@@ -200,21 +200,19 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
       if (options.contentSecurityPolicy) {
-        const result = createCSPHeader(
+        const { header, nonce } = createCSPHeader(
           options.contentSecurityPolicy.mode,
           (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
           options.contentSecurityPolicy.directives,
         );
-        const { nonce } = result;
-        const csp = result.header;
 
-        setHeader(handlerResult, 'Content-Security-Policy', csp);
+        setHeader(handlerResult, 'Content-Security-Policy', header);
         if (nonce) {
           setHeader(handlerResult, 'X-Nonce', nonce);
         }
 
         logger.debug('Clerk generated CSP', () => ({
-          csp,
+          header,
           nonce,
         }));
       }
