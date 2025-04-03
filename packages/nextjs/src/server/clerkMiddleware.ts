@@ -1,7 +1,6 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -127,14 +126,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
       clerkMiddlewareRequestDataStore.set('requestData', options);
       const resolvedClerkClient = await clerkClient();
-
-      resolvedClerkClient.telemetry.record(
-        eventMethodCalled('clerkMiddleware', {
-          handler: Boolean(handler),
-          satellite: Boolean(options.isSatellite),
-          proxy: Boolean(options.proxyUrl),
-        }),
-      );
 
       if (options.debug) {
         logger.enable();
@@ -361,6 +352,7 @@ const handleControlFlowErrors = (
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
+      sessionStatus: requestState.toAuth()?.sessionStatus,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
   }
 

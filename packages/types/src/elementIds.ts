@@ -38,7 +38,8 @@ export type ProfileSectionId =
   | 'organizationProfile'
   | 'organizationDanger'
   | 'organizationDomains'
-  | 'manageVerifiedDomains';
+  | 'manageVerifiedDomains'
+  | 'paymentSources';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';

@@ -13,6 +13,7 @@ export const enUS: LocalizationResource = {
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
+  badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
   badge__requiresAction: 'Requires action',
@@ -668,6 +669,23 @@ export const enUS: LocalizationResource = {
         headerTitle__plans: 'Plans',
       },
       title: 'Billing & Payments',
+      paymentSourcesSection: {
+        title: 'Available options',
+        add: 'Add new payment source',
+        addSubtitle: 'Add a new payment source to your account.',
+        cancelButton: 'Cancel',
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        removeResource: {
+          title: 'Remove payment source',
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+        },
+      },
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',

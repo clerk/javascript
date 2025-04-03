@@ -11,6 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
 
 export const BillingPage = withCardStateProvider(() => {
@@ -56,7 +57,9 @@ export const BillingPage = withCardStateProvider(() => {
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
-            <TabPanel sx={{ width: '100%' }}>Payment Sources</TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <__experimental_PaymentSources />
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Col>

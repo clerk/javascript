@@ -11,7 +11,7 @@ import {
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
@@ -165,6 +165,7 @@ const defaultOptions: ClerkOptions = {
   signUpFallbackRedirectUrl: undefined,
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
+  treatPendingAsSignedOut: true,
 };
 
 export class Clerk implements ClerkInterface {
@@ -317,6 +318,13 @@ export class Clerk implements ClerkInterface {
   }
 
   get isSignedIn(): boolean {
+    const { treatPendingAsSignedOut } = this.#options;
+
+    const hasPendingSession = this?.session?.status === 'pending';
+    if (treatPendingAsSignedOut && hasPendingSession) {
+      return false;
+    }
+
     return !!this.session;
   }
 
@@ -2181,7 +2189,7 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        const [envResult, clientResult] = await Promise.allSettled([initEnvironmentPromise, initClient()]);
+        const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
 
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;

@@ -1,0 +1,4 @@
+{
+  "main": "../dist/webhooks.js",
+  "types": "../dist/webhooks.d.ts"
+}
