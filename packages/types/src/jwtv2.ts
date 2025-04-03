@@ -37,7 +37,7 @@ declare global {
   }
 }
 
-export type JWTPayloadBase = {
+type JWTPayloadBase = {
   /**
    * The version of the JWT payload.
    */
