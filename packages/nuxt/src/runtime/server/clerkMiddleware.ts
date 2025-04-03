@@ -1,6 +1,7 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
@@ -99,7 +100,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
-    const authHandler = () => authObject;
+    const authHandler = (options: PendingSessionOptions) => requestState.toAuth(options);
 
     const auth = new Proxy(Object.assign(authHandler, authObject), {
       get(target, prop: string, receiver) {

@@ -14,7 +14,13 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-type ToAuthFn<T> = (options?: PendingSessionOptions) => T;
+type ToAuthFn<TReturn extends SignedInAuthObject | SignedOutAuthObject, TOptions = PendingSessionOptions> = (
+  options?: TOptions,
+) => TOptions extends { treatPendingAsSignedOut: true }
+  ? SignedOutAuthObject
+  : TReturn extends SignedInAuthObject
+    ? SignedInAuthObject
+    : SignedOutAuthObject;
 
 export type SignedInState = {
   status: typeof AuthStatus.SignedIn;
@@ -82,7 +88,15 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
 function toAuthHandler<T extends SignedInAuthObject | SignedOutAuthObject>(authObject: T) {
-  return () => authObject;
+  return (options?: PendingSessionOptions) => {
+    const hasPendingStatus = authObject.sessionStatus === 'pending';
+
+    if (hasPendingStatus && options?.treatPendingAsSignedOut) {
+      return signedOutAuthObject() as T;
+    }
+
+    return authObject;
+  };
 }
 
 export function signedIn(
