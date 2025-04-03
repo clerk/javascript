@@ -52,7 +52,7 @@ export function SubscriptionDetailDrawer({
   if (!subscription) {
     return null;
   }
-  const features = subscription.plan.features;
+  const features = subscription.plan.features.sort((a, b) => a.name.localeCompare(b.name));
   const hasFeatures = features.length > 0;
   const cancelSubscription = async () => {
     setCancelError(undefined);
