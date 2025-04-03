@@ -6,7 +6,7 @@ import type { IsomorphicClerk } from '../isomorphicClerk';
 const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
   return new Promise<void>(resolve => {
     isomorphicClerk.addStatusListener(status => {
-      if (status === 'ready') {
+      if (['ready', 'degraded'].includes(status)) {
         resolve();
       }
     });
