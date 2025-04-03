@@ -29,7 +29,7 @@ export class CaptchaChallenge {
       });
     }
 
-    return { captchaError: 'invisible_captcha_unsupported' };
+    return { captchaError: 'captcha_unavailable' };
   }
 
   /**
@@ -55,11 +55,11 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return { captchaError: e?.message || e };
+        return opts?.action === 'verify' ? { captchaError: e?.message || e } : undefined;
       });
     }
 
-    return { captchaError: 'captcha_unsupported' };
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable' } : {};
   }
 
   /**
