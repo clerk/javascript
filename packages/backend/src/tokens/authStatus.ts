@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, PendingSessionOptions } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
@@ -14,6 +14,8 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
+type ToAuthFn<T> = (options?: PendingSessionOptions) => T;
+
 export type SignedInState = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
@@ -27,7 +29,7 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  toAuth: () => SignedInAuthObject;
+  toAuth: ToAuthFn<SignedInAuthObject>;
   headers: Headers;
   token: string;
 };
@@ -45,7 +47,7 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  toAuth: () => SignedOutAuthObject;
+  toAuth: ToAuthFn<SignedOutAuthObject>;
   headers: Headers;
   token: null;
 };
@@ -79,6 +81,10 @@ export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
 export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
+function toAuthHandler<T extends SignedInAuthObject | SignedOutAuthObject>(authObject: T) {
+  return () => authObject;
+}
+
 export function signedIn(
   authenticateContext: AuthenticateContext,
   sessionClaims: JwtPayload,
@@ -99,7 +105,7 @@ export function signedIn(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    toAuth: () => authObject,
+    toAuth: toAuthHandler(authObject),
     headers,
     token,
   };
@@ -125,7 +131,9 @@ export function signedOut(
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
     headers,
-    toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
+    toAuth: toAuthHandler(
+      signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
+    ),
     token: null,
   });
 }
