@@ -99,7 +99,8 @@ const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthO
   // sts can be undefined for instances that have not opt-in
   const sessionStatus = claims.sts ?? null;
 
-  // TODO: replace this when the new claim for org permissions is added
+  // TODO: replace this when the new claim for org permissions is added, this will not break
+  // anything since the JWT v2 is not yet available
   const orgPermissions = claims.ver === undefined ? claims.org_permissions : undefined;
 
   return {
