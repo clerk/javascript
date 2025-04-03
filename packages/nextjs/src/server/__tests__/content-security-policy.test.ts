@@ -26,9 +26,13 @@ describe('CSP Header Utils', () => {
       const directives = result.header.split('; ');
 
       expect(directives).toContainEqual("default-src 'self'");
-      expect(directives).toContainEqual("connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+      );
       expect(directives).toContainEqual("form-action 'self'");
-      expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
@@ -70,9 +74,9 @@ describe('CSP Header Utils', () => {
 
     it('should handle custom directives as an object', () => {
       const customDirectives = {
-        'default-src': ["'none'"],
-        'img-src': ["'self'", 'https://example.com'],
-        'custom-directive': ["'value'"],
+        'default-src': ['none'],
+        'img-src': ['self', 'https://example.com'],
+        'custom-directive': ['value'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -84,7 +88,7 @@ describe('CSP Header Utils', () => {
       expect(imgSrcDirective).toContain("'self'");
       expect(imgSrcDirective).toContain('https://img.clerk.com');
       expect(imgSrcDirective).toContain('https://example.com');
-      expect(result.header).toContain("custom-directive 'value'");
+      expect(result.header).toContain('custom-directive value');
     });
 
     it('should handle different host formats', () => {
@@ -109,7 +113,6 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcDirective).toContain('https://*.js.stripe.com');
       expect(scriptSrcDirective).toContain('https://js.stripe.com');
       expect(scriptSrcDirective).toContain('https://maps.googleapis.com');
-
     });
 
     it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
@@ -122,10 +125,14 @@ describe('CSP Header Utils', () => {
       const directives = result.header.split('; ');
 
       // Check each directive individually with exact matches
-      expect(directives).toContainEqual("connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+      );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
-      expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
@@ -171,9 +178,13 @@ describe('CSP Header Utils', () => {
       const directives = result.header.split('; ');
 
       // When full URL is provided, it should be parsed to clerk.domain.tld in all relevant directives
-      expect(directives).toContainEqual(`connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com`);
+      expect(directives).toContainEqual(
+        `connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com`,
+      );
       expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
-      expect(directives).toContainEqual(`frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com`);
+      expect(directives).toContainEqual(
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com`,
+      );
 
       // Check that other directives are present but don't contain the clerk subdomain
       expect(directives).toContainEqual(`default-src 'self'`);
@@ -203,7 +214,7 @@ describe('CSP Header Utils', () => {
 
     it('correctly adds new directives from custom directives object and preserves special keyword quoting', () => {
       const customDirectives = {
-        'new-directive': ["'self'", 'value1', 'value2', "'unsafe-inline'"],
+        'new-directive': ['self', 'value1', 'value2', 'unsafe-inline'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -221,8 +232,8 @@ describe('CSP Header Utils', () => {
 
     it('produces a complete CSP header with all expected directives and special keywords quoted', () => {
       const customDirectives = {
-        'script-src': ['new-value', "'unsafe-inline'"],
-        'new-directive': ["'self'", 'value1', 'value2'],
+        'script-src': ['new-value', 'unsafe-inline'],
+        'new-directive': ['self', 'value1', 'value2'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -230,10 +241,14 @@ describe('CSP Header Utils', () => {
       const directives = result.header.split('; ');
 
       // Verify all directives are present with their exact values, with special keywords quoted
-      expect(directives).toContainEqual("connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+      );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
-      expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
@@ -298,9 +313,9 @@ describe('CSP Header Utils', () => {
 
     it('correctly merges clerk subdomain with existing CSP values', () => {
       const customDirectives = {
-        'connect-src': ["'self'", 'https://api.example.com'],
-        'img-src': ["'self'", 'https://images.example.com'],
-        'frame-src': ["'self'", 'https://frames.example.com'],
+        'connect-src': ['self', 'https://api.example.com'],
+        'img-src': ['self', 'https://images.example.com'],
+        'frame-src': ['self', 'https://frames.example.com'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -345,10 +360,14 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcValues).not.toContain('https:');
 
       // Other directives should still be present
-      expect(directives).toContainEqual("connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://api.stripe.com https://maps.googleapis.com *.clerk.accounts.dev clerk.example.com",
+      );
       expect(directives).toContainEqual("default-src 'self'");
       expect(directives).toContainEqual("form-action 'self'");
-      expect(directives).toContainEqual("frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
