@@ -165,6 +165,7 @@ const defaultOptions: ClerkOptions = {
   signUpFallbackRedirectUrl: undefined,
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
+  treatPendingAsSignedOut: true,
 };
 
 export class Clerk implements ClerkInterface {
@@ -319,6 +320,13 @@ export class Clerk implements ClerkInterface {
   }
 
   get isSignedIn(): boolean {
+    const { treatPendingAsSignedOut } = this.#options;
+
+    const hasPendingSession = this?.session?.status === 'pending';
+    if (treatPendingAsSignedOut && hasPendingSession) {
+      return false;
+    }
+
     return !!this.session;
   }
 
