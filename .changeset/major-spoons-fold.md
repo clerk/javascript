@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-Introduces JWT versioning
+Introduces `ver` as JWT claim to allow versioning of the session token.
