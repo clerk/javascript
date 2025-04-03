@@ -397,6 +397,7 @@ const handleControlFlowErrors = (
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
+      sessionStatus: requestState.toAuth()?.sessionStatus,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
   }
 

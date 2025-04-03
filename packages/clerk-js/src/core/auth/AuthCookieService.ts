@@ -1,10 +1,10 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
-import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
+import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
@@ -181,9 +181,9 @@ export class AuthCookieService {
   }
 
   private handleGetTokenError(e: any) {
-    //throw if not a clerk api error (aka fapi error) and not a network error
-    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e)) {
-      clerkCoreErrorTokenRefreshFailed(e.message || e);
+    //early return if not a clerk api error (aka fapi error) and not a network error
+    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e) && !isNetworkError(e)) {
+      return;
     }
 
     //sign user out if a 4XX error
@@ -191,8 +191,11 @@ export class AuthCookieService {
       void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
+
+    // --------
     // Treat any other error as a noop
     // TODO(debug-logs): Once debug logs is available log this error.
+    // --------
   }
 
   /**

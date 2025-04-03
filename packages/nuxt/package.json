@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.4.6",
+  "version": "1.5.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -45,6 +45,10 @@
     "./errors": {
       "types": "./dist/runtime/errors.d.ts",
       "default": "./dist/runtime/errors.js"
+    },
+    "./webhooks": {
+      "types": "./dist/runtime/webhooks.d.ts",
+      "default": "./dist/runtime/webhooks.js"
     }
   },
   "main": "./dist/module.js",
