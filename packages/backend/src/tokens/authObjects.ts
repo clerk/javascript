@@ -100,8 +100,8 @@ export function signedInAuthObject(
     org_id: orgId,
     org_role: orgRole,
     org_slug: orgSlug,
-    org_permissions: orgPermissions,
     sub: userId,
+    org_permissions: orgPermissions,
     fva,
     sts,
   } = sessionClaims;
@@ -117,6 +117,9 @@ export function signedInAuthObject(
 
   // sts can be undefined for instances that have not opt-in
   const sessionStatus = sts ?? null;
+
+  // TODO(jwt-versioning): need to dynamically create SignedInAuthObject based on the JWT version
+  // and the claims that are present in the JWT. For now we are still on v1.
 
   return {
     actor,

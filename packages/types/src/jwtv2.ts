@@ -37,7 +37,12 @@ declare global {
   }
 }
 
-export interface JwtPayload extends CustomJwtSessionClaims {
+export type JWTPayloadBase = {
+  /**
+   * The version of the JWT payload.
+   */
+  ver: number | undefined;
+
   /**
    * Encoded token supporting the `getRawString` method.
    */
@@ -83,6 +88,13 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
+   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
+   */
+  fva?: [fistFactorAge: number, secondFactorAge: number];
+
+  /**
    * Active organization ID.
    */
   org_id?: string;
@@ -98,18 +110,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_role?: OrganizationCustomRoleKey;
 
   /**
-   * Active organization permissions
-   */
-  org_permissions?: OrganizationCustomPermissionKey[];
-
-  /**
-   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
-   */
-  fva?: [fistFactorAge: number, secondFactorAge: number];
-
-  /**
    * Session status
    */
   sts?: SessionStatusClaim;
@@ -118,7 +118,29 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
-}
+};
+
+export type VersionedJwtPayload =
+  | {
+      ver: undefined;
+
+      /**
+       *
+       * Active organization permissions.
+       */
+      org_permissions?: OrganizationCustomPermissionKey[];
+    }
+  | {
+      ver: 2;
+
+      /**
+       * @deprecated - TODO - replace this with new org permissions claim
+       * Active organization permissions.
+       */
+      org_permissions?: OrganizationCustomPermissionKey[];
+    };
+
+export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
