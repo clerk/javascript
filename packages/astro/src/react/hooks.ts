@@ -12,7 +12,7 @@ import { useCallback, useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore } from '../stores/external';
+import { $authStore, $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 
 /**
