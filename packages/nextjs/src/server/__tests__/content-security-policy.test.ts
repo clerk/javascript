@@ -107,10 +107,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
-      const customDirectives = {
-        'custom-directive': ['new-value'],
-      };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader('standard', testHost);
 
       // Split the result into individual directives for precise testing
       const directives = result.header.split('; ');
@@ -127,7 +124,6 @@ describe('CSP Header Utils', () => {
       expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
       expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
       expect(directives).toContainEqual("worker-src 'self' blob:");
-      expect(directives).toContainEqual('custom-directive new-value');
 
       // script-src varies based on NODE_ENV, so we check for common values
       const scriptSrc = directives.find((d: string) => d.startsWith('script-src'));
@@ -205,16 +201,16 @@ describe('CSP Header Utils', () => {
 
     it('correctly adds new directives from custom directives object and preserves special keyword quoting', () => {
       const customDirectives = {
-        'new-directive': ['self', 'value1', 'value2', 'unsafe-inline'],
+        'object-src': ['self', 'value1', 'value2', 'unsafe-inline'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
       // The new directive should be added
       const directives = result.header.split('; ');
-      const newDirective = directives.find((d: string) => d.startsWith('new-directive')) ?? '';
+      const newDirective = directives.find((d: string) => d.startsWith('object-src')) ?? '';
       expect(newDirective).toBeDefined();
 
-      const newDirectiveValues = newDirective.replace('new-directive ', '').split(' ');
+      const newDirectiveValues = newDirective.replace('object-src ', '').split(' ');
       expect(newDirectiveValues).toContain("'self'");
       expect(newDirectiveValues).toContain('value1');
       expect(newDirectiveValues).toContain('value2');
@@ -224,7 +220,7 @@ describe('CSP Header Utils', () => {
     it('produces a complete CSP header with all expected directives and special keywords quoted', () => {
       const customDirectives = {
         'script-src': ['new-value', 'unsafe-inline'],
-        'new-directive': ['self', 'value1', 'value2'],
+        'object-src': ['self', 'value1', 'value2'],
       };
       const result = createCSPHeader('standard', testHost, customDirectives);
 
@@ -245,10 +241,10 @@ describe('CSP Header Utils', () => {
       expect(directives).toContainEqual("worker-src 'self' blob:");
 
       // Verify the new directive exists and has expected values
-      const newDirective = directives.find((d: string) => d.startsWith('new-directive')) ?? '';
+      const newDirective = directives.find((d: string) => d.startsWith('object-src')) ?? '';
       expect(newDirective).toBeDefined();
 
-      const newDirectiveValues = newDirective.replace('new-directive ', '').split(' ');
+      const newDirectiveValues = newDirective.replace('object-src ', '').split(' ');
       expect(newDirectiveValues).toContain("'self'");
       expect(newDirectiveValues).toContain('value1');
       expect(newDirectiveValues).toContain('value2');
