@@ -660,6 +660,12 @@ export interface Clerk {
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
+
+  /**
+   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * initiated outside of the Clerk class.
+   */
+  __internal_setActiveInProgress: boolean;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
