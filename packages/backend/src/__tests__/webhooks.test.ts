@@ -33,7 +33,19 @@ describe('verifyWebhook', () => {
       }),
     });
 
-    await expect(verifyWebhook(mockRequest)).rejects.toThrow('@clerk/backend: Missing required Svix headers');
+    await expect(verifyWebhook(mockRequest)).rejects.toThrow('Missing required Svix headers: svix-signature');
+  });
+
+  it('throws with all missing headers in error message', async () => {
+    const mockRequest = new Request('https://clerk.com/webhooks', {
+      method: 'POST',
+      body: mockBody,
+      headers: new Headers({}),
+    });
+
+    await expect(verifyWebhook(mockRequest)).rejects.toThrow(
+      'Missing required Svix headers: svix-id, svix-timestamp, svix-signature',
+    );
   });
 
   it('throws when signing secret is missing', async () => {

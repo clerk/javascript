@@ -8,6 +8,12 @@ export type VerifyWebhookOptions = {
   signingSecret?: string;
 };
 
+const SVIX_ID_HEADER = 'svix-id';
+const SVIX_TIMESTAMP_HEADER = 'svix-timestamp';
+const SVIX_SIGNATURE_HEADER = 'svix-signature';
+
+const REQUIRED_SVIX_HEADERS = [SVIX_ID_HEADER, SVIX_TIMESTAMP_HEADER, SVIX_SIGNATURE_HEADER] as const;
+
 export * from './api/resources/Webhooks';
 
 /**
@@ -43,25 +49,25 @@ export * from './api/resources/Webhooks';
  */
 export async function verifyWebhook(request: Request, options: VerifyWebhookOptions = {}): Promise<WebhookEvent> {
   const secret = options.signingSecret ?? getEnvVariable('CLERK_WEBHOOK_SIGNING_SECRET');
-  const svixId = request.headers.get('svix-id');
-  const svixTimestamp = request.headers.get('svix-timestamp');
-  const svixSignature = request.headers.get('svix-signature');
+  const svixId = request.headers.get(SVIX_ID_HEADER);
+  const svixTimestamp = request.headers.get(SVIX_TIMESTAMP_HEADER);
+  const svixSignature = request.headers.get(SVIX_SIGNATURE_HEADER);
 
   if (!secret) {
     return errorThrower.throw('Missing signing secret. Please add it to your environment variables.');
   }
 
   if (!svixId || !svixTimestamp || !svixSignature) {
-    return errorThrower.throw('Missing required Svix headers.');
+    const missingHeaders = REQUIRED_SVIX_HEADERS.filter(header => !request.headers.has(header));
+    return errorThrower.throw(`Missing required Svix headers: ${missingHeaders.join(', ')}`);
   }
 
   const sivx = new Webhook(secret);
-
   const body = await request.text();
 
   return sivx.verify(body, {
-    'svix-id': svixId,
-    'svix-timestamp': svixTimestamp,
-    'svix-signature': svixSignature,
+    [SVIX_ID_HEADER]: svixId,
+    [SVIX_TIMESTAMP_HEADER]: svixTimestamp,
+    [SVIX_SIGNATURE_HEADER]: svixSignature,
   }) as WebhookEvent;
 }
