@@ -2158,21 +2158,17 @@ export class Clerk implements ClerkInterface {
       try {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
-          .then(res => {
-            this.updateEnvironment(res);
-          })
-          .catch(e => {
+          .then(res => this.updateEnvironment(res))
+          .catch(() => {
             ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
               null,
             );
 
-            if (!environmentSnapshot) {
-              throw e;
+            if (environmentSnapshot) {
+              this.updateEnvironment(new Environment(environmentSnapshot));
             }
-
-            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
         const initClient = async () => {
@@ -2225,25 +2221,18 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
 
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
           if (isError(e, 'requires_captcha')) {
-            if (envResult.status === 'rejected') {
-              // TODO(resiliency): Instead of throwing make status as degraded and loaded true
-              await initEnvironmentPromise;
-            }
             initComponents();
             await initClient();
           } else {
             throw e;
           }
         }
-
-        // TODO(resiliency): Instead of throwing make status as degraded and loaded true
-        await initEnvironmentPromise;
 
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 

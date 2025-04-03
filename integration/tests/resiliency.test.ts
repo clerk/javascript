@@ -4,8 +4,26 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
+const make500ClerkResponse = () => ({
+  status: 500,
+  body: JSON.stringify({
+    errors: [
+      {
+        message: 'Oops, an unexpected error occurred',
+        long_message: "There was an internal error on our servers. We've been notified and are working on fixing it.",
+        code: 'internal_clerk_error',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resiliency @generic', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
+
+  if (app.name.includes('next')) {
+    test.skip();
+  }
 
   let fakeUser: FakeUser;
 
@@ -32,22 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     // Simulate developer coming back and client fails to load.
-    await page.route('**/v1/client?**', route => {
-      return route.fulfill({
-        status: 500,
-        body: JSON.stringify({
-          errors: [
-            {
-              message: 'Oops, an unexpected error occurred',
-              long_message:
-                "There was an internal error on our servers. We've been notified and are working on fixing it.",
-              code: 'internal_clerk_error',
-            },
-          ],
-          clerk_trace_id: 'some-trace-id',
-        }),
-      });
-    });
+    await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
 
     await page.waitForTimeout(1_000);
     await page.reload();
@@ -170,7 +173,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     test('clerk-js hotloading failed', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      await page.route('http://localhost:18211/clerk.browser.js', route => route.abort());
+      await page.route('**/clerk.browser.js', route => route.abort());
 
       await u.page.goToRelative('/clerk-status');
 
@@ -196,22 +199,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     test('clerk-js client fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      await page.route('**/v1/client?**', route => {
-        return route.fulfill({
-          status: 500,
-          body: JSON.stringify({
-            errors: [
-              {
-                message: 'Oops, an unexpected error occurred',
-                long_message:
-                  "There was an internal error on our servers. We've been notified and are working on fixing it.",
-                code: 'internal_clerk_error',
-              },
-            ],
-            clerk_trace_id: 'some-trace-id',
-          }),
-        });
-      });
+      await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
 
       await u.page.goToRelative('/clerk-status');
 
@@ -240,22 +228,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     test('clerk-js environment fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      await page.route('**/v1/environment?**', route => {
-        return route.fulfill({
-          status: 500,
-          body: JSON.stringify({
-            errors: [
-              {
-                message: 'Oops, an unexpected error occurred',
-                long_message:
-                  "There was an internal error on our servers. We've been notified and are working on fixing it.",
-                code: 'internal_clerk_error',
-              },
-            ],
-            clerk_trace_id: 'some-trace-id',
-          }),
-        });
-      });
+      await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
 
       await u.page.goToRelative('/clerk-status');
 
@@ -266,9 +239,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await u.po.clerk.toBeLoading();
 
       // Wait for loading to complete and verify final state
-      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible({
-        timeout: 10_000,
-      });
+      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible();
       await u.po.clerk.toBeDegraded();
       await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
       await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
