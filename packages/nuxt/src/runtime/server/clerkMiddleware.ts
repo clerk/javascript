@@ -1,5 +1,6 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
@@ -98,7 +99,17 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
-    event.context.auth = authObject;
+    const authHandler = () => authObject;
+
+    const auth = new Proxy(Object.assign(authHandler, authObject), {
+      get(target, prop: string, receiver) {
+        deprecated('event.context.auth', 'Use `event.context.auth()` as a function instead.');
+
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+
+    event.context.auth = auth;
     // Internal serializable state that will be passed to the client
     event.context.__clerk_initial_state = createInitialState(authObject);
 
