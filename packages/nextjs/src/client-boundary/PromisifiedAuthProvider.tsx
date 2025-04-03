@@ -54,7 +54,7 @@ export function PromisifiedAuthProvider({
  * }
  * ```
  */
-export function usePromisifiedAuth(options: Parameters<typeof useAuth>[0]) {
+export function usePromisifiedAuth(options: Parameters<typeof useAuth>[0] = {}) {
   const isPagesRouter = useRouter();
   const valueFromContext = React.useContext(PromisifiedAuthContext);
 
@@ -64,7 +64,6 @@ export function usePromisifiedAuth(options: Parameters<typeof useAuth>[0]) {
   }
 
   // At this point we should have a usable auth object
-
   if (typeof window === 'undefined') {
     // Pages router should always use useAuth as it is able to grab initial auth state from context during SSR.
     if (isPagesRouter) {
