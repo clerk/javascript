@@ -104,15 +104,6 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     void isomorphicClerk.__unstable__updateProps({ options });
   }, [options.localization]);
 
-  // const clerkStatus = useSyncExternalStore(
-  //   (...a) => {
-  //     console.log('Status update');
-  //     return isomorphicClerk.addStatusListener(...a);
-  //   },
-  //   () => isomorphicClerk.status,
-  //   () => isomorphicClerk.status,
-  // );
-
   useEffect(() => {
     const unsub = isomorphicClerk.addStatusListener(setStatus);
     return () => {
@@ -121,8 +112,6 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   }, []);
 
   useEffect(() => isomorphicClerk.addOnLoaded(() => setLoaded(true)), []);
-
-  console.log('[clerkStatus]', clerkStatus, loaded);
 
   React.useEffect(() => {
     return () => {

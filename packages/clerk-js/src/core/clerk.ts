@@ -390,10 +390,16 @@ export class Clerk implements ClerkInterface {
       });
     }
 
-    if (this.#options.standardBrowser) {
-      await this.#loadInStandardBrowser();
-    } else {
-      await this.#loadInNonStandardBrowser();
+    try {
+      if (this.#options.standardBrowser) {
+        await this.#loadInStandardBrowser();
+      } else {
+        await this.#loadInNonStandardBrowser();
+      }
+    } catch (e) {
+      this.__internal_setStatus('error');
+      // bubble up the error
+      throw e;
     }
   };
 
@@ -2090,7 +2096,7 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #loadInStandardBrowser = async (): Promise<boolean> => {
+  #loadInStandardBrowser = async (): Promise<void> => {
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()
@@ -2108,8 +2114,8 @@ export class Clerk implements ClerkInterface {
     this.#validateMultiDomainOptions();
     if (this.#shouldSyncWithPrimary()) {
       await this.#syncWithPrimary();
-      // ClerkJS is not considered loaded during the sync/link process with the primary domain
-      return false;
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain, return early
+      return;
     }
 
     /**
@@ -2118,7 +2124,7 @@ export class Clerk implements ClerkInterface {
      */
     if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();
-      return false;
+      return;
     }
 
     /**
@@ -2234,7 +2240,7 @@ export class Clerk implements ClerkInterface {
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
-          return false;
+          return;
         }
 
         initComponents();
@@ -2245,7 +2251,7 @@ export class Clerk implements ClerkInterface {
           await this.#authService.handleUnauthenticatedDevBrowser();
         } else if (!isValidBrowserOnline()) {
           console.warn(err);
-          return false;
+          return;
         } else {
           throw err;
         }
@@ -2262,21 +2268,17 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    if (initializationDegradedCounter > 0) {
-      this.__internal_setStatus('degraded');
-    } else {
-      this.__internal_setStatus('ready');
-    }
-    return true;
+    this.__internal_setStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
     return !!this.__internal_getCachedResources;
   };
 
-  #loadInNonStandardBrowser = async (): Promise<boolean> => {
+  #loadInNonStandardBrowser = async (): Promise<void> => {
     let environment: Environment, client: Client;
     const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    let initializationDegradedCounter = 0;
     try {
       [environment, client] = await Promise.all([
         Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
@@ -2288,6 +2290,7 @@ export class Clerk implements ClerkInterface {
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
         client = Client.getOrCreateInstance(cachedResources?.client);
+        ++initializationDegradedCounter;
       } else {
         throw err;
       }
@@ -2302,7 +2305,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    return true;
+    this.__internal_setStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

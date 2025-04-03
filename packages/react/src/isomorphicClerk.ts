@@ -157,7 +157,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   get status(): Clerk['status'] {
-    return this.clerkjs?.status || this.#status;
+    /**
+     * If clerk-js is not available the returned value can either be "loading" or "error".
+     */
+    if (!this.clerkjs) {
+      return this.#status;
+    }
+    return (
+      this.clerkjs?.status ||
+      /**
+       * Support older clerk-js versions.
+       * If clerk-js is available but `.status` is missing it we need to fallback to `.loaded`.
+       * Since "degraded" an "error" did not exist before,
+       * map "loaded" to "ready" and "not loaded" to "loading".
+       */
+      (this.clerkjs.loaded ? 'ready' : 'loading')
+    );
   }
 
   static #instance: IsomorphicClerk | null | undefined;

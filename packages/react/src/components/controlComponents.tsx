@@ -1,7 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
-  Clerk as ClerkInterface,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -36,31 +35,6 @@ export const SignedOut = ({ children }: React.PropsWithChildren<unknown>) => {
   return null;
 };
 
-type PropsWithChildrenFunction<P, T> = P & {
-  children?: React.ReactNode | ((item: T) => React.ReactNode);
-};
-
-export const ClerkStatus = ({
-  status,
-  children,
-}: PropsWithChildrenFunction<
-  {
-    status?: ClerkInterface['status'];
-  },
-  ClerkInterface['status']
->) => {
-  useAssertWrappedByClerkProvider('ClerkLoaded');
-
-  const isomorphicClerk = useIsomorphicClerkContext();
-  const toRender = typeof children === 'function' ? children(isomorphicClerk.status) : children;
-
-  if (isomorphicClerk.status === status && !!status) {
-    return status ? toRender : null;
-  }
-
-  return toRender;
-};
-
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 
@@ -75,7 +49,28 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  if (isomorphicClerk.loaded) {
+  if (isomorphicClerk.status !== 'loading') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkFailed = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkFailed');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'error') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkDegraded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  // What if status form  clerk js is not available ?
+  if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
   return children;
