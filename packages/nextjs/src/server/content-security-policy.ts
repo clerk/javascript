@@ -80,10 +80,16 @@ class CSPDirectiveManager {
 
   /** Default CSP directives and their values */
   static readonly DEFAULT_DIRECTIVES: CSPValues = {
-    'connect-src': ['self'],
+    'connect-src': ['self', 'https://api.stripe.com', 'https://maps.googleapis.com'],
     'default-src': ['self'],
     'form-action': ['self'],
-    'frame-src': ['self', 'https://challenges.cloudflare.com'],
+    'frame-src': [
+      'self',
+      'https://challenges.cloudflare.com',
+      'https://*.js.stripe.com',
+      'https://js.stripe.com',
+      'https://hooks.stripe.com',
+    ],
     'img-src': ['self', 'https://img.clerk.com'],
     'script-src': [
       'self',
@@ -91,6 +97,9 @@ class CSPDirectiveManager {
       'unsafe-inline',
       'https:',
       'http:',
+      'https://*.js.stripe.com',
+      'https://js.stripe.com',
+      'https://maps.googleapis.com',
     ],
     'style-src': ['self', 'unsafe-inline'],
     'worker-src': ['self', 'blob:'],
