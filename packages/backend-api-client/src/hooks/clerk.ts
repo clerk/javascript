@@ -6,7 +6,7 @@ import {
 } from './types.js';
 
 export const SUPPORTED_BAPI_VERSION = '2024-10-01';
-export const USER_AGENT = '@clerk/backend-api-client@0.0.0-test'; // TODO: Replace with the actual user agent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`
+export const USER_AGENT = '@clerk/backend@0.0.0-test'; // TODO: Replace with the actual user agent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`
 
 const SKIP_SECRET_KEY_OPERATION_IDS = new Set([
   'CreateAccountlessApplication',
