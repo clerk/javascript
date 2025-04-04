@@ -80,11 +80,10 @@ const RemoveScreen = ({
   );
 };
 
-export const __experimental_PaymentSources = (props: __experimental_PaymentSourcesProps) => {
-  const { orgId } = props;
+export const __experimental_PaymentSources = (_: __experimental_PaymentSourcesProps) => {
   const { __experimental_commerce } = useClerk();
 
-  const { data, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, { orgId });
+  const { data, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-user-payment-sources');
   const { data: paymentSources } = data || { data: [] };
 
   return (

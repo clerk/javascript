@@ -9,14 +9,16 @@ type UsePlansProps = {
 };
 
 export const usePlans = (props: UsePlansProps) => {
-  const { subscriberType } = props;
+  const { subscriberType = 'user' } = props;
   const { __experimental_commerce } = useClerk();
 
   const { data: userSubscriptions, revalidate: revalidateUserSubscriptions } = useFetch(
-    __experimental_commerce?.__experimental_billing.getSubscriptions,
+    subscriberType === 'user' ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
     'commerce-user-subscriptions',
   );
-  const { subscriptions: orgSubscriptions } = useOrganization({ subscriptions: true });
+  const { subscriptions: orgSubscriptions } = useOrganization({
+    subscriptions: subscriberType === 'org' ? true : undefined,
+  });
 
   const { data: allPlans, revalidate: revalidatePlans } = useFetch(
     __experimental_commerce?.__experimental_billing.getPlans,

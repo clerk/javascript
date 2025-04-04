@@ -537,7 +537,7 @@ const Components = (props: ComponentsProps) => {
       <Checkout
         planId={checkoutDrawer.props.planId}
         planPeriod={checkoutDrawer.props.planPeriod}
-        orgId={checkoutDrawer.props.orgId}
+        subscriberType={checkoutDrawer.props.subscriberType}
         onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
       />
     </LazyDrawerRenderer>

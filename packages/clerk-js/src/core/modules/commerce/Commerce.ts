@@ -4,11 +4,12 @@ import type {
   __experimental_CommerceInitializedPaymentSourceJSON,
   __experimental_CommerceNamespace,
   __experimental_CommercePaymentSourceJSON,
-  __experimental_GetPaymentSourcesParams,
   __experimental_InitializePaymentSourceParams,
   ClerkPaginatedResponse,
+  ClerkPaginationParams,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   __experimental_CommerceInitializedPaymentSource,
   __experimental_CommercePaymentSource,
@@ -48,11 +49,11 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
     return new __experimental_CommercePaymentSource(json);
   };
 
-  getPaymentSources = async (params: __experimental_GetPaymentSourcesParams) => {
+  getPaymentSources = async (params: ClerkPaginationParams) => {
     return await BaseResource._fetch({
       path: `/me/commerce/payment_sources`,
       method: 'GET',
-      search: { orgId: params.orgId || '' },
+      search: convertPageToOffsetSearchParams(params),
     }).then(res => {
       const { data: paymentSources, total_count } =
         res as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;
