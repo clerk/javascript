@@ -3,6 +3,23 @@ import { z } from 'zod';
 import { ClerkTool } from '../clerk-tool';
 import { prunePrivateData } from '../utils';
 
+const getOrganizationParameters = z.object({
+  organizationId: z
+    .string()
+    .optional()
+    .describe('(string, optional): The ID of the organization to retrieve. Required if slug is not provided.'),
+  slug: z
+    .string()
+    .optional()
+    .describe(
+      '(string, optional): The slug of the organization to retrieve. Required if organizationId is not provided.',
+    ),
+  includeMembersCount: z
+    .boolean()
+    .optional()
+    .describe('(boolean, optional): Whether to include the members count for the organization.'),
+});
+
 const getOrganization = ClerkTool({
   name: 'getOrganization',
   description: `
@@ -16,32 +33,49 @@ const getOrganization = ClerkTool({
     2. Checking if an organization exists before performing operations on it
     3. Retrieving organization metadata for application-specific functionality
   `,
-  parameters: z.object({
-    organizationId: z
-      .string()
-      .optional()
-      .describe('(string, optional): The ID of the organization to retrieve. Required if slug is not provided.'),
-    slug: z
-      .string()
-      .optional()
-      .describe(
-        '(string, optional): The slug of the organization to retrieve. Required if organizationId is not provided.',
-      ),
-    includeMembersCount: z
-      .boolean()
-      .optional()
-      .describe('(boolean, optional): Whether to include the members count for the organization.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    if (!params.organizationId && !params.slug) {
+  parameters: getOrganizationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof getOrganizationParameters>) => {
+    const organizationId = (context.orgId || params.organizationId) as string; // TODO: Is it safe to assume this is a string?
+
+    if (!organizationId && !params.slug) {
       throw new Error('Either organizationId or slug must be provided');
     }
-    const res = await clerkClient.organizations.getOrganization({
+
+    const res = await clerkClient.api.organizations.get({
       ...params,
-      organizationId: context.orgId || params.organizationId,
+      organizationId,
     });
-    return prunePrivateData(context, res.raw);
+
+    return prunePrivateData(context, res);
   },
+});
+
+const createOrganizationParameters = z.object({
+  name: z.string().describe('(string): The name of the new organization. Required.'),
+  slug: z
+    .string()
+    .optional()
+    .describe(
+      '(string, optional): A URL-friendly identifier for the organization. If not provided, created from the name.',
+    ),
+  createdBy: z
+    .string()
+    .optional()
+    .describe(
+      '(string, optional): The user ID of the user creating the organization. Defaults to the current authenticated user.',
+    ),
+  maxAllowedMemberships: z
+    .number()
+    .optional()
+    .describe('(number, optional): Maximum number of members allowed in the organization.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): Public metadata for the organization.'),
+  privateMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): Private metadata for the organization (backend-only).'),
 });
 
 const createOrganization = ClerkTool({
@@ -58,41 +92,33 @@ const createOrganization = ClerkTool({
     2. Building a self-service organization creation flow
     3. Migrating organizations from another system
   `,
-  parameters: z.object({
-    name: z.string().describe('(string): The name of the new organization. Required.'),
-    slug: z
-      .string()
-      .optional()
-      .describe(
-        '(string, optional): A URL-friendly identifier for the organization. If not provided, created from the name.',
-      ),
-    createdBy: z
-      .string()
-      .optional()
-      .describe(
-        '(string, optional): The user ID of the user creating the organization. Defaults to the current authenticated user.',
-      ),
-    maxAllowedMemberships: z
-      .number()
-      .optional()
-      .describe('(number, optional): Maximum number of members allowed in the organization.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): Public metadata for the organization.'),
-    privateMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): Private metadata for the organization (backend-only).'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const { createdBy, ...createParams } = params;
-    // Use provided createdBy or fall back to context userId
-    const createParamsWithUser =
-      createdBy || context.userId ? { ...createParams, createdBy: createdBy || context.userId } : createParams;
-    const res = await clerkClient.organizations.createOrganization(createParamsWithUser);
-    return prunePrivateData(context, res.raw);
-  },
+  parameters: createOrganizationParameters,
+
+  execute:
+    (clerkClient, context) =>
+    async ({ createdBy, ...restParams }: z.infer<typeof createOrganizationParameters>) => {
+      // Use provided createdBy or fall back to context userId
+      const createParamsWithUser =
+        createdBy || context.userId ? { ...restParams, createdBy: createdBy || context.userId } : restParams;
+      const res = await clerkClient.api.organizations.create(createParamsWithUser);
+
+      return prunePrivateData(context, res);
+    },
+});
+
+const updateOrganizationParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to update. Required.'),
+  name: z.string().optional().describe('(string, optional): New name for the organization.'),
+  slug: z.string().optional().describe('(string, optional): New slug for the organization.'),
+  maxAllowedMemberships: z.number().optional().describe('(number, optional): New maximum number of members allowed.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): New public metadata for the organization.'),
+  privateMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): New private metadata for the organization (backend-only).'),
 });
 
 const updateOrganization = ClerkTool({
@@ -109,25 +135,32 @@ const updateOrganization = ClerkTool({
     2. Changing the maximum allowed memberships
     3. Updating multiple organization attributes at once
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to update. Required.'),
-    name: z.string().optional().describe('(string, optional): New name for the organization.'),
-    slug: z.string().optional().describe('(string, optional): New slug for the organization.'),
-    maxAllowedMemberships: z.number().optional().describe('(number, optional): New maximum number of members allowed.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): New public metadata for the organization.'),
-    privateMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): New private metadata for the organization (backend-only).'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const { organizationId, ...updateParams } = params;
-    const res = await clerkClient.organizations.updateOrganization(context.orgId || organizationId, updateParams);
-    return prunePrivateData(context, res.raw);
+  parameters: updateOrganizationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateOrganizationParameters>) => {
+    const { organizationId, ...requestBody } = params;
+    const res = await clerkClient.api.organizations.update({
+      organizationId: context.orgId || organizationId,
+      requestBody,
+    });
+
+    return prunePrivateData(context, res);
   },
+});
+
+const updateOrganizationMetadataParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to update. Required.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe(
+      '(Record<string,any>, optional): The public metadata to set or update. Use null values to remove specific keys.',
+    ),
+  privateMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe(
+      '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
+    ),
 });
 
 const updateOrganizationMetadata = ClerkTool({
@@ -147,29 +180,20 @@ const updateOrganizationMetadata = ClerkTool({
     2. Keeping track of organization-specific application state
     3. Adding custom attributes to organizations
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to update. Required.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe(
-        '(Record<string,any>, optional): The public metadata to set or update. Use null values to remove specific keys.',
-      ),
-    privateMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe(
-        '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
-      ),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const { organizationId, ...metadataParams } = params;
-    const res = await clerkClient.organizations.updateOrganizationMetadata(
-      context.orgId || organizationId,
-      metadataParams,
-    );
-    return prunePrivateData(context, res.raw);
+  parameters: updateOrganizationMetadataParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateOrganizationMetadataParameters>) => {
+    const { organizationId, ...requestBody } = params;
+    const res = await clerkClient.api.organizations.mergeMetadata({
+      organizationId: context.orgId || organizationId,
+      requestBody,
+    });
+
+    return prunePrivateData(context, res);
   },
+});
+
+const deleteOrganizationParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to delete. Required.'),
 });
 
 const deleteOrganization = ClerkTool({
@@ -186,13 +210,17 @@ const deleteOrganization = ClerkTool({
     2. Allowing users to delete their own organizations
     3. Administrative operations to remove unwanted organizations
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to delete. Required.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.deleteOrganization(context.orgId || params.organizationId);
-    return prunePrivateData(context, res.raw);
+  parameters: deleteOrganizationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof deleteOrganizationParameters>) => {
+    const res = await clerkClient.api.organizations.delete(context.orgId || params.organizationId);
+    return prunePrivateData(context, res);
   },
+});
+
+const createOrganizationMembershipParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to add the member to. Required.'),
+  userId: z.string().describe('(string): The ID of the user to add as a member. Required.'),
+  role: z.string().describe('(string): The role to assign to the user in the organization. Required.'),
 });
 
 const createOrganizationMembership = ClerkTool({
@@ -209,19 +237,24 @@ const createOrganizationMembership = ClerkTool({
     2. Building administrative interfaces for member management
     3. Migrating memberships from another system
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to add the member to. Required.'),
-    userId: z.string().describe('(string): The ID of the user to add as a member. Required.'),
-    role: z.string().describe('(string): The role to assign to the user in the organization. Required.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.createOrganizationMembership({
-      ...params,
+  parameters: createOrganizationMembershipParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof createOrganizationMembershipParameters>) => {
+    const res = await clerkClient.api.organizationMemberships.create({
       organizationId: context.orgId || params.organizationId,
-      userId: context.userId || params.userId,
+      requestBody: {
+        role: params.role,
+        userId: context.userId || params.userId,
+      },
     });
-    return prunePrivateData(context, res.raw);
+
+    return prunePrivateData(context, res);
   },
+});
+
+const updateOrganizationMembershipParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization containing the membership. Required.'),
+  userId: z.string().describe('(string): The ID of the user whose membership is being updated. Required.'),
+  role: z.string().describe('(string): The new role to assign to the user. Required.'),
 });
 
 const updateOrganizationMembership = ClerkTool({
@@ -238,18 +271,34 @@ const updateOrganizationMembership = ClerkTool({
     2. Building role management interfaces
     3. Implementing admin-level controls for organization management
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization containing the membership. Required.'),
-    userId: z.string().describe('(string): The ID of the user whose membership is being updated. Required.'),
-    role: z.string().describe('(string): The new role to assign to the user. Required.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.updateOrganizationMembership({
-      ...params,
-      organizationId: context.orgId || params.organizationId,
+  parameters: updateOrganizationMembershipParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateOrganizationMembershipParameters>) => {
+    const { organizationId, userId, ...requestBody } = params;
+    const res = await clerkClient.api.organizationMemberships.update({
+      organizationId: context.orgId || organizationId,
+      userId,
+      requestBody,
     });
-    return prunePrivateData(context, res.raw);
+
+    return prunePrivateData(context, res);
   },
+});
+
+const updateOrganizationMembershipMetadataParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization containing the membership. Required.'),
+  userId: z.string().describe('(string): The ID of the user whose membership metadata is being updated. Required.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe(
+      '(Record<string,any>, optional): The public metadata to set or update. Use null values to remove specific keys.',
+    ),
+  privateMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe(
+      '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
+    ),
 });
 
 const updateOrganizationMembershipMetadata = ClerkTool({
@@ -269,29 +318,22 @@ const updateOrganizationMembershipMetadata = ClerkTool({
     2. Adding custom attributes to track member activity or status
     3. Customizing a user's experience within a specific organization
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization containing the membership. Required.'),
-    userId: z.string().describe('(string): The ID of the user whose membership metadata is being updated. Required.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe(
-        '(Record<string,any>, optional): The public metadata to set or update. Use null values to remove specific keys.',
-      ),
-    privateMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe(
-        '(Record<string,any>, optional): The private metadata to set or update. Backend-only data. Use null values to remove specific keys.',
-      ),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.updateOrganizationMembershipMetadata({
-      ...params,
+  parameters: updateOrganizationMembershipMetadataParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateOrganizationMembershipMetadataParameters>) => {
+    const { organizationId, userId, ...requestBody } = params;
+    const res = await clerkClient.api.organizationMemberships.updateMetadata({
       organizationId: context.orgId || params.organizationId,
+      userId,
+      requestBody,
     });
-    return prunePrivateData(context, res.raw);
+
+    return prunePrivateData(context, res);
   },
+});
+
+const deleteOrganizationMembershipParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to remove the member from. Required.'),
+  userId: z.string().describe('(string): The ID of the user to remove from the organization. Required.'),
 });
 
 const deleteOrganizationMembership = ClerkTool({
@@ -308,17 +350,34 @@ const deleteOrganizationMembership = ClerkTool({
     2. Building membership management interfaces with removal capability
     3. Implementing self-service leave organization functionality
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to remove the member from. Required.'),
-    userId: z.string().describe('(string): The ID of the user to remove from the organization. Required.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.organizations.deleteOrganizationMembership({
+  parameters: deleteOrganizationMembershipParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof deleteOrganizationMembershipParameters>) => {
+    const res = await clerkClient.api.organizationMemberships.delete({
       ...params,
       userId: context.userId || params.userId,
     });
-    return prunePrivateData(context, res.raw);
+    return prunePrivateData(context, res);
   },
+});
+
+const createOrganizationInvitationParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization to create an invitation for. Required.'),
+  emailAddress: z.string().describe('(string): Email address to send the invitation to. Required.'),
+  role: z.string().describe('(string): Role to assign to the user upon accepting the invitation. Required.'),
+  inviterUserId: z
+    .string()
+    .optional()
+    .describe(
+      '(string, optional): User ID of the person sending the invitation. Defaults to the current authenticated user.',
+    ),
+  redirectUrl: z
+    .string()
+    .optional()
+    .describe('(string, optional): URL to redirect users to after they accept the invitation.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): Public metadata for the invitation.'),
 });
 
 const createOrganizationInvitation = ClerkTool({
@@ -335,36 +394,31 @@ const createOrganizationInvitation = ClerkTool({
     2. Implementing team expansion functionality
     3. Creating administrative tools for organization growth
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization to create an invitation for. Required.'),
-    emailAddress: z.string().describe('(string): Email address to send the invitation to. Required.'),
-    role: z.string().describe('(string): Role to assign to the user upon accepting the invitation. Required.'),
-    inviterUserId: z
-      .string()
-      .optional()
-      .describe(
-        '(string, optional): User ID of the person sending the invitation. Defaults to the current authenticated user.',
-      ),
-    redirectUrl: z
-      .string()
-      .optional()
-      .describe('(string, optional): URL to redirect users to after they accept the invitation.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): Public metadata for the invitation.'),
-  }),
-  execute: (clerkClient, context) => async params => {
+  parameters: createOrganizationInvitationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof createOrganizationInvitationParameters>) => {
     const { inviterUserId, ...inviteParams } = params;
+
     // Use provided inviterUserId or fall back to context userId
     const inviteParamsWithUser =
       inviterUserId || context.userId
         ? { ...inviteParams, inviterUserId: inviterUserId || context.userId }
         : inviteParams;
 
-    const res = await clerkClient.organizations.createOrganizationInvitation(inviteParamsWithUser);
-    return prunePrivateData(context, res.raw);
+    const res = await clerkClient.api.organizationInvitations.create(inviteParamsWithUser);
+
+    return prunePrivateData(context, res);
   },
+});
+
+const revokeOrganizationInvitationParameters = z.object({
+  organizationId: z.string().describe('(string): The ID of the organization containing the invitation. Required.'),
+  invitationId: z.string().describe('(string): The ID of the invitation to revoke. Required.'),
+  requestingUserId: z
+    .string()
+    .optional()
+    .describe(
+      '(string, optional): User ID of the person revoking the invitation. Defaults to the current authenticated user.',
+    ),
 });
 
 const revokeOrganizationInvitation = ClerkTool({
@@ -381,17 +435,8 @@ const revokeOrganizationInvitation = ClerkTool({
     2. Building invitation management interfaces with revocation capability
     3. Implementing security measures to quickly revoke access
   `,
-  parameters: z.object({
-    organizationId: z.string().describe('(string): The ID of the organization containing the invitation. Required.'),
-    invitationId: z.string().describe('(string): The ID of the invitation to revoke. Required.'),
-    requestingUserId: z
-      .string()
-      .optional()
-      .describe(
-        '(string, optional): User ID of the person revoking the invitation. Defaults to the current authenticated user.',
-      ),
-  }),
-  execute: (clerkClient, context) => async params => {
+  parameters: revokeOrganizationInvitationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof revokeOrganizationInvitationParameters>) => {
     const { requestingUserId, ...revokeParams } = params;
     // Use provided requestingUserId or fall back to context userId
     const revokeParamsWithUser =
@@ -399,8 +444,8 @@ const revokeOrganizationInvitation = ClerkTool({
         ? { ...revokeParams, requestingUserId: requestingUserId || context.userId }
         : revokeParams;
 
-    const res = await clerkClient.organizations.revokeOrganizationInvitation(revokeParamsWithUser);
-    return prunePrivateData(context, res.raw);
+    const res = await clerkClient.api.organizationInvitations.revoke(revokeParamsWithUser);
+    return prunePrivateData(context, res);
   },
 });
 

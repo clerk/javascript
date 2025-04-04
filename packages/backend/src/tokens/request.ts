@@ -1,3 +1,4 @@
+import type { Cookies } from '@clerk/backend-api-client/models/components';
 import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
 import { match } from '@clerk/shared/pathToRegexp';
 import type { JwtPayload } from '@clerk/types';
@@ -273,17 +274,30 @@ ${error.getFullMessage()}`,
     }
 
     try {
-      // Perform the actual token refresh.
-      const response = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
-        format: 'cookie',
+      const params = {
+        format: 'cookie' as const,
         suffixed_cookies: authenticateContext.usesSuffixedCookies(),
         expired_token: expiredSessionToken || '',
         refresh_token: refreshToken || '',
         request_origin: authenticateContext.clerkUrl.origin,
         // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
         request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
+      };
+
+      // Perform the actual token refresh
+      const response = await options.apiClient.sessions.refresh({
+        sessionId: decodeResult.payload.sid,
+        requestBody: {
+          format: params.format,
+          // suffixedCookies: params.suffixed_cookies, // TODO: Doesn't seem to be handled in BAPI, but exists in the Backend SDK
+          expiredToken: params.expired_token,
+          refreshToken: params.refresh_token,
+          requestOrigin: params.request_origin,
+          requestHeaders: params.request_headers,
+        },
       });
-      return { data: response.cookies, error: null };
+
+      return { data: (response as Cookies).cookies, error: null };
     } catch (err: any) {
       if (err?.errors?.length) {
         if (err.errors[0].code === 'unexpected_error') {

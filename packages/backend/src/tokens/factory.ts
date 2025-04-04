@@ -1,4 +1,4 @@
-import type { ApiClient } from '../api';
+import type { BackendApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 import type { AuthenticateRequestOptions } from './types';
@@ -36,7 +36,7 @@ const defaultOptions = {
  */
 export type CreateAuthenticateRequestOptions = {
   options: BuildTimeOptions;
-  apiClient: ApiClient;
+  apiClient: BackendApiClient;
 };
 
 /**

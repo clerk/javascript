@@ -50,6 +50,7 @@ export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOpt
  * Re-export resource types from @clerk/backend
  */
 export type {
+  apiTypes,
   OrganizationMembershipRole,
   // Resources
   AllowlistIdentifier,

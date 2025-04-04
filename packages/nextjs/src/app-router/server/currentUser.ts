@@ -1,4 +1,4 @@
-import type { User } from '@clerk/backend';
+import type { apiTypes } from '@clerk/backend';
 
 import { clerkClient } from '../../server/clerkClient';
 import { auth } from './auth';
@@ -24,7 +24,7 @@ import { auth } from './auth';
  * }
  * ```
  */
-export async function currentUser(): Promise<User | null> {
+export async function currentUser(): Promise<apiTypes.User | null> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -33,5 +33,5 @@ export async function currentUser(): Promise<User | null> {
     return null;
   }
 
-  return (await clerkClient()).users.getUser(userId);
+  return (await clerkClient()).api.users.get(userId);
 }

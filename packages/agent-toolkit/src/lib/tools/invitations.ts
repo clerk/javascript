@@ -3,6 +3,26 @@ import { z } from 'zod';
 import { ClerkTool } from '../clerk-tool';
 import { prunePrivateData } from '../utils';
 
+const createInvitationParameters = z.object({
+  emailAddress: z.string().describe('(string): Email address to send the invitation to. Required.'),
+  redirectUrl: z
+    .string()
+    .optional()
+    .describe('(string, optional): URL to redirect users to after they accept the invitation.'),
+  publicMetadata: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe('(Record<string,any>, optional): Public metadata for the invitation.'),
+  notify: z
+    .boolean()
+    .optional()
+    .describe('(boolean, optional): Whether to send an email notification. Defaults to true.'),
+  ignoreExisting: z
+    .boolean()
+    .optional()
+    .describe('(boolean, optional): Whether to ignore if an invitation already exists. Defaults to false.'),
+});
+
 const createInvitation = ClerkTool({
   name: 'createInvitation',
   description: `
@@ -17,29 +37,15 @@ const createInvitation = ClerkTool({
     2. Creating a closed registration system where only invited users can join
     3. Pre-configuring user attributes via publicMetadata before they sign up
   `,
-  parameters: z.object({
-    emailAddress: z.string().describe('(string): Email address to send the invitation to. Required.'),
-    redirectUrl: z
-      .string()
-      .optional()
-      .describe('(string, optional): URL to redirect users to after they accept the invitation.'),
-    publicMetadata: z
-      .record(z.string(), z.any())
-      .optional()
-      .describe('(Record<string,any>, optional): Public metadata for the invitation.'),
-    notify: z
-      .boolean()
-      .optional()
-      .describe('(boolean, optional): Whether to send an email notification. Defaults to true.'),
-    ignoreExisting: z
-      .boolean()
-      .optional()
-      .describe('(boolean, optional): Whether to ignore if an invitation already exists. Defaults to false.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.invitations.createInvitation(params);
-    return prunePrivateData(context, res.raw);
+  parameters: createInvitationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof createInvitationParameters>) => {
+    const res = await clerkClient.api.invitations.create(params);
+    return prunePrivateData(context, res); // TODO: Use raw JSON response
   },
+});
+
+const revokeInvitationParameters = z.object({
+  invitationId: z.string().describe('(string): The ID of the invitation to revoke. Required.'),
 });
 
 const revokeInvitation = ClerkTool({
@@ -56,12 +62,10 @@ const revokeInvitation = ClerkTool({
     2. Revoking access when a prospective user should no longer be invited
     3. Implementing invitation management controls for administrators
   `,
-  parameters: z.object({
-    invitationId: z.string().describe('(string): The ID of the invitation to revoke. Required.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.invitations.revokeInvitation(params.invitationId);
-    return prunePrivateData(context, res.raw);
+  parameters: revokeInvitationParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof revokeInvitationParameters>) => {
+    const res = await clerkClient.api.invitations.revoke(params.invitationId);
+    return prunePrivateData(context, res); // TODO: Use raw JSON response
   },
 });
 

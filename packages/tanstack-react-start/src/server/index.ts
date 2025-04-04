@@ -7,6 +7,7 @@ export { clerkClient } from './clerkClient';
  * Re-export resource types from @clerk/backend
  */
 export type {
+  apiTypes,
   OrganizationMembershipRole,
   // Webhook event types
   WebhookEvent,

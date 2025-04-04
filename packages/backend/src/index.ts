@@ -1,9 +1,10 @@
+import type { ClerkBackendApi } from '@clerk/backend-api-client';
 import type { TelemetryCollectorOptions } from '@clerk/shared/telemetry';
 import { TelemetryCollector } from '@clerk/shared/telemetry';
 import type { SDKMetadata } from '@clerk/types';
 
 import type { ApiClient, CreateBackendApiOptions } from './api';
-import { createBackendApiClient } from './api';
+import { createBackendApiClient, createGeneratedBackendApiClient } from './api';
 import { withLegacyReturn } from './jwt/legacyReturn';
 import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
@@ -23,13 +24,15 @@ export type ClerkOptions = CreateBackendApiOptions &
 // TS4023: Exported variable 'clerkClient' has or is using name 'AuthErrorReason' from external module "/packages/backend/dist/index" but cannot be named.
 export type ClerkClient = {
   telemetry: TelemetryCollector;
+  api: ClerkBackendApi;
 } & ApiClient &
   ReturnType<typeof createAuthenticateRequest>;
 
 export function createClerkClient(options: ClerkOptions): ClerkClient {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
-  const requestState = createAuthenticateRequest({ options: opts, apiClient });
+  const backendApiClient = createGeneratedBackendApiClient(opts);
+  const requestState = createAuthenticateRequest({ options: opts, apiClient: backendApiClient });
   const telemetry = new TelemetryCollector({
     ...options.telemetry,
     publishableKey: opts.publishableKey,
@@ -40,6 +43,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
 
   return {
     ...apiClient,
+    api: backendApiClient,
     ...requestState,
     telemetry,
   };
@@ -50,6 +54,12 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  */
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
+
+/**
+ * Generated Types
+ */
+export type { apiTypes } from './api';
+
 /**
  * JSON types
  */

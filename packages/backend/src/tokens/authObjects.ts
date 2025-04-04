@@ -11,7 +11,7 @@ import type {
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
-import { createBackendApiClient } from '../api';
+import { createGeneratedBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 
 type AuthObjectDebugData = Record<string, any>;
@@ -127,11 +127,18 @@ export function signedInAuthObject(
 ): SignedInAuthObject {
   const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
     generateSignedInAuthObjectProperties(sessionClaims);
-  const apiClient = createBackendApiClient(authenticateContext);
+  const apiClient = createGeneratedBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
     sessionToken,
-    fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
+    fetcher: async (sessionId, templateName = '') => {
+      const res = await apiClient.sessions.createTokenFromTemplate({
+        sessionId,
+        templateName,
+      });
+
+      return res.jwt!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    },
   });
 
   return {

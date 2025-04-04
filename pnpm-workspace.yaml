@@ -1,6 +1,5 @@
 packages:
   - 'packages/*'
-  - '!packages/backend-api-client'
 
 catalogs:
   # Can be referenced through "catalog:react"
