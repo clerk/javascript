@@ -26,7 +26,7 @@ The computed value of `useClerk().loaded` is:
 </ClerkFailed>
 ```
 
-### `<ClerkDegraded/>`
+### `<ClerkDegraded />`
 ```tsx
 <ClerkLoaded>
   <MyCustomPasskeyRegistration/>
