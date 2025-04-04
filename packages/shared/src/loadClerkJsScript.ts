@@ -85,7 +85,7 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
       .then(() => true)
       .catch(msg => {
         if (msg) {
-          throw new Error(msg);
+          throw msg;
         }
         return false;
       });
