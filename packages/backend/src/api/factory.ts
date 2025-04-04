@@ -22,6 +22,7 @@ import { buildRequest } from './request';
 export type CreateBackendApiOptions = Parameters<typeof buildRequest>[0];
 
 export type ApiClient = ReturnType<typeof createBackendApiClient>;
+export type BackendApiClient = ReturnType<typeof createGeneratedBackendApiClient>;
 
 export function createBackendApiClient(options: CreateBackendApiOptions) {
   const request = buildRequest(options);

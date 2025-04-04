@@ -12,9 +12,13 @@ const getUserId = ClerkTool({
     Example use case: When you need to verify if a user is logged in before performing user-specific operations.
   `,
   parameters: z.object({}),
-  execute: (clerkClient, context) => () => {
+  execute: (_, context) => () => {
     return Promise.resolve(context.userId || null);
   },
+});
+
+const getUserParameters = z.object({
+  userId: z.string().describe('(string): The userId of the User to retrieve.'),
 });
 
 const getUser = ClerkTool({
@@ -26,12 +30,10 @@ const getUser = ClerkTool({
     If the userId parameter is not provided, it will use the current authenticated user's ID.
     Example use case: When you need to display user profile information or check user attributes.
   `,
-  parameters: z.object({
-    userId: z.string().describe('(string): The userId of the User to retrieve.'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.users.getUser(context.userId || params.userId);
-    return prunePrivateData(context, res.raw);
+  parameters: getUserParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof getUserParameters>) => {
+    const res = await clerkClient.api.users.get(context.userId || params.userId);
+    return prunePrivateData(context, res);
   },
 });
 
@@ -44,8 +46,15 @@ const getUserCount = ClerkTool({
   `,
   parameters: z.object({}),
   execute: (clerkClient, _) => async () => {
-    return await clerkClient.users.getCount();
+    return await clerkClient.api.users.count({}); // TODO: Mark requestBody as optional
   },
+});
+
+const updateUserPublicMetadataParameters = z.object({
+  userId: z.string().describe('(string): The userId of the User to update.'),
+  metadata: z
+    .record(z.string(), z.any())
+    .describe('(Record<string,any>): The public metadata to set or update. Use null values to remove specific keys.'),
 });
 
 const updateUserPublicMetadata = ClerkTool({
@@ -61,17 +70,23 @@ const updateUserPublicMetadata = ClerkTool({
 
     Example use case: Storing user preferences, feature flags, or application-specific data that persists across sessions.
   `,
-  parameters: z.object({
-    userId: z.string().describe('(string): The userId of the User to update.'),
-    metadata: z
-      .record(z.string(), z.any())
-      .describe('(Record<string,any>): The public metadata to set or update. Use null values to remove specific keys.'),
-  }),
-  execute: (clerkClient, context) => async params => {
+  parameters: updateUserPublicMetadataParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateUserPublicMetadataParameters>) => {
     const { userId, metadata } = params;
-    const res = await clerkClient.users.updateUserMetadata(context.userId || userId, { publicMetadata: metadata });
-    return prunePrivateData(context, res.raw);
+    const res = await clerkClient.api.users.updateMetadata({
+      userId: context.userId || userId,
+      requestBody: { publicMetadata: metadata },
+    });
+
+    return prunePrivateData(context, res);
   },
+});
+
+const updateUserUnsafeMetadataParameters = z.object({
+  userId: z.string().describe('(string): The userId of the User to update.'),
+  metadata: z
+    .record(z.string(), z.any())
+    .describe('(Record<string,any>): The unsafe metadata to set or update. Use null values to remove specific keys.'),
 });
 
 const updateUserUnsafeMetadata = ClerkTool({
@@ -88,17 +103,24 @@ const updateUserUnsafeMetadata = ClerkTool({
 
     Example use case: Storing user data that should be modifiable from the frontend but not included in authentication tokens.
   `,
-  parameters: z.object({
-    userId: z.string().describe('(string): The userId of the User to update.'),
-    metadata: z
-      .record(z.string(), z.any())
-      .describe('(Record<string,any>): The unsafe metadata to set or update. Use null values to remove specific keys.'),
-  }),
-  execute: (clerkClient, context) => async params => {
+  parameters: updateUserUnsafeMetadataParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateUserUnsafeMetadataParameters>) => {
     const { userId, metadata } = params;
-    const res = await clerkClient.users.updateUserMetadata(context.userId || userId, { unsafeMetadata: metadata });
-    return prunePrivateData(context, res.raw);
+    const res = await clerkClient.api.users.updateMetadata({
+      userId: context.userId || userId,
+      requestBody: { unsafeMetadata: metadata },
+    });
+
+    return prunePrivateData(context, res);
   },
+});
+
+const updateUserParameters = z.object({
+  userId: z.string().describe('(string): The userId of the User to update.'),
+  firstName: z.string().optional().describe('(string): New first name for the user'),
+  lastName: z.string().optional().describe('(string): New last name for the user'),
+  username: z.string().optional().describe('(string): New username for the user'),
+  profileImageUrl: z.string().optional().describe('(string): URL for the user profile image'),
 });
 
 const updateUser = ClerkTool({
@@ -118,17 +140,15 @@ const updateUser = ClerkTool({
     2. Enabling or disabling a user account
     3. Setting a user's primary contact information
   `,
-  parameters: z.object({
-    userId: z.string().describe('(string): The userId of the User to update.'),
-    firstName: z.string().optional().describe('(string): New first name for the user'),
-    lastName: z.string().optional().describe('(string): New last name for the user'),
-    username: z.string().optional().describe('(string): New username for the user'),
-    profileImageUrl: z.string().optional().describe('(string): URL for the user profile image'),
-  }),
-  execute: (clerkClient, context) => async params => {
-    const { userId, ...updateParams } = params;
-    const res = await clerkClient.users.updateUser(context.userId || userId, updateParams);
-    return prunePrivateData(context, res.raw);
+  parameters: updateUserParameters,
+  execute: (clerkClient, context) => async (params: z.infer<typeof updateUserParameters>) => {
+    const { userId, ...requestBody } = params;
+    const res = await clerkClient.api.users.update({
+      userId: context.userId || userId,
+      requestBody,
+    });
+
+    return prunePrivateData(context, res);
   },
 });
 

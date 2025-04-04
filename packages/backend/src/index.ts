@@ -32,7 +32,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   const opts = { ...options };
   const apiClient = createBackendApiClient(opts);
   const backendApiClient = createGeneratedBackendApiClient(opts);
-  const requestState = createAuthenticateRequest({ options: opts, apiClient });
+  const requestState = createAuthenticateRequest({ options: opts, apiClient: backendApiClient });
   const telemetry = new TelemetryCollector({
     ...options.telemetry,
     publishableKey: opts.publishableKey,
@@ -54,6 +54,12 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  */
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
+
+/**
+ * Generated Types
+ */
+export type { apiTypes } from './api';
+
 /**
  * JSON types
  */

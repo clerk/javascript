@@ -1,4 +1,4 @@
-import type { ApiClient } from '../api';
+import type { BackendApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -43,7 +43,7 @@ export type AuthenticateRequestOptions = {
   /**
    * @internal
    */
-  apiClient?: ApiClient;
+  apiClient?: BackendApiClient;
 } & VerifyTokenOptions;
 
 /**
