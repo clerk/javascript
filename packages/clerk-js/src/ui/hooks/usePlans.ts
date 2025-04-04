@@ -14,6 +14,8 @@ export const usePlans = (props: UsePlansProps) => {
 
   const { data: userSubscriptions, revalidate: revalidateUserSubscriptions } = useFetch(
     subscriberType === 'user' ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
+    {},
+    undefined,
     'commerce-user-subscriptions',
   );
   const { subscriptions: orgSubscriptions } = useOrganization({

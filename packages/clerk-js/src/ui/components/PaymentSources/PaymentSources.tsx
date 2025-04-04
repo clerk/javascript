@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { __experimental_CommercePaymentSourceResource, __experimental_PaymentSourcesProps } from '@clerk/types';
 import { Fragment, useRef } from 'react';
 
@@ -80,10 +80,17 @@ const RemoveScreen = ({
   );
 };
 
-export const __experimental_PaymentSources = (_: __experimental_PaymentSourcesProps) => {
+export const __experimental_PaymentSources = (props: __experimental_PaymentSourcesProps) => {
   const { __experimental_commerce } = useClerk();
+  const { organization } = useOrganization();
+  const { subscriberType = 'user' } = props;
 
-  const { data, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-user-payment-sources');
+  const { data, revalidate } = useFetch(
+    __experimental_commerce?.getPaymentSources,
+    { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
+    undefined,
+    'commerce-user-payment-sources',
+  );
   const { data: paymentSources } = data || { data: [] };
 
   return (
