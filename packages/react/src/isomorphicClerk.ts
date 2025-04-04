@@ -437,7 +437,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
         if (!global.Clerk) {
-          console.log('pending');
           await loadClerkJsScript({
             ...this.options,
             publishableKey: this.#publishableKey,

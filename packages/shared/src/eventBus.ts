@@ -39,7 +39,6 @@ export const createEventBus = <Events extends Record<string, unknown>>() => {
   };
 
   const off = <Event extends keyof Events>(event: Event, handler: EventHandler<Events, Event>) => {
-    console.log('unregistering', handler);
     const handlers = eventToHandlersMap.get(event) || [];
     if (!handlers.length) {
       return;

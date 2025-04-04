@@ -2255,7 +2255,6 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    console.log('js registered', publicClerkBus.internal.retrieveListeners('status'));
     publicClerkBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
