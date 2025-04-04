@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
+import { SESSION_STORAGE_AUTH_WITH_POPUP_KEY } from '../../../core/constants';
 import { buildSSOCallbackURL } from '../../common/redirects';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -37,6 +38,12 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
               card.setIdle();
             }
           }, 500);
+
+          try {
+            window.sessionStorage.setItem(SESSION_STORAGE_AUTH_WITH_POPUP_KEY, 'true');
+          } catch {
+            // It's okay if sessionStorage is disabled since we will treat the failure to read the value as it being true.
+          }
 
           return signIn
             .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })

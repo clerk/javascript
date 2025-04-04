@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { OAuthStrategy } from '@clerk/types';
 import React from 'react';
 
+import { SESSION_STORAGE_AUTH_WITH_POPUP_KEY } from '../../../core/constants';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { useCardState } from '../../elements';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
@@ -38,6 +39,12 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               card.setIdle();
             }
           }, 500);
+
+          try {
+            window.sessionStorage.setItem(SESSION_STORAGE_AUTH_WITH_POPUP_KEY, 'true');
+          } catch {
+            // It's okay if sessionStorage is disabled since we will treat the failure to read the value as it being true.
+          }
 
           return signUp
             .authenticateWithPopup({
