@@ -97,7 +97,18 @@ export const createRedirect: CreateRedirect = params => {
     }
 
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
-    const targetUrl = signUpUrl || accountsSignUpUrl;
+
+    // Allows redirection to SignInOrUp path
+    function buildSignUpUrl(signIn: string | URL | undefined) {
+      if (!signIn) {
+        return;
+      }
+      const url = new URL(signIn, baseUrl);
+      url.pathname = `${url.pathname}/create`;
+      return url.toString();
+    }
+
+    const targetUrl = signUpUrl || buildSignUpUrl(signInUrl) || accountsSignUpUrl;
 
     if (hasPendingStatus) {
       return redirectToTasks(targetUrl, { returnBackUrl });
