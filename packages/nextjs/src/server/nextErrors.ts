@@ -93,17 +93,21 @@ function nextjsRedirectError(
   throw error;
 }
 
+function buildReturnBackUrl(url: string, returnBackUrl?: string | URL | null): string | URL {
+  return returnBackUrl === null ? '' : returnBackUrl || url;
+}
+
 function redirectToSignInError(url: string, returnBackUrl?: string | URL | null): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN,
-    returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
+    returnBackUrl: buildReturnBackUrl(url, returnBackUrl),
   });
 }
 
 function redirectToSignUpError(url: string, returnBackUrl?: string | URL | null): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_UP,
-    returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
+    returnBackUrl: buildReturnBackUrl(url, returnBackUrl),
   });
 }
 

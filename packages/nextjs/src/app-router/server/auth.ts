@@ -93,7 +93,8 @@ export const auth: AuthFn = async () => {
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 
-  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+  const createRedirectForRequest = (...args: Parameters<RedirectFun<never>>) => {
+    const { returnBackUrl } = args[0] || {};
     const clerkRequest = createClerkRequest(request);
     const devBrowserToken =
       clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
@@ -101,38 +102,31 @@ export const auth: AuthFn = async () => {
 
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+    return [
+      createRedirect({
+        redirectAdapter: redirect,
+        devBrowserToken: devBrowserToken,
+        baseUrl: clerkRequest.clerkUrl.toString(),
+        publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+        signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
+        signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
+        sessionStatus: authObject.sessionStatus,
+      }),
+      returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
+    ] as const;
+  };
 
-    return createRedirect({
-      redirectAdapter: redirect,
-      devBrowserToken: devBrowserToken,
-      baseUrl: clerkRequest.clerkUrl.toString(),
-      publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-      signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
-      signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-      sessionStatus: authObject.sessionStatus,
-    }).redirectToSignIn({
-      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
+  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+    const [r, returnBackUrl] = createRedirectForRequest(opts);
+    return r.redirectToSignIn({
+      returnBackUrl,
     });
   };
 
   const redirectToSignUp: RedirectFun<never> = (opts = {}) => {
-    const clerkRequest = createClerkRequest(request);
-    const devBrowserToken =
-      clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
-      clerkRequest.cookies.get(constants.Cookies.DevBrowser);
-
-    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
-    const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-    return createRedirect({
-      redirectAdapter: redirect,
-      devBrowserToken: devBrowserToken,
-      baseUrl: clerkRequest.clerkUrl.toString(),
-      publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-      signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
-      signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-    }).redirectToSignUp({
-      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
+    const [r, returnBackUrl] = createRedirectForRequest(opts);
+    return r.redirectToSignUp({
+      returnBackUrl,
     });
   };
 

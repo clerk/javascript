@@ -361,25 +361,21 @@ const handleControlFlowErrors = (
     );
   }
 
-  if (isRedirectToSignInError(e)) {
-    return createRedirect({
+  const isRedirectToSignIn = isRedirectToSignInError(e);
+  const isRedirectToSignUp = isRedirectToSignUpError(e);
+
+  if (isRedirectToSignIn || isRedirectToSignUp) {
+    const redirect = createRedirect({
       redirectAdapter,
       baseUrl: clerkRequest.clerkUrl,
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
       sessionStatus: requestState.toAuth()?.sessionStatus,
-    }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
-  }
+    });
 
-  if (isRedirectToSignUpError(e)) {
-    return createRedirect({
-      redirectAdapter,
-      baseUrl: clerkRequest.clerkUrl,
-      signInUrl: requestState.signInUrl,
-      signUpUrl: requestState.signUpUrl,
-      publishableKey: requestState.publishableKey,
-    }).redirectToSignUp({ returnBackUrl: e.returnBackUrl });
+    const { returnBackUrl } = e;
+    return redirect[isRedirectToSignIn ? 'redirectToSignIn' : 'redirectToSignUp']({ returnBackUrl });
   }
 
   if (isNextjsRedirectError(e)) {
