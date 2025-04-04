@@ -19,7 +19,6 @@ export default clerkMiddleware(
     }
   },
   {
-    debug: process.env.NODE_ENV !== "production",
     contentSecurityPolicy: {
       mode: "strict-dynamic",
       directives: {
