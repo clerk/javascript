@@ -1,6 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
-import type { Clerk, ClientResource, InitialState, Resources } from '@clerk/types';
+import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
@@ -15,8 +15,6 @@ type ClerkContextProvider = {
 };
 
 export type ClerkContextProviderState = Resources;
-
-const isClerkJSOperational = (status: Clerk['status']) => ['ready', 'degraded'].includes(status);
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
@@ -33,8 +31,14 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
-  const derivedState = deriveState(isClerkJSOperational(clerkStatus), state, initialState);
-  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkStatus]);
+  const derivedState = deriveState(clerk.loaded, state, initialState);
+  const clerkCtx = React.useMemo(
+    () => ({ value: clerk }),
+    [
+      // Only upda the clerk reference on status change
+      clerkStatus,
+    ],
+  );
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const {
@@ -104,14 +108,12 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   }, [options.localization]);
 
   useEffect(() => {
-    const unsub = isomorphicClerk.addStatusListener(setStatus);
-    return () => unsub();
-  }, []);
+    isomorphicClerk.on('status', setStatus);
+    return () => isomorphicClerk.off('status', setStatus);
+  }, [isomorphicClerk]);
 
   React.useEffect(() => {
     return () => {
-      // reset to initial loading state
-      isomorphicClerk.__internal_setStatus('loading');
       IsomorphicClerk.clearInstance();
     };
   }, []);

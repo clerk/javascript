@@ -5,11 +5,15 @@ import type { IsomorphicClerk } from '../isomorphicClerk';
  */
 const clerkLoaded = (isomorphicClerk: IsomorphicClerk) => {
   return new Promise<void>(resolve => {
-    isomorphicClerk.addStatusListener(status => {
+    const handler = (status: string) => {
       if (['ready', 'degraded'].includes(status)) {
         resolve();
+        isomorphicClerk.off('status', handler);
       }
-    });
+    };
+
+    // Register the event listener
+    isomorphicClerk.on('status', handler, { notify: true });
   });
 };
 

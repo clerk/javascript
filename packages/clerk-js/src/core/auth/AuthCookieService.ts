@@ -1,6 +1,7 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import { publicClerkBus } from '@clerk/shared/eventBus';
 import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
@@ -193,7 +194,7 @@ export class AuthCookieService {
     }
 
     // The poller failed to fetch a fresh session token, update status to `degraded`.
-    this.clerk.__internal_setStatus('degraded');
+    publicClerkBus.dispatch('status', 'degraded');
 
     // --------
     // Treat any other error as a noop

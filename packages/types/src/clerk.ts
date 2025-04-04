@@ -91,6 +91,20 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+export const events = {
+  Status: 'status',
+} as const;
+
+type ClerkEvent = (typeof events)[keyof typeof events];
+type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
+
+type EventPayload = {
+  [events.Status]: Status;
+};
+
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
 /**
  * @inline
  */
@@ -437,19 +451,9 @@ export interface Clerk {
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
-  /**
-   * Register a listener that triggers a callback each time Clerk updates its status.
-   * @param callback Callback function receiving latest Clerk status
-   * @returns - Unsubscribe callback
-   */
-  addStatusListener: (listener: StatusListenerCallback) => UnsubscribeCallback;
+  on: OnEventListener;
 
-  /**
-   * Updates the status of Clerk singleton based on the provided argument.
-   * By default, it notifies subscribers wit the new status.
-   * @internal
-   */
-  __internal_setStatus: (status: Status, opts?: { notify: boolean }) => void;
+  off: OffEventListener;
 
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.

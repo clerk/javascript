@@ -1,6 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { publicClerkBus } from '@clerk/shared/eventBus';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -66,7 +67,6 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
-  StatusListenerCallback,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -203,7 +203,6 @@ export class Clerk implements ClerkInterface {
   #instanceType?: InstanceType;
   #status: ClerkInterface['status'] = 'loading';
   #listeners: Array<(emission: Resources) => void> = [];
-  #statusListeners: Array<(status: Clerk['status']) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
@@ -363,6 +362,9 @@ export class Clerk implements ClerkInterface {
       },
       proxyUrl: this.proxyUrl,
     });
+
+    publicClerkBus.onPreDispatch('status', status => (this.#status = status));
+
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
   }
@@ -405,7 +407,7 @@ export class Clerk implements ClerkInterface {
         await this.#loadInNonStandardBrowser();
       }
     } catch (e) {
-      this.__internal_setStatus('error');
+      publicClerkBus.dispatch('status', 'error');
       // bubble up the error
       throw e;
     }
@@ -1183,24 +1185,12 @@ export class Clerk implements ClerkInterface {
     return unsubscribe;
   };
 
-  public addStatusListener = (listener: StatusListenerCallback): UnsubscribeCallback => {
-    this.#statusListeners.push(listener);
-    // emit instantly
-    listener(this.status);
-    return () => {
-      this.#statusListeners = this.#statusListeners.filter(l => l !== listener);
-    };
+  public on: ClerkInterface['on'] = (...args) => {
+    publicClerkBus.on(...args);
   };
 
-  public __internal_setStatus = (status: Clerk['status'], opts = { notify: true }): void => {
-    this.#status = status;
-    if (!opts?.notify) {
-      return;
-    }
-
-    for (const listener of this.#statusListeners) {
-      listener(status);
-    }
+  public off: ClerkInterface['off'] = (...args) => {
+    publicClerkBus.off(...args);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2265,7 +2255,8 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    this.__internal_setStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    console.log('js registered', publicClerkBus.internal.retrieveListeners('status'));
+    publicClerkBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
@@ -2302,7 +2293,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    this.__internal_setStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    publicClerkBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo
