@@ -5,6 +5,7 @@ export * from './getAuth';
  * Re-export resource types from @clerk/backend
  */
 export type {
+  apiTypes,
   OrganizationMembershipRole,
   // Webhook event types
   WebhookEvent,

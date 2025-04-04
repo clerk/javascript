@@ -9,6 +9,6 @@ declare namespace App {
     auth: () => import('@clerk/astro/server').GetAuthReturn & {
       redirectToSignIn: import('@clerk/backend/internal').RedirectFun<Response>;
     };
-    currentUser: () => Promise<import('@clerk/astro/server').User | null>;
+    currentUser: () => Promise<import('@clerk/astro/server').apiTypesUser | null>;
   }
 }

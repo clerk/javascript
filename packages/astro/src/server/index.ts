@@ -7,6 +7,7 @@ export { verifyToken, createClerkClient } from '@clerk/backend';
  * Re-export types
  */
 export type {
+  apiTypes,
   OrganizationMembershipRole,
   // Webhook event types
   WebhookEvent,
