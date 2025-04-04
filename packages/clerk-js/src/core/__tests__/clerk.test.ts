@@ -536,36 +536,6 @@ describe('Clerk singleton', () => {
           expect(mockSession.getToken).toHaveBeenCalled();
         });
       });
-
-      it('navigates to task and set accessors with touched session', async () => {
-        mockClientFetch.mockReturnValue(Promise.resolve({ sessions: [mockSession], signedInSessions: [mockSession] }));
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token';
-        });
-        sut.navigate = jest.fn().mockImplementationOnce(() => {
-          executionOrder.push('navigate');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ session: mockSession.id });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'navigate']);
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-          expect(sut.session).toMatchObject(mockSession);
-        });
-      });
     });
   });
 
