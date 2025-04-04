@@ -117,11 +117,11 @@ export interface Clerk {
   loaded: boolean;
 
   /**
-   * Describes the state the clerk singleton operates in.
-   * If `error`, it means Clerk failed to initialize.
-   * If `loading`, it means Clerk is still attempting to load.
-   * If `ready`, it means Clerk singleton is fully operational.
-   * If `degraded`, it means Clerk singleton has partially operational.
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
    */
   status: Status;
 
