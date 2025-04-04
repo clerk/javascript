@@ -20,7 +20,7 @@ type AuthorizationOptions = {
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
   factorVerificationAge: [number, number] | null;
-  features: string | null | undefined;
+  __experimental_features?: string | null;
 };
 
 type CheckOrgAuthorization = (
@@ -30,7 +30,7 @@ type CheckOrgAuthorization = (
 
 type CheckFeatureAuthorization = (
   params: { __experimental_feature?: string },
-  { features }: AuthorizationOptions,
+  { __experimental_features }: AuthorizationOptions,
 ) => boolean | null;
 
 type CheckReverificationAuthorization = (
@@ -93,18 +93,18 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
 
 const checkFeatureAuthorization: CheckFeatureAuthorization = (param, options) => {
   const { __experimental_feature: feature } = param;
-  const { features } = options;
+  const { __experimental_features } = options;
 
   if (!feature) {
     return null;
   }
 
-  if (!features) {
+  if (!__experimental_features) {
     return null;
   }
 
-  if (typeof features === 'string') {
-    return features.split(',').includes(feature);
+  if (typeof __experimental_features === 'string') {
+    return __experimental_features.split(',').includes(feature);
   }
 
   return null;
@@ -205,6 +205,7 @@ type AuthStateOptions = {
     orgRole?: OrganizationCustomRoleKey | null;
     orgSlug?: string | null;
     orgPermissions?: OrganizationCustomPermissionKey[] | null;
+    __experimental_features?: string | null;
     getToken: GetToken;
     signOut: SignOut;
     has: (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => boolean;

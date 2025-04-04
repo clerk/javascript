@@ -43,6 +43,7 @@ type SignedInAuthObjectProperties = {
    * [fistFactorAge, secondFactorAge]
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+  __experimental_features?: string | null;
 };
 
 /**
@@ -114,6 +115,7 @@ const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthO
     orgSlug: claims.org_slug,
     orgPermissions,
     factorVerificationAge,
+    __experimental_features: claims.fea,
   };
 };
 
@@ -125,8 +127,18 @@ export function signedInAuthObject(
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
-  const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
-    generateSignedInAuthObjectProperties(sessionClaims);
+  const {
+    actor,
+    sessionId,
+    sessionStatus,
+    userId,
+    orgId,
+    orgRole,
+    orgSlug,
+    orgPermissions,
+    factorVerificationAge,
+    __experimental_features,
+  } = generateSignedInAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
@@ -145,6 +157,7 @@ export function signedInAuthObject(
     orgSlug,
     orgPermissions,
     factorVerificationAge,
+    __experimental_features,
     getToken,
     has: createCheckAuthorization({
       orgId,
@@ -152,6 +165,7 @@ export function signedInAuthObject(
       orgPermissions,
       userId,
       factorVerificationAge,
+      __experimental_features,
     }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };

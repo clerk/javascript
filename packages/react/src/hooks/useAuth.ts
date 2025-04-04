@@ -144,7 +144,17 @@ export function useDerivedAuth(
   authObject: any,
   { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
 ): UseAuthReturn {
-  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
+  const {
+    userId,
+    orgId,
+    orgRole,
+    has,
+    signOut,
+    getToken,
+    orgPermissions,
+    factorVerificationAge,
+    __experimental_features,
+  } = authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -157,11 +167,10 @@ export function useDerivedAuth(
         orgRole,
         orgPermissions,
         factorVerificationAge,
-        // TODO: get features from authObject
-        // features: 'testfeature',
+        __experimental_features,
       })(params);
     },
-    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge, __experimental_features],
   );
 
   const payload = resolveAuthState({
