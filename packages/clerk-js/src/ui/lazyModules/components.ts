@@ -95,6 +95,10 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
 );
 
+export const Checkout = lazy(() =>
+  componentImportPaths.Checkout().then(module => ({ default: module.__experimental_Checkout })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
 );
@@ -124,6 +128,7 @@ export const ClerkComponents = {
   WaitlistModal,
   BlankCaptchaModal,
   PricingTable,
+  Checkout,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

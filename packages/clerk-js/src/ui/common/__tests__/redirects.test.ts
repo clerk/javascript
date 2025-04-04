@@ -207,5 +207,10 @@ describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
     expect(
       buildSSOCallbackURL({ routing: 'virtual', authQueryString: 'redirect_url=%2Ffoo' }, 'http://test.host'),
     ).toBe('http://test.host/#/sso-callback?redirect_url=%2Ffoo');
+
+    // Custom SSO callback URL in the context
+    expect(buildSSOCallbackURL({ ssoCallbackUrl: 'http://test.host/ctx-sso-callback' })).toBe(
+      'http://test.host/ctx-sso-callback',
+    );
   });
 });

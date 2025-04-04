@@ -1,10 +1,10 @@
 {
   "files": [
-    { "path": "./dist/clerk.js", "maxSize": "584.85kB" },
+    { "path": "./dist/clerk.js", "maxSize": "595kB" },
     { "path": "./dist/clerk.browser.js", "maxSize": "81KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "55KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "96KB" },
-    { "path": "./dist/vendors*.js", "maxSize": "30KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "35KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "35.5KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },

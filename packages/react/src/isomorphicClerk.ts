@@ -3,6 +3,7 @@ import { publicClerkBus } from '@clerk/shared/eventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
@@ -96,6 +97,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_reloadInitialResources'
   | '__experimental_commerce'
   | '__internal_setComponentNavigationContext'
+  | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
   __experimental_commerce: __experimental_CommerceNamespace | undefined;
@@ -109,6 +111,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
+  private preopenCheckout?: null | __experimental_CheckoutProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -222,8 +225,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#proxyUrl || '';
   }
 
+  /**
+   * Accesses private options from the `Clerk` instance and defaults to
+   * `IsomorphicClerk` options when in SSR context.
+   *  @internal
+   */
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] | undefined {
-    return this.clerkjs?.__internal_getOption(key);
+    return this.clerkjs?.__internal_getOption ? this.clerkjs?.__internal_getOption(key) : this.options[key];
   }
 
   constructor(options: IsomorphicClerkOptions) {
@@ -531,6 +539,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openSignIn(this.preopenSignIn);
     }
 
+    if (this.preopenCheckout !== null) {
+      clerkjs.__internal_openCheckout(this.preopenCheckout);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -712,6 +724,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.closeSignIn();
     } else {
       this.preopenSignIn = null;
+    }
+  };
+
+  __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_openCheckout(props);
+    } else {
+      this.preopenCheckout = props;
+    }
+  };
+
+  __internal_closeCheckout = () => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__internal_closeCheckout();
+    } else {
+      this.preopenCheckout = null;
     }
   };
 
