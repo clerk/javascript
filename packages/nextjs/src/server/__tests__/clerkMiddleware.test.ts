@@ -314,7 +314,7 @@ describe('clerkMiddleware(params)', () => {
       locationHeader: 'sign-up',
     } as const,
   ])('$name', ({ util, locationHeader }) => {
-    it(`redirects to ${locationHeader} url when redirectToSignIn is called and the request is a page request`, async () => {
+    it(`redirects to ${locationHeader} url when ${util} is called and the request is a page request`, async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
