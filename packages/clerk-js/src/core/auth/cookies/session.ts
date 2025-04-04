@@ -32,8 +32,8 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
     const secure = getSecureAttribute(sameSite);
 
-    suffixedSessionCookie.set(token, { expires, sameSite, secure });
-    sessionCookie.set(token, { expires, sameSite, secure });
+    suffixedSessionCookie.set(token, { expires, sameSite, secure, partition: true });
+    sessionCookie.set(token, { expires, sameSite, secure, partition: true });
   };
 
   const get = () => suffixedSessionCookie.get() || sessionCookie.get();
