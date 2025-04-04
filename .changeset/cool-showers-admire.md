@@ -11,9 +11,10 @@ Possible values are:
 - `error` set when hotloading clerk-js failed or `Clerk.load()` failed
 - `ready` set when Clerk is fully operational
 - `degraded` set when Clerk is partially operational
+The computed value of `useClerk().loaded` is:
 
-`useClerk().loaded` is `true` when `useClerk().status` is either `"ready"` or `"degraded"`.
-`useClerk().loaded` is `false` when `useClerk().status` is `"loading"` or `"error"`.
+- `true` when `useClerk().status` is either `"ready"` or `"degraded"`.
+- `false` when `useClerk().status` is `"loading"` or `"error"`.
 
 ### `<ClerkFailed/>`
 ```tsx
