@@ -20,17 +20,17 @@ let value: OAuthApplications = {
       redirectUris: [
         "<value>",
       ],
-      callbackUrl: "https://acceptable-passport.name",
-      authorizeUrl: "https://white-adviser.net",
-      tokenFetchUrl: "https://memorable-finger.net",
-      userInfoUrl: "https://judicious-legging.net/",
-      discoveryUrl: "https://enchanted-handle.name/",
-      tokenIntrospectionUrl: "https://polished-certification.org",
-      createdAt: 871786,
-      updatedAt: 502721,
+      callbackUrl: "https://raw-hydrant.com/",
+      authorizeUrl: "https://aware-pasta.com/",
+      tokenFetchUrl: "https://icy-finger.net",
+      userInfoUrl: "https://weekly-gallery.info/",
+      discoveryUrl: "https://fortunate-fen.biz/",
+      tokenIntrospectionUrl: "https://sparse-hyphenation.info",
+      createdAt: 178484,
+      updatedAt: 329924,
     },
   ],
-  totalCount: 922348,
+  totalCount: 546216,
 };
 ```
 

@@ -6,7 +6,7 @@
 import { CreateOrganizationInvitationBulkRequestBody } from "@clerk/backend-api-client/models/operations";
 
 let value: CreateOrganizationInvitationBulkRequestBody = {
-  emailAddress: "Kira13@gmail.com",
+  emailAddress: "Minnie_Greenfelder49@gmail.com",
   role: "<value>",
 };
 ```

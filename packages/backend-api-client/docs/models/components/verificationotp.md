@@ -7,9 +7,9 @@ import { VerificationOTP } from "@clerk/backend-api-client/models/components";
 
 let value: VerificationOTP = {
   status: "failed",
-  strategy: "phone_code",
-  attempts: 164694,
-  expireAt: 621479,
+  strategy: "reset_password_email_code",
+  attempts: 339327,
+  expireAt: 426264,
 };
 ```
 

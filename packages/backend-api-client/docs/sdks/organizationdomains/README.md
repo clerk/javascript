@@ -17,14 +17,14 @@ Creates a new organization domain. By default the domain is verified, but can be
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationDomains.create({
+  const result = await clerkBackendApi.organizationDomains.create({
     organizationId: "<id>",
     requestBody: {},
   });
@@ -41,17 +41,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationDomainsCreate } from "@clerk/backend-api-client/funcs/organizationDomainsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationDomainsCreate(clerk, {
+  const res = await organizationDomainsCreate(clerkBackendApi, {
     organizationId: "<id>",
     requestBody: {},
   });
@@ -96,14 +96,14 @@ Get a list of all domains of an organization.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationDomains.list({
+  const result = await clerkBackendApi.organizationDomains.list({
     organizationId: "<id>",
   });
 
@@ -119,17 +119,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationDomainsList } from "@clerk/backend-api-client/funcs/organizationDomainsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationDomainsList(clerk, {
+  const res = await organizationDomainsList(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -173,14 +173,14 @@ Updates the properties of an existing organization domain.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationDomains.update({
+  const result = await clerkBackendApi.organizationDomains.update({
     organizationId: "<id>",
     domainId: "<id>",
     requestBody: {},
@@ -198,17 +198,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationDomainsUpdate } from "@clerk/backend-api-client/funcs/organizationDomainsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationDomainsUpdate(clerk, {
+  const res = await organizationDomainsUpdate(clerkBackendApi, {
     organizationId: "<id>",
     domainId: "<id>",
     requestBody: {},
@@ -254,14 +254,14 @@ Removes the given domain from the organization.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationDomains.delete({
+  const result = await clerkBackendApi.organizationDomains.delete({
     organizationId: "<id>",
     domainId: "<id>",
   });
@@ -278,17 +278,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationDomainsDelete } from "@clerk/backend-api-client/funcs/organizationDomainsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationDomainsDelete(clerk, {
+  const res = await organizationDomainsDelete(clerkBackendApi, {
     organizationId: "<id>",
     domainId: "<id>",
   });

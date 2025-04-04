@@ -3,16 +3,16 @@ id: b39507bb-2d17-4d8e-b29b-b5758858cc6e
 management:
   docChecksum: ebe67a4999504f7a2339d58f1957ce1f
   docVersion: "2025-03-12"
-  speakeasyVersion: 1.528.1
-  generationVersion: 2.565.1
-  releaseVersion: 0.3.10
-  configChecksum: 670d0662120cf58bfc279dc725382511
+  speakeasyVersion: 1.529.1
+  generationVersion: 2.566.5
+  releaseVersion: 0.3.11
+  configChecksum: 6ae8236b55c8d3e6a4706ea86c02713e
 features:
   typescript:
     additionalDependencies: 0.1.0
     additionalProperties: 0.1.1
     constsAndDefaults: 0.1.11
-    core: 3.21.4
+    core: 3.21.5
     defaultEnabledRetries: 0.1.0
     deprecations: 2.81.1
     devContainers: 2.90.0
@@ -439,7 +439,7 @@ generatedFiles:
   - docs/sdks/allowlistidentifiers/README.md
   - docs/sdks/betafeatures/README.md
   - docs/sdks/blocklistidentifiers/README.md
-  - docs/sdks/clerk/README.md
+  - docs/sdks/clerkbackendapi/README.md
   - docs/sdks/clients/README.md
   - docs/sdks/domains/README.md
   - docs/sdks/emailaddresses/README.md
@@ -884,7 +884,7 @@ examples:
           offset: 0
       responses:
         "200":
-          application/json: [{"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 229716, "expire_at": 152837, "abandon_at": 635532, "updated_at": 639387, "created_at": 17577}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 86140, "expire_at": 68504, "abandon_at": 687960, "updated_at": 509883, "created_at": 633911}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 7468, "created_at": 54607}, {"object": "client", "id": "<id>", "session_ids": ["<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "active", "last_active_at": 931165, "expire_at": 567445, "abandon_at": 876407, "updated_at": 490078, "created_at": 51681}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 322596, "created_at": 860596}, {"object": "client", "id": "<id>", "session_ids": [], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "ended", "last_active_at": 913465, "expire_at": 173090, "abandon_at": 75058, "updated_at": 897069, "created_at": 135572}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 425334, "expire_at": 432930, "abandon_at": 480616, "updated_at": 103421, "created_at": 523875}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 410206, "expire_at": 863466, "abandon_at": 307390, "updated_at": 392057, "created_at": 113486}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 181118, "created_at": 913851}]
+          application/json: [{"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 229716, "expire_at": 152837, "abandon_at": 635532, "updated_at": 639387, "created_at": 17577}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 86140, "expire_at": 68504, "abandon_at": 687960, "updated_at": 509883, "created_at": 633911}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 7468, "created_at": 54607}, {"object": "client", "id": "<id>", "session_ids": ["<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "active", "last_active_at": 931165, "expire_at": 567445, "abandon_at": 876407, "updated_at": 490078, "created_at": 51681}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 322596, "created_at": 860596}, {"object": "client", "id": "<id>", "session_ids": [], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 913465, "expire_at": 173090, "abandon_at": 75058, "updated_at": 897069, "created_at": 135572}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 425334, "expire_at": 432930, "abandon_at": 480616, "updated_at": 103421, "created_at": 523875}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "replaced", "last_active_at": 410206, "expire_at": 863466, "abandon_at": 307390, "updated_at": 392057, "created_at": 113486}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 181118, "created_at": 913851}]
         "400":
           application/json: {"errors": []}
   VerifyClient:
@@ -901,14 +901,14 @@ examples:
           client_id: "<id>"
       responses:
         "200":
-          application/json: {"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 521235, "expire_at": 969961, "abandon_at": 458049, "updated_at": 450824, "created_at": 262795}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 937146, "expire_at": 438142, "abandon_at": 801373, "updated_at": 78888, "created_at": 219956}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 313464, "created_at": 94589}
+          application/json: {"object": "client", "id": "<id>", "session_ids": ["<value>", "<value>"], "sessions": [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 521235, "expire_at": 969961, "abandon_at": 458049, "updated_at": 450824, "created_at": 262795}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "revoked", "last_active_at": 937146, "expire_at": 438142, "abandon_at": 801373, "updated_at": 78888, "created_at": 219956}], "sign_in_id": "<id>", "sign_up_id": "<id>", "last_active_session_id": "<id>", "updated_at": 313464, "created_at": 94589}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   CreateEmailAddress:
     speakeasy-default-create-email-address:
       responses:
         "200":
-          application/json: {"object": "email_address", "email_address": "Loyal79@yahoo.com", "reserved": true, "verification": {"status": "unverified", "strategy": "reset_password_email_code", "expire_at": 586220, "attempts": 816588}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 957409, "updated_at": 357021}
+          application/json: {"object": "email_address", "email_address": "Loyal79@yahoo.com", "reserved": true, "verification": {"status": "unverified", "strategy": "reset_password_email_code", "attempts": 816588, "expire_at": 586220}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 957409, "updated_at": 357021}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   GetEmailAddress:
@@ -938,7 +938,7 @@ examples:
           email_address_id: "<id>"
       responses:
         "200":
-          application/json: {"object": "email_address", "email_address": "Lavern48@hotmail.com", "reserved": true, "verification": {"status": "verified", "strategy": "ticket", "expire_at": 249440, "attempts": 311507}, "linked_to": [], "created_at": 789275, "updated_at": 889838}
+          application/json: {"object": "email_address", "email_address": "Lavern48@hotmail.com", "reserved": true, "verification": {"status": "verified", "strategy": "ticket", "attempts": 311507, "expire_at": 249440}, "linked_to": [], "created_at": 789275, "updated_at": 889838}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   CreatePhoneNumber:
@@ -986,7 +986,7 @@ examples:
           offset: 0
       responses:
         "200":
-          application/json: [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 678317, "expire_at": 177706, "abandon_at": 229716, "updated_at": 152837, "created_at": 635532}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 17577, "expire_at": 718303, "abandon_at": 86140, "updated_at": 68504, "created_at": 687960}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "expired", "last_active_at": 633911, "expire_at": 7468, "abandon_at": 54607, "updated_at": 367745, "created_at": 485729}]
+          application/json: [{"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 678317, "expire_at": 177706, "abandon_at": 229716, "updated_at": 152837, "created_at": 635532}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 17577, "expire_at": 718303, "abandon_at": 86140, "updated_at": 68504, "created_at": 687960}, {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 633911, "expire_at": 7468, "abandon_at": 54607, "updated_at": 367745, "created_at": 485729}]
         "400":
           application/json: {"errors": []}
   createSession:
@@ -1003,9 +1003,19 @@ examples:
           session_id: "<id>"
       responses:
         "200":
-          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "removed", "last_active_at": 558834, "expire_at": 544221, "abandon_at": 521235, "updated_at": 969961, "created_at": 458049}
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 558834, "expire_at": 544221, "abandon_at": 521235, "updated_at": 969961, "created_at": 458049}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+  RefreshSession:
+    speakeasy-default-refresh-session:
+      parameters:
+        path:
+          session_id: "<id>"
+      responses:
+        "200":
+          application/json: {"object": "cookies", "cookies": ["<value>", "<value>", "<value>"]}
+        "400":
+          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   RevokeSession:
     speakeasy-default-revoke-session:
       parameters:
@@ -1023,7 +1033,7 @@ examples:
           session_id: "<id>"
       responses:
         "200":
-          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "abandoned", "last_active_at": 189595, "expire_at": 187097, "abandon_at": 227138, "updated_at": 756755, "created_at": 394054}
+          application/json: {"object": "session", "id": "<id>", "user_id": "<id>", "client_id": "<id>", "status": "replaced", "last_active_at": 189595, "expire_at": 187097, "abandon_at": 227138, "updated_at": 756755, "created_at": 394054}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   CreateSessionToken:
@@ -1270,9 +1280,9 @@ examples:
           offset: 0
       responses:
         "200":
-          application/json: [{}]
+          application/json: [{"object": "oauth_access_token", "external_account_id": "<id>", "provider_user_id": "<id>", "token": "<value>", "expires_at": 701535, "provider": "<value>", "public_metadata": {"key": "<value>"}, "label": "<value>"}]
         "400":
-          application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
+          application/json: {"errors": []}
   UsersGetOrganizationMemberships:
     speakeasy-default-users-get-organization-memberships:
       parameters:
@@ -2146,16 +2156,6 @@ examples:
           application/json: {"object": "waitlist_entry", "id": "<id>", "email_address": "Loyal79@yahoo.com", "status": "pending", "created_at": 86, "updated_at": 169727, "invitation": {"object": "invitation", "id": "<id>", "email_address": "Pearl_McGlynn@gmail.com", "public_metadata": {"key": "<value>"}, "revoked": false, "status": "pending", "created_at": 17759, "updated_at": 230313}}
         "400":
           application/json: {"errors": []}
-  RefreshSession:
-    speakeasy-default-refresh-session:
-      parameters:
-        path:
-          session_id: "<id>"
-      responses:
-        "200":
-          application/json: {"object": "cookies", "cookies": ["<value>", "<value>", "<value>"]}
-        "400":
-          application/json: {"errors": []}
   CreateAccountlessApplication:
     speakeasy-default-create-accountless-application:
       responses:
@@ -2170,5 +2170,5 @@ examples:
           application/json: {"object": "accountless_application", "publishable_key": "<value>"}
         "500":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}, {"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
-examplesVersion: 1.0.0
+examplesVersion: 1.0.1
 generatedTests: {}

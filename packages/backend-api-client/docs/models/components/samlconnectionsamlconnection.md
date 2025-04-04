@@ -8,12 +8,12 @@ import { SAMLConnectionSAMLConnection } from "@clerk/backend-api-client/models/c
 let value: SAMLConnectionSAMLConnection = {
   id: "<id>",
   name: "<value>",
-  domain: "minty-airman.biz",
+  domain: "monstrous-octave.org",
   active: false,
   provider: "<value>",
   syncUserAttributes: false,
-  createdAt: 424685,
-  updatedAt: 374170,
+  createdAt: 456678,
+  updatedAt: 104104,
 };
 ```
 

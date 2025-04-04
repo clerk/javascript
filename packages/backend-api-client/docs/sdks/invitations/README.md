@@ -19,14 +19,14 @@ Also, trying to create an invitation for an email address that already exists in
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.invitations.create();
+  const result = await clerkBackendApi.invitations.create();
 
   // Handle the result
   console.log(result);
@@ -40,17 +40,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { invitationsCreate } from "@clerk/backend-api-client/funcs/invitationsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await invitationsCreate(clerk);
+  const res = await invitationsCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -92,14 +92,14 @@ Returns all non-revoked invitations for your application, sorted by creation dat
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.invitations.list({});
+  const result = await clerkBackendApi.invitations.list({});
 
   // Handle the result
   console.log(result);
@@ -113,17 +113,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { invitationsList } from "@clerk/backend-api-client/funcs/invitationsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await invitationsList(clerk, {});
+  const res = await invitationsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -167,14 +167,14 @@ note that there must be no existing user for any of the email addresses you prov
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.invitations.bulkCreate();
+  const result = await clerkBackendApi.invitations.bulkCreate();
 
   // Handle the result
   console.log(result);
@@ -188,17 +188,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { invitationsBulkCreate } from "@clerk/backend-api-client/funcs/invitationsBulkCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await invitationsBulkCreate(clerk);
+  const res = await invitationsBulkCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -243,14 +243,14 @@ Only active (i.e. non-revoked) invitations can be revoked.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.invitations.revoke({
+  const result = await clerkBackendApi.invitations.revoke({
     invitationId: "<id>",
   });
 
@@ -266,17 +266,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { invitationsRevoke } from "@clerk/backend-api-client/funcs/invitationsRevoke.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await invitationsRevoke(clerk, {
+  const res = await invitationsRevoke(clerkBackendApi, {
     invitationId: "<id>",
   });
 

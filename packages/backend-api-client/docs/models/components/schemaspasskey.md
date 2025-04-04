@@ -8,12 +8,12 @@ import { SchemasPasskey } from "@clerk/backend-api-client/models/components";
 let value: SchemasPasskey = {
   object: "passkey",
   name: "<value>",
-  lastUsedAt: 189848,
+  lastUsedAt: 910279,
   verification: {
     status: "verified",
     strategy: "passkey",
-    attempts: 511319,
-    expireAt: 224317,
+    attempts: 587946,
+    expireAt: 360562,
   },
 };
 ```

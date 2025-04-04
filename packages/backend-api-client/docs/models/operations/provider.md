@@ -7,7 +7,7 @@ The IdP provider of the connection.
 ```typescript
 import { Provider } from "@clerk/backend-api-client/models/operations";
 
-let value: Provider = "saml_google";
+let value: Provider = "saml_custom";
 ```
 
 ## Values

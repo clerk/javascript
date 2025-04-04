@@ -7,11 +7,11 @@
 
 ```typescript
 const value: components.Saml = {
-  status: "verified",
+  status: "expired",
   strategy: "saml",
-  externalVerificationRedirectUrl: "https://dependent-valentine.net",
-  expireAt: 215507,
-  attempts: 947371,
+  externalVerificationRedirectUrl: "https://worst-flu.info",
+  expireAt: 703998,
+  attempts: 988849,
 };
 ```
 
@@ -21,8 +21,8 @@ const value: components.Saml = {
 const value: components.VerificationTicket = {
   status: "expired",
   strategy: "ticket",
-  attempts: 253941,
-  expireAt: 213312,
+  attempts: 969814,
+  expireAt: 978944,
 };
 ```
 

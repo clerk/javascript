@@ -8,8 +8,8 @@ import { Web3WalletVerificationAdmin } from "@clerk/backend-api-client/models/co
 let value: Web3WalletVerificationAdmin = {
   status: "verified",
   strategy: "admin",
-  attempts: 97844,
-  expireAt: 862192,
+  attempts: 286319,
+  expireAt: 326549,
 };
 ```
 

@@ -14,14 +14,14 @@ Retrieve the JSON Web Key Set of the instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwks.getJWKS();
+  const result = await clerkBackendApi.jwks.getJWKS();
 
   // Handle the result
   console.log(result);
@@ -35,17 +35,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwksGetJWKS } from "@clerk/backend-api-client/funcs/jwksGetJWKS.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwksGetJWKS(clerk);
+  const res = await jwksGetJWKS(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

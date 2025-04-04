@@ -7,10 +7,10 @@
 
 ```typescript
 const value: components.Oauth = {
-  status: "verified",
+  status: "transferable",
   strategy: "<value>",
-  expireAt: 586410,
-  attempts: 63955,
+  expireAt: 793903,
+  attempts: 10861,
 };
 ```
 
@@ -18,10 +18,10 @@ const value: components.Oauth = {
 
 ```typescript
 const value: components.GoogleOneTap = {
-  status: "unverified",
+  status: "verified",
   strategy: "google_one_tap",
-  expireAt: 977496,
-  attempts: 876506,
+  expireAt: 711383,
+  attempts: 484357,
 };
 ```
 

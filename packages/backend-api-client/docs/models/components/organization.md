@@ -10,7 +10,7 @@ let value: Organization = {
   id: "<id>",
   name: "<value>",
   slug: "<value>",
-  maxAllowedMemberships: 233420,
+  maxAllowedMemberships: 876527,
   adminDeleteEnabled: false,
   publicMetadata: {
     "key": "<value>",
@@ -18,8 +18,8 @@ let value: Organization = {
   privateMetadata: {
     "key": "<value>",
   },
-  createdAt: 689768,
-  updatedAt: 58356,
+  createdAt: 164019,
+  updatedAt: 574019,
 };
 ```
 

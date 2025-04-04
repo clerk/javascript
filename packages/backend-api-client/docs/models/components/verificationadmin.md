@@ -8,8 +8,8 @@ import { VerificationAdmin } from "@clerk/backend-api-client/models/components";
 let value: VerificationAdmin = {
   status: "verified",
   strategy: "admin",
-  attempts: 793698,
-  expireAt: 223924,
+  attempts: 489947,
+  expireAt: 705665,
 };
 ```
 

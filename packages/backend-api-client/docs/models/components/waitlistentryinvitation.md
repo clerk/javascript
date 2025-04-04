@@ -8,14 +8,14 @@ import { WaitlistEntryInvitation } from "@clerk/backend-api-client/models/compon
 let value: WaitlistEntryInvitation = {
   object: "invitation",
   id: "<id>",
-  emailAddress: "Lemuel10@gmail.com",
+  emailAddress: "Wilhelmine.Glover83@yahoo.com",
   publicMetadata: {
     "key": "<value>",
   },
   revoked: false,
   status: "pending",
-  createdAt: 29190,
-  updatedAt: 534917,
+  createdAt: 834453,
+  updatedAt: 94210,
 };
 ```
 

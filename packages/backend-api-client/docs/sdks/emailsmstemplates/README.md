@@ -20,14 +20,14 @@ The templates are returned sorted by position.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.emailSMSTemplates.list({
+  const result = await clerkBackendApi.emailSMSTemplates.list({
     templateType: "sms",
   });
 
@@ -43,17 +43,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { emailSMSTemplatesList } from "@clerk/backend-api-client/funcs/emailSMSTemplatesList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await emailSMSTemplatesList(clerk, {
+  const res = await emailSMSTemplatesList(clerkBackendApi, {
     templateType: "sms",
   });
 
@@ -99,14 +99,14 @@ Returns the details of a template
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.emailSMSTemplates.get({
+  const result = await clerkBackendApi.emailSMSTemplates.get({
     templateType: "sms",
     slug: "<value>",
   });
@@ -123,17 +123,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { emailSMSTemplatesGet } from "@clerk/backend-api-client/funcs/emailSMSTemplatesGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await emailSMSTemplatesGet(clerk, {
+  const res = await emailSMSTemplatesGet(clerkBackendApi, {
     templateType: "sms",
     slug: "<value>",
   });
@@ -180,14 +180,14 @@ Reverts an updated template to its default state
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.emailSMSTemplates.revert({
+  const result = await clerkBackendApi.emailSMSTemplates.revert({
     templateType: "email",
     slug: "<value>",
   });
@@ -204,17 +204,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { emailSMSTemplatesRevert } from "@clerk/backend-api-client/funcs/emailSMSTemplatesRevert.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await emailSMSTemplatesRevert(clerk, {
+  const res = await emailSMSTemplatesRevert(clerkBackendApi, {
     templateType: "email",
     slug: "<value>",
   });
@@ -263,14 +263,14 @@ The app developer will need to listen to the `email.created` or `sms.created` we
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.emailSMSTemplates.toggleTemplateDelivery({
+  const result = await clerkBackendApi.emailSMSTemplates.toggleTemplateDelivery({
     templateType: "sms",
     slug: "<value>",
   });
@@ -287,17 +287,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { emailSMSTemplatesToggleTemplateDelivery } from "@clerk/backend-api-client/funcs/emailSMSTemplatesToggleTemplateDelivery.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await emailSMSTemplatesToggleTemplateDelivery(clerk, {
+  const res = await emailSMSTemplatesToggleTemplateDelivery(clerkBackendApi, {
     templateType: "sms",
     slug: "<value>",
   });

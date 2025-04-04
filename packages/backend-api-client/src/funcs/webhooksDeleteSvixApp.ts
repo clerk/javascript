@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
 import { RequestOptions } from "../lib/sdks.js";
@@ -29,7 +29,7 @@ import { Result } from "../types/fp.js";
  * Delete a Svix app and disassociate it from the current instance
  */
 export function webhooksDeleteSvixApp(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -51,7 +51,7 @@ export function webhooksDeleteSvixApp(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   options?: RequestOptions,
 ): Promise<
   [

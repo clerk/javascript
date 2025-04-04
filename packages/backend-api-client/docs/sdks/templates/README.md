@@ -16,14 +16,14 @@ Returns a preview of a template for a given template_type, slug and body
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.templates.preview({
+  const result = await clerkBackendApi.templates.preview({
     templateType: "<value>",
     slug: "<value>",
   });
@@ -40,17 +40,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { templatesPreview } from "@clerk/backend-api-client/funcs/templatesPreview.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await templatesPreview(clerk, {
+  const res = await templatesPreview(clerkBackendApi, {
     templateType: "<value>",
     slug: "<value>",
   });

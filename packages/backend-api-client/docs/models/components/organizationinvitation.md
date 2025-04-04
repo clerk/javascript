@@ -10,16 +10,16 @@ import { OrganizationInvitation } from "@clerk/backend-api-client/models/compone
 let value: OrganizationInvitation = {
   object: "organization_invitation",
   id: "<id>",
-  emailAddress: "Herbert.Stanton@gmail.com",
+  emailAddress: "Casandra.Marks@gmail.com",
   role: "<value>",
   roleName: "<value>",
   publicMetadata: {
     "key": "<value>",
   },
-  url: "https://aggressive-convection.info/",
-  expiresAt: 929292,
-  createdAt: 99615,
-  updatedAt: 945302,
+  url: "https://stupendous-hovel.org",
+  expiresAt: 379715,
+  createdAt: 495889,
+  updatedAt: 227921,
 };
 ```
 

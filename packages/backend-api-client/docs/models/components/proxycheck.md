@@ -11,11 +11,11 @@ let value: ProxyCheck = {
   object: "proxy_check",
   id: "<id>",
   domainId: "<id>",
-  lastRunAt: 895386,
-  proxyUrl: "https://negative-drug.name",
+  lastRunAt: 26588,
+  proxyUrl: "https://glossy-issue.org",
   successful: false,
-  createdAt: 896762,
-  updatedAt: 406733,
+  createdAt: 765207,
+  updatedAt: 510204,
 };
 ```
 

@@ -5,7 +5,7 @@
 ```typescript
 import { Status } from "@clerk/backend-api-client/models/components";
 
-let value: Status = "active";
+let value: Status = "abandoned";
 ```
 
 ## Values

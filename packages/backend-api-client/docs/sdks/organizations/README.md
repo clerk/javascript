@@ -24,14 +24,14 @@ Most recent organizations will be returned first.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.list({});
+  const result = await clerkBackendApi.organizations.list({});
 
   // Handle the result
   console.log(result);
@@ -45,17 +45,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsList } from "@clerk/backend-api-client/funcs/organizationsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsList(clerk, {});
+  const res = await organizationsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -106,14 +106,14 @@ the next time they create a session, presuming they don't explicitly set a diffe
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.create();
+  const result = await clerkBackendApi.organizations.create();
 
   // Handle the result
   console.log(result);
@@ -127,17 +127,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsCreate } from "@clerk/backend-api-client/funcs/organizationsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsCreate(clerk);
+  const res = await organizationsCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -179,14 +179,14 @@ Fetches the organization whose ID or slug matches the provided `id_or_slug` URL 
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.get({
+  const result = await clerkBackendApi.organizations.get({
     organizationId: "<id>",
   });
 
@@ -202,17 +202,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsGet } from "@clerk/backend-api-client/funcs/organizationsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsGet(clerk, {
+  const res = await organizationsGet(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -256,14 +256,14 @@ Updates an existing organization
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.update({
+  const result = await clerkBackendApi.organizations.update({
     organizationId: "<id>",
     requestBody: {},
   });
@@ -280,17 +280,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsUpdate } from "@clerk/backend-api-client/funcs/organizationsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsUpdate(clerk, {
+  const res = await organizationsUpdate(clerkBackendApi, {
     organizationId: "<id>",
     requestBody: {},
   });
@@ -337,14 +337,14 @@ This is not reversible.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.delete({
+  const result = await clerkBackendApi.organizations.delete({
     organizationId: "<id>",
   });
 
@@ -360,17 +360,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsDelete } from "@clerk/backend-api-client/funcs/organizationsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsDelete(clerk, {
+  const res = await organizationsDelete(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -417,14 +417,14 @@ You can remove metadata keys at any level by setting their value to `null`.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.mergeMetadata({
+  const result = await clerkBackendApi.organizations.mergeMetadata({
     organizationId: "<id>",
     requestBody: {},
   });
@@ -441,17 +441,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsMergeMetadata } from "@clerk/backend-api-client/funcs/organizationsMergeMetadata.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsMergeMetadata(clerk, {
+  const res = await organizationsMergeMetadata(clerkBackendApi, {
     organizationId: "<id>",
     requestBody: {},
   });
@@ -499,14 +499,14 @@ Only the following file content types are supported: `image/jpeg`, `image/png`, 
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.uploadLogo({
+  const result = await clerkBackendApi.organizations.uploadLogo({
     organizationId: "<id>",
   });
 
@@ -522,17 +522,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsUploadLogo } from "@clerk/backend-api-client/funcs/organizationsUploadLogo.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsUploadLogo(clerk, {
+  const res = await organizationsUploadLogo(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -576,14 +576,14 @@ Delete the organization's logo.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizations.deleteLogo({
+  const result = await clerkBackendApi.organizations.deleteLogo({
     organizationId: "<id>",
   });
 
@@ -599,17 +599,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationsDeleteLogo } from "@clerk/backend-api-client/funcs/organizationsDeleteLogo.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationsDeleteLogo(clerk, {
+  const res = await organizationsDeleteLogo(clerkBackendApi, {
     organizationId: "<id>",
   });
 

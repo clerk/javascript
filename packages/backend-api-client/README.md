@@ -103,12 +103,12 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ### Example
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk();
+const clerkBackendApi = new ClerkBackendApi();
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 }
 
 run();
@@ -129,14 +129,14 @@ This SDK supports the following security scheme globally:
 
 To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 }
 
 run();
@@ -548,14 +548,14 @@ Certain SDK methods accept files as part of a multi-part request. It is possible
 > - **Node.js v18:** A file stream can be created using the `fileFrom` helper from [`fetch-blob/from.js`](https://www.npmjs.com/package/fetch-blob).
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.users.setProfileImage({
+  const result = await clerkBackendApi.users.setProfileImage({
     userId: "<id>",
     requestBody: {},
   });
@@ -576,12 +576,12 @@ Some of the endpoints in this SDK support retries.  If you use the SDK without a
 
 To change the default retry strategy for a single API call, simply provide a retryConfig object to the call:
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk();
+const clerkBackendApi = new ClerkBackendApi();
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({}, {
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({}, {
     retries: {
       strategy: "backoff",
       backoff: {
@@ -601,9 +601,9 @@ run();
 
 If you'd like to override the default retry strategy for all operations that support retries, you can provide a retryConfig at SDK initialization:
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   retryConfig: {
     strategy: "backoff",
     backoff: {
@@ -617,7 +617,7 @@ const clerk = new Clerk({
 });
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 }
 
 run();
@@ -638,20 +638,20 @@ Some methods specify known errors which can be thrown. All the known errors are 
 If the method throws an error and it is not captured by the known errors, it will default to throwing a `APIError`.
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 import {
   ClerkErrors,
   SDKValidationError,
 } from "@clerk/backend-api-client/models/errors";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
   let result;
   try {
-    result = await clerk.clients.verify();
+    result = await clerkBackendApi.clients.verify();
 
     // Handle the result
     console.log(result);
@@ -702,14 +702,14 @@ In some rare cases, the SDK can fail to get a response from the server or even m
 
 The default server can be overridden globally by passing a URL to the `serverURL: string` optional parameter when initializing the SDK client instance. For example:
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   serverURL: "https://api.clerk.com/v1",
 });
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 }
 
 run();
@@ -735,7 +735,7 @@ custom header and a timeout to requests and how to use the `"requestError"` hook
 to log errors:
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 import { HTTPClient } from "@clerk/backend-api-client/lib/http";
 
 const httpClient = new HTTPClient({
@@ -762,7 +762,7 @@ httpClient.addHook("requestError", (error, request) => {
   console.groupEnd();
 });
 
-const sdk = new Clerk({ httpClient });
+const sdk = new ClerkBackendApi({ httpClient });
 ```
 <!-- End Custom HTTP Client [http-client] -->
 
@@ -777,9 +777,9 @@ You can pass a logger that matches `console`'s interface as an SDK option.
 > Beware that debug logging will reveal secrets, like API tokens in headers, in log messages printed to a console or files. It's recommended to use this feature only during local development and not in production.
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const sdk = new Clerk({ debugLogger: console });
+const sdk = new ClerkBackendApi({ debugLogger: console });
 ```
 
 You can also enable a default debug logger by setting an environment variable `CLERK_DEBUG` to true.

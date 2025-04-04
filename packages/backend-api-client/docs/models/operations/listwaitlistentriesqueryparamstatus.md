@@ -7,7 +7,7 @@ Filter waitlist entries by their status
 ```typescript
 import { ListWaitlistEntriesQueryParamStatus } from "@clerk/backend-api-client/models/operations";
 
-let value: ListWaitlistEntriesQueryParamStatus = "invited";
+let value: ListWaitlistEntriesQueryParamStatus = "pending";
 ```
 
 ## Values

@@ -10,7 +10,7 @@ let value: OrganizationWithLogo = {
   id: "<id>",
   name: "<value>",
   slug: "<value>",
-  maxAllowedMemberships: 730709,
+  maxAllowedMemberships: 915906,
   adminDeleteEnabled: false,
   publicMetadata: {
     "key": "<value>",
@@ -18,9 +18,9 @@ let value: OrganizationWithLogo = {
   privateMetadata: {
     "key": "<value>",
   },
-  createdAt: 881721,
-  updatedAt: 272437,
-  imageUrl: "https://hospitable-republican.biz/",
+  createdAt: 744967,
+  updatedAt: 514072,
+  imageUrl: "https://courageous-flat.net/",
   hasImage: false,
 };
 ```

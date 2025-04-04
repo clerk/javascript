@@ -9,10 +9,10 @@ import { OrganizationMembershipPublicUserData } from "@clerk/backend-api-client/
 
 let value: OrganizationMembershipPublicUserData = {
   userId: "<id>",
-  firstName: "Pasquale",
-  lastName: "Predovic",
-  profileImageUrl: "https://sour-disposer.info",
-  imageUrl: "https://first-gallery.biz",
+  firstName: "Rosalinda",
+  lastName: "Little",
+  profileImageUrl: "https://dull-smoke.name/",
+  imageUrl: "https://humble-pharmacopoeia.info/",
   hasImage: false,
 };
 ```

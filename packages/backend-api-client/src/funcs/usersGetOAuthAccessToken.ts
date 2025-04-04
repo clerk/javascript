@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeFormQuery, encodeSimple } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  * For OAuth 2.0, if the access token has expired and we have a corresponding refresh token, the access token will be refreshed transparently the new one will be returned.
  */
 export function usersGetOAuthAccessToken(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetOAuthAccessTokenRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -58,7 +58,7 @@ export function usersGetOAuthAccessToken(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetOAuthAccessTokenRequest,
   options?: RequestOptions,
 ): Promise<

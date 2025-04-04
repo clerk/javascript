@@ -17,14 +17,14 @@ Supports filtering by email address or status and pagination with limit and offs
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.waitlistEntries.list({});
+  const result = await clerkBackendApi.waitlistEntries.list({});
 
   // Handle the result
   console.log(result);
@@ -38,17 +38,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { waitlistEntriesList } from "@clerk/backend-api-client/funcs/waitlistEntriesList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await waitlistEntriesList(clerk, {});
+  const res = await waitlistEntriesList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -90,14 +90,14 @@ If the email address is already on the waitlist, no new entry will be created an
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.waitlistEntries.create();
+  const result = await clerkBackendApi.waitlistEntries.create();
 
   // Handle the result
   console.log(result);
@@ -111,17 +111,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { waitlistEntriesCreate } from "@clerk/backend-api-client/funcs/waitlistEntriesCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await waitlistEntriesCreate(clerk);
+  const res = await waitlistEntriesCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

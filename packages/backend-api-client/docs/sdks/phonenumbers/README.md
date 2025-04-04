@@ -17,14 +17,14 @@ Create a new phone number
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.phoneNumbers.create();
+  const result = await clerkBackendApi.phoneNumbers.create();
 
   // Handle the result
   console.log(result);
@@ -38,17 +38,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { phoneNumbersCreate } from "@clerk/backend-api-client/funcs/phoneNumbersCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await phoneNumbersCreate(clerk);
+  const res = await phoneNumbersCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -90,14 +90,14 @@ Returns the details of a phone number
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.phoneNumbers.get({
+  const result = await clerkBackendApi.phoneNumbers.get({
     phoneNumberId: "<id>",
   });
 
@@ -113,17 +113,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { phoneNumbersGet } from "@clerk/backend-api-client/funcs/phoneNumbersGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await phoneNumbersGet(clerk, {
+  const res = await phoneNumbersGet(clerkBackendApi, {
     phoneNumberId: "<id>",
   });
 
@@ -167,14 +167,14 @@ Delete the phone number with the given ID
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.phoneNumbers.delete({
+  const result = await clerkBackendApi.phoneNumbers.delete({
     phoneNumberId: "<id>",
   });
 
@@ -190,17 +190,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { phoneNumbersDelete } from "@clerk/backend-api-client/funcs/phoneNumbersDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await phoneNumbersDelete(clerk, {
+  const res = await phoneNumbersDelete(clerkBackendApi, {
     phoneNumberId: "<id>",
   });
 
@@ -244,14 +244,14 @@ Updates a phone number
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.phoneNumbers.update({
+  const result = await clerkBackendApi.phoneNumbers.update({
     phoneNumberId: "<id>",
   });
 
@@ -267,17 +267,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { phoneNumbersUpdate } from "@clerk/backend-api-client/funcs/phoneNumbersUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await phoneNumbersUpdate(clerk, {
+  const res = await phoneNumbersUpdate(clerkBackendApi, {
     phoneNumberId: "<id>",
   });
 

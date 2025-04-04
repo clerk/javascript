@@ -16,14 +16,14 @@ Create a Svix app and associate it with the current instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.webhooks.createSvixApp();
+  const result = await clerkBackendApi.webhooks.createSvixApp();
 
   // Handle the result
   console.log(result);
@@ -37,17 +37,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { webhooksCreateSvixApp } from "@clerk/backend-api-client/funcs/webhooksCreateSvixApp.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await webhooksCreateSvixApp(clerk);
+  const res = await webhooksCreateSvixApp(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -88,14 +88,14 @@ Delete a Svix app and disassociate it from the current instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  await clerk.webhooks.deleteSvixApp();
+  await clerkBackendApi.webhooks.deleteSvixApp();
 
 
 }
@@ -108,17 +108,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { webhooksDeleteSvixApp } from "@clerk/backend-api-client/funcs/webhooksDeleteSvixApp.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await webhooksDeleteSvixApp(clerk);
+  const res = await webhooksDeleteSvixApp(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -158,14 +158,14 @@ Generate a new url for accessing the Svix's management dashboard for that partic
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.webhooks.generateSvixAuthURL();
+  const result = await clerkBackendApi.webhooks.generateSvixAuthURL();
 
   // Handle the result
   console.log(result);
@@ -179,17 +179,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { webhooksGenerateSvixAuthURL } from "@clerk/backend-api-client/funcs/webhooksGenerateSvixAuthURL.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await webhooksGenerateSvixAuthURL(clerk);
+  const res = await webhooksGenerateSvixAuthURL(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

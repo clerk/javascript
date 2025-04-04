@@ -6,10 +6,10 @@
 import { FromOAuth } from "@clerk/backend-api-client/models/components";
 
 let value: FromOAuth = {
-  status: "verified",
+  status: "unverified",
   strategy: "<value>",
-  expireAt: 431418,
-  attempts: 896547,
+  expireAt: 823614,
+  attempts: 183326,
 };
 ```
 

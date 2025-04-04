@@ -10,11 +10,11 @@ import { ActorToken } from "@clerk/backend-api-client/models/components";
 let value: ActorToken = {
   object: "actor_token",
   id: "<id>",
-  status: "pending",
+  status: "accepted",
   userId: "<id>",
   actor: {},
-  createdAt: 638762,
-  updatedAt: 490305,
+  createdAt: 636104,
+  updatedAt: 321886,
 };
 ```
 

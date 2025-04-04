@@ -12,7 +12,7 @@ let value: OAuthAccessToken = {
   externalAccountId: "<id>",
   providerUserId: "<id>",
   token: "<value>",
-  expiresAt: 420539,
+  expiresAt: 585878,
   provider: "<value>",
   publicMetadata: {
     "key": "<value>",

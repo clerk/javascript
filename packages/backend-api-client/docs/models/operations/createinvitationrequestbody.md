@@ -8,7 +8,7 @@ Required parameters
 import { CreateInvitationRequestBody } from "@clerk/backend-api-client/models/operations";
 
 let value: CreateInvitationRequestBody = {
-  emailAddress: "Britney9@yahoo.com",
+  emailAddress: "Orlando.Reilly75@gmail.com",
 };
 ```
 

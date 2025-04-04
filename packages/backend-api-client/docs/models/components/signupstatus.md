@@ -5,7 +5,7 @@
 ```typescript
 import { SignUpStatus } from "@clerk/backend-api-client/models/components";
 
-let value: SignUpStatus = "complete";
+let value: SignUpStatus = "missing_requirements";
 ```
 
 ## Values

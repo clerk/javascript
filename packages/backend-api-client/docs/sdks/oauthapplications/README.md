@@ -22,14 +22,14 @@ Most recent OAuth applications will be returned first.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.list({});
+  const result = await clerkBackendApi.oauthApplications.list({});
 
   // Handle the result
   console.log(result);
@@ -43,17 +43,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsList } from "@clerk/backend-api-client/funcs/oauthApplicationsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsList(clerk, {});
+  const res = await oauthApplicationsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -97,14 +97,14 @@ All URL schemes are allowed such as `http://`, `https://`, `myapp://`, etc...
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.create({
+  const result = await clerkBackendApi.oauthApplications.create({
     name: "<value>",
   });
 
@@ -120,17 +120,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsCreate } from "@clerk/backend-api-client/funcs/oauthApplicationsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsCreate(clerk, {
+  const res = await oauthApplicationsCreate(clerkBackendApi, {
     name: "<value>",
   });
 
@@ -174,14 +174,14 @@ Fetches the OAuth application whose ID matches the provided `id` in the path.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.get({
+  const result = await clerkBackendApi.oauthApplications.get({
     oauthApplicationId: "<id>",
   });
 
@@ -197,17 +197,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsGet } from "@clerk/backend-api-client/funcs/oauthApplicationsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsGet(clerk, {
+  const res = await oauthApplicationsGet(clerkBackendApi, {
     oauthApplicationId: "<id>",
   });
 
@@ -251,14 +251,14 @@ Updates an existing OAuth application
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.update({
+  const result = await clerkBackendApi.oauthApplications.update({
     oauthApplicationId: "<id>",
     requestBody: {},
   });
@@ -275,17 +275,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsUpdate } from "@clerk/backend-api-client/funcs/oauthApplicationsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsUpdate(clerk, {
+  const res = await oauthApplicationsUpdate(clerkBackendApi, {
     oauthApplicationId: "<id>",
     requestBody: {},
   });
@@ -331,14 +331,14 @@ This is not reversible.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.delete({
+  const result = await clerkBackendApi.oauthApplications.delete({
     oauthApplicationId: "<id>",
   });
 
@@ -354,17 +354,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsDelete } from "@clerk/backend-api-client/funcs/oauthApplicationsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsDelete(clerk, {
+  const res = await oauthApplicationsDelete(clerkBackendApi, {
     oauthApplicationId: "<id>",
   });
 
@@ -409,14 +409,14 @@ When the client secret is rotated, make sure to update it in authorized OAuth cl
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.oauthApplications.rotateSecret({
+  const result = await clerkBackendApi.oauthApplications.rotateSecret({
     oauthApplicationId: "<id>",
   });
 
@@ -432,17 +432,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { oauthApplicationsRotateSecret } from "@clerk/backend-api-client/funcs/oauthApplicationsRotateSecret.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await oauthApplicationsRotateSecret(clerk, {
+  const res = await oauthApplicationsRotateSecret(clerkBackendApi, {
     oauthApplicationId: "<id>",
   });
 

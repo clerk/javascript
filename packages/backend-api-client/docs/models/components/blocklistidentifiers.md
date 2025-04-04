@@ -11,7 +11,7 @@ let value: BlocklistIdentifiers = {
   data: [
     {},
   ],
-  totalCount: 974257,
+  totalCount: 299491,
 };
 ```
 

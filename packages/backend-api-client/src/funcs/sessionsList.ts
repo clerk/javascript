@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeFormQuery } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -36,7 +36,7 @@ import { Result } from "../types/fp.js";
  * moving forward at least one of `client_id` or `user_id` parameters should be provided.
  */
 export function sessionsList(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetSessionListRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -60,7 +60,7 @@ export function sessionsList(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetSessionListRequest,
   options?: RequestOptions,
 ): Promise<

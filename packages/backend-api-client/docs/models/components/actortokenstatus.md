@@ -5,7 +5,7 @@
 ```typescript
 import { ActorTokenStatus } from "@clerk/backend-api-client/models/components";
 
-let value: ActorTokenStatus = "accepted";
+let value: ActorTokenStatus = "pending";
 ```
 
 ## Values

@@ -12,12 +12,12 @@ let value: JWTTemplate = {
   id: "<id>",
   name: "<value>",
   claims: {},
-  lifetime: 985492,
-  allowedClockSkew: 968972,
+  lifetime: 358570,
+  allowedClockSkew: 679793,
   customSigningKey: false,
   signingAlgorithm: "<value>",
-  createdAt: 904949,
-  updatedAt: 296556,
+  createdAt: 933621,
+  updatedAt: 463729,
 };
 ```
 

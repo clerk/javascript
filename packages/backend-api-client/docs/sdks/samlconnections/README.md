@@ -20,14 +20,14 @@ The SAML Connections are ordered by descending creation date and the most recent
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.samlConnections.list({});
+  const result = await clerkBackendApi.samlConnections.list({});
 
   // Handle the result
   console.log(result);
@@ -41,17 +41,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { samlConnectionsList } from "@clerk/backend-api-client/funcs/samlConnectionsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await samlConnectionsList(clerk, {});
+  const res = await samlConnectionsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -93,14 +93,14 @@ Create a new SAML Connection.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.samlConnections.create();
+  const result = await clerkBackendApi.samlConnections.create();
 
   // Handle the result
   console.log(result);
@@ -114,17 +114,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { samlConnectionsCreate } from "@clerk/backend-api-client/funcs/samlConnectionsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await samlConnectionsCreate(clerk);
+  const res = await samlConnectionsCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -166,14 +166,14 @@ Fetches the SAML Connection whose ID matches the provided `saml_connection_id` i
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.samlConnections.get({
+  const result = await clerkBackendApi.samlConnections.get({
     samlConnectionId: "<id>",
   });
 
@@ -189,17 +189,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { samlConnectionsGet } from "@clerk/backend-api-client/funcs/samlConnectionsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await samlConnectionsGet(clerk, {
+  const res = await samlConnectionsGet(clerkBackendApi, {
     samlConnectionId: "<id>",
   });
 
@@ -243,14 +243,14 @@ Updates the SAML Connection whose ID matches the provided `id` in the path.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.samlConnections.update({
+  const result = await clerkBackendApi.samlConnections.update({
     samlConnectionId: "<id>",
     requestBody: {},
   });
@@ -267,17 +267,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { samlConnectionsUpdate } from "@clerk/backend-api-client/funcs/samlConnectionsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await samlConnectionsUpdate(clerk, {
+  const res = await samlConnectionsUpdate(clerkBackendApi, {
     samlConnectionId: "<id>",
     requestBody: {},
   });
@@ -322,14 +322,14 @@ Deletes the SAML Connection whose ID matches the provided `id` in the path.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.samlConnections.delete({
+  const result = await clerkBackendApi.samlConnections.delete({
     samlConnectionId: "<id>",
   });
 
@@ -345,17 +345,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { samlConnectionsDelete } from "@clerk/backend-api-client/funcs/samlConnectionsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await samlConnectionsDelete(clerk, {
+  const res = await samlConnectionsDelete(clerkBackendApi, {
     samlConnectionId: "<id>",
   });
 

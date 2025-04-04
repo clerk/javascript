@@ -1,11 +1,11 @@
 <!-- Start SDK Example Usage [usage] -->
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk();
+const clerkBackendApi = new ClerkBackendApi();
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 }
 
 run();

@@ -9,13 +9,13 @@ import { EmailAddress } from "@clerk/backend-api-client/models/components";
 
 let value: EmailAddress = {
   object: "email_address",
-  emailAddress: "Mireya_Wolf@yahoo.com",
+  emailAddress: "Arlo_Sanford75@gmail.com",
   reserved: false,
   verification: {
-    status: "unverified",
-    strategy: "<value>",
-    expireAt: 521037,
-    attempts: 54338,
+    status: "failed",
+    strategy: "email_code",
+    attempts: 511846,
+    expireAt: 482550,
   },
   linkedTo: [
     {
@@ -23,8 +23,8 @@ let value: EmailAddress = {
       id: "<id>",
     },
   ],
-  createdAt: 199996,
-  updatedAt: 18521,
+  createdAt: 887530,
+  updatedAt: 135881,
 };
 ```
 

@@ -24,14 +24,14 @@ moving forward at least one of `client_id` or `user_id` parameters should be pro
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.list({});
+  const result = await clerkBackendApi.sessions.list({});
 
   // Handle the result
   console.log(result);
@@ -45,17 +45,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsList } from "@clerk/backend-api-client/funcs/sessionsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsList(clerk, {});
+  const res = await sessionsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -100,14 +100,14 @@ we recommend using the [Sign-in Tokens](https://clerk.com/docs/reference/backend
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.create();
+  const result = await clerkBackendApi.sessions.create();
 
   // Handle the result
   console.log(result);
@@ -121,17 +121,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsCreate } from "@clerk/backend-api-client/funcs/sessionsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsCreate(clerk);
+  const res = await sessionsCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -173,14 +173,14 @@ Retrieve the details of a session
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.get({
+  const result = await clerkBackendApi.sessions.get({
     sessionId: "<id>",
   });
 
@@ -196,17 +196,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsGet } from "@clerk/backend-api-client/funcs/sessionsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsGet(clerk, {
+  const res = await sessionsGet(clerkBackendApi, {
     sessionId: "<id>",
   });
 
@@ -251,14 +251,14 @@ are validation errors, which signals the SDKs to fallback to the handshake flow.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.refresh({
+  const result = await clerkBackendApi.sessions.refresh({
     sessionId: "<id>",
   });
 
@@ -274,17 +274,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsRefresh } from "@clerk/backend-api-client/funcs/sessionsRefresh.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsRefresh(clerk, {
+  const res = await sessionsRefresh(clerkBackendApi, {
     sessionId: "<id>",
   });
 
@@ -329,14 +329,14 @@ In multi-session mode, a revoked session will still be returned along with its c
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.revoke({
+  const result = await clerkBackendApi.sessions.revoke({
     sessionId: "<id>",
   });
 
@@ -352,17 +352,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsRevoke } from "@clerk/backend-api-client/funcs/sessionsRevoke.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsRevoke(clerk, {
+  const res = await sessionsRevoke(clerkBackendApi, {
     sessionId: "<id>",
   });
 
@@ -411,14 +411,14 @@ WARNING: This endpoint is deprecated and will be removed in future versions. We 
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.verify({
+  const result = await clerkBackendApi.sessions.verify({
     sessionId: "<id>",
   });
 
@@ -434,17 +434,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsVerify } from "@clerk/backend-api-client/funcs/sessionsVerify.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsVerify(clerk, {
+  const res = await sessionsVerify(clerkBackendApi, {
     sessionId: "<id>",
   });
 
@@ -488,14 +488,14 @@ Creates a session JSON Web Token (JWT) based on a session.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.createToken({
+  const result = await clerkBackendApi.sessions.createToken({
     sessionId: "<id>",
   });
 
@@ -511,17 +511,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsCreateToken } from "@clerk/backend-api-client/funcs/sessionsCreateToken.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsCreateToken(clerk, {
+  const res = await sessionsCreateToken(clerkBackendApi, {
     sessionId: "<id>",
   });
 
@@ -565,14 +565,14 @@ Creates a JSON Web Token(JWT) based on a session and a JWT Template name defined
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.sessions.createTokenFromTemplate({
+  const result = await clerkBackendApi.sessions.createTokenFromTemplate({
     sessionId: "<id>",
     templateName: "<value>",
   });
@@ -589,17 +589,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { sessionsCreateTokenFromTemplate } from "@clerk/backend-api-client/funcs/sessionsCreateTokenFromTemplate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await sessionsCreateTokenFromTemplate(clerk, {
+  const res = await sessionsCreateTokenFromTemplate(clerkBackendApi, {
     sessionId: "<id>",
     templateName: "<value>",
   });

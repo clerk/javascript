@@ -7,8 +7,8 @@ import { CreateSAMLConnectionRequestBody } from "@clerk/backend-api-client/model
 
 let value: CreateSAMLConnectionRequestBody = {
   name: "<value>",
-  domain: "pale-milestone.biz",
-  provider: "saml_microsoft",
+  domain: "naughty-executor.org",
+  provider: "saml_custom",
 };
 ```
 

@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeFormQuery } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  * The users are returned sorted by creation date, with the newest users appearing first.
  */
 export function usersList(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetUserListRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -58,7 +58,7 @@ export function usersList(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetUserListRequest,
   options?: RequestOptions,
 ): Promise<

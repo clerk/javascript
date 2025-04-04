@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeJSON } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -36,7 +36,7 @@ import { Result } from "../types/fp.js";
  * WARNING: Changing your domain will invalidate all current user sessions (i.e. users will be logged out). Also, while your application is being deployed, a small downtime is expected to occur.
  */
 export function instanceSettingsChangeDomain(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: operations.ChangeProductionInstanceDomainRequestBody | undefined,
   options?: RequestOptions,
 ): APIPromise<
@@ -60,7 +60,7 @@ export function instanceSettingsChangeDomain(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: operations.ChangeProductionInstanceDomainRequestBody | undefined,
   options?: RequestOptions,
 ): Promise<

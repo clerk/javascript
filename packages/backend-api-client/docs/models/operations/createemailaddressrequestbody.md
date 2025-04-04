@@ -7,7 +7,7 @@ import { CreateEmailAddressRequestBody } from "@clerk/backend-api-client/models/
 
 let value: CreateEmailAddressRequestBody = {
   userId: "<id>",
-  emailAddress: "Micheal.Little@yahoo.com",
+  emailAddress: "Cydney.Graham32@hotmail.com",
 };
 ```
 

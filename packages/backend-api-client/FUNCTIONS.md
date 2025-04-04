@@ -19,16 +19,16 @@ specific category of applications.
 ## Example
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { miscellaneousGetPublicInterstitial } from "@clerk/backend-api-client/funcs/miscellaneousGetPublicInterstitial.js";
 import { SDKValidationError } from "@clerk/backend-api-client/models/errors/sdkvalidationerror.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore();
+const clerkBackendApi = new ClerkBackendApiCore();
 
 async function run() {
-  const res = await miscellaneousGetPublicInterstitial(clerk, {});
+  const res = await miscellaneousGetPublicInterstitial(clerkBackendApi, {});
 
   switch (true) {
     case res.ok:

@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeFormQuery } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -32,7 +32,7 @@ import { Result } from "../types/fp.js";
  * Returns all non-revoked invitations for your application, sorted by creation date
  */
 export function invitationsList(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.ListInvitationsRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -55,7 +55,7 @@ export function invitationsList(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.ListInvitationsRequest,
   options?: RequestOptions,
 ): Promise<

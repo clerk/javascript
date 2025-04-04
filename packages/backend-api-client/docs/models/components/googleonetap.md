@@ -6,10 +6,10 @@
 import { GoogleOneTap } from "@clerk/backend-api-client/models/components";
 
 let value: GoogleOneTap = {
-  status: "unverified",
+  status: "verified",
   strategy: "google_one_tap",
-  expireAt: 240829,
-  attempts: 100294,
+  expireAt: 537108,
+  attempts: 5426,
 };
 ```
 

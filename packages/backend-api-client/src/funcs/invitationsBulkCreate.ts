@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeJSON } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -36,7 +36,7 @@ import { Result } from "../types/fp.js";
  * note that there must be no existing user for any of the email addresses you provide, and this rule cannot be bypassed.
  */
 export function invitationsBulkCreate(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: Array<operations.RequestBody> | undefined,
   options?: RequestOptions,
 ): APIPromise<
@@ -60,7 +60,7 @@ export function invitationsBulkCreate(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: Array<operations.RequestBody> | undefined,
   options?: RequestOptions,
 ): Promise<

@@ -10,14 +10,14 @@ import { InvitationRevoked } from "@clerk/backend-api-client/models/components";
 let value: InvitationRevoked = {
   object: "invitation",
   id: "<id>",
-  emailAddress: "Vance_Schuster81@yahoo.com",
+  emailAddress: "Porter_Treutel@hotmail.com",
   publicMetadata: {
     "key": "<value>",
   },
   revoked: true,
   status: "revoked",
-  createdAt: 628899,
-  updatedAt: 398434,
+  createdAt: 105425,
+  updatedAt: 795519,
 };
 ```
 

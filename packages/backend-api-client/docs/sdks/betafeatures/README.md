@@ -15,14 +15,14 @@ Updates the settings of an instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.betaFeatures.updateInstanceSettings();
+  const result = await clerkBackendApi.betaFeatures.updateInstanceSettings();
 
   // Handle the result
   console.log(result);
@@ -36,17 +36,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { betaFeaturesUpdateInstanceSettings } from "@clerk/backend-api-client/funcs/betaFeaturesUpdateInstanceSettings.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await betaFeaturesUpdateInstanceSettings(clerk);
+  const res = await betaFeaturesUpdateInstanceSettings(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -94,14 +94,14 @@ WARNING: Changing your domain will invalidate all current user sessions (i.e. us
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  await clerk.betaFeatures.updateProductionInstanceDomain();
+  await clerkBackendApi.betaFeatures.updateProductionInstanceDomain();
 
 
 }
@@ -114,17 +114,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { betaFeaturesUpdateProductionInstanceDomain } from "@clerk/backend-api-client/funcs/betaFeaturesUpdateProductionInstanceDomain.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await betaFeaturesUpdateProductionInstanceDomain(clerk);
+  const res = await betaFeaturesUpdateProductionInstanceDomain(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

@@ -10,12 +10,12 @@ let value: Session = {
   id: "<id>",
   userId: "<id>",
   clientId: "<id>",
-  status: "ended",
-  lastActiveAt: 660174,
-  expireAt: 290077,
-  abandonAt: 618016,
-  updatedAt: 428769,
-  createdAt: 135474,
+  status: "expired",
+  lastActiveAt: 678695,
+  expireAt: 59539,
+  abandonAt: 630065,
+  updatedAt: 456916,
+  createdAt: 382827,
 };
 ```
 

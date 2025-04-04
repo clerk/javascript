@@ -14,11 +14,11 @@ let value: Domains = {
       id: "<id>",
       name: "<value>",
       isSatellite: false,
-      frontendApiUrl: "https://big-scenario.biz",
+      frontendApiUrl: "https://bleak-paintwork.biz/",
       developmentOrigin: "<value>",
     },
   ],
-  totalCount: 241418,
+  totalCount: 10103,
 };
 ```
 

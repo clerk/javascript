@@ -15,12 +15,12 @@ It is used by Clerk SDKs when the user's authentication state cannot be immediat
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk();
+const clerkBackendApi = new ClerkBackendApi();
 
 async function run() {
-  await clerk.miscellaneous.getPublicInterstitial({});
+  await clerkBackendApi.miscellaneous.getPublicInterstitial({});
 
 
 }
@@ -33,15 +33,15 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { miscellaneousGetPublicInterstitial } from "@clerk/backend-api-client/funcs/miscellaneousGetPublicInterstitial.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore();
+const clerkBackendApi = new ClerkBackendApiCore();
 
 async function run() {
-  const res = await miscellaneousGetPublicInterstitial(clerk, {});
+  const res = await miscellaneousGetPublicInterstitial(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;

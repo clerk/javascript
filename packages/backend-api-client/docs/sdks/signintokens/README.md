@@ -17,14 +17,14 @@ You can optionally supply a different duration in seconds using the `expires_in_
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.signInTokens.create();
+  const result = await clerkBackendApi.signInTokens.create();
 
   // Handle the result
   console.log(result);
@@ -38,17 +38,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { signInTokensCreate } from "@clerk/backend-api-client/funcs/signInTokensCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await signInTokensCreate(clerk);
+  const res = await signInTokensCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -90,14 +90,14 @@ Revokes a pending sign-in token
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.signInTokens.revoke({
+  const result = await clerkBackendApi.signInTokens.revoke({
     signInTokenId: "<id>",
   });
 
@@ -113,17 +113,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { signInTokensRevoke } from "@clerk/backend-api-client/funcs/signInTokensRevoke.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await signInTokensRevoke(clerk, {
+  const res = await signInTokensRevoke(clerkBackendApi, {
     signInTokenId: "<id>",
   });
 

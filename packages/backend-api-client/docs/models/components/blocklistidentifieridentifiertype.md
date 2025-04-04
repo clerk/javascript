@@ -5,7 +5,7 @@
 ```typescript
 import { BlocklistIdentifierIdentifierType } from "@clerk/backend-api-client/models/components";
 
-let value: BlocklistIdentifierIdentifierType = "web3_wallet";
+let value: BlocklistIdentifierIdentifierType = "phone_number";
 ```
 
 ## Values

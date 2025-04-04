@@ -9,13 +9,13 @@ import { PhoneNumber } from "@clerk/backend-api-client/models/components";
 
 let value: PhoneNumber = {
   object: "phone_number",
-  phoneNumber: "432.397.4220 x4363",
+  phoneNumber: "749-570-5537 x9671",
   reserved: false,
   verification: {
     status: "unverified",
     strategy: "phone_code",
-    attempts: 679393,
-    expireAt: 453697,
+    attempts: 113519,
+    expireAt: 242200,
   },
   linkedTo: [
     {
@@ -23,8 +23,8 @@ let value: PhoneNumber = {
       id: "<id>",
     },
   ],
-  createdAt: 536579,
-  updatedAt: 896672,
+  createdAt: 255568,
+  updatedAt: 956779,
 };
 ```
 

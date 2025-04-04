@@ -18,14 +18,14 @@ List all templates
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwtTemplates.list({});
+  const result = await clerkBackendApi.jwtTemplates.list({});
 
   // Handle the result
   console.log(result);
@@ -39,17 +39,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwtTemplatesList } from "@clerk/backend-api-client/funcs/jwtTemplatesList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwtTemplatesList(clerk, {});
+  const res = await jwtTemplatesList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -90,14 +90,14 @@ Create a new JWT template
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwtTemplates.create();
+  const result = await clerkBackendApi.jwtTemplates.create();
 
   // Handle the result
   console.log(result);
@@ -111,17 +111,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwtTemplatesCreate } from "@clerk/backend-api-client/funcs/jwtTemplatesCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwtTemplatesCreate(clerk);
+  const res = await jwtTemplatesCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -163,14 +163,14 @@ Retrieve the details of a given JWT template
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwtTemplates.get({
+  const result = await clerkBackendApi.jwtTemplates.get({
     templateId: "<id>",
   });
 
@@ -186,17 +186,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwtTemplatesGet } from "@clerk/backend-api-client/funcs/jwtTemplatesGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwtTemplatesGet(clerk, {
+  const res = await jwtTemplatesGet(clerkBackendApi, {
     templateId: "<id>",
   });
 
@@ -240,14 +240,14 @@ Updates an existing JWT template
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwtTemplates.update({
+  const result = await clerkBackendApi.jwtTemplates.update({
     templateId: "<id>",
   });
 
@@ -263,17 +263,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwtTemplatesUpdate } from "@clerk/backend-api-client/funcs/jwtTemplatesUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwtTemplatesUpdate(clerk, {
+  const res = await jwtTemplatesUpdate(clerkBackendApi, {
     templateId: "<id>",
   });
 
@@ -317,14 +317,14 @@ Delete a Template
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.jwtTemplates.delete({
+  const result = await clerkBackendApi.jwtTemplates.delete({
     templateId: "<id>",
   });
 
@@ -340,17 +340,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { jwtTemplatesDelete } from "@clerk/backend-api-client/funcs/jwtTemplatesDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await jwtTemplatesDelete(clerk, {
+  const res = await jwtTemplatesDelete(clerkBackendApi, {
     templateId: "<id>",
   });
 

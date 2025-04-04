@@ -12,18 +12,18 @@ let value: OrganizationDomain = {
   id: "<id>",
   organizationId: "<id>",
   name: "<value>",
-  enrollmentMode: "automatic_invitation",
+  enrollmentMode: "automatic_suggestion",
   affiliationEmailAddress: "<value>",
   verification: {
     status: "verified",
     strategy: "<value>",
-    attempts: 633998,
-    expireAt: 867290,
+    attempts: 151278,
+    expireAt: 451117,
   },
-  totalPendingInvitations: 940210,
-  totalPendingSuggestions: 750765,
-  createdAt: 699575,
-  updatedAt: 967966,
+  totalPendingInvitations: 195211,
+  totalPendingSuggestions: 406321,
+  createdAt: 84447,
+  updatedAt: 140929,
 };
 ```
 

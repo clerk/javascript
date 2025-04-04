@@ -23,14 +23,14 @@ different organization as active before then.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationMemberships.create({
+  const result = await clerkBackendApi.organizationMemberships.create({
     organizationId: "<id>",
     requestBody: {
       userId: "<id>",
@@ -50,17 +50,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationMembershipsCreate } from "@clerk/backend-api-client/funcs/organizationMembershipsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationMembershipsCreate(clerk, {
+  const res = await organizationMembershipsCreate(clerkBackendApi, {
     organizationId: "<id>",
     requestBody: {
       userId: "<id>",
@@ -108,14 +108,14 @@ Retrieves all user memberships for the given organization
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationMemberships.list({
+  const result = await clerkBackendApi.organizationMemberships.list({
     organizationId: "<id>",
     lastActiveAtBefore: 1700690400000,
     lastActiveAtAfter: 1700690400000,
@@ -135,17 +135,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationMembershipsList } from "@clerk/backend-api-client/funcs/organizationMembershipsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationMembershipsList(clerk, {
+  const res = await organizationMembershipsList(clerkBackendApi, {
     organizationId: "<id>",
     lastActiveAtBefore: 1700690400000,
     lastActiveAtAfter: 1700690400000,
@@ -193,14 +193,14 @@ Updates the properties of an existing organization membership
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationMemberships.update({
+  const result = await clerkBackendApi.organizationMemberships.update({
     organizationId: "<id>",
     userId: "<id>",
     requestBody: {
@@ -220,17 +220,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationMembershipsUpdate } from "@clerk/backend-api-client/funcs/organizationMembershipsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationMembershipsUpdate(clerk, {
+  const res = await organizationMembershipsUpdate(clerkBackendApi, {
     organizationId: "<id>",
     userId: "<id>",
     requestBody: {
@@ -278,14 +278,14 @@ Removes the given membership from the organization
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationMemberships.delete({
+  const result = await clerkBackendApi.organizationMemberships.delete({
     organizationId: "<id>",
     userId: "<id>",
   });
@@ -302,17 +302,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationMembershipsDelete } from "@clerk/backend-api-client/funcs/organizationMembershipsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationMembershipsDelete(clerk, {
+  const res = await organizationMembershipsDelete(clerkBackendApi, {
     organizationId: "<id>",
     userId: "<id>",
   });
@@ -359,14 +359,14 @@ You can remove metadata keys at any level by setting their value to `null`.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationMemberships.updateMetadata({
+  const result = await clerkBackendApi.organizationMemberships.updateMetadata({
     organizationId: "<id>",
     userId: "<id>",
   });
@@ -383,17 +383,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationMembershipsUpdateMetadata } from "@clerk/backend-api-client/funcs/organizationMembershipsUpdateMetadata.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationMembershipsUpdateMetadata(clerk, {
+  const res = await organizationMembershipsUpdateMetadata(clerkBackendApi, {
     organizationId: "<id>",
     userId: "<id>",
   });

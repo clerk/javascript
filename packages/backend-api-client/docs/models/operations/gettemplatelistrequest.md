@@ -6,7 +6,7 @@
 import { GetTemplateListRequest } from "@clerk/backend-api-client/models/operations";
 
 let value: GetTemplateListRequest = {
-  templateType: "email",
+  templateType: "sms",
 };
 ```
 

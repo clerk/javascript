@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeFormQuery } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -31,7 +31,7 @@ import { Result } from "../types/fp.js";
  * It is used by Clerk SDKs when the user's authentication state cannot be immediately determined.
  */
 export function miscellaneousGetPublicInterstitial(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetPublicInterstitialRequest,
   options?: RequestOptions,
 ): APIPromise<
@@ -54,7 +54,7 @@ export function miscellaneousGetPublicInterstitial(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request: operations.GetPublicInterstitialRequest,
   options?: RequestOptions,
 ): Promise<

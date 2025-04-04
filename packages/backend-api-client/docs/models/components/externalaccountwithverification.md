@@ -6,25 +6,25 @@
 import { ExternalAccountWithVerification } from "@clerk/backend-api-client/models/components";
 
 let value: ExternalAccountWithVerification = {
-  object: "facebook_account",
+  object: "external_account",
   id: "<id>",
   provider: "<value>",
   identificationId: "<id>",
   providerUserId: "<id>",
   approvedScopes: "<value>",
-  emailAddress: "Dario63@hotmail.com",
-  firstName: "Elda",
-  lastName: "Mosciski",
+  emailAddress: "Wilfred60@yahoo.com",
+  firstName: "Retha",
+  lastName: "Howell",
   publicMetadata: {
     "key": "<value>",
   },
-  createdAt: 13236,
-  updatedAt: 347233,
+  createdAt: 851814,
+  updatedAt: 752768,
   verification: {
-    status: "transferable",
+    status: "failed",
     strategy: "<value>",
-    expireAt: 478370,
-    attempts: 497391,
+    expireAt: 455623,
+    attempts: 310189,
   },
 };
 ```

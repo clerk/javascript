@@ -10,9 +10,9 @@ import { RedirectURL } from "@clerk/backend-api-client/models/components";
 let value: RedirectURL = {
   object: "redirect_url",
   id: "<id>",
-  url: "https://firm-impact.info",
-  createdAt: 248413,
-  updatedAt: 505866,
+  url: "https://helpful-yak.org/",
+  createdAt: 858704,
+  updatedAt: 594706,
 };
 ```
 

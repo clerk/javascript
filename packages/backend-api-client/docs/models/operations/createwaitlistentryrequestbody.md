@@ -6,7 +6,7 @@
 import { CreateWaitlistEntryRequestBody } from "@clerk/backend-api-client/models/operations";
 
 let value: CreateWaitlistEntryRequestBody = {
-  emailAddress: "Maximo.Schulist@hotmail.com",
+  emailAddress: "Katarina6@yahoo.com",
 };
 ```
 

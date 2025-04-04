@@ -5,7 +5,7 @@
 ```typescript
 import { SAMLVerificationStatus } from "@clerk/backend-api-client/models/components";
 
-let value: SAMLVerificationStatus = "unverified";
+let value: SAMLVerificationStatus = "failed";
 ```
 
 ## Values

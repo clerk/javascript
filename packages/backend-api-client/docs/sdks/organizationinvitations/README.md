@@ -25,14 +25,14 @@ The organization invitations are ordered by descending creation date by default.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.getAll({});
+  const result = await clerkBackendApi.organizationInvitations.getAll({});
 
   // Handle the result
   console.log(result);
@@ -46,17 +46,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsGetAll } from "@clerk/backend-api-client/funcs/organizationInvitationsGetAll.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsGetAll(clerk, {});
+  const res = await organizationInvitationsGetAll(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -114,14 +114,14 @@ When the organization invitation is accepted, the metadata will be transferred t
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.create({
+  const result = await clerkBackendApi.organizationInvitations.create({
     organizationId: "<id>",
   });
 
@@ -137,17 +137,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsCreate } from "@clerk/backend-api-client/funcs/organizationInvitationsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsCreate(clerk, {
+  const res = await organizationInvitationsCreate(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -196,14 +196,14 @@ Any invitations created as a result of an Organization Domain are not included i
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.list({
+  const result = await clerkBackendApi.organizationInvitations.list({
     organizationId: "<id>",
   });
 
@@ -219,17 +219,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsList } from "@clerk/backend-api-client/funcs/organizationInvitationsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsList(clerk, {
+  const res = await organizationInvitationsList(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -285,14 +285,14 @@ When the organization invitation is accepted, the metadata will be transferred t
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.bulkCreate({
+  const result = await clerkBackendApi.organizationInvitations.bulkCreate({
     organizationId: "<id>",
     requestBody: [
 
@@ -311,17 +311,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsBulkCreate } from "@clerk/backend-api-client/funcs/organizationInvitationsBulkCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsBulkCreate(clerk, {
+  const res = await organizationInvitationsBulkCreate(clerkBackendApi, {
     organizationId: "<id>",
     requestBody: [
   
@@ -375,14 +375,14 @@ Any invitations created as a result of an Organization Domain are not included i
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.listPending({
+  const result = await clerkBackendApi.organizationInvitations.listPending({
     organizationId: "<id>",
   });
 
@@ -398,17 +398,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsListPending } from "@clerk/backend-api-client/funcs/organizationInvitationsListPending.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsListPending(clerk, {
+  const res = await organizationInvitationsListPending(clerkBackendApi, {
     organizationId: "<id>",
   });
 
@@ -452,14 +452,14 @@ Use this request to get an existing organization invitation by ID.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.get({
+  const result = await clerkBackendApi.organizationInvitations.get({
     organizationId: "<id>",
     invitationId: "<id>",
   });
@@ -476,17 +476,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsGet } from "@clerk/backend-api-client/funcs/organizationInvitationsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsGet(clerk, {
+  const res = await organizationInvitationsGet(clerkBackendApi, {
     organizationId: "<id>",
     invitationId: "<id>",
   });
@@ -535,14 +535,14 @@ Only users with "admin" role can revoke invitations.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.organizationInvitations.revoke({
+  const result = await clerkBackendApi.organizationInvitations.revoke({
     organizationId: "<id>",
     invitationId: "<id>",
   });
@@ -559,17 +559,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { organizationInvitationsRevoke } from "@clerk/backend-api-client/funcs/organizationInvitationsRevoke.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await organizationInvitationsRevoke(clerk, {
+  const res = await organizationInvitationsRevoke(clerkBackendApi, {
     organizationId: "<id>",
     invitationId: "<id>",
   });

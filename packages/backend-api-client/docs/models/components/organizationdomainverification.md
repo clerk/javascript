@@ -8,10 +8,10 @@ Verification details for the domain
 import { OrganizationDomainVerification } from "@clerk/backend-api-client/models/components";
 
 let value: OrganizationDomainVerification = {
-  status: "unverified",
+  status: "verified",
   strategy: "<value>",
-  attempts: 839189,
-  expireAt: 237742,
+  attempts: 337698,
+  expireAt: 194236,
 };
 ```
 

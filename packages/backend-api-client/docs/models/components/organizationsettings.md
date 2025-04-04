@@ -10,9 +10,9 @@ import { OrganizationSettings } from "@clerk/backend-api-client/models/component
 let value: OrganizationSettings = {
   object: "organization_settings",
   enabled: false,
-  maxAllowedMemberships: 414857,
-  maxAllowedRoles: 360545,
-  maxAllowedPermissions: 828657,
+  maxAllowedMemberships: 207735,
+  maxAllowedRoles: 798517,
+  maxAllowedPermissions: 12666,
   creatorRole: "<value>",
   adminDeleteEnabled: false,
   domainsEnabled: false,

@@ -12,19 +12,19 @@ let value: OrganizationInvitationsWithPublicOrganizationData = {
     {
       object: "organization_invitation",
       id: "<id>",
-      emailAddress: "Alvena_Blick@yahoo.com",
+      emailAddress: "Cruz_Brakus@yahoo.com",
       role: "<value>",
       roleName: "<value>",
       publicMetadata: {
         "key": "<value>",
       },
-      url: "https://punctual-amnesty.info",
-      expiresAt: 510017,
-      createdAt: 536178,
-      updatedAt: 681393,
+      url: "https://dark-underneath.org/",
+      expiresAt: 82541,
+      createdAt: 32271,
+      updatedAt: 430026,
     },
   ],
-  totalCount: 277596,
+  totalCount: 536855,
 };
 ```
 

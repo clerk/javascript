@@ -5,7 +5,7 @@
 ```typescript
 import { OTPVerificationStrategy } from "@clerk/backend-api-client/models/components";
 
-let value: OTPVerificationStrategy = "reset_password_email_code";
+let value: OTPVerificationStrategy = "email_code";
 ```
 
 ## Values

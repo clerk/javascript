@@ -16,14 +16,14 @@ Get a list of all identifiers which are not allowed to access an instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.blocklistIdentifiers.list();
+  const result = await clerkBackendApi.blocklistIdentifiers.list();
 
   // Handle the result
   console.log(result);
@@ -37,17 +37,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { blocklistIdentifiersList } from "@clerk/backend-api-client/funcs/blocklistIdentifiersList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await blocklistIdentifiersList(clerk);
+  const res = await blocklistIdentifiersList(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -88,14 +88,14 @@ Create an identifier that is blocked from accessing an instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.blocklistIdentifiers.create();
+  const result = await clerkBackendApi.blocklistIdentifiers.create();
 
   // Handle the result
   console.log(result);
@@ -109,17 +109,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { blocklistIdentifiersCreate } from "@clerk/backend-api-client/funcs/blocklistIdentifiersCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await blocklistIdentifiersCreate(clerk);
+  const res = await blocklistIdentifiersCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -161,14 +161,14 @@ Delete an identifier from the instance block-list
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.blocklistIdentifiers.delete({
+  const result = await clerkBackendApi.blocklistIdentifiers.delete({
     identifierId: "<id>",
   });
 
@@ -184,17 +184,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { blocklistIdentifiersDelete } from "@clerk/backend-api-client/funcs/blocklistIdentifiersDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await blocklistIdentifiersDelete(clerk, {
+  const res = await blocklistIdentifiersDelete(clerkBackendApi, {
     identifierId: "<id>",
   });
 

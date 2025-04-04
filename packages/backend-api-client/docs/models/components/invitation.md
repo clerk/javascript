@@ -10,14 +10,14 @@ import { Invitation } from "@clerk/backend-api-client/models/components";
 let value: Invitation = {
   object: "invitation",
   id: "<id>",
-  emailAddress: "Lou_Cronin@hotmail.com",
+  emailAddress: "Lenora_Metz47@gmail.com",
   publicMetadata: {
     "key": "<value>",
   },
   revoked: false,
   status: "pending",
-  createdAt: 590984,
-  updatedAt: 857723,
+  createdAt: 357903,
+  updatedAt: 632042,
 };
 ```
 

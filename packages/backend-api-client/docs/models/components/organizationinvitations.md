@@ -12,19 +12,19 @@ let value: OrganizationInvitations = {
     {
       object: "organization_invitation",
       id: "<id>",
-      emailAddress: "Jacinto_Feest3@hotmail.com",
+      emailAddress: "Cody.Bergstrom@yahoo.com",
       role: "<value>",
       roleName: "<value>",
       publicMetadata: {
         "key": "<value>",
       },
-      url: "https://black-director.biz/",
-      expiresAt: 253191,
-      createdAt: 131055,
-      updatedAt: 12036,
+      url: "https://grandiose-epic.biz",
+      expiresAt: 244152,
+      createdAt: 319917,
+      updatedAt: 133999,
     },
   ],
-  totalCount: 115484,
+  totalCount: 510654,
 };
 ```
 

@@ -3,7 +3,7 @@
  */
 
 import * as z from "zod";
-import { ClerkCore } from "../core.js";
+import { ClerkBackendApiCore } from "../core.js";
 import { encodeJSON } from "../lib/encodings.js";
 import * as M from "../lib/matchers.js";
 import { compactMap } from "../lib/primitives.js";
@@ -38,7 +38,7 @@ import { Result } from "../types/fp.js";
  * @deprecated method: This will be removed in a future release, please migrate away from it as soon as possible.
  */
 export function betaFeaturesUpdateProductionInstanceDomain(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: operations.UpdateProductionInstanceDomainRequestBody | undefined,
   options?: RequestOptions,
 ): APIPromise<
@@ -62,7 +62,7 @@ export function betaFeaturesUpdateProductionInstanceDomain(
 }
 
 async function $do(
-  client: ClerkCore,
+  client: ClerkBackendApiCore,
   request?: operations.UpdateProductionInstanceDomainRequestBody | undefined,
   options?: RequestOptions,
 ): Promise<

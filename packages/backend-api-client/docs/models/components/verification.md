@@ -7,10 +7,10 @@
 
 ```typescript
 const value: components.Otp = {
-  status: "expired",
-  strategy: "phone_code",
-  attempts: 868126,
-  expireAt: 162493,
+  status: "verified",
+  strategy: "email_code",
+  attempts: 96573,
+  expireAt: 203129,
 };
 ```
 
@@ -20,8 +20,8 @@ const value: components.Otp = {
 const value: components.Admin = {
   status: "verified",
   strategy: "admin",
-  attempts: 615560,
-  expireAt: 123820,
+  attempts: 443786,
+  expireAt: 762106,
 };
 ```
 
@@ -29,10 +29,10 @@ const value: components.Admin = {
 
 ```typescript
 const value: components.FromOAuth = {
-  status: "verified",
+  status: "unverified",
   strategy: "<value>",
-  expireAt: 807319,
-  attempts: 569101,
+  expireAt: 680983,
+  attempts: 822603,
 };
 ```
 
@@ -40,10 +40,10 @@ const value: components.FromOAuth = {
 
 ```typescript
 const value: components.Ticket = {
-  status: "verified",
+  status: "unverified",
   strategy: "ticket",
-  attempts: 69167,
-  expireAt: 697429,
+  attempts: 281284,
+  expireAt: 751089,
 };
 ```
 

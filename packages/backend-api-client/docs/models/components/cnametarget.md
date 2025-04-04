@@ -6,7 +6,7 @@
 import { CNameTarget } from "@clerk/backend-api-client/models/components";
 
 let value: CNameTarget = {
-  host: "insistent-markup.biz",
+  host: "broken-term.info",
   value: "<value>",
   required: false,
 };

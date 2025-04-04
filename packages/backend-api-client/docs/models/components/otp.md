@@ -6,10 +6,10 @@
 import { Otp } from "@clerk/backend-api-client/models/components";
 
 let value: Otp = {
-  status: "failed",
+  status: "expired",
   strategy: "phone_code",
-  attempts: 919483,
-  expireAt: 714242,
+  attempts: 473959,
+  expireAt: 690073,
 };
 ```
 

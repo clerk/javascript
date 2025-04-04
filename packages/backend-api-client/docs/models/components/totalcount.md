@@ -9,7 +9,7 @@ import { TotalCount } from "@clerk/backend-api-client/models/components";
 
 let value: TotalCount = {
   object: "total_count",
-  totalCount: 245367,
+  totalCount: 194474,
 };
 ```
 

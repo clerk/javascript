@@ -10,16 +10,16 @@ import { OrganizationInvitationWithPublicOrganizationData } from "@clerk/backend
 let value: OrganizationInvitationWithPublicOrganizationData = {
   object: "organization_invitation",
   id: "<id>",
-  emailAddress: "Gladys45@gmail.com",
+  emailAddress: "Bridget.Towne@gmail.com",
   role: "<value>",
   roleName: "<value>",
   publicMetadata: {
     "key": "<value>",
   },
-  url: "https://serene-guard.org/",
-  expiresAt: 690025,
-  createdAt: 699622,
-  updatedAt: 327720,
+  url: "https://dramatic-birdbath.name/",
+  expiresAt: 605579,
+  createdAt: 495870,
+  updatedAt: 834792,
 };
 ```
 

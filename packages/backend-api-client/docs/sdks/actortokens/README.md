@@ -16,14 +16,14 @@ The `actor` parameter needs to include at least a "sub" key whose value is the I
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.actorTokens.create({
+  const result = await clerkBackendApi.actorTokens.create({
     userId: "<id>",
     actor: {
       sub: "user_2OEpKhcCN1Lat9NQ0G6puh7q5Rb",
@@ -42,17 +42,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { actorTokensCreate } from "@clerk/backend-api-client/funcs/actorTokensCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await actorTokensCreate(clerk, {
+  const res = await actorTokensCreate(clerkBackendApi, {
     userId: "<id>",
     actor: {
       sub: "user_2OEpKhcCN1Lat9NQ0G6puh7q5Rb",
@@ -99,14 +99,14 @@ Revokes a pending actor token.
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.actorTokens.revoke({
+  const result = await clerkBackendApi.actorTokens.revoke({
     actorTokenId: "<id>",
   });
 
@@ -122,17 +122,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { actorTokensRevoke } from "@clerk/backend-api-client/funcs/actorTokensRevoke.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await actorTokensRevoke(clerk, {
+  const res = await actorTokensRevoke(clerkBackendApi, {
     actorTokenId: "<id>",
   });
 

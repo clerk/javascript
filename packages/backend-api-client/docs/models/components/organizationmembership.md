@@ -22,7 +22,7 @@ let value: OrganizationMembership = {
     id: "<id>",
     name: "<value>",
     slug: "<value>",
-    maxAllowedMemberships: 683282,
+    maxAllowedMemberships: 855587,
     adminDeleteEnabled: false,
     publicMetadata: {
       "key": "<value>",
@@ -30,11 +30,11 @@ let value: OrganizationMembership = {
     privateMetadata: {
       "key": "<value>",
     },
-    createdAt: 695626,
-    updatedAt: 283519,
+    createdAt: 692983,
+    updatedAt: 707934,
   },
-  createdAt: 379927,
-  updatedAt: 181151,
+  createdAt: 330138,
+  updatedAt: 694003,
 };
 ```
 

@@ -7,7 +7,7 @@ Filter invitations based on their status
 ```typescript
 import { ListInvitationsQueryParamStatus } from "@clerk/backend-api-client/models/operations";
 
-let value: ListInvitationsQueryParamStatus = "pending";
+let value: ListInvitationsQueryParamStatus = "accepted";
 ```
 
 ## Values

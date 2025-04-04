@@ -8,7 +8,7 @@ Response that contains a temporary Svix URL to access management dashboard
 import { SvixURL } from "@clerk/backend-api-client/models/components";
 
 let value: SvixURL = {
-  svixUrl: "https://entire-follower.net/",
+  svixUrl: "https://incomplete-puppet.com",
 };
 ```
 

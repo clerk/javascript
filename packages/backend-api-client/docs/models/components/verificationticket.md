@@ -6,10 +6,10 @@
 import { VerificationTicket } from "@clerk/backend-api-client/models/components";
 
 let value: VerificationTicket = {
-  status: "unverified",
+  status: "expired",
   strategy: "ticket",
-  attempts: 663078,
-  expireAt: 263322,
+  attempts: 37363,
+  expireAt: 355870,
 };
 ```
 

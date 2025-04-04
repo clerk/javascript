@@ -17,18 +17,18 @@ let value: OrganizationDomains = {
       enrollmentMode: "automatic_suggestion",
       affiliationEmailAddress: "<value>",
       verification: {
-        status: "unverified",
+        status: "verified",
         strategy: "<value>",
-        attempts: 70869,
-        expireAt: 292794,
+        attempts: 151251,
+        expireAt: 281645,
       },
-      totalPendingInvitations: 152354,
-      totalPendingSuggestions: 417486,
-      createdAt: 131289,
-      updatedAt: 604118,
+      totalPendingInvitations: 311206,
+      totalPendingSuggestions: 882518,
+      createdAt: 642879,
+      updatedAt: 237153,
     },
   ],
-  totalCount: 382808,
+  totalCount: 402888,
 };
 ```
 

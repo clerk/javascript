@@ -5,7 +5,7 @@
 ```typescript
 import { CodeType } from "@clerk/backend-api-client/models/operations";
 
-let value: CodeType = "totp";
+let value: CodeType = "backup_code";
 ```
 
 ## Values

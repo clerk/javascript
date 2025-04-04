@@ -7,10 +7,10 @@
 
 ```typescript
 const value: components.VerificationOTP = {
-  status: "failed",
-  strategy: "phone_code",
-  attempts: 934214,
-  expireAt: 613966,
+  status: "unverified",
+  strategy: "reset_password_email_code",
+  attempts: 680380,
+  expireAt: 756824,
 };
 ```
 
@@ -20,8 +20,8 @@ const value: components.VerificationOTP = {
 const value: components.VerificationAdmin = {
   status: "verified",
   strategy: "admin",
-  attempts: 535633,
-  expireAt: 589910,
+  attempts: 743059,
+  expireAt: 136129,
 };
 ```
 

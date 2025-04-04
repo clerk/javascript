@@ -8,9 +8,9 @@ import { Saml } from "@clerk/backend-api-client/models/components";
 let value: Saml = {
   status: "expired",
   strategy: "saml",
-  externalVerificationRedirectUrl: "https://ideal-mortise.net/",
-  expireAt: 628982,
-  attempts: 872651,
+  externalVerificationRedirectUrl: "https://firsthand-synergy.com/",
+  expireAt: 974621,
+  attempts: 993279,
 };
 ```
 

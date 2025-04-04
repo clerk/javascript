@@ -21,14 +21,14 @@ a different proxy URL than the one provided. It can also be used to re-validate 
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.proxyChecks.verify();
+  const result = await clerkBackendApi.proxyChecks.verify();
 
   // Handle the result
   console.log(result);
@@ -42,17 +42,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { proxyChecksVerify } from "@clerk/backend-api-client/funcs/proxyChecksVerify.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await proxyChecksVerify(clerk);
+  const res = await proxyChecksVerify(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

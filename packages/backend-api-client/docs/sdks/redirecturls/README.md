@@ -17,14 +17,14 @@ Lists all whitelisted redirect_urls for the instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.redirectUrls.list({});
+  const result = await clerkBackendApi.redirectUrls.list({});
 
   // Handle the result
   console.log(result);
@@ -38,17 +38,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { redirectUrlsList } from "@clerk/backend-api-client/funcs/redirectUrlsList.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await redirectUrlsList(clerk, {});
+  const res = await redirectUrlsList(clerkBackendApi, {});
 
   if (!res.ok) {
     throw res.error;
@@ -89,14 +89,14 @@ Create a redirect URL
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.redirectUrls.create();
+  const result = await clerkBackendApi.redirectUrls.create();
 
   // Handle the result
   console.log(result);
@@ -110,17 +110,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { redirectUrlsCreate } from "@clerk/backend-api-client/funcs/redirectUrlsCreate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await redirectUrlsCreate(clerk);
+  const res = await redirectUrlsCreate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -162,14 +162,14 @@ Retrieve the details of the redirect URL with the given ID
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.redirectUrls.get({
+  const result = await clerkBackendApi.redirectUrls.get({
     id: "<id>",
   });
 
@@ -185,17 +185,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { redirectUrlsGet } from "@clerk/backend-api-client/funcs/redirectUrlsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await redirectUrlsGet(clerk, {
+  const res = await redirectUrlsGet(clerkBackendApi, {
     id: "<id>",
   });
 
@@ -239,14 +239,14 @@ Remove the selected redirect URL from the whitelist of the instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.redirectUrls.delete({
+  const result = await clerkBackendApi.redirectUrls.delete({
     id: "<id>",
   });
 
@@ -262,17 +262,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { redirectUrlsDelete } from "@clerk/backend-api-client/funcs/redirectUrlsDelete.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await redirectUrlsDelete(clerk, {
+  const res = await redirectUrlsDelete(clerkBackendApi, {
     id: "<id>",
   });
 

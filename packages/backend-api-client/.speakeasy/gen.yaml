@@ -3,7 +3,7 @@ generation:
   devContainers:
     enabled: true
     schemaPath: https://raw.githubusercontent.com/clerk/openapi-specs/refs/heads/main/bapi/2025-03-12.yml
-  sdkClassName: Clerk
+  sdkClassName: ClerkBackendApi
   maintainOpenAPIOrder: true
   usageSnippets:
     optionalPropertyRendering: withExample
@@ -18,7 +18,7 @@ generation:
     oAuth2ClientCredentialsEnabled: true
     oAuth2PasswordEnabled: true
 typescript:
-  version: 0.3.10
+  version: 0.3.11
   additionalDependencies:
     dependencies: {}
     devDependencies: {}

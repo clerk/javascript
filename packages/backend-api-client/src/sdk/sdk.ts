@@ -36,7 +36,7 @@ import { Users } from "./users.js";
 import { WaitlistEntries } from "./waitlistentries.js";
 import { Webhooks } from "./webhooks.js";
 
-export class Clerk extends ClientSDK {
+export class ClerkBackendApi extends ClientSDK {
   private _miscellaneous?: Miscellaneous;
   get miscellaneous(): Miscellaneous {
     return (this._miscellaneous ??= new Miscellaneous(this._options));

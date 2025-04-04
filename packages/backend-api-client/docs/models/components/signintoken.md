@@ -10,10 +10,10 @@ import { SignInToken } from "@clerk/backend-api-client/models/components";
 let value: SignInToken = {
   object: "sign_in_token",
   id: "<id>",
-  status: "accepted",
+  status: "pending",
   userId: "<id>",
-  createdAt: 524970,
-  updatedAt: 750595,
+  createdAt: 182414,
+  updatedAt: 992608,
 };
 ```
 

@@ -9,13 +9,13 @@ let value: Web3Wallet = {
   object: "web3_wallet",
   web3Wallet: "<value>",
   verification: {
-    status: "verified",
-    strategy: "admin",
-    attempts: 146946,
-    expireAt: 79522,
+    status: "unverified",
+    strategy: "web3_okx_wallet_signature",
+    attempts: 765974,
+    expireAt: 362107,
   },
-  createdAt: 89603,
-  updatedAt: 672048,
+  createdAt: 676177,
+  updatedAt: 936027,
 };
 ```
 

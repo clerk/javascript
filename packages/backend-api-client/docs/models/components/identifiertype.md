@@ -5,7 +5,7 @@
 ```typescript
 import { IdentifierType } from "@clerk/backend-api-client/models/components";
 
-let value: IdentifierType = "phone_number";
+let value: IdentifierType = "email_address";
 ```
 
 ## Values

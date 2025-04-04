@@ -6,10 +6,10 @@
 import { Web3Signature } from "@clerk/backend-api-client/models/components";
 
 let value: Web3Signature = {
-  status: "expired",
-  strategy: "web3_okx_wallet_signature",
-  attempts: 333145,
-  expireAt: 81101,
+  status: "failed",
+  strategy: "web3_coinbase_wallet_signature",
+  attempts: 405645,
+  expireAt: 250679,
 };
 ```
 

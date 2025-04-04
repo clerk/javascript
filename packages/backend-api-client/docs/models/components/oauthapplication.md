@@ -16,14 +16,14 @@ let value: OAuthApplication = {
   redirectUris: [
     "<value>",
   ],
-  callbackUrl: "https://vague-someplace.org",
-  authorizeUrl: "https://antique-completion.info",
-  tokenFetchUrl: "https://frivolous-coast.org",
-  userInfoUrl: "https://untried-coast.name/",
-  discoveryUrl: "https://blushing-possession.biz/",
-  tokenIntrospectionUrl: "https://bare-bar.org/",
-  createdAt: 739884,
-  updatedAt: 898063,
+  callbackUrl: "https://insecure-fireplace.org",
+  authorizeUrl: "https://limping-reboot.com",
+  tokenFetchUrl: "https://practical-cemetery.net/",
+  userInfoUrl: "https://noted-appliance.info",
+  discoveryUrl: "https://primary-sonar.name/",
+  tokenIntrospectionUrl: "https://unselfish-pendant.biz/",
+  createdAt: 869106,
+  updatedAt: 674489,
 };
 ```
 

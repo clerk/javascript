@@ -7,7 +7,7 @@ import { CreatePhoneNumberRequestBody } from "@clerk/backend-api-client/models/o
 
 let value: CreatePhoneNumberRequestBody = {
   userId: "<id>",
-  phoneNumber: "1-937-659-0008 x78974",
+  phoneNumber: "295.240.1199 x39924",
 };
 ```
 

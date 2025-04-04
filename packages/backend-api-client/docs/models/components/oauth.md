@@ -6,10 +6,10 @@
 import { Oauth } from "@clerk/backend-api-client/models/components";
 
 let value: Oauth = {
-  status: "transferable",
+  status: "expired",
   strategy: "<value>",
-  expireAt: 669917,
-  attempts: 785153,
+  expireAt: 810532,
+  attempts: 763401,
 };
 ```
 

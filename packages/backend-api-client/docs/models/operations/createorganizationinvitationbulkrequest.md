@@ -9,7 +9,7 @@ let value: CreateOrganizationInvitationBulkRequest = {
   organizationId: "<id>",
   requestBody: [
     {
-      emailAddress: "Christa0@gmail.com",
+      emailAddress: "Aletha_Erdman@hotmail.com",
       role: "<value>",
     },
   ],

@@ -15,11 +15,11 @@ export type UploadOrganizationLogoFile = {
 };
 
 export type UploadOrganizationLogoRequestBody = {
-  file: UploadOrganizationLogoFile | Blob;
   /**
    * The ID of the user that will be credited with the image upload.
    */
   uploaderUserId?: string | undefined;
+  file: UploadOrganizationLogoFile | Blob;
 };
 
 export type UploadOrganizationLogoRequest = {
@@ -103,8 +103,8 @@ export const UploadOrganizationLogoRequestBody$inboundSchema: z.ZodType<
   z.ZodTypeDef,
   unknown
 > = z.object({
-  file: z.lazy(() => UploadOrganizationLogoFile$inboundSchema),
   uploader_user_id: z.string().optional(),
+  file: z.lazy(() => UploadOrganizationLogoFile$inboundSchema),
 }).transform((v) => {
   return remap$(v, {
     "uploader_user_id": "uploaderUserId",
@@ -113,8 +113,8 @@ export const UploadOrganizationLogoRequestBody$inboundSchema: z.ZodType<
 
 /** @internal */
 export type UploadOrganizationLogoRequestBody$Outbound = {
-  file: UploadOrganizationLogoFile$Outbound | Blob;
   uploader_user_id?: string | undefined;
+  file: UploadOrganizationLogoFile$Outbound | Blob;
 };
 
 /** @internal */
@@ -123,10 +123,10 @@ export const UploadOrganizationLogoRequestBody$outboundSchema: z.ZodType<
   z.ZodTypeDef,
   UploadOrganizationLogoRequestBody
 > = z.object({
+  uploaderUserId: z.string().optional(),
   file: z.lazy(() => UploadOrganizationLogoFile$outboundSchema).or(
     blobLikeSchema,
   ),
-  uploaderUserId: z.string().optional(),
 }).transform((v) => {
   return remap$(v, {
     uploaderUserId: "uploader_user_id",

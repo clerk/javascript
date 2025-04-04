@@ -18,14 +18,14 @@ Fetches the current instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.instanceSettings.get();
+  const result = await clerkBackendApi.instanceSettings.get();
 
   // Handle the result
   console.log(result);
@@ -39,17 +39,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { instanceSettingsGet } from "@clerk/backend-api-client/funcs/instanceSettingsGet.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await instanceSettingsGet(clerk);
+  const res = await instanceSettingsGet(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -89,14 +89,14 @@ Updates the settings of an instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  await clerk.instanceSettings.update();
+  await clerkBackendApi.instanceSettings.update();
 
 
 }
@@ -109,17 +109,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { instanceSettingsUpdate } from "@clerk/backend-api-client/funcs/instanceSettingsUpdate.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await instanceSettingsUpdate(clerk);
+  const res = await instanceSettingsUpdate(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -160,14 +160,14 @@ Updates the restriction settings of an instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.instanceSettings.updateRestrictions();
+  const result = await clerkBackendApi.instanceSettings.updateRestrictions();
 
   // Handle the result
   console.log(result);
@@ -181,17 +181,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { instanceSettingsUpdateRestrictions } from "@clerk/backend-api-client/funcs/instanceSettingsUpdateRestrictions.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await instanceSettingsUpdateRestrictions(clerk);
+  const res = await instanceSettingsUpdateRestrictions(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -237,14 +237,14 @@ WARNING: Changing your domain will invalidate all current user sessions (i.e. us
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  await clerk.instanceSettings.changeDomain();
+  await clerkBackendApi.instanceSettings.changeDomain();
 
 
 }
@@ -257,17 +257,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { instanceSettingsChangeDomain } from "@clerk/backend-api-client/funcs/instanceSettingsChangeDomain.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await instanceSettingsChangeDomain(clerk);
+  const res = await instanceSettingsChangeDomain(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;
@@ -308,14 +308,14 @@ Updates the organization settings of the instance
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.instanceSettings.updateOrganizationSettings();
+  const result = await clerkBackendApi.instanceSettings.updateOrganizationSettings();
 
   // Handle the result
   console.log(result);
@@ -329,17 +329,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { instanceSettingsUpdateOrganizationSettings } from "@clerk/backend-api-client/funcs/instanceSettingsUpdateOrganizationSettings.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await instanceSettingsUpdateOrganizationSettings(clerk);
+  const res = await instanceSettingsUpdateOrganizationSettings(clerkBackendApi);
 
   if (!res.ok) {
     throw res.error;

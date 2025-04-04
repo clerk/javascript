@@ -7,7 +7,7 @@ Filter sessions by the provided status
 ```typescript
 import { Status } from "@clerk/backend-api-client/models/operations";
 
-let value: Status = "replaced";
+let value: Status = "removed";
 ```
 
 ## Values

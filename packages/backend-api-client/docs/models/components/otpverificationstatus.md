@@ -5,7 +5,7 @@
 ```typescript
 import { OTPVerificationStatus } from "@clerk/backend-api-client/models/components";
 
-let value: OTPVerificationStatus = "verified";
+let value: OTPVerificationStatus = "unverified";
 ```
 
 ## Values

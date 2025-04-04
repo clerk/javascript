@@ -16,14 +16,14 @@ Updates the existing template of the given type and slug
 ### Example Usage
 
 ```typescript
-import { Clerk } from "@clerk/backend-api-client";
+import { ClerkBackendApi } from "@clerk/backend-api-client";
 
-const clerk = new Clerk({
+const clerkBackendApi = new ClerkBackendApi({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const result = await clerk.emailAndSmsTemplates.upsert({
+  const result = await clerkBackendApi.emailAndSmsTemplates.upsert({
     templateType: "sms",
     slug: "<value>",
   });
@@ -40,17 +40,17 @@ run();
 The standalone function version of this method:
 
 ```typescript
-import { ClerkCore } from "@clerk/backend-api-client/core.js";
+import { ClerkBackendApiCore } from "@clerk/backend-api-client/core.js";
 import { emailAndSmsTemplatesUpsert } from "@clerk/backend-api-client/funcs/emailAndSmsTemplatesUpsert.js";
 
-// Use `ClerkCore` for best tree-shaking performance.
+// Use `ClerkBackendApiCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
-const clerk = new ClerkCore({
+const clerkBackendApi = new ClerkBackendApiCore({
   bearerAuth: process.env["CLERK_BEARER_AUTH"] ?? "",
 });
 
 async function run() {
-  const res = await emailAndSmsTemplatesUpsert(clerk, {
+  const res = await emailAndSmsTemplatesUpsert(clerkBackendApi, {
     templateType: "sms",
     slug: "<value>",
   });

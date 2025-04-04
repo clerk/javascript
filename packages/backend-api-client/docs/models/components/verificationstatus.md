@@ -5,7 +5,7 @@
 ```typescript
 import { VerificationStatus } from "@clerk/backend-api-client/models/components";
 
-let value: VerificationStatus = "expired";
+let value: VerificationStatus = "unverified";
 ```
 
 ## Values

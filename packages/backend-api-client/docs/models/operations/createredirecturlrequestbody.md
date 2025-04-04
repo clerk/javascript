@@ -6,7 +6,7 @@
 import { CreateRedirectURLRequestBody } from "@clerk/backend-api-client/models/operations";
 
 let value: CreateRedirectURLRequestBody = {
-  url: "https://shocked-vestment.biz/",
+  url: "https://white-scrap.com/",
 };
 ```
 
