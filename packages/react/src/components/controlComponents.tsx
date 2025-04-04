@@ -1,6 +1,7 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
+  FeatureKey,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -61,21 +62,31 @@ export type ProtectProps = React.PropsWithChildren<
         condition?: never;
         role: OrganizationCustomRoleKey;
         permission?: never;
+        __experimental_feature?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission: OrganizationCustomPermissionKey;
+        __experimental_feature?: never;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
         role?: never;
         permission?: never;
+        __experimental_feature?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission?: never;
+        __experimental_feature: FeatureKey;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        __experimental_feature?: never;
       }
   ) & {
     fallback?: React.ReactNode;
@@ -89,8 +100,10 @@ export type ProtectProps = React.PropsWithChildren<
  * ```
  * <Protect permission="a_permission_key" />
  * <Protect role="a_role_key" />
+ * <Protect __experimental_feature"a_feature_key" />
  * <Protect condition={(has) => has({permission:"a_permission_key"})} />
  * <Protect condition={(has) => has({role:"a_role_key"})} />
+ * <Protect condition={(has) => has({__experimental_feature:"a_feature_key"})} />
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
@@ -127,7 +140,7 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.__experimental_feature) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }

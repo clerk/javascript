@@ -157,7 +157,8 @@ export function useDerivedAuth(
         orgRole,
         orgPermissions,
         factorVerificationAge,
-        features: '',
+        // TODO: get features from authObject
+        // features: 'testfeature',
       })(params);
     },
     [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
