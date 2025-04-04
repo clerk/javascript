@@ -2,7 +2,7 @@
 '@clerk/nextjs': minor
 ---
 
-- Introduce `auth().redirectToSignUp()` that can be used in API routes and pages.
+- Introduce `auth().redirectToSignUp()` that can be used in API routes and pages. Originally effort by [@sambarnes](https://github.com/clerk/javascript/pull/5407)
 
 ```ts
 import { clerkMiddleware } from '@clerk/nextjs/server';
