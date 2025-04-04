@@ -12,6 +12,8 @@ import { clerkMiddleware } from '../clerkMiddleware';
 import { createRouteMatcher } from '../routeMatcher';
 import { decryptClerkRequestData } from '../utils';
 
+vi.mock('../clerkClient');
+
 const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 const authenticateRequestMock = vi.fn().mockResolvedValue({
   toAuth: () => ({
@@ -19,15 +21,6 @@ const authenticateRequestMock = vi.fn().mockResolvedValue({
   }),
   headers: new Headers(),
   publishableKey,
-});
-
-vi.mock('../clerkClient', () => {
-  return {
-    clerkClient: () => ({
-      authenticateRequest: authenticateRequestMock,
-      telemetry: { record: vi.fn() },
-    }),
-  };
 });
 
 /**
@@ -43,6 +36,14 @@ beforeAll(() => {
 afterAll(() => {
   global.console.warn = consoleWarn;
   global.console.log = consoleLog;
+});
+
+beforeEach(() => {
+  vi.mocked(clerkClient).mockResolvedValue({
+    authenticateRequest: authenticateRequestMock,
+    // @ts-expect-error - mock
+    telemetry: { record: vi.fn() },
+  });
 });
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
@@ -346,7 +347,7 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
-    it(`redirects to ${locationHeader} url with redirect_url set to the  provided returnBackUrl param`, async () => {
+    it(`redirects to ${locationHeader} url with redirect_url set to the provided returnBackUrl param`, async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
@@ -381,6 +382,37 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.headers.get('location')).toContain(locationHeader);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+  });
+
+  describe('auth().redirectToSignUp()', () => {
+    it('to support signInOrUp', async () => {
+      vi.mocked(clerkClient).mockResolvedValue({
+        authenticateRequest: vi.fn().mockResolvedValue({
+          toAuth: () => ({
+            debug: (d: any) => d,
+          }),
+          headers: new Headers(),
+          publishableKey,
+          signInUrl: '/hello',
+        }),
+        // @ts-expect-error - mock
+        telemetry: { record: vi.fn() },
+      });
+
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        (await auth()).redirectToSignUp();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain(`/hello/create`);
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
   });
