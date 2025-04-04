@@ -1136,20 +1136,17 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    if (newSession?.currentTask) {
+    // Only triggers navigation for internal routing, in order to not affect custom flows
+    if (newSession?.currentTask && this.#componentNavigationContext) {
       await navigateToTask(session.currentTask.key, {
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
       });
-
-      // Delay updating session accessors until active status transition to prevent premature component unmounting.
-      // This is particularly important when SignIn components are wrapped in SignedOut components,
-      // as early state updates could cause unwanted unmounting during the transition.
-      this.#setAccessors(session);
     }
 
+    this.#setAccessors(session);
     this.#emit();
   };
 
