@@ -32,7 +32,7 @@ import { Result } from "../types/fp.js";
  */
 export function usersDeleteTOTP(
   client: ClerkBackendApiCore,
-  request: operations.DeleteTOTPRequest,
+  userId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function usersDeleteTOTP(
 > {
   return new APIPromise($do(
     client,
-    request,
+    userId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteTOTPRequest,
+  userId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -76,8 +76,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteTOTPRequest = {
+    userId: userId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.DeleteTOTPRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

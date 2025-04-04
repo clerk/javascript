@@ -63,12 +63,12 @@ export class Sessions extends ClientSDK {
    * Retrieve the details of a session
    */
   async get(
-    request: operations.GetSessionRequest,
+    sessionId: string,
     options?: RequestOptions,
   ): Promise<components.Session> {
     return unwrapAsync(sessionsGet(
       this,
-      request,
+      sessionId,
       options,
     ));
   }
@@ -99,12 +99,12 @@ export class Sessions extends ClientSDK {
    * In multi-session mode, a revoked session will still be returned along with its client object, however the user will need to sign in again.
    */
   async revoke(
-    request: operations.RevokeSessionRequest,
+    sessionId: string,
     options?: RequestOptions,
   ): Promise<components.Session> {
     return unwrapAsync(sessionsRevoke(
       this,
-      request,
+      sessionId,
       options,
     ));
   }

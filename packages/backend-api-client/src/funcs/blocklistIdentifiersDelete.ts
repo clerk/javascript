@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function blocklistIdentifiersDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteBlocklistIdentifierRequest,
+  identifierId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function blocklistIdentifiersDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    identifierId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteBlocklistIdentifierRequest,
+  identifierId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteBlocklistIdentifierRequest = {
+    identifierId: identifierId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) =>
       operations.DeleteBlocklistIdentifierRequest$outboundSchema.parse(value),
     "Input validation failed",

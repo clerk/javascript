@@ -174,9 +174,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.domains.delete({
-    domainId: "<id>",
-  });
+  const result = await clerkBackendApi.domains.delete("<id>");
 
   // Handle the result
   console.log(result);
@@ -200,9 +198,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await domainsDelete(clerkBackendApi, {
-    domainId: "<id>",
-  });
+  const res = await domainsDelete(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -221,7 +217,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteDomainRequest](../../models/operations/deletedomainrequest.md)                                                                                               | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `domainId`                                                                                                                                                                     | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the domain that will be deleted. Must be a satellite domain.                                                                                                         |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |

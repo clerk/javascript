@@ -2,7 +2,7 @@
 
 {
   "name": "@clerk/backend-api-client",
-  "version": "0.3.12",
+  "version": "0.4.1",
   "exports": {
     ".": "./src/index.ts",    
     "./models/errors": "./src/models/errors/index.ts",    

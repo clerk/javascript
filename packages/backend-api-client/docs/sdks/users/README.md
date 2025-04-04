@@ -295,9 +295,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.get({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.get("<id>");
 
   // Handle the result
   console.log(result);
@@ -321,9 +319,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersGet(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersGet(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -342,7 +338,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.GetUserRequest](../../models/operations/getuserrequest.md)                                                                                                         | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to retrieve                                                                                                                                                 |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -462,9 +458,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.delete({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.delete("<id>");
 
   // Handle the result
   console.log(result);
@@ -488,9 +482,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersDelete(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersDelete(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -509,7 +501,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteUserRequest](../../models/operations/deleteuserrequest.md)                                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to delete                                                                                                                                                   |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -539,9 +531,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.ban({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.ban("<id>");
 
   // Handle the result
   console.log(result);
@@ -565,9 +555,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersBan(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersBan(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -586,7 +574,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.BanUserRequest](../../models/operations/banuserrequest.md)                                                                                                         | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to ban                                                                                                                                                      |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -616,9 +604,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.unban({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.unban("<id>");
 
   // Handle the result
   console.log(result);
@@ -642,9 +628,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersUnban(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersUnban(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -663,7 +647,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.UnbanUserRequest](../../models/operations/unbanuserrequest.md)                                                                                                     | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to unban                                                                                                                                                    |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -694,9 +678,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.lock({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.lock("<id>");
 
   // Handle the result
   console.log(result);
@@ -720,9 +702,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersLock(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersLock(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -741,7 +721,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.LockUserRequest](../../models/operations/lockuserrequest.md)                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to lock                                                                                                                                                     |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -771,9 +751,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.unlock({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.unlock("<id>");
 
   // Handle the result
   console.log(result);
@@ -797,9 +775,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersUnlock(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersUnlock(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -818,7 +794,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.UnlockUserRequest](../../models/operations/unlockuserrequest.md)                                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to unlock                                                                                                                                                   |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -927,9 +903,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.deleteProfileImage({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.deleteProfileImage("<id>");
 
   // Handle the result
   console.log(result);
@@ -953,9 +927,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersDeleteProfileImage(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersDeleteProfileImage(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -974,7 +946,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteUserProfileImageRequest](../../models/operations/deleteuserprofileimagerequest.md)                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user to delete the profile image for                                                                                                                             |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -1480,9 +1452,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.disableMfa({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.disableMfa("<id>");
 
   // Handle the result
   console.log(result);
@@ -1506,9 +1476,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersDisableMfa(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersDisableMfa(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -1527,7 +1495,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DisableMFARequest](../../models/operations/disablemfarequest.md)                                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user whose MFA methods are to be disabled                                                                                                                        |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -1558,9 +1526,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.deleteBackupCodes({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.deleteBackupCodes("<id>");
 
   // Handle the result
   console.log(result);
@@ -1584,9 +1550,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersDeleteBackupCodes(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersDeleteBackupCodes(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -1605,7 +1569,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteBackupCodeRequest](../../models/operations/deletebackupcoderequest.md)                                                                                       | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user whose backup codes are to be deleted.                                                                                                                       |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -1796,9 +1760,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.users.deleteTOTP({
-    userId: "<id>",
-  });
+  const result = await clerkBackendApi.users.deleteTOTP("<id>");
 
   // Handle the result
   console.log(result);
@@ -1822,9 +1784,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await usersDeleteTOTP(clerkBackendApi, {
-    userId: "<id>",
-  });
+  const res = await usersDeleteTOTP(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -1843,7 +1803,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteTOTPRequest](../../models/operations/deletetotprequest.md)                                                                                                   | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `userId`                                                                                                                                                                       | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the user whose TOTPs are to be deleted                                                                                                                               |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |

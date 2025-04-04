@@ -36,12 +36,12 @@ export class PhoneNumbers extends ClientSDK {
    * Returns the details of a phone number
    */
   async get(
-    request: operations.GetPhoneNumberRequest,
+    phoneNumberId: string,
     options?: RequestOptions,
   ): Promise<components.PhoneNumber> {
     return unwrapAsync(phoneNumbersGet(
       this,
-      request,
+      phoneNumberId,
       options,
     ));
   }
@@ -53,12 +53,12 @@ export class PhoneNumbers extends ClientSDK {
    * Delete the phone number with the given ID
    */
   async delete(
-    request: operations.DeletePhoneNumberRequest,
+    phoneNumberId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(phoneNumbersDelete(
       this,
-      request,
+      phoneNumberId,
       options,
     ));
   }

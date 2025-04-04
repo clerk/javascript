@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function allowlistIdentifiersDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteAllowlistIdentifierRequest,
+  identifierId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function allowlistIdentifiersDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    identifierId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteAllowlistIdentifierRequest,
+  identifierId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteAllowlistIdentifierRequest = {
+    identifierId: identifierId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) =>
       operations.DeleteAllowlistIdentifierRequest$outboundSchema.parse(value),
     "Input validation failed",

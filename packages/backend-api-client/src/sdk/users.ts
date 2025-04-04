@@ -98,12 +98,12 @@ export class Users extends ClientSDK {
    * Retrieve the details of a user
    */
   async get(
-    request: operations.GetUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersGet(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -143,12 +143,12 @@ export class Users extends ClientSDK {
    * Delete the specified user
    */
   async delete(
-    request: operations.DeleteUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(usersDelete(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -160,12 +160,12 @@ export class Users extends ClientSDK {
    * Marks the given user as banned, which means that all their sessions are revoked and they are not allowed to sign in again.
    */
   async ban(
-    request: operations.BanUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersBan(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -177,12 +177,12 @@ export class Users extends ClientSDK {
    * Removes the ban mark from the given user.
    */
   async unban(
-    request: operations.UnbanUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersUnban(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -195,12 +195,12 @@ export class Users extends ClientSDK {
    * Lock duration can be configured in the instance's restrictions settings.
    */
   async lock(
-    request: operations.LockUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersLock(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -212,12 +212,12 @@ export class Users extends ClientSDK {
    * Removes the lock from the given user.
    */
   async unlock(
-    request: operations.UnlockUserRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersUnlock(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -246,12 +246,12 @@ export class Users extends ClientSDK {
    * Delete a user's profile image
    */
   async deleteProfileImage(
-    request: operations.DeleteUserProfileImageRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<components.User> {
     return unwrapAsync(usersDeleteProfileImage(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -377,12 +377,12 @@ export class Users extends ClientSDK {
    * Disable all of a user's MFA methods (e.g. OTP sent via SMS, TOTP on their authenticator app) at once.
    */
   async disableMfa(
-    request: operations.DisableMFARequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<operations.DisableMFAResponseBody> {
     return unwrapAsync(usersDisableMfa(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -394,12 +394,12 @@ export class Users extends ClientSDK {
    * Disable all of a user's backup codes.
    */
   async deleteBackupCodes(
-    request: operations.DeleteBackupCodeRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<operations.DeleteBackupCodeResponseBody> {
     return unwrapAsync(usersDeleteBackupCodes(
       this,
-      request,
+      userId,
       options,
     ));
   }
@@ -445,12 +445,12 @@ export class Users extends ClientSDK {
    * Deletes all of the user's TOTPs.
    */
   async deleteTOTP(
-    request: operations.DeleteTOTPRequest,
+    userId: string,
     options?: RequestOptions,
   ): Promise<operations.DeleteTOTPResponseBody> {
     return unwrapAsync(usersDeleteTOTP(
       this,
-      request,
+      userId,
       options,
     ));
   }

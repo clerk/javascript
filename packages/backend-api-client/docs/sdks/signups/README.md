@@ -22,9 +22,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.signUps.get({
-    id: "<id>",
-  });
+  const result = await clerkBackendApi.signUps.get("<id>");
 
   // Handle the result
   console.log(result);
@@ -48,9 +46,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await signUpsGet(clerkBackendApi, {
-    id: "<id>",
-  });
+  const res = await signUpsGet(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -69,7 +65,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.GetSignUpRequest](../../models/operations/getsignuprequest.md)                                                                                                     | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `id`                                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the sign-up to retrieve                                                                                                                                              |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |

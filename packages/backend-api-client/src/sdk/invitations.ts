@@ -78,12 +78,12 @@ export class Invitations extends ClientSDK {
    * Only active (i.e. non-revoked) invitations can be revoked.
    */
   async revoke(
-    request: operations.RevokeInvitationRequest,
+    invitationId: string,
     options?: RequestOptions,
   ): Promise<components.InvitationRevoked> {
     return unwrapAsync(invitationsRevoke(
       this,
-      request,
+      invitationId,
       options,
     ));
   }

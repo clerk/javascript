@@ -169,9 +169,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.redirectUrls.get({
-    id: "<id>",
-  });
+  const result = await clerkBackendApi.redirectUrls.get("<id>");
 
   // Handle the result
   console.log(result);
@@ -195,9 +193,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await redirectUrlsGet(clerkBackendApi, {
-    id: "<id>",
-  });
+  const res = await redirectUrlsGet(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -216,7 +212,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.GetRedirectURLRequest](../../models/operations/getredirecturlrequest.md)                                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `id`                                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the redirect URL                                                                                                                                                     |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -246,9 +242,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.redirectUrls.delete({
-    id: "<id>",
-  });
+  const result = await clerkBackendApi.redirectUrls.delete("<id>");
 
   // Handle the result
   console.log(result);
@@ -272,9 +266,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await redirectUrlsDelete(clerkBackendApi, {
-    id: "<id>",
-  });
+  const res = await redirectUrlsDelete(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -293,7 +285,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteRedirectURLRequest](../../models/operations/deleteredirecturlrequest.md)                                                                                     | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `id`                                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the redirect URL                                                                                                                                                     |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |

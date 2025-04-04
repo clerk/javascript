@@ -36,7 +36,7 @@ import { Result } from "../types/fp.js";
  */
 export function invitationsRevoke(
   client: ClerkBackendApiCore,
-  request: operations.RevokeInvitationRequest,
+  invitationId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -53,14 +53,14 @@ export function invitationsRevoke(
 > {
   return new APIPromise($do(
     client,
-    request,
+    invitationId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.RevokeInvitationRequest,
+  invitationId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -78,8 +78,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.RevokeInvitationRequest = {
+    invitationId: invitationId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.RevokeInvitationRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function usersUnban(
   client: ClerkBackendApiCore,
-  request: operations.UnbanUserRequest,
+  userId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function usersUnban(
 > {
   return new APIPromise($do(
     client,
-    request,
+    userId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.UnbanUserRequest,
+  userId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.UnbanUserRequest = {
+    userId: userId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.UnbanUserRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

@@ -181,9 +181,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.oauthApplications.get({
-    oauthApplicationId: "<id>",
-  });
+  const result = await clerkBackendApi.oauthApplications.get("<id>");
 
   // Handle the result
   console.log(result);
@@ -207,9 +205,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await oauthApplicationsGet(clerkBackendApi, {
-    oauthApplicationId: "<id>",
-  });
+  const res = await oauthApplicationsGet(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -228,7 +224,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.GetOAuthApplicationRequest](../../models/operations/getoauthapplicationrequest.md)                                                                                 | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `oauthApplicationId`                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the OAuth application                                                                                                                                                |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -338,9 +334,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.oauthApplications.delete({
-    oauthApplicationId: "<id>",
-  });
+  const result = await clerkBackendApi.oauthApplications.delete("<id>");
 
   // Handle the result
   console.log(result);
@@ -364,9 +358,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await oauthApplicationsDelete(clerkBackendApi, {
-    oauthApplicationId: "<id>",
-  });
+  const res = await oauthApplicationsDelete(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -385,7 +377,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.DeleteOAuthApplicationRequest](../../models/operations/deleteoauthapplicationrequest.md)                                                                           | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `oauthApplicationId`                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the OAuth application to delete                                                                                                                                      |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |
@@ -416,9 +408,7 @@ const clerkBackendApi = new ClerkBackendApi({
 });
 
 async function run() {
-  const result = await clerkBackendApi.oauthApplications.rotateSecret({
-    oauthApplicationId: "<id>",
-  });
+  const result = await clerkBackendApi.oauthApplications.rotateSecret("<id>");
 
   // Handle the result
   console.log(result);
@@ -442,9 +432,7 @@ const clerkBackendApi = new ClerkBackendApiCore({
 });
 
 async function run() {
-  const res = await oauthApplicationsRotateSecret(clerkBackendApi, {
-    oauthApplicationId: "<id>",
-  });
+  const res = await oauthApplicationsRotateSecret(clerkBackendApi, "<id>");
 
   if (!res.ok) {
     throw res.error;
@@ -463,7 +451,7 @@ run();
 
 | Parameter                                                                                                                                                                      | Type                                                                                                                                                                           | Required                                                                                                                                                                       | Description                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `request`                                                                                                                                                                      | [operations.RotateOAuthApplicationSecretRequest](../../models/operations/rotateoauthapplicationsecretrequest.md)                                                               | :heavy_check_mark:                                                                                                                                                             | The request object to use for the request.                                                                                                                                     |
+| `oauthApplicationId`                                                                                                                                                           | *string*                                                                                                                                                                       | :heavy_check_mark:                                                                                                                                                             | The ID of the OAuth application for which to rotate the client secret                                                                                                          |
 | `options`                                                                                                                                                                      | RequestOptions                                                                                                                                                                 | :heavy_minus_sign:                                                                                                                                                             | Used to set various options for making HTTP requests.                                                                                                                          |
 | `options.fetchOptions`                                                                                                                                                         | [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/Request/Request#options)                                                                                        | :heavy_minus_sign:                                                                                                                                                             | Options that are passed to the underlying HTTP request. This can be used to inject extra headers for examples. All `Request` options, except `method` and `body`, are allowed. |
 | `options.retries`                                                                                                                                                              | [RetryConfig](../../lib/utils/retryconfig.md)                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                             | Enables retrying HTTP requests under certain failure conditions.                                                                                                               |

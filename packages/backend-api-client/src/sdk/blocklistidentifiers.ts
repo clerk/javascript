@@ -50,12 +50,12 @@ export class BlocklistIdentifiers extends ClientSDK {
    * Delete an identifier from the instance block-list
    */
   async delete(
-    request: operations.DeleteBlocklistIdentifierRequest,
+    identifierId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(blocklistIdentifiersDelete(
       this,
-      request,
+      identifierId,
       options,
     ));
   }

@@ -51,12 +51,12 @@ export class JwtTemplates extends ClientSDK {
    * Retrieve the details of a given JWT template
    */
   async get(
-    request: operations.GetJWTTemplateRequest,
+    templateId: string,
     options?: RequestOptions,
   ): Promise<components.JWTTemplate> {
     return unwrapAsync(jwtTemplatesGet(
       this,
-      request,
+      templateId,
       options,
     ));
   }
@@ -82,12 +82,12 @@ export class JwtTemplates extends ClientSDK {
    * Delete a Template
    */
   async delete(
-    request: operations.DeleteJWTTemplateRequest,
+    templateId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(jwtTemplatesDelete(
       this,
-      request,
+      templateId,
       options,
     ));
   }

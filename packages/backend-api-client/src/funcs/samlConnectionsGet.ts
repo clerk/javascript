@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function samlConnectionsGet(
   client: ClerkBackendApiCore,
-  request: operations.GetSAMLConnectionRequest,
+  samlConnectionId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function samlConnectionsGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    samlConnectionId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetSAMLConnectionRequest,
+  samlConnectionId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetSAMLConnectionRequest = {
+    samlConnectionId: samlConnectionId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetSAMLConnectionRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

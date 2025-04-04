@@ -56,12 +56,12 @@ export class SamlConnections extends ClientSDK {
    * Fetches the SAML Connection whose ID matches the provided `saml_connection_id` in the path.
    */
   async get(
-    request: operations.GetSAMLConnectionRequest,
+    samlConnectionId: string,
     options?: RequestOptions,
   ): Promise<components.SchemasSAMLConnection> {
     return unwrapAsync(samlConnectionsGet(
       this,
-      request,
+      samlConnectionId,
       options,
     ));
   }
@@ -90,12 +90,12 @@ export class SamlConnections extends ClientSDK {
    * Deletes the SAML Connection whose ID matches the provided `id` in the path.
    */
   async delete(
-    request: operations.DeleteSAMLConnectionRequest,
+    samlConnectionId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(samlConnectionsDelete(
       this,
-      request,
+      samlConnectionId,
       options,
     ));
   }

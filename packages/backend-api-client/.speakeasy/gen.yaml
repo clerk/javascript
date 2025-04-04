@@ -18,7 +18,7 @@ generation:
     oAuth2ClientCredentialsEnabled: true
     oAuth2PasswordEnabled: true
 typescript:
-  version: 0.3.12
+  version: 0.4.1
   additionalDependencies:
     dependencies: {}
     devDependencies: {}
@@ -49,7 +49,7 @@ typescript:
       webhooks: models/webhooks
   inputModelSuffix: input
   jsonpath: rfc9535
-  maxMethodParams: 0
+  maxMethodParams: 1
   methodArguments: require-security-and-request
   moduleFormat: dual
   outputModelSuffix: output

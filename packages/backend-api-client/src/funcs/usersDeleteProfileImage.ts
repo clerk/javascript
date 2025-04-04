@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function usersDeleteProfileImage(
   client: ClerkBackendApiCore,
-  request: operations.DeleteUserProfileImageRequest,
+  userId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function usersDeleteProfileImage(
 > {
   return new APIPromise($do(
     client,
-    request,
+    userId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteUserProfileImageRequest,
+  userId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteUserProfileImageRequest = {
+    userId: userId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) =>
       operations.DeleteUserProfileImageRequest$outboundSchema.parse(value),
     "Input validation failed",

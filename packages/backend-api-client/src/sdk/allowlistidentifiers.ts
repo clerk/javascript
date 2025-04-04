@@ -52,12 +52,12 @@ export class AllowlistIdentifiers extends ClientSDK {
    * Delete an identifier from the instance allow-list
    */
   async delete(
-    request: operations.DeleteAllowlistIdentifierRequest,
+    identifierId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(allowlistIdentifiersDelete(
       this,
-      request,
+      identifierId,
       options,
     ));
   }

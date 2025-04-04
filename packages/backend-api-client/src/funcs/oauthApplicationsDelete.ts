@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  */
 export function oauthApplicationsDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteOAuthApplicationRequest,
+  oauthApplicationId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -51,14 +51,14 @@ export function oauthApplicationsDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    oauthApplicationId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteOAuthApplicationRequest,
+  oauthApplicationId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -76,8 +76,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteOAuthApplicationRequest = {
+    oauthApplicationId: oauthApplicationId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) =>
       operations.DeleteOAuthApplicationRequest$outboundSchema.parse(value),
     "Input validation failed",

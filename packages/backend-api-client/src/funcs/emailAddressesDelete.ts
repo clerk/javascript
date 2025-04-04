@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function emailAddressesDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteEmailAddressRequest,
+  emailAddressId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function emailAddressesDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    emailAddressId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteEmailAddressRequest,
+  emailAddressId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteEmailAddressRequest = {
+    emailAddressId: emailAddressId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.DeleteEmailAddressRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

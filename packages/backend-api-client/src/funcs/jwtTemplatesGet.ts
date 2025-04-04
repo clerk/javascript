@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function jwtTemplatesGet(
   client: ClerkBackendApiCore,
-  request: operations.GetJWTTemplateRequest,
+  templateId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function jwtTemplatesGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    templateId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetJWTTemplateRequest,
+  templateId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetJWTTemplateRequest = {
+    templateId: templateId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetJWTTemplateRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

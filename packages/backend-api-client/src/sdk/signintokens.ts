@@ -36,12 +36,12 @@ export class SignInTokens extends ClientSDK {
    * Revokes a pending sign-in token
    */
   async revoke(
-    request: operations.RevokeSignInTokenRequest,
+    signInTokenId: string,
     options?: RequestOptions,
   ): Promise<components.SignInToken> {
     return unwrapAsync(signInTokensRevoke(
       this,
-      request,
+      signInTokenId,
       options,
     ));
   }

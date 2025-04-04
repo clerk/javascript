@@ -105,12 +105,12 @@ export class Organizations extends ClientSDK {
    * This is not reversible.
    */
   async delete(
-    request: operations.DeleteOrganizationRequest,
+    organizationId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(organizationsDelete(
       this,
-      request,
+      organizationId,
       options,
     ));
   }
@@ -162,12 +162,12 @@ export class Organizations extends ClientSDK {
    * Delete the organization's logo.
    */
   async deleteLogo(
-    request: operations.DeleteOrganizationLogoRequest,
+    organizationId: string,
     options?: RequestOptions,
   ): Promise<components.Organization> {
     return unwrapAsync(organizationsDeleteLogo(
       this,
-      request,
+      organizationId,
       options,
     ));
   }

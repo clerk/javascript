@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function signUpsGet(
   client: ClerkBackendApiCore,
-  request: operations.GetSignUpRequest,
+  id: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function signUpsGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    id,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetSignUpRequest,
+  id: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetSignUpRequest = {
+    id: id,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetSignUpRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

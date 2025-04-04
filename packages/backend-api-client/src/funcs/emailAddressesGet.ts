@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function emailAddressesGet(
   client: ClerkBackendApiCore,
-  request: operations.GetEmailAddressRequest,
+  emailAddressId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function emailAddressesGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    emailAddressId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetEmailAddressRequest,
+  emailAddressId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetEmailAddressRequest = {
+    emailAddressId: emailAddressId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetEmailAddressRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

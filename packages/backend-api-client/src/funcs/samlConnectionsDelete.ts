@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function samlConnectionsDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteSAMLConnectionRequest,
+  samlConnectionId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function samlConnectionsDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    samlConnectionId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteSAMLConnectionRequest,
+  samlConnectionId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteSAMLConnectionRequest = {
+    samlConnectionId: samlConnectionId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) =>
       operations.DeleteSAMLConnectionRequest$outboundSchema.parse(value),
     "Input validation failed",

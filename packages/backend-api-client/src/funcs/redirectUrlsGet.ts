@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function redirectUrlsGet(
   client: ClerkBackendApiCore,
-  request: operations.GetRedirectURLRequest,
+  id: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function redirectUrlsGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    id,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetRedirectURLRequest,
+  id: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetRedirectURLRequest = {
+    id: id,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetRedirectURLRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

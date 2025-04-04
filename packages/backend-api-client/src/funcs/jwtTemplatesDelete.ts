@@ -30,7 +30,7 @@ import { Result } from "../types/fp.js";
  */
 export function jwtTemplatesDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteJWTTemplateRequest,
+  templateId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -47,14 +47,14 @@ export function jwtTemplatesDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    templateId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteJWTTemplateRequest,
+  templateId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -72,8 +72,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteJWTTemplateRequest = {
+    templateId: templateId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.DeleteJWTTemplateRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

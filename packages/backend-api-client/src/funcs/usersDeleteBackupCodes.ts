@@ -32,7 +32,7 @@ import { Result } from "../types/fp.js";
  */
 export function usersDeleteBackupCodes(
   client: ClerkBackendApiCore,
-  request: operations.DeleteBackupCodeRequest,
+  userId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function usersDeleteBackupCodes(
 > {
   return new APIPromise($do(
     client,
-    request,
+    userId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteBackupCodeRequest,
+  userId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -76,8 +76,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteBackupCodeRequest = {
+    userId: userId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.DeleteBackupCodeRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  */
 export function sessionsRevoke(
   client: ClerkBackendApiCore,
-  request: operations.RevokeSessionRequest,
+  sessionId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -51,14 +51,14 @@ export function sessionsRevoke(
 > {
   return new APIPromise($do(
     client,
-    request,
+    sessionId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.RevokeSessionRequest,
+  sessionId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -76,8 +76,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.RevokeSessionRequest = {
+    sessionId: sessionId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.RevokeSessionRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

@@ -34,7 +34,7 @@ import { Result } from "../types/fp.js";
  */
 export function domainsDelete(
   client: ClerkBackendApiCore,
-  request: operations.DeleteDomainRequest,
+  domainId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -51,14 +51,14 @@ export function domainsDelete(
 > {
   return new APIPromise($do(
     client,
-    request,
+    domainId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.DeleteDomainRequest,
+  domainId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -76,8 +76,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.DeleteDomainRequest = {
+    domainId: domainId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.DeleteDomainRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

@@ -35,12 +35,12 @@ export class ActorTokens extends ClientSDK {
    * Revokes a pending actor token.
    */
   async revoke(
-    request: operations.RevokeActorTokenRequest,
+    actorTokenId: string,
     options?: RequestOptions,
   ): Promise<components.ActorToken> {
     return unwrapAsync(actorTokensRevoke(
       this,
-      request,
+      actorTokenId,
       options,
     ));
   }

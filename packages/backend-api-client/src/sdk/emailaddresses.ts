@@ -36,12 +36,12 @@ export class EmailAddresses extends ClientSDK {
    * Returns the details of an email address.
    */
   async get(
-    request: operations.GetEmailAddressRequest,
+    emailAddressId: string,
     options?: RequestOptions,
   ): Promise<components.EmailAddress> {
     return unwrapAsync(emailAddressesGet(
       this,
-      request,
+      emailAddressId,
       options,
     ));
   }
@@ -53,12 +53,12 @@ export class EmailAddresses extends ClientSDK {
    * Delete the email address with the given ID
    */
   async delete(
-    request: operations.DeleteEmailAddressRequest,
+    emailAddressId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(emailAddressesDelete(
       this,
-      request,
+      emailAddressId,
       options,
     ));
   }

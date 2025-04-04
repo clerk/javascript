@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function phoneNumbersGet(
   client: ClerkBackendApiCore,
-  request: operations.GetPhoneNumberRequest,
+  phoneNumberId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function phoneNumbersGet(
 > {
   return new APIPromise($do(
     client,
-    request,
+    phoneNumberId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.GetPhoneNumberRequest,
+  phoneNumberId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.GetPhoneNumberRequest = {
+    phoneNumberId: phoneNumberId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.GetPhoneNumberRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

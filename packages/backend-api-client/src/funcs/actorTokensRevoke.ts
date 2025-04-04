@@ -33,7 +33,7 @@ import { Result } from "../types/fp.js";
  */
 export function actorTokensRevoke(
   client: ClerkBackendApiCore,
-  request: operations.RevokeActorTokenRequest,
+  actorTokenId: string,
   options?: RequestOptions,
 ): APIPromise<
   Result<
@@ -50,14 +50,14 @@ export function actorTokensRevoke(
 > {
   return new APIPromise($do(
     client,
-    request,
+    actorTokenId,
     options,
   ));
 }
 
 async function $do(
   client: ClerkBackendApiCore,
-  request: operations.RevokeActorTokenRequest,
+  actorTokenId: string,
   options?: RequestOptions,
 ): Promise<
   [
@@ -75,8 +75,12 @@ async function $do(
     APICall,
   ]
 > {
+  const input: operations.RevokeActorTokenRequest = {
+    actorTokenId: actorTokenId,
+  };
+
   const parsed = safeParse(
-    request,
+    input,
     (value) => operations.RevokeActorTokenRequest$outboundSchema.parse(value),
     "Input validation failed",
   );

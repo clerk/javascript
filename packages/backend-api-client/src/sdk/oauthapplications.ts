@@ -60,12 +60,12 @@ export class OauthApplications extends ClientSDK {
    * Fetches the OAuth application whose ID matches the provided `id` in the path.
    */
   async get(
-    request: operations.GetOAuthApplicationRequest,
+    oauthApplicationId: string,
     options?: RequestOptions,
   ): Promise<components.OAuthApplication> {
     return unwrapAsync(oauthApplicationsGet(
       this,
-      request,
+      oauthApplicationId,
       options,
     ));
   }
@@ -95,12 +95,12 @@ export class OauthApplications extends ClientSDK {
    * This is not reversible.
    */
   async delete(
-    request: operations.DeleteOAuthApplicationRequest,
+    oauthApplicationId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(oauthApplicationsDelete(
       this,
-      request,
+      oauthApplicationId,
       options,
     ));
   }
@@ -113,12 +113,12 @@ export class OauthApplications extends ClientSDK {
    * When the client secret is rotated, make sure to update it in authorized OAuth clients.
    */
   async rotateSecret(
-    request: operations.RotateOAuthApplicationSecretRequest,
+    oauthApplicationId: string,
     options?: RequestOptions,
   ): Promise<components.OAuthApplicationWithSecret> {
     return unwrapAsync(oauthApplicationsRotateSecret(
       this,
-      request,
+      oauthApplicationId,
       options,
     ));
   }

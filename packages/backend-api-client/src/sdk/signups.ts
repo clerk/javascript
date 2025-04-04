@@ -17,12 +17,12 @@ export class SignUps extends ClientSDK {
    * Retrieve the details of the sign-up with the given ID
    */
   async get(
-    request: operations.GetSignUpRequest,
+    id: string,
     options?: RequestOptions,
   ): Promise<components.SignUp> {
     return unwrapAsync(signUpsGet(
       this,
-      request,
+      id,
       options,
     ));
   }

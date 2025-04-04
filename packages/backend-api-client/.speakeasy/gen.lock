@@ -5,8 +5,8 @@ management:
   docVersion: "2025-03-12"
   speakeasyVersion: 1.529.1
   generationVersion: 2.566.5
-  releaseVersion: 0.3.12
-  configChecksum: f80b6bc643a7858e52d6932e3d209955
+  releaseVersion: 0.4.1
+  configChecksum: 5312a850fcec02aa232daa89472820b8
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -18,6 +18,7 @@ features:
     devContainers: 2.90.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.1.2
+    flattening: 2.82.1
     globalSecurity: 2.82.13
     globalSecurityCallbacks: 0.1.0
     globalSecurityFlattening: 0.1.0

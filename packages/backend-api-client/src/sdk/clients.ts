@@ -56,12 +56,12 @@ export class Clients extends ClientSDK {
    * Returns the details of a client.
    */
   async get(
-    request: operations.GetClientRequest,
+    clientId: string,
     options?: RequestOptions,
   ): Promise<components.Client> {
     return unwrapAsync(clientsGet(
       this,
-      request,
+      clientId,
       options,
     ));
   }

@@ -57,12 +57,12 @@ export class Domains extends ClientSDK {
    * It is currently not possible to delete the instance's primary domain.
    */
   async delete(
-    request: operations.DeleteDomainRequest,
+    domainId: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(domainsDelete(
       this,
-      request,
+      domainId,
       options,
     ));
   }

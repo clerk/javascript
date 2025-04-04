@@ -53,12 +53,12 @@ export class RedirectUrls extends ClientSDK {
    * Retrieve the details of the redirect URL with the given ID
    */
   async get(
-    request: operations.GetRedirectURLRequest,
+    id: string,
     options?: RequestOptions,
   ): Promise<components.RedirectURL> {
     return unwrapAsync(redirectUrlsGet(
       this,
-      request,
+      id,
       options,
     ));
   }
@@ -70,12 +70,12 @@ export class RedirectUrls extends ClientSDK {
    * Remove the selected redirect URL from the whitelist of the instance
    */
   async delete(
-    request: operations.DeleteRedirectURLRequest,
+    id: string,
     options?: RequestOptions,
   ): Promise<components.DeletedObject> {
     return unwrapAsync(redirectUrlsDelete(
       this,
-      request,
+      id,
       options,
     ));
   }
