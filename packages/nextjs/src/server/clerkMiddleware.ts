@@ -150,12 +150,12 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
-      const authHeader = request.headers.get('authorization');
+      const authHeader = request.headers.get(constants.Headers.Authorization);
       if (authHeader && authHeader.startsWith('Basic ')) {
         logger.debug('Basic Auth detected');
       }
 
-      const cspHeader = request.headers.get('Content-Security-Policy');
+      const cspHeader = request.headers.get(constants.Headers.ContentSecurityPolicy);
       if (cspHeader) {
         logger.debug('Content-Security-Policy detected', () => ({
           value: cspHeader,
@@ -208,9 +208,9 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
           options.contentSecurityPolicy.directives,
         );
 
-        setHeader(handlerResult, 'Content-Security-Policy', header);
+        setHeader(handlerResult, constants.Headers.ContentSecurityPolicy, header);
         if (nonce) {
-          setHeader(handlerResult, 'X-Nonce', nonce);
+          setHeader(handlerResult, constants.Headers.Nonce, nonce);
         }
 
         logger.debug('Clerk generated CSP', () => ({
@@ -223,7 +223,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       // and move the logic in clerk/backend
       if (requestState.headers) {
         requestState.headers.forEach((value, key) => {
-          if (key === 'Content-Security-Policy') {
+          if (key === constants.Headers.ContentSecurityPolicy) {
             logger.debug('Content-Security-Policy detected', () => ({
               value,
             }));
