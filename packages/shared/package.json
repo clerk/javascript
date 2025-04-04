@@ -117,7 +117,8 @@
     "web3",
     "getEnvVariable",
     "pathMatcher",
-    "organization"
+    "organization",
+    "eventBus"
   ],
   "scripts": {
     "build": "tsup",
