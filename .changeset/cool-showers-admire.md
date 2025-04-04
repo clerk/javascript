@@ -3,7 +3,7 @@
 '@clerk/clerk-react': minor
 ---
 
-Introduce `useClerk().status` alongside `<ClerkFailed/>` and `<ClerkDegraded/>`.
+Introduce `useClerk().status` alongside `<ClerkFailed />` and `<ClerkDegraded />`.
 
 ### `useClerk().status`
 Possible values are:
