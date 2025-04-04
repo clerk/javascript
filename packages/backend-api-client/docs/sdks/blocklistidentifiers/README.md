@@ -76,10 +76,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 401, 402           | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 401, 402             | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## create
 
@@ -149,10 +149,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 400, 402, 422      | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 400, 402, 422        | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## delete
 
@@ -226,7 +226,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 402, 404           | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 402, 404             | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |

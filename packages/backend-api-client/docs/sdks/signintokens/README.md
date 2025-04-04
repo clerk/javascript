@@ -78,10 +78,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 404, 422           | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 404, 422             | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## revoke
 
@@ -155,7 +155,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 400, 404           | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 400, 404             | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |

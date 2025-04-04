@@ -5,8 +5,8 @@ management:
   docVersion: "2025-03-12"
   speakeasyVersion: 1.529.1
   generationVersion: 2.566.5
-  releaseVersion: 0.3.11
-  configChecksum: 6ae8236b55c8d3e6a4706ea86c02713e
+  releaseVersion: 0.3.12
+  configChecksum: f80b6bc643a7858e52d6932e3d209955
 features:
   typescript:
     additionalDependencies: 0.1.0
@@ -697,7 +697,7 @@ generatedFiles:
   - src/models/components/waitlistentries.ts
   - src/models/components/waitlistentry.ts
   - src/models/components/web3wallet.ts
-  - src/models/errors/apierror.ts
+  - src/models/errors/clerkapierror.ts
   - src/models/errors/clerkerrors.ts
   - src/models/errors/httpclienterrors.ts
   - src/models/errors/index.ts
@@ -908,7 +908,7 @@ examples:
     speakeasy-default-create-email-address:
       responses:
         "200":
-          application/json: {"object": "email_address", "email_address": "Loyal79@yahoo.com", "reserved": true, "verification": {"status": "unverified", "strategy": "reset_password_email_code", "attempts": 816588, "expire_at": 586220}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 957409, "updated_at": 357021}
+          application/json: {"object": "email_address", "email_address": "Loyal79@yahoo.com", "reserved": true, "verification": {"status": "unverified", "strategy": "reset_password_email_code", "expire_at": 586220, "attempts": 816588}, "linked_to": [{"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}, {"type": "<value>", "id": "<id>"}], "created_at": 957409, "updated_at": 357021}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   GetEmailAddress:
@@ -938,7 +938,7 @@ examples:
           email_address_id: "<id>"
       responses:
         "200":
-          application/json: {"object": "email_address", "email_address": "Lavern48@hotmail.com", "reserved": true, "verification": {"status": "verified", "strategy": "ticket", "attempts": 311507, "expire_at": 249440}, "linked_to": [], "created_at": 789275, "updated_at": 889838}
+          application/json: {"object": "email_address", "email_address": "Lavern48@hotmail.com", "reserved": true, "verification": {"status": "verified", "strategy": "ticket", "expire_at": 249440, "attempts": 311507}, "linked_to": [], "created_at": 789275, "updated_at": 889838}
         "400":
           application/json: {"errors": [{"message": "<value>", "long_message": "<value>", "code": "<value>"}]}
   CreatePhoneNumber:

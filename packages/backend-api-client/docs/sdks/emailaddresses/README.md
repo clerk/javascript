@@ -81,7 +81,7 @@ run();
 | Error Type              | Status Code             | Content Type            |
 | ----------------------- | ----------------------- | ----------------------- |
 | errors.ClerkErrors      | 400, 401, 403, 404, 422 | application/json        |
-| errors.APIError         | 4XX, 5XX                | \*/\*                   |
+| errors.ClerkAPIError    | 4XX, 5XX                | \*/\*                   |
 
 ## get
 
@@ -155,10 +155,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 400, 401, 403, 404 | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 400, 401, 403, 404   | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## delete
 
@@ -232,10 +232,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 400, 401, 403, 404 | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 400, 401, 403, 404   | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## update
 
@@ -309,7 +309,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 400, 401, 403, 404 | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 400, 401, 403, 404   | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |

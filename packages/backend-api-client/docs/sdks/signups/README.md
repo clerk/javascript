@@ -80,10 +80,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 403                | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 403                  | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## update
 
@@ -157,7 +157,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 403                | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 403                  | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |

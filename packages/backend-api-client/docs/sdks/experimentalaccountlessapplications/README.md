@@ -75,10 +75,10 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 500                | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 500                  | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |
 
 ## complete
 
@@ -147,7 +147,7 @@ run();
 
 ### Errors
 
-| Error Type         | Status Code        | Content Type       |
-| ------------------ | ------------------ | ------------------ |
-| errors.ClerkErrors | 500                | application/json   |
-| errors.APIError    | 4XX, 5XX           | \*/\*              |
+| Error Type           | Status Code          | Content Type         |
+| -------------------- | -------------------- | -------------------- |
+| errors.ClerkErrors   | 500                  | application/json     |
+| errors.ClerkAPIError | 4XX, 5XX             | \*/\*                |

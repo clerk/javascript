@@ -9,7 +9,7 @@ import { RequestOptions } from "../lib/sdks.js";
 import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
 import * as components from "../models/components/index.js";
-import { APIError } from "../models/errors/apierror.js";
+import { ClerkAPIError } from "../models/errors/clerkapierror.js";
 import {
   ConnectionError,
   InvalidRequestError,
@@ -33,7 +33,7 @@ export function instanceSettingsGet(
 ): APIPromise<
   Result<
     components.Instance,
-    | APIError
+    | ClerkAPIError
     | SDKValidationError
     | UnexpectedClientError
     | InvalidRequestError
@@ -55,7 +55,7 @@ async function $do(
   [
     Result<
       components.Instance,
-      | APIError
+      | ClerkAPIError
       | SDKValidationError
       | UnexpectedClientError
       | InvalidRequestError
@@ -126,7 +126,7 @@ async function $do(
 
   const [result] = await M.match<
     components.Instance,
-    | APIError
+    | ClerkAPIError
     | SDKValidationError
     | UnexpectedClientError
     | InvalidRequestError

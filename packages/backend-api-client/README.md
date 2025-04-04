@@ -630,12 +630,12 @@ run();
 
 Some methods specify known errors which can be thrown. All the known errors are enumerated in the `models/errors/errors.ts` module. The known errors for a method are documented under the *Errors* tables in SDK docs. For example, the `verify` method may throw the following errors:
 
-| Error Type         | Status Code   | Content Type     |
-| ------------------ | ------------- | ---------------- |
-| errors.ClerkErrors | 400, 401, 404 | application/json |
-| errors.APIError    | 4XX, 5XX      | \*/\*            |
+| Error Type           | Status Code   | Content Type     |
+| -------------------- | ------------- | ---------------- |
+| errors.ClerkErrors   | 400, 401, 404 | application/json |
+| errors.ClerkAPIError | 4XX, 5XX      | \*/\*            |
 
-If the method throws an error and it is not captured by the known errors, it will default to throwing a `APIError`.
+If the method throws an error and it is not captured by the known errors, it will default to throwing a `ClerkAPIError`.
 
 ```typescript
 import { ClerkBackendApi } from "@clerk/backend-api-client";

@@ -18,7 +18,7 @@ generation:
     oAuth2ClientCredentialsEnabled: true
     oAuth2PasswordEnabled: true
 typescript:
-  version: 0.3.11
+  version: 0.3.12
   additionalDependencies:
     dependencies: {}
     devDependencies: {}
@@ -31,7 +31,7 @@ typescript:
     - install
     - --filter
     - '@clerk/backend-api-client'
-  defaultErrorName: APIError
+  defaultErrorName: ClerkAPIError
   enableCustomCodeRegions: false
   enableMCPServer: false
   enableReactQuery: false

@@ -10,7 +10,7 @@ import { safeParse } from "../lib/schemas.js";
 import { RequestOptions } from "../lib/sdks.js";
 import { extractSecurity, resolveGlobalSecurity } from "../lib/security.js";
 import { pathToFunc } from "../lib/url.js";
-import { APIError } from "../models/errors/apierror.js";
+import { ClerkAPIError } from "../models/errors/clerkapierror.js";
 import {
   ConnectionError,
   InvalidRequestError,
@@ -39,7 +39,7 @@ export function usersDeleteTOTP(
     operations.DeleteTOTPResponseBody,
     | errors.ClerkErrors
     | errors.ClerkErrors
-    | APIError
+    | ClerkAPIError
     | SDKValidationError
     | UnexpectedClientError
     | InvalidRequestError
@@ -65,7 +65,7 @@ async function $do(
       operations.DeleteTOTPResponseBody,
       | errors.ClerkErrors
       | errors.ClerkErrors
-      | APIError
+      | ClerkAPIError
       | SDKValidationError
       | UnexpectedClientError
       | InvalidRequestError
@@ -161,7 +161,7 @@ async function $do(
     operations.DeleteTOTPResponseBody,
     | errors.ClerkErrors
     | errors.ClerkErrors
-    | APIError
+    | ClerkAPIError
     | SDKValidationError
     | UnexpectedClientError
     | InvalidRequestError
