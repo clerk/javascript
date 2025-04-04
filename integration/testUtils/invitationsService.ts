@@ -6,7 +6,7 @@ export type InvitationService = {
 export const createInvitationService = (clerkClient: ClerkClient) => {
   const self: InvitationService = {
     createBapiInvitation: async emailAddress => {
-      return await clerkClient.invitations.createInvitation({
+      return await clerkClient.invitations.create({
         emailAddress,
       });
     },

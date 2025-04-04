@@ -27,7 +27,7 @@ test.describe('dynamic keys @nextjs', () => {
           if (shouldFetchBapi(request)){
             const client = await clerkClient();
 
-            const count = await client.users?.getCount();
+            const count = await client.users?.count({});
 
             if (count){
               return NextResponse.redirect(new URL('/users-count', request.url));
@@ -47,7 +47,7 @@ test.describe('dynamic keys @nextjs', () => {
         () => `import { clerkClient } from '@clerk/nextjs/server'
 
         export default async function Page(){
-          const count = await clerkClient().users?.getCount() ?? 0;
+          const count = await clerkClient().users?.count({}) ?? 0;
 
           return <p>Users count: {count}</p>
         }

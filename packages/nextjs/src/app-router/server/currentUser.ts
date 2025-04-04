@@ -33,5 +33,5 @@ export async function currentUser(): Promise<User | null> {
     return null;
   }
 
-  return (await clerkClient()).users.getUser(userId);
+  return (await clerkClient()).users.get({ userId });
 }

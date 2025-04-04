@@ -131,7 +131,14 @@ export function signedInAuthObject(
   const getToken = createGetToken({
     sessionId,
     sessionToken,
-    fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
+    fetcher: async (sessionId, templateName = '') => {
+      const res = await apiClient.sessions.createTokenFromTemplate({
+        sessionId,
+        templateName,
+      });
+
+      return res.jwt || null;
+    },
   });
 
   return {
@@ -187,7 +194,7 @@ export const makeAuthObjectSerializable = <T extends Record<string, unknown>>(ob
   return rest as unknown as T;
 };
 
-type TokenFetcher = (sessionId: string, template: string) => Promise<string>;
+type TokenFetcher = (sessionId: string, template: string) => Promise<string | null>;
 
 type CreateGetToken = (params: { sessionId: string; sessionToken: string; fetcher: TokenFetcher }) => ServerGetToken;
 

@@ -10,7 +10,7 @@ export default eventHandler(async event => {
     });
   }
 
-  const user = await clerkClient(event).users.getUser(userId);
+  const user = await clerkClient(event).users.get({ userId });
 
   return user;
 });

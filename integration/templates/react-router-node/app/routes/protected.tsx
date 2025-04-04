@@ -11,7 +11,7 @@ export async function loader(args: Route.LoaderArgs) {
     return redirect('/sign-in');
   }
 
-  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.getUser(userId);
+  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.get({ userId });
 
   return {
     user,

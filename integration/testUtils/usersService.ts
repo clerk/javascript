@@ -92,7 +92,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       };
     },
     createBapiUser: async fakeUser => {
-      return await clerkClient.users.createUser({
+      return await clerkClient.users.create({
         emailAddress: [fakeUser.email],
         password: fakeUser.password,
         firstName: fakeUser.firstName,
@@ -106,7 +106,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       let id = opts.id;
 
       if (!id) {
-        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        const users = await clerkClient.users.list({ emailAddress: [opts.email] });
         id = users[0]?.id;
       }
 
@@ -115,12 +115,12 @@ export const createUserService = (clerkClient: ClerkClient) => {
         return;
       }
 
-      await clerkClient.users.deleteUser(id);
+      await clerkClient.users.delete({ userId: id });
     },
     getUser: async (opts: { id?: string; email?: string }) => {
       if (opts.id) {
         try {
-          const user = await clerkClient.users.getUser(opts.id);
+          const user = await clerkClient.users.get({ userId: opts.id });
           return user;
         } catch (err) {
           console.log(`Error fetching user "${opts.id}": ${err.message}`);
@@ -129,7 +129,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       }
 
       if (opts.email) {
-        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        const users = await clerkClient.users.list({ emailAddress: [opts.email] });
         if (users.length > 0) {
           return users[0];
         } else {
@@ -142,14 +142,14 @@ export const createUserService = (clerkClient: ClerkClient) => {
     },
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();
-      const organization = await clerkClient.organizations.createOrganization({
+      const organization = await clerkClient.organizations.create({
         name: faker.animal.dog(),
         createdBy: userId,
       });
       return {
         name,
         organization,
-        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
+        delete: () => clerkClient.organizations.delete({ organizationId: organization.id }),
       } satisfies FakeOrganization;
     },
   };

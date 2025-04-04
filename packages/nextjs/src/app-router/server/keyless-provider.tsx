@@ -96,13 +96,10 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
        * Notifying the dashboard the should runs once. We are controlling this behaviour by caching the result of the request.
        * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
        */
-      await clerkDevelopmentCache?.run(
-        () => client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding(),
-        {
-          cacheKey: `${newOrReadKeys.publishableKey}_complete`,
-          onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
-        },
-      );
+      await clerkDevelopmentCache?.run(() => client.experimentalAccountlessApplications.complete(), {
+        cacheKey: `${newOrReadKeys.publishableKey}_complete`,
+        onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
+      });
     } catch {
       // noop
     }
@@ -127,6 +124,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
   const host = headerStore.get('x-forwarded-host');
   const proto = headerStore.get('x-forwarded-proto');
 
+  // @ts-expect-error - TODO: OAS Spec suggests that this can be empty
   const claimUrl = new URL(newOrReadKeys.claimUrl);
   if (host && proto) {
     onlyTry(() => claimUrl.searchParams.set('return_url', new URL(`${proto}://${host}`).href));

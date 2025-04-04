@@ -37,8 +37,8 @@ const createInvitation = ClerkTool({
       .describe('(boolean, optional): Whether to ignore if an invitation already exists. Defaults to false.'),
   }),
   execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.invitations.createInvitation(params);
-    return prunePrivateData(context, res.raw);
+    const res = await clerkClient.invitations.create(params);
+    return prunePrivateData(context, res);
   },
 });
 
@@ -59,10 +59,12 @@ const revokeInvitation = ClerkTool({
   parameters: z.object({
     invitationId: z.string().describe('(string): The ID of the invitation to revoke. Required.'),
   }),
-  execute: (clerkClient, context) => async params => {
-    const res = await clerkClient.invitations.revokeInvitation(params.invitationId);
-    return prunePrivateData(context, res.raw);
-  },
+  execute:
+    (clerkClient, context) =>
+    async ({ invitationId }) => {
+      const res = await clerkClient.invitations.revoke({ invitationId });
+      return prunePrivateData(context, res);
+    },
 });
 
 export const invitations = {
