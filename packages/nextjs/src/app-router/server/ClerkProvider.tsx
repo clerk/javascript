@@ -19,8 +19,13 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   return data;
 });
 
-const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
-  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
+const getNonceHeaders = React.cache(async function getNonceHeaders() {
+  const headersList = await headers();
+  const nonce = headersList.get('X-Nonce');
+  return nonce
+    ? nonce
+    : // Fallback to extracting from CSP header
+      getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
 export async function ClerkProvider(
@@ -51,9 +56,9 @@ export async function ClerkProvider(
        * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
        * Without the await here, Next will throw a DynamicServerError during build.
        */
-      return Promise.resolve(await getNonceFromCSPHeader());
+      return Promise.resolve(await getNonceHeaders());
     }
-    return getNonceFromCSPHeader();
+    return getNonceHeaders();
   }
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
