@@ -37,3 +37,8 @@ export { huHU } from './hu-HU';
 export { isIS } from './is-IS';
 export { hrHR } from './hr-HR';
 export { idID } from './id-ID';
+export { hiIN } from "./hi-IN";
+export { bnIN } from "./bn-IN";
+export { teIN } from "./te-IN";
+export { taIN } from "./ta-IN";
+export { msMY } from "./ms-MY";
