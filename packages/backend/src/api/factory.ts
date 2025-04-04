@@ -1,3 +1,6 @@
+import { ClerkBackendApi } from '@clerk/backend-api-client';
+import { joinPaths } from 'src/util/path';
+
 import {
   AccountlessApplicationAPI,
   AllowlistIdentifierAPI,
@@ -41,4 +44,14 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     samlConnections: new SamlConnectionAPI(request),
     testingTokens: new TestingTokenAPI(request),
   };
+}
+
+export function createGeneratedBackendApiClient(options: CreateBackendApiOptions) {
+  const serverURL = options.apiUrl ? joinPaths(options.apiUrl, options.apiVersion || 'v1') : undefined;
+
+  // TODO: Add dynamic user agent
+  return new ClerkBackendApi({
+    bearerAuth: options.secretKey,
+    serverURL,
+  });
 }
