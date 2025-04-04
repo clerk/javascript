@@ -15,7 +15,7 @@ export class CaptchaChallenge {
     const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
-      return getCaptchaToken({
+      const captchaResult = await getCaptchaToken({
         siteKey: captchaPublicKeyInvisible,
         invisibleSiteKey: captchaPublicKeyInvisible,
         widgetType: 'invisible',
@@ -25,11 +25,12 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return { captchaError: e?.message || e };
+        return { captchaError: e?.message || e || 'unexpected_captcha_error' };
       });
+      return { ...captchaResult, action: opts?.action };
     }
 
-    return { captchaError: 'captcha_unavailable' };
+    return { captchaError: 'captcha_unavailable', action: opts?.action };
   }
 
   /**
@@ -45,7 +46,7 @@ export class CaptchaChallenge {
       retrieveCaptchaInfo(this.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
-      return getCaptchaToken({
+      const captchaResult = await getCaptchaToken({
         siteKey: captchaSiteKey,
         widgetType: captchaWidgetType,
         invisibleSiteKey: captchaPublicKeyInvisible,
@@ -53,13 +54,19 @@ export class CaptchaChallenge {
         ...opts,
       }).catch(e => {
         if (e.captchaError) {
-          return { captchaError: e.captchaError };
+          return opts?.action === 'verify'
+            ? { captchaError: e.captchaError, action: 'verify' }
+            : { captchaError: e.captchaError };
         }
-        return opts?.action === 'verify' ? { captchaError: e?.message || e } : undefined;
+        // if captcha action is signup, we return undefined, because we don't want to make the call to FAPI
+        return opts?.action === 'verify' ? { captchaError: e?.message || e || 'unexpected_captcha_error' } : undefined;
       });
+      return opts?.action === 'verify' ? { ...captchaResult, action: 'verify' } : captchaResult;
     }
 
-    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable' } : {};
+    // if captcha action is signup, we return an empty object, because it means that the bot protection is disabled
+    // and the user should be able to sign up without solving a captcha
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', action: opts?.action } : {};
   }
 
   /**

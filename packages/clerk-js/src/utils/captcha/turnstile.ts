@@ -176,7 +176,15 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     // but we won't show the modal as it will never escalate to interactive mode
     captchaWidgetType = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
-    await openModal?.();
+    try {
+      await openModal?.();
+    } catch {
+      // When a client is captcha_block the first attempt to open the modal will fail with 'ClerkJS components are not ready yet.'
+      // This happens consistently in the first attempt, because in clerk.#loadInStandardBrowser we first await for the `/client` response
+      // and then we run initComponents to initialize the components.
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw { captchaError: 'modal_component_not_ready' };
+    }
     const modalContainderEl = await waitForElement(modalContainerQuerySelector);
     if (modalContainderEl) {
       const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
