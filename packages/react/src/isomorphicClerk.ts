@@ -728,7 +728,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openCheckout(props);
     } else {
       this.preopenCheckout = props;
@@ -736,7 +736,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_closeCheckout = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_closeCheckout();
     } else {
       this.preopenCheckout = null;
