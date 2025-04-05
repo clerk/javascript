@@ -1,6 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createClerkEventBus } from '@clerk/shared/eventBus';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -201,14 +202,14 @@ export class Clerk implements ClerkInterface {
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
-  #loaded = false;
-
+  #status: ClerkInterface['status'] = 'loading';
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
+  #publicEventBus = createClerkEventBus();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -251,7 +252,11 @@ export class Clerk implements ClerkInterface {
   }
 
   get loaded(): boolean {
-    return this.#loaded;
+    return this.status === 'degraded' || this.status === 'ready';
+  }
+
+  get status(): ClerkInterface['status'] {
+    return this.#status;
   }
 
   get isSatellite(): boolean {
@@ -361,6 +366,10 @@ export class Clerk implements ClerkInterface {
       },
       proxyUrl: this.proxyUrl,
     });
+
+    this.#publicEventBus.dispatch('status', 'loading');
+    this.#publicEventBus.onPreDispatch('status', s => (this.#status = s));
+
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
   }
@@ -396,10 +405,16 @@ export class Clerk implements ClerkInterface {
       });
     }
 
-    if (this.#options.standardBrowser) {
-      this.#loaded = await this.#loadInStandardBrowser();
-    } else {
-      this.#loaded = await this.#loadInNonStandardBrowser();
+    try {
+      if (this.#options.standardBrowser) {
+        await this.#loadInStandardBrowser();
+      } else {
+        await this.#loadInNonStandardBrowser();
+      }
+    } catch (e) {
+      this.#publicEventBus.dispatch('status', 'error');
+      // bubble up the error
+      throw e;
     }
   };
 
@@ -1187,6 +1202,14 @@ export class Clerk implements ClerkInterface {
       this.#listeners = this.#listeners.filter(l => l !== listener);
     };
     return unsubscribe;
+  };
+
+  public on: ClerkInterface['on'] = (...args) => {
+    this.#publicEventBus.on(...args);
+  };
+
+  public off: ClerkInterface['off'] = (...args) => {
+    this.#publicEventBus.off(...args);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2090,15 +2113,20 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  #loadInStandardBrowser = async (): Promise<boolean> => {
+  #loadInStandardBrowser = async (): Promise<void> => {
     /**
      * 0. Init auth service and setup dev browser
      * This is not needed for production instances hence the .clear()
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
+    this.#authService = await AuthCookieService.create(
+      this,
+      this.#fapiClient,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.#instanceType!,
+      this.#publicEventBus,
+    );
 
     /**
      * 1. Multi-domain SSO handling
@@ -2108,8 +2136,8 @@ export class Clerk implements ClerkInterface {
     this.#validateMultiDomainOptions();
     if (this.#shouldSyncWithPrimary()) {
       await this.#syncWithPrimary();
-      // ClerkJS is not considered loaded during the sync/link process with the primary domain
-      return false;
+      // ClerkJS is not considered loaded during the sync/link process with the primary domain, return early
+      return;
     }
 
     /**
@@ -2118,7 +2146,7 @@ export class Clerk implements ClerkInterface {
      */
     if (this.#shouldRedirectToSatellite()) {
       await this.#redirectToSatellite();
-      return false;
+      return;
     }
 
     /**
@@ -2135,6 +2163,8 @@ export class Clerk implements ClerkInterface {
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
+    let initializationDegradedCounter = 0;
+
     let retries = 0;
     while (retries < 2) {
       retries++;
@@ -2142,20 +2172,17 @@ export class Clerk implements ClerkInterface {
       try {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
-          .then(res => {
-            this.updateEnvironment(res);
-          })
-          .catch(e => {
+          .then(res => this.updateEnvironment(res))
+          .catch(() => {
+            ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
               null,
             );
 
-            if (!environmentSnapshot) {
-              throw e;
+            if (environmentSnapshot) {
+              this.updateEnvironment(new Environment(environmentSnapshot));
             }
-
-            this.updateEnvironment(new Environment(environmentSnapshot));
           });
 
         const initClient = async () => {
@@ -2170,6 +2197,8 @@ export class Clerk implements ClerkInterface {
                 // bubble it up
                 throw e;
               }
+
+              ++initializationDegradedCounter;
 
               const jwtInCookie = this.#authService?.getSessionCookie();
               const localClient = createClientFromJwt(jwtInCookie);
@@ -2206,15 +2235,12 @@ export class Clerk implements ClerkInterface {
           }
         };
 
-        const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
 
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
           if (isError(e, 'requires_captcha')) {
-            if (envResult.status === 'rejected') {
-              await initEnvironmentPromise;
-            }
             initComponents();
             await initClient();
           } else {
@@ -2222,12 +2248,10 @@ export class Clerk implements ClerkInterface {
           }
         }
 
-        await initEnvironmentPromise;
-
         this.#authService?.setClientUatCookieForDevelopmentInstances();
 
         if (await this.#redirectFAPIInitiatedFlow()) {
-          return false;
+          return;
         }
 
         initComponents();
@@ -2238,7 +2262,7 @@ export class Clerk implements ClerkInterface {
           await this.#authService.handleUnauthenticatedDevBrowser();
         } else if (!isValidBrowserOnline()) {
           console.warn(err);
-          return false;
+          return;
         } else {
           throw err;
         }
@@ -2254,16 +2278,18 @@ export class Clerk implements ClerkInterface {
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
-    return true;
+
+    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
     return !!this.__internal_getCachedResources;
   };
 
-  #loadInNonStandardBrowser = async (): Promise<boolean> => {
+  #loadInNonStandardBrowser = async (): Promise<void> => {
     let environment: Environment, client: Client;
     const fetchMaxTries = this.shouldFallbackToCachedResources() ? 1 : undefined;
+    let initializationDegradedCounter = 0;
     try {
       [environment, client] = await Promise.all([
         Environment.getInstance().fetch({ touch: false, fetchMaxTries }),
@@ -2275,6 +2301,7 @@ export class Clerk implements ClerkInterface {
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
         client = Client.getOrCreateInstance(cachedResources?.client);
+        ++initializationDegradedCounter;
       } else {
         throw err;
       }
@@ -2289,7 +2316,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    return true;
+    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

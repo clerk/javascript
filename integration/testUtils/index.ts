@@ -67,6 +67,21 @@ const createClerkUtils = ({ page }: TestArgs) => {
         return !!window.Clerk?.loaded;
       });
     },
+    toBeLoading: async () => {
+      return page.waitForFunction(() => {
+        return window.Clerk?.status === 'loading';
+      });
+    },
+    toBeReady: async () => {
+      return page.waitForFunction(() => {
+        return window.Clerk?.status === 'ready';
+      });
+    },
+    toBeDegraded: async () => {
+      return page.waitForFunction(() => {
+        return window.Clerk?.status === 'degraded';
+      });
+    },
     getClientSideUser: () => {
       return page.evaluate(() => {
         return window.Clerk?.user;

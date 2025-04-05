@@ -64,6 +64,7 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type StatusListenerCallback = (status: Status) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
@@ -90,6 +91,25 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+export const events = {
+  Status: 'status',
+} as const;
+
+type ClerkEvent = (typeof events)[keyof typeof events];
+type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
+
+type EventPayload = {
+  [events.Status]: Status;
+};
+
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * @inline
+ */
+export type Status = 'degraded' | 'error' | 'loading' | 'ready';
+
 /**
  * Main Clerk SDK object.
  */
@@ -109,6 +129,15 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
+   */
+  status: Status;
 
   /**
    * @internal
@@ -432,6 +461,10 @@ export interface Clerk {
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+
+  on: OnEventListener;
+
+  off: OffEventListener;
 
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
