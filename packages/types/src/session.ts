@@ -1,3 +1,4 @@
+import type { FeatureKey } from './authorization';
 import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
@@ -52,12 +53,19 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      __experimental_feature?: never;
     }
   | {
       role?: never;
       permission: OrganizationCustomPermissionKey;
+      __experimental_feature?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      __experimental_feature: FeatureKey;
+    }
+  | { role?: never; permission?: never; __experimental_feature?: never }
 >;
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
@@ -90,12 +98,19 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      __experimental_feature?: never;
     }
   | {
       role?: never;
       permission: DisallowSystemPermissions<P>;
+      __experimental_feature?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      __experimental_feature: FeatureKey;
+    }
+  | { role?: never; permission?: never; __experimental_feature?: never }
 >;
 
 /**

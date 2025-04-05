@@ -3,6 +3,7 @@ export * from './appearance';
 export * from './elementIds';
 export * from './attributes';
 export * from './authConfig';
+export * from './authorization';
 export * from './backupCode';
 export * from './clerk';
 export * from './client';

@@ -115,6 +115,8 @@ export class Session extends BaseResource implements SessionResource {
       orgId: activeMembership?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
+      // TODO: retrieve features
+      __experimental_features: 'testfeature',
     })(params);
   };
 

@@ -119,6 +119,12 @@ type JWTPayloadBase = {
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
+
+  /**
+   * Feature claims, you can have multiple features in the same claim. e.g.: "impersonation,emails"
+   * @experimental
+   */
+  fea?: string | null;
 };
 
 export type VersionedJwtPayload =
@@ -126,7 +132,6 @@ export type VersionedJwtPayload =
       ver?: never;
 
       /**
-       *
        * Active organization permissions.
        */
       org_permissions?: OrganizationCustomPermissionKey[];
