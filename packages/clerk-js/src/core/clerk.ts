@@ -68,7 +68,6 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
-  Status,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -368,8 +367,8 @@ export class Clerk implements ClerkInterface {
       proxyUrl: this.proxyUrl,
     });
 
-    // this.#publicEventBus.dispatch('status', 'loading');
-    // publicClerkBus.onPreDispatch('status',this.#onStatus);
+    this.#publicEventBus.dispatch('status', 'loading');
+    this.#publicEventBus.onPreDispatch('status', s => (this.#status = s));
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -1211,11 +1210,6 @@ export class Clerk implements ClerkInterface {
 
   public off: ClerkInterface['off'] = (...args) => {
     this.#publicEventBus.off(...args);
-  };
-
-  #updateStatus = (status: Status) => {
-    this.#status = status;
-    this.#publicEventBus.dispatch('status', status);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2285,7 +2279,7 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    this.#updateStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
@@ -2322,7 +2316,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    this.#updateStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

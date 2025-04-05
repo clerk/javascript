@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { publicClerkBus } from '@clerk/shared/eventBus';
+import { createClerkEventBus } from '@clerk/shared/eventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
@@ -136,20 +136,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nativeUnsubscribe?: UnsubscribeCallback;
     }
   >();
-
-  // private premountAddStatusListenerCalls = new Map<
-  //   StatusListenerCallback,
-  //   {
-  //     unsubscribe: UnsubscribeCallback;
-  //     nativeUnsubscribe?: UnsubscribeCallback;
-  //   }
-  // >();
   private loadedListeners: Array<() => void> = [];
 
   #status: Clerk['status'] = 'loading';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
+  #eventBus = createClerkEventBus();
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -247,7 +240,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
 
-    publicClerkBus.onPreDispatch('status', status => (this.#status = status));
+    this.#eventBus.dispatch('status', 'loading');
+    this.#eventBus.onPreDispatch('status', status => (this.#status = status));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -468,27 +462,27 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     } catch (err) {
       const error = err as Error;
-      publicClerkBus.dispatch('status', 'error');
+      this.#eventBus.dispatch('status', 'error');
       console.error(error.stack || error.message || error);
       return;
     }
   }
 
-  public on: Clerk['on'] = (event, handler) => {
+  public on: Clerk['on'] = (...args) => {
     // Support older clerk-js versions.
     if (this.clerkjs?.on) {
-      return this.clerkjs.on(event, handler);
+      return this.clerkjs.on(...args);
     } else {
-      publicClerkBus.on(event, handler);
+      this.#eventBus.on(...args);
     }
   };
 
-  public off: Clerk['off'] = (event, handler) => {
+  public off: Clerk['off'] = (...args) => {
     // Support older clerk-js versions.
     if (this.clerkjs?.off) {
-      return this.clerkjs.off(event, handler);
+      return this.clerkjs.off(...args);
     } else {
-      publicClerkBus.off(event, handler);
+      this.#eventBus.off(...args);
     }
   };
 
@@ -520,6 +514,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+    console.log('hydrateClerkJS');
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
@@ -531,8 +526,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
     });
 
-    publicClerkBus.internal.retrieveListeners('status')?.forEach(listener => {
-      clerkjs.on('status', listener, { notify: true });
+    this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
+      // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
+      this.on('status', listener, { notify: true });
     });
 
     if (this.preopenSignIn !== null) {
@@ -603,7 +599,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
     if (typeof this.clerkjs.status === 'undefined') {
-      publicClerkBus.dispatch('status', 'ready');
+      this.#eventBus.dispatch('status', 'ready');
     }
 
     this.emitLoaded();
