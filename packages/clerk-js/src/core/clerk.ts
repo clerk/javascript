@@ -1,7 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
-import { publicClerkBus } from '@clerk/shared/eventBus';
+import { createClerkEventBus } from '@clerk/shared/eventBus';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -68,6 +68,7 @@ import type {
   SignUpProps,
   SignUpRedirectOptions,
   SignUpResource,
+  Status,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -209,6 +210,7 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
+  #publicEventBus = createClerkEventBus();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -366,7 +368,8 @@ export class Clerk implements ClerkInterface {
       proxyUrl: this.proxyUrl,
     });
 
-    publicClerkBus.onPreDispatch('status', status => (this.#status = status));
+    // this.#publicEventBus.dispatch('status', 'loading');
+    // publicClerkBus.onPreDispatch('status',this.#onStatus);
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -410,7 +413,7 @@ export class Clerk implements ClerkInterface {
         await this.#loadInNonStandardBrowser();
       }
     } catch (e) {
-      publicClerkBus.dispatch('status', 'error');
+      this.#publicEventBus.dispatch('status', 'error');
       // bubble up the error
       throw e;
     }
@@ -1203,11 +1206,16 @@ export class Clerk implements ClerkInterface {
   };
 
   public on: ClerkInterface['on'] = (...args) => {
-    publicClerkBus.on(...args);
+    this.#publicEventBus.on(...args);
   };
 
   public off: ClerkInterface['off'] = (...args) => {
-    publicClerkBus.off(...args);
+    this.#publicEventBus.off(...args);
+  };
+
+  #updateStatus = (status: Status) => {
+    this.#status = status;
+    this.#publicEventBus.dispatch('status', status);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2118,8 +2126,13 @@ export class Clerk implements ClerkInterface {
      * At this point we have already attempted to pre-populate devBrowser with a fresh JWT, if Step 2 was successful this will not be overwritten.
      * For multi-domain we want to avoid retrieving a fresh JWT from FAPI, and we need to get the token as a result of multi-domain session syncing.
      */
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.#authService = await AuthCookieService.create(this, this.#fapiClient, this.#instanceType!);
+    this.#authService = await AuthCookieService.create(
+      this,
+      this.#fapiClient,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.#instanceType!,
+      this.#publicEventBus,
+    );
 
     /**
      * 1. Multi-domain SSO handling
@@ -2272,7 +2285,7 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    publicClerkBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#updateStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
@@ -2309,7 +2322,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    publicClerkBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#updateStatus(initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

@@ -1,7 +1,7 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
-import { publicClerkBus } from '@clerk/shared/eventBus';
+import type { createClerkEventBus } from '@clerk/shared/eventBus';
 import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
@@ -42,9 +42,14 @@ export class AuthCookieService {
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
 
-  public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
+  public static async create(
+    clerk: Clerk,
+    fapiClient: FapiClient,
+    instanceType: InstanceType,
+    clerkEventBus: ReturnType<typeof createClerkEventBus>,
+  ) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
-    const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType);
+    const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType, clerkEventBus);
     await service.setup();
     return service;
   }
@@ -54,6 +59,7 @@ export class AuthCookieService {
     fapiClient: FapiClient,
     cookieSuffix: string,
     private instanceType: InstanceType,
+    private clerkEventBus: ReturnType<typeof createClerkEventBus>,
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
@@ -194,7 +200,7 @@ export class AuthCookieService {
     }
 
     // The poller failed to fetch a fresh session token, update status to `degraded`.
-    publicClerkBus.dispatch('status', 'degraded');
+    this.clerkEventBus.dispatch('status', 'degraded');
 
     // --------
     // Treat any other error as a noop

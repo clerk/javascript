@@ -38,16 +38,20 @@ export const createEventBus = <Events extends Record<string, unknown>>() => {
     eventToPredispatchHandlersMap.get(event)?.push(handler);
   };
 
-  const off = <Event extends keyof Events>(event: Event, handler: EventHandler<Events, Event>) => {
+  const off = <Event extends keyof Events>(event: Event, handler?: EventHandler<Events, Event>) => {
     const handlers = eventToHandlersMap.get(event) || [];
     if (!handlers.length) {
       return;
     }
 
-    eventToHandlersMap.set(
-      event,
-      handlers.filter(h => h !== handler),
-    );
+    if (handler) {
+      eventToHandlersMap.set(
+        event,
+        handlers.filter(h => h !== handler),
+      );
+    }
+
+    eventToHandlersMap.delete(event);
   };
 
   const retrieveListeners = <Event extends keyof Events>(event: Event) => {
@@ -71,7 +75,8 @@ export const clerkEvents = {
 
 type ClerkEvent = {
   [clerkEvents.Status]: Status;
-  one: null;
 };
 
-export const publicClerkBus = createEventBus<ClerkEvent>();
+export const createClerkEventBus = () => {
+  return createEventBus<ClerkEvent>();
+};
