@@ -144,7 +144,7 @@ const _off: InternalOff = (eventToHandlersMap, event, handler) => {
 };
 
 /**
- * ES6/2015 Compatible Event Bus
+ * A ES6/2015 compatible 300 byte event bus
  *
  * Creates a strongly-typed event bus that enables publish/subscribe communication between components.
  *
