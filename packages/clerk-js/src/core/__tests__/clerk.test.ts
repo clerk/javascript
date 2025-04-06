@@ -596,7 +596,7 @@ describe('Clerk singleton', () => {
             jwt: {},
             getRawString: () => 'updated-jwt',
           } as TokenResource;
-          eventBus.dispatch(events.TokenUpdate, { token });
+          eventBus.emit(events.TokenUpdate, { token });
 
           expect(document.cookie).toContain('updated-jwt');
         });

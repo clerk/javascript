@@ -1,15 +1,10 @@
 /**
  * Type definition for event handler functions
- *
- * @template Events - Record mapping event names to their payload types
- * @template Key - The specific event name this handler is for
- * @template R - Return type of the handler (defaults to void)
  */
-type EventHandler<Events extends Record<string, unknown>, Key extends keyof Events, R = void> = (
-  payload: Events[Key],
-) => R;
+type EventHandler<Events extends Record<string, unknown>, Key extends keyof Events> = (payload: Events[Key]) => void;
 
 /**
+ * @interface
  * Strongly-typed event bus interface that enables type-safe publish/subscribe patterns
  */
 type EventBus<Events extends Record<string, unknown>> = {
@@ -46,7 +41,7 @@ type EventBus<Events extends Record<string, unknown>> = {
    * @param payload - The data to pass to event handlers
    * @returns void
    */
-  dispatch: <Event extends keyof Events>(event: Event, payload: Events[Event]) => void;
+  emit: <Event extends keyof Events>(event: Event, payload: Events[Event]) => void;
 
   /**
    * Unsubscribe from an event
@@ -196,7 +191,7 @@ export const createEventBus = <Events extends Record<string, unknown>>(): EventB
   const latestPayloadMap = new Map<keyof Events, any>();
   const eventToPredispatchHandlersMap = new Map<keyof Events, Array<(...args: any[]) => void>>();
 
-  const dispatch = <Event extends keyof Events>(event: Event, payload: Events[Event]) => {
+  const emit: EventBus<Events>['emit'] = (event, payload) => {
     latestPayloadMap.set(event, payload);
     _dispatch(eventToPredispatchHandlersMap, event, payload);
     _dispatch(eventToHandlersMap, event, payload);
@@ -205,7 +200,7 @@ export const createEventBus = <Events extends Record<string, unknown>>(): EventB
   return {
     on: (...args) => _on(eventToHandlersMap, latestPayloadMap, ...args),
     onBefore: (...args) => _on(eventToPredispatchHandlersMap, latestPayloadMap, ...args),
-    dispatch,
+    emit,
     off: (...args) => _off(eventToHandlersMap, ...args),
     offBefore: (...args) => _off(eventToPredispatchHandlersMap, ...args),
     internal: {

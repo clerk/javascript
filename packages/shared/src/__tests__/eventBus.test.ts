@@ -51,7 +51,7 @@ describe('eventBus', () => {
       const payload = 'test-message';
 
       // Act
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
       eventBus.on('test-event', handler, { notify: true });
 
       // Assert
@@ -65,7 +65,7 @@ describe('eventBus', () => {
       const payload = 'test-message';
 
       // Act
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
       eventBus.on('test-event', handler, { notify: false });
 
       // Assert
@@ -78,7 +78,7 @@ describe('eventBus', () => {
       const payload = 'test-message';
 
       // Act
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
       eventBus.on('test-event', handler);
 
       // Assert
@@ -96,7 +96,7 @@ describe('eventBus', () => {
 
       // Assert - using dispatch to verify pre-dispatch handler is called
       const payload = 'test-message';
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
       expect(handler).toHaveBeenCalledWith(payload);
     });
   });
@@ -112,7 +112,7 @@ describe('eventBus', () => {
       eventBus.on('test-event', handler2);
 
       // Act
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
 
       // Assert
       expect(handler1).toHaveBeenCalledWith(payload);
@@ -127,7 +127,7 @@ describe('eventBus', () => {
       eventBus.on('test-event-with-object', handler);
 
       // Act
-      eventBus.dispatch('test-event-with-object', payload);
+      eventBus.emit('test-event-with-object', payload);
 
       // Assert
       expect(handler).toHaveBeenCalledWith(payload);
@@ -144,7 +144,7 @@ describe('eventBus', () => {
       eventBus.on('test-event', regularHandler);
 
       // Act
-      eventBus.dispatch('test-event', payload);
+      eventBus.emit('test-event', payload);
 
       // Assert
       expect(calls).toEqual(['pre', 'regular']);
@@ -159,8 +159,8 @@ describe('eventBus', () => {
       const handler = jest.fn();
 
       // Act
-      eventBus.dispatch('test-event', payload1);
-      eventBus.dispatch('test-event', payload2);
+      eventBus.emit('test-event', payload1);
+      eventBus.emit('test-event', payload2);
       eventBus.on('test-event', handler, { notify: true });
 
       // Assert
@@ -177,7 +177,7 @@ describe('eventBus', () => {
       eventBus.on('test-event-with-number', handler2);
 
       // Act
-      eventBus.dispatch('test-event', 'test-message');
+      eventBus.emit('test-event', 'test-message');
 
       // Assert
       expect(handler1).toHaveBeenCalledTimes(1);
@@ -196,7 +196,7 @@ describe('eventBus', () => {
 
       // Act
       eventBus.off('test-event', handler1);
-      eventBus.dispatch('test-event', 'test-message');
+      eventBus.emit('test-event', 'test-message');
 
       // Assert
       expect(handler1).not.toHaveBeenCalled();
@@ -213,7 +213,7 @@ describe('eventBus', () => {
 
       // Act
       eventBus.off('test-event');
-      eventBus.dispatch('test-event', 'test-message');
+      eventBus.emit('test-event', 'test-message');
 
       // Assert
       expect(handler1).not.toHaveBeenCalled();
@@ -233,7 +233,7 @@ describe('eventBus', () => {
 
       // Act
       eventBus.offBefore('test-event', preHandler1);
-      eventBus.dispatch('test-event', 'test-message');
+      eventBus.emit('test-event', 'test-message');
 
       // Assert
       expect(preHandler1).not.toHaveBeenCalled();
@@ -250,7 +250,7 @@ describe('eventBus', () => {
 
       // Act
       eventBus.offBefore('test-event');
-      eventBus.dispatch('test-event', 'test-message');
+      eventBus.emit('test-event', 'test-message');
 
       // Assert
       expect(preHandler1).not.toHaveBeenCalled();
