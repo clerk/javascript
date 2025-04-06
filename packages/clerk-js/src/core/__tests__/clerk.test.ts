@@ -169,7 +169,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -500,7 +500,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
