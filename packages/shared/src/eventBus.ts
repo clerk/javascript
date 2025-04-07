@@ -152,7 +152,7 @@ const _off: InternalOff = (eventToHandlersMap, event, handler) => {
  * @returns An EventBus instance with the following methods:
  * - `on`: Subscribe to an event
  * - `onPreDispatch`: Subscribe to an event, triggered before regular subscribers
- * - `dispatch`: Publish an event with payload
+ * - `emit`: Publish an event with payload
  * - `off`: Unsubscribe from an event
  * - `offPreDispatch`: Unsubscribe from a pre-dispatch event
  *
