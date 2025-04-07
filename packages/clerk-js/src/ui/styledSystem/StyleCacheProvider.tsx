@@ -24,7 +24,15 @@ const wrapInLayer: (layerName: string) => StylisPlugin = layerName => node => {
   });
 };
 
-const el = document.querySelector('style#cl-style-insertion-point');
+const getInsertionPoint = () => {
+  const metaTag = document.querySelector('meta[name="emotion-insertion-point"]');
+  if (metaTag) {
+    return metaTag as HTMLElement;
+  }
+  return document.querySelector('style#cl-style-insertion-point') as HTMLElement;
+};
+
+const el = getInsertionPoint();
 
 type StyleCacheProviderProps = React.PropsWithChildren<{
   nonce?: string;
@@ -37,7 +45,7 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
       createCache({
         key: 'cl-internal',
         prepend: !el,
-        insertionPoint: el ? (el as HTMLElement) : undefined,
+        insertionPoint: el ? el : undefined,
         nonce: props.nonce,
         stylisPlugins: props.cssLayerName ? [wrapInLayer(props.cssLayerName)] : undefined,
       }),
