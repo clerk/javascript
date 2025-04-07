@@ -626,7 +626,9 @@ export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJ
   last4: string;
   payment_method: string;
   card_type: string;
+  is_default: boolean;
   status: __experimental_CommercePaymentSourceStatus;
+  wallet_type: string | null;
 }
 
 export interface __experimental_CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON {

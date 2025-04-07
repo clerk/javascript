@@ -79,6 +79,7 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
           isOpen={showSubscriptionDetailDrawer}
           setIsOpen={setShowSubscriptionDetailDrawer}
           subscription={detailSubscription}
+          subscriberType={subscriberType}
           setPlanPeriod={setPlanPeriod}
           strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
           portalProps={{

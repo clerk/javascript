@@ -3,12 +3,14 @@ import type { __experimental_CommercePaymentSourceResource, __experimental_Payme
 import { Fragment, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
+import { usePaymentSourcesContext } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
-import { CreditCard } from '../../icons';
+import { ApplePay, CreditCard } from '../../icons';
+import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource } from './AddPaymentSource';
 
@@ -38,6 +40,8 @@ const RemoveScreen = ({
 }) => {
   const { close } = useActionContext();
   const card = useCardState();
+  const { subscriberType = 'user' } = usePaymentSourcesContext();
+  const { organization } = useOrganization();
   const ref = useRef(
     `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
   );
@@ -48,7 +52,7 @@ const RemoveScreen = ({
 
   const removePaymentSource = async () => {
     await paymentSource
-      .remove()
+      .remove({ orgId: subscriberType === 'org' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
         handleError(error, [], card.setError);
@@ -80,10 +84,10 @@ const RemoveScreen = ({
   );
 };
 
-export const __experimental_PaymentSources = (props: __experimental_PaymentSourcesProps) => {
+const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { subscriberType = 'user' } = props;
+  const { subscriberType = 'user' } = usePaymentSourcesContext();
 
   const { data, revalidate } = useFetch(
     __experimental_commerce?.getPaymentSources,
@@ -110,12 +114,10 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
                   gap={2}
                   align='baseline'
                 >
-                  {paymentSource.paymentMethod === 'card' && (
-                    <Icon
-                      icon={CreditCard}
-                      sx={{ alignSelf: 'center' }}
-                    />
-                  )}
+                  <Icon
+                    icon={paymentSource.walletType === 'apple_pay' ? ApplePay : CreditCard}
+                    sx={{ alignSelf: 'center' }}
+                  />
                   <Text
                     sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
                     truncate
@@ -137,7 +139,10 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
                     />
                   )}
                 </Flex>
-                <PaymentSourceMenu paymentSource={paymentSource} />
+                <PaymentSourceMenu
+                  paymentSource={paymentSource}
+                  revalidate={revalidate}
+                />
               </ProfileSection.Item>
 
               <Action.Open value={`remove-${paymentSource.id}`}>
@@ -167,16 +172,40 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
   );
 };
 
-const PaymentSourceMenu = ({ paymentSource }: { paymentSource: __experimental_CommercePaymentSourceResource }) => {
-  const { open } = useActionContext();
+export const __experimental_PaymentSources = PaymentSources;
 
-  const actions = [
-    {
-      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
-      isDestructive: true,
-      onClick: () => open(`remove-${paymentSource.id}`),
-    },
-  ];
+const PaymentSourceMenu = ({
+  paymentSource,
+  revalidate,
+}: {
+  paymentSource: __experimental_CommercePaymentSourceResource;
+  revalidate: () => void;
+}) => {
+  const { open } = useActionContext();
+  const { organization } = useOrganization();
+  const { subscriberType = 'user' } = usePaymentSourcesContext();
+
+  const actions = (
+    [
+      paymentSource.isDefault
+        ? null
+        : {
+            label: localizationKeys(
+              'userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__default',
+            ),
+            onClick: () => {
+              paymentSource
+                .makeDefault({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+                .then(revalidate);
+            },
+          },
+      {
+        label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
+        isDestructive: true,
+        onClick: () => open(`remove-${paymentSource.id}`),
+      },
+    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
+  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
   return <ThreeDotsMenu actions={actions} />;
 };

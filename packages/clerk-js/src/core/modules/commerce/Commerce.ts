@@ -28,11 +28,14 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
   }
 
   initializePaymentSource = async (params: __experimental_InitializePaymentSourceParams) => {
+    const { orgId, ...rest } = params;
     const json = (
       await BaseResource._fetch({
-        path: `/me/commerce/payment_sources/initialize`,
+        path: orgId
+          ? `/organizations/${orgId}/commerce/payment_sources/initialize`
+          : `/me/commerce/payment_sources/initialize`,
         method: 'POST',
-        body: params as any,
+        body: rest as any,
       })
     )?.response as unknown as __experimental_CommerceInitializedPaymentSourceJSON;
     return new __experimental_CommerceInitializedPaymentSource(json);

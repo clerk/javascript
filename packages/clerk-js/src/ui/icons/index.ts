@@ -5,6 +5,7 @@
  * The above no-check is safe, as webpack will not allow compilation if for example a file is not resolved.
  */
 export { default as Add } from './add.svg';
+export { default as ApplePay } from './apple-pay.svg';
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
