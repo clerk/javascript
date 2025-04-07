@@ -299,7 +299,7 @@ type SignedInAuthObjectProperties = {
  *
  * Resolves the signed-in auth state from JWT claims.
  */
-const resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuthObjectProperties => {
+const __experimental_resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuthObjectProperties => {
   let orgId: string | undefined;
   let orgRole: OrganizationCustomRoleKey | undefined;
   let orgSlug: string | undefined;
@@ -346,5 +346,5 @@ export {
   createCheckAuthorization,
   validateReverificationConfig,
   resolveAuthState,
-  resolveSignedInAuthStateFromJWTClaims,
+  __experimental_resolveSignedInAuthStateFromJWTClaims,
 };
