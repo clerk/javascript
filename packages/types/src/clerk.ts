@@ -839,6 +839,10 @@ export type ClerkOptions = PendingSessionOptions &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        /**
+         * The name of the CSS layer to use for Clerk components.
+         */
+        cssLayerName?: string;
       },
       Record<string, any>
     >;

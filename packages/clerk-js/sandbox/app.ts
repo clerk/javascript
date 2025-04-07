@@ -326,7 +326,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      experimental: { commerce: true },
+      experimental: { commerce: true, cssLayerName: 'clerk' },
     });
     renderCurrentRoute();
     updateVariables();
