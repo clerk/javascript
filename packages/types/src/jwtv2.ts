@@ -43,7 +43,7 @@ type JWTPayloadBase = {
    *
    * The version of the JWT payload.
    */
-  ver: number | undefined;
+  v?: number | undefined;
 
   /**
    * Encoded token supporting the `getRawString` method.
@@ -110,12 +110,7 @@ type JWTPayloadBase = {
 
 export type VersionedJwtPayload =
   | {
-      /**
-       * @experimental
-       *
-       * The version of the JWT payload.
-       */
-      v?: never;
+      v?: undefined;
 
       /**
        *
@@ -139,13 +134,7 @@ export type VersionedJwtPayload =
       org_role?: OrganizationCustomRoleKey;
     }
   | {
-      /**
-       * @experimental
-       *
-       * The version of the JWT payload.
-       */
       v: 2;
-
       /**
        * @experimental - This structure is subject to change.
        *
@@ -166,6 +155,12 @@ export type VersionedJwtPayload =
          * Active organization role.
          */
         rol?: OrganizationCustomRoleKey;
+
+        /**
+         *
+         * Active organization permissions.
+         */
+        per?: OrganizationCustomPermissionKey[];
       };
     };
 

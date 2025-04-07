@@ -317,8 +317,7 @@ const __experimental_resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload
       orgRole = claims.org?.rol;
       orgSlug = claims.org?.slg;
 
-      // TODO(jwt-v2): when JWT version 2 is available, do proper handling for org permissions
-      orgPermissions = (claims?.org_permissions as string[] | undefined) ?? undefined;
+      orgPermissions = claims.org?.per;
       break;
     default:
       orgId = claims.org_id;

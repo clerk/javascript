@@ -111,7 +111,6 @@ export function signedInAuthObject(
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
-
   return {
     actor,
     sessionClaims,
