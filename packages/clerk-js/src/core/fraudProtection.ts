@@ -26,7 +26,7 @@ export class FraudProtection {
   public async execute<T extends () => Promise<any>, R = Awaited<ReturnType<T>>>(clerk: Clerk, cb: T): Promise<R> {
     if (this.hasReachedDeadEnd) {
       throw new ClerkRuntimeError(
-        'Failed security challenge. Please try again with a different browser or refresh the page.',
+        'Security verification failed. Please try again by refreshing the page, clearing your browser cookies, or using a different web browser.',
         { code: 'captcha_client_dead_end' },
       );
     }
