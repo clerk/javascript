@@ -6,7 +6,6 @@ OrganizationMembership {
   "destroy": [Function],
   "id": "test_id",
   "organization": Organization {
-    "__experimental_getSubscriptions": [Function],
     "addMember": [Function],
     "adminDeleteEnabled": true,
     "createDomain": [Function],
