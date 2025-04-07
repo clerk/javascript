@@ -39,6 +39,8 @@ declare global {
 
 type JWTPayloadBase = {
   /**
+   * @experimental
+   *
    * The version of the JWT payload.
    */
   ver: number | undefined;
@@ -123,6 +125,11 @@ type JWTPayloadBase = {
 
 export type VersionedJwtPayload =
   | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
       ver?: never;
 
       /**
@@ -132,6 +139,11 @@ export type VersionedJwtPayload =
       org_permissions?: OrganizationCustomPermissionKey[];
     }
   | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
       ver: 2;
 
       org_permissions?: never;
