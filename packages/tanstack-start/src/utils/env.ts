@@ -1,1 +1,0 @@
-disableDevelopmentModeWarning: getValue('CLERK_DISABLE_DEVELOPMENT_MODE_WARNING'),
