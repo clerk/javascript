@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react/index';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
