@@ -9,4 +9,4 @@
 '@clerk/clerk-expo': minor
 ---
 
-Support disabling Clerk's development mode warning by passing `disableDevelopmentModeWarning: true` as an option to `Clerk.load()`. Associated environment variable: `CLERK_DISABLE_DEVELOPMENT_MODE_WARNING`.
+Support disabling Clerk's development mode console warning by passing `developmentModeWarningDisabled: true` as an option to `Clerk.load()`. Associated environment variable: `CLERK_DEVELOPMENT_MODE_WARNING_DISABLED`.

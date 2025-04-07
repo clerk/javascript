@@ -63,7 +63,7 @@ export default defineNuxtModule<ModuleOptions>({
           clerkJSUrl: options.clerkJSUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
-          disableDevelopmentModeWarning: options.disableDevelopmentModeWarning,
+          developmentModeWarningDisabled: options.developmentModeWarningDisabled,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,

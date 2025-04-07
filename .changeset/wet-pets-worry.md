@@ -10,4 +10,4 @@
 '@clerk/nuxt': minor
 ---
 
-Introduce `disableDevelopmentModeWarning` option to silence the warning when Clerk is loaded with development keys.
+Introduce `developmentModeWarningDisabled` option to silence the warning when Clerk is loaded with development keys.

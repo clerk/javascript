@@ -21,6 +21,6 @@ export const getPublicEnvVariables = (context?: H3EventContext) => {
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
-    disableDevelopmentModeWarning: getValue('CLERK_DISABLE_DEVELOPMENT_MODE_WARNING'),
+    developmentModeWarningDisabled: isTruthy(getValue('CLERK_DEVELOPMENT_MODE_WARNING_DISABLED')),
   } as const;
 };

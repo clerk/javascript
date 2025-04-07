@@ -25,6 +25,6 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     signUpFallbackRedirectUrl: getValue('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL'),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
-    disableDevelopmentModeWarning: isTruthy(getValue('CLERK_DISABLE_DEVELOPMENT_MODE_WARNING')
+    developmentModeWarningDisabled: isTruthy(getValue('CLERK_DEVELOPMENT_MODE_WARNING_DISABLED')),
   };
 };

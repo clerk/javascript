@@ -99,7 +99,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
-    __disableDevelopmentModeWarning: isTruthy(getEnvVariable('CLERK_DISABLE_DEVELOPMENT_MODE_WARNING', context)),
+    __developmentModeWarningDisabled: isTruthy(getEnvVariable('CLERK_DEVELOPMENT_MODE_WARNING_DISABLED', context)),
   });
 
   return {

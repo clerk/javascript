@@ -29,8 +29,8 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
       disabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
-    disableDevelopmentModeWarning:
-      props.disableDevelopmentModeWarning || process.env.NEXT_PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING || '',
+    developmentModeWarningDisabled:
+      props.developmentModeWarningDisabled ?? isTruthy(process.env.NEXT_PUBLIC_CLERK_DEVELOPMENT_MODE_WARNING_DISABLED),
     sdkMetadata: SDK_METADATA,
   };
 };

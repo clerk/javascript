@@ -45,7 +45,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     children,
     tokenCache,
     publishableKey,
-    disableDevelopmentModeWarning = process.env.EXPO_PUBLIC_CLERK_DISABLE_DEVELOPMENT_MODE_WARNING || '',
+    developmentModeWarningDisabled = process.env.EXPO_PUBLIC_CLERK_DEVELOPMENT_MODE_WARNING_DISABLED || '',
     __experimental_passkeys,
     experimental,
     __experimental_resourceCache,
@@ -63,7 +63,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state.
       // See JS-598 for additional context.
       key={pk}
-      disableDevelopmentModeWarning={Boolean(disableDevelopmentModeWarning)}
+      developmentModeWarningDisabled={Boolean(developmentModeWarningDisabled)}
       {...rest}
       publishableKey={pk}
       sdkMetadata={SDK_METADATA}
