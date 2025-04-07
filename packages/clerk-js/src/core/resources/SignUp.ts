@@ -360,7 +360,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       clerkMissingOptionError('popup');
     }
 
-    return _authenticateWithPopup(SignUp.clerk, this.authenticateWithRedirectOrPopup, params, url => {
+    return _authenticateWithPopup(SignUp.clerk, 'signUp', this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url instanceof URL ? url.toString() : url;
     });
   };
