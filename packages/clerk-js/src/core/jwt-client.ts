@@ -45,6 +45,8 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
 
   const { sid, sub, org_id, org_role, org_permissions, org_slug, fva } = token.jwt.claims;
 
+  // TODO(jwt-v2): when JWT version 2 is available, we should use the new claims instead of the old ones
+
   const defaultClient = {
     object: 'client',
     last_active_session_id: sid,

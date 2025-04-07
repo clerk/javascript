@@ -37,11 +37,19 @@ declare global {
   }
 }
 
-export interface JwtPayload extends CustomJwtSessionClaims {
+type JWTPayloadBase = {
+  /**
+   * @experimental
+   *
+   * The version of the JWT payload.
+   */
+  ver: number | undefined;
+
   /**
    * Encoded token supporting the `getRawString` method.
    */
   __raw: string;
+
   /**
    * JWT Issuer - [RFC7519#section-4.1.1](https://tools.ietf.org/html/rfc7519#section-4.1.1).
    */
@@ -83,6 +91,13 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
+   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
+   * This API is experimental and may change at any moment.
+   * @experimental
+   */
+  fva?: [fistFactorAge: number, secondFactorAge: number];
+
+  /**
    * Active organization ID.
    */
   org_id?: string;
@@ -98,18 +113,6 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_role?: OrganizationCustomRoleKey;
 
   /**
-   * Active organization permissions
-   */
-  org_permissions?: OrganizationCustomPermissionKey[];
-
-  /**
-   * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
-   */
-  fva?: [fistFactorAge: number, secondFactorAge: number];
-
-  /**
    * Session status
    */
   sts?: SessionStatusClaim;
@@ -118,7 +121,36 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;
-}
+};
+
+export type VersionedJwtPayload =
+  | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
+      ver?: never;
+
+      /**
+       *
+       * Active organization permissions.
+       */
+      org_permissions?: OrganizationCustomPermissionKey[];
+    }
+  | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
+      ver: 2;
+
+      org_permissions?: never;
+      // TODO: include the version 2 claims here
+    };
+
+export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).

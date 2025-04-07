@@ -101,6 +101,94 @@ describe('useDerivedAuth', () => {
     expect(current.has?.({ permission: 'test' })).toBe(false);
   });
 
+  it('returns signed out state when session has pending status by default', () => {
+    const authObject = {
+      sessionId: 'session123',
+      sessionStatus: 'pending',
+      userId: 'user123',
+      actor: 'actor123',
+      orgId: 'org123',
+      orgRole: 'admin',
+      orgSlug: 'my-org',
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject));
+
+    expect(current.isLoaded).toBe(true);
+    expect(current.isSignedIn).toBe(false);
+    expect(current.sessionId).toBeNull();
+    expect(current.userId).toBeNull();
+    expect(current.actor).toBeNull();
+    expect(current.orgId).toBeNull();
+    expect(current.orgRole).toBeNull();
+    expect(current.orgSlug).toBeNull();
+    expect(current.has).toBeInstanceOf(Function);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
+  });
+
+  it('with `treatPendingAsSignedOut: true` option, returns signed out state when session has pending status', () => {
+    const authObject = {
+      sessionId: 'session123',
+      sessionStatus: 'pending',
+      userId: 'user123',
+      actor: 'actor123',
+      orgId: 'org123',
+      orgRole: 'admin',
+      orgSlug: 'my-org',
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject, { treatPendingAsSignedOut: true }));
+
+    expect(current.isLoaded).toBe(true);
+    expect(current.isSignedIn).toBe(false);
+    expect(current.sessionId).toBeNull();
+    expect(current.userId).toBeNull();
+    expect(current.actor).toBeNull();
+    expect(current.orgId).toBeNull();
+    expect(current.orgRole).toBeNull();
+    expect(current.orgSlug).toBeNull();
+    expect(current.has).toBeInstanceOf(Function);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
+  });
+
+  it('with `treatPendingAsSignedOut: false` option, returns signed in state when session has pending status', () => {
+    const authObject = {
+      sessionId: 'session123',
+      sessionStatus: 'pending',
+      userId: 'user123',
+      actor: 'actor123',
+      orgId: 'org123',
+      orgRole: 'admin',
+      orgSlug: 'my-org',
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject, { treatPendingAsSignedOut: false }));
+
+    expect(current.isLoaded).toBe(true);
+    expect(current.isSignedIn).toBe(true);
+    expect(current.sessionId).toBe('session123');
+    expect(current.userId).toBe('user123');
+    expect(current.actor).toBe('actor123');
+    expect(current.orgId).toBe('org123');
+    expect(current.orgRole).toBe('admin');
+    expect(current.orgSlug).toBe('my-org');
+    expect(typeof current.has).toBe('function');
+    expect(current.signOut).toBe(authObject.signOut);
+    expect(current.getToken).toBe(authObject.getToken);
+  });
+
   it('returns signed in with org context when sessionId, userId, orgId, and orgRole are present', () => {
     const authObject = {
       sessionId: 'session123',
