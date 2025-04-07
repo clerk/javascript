@@ -20,7 +20,7 @@ describe('resolveSignedInAuthStateFromJWTClaims', () => {
         id: 'org_id',
         rol: 'admin',
         slg: 'org_slug',
-        per: ['permission1', 'permission2'],
+        per: 'permission1,permission2',
       },
     });
 
@@ -31,7 +31,7 @@ describe('resolveSignedInAuthStateFromJWTClaims', () => {
       org_slug: 'org_slug',
       org_permissions: ['permission1', 'permission2'],
     });
-    expect(signedInAuthObjectV1).toMatchObject(signedInAuthObjectV2);
+    expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
   });
 
   test('produced auth object with v2 matches v1 without having orgs related claims', () => {
@@ -43,6 +43,32 @@ describe('resolveSignedInAuthStateFromJWTClaims', () => {
     const { sessionClaims: v1Claims, ...signedInAuthObjectV1 } = resolveSignedInAuthStateFromJWTClaims({
       ...baseClaims,
     });
-    expect(signedInAuthObjectV1).toMatchObject(signedInAuthObjectV2);
+    expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
+  });
+
+  test('v2 org permissions are splitted correctly', () => {
+    const authObject = resolveSignedInAuthStateFromJWTClaims({
+      ...baseClaims,
+      v: 2,
+      org: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'permission1,permission2',
+      },
+    });
+    expect(authObject.orgPermissions).toEqual(['permission1', 'permission2']);
+
+    const authObject2 = resolveSignedInAuthStateFromJWTClaims({
+      ...baseClaims,
+      v: 2,
+      org: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'permission1',
+      },
+    });
+    expect(authObject2.orgPermissions).toEqual(['permission1']);
   });
 });

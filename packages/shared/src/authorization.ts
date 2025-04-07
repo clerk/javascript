@@ -303,7 +303,7 @@ const __experimental_resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload
   let orgId: string | undefined;
   let orgRole: OrganizationCustomRoleKey | undefined;
   let orgSlug: string | undefined;
-  let orgPermissions: string[] | undefined;
+  let orgPermissions: OrganizationCustomPermissionKey[] | undefined;
 
   // fva can be undefined for instances that have not opt-in
   const factorVerificationAge = claims.fva ?? null;
@@ -312,13 +312,13 @@ const __experimental_resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload
   const sessionStatus = claims.sts ?? null;
 
   switch (claims.v) {
-    case 2:
+    case 2: {
       orgId = claims.org?.id;
       orgRole = claims.org?.rol;
       orgSlug = claims.org?.slg;
-
-      orgPermissions = claims.org?.per;
+      orgPermissions = claims.org?.per?.split(',').map((permission: string) => permission.trim()) || undefined;
       break;
+    }
     default:
       orgId = claims.org_id;
       orgRole = claims.org_role;

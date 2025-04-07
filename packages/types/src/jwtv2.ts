@@ -160,7 +160,7 @@ export type VersionedJwtPayload =
          *
          * Active organization permissions.
          */
-        per?: OrganizationCustomPermissionKey[];
+        per?: string;
       };
     };
 
