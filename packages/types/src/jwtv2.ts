@@ -98,21 +98,6 @@ type JWTPayloadBase = {
   fva?: [fistFactorAge: number, secondFactorAge: number];
 
   /**
-   * Active organization ID.
-   */
-  org_id?: string;
-
-  /**
-   * Active organization slug.
-   */
-  org_slug?: string;
-
-  /**
-   * Active organization role.
-   */
-  org_role?: OrganizationCustomRoleKey;
-
-  /**
    * Session status
    */
   sts?: SessionStatusClaim;
@@ -137,6 +122,21 @@ export type VersionedJwtPayload =
        * Active organization permissions.
        */
       org_permissions?: OrganizationCustomPermissionKey[];
+
+      /**
+       * Active organization ID.
+       */
+      org_id?: string;
+
+      /**
+       * Active organization slug.
+       */
+      org_slug?: string;
+
+      /**
+       * Active organization role.
+       */
+      org_role?: OrganizationCustomRoleKey;
     }
   | {
       /**
@@ -146,8 +146,27 @@ export type VersionedJwtPayload =
        */
       ver: 2;
 
-      org_permissions?: never;
-      // TODO: include the version 2 claims here
+      /**
+       * @experimental - This structure is subject to change.
+       *
+       * Active organization information.
+       */
+      org?: {
+        /**
+         * Active organization ID.
+         */
+        id: string;
+
+        /**
+         * Active organization slug.
+         */
+        slg?: string;
+
+        /**
+         * Active organization role.
+         */
+        rol?: OrganizationCustomRoleKey;
+      };
     };
 
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
