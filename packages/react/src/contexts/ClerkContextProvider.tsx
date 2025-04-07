@@ -35,7 +35,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),
     [
-      // Only upda the clerk reference on status change
+      // Only update the clerk reference on status change
       clerkStatus,
     ],
   );
