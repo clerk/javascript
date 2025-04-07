@@ -1,7 +1,6 @@
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
 import { Clerk, ClerkRuntimeError } from './resources/internal';
 import { Client, isClerkAPIResponseError } from './resources/internal';
-import { waitForElement } from '@clerk/shared/dom';
 
 export class FraudProtection {
   private static instance: FraudProtection;
@@ -69,7 +68,6 @@ export class FraudProtection {
         this.captchaRetryCount++;
         if (this.captchaRetryCount >= this.MAX_RETRY_ATTEMPTS && !this.hasReachedDeadEnd) {
           this.hasReachedDeadEnd = true;
-          await this.openDeadEndModal(clerk);
         }
         throw err;
       } finally {
@@ -84,31 +82,5 @@ export class FraudProtection {
 
   public managedChallenge(clerk: Clerk) {
     return new this.CaptchaChallengeImpl(clerk).managedInModal({ action: 'verify' });
-  }
-
-  private async openDeadEndModal(clerk: Clerk) {
-    const container = '#cl-modal-captcha-container';
-    const wrapper = '#cl-modal-captcha-wrapper';
-    await clerk.__internal_openBlankCaptchaModal?.();
-    const el = await waitForElement(container);
-    if (el) {
-      el.innerHTML = `
-      <div style="text-align: start">
-        <p>Our system has flagged your connection as potentially automated. Try these solutions:</p>
-        <ul>
-          <li><strong>Refresh the page</strong> - Try refreshing the page to try again</li>
-          <li><strong>Disable browser extensions</strong> - Ad blockers may interfere with our validations</li>
-          <li><strong>Disable VPNs or proxies</strong> - These may trigger security filters</li>
-          <li><strong>Change browser</strong> - Make sure you are using the latest Chrome, Firefox, Safari, or Edge</li>
-          <li><strong>Try different network</strong> - Network restrictions can cause validation failures</li>
-        </ul>
-      </div>
-      `;
-    }
-    const wrapperEl = document.querySelector(wrapper) as HTMLElement;
-    if (wrapperEl) {
-      wrapperEl.style.setProperty('visibility', 'visible');
-      wrapperEl.style.setProperty('pointer-events', 'all');
-    }
   }
 }
