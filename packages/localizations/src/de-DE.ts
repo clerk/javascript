@@ -813,7 +813,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
-      billing: 'Billing',
+      billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
       title: 'Benutzerkonto',
