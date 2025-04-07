@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Πίσω',
+  badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
   badge__primary: 'Κύριο',
@@ -130,6 +139,7 @@ export const elGR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Πρόσκληση',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Αφαίρεση μέλους',
         tableHeader__actions: 'Ενέργειες',
@@ -277,6 +287,7 @@ export const elGR: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -300,6 +311,11 @@ export const elGR: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -462,6 +478,7 @@ export const elGR: LocalizationResource = {
       actionText: 'Δεν έχετε λογαριασμό;',
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Σύνδεση',
       titleCombined: 'Συνέχεια στο {{applicationName}}',
     },
@@ -542,7 +559,9 @@ export const elGR: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Έχετε ήδη λογαριασμό;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      subtitleCombined: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
+      titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
     },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
@@ -650,6 +669,14 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -702,6 +729,11 @@ export const elGR: LocalizationResource = {
         resendButton: 'Δεν λάβατε κάποιον σύνδεσμο; Επανάληψη αποστολής',
         successMessage: 'Το email {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'Η διεύθυνση {{identifier}} θα αφαιρεθεί από αυτόν τον λογαριασμό.',
         messageLine2: 'Δεν θα μπορείτε πλέον να συνδεθείτε χρησιμοποιώντας αυτήν τη διεύθυνση email.',
@@ -770,6 +802,7 @@ export const elGR: LocalizationResource = {
     mobileButton__menu: 'Μενού',
     navbar: {
       account: 'Προφίλ',
+      billing: undefined,
       description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
       security: 'Ασφάλεια',
       title: 'Λογαριασμός',
@@ -870,6 +903,7 @@ export const elGR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -896,6 +930,7 @@ export const elGR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Αφαίρεση πορτοφολιού',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Πορτοφόλια Web3',
         title: 'Πορτοφόλια Web3',
       },

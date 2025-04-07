@@ -123,6 +123,7 @@ describe('PhoneSection', () => {
       const item = getByText(number);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -145,6 +146,7 @@ describe('PhoneSection', () => {
       const item = getByText(numbers[0]);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -171,6 +173,7 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await userEvent.click(menuButton!);
         });
 
@@ -192,6 +195,7 @@ describe('PhoneSection', () => {
         const item = getByText(numbers[0]);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await userEvent.click(menuButton!);
         });
 
@@ -201,6 +205,66 @@ describe('PhoneSection', () => {
         await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
         expect(queryByRole('heading', { name: /Remove phone number/i })).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Handles opening/closing actions', () => {
+    it('closes add phone number form when remove an phone number action is clicked', async () => {
+      const { wrapper, fixtures } = await createFixtures(withNumberCofig);
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <PhoneSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fixtures.clerk.user?.phoneNumbers[0].destroy.mockResolvedValue();
+
+      await userEvent.click(getByRole('button', { name: /add phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /add phone number/i }));
+
+      const item = getByText(numbers[0]);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove phone number/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /remove phone number/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove phone number/i })).toBeInTheDocument());
+      await waitFor(() => expect(queryByRole('heading', { name: /add phone number/i })).not.toBeInTheDocument());
+    });
+
+    it('closes remove phone number form when add phone number action is clicked', async () => {
+      const { wrapper, fixtures } = await createFixtures(withNumberCofig);
+      const { getByText, userEvent, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <PhoneSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fixtures.clerk.user?.phoneNumbers[0].destroy.mockResolvedValue();
+
+      const item = getByText(numbers[0]);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove phone number/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /remove phone number/i }));
+
+      await userEvent.click(getByRole('button', { name: /add phone number/i }));
+      await waitFor(() => getByRole('heading', { name: /add phone number/i }));
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove phone number/i })).not.toBeInTheDocument());
+      await waitFor(() => expect(queryByRole('heading', { name: /add phone number/i })).toBeInTheDocument());
     });
   });
 

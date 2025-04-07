@@ -1,7 +1,8 @@
+import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
-import type { FlowMetadata } from '../elements';
+import type { Drawer, FlowMetadata } from '../elements';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -19,6 +20,8 @@ const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal }
 const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
+const DrawerRoot = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Root })));
+const DrawerOverlay = lazy(() => import('./../elements').then(m => ({ default: m.Drawer.Overlay })));
 const OrganizationSwitcherPrefetch = lazy(() =>
   import(/* webpackChunkName: "prefetchorganizationlist" */ '../components/prefetch-organization-list').then(m => ({
     default: m.OrganizationSwitcherPrefetch,
@@ -56,6 +59,9 @@ type LazyComponentRendererProps = React.PropsWithChildren<
 type PortalProps = Parameters<typeof Portal>[0];
 
 export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
+  if (props?.componentProps?.routing === 'virtual') {
+    deprecated('routing="virtual"', 'Use routing="hash" instead.');
+  }
   return (
     <AppearanceProvider
       globalAppearance={props.globalAppearance}
@@ -80,7 +86,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     flowName?: FlowMetadata['flow'];
     startPath?: string;
     onClose?: ModalProps['handleClose'];
-    onExternalNavigate?: () => any;
+    onExternalNavigate?: () => void;
     modalContainerSx?: ThemableCssProp;
     modalContentSx?: ThemableCssProp;
     canCloseModal?: boolean;
@@ -123,6 +129,48 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>
+    </Suspense>
+  );
+};
+
+type DrawerProps = Parameters<typeof Drawer.Root>[0];
+
+type LazyDrawerRendererProps = React.PropsWithChildren<
+  {
+    componentName: ClerkComponentName;
+    flowName?: FlowMetadata['flow'];
+    open: DrawerProps['open'];
+    onOpenChange: DrawerProps['onOpenChange'];
+    portalId?: string;
+  } & AppearanceProviderProps
+>;
+
+export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
+  return (
+    <Suspense fallback={''}>
+      <VirtualRouter startPath=''>
+        <AppearanceProvider
+          globalAppearance={props.globalAppearance}
+          appearanceKey={props.appearanceKey}
+          appearance={props.componentAppearance}
+        >
+          <FlowMetadataProvider flow={props.flowName || ('' as any)}>
+            <InternalThemeProvider>
+              <DrawerRoot
+                open={props.open}
+                onOpenChange={props.onOpenChange}
+                strategy={props.portalId ? 'absolute' : 'fixed'}
+                portalProps={{
+                  id: props.portalId ? props.portalId : undefined,
+                }}
+              >
+                <DrawerOverlay />
+                {props.children}
+              </DrawerRoot>
+            </InternalThemeProvider>
+          </FlowMetadataProvider>
+        </AppearanceProvider>
+      </VirtualRouter>
     </Suspense>
   );
 };

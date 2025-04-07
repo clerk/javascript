@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.1.12",
+  "version": "2.2.0",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -22,18 +22,41 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./webhooks": {
+      "import": {
+        "types": "./dist/types/webhooks.d.ts",
+        "default": "./dist/esm/webhooks.js"
+      },
+      "require": {
+        "types": "./dist/types/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      }
+    }
+  },
   "main": "./dist/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "webhooks"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
-    "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "jest",
@@ -47,7 +70,6 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "workspace:*",
     "fastify": "^5.0.0"
   },
   "peerDependencies": {

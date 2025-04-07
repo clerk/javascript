@@ -38,7 +38,7 @@ export function isNextRequest(val: unknown): val is NextRequest {
       typeof nextUrl?.searchParams.get === 'function' &&
       typeof cookies?.get === 'function'
     );
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -47,7 +47,7 @@ export function isRequestWebAPI(val: unknown): val is Request {
   try {
     const { headers } = (val || {}) as Request;
     return typeof headers?.get === 'function';
-  } catch (e) {
+  } catch {
     return false;
   }
 }

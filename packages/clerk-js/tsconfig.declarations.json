@@ -10,5 +10,12 @@
     "outDir": "./dist",
     "declarationDir": "./dist/types",
     "noImplicitReturns": false
-  }
+  },
+  "include": [
+    "src/index.ts",
+    "src/index.browser.ts",
+    "src/index.headless.ts",
+    "src/index.headless.browser.ts",
+    "src/**/*.d.ts"
+  ]
 }

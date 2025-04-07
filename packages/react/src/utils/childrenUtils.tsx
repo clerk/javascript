@@ -8,7 +8,7 @@ export const assertSingleChild =
   (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
     try {
       return React.Children.only(children);
-    } catch (e) {
+    } catch {
       return errorThrower.throw(multipleChildrenInButtonComponent(name));
     }
   };

@@ -8,15 +8,3 @@ export const setHeader = <T extends Response>(res: T, name: string, val: string)
   res.headers.set(name, val);
   return res;
 };
-
-export const stringifyHeaders = (headers: { forEach: Headers['forEach'] }) => {
-  if (!headers) {
-    return JSON.stringify({});
-  }
-
-  const obj: Record<string, string> = {};
-  headers.forEach((value, name) => {
-    obj[name] = value;
-  });
-  return JSON.stringify(obj);
-};

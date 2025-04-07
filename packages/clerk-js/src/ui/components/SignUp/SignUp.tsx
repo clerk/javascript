@@ -2,10 +2,12 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
+import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { usePreloadTasks } from '../../hooks/usePreloadTasks';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -21,7 +23,15 @@ function RedirectToSignUp() {
 }
 
 function SignUpRoutes(): JSX.Element {
+  usePreloadTasks();
+
+  const { __internal_setComponentNavigationContext } = useClerk();
+  const { navigate, indexPath } = useRouter();
   const signUpContext = useSignUpContext();
+
+  React.useEffect(() => {
+    return __internal_setComponentNavigationContext?.({ indexPath, navigate });
+  }, [indexPath, navigate]);
 
   return (
     <Flow.Root flow='signUp'>
@@ -74,6 +84,9 @@ function SignUpRoutes(): JSX.Element {
             <SignUpContinue />
           </Route>
         </Route>
+        <Route path='tasks'>
+          <LazySessionTasks />
+        </Route>
         <Route index>
           <SignUpStart />
         </Route>
@@ -117,3 +130,5 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
     </Route>
   );
 };
+
+export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };

@@ -34,6 +34,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     ...options.telemetry,
     publishableKey: opts.publishableKey,
     secretKey: opts.secretKey,
+    samplingRate: 0.1,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
   });
 
@@ -65,6 +66,8 @@ export type {
   InvitationJSON,
   OauthAccessTokenJSON,
   OrganizationJSON,
+  OrganizationDomainJSON,
+  OrganizationDomainVerificationJSON,
   OrganizationInvitationJSON,
   PublicOrganizationDataJSON,
   OrganizationMembershipJSON,
@@ -78,6 +81,7 @@ export type {
   SMSMessageJSON,
   UserJSON,
   VerificationJSON,
+  WaitlistEntryJSON,
   Web3WalletJSON,
   DeletedObjectJSON,
   PaginatedResponseJSON,
@@ -96,6 +100,8 @@ export type {
   Invitation,
   OauthAccessToken,
   Organization,
+  OrganizationDomain,
+  OrganizationDomainVerification,
   OrganizationInvitation,
   OrganizationMembership,
   OrganizationMembershipPublicUserData,
@@ -112,13 +118,17 @@ export type {
  * Webhooks event types
  */
 export type {
-  UserWebhookEvent,
   EmailWebhookEvent,
-  SMSWebhookEvent,
-  SessionWebhookEvent,
   OrganizationWebhookEvent,
-  OrganizationMembershipWebhookEvent,
+  OrganizationDomainWebhookEvent,
   OrganizationInvitationWebhookEvent,
+  OrganizationMembershipWebhookEvent,
+  RoleWebhookEvent,
+  PermissionWebhookEvent,
+  SessionWebhookEvent,
+  SMSWebhookEvent,
+  UserWebhookEvent,
+  WaitlistEntryWebhookEvent,
   WebhookEvent,
   WebhookEventType,
 } from './api/resources/Webhooks';

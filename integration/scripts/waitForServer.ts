@@ -20,7 +20,7 @@ export const waitForServer = async (url: string, opts: WaitForServerArgsType) =>
       if (res.ok) {
         return Promise.resolve();
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
     attempts++;

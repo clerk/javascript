@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -8,9 +9,7 @@ import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
-  Form,
   Header,
-  LegalCheckbox,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
@@ -28,7 +27,7 @@ import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpStart(): JSX.Element {
+function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -177,6 +176,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          case ERROR_CODES.CAPTCHA_INVALID:
             card.setError(error);
             break;
           default:
@@ -217,7 +217,14 @@ function _SignUpStart(): JSX.Element {
     if (fields.ticket) {
       const noop = () => {};
       // fieldsToSubmit: Constructing a fake fields object for strategy.
-      fieldsToSubmit.push({ id: 'strategy', value: 'ticket', setValue: noop, onChange: noop, setError: noop } as any);
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'ticket',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -236,8 +243,14 @@ function _SignUpStart(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    return signUp
-      .create(buildRequest(fieldsToSubmit))
+    let signUpAttempt: Promise<SignUpResource>;
+    if (!fields.ticket) {
+      signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
+    } else {
+      signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
+    }
+
+    return signUpAttempt
       .then(res =>
         completeSignUpFlow({
           signUp: res,
@@ -274,8 +287,18 @@ function _SignUpStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
+            <Header.Title
+              localizationKey={
+                isCombinedFlow ? localizationKeys('signUp.start.titleCombined') : localizationKeys('signUp.start.title')
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signUp.start.subtitleCombined')
+                  : localizationKeys('signUp.start.subtitle')
+              }
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex
@@ -302,15 +325,7 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
-            {!shouldShowForm && isLegalConsentEnabled && (
-              <Form.ControlRow elementId='legalAccepted'>
-                <LegalCheckbox
-                  {...formState.legalAccepted.props}
-                  isRequired={fields.legalAccepted?.required}
-                />
-              </Form.ControlRow>
-            )}
-            {!shouldShowForm && <CaptchaElement maxHeight='0' />}
+            {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
 
@@ -328,4 +343,4 @@ function _SignUpStart(): JSX.Element {
   );
 }
 
-export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(_SignUpStart));
+export const SignUpStart = withRedirectToAfterSignUp(withCardStateProvider(SignUpStartInternal));

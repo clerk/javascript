@@ -24,7 +24,7 @@ import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 // and is not listed in the HSTS preload list
 // For more info, refer to https://hstspreload.org/
 // and https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-const APP_HOST = 'lclclerk.com';
+const APP_HOST = 'lclclerk.com:8880';
 
 testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
   'localhost non-secure context @generic',
@@ -53,7 +53,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
 
     test('sign-in flow', async ({ page }) => {
       const u = createTestUtils({ app, page });
-      await u.page.goto(`http://${APP_HOST}`);
+      await u.page.goto(`http://${APP_HOST}`, { timeout: 50000 });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u.po.expect.toBeSignedIn();

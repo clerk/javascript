@@ -13,6 +13,7 @@ export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlterna
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
   prepare?: () => Promise<SessionVerificationResource>;
+  showAlternativeMethods?: boolean;
 };
 
 type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
@@ -44,6 +45,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
     : undefined;
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     session!
       .attemptSecondFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {
@@ -64,6 +66,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={session?.user?.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      showAlternativeMethods={props.showAlternativeMethods}
     />
   );
 };

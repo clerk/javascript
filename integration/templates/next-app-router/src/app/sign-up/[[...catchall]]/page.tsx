@@ -8,6 +8,7 @@ export default function Page() {
         path={'/sign-up'}
         signInUrl={'/sign-in'}
         fallback={<>Loading sign up</>}
+        unsafeMetadata={{ position: 'goalie' }}
       />
     </div>
   );

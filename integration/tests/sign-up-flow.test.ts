@@ -4,7 +4,7 @@ import { appConfigs } from '../presets';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up flow @generic @nextjs', ({ app }) => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'parallel' });
 
   test.afterAll(async () => {
     await app.teardown();
@@ -87,6 +87,37 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
 
     // Check if user is signed in
     await u.po.expect.toBeSignedIn();
+    await fakeUser.deleteIfExists();
+  });
+
+  test('(modal) can sign up with phone number', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+
+    // Open modal
+    await u.page.goToRelative('/buttons');
+    await u.page.getByText('Sign up button (fallback)').click();
+    await u.po.signUp.waitForModal();
+
+    // Fill in sign up form
+    await u.po.signUp.signUp({
+      email: fakeUser.email,
+      phoneNumber: fakeUser.phoneNumber,
+      password: fakeUser.password,
+    });
+
+    // Verify email
+    await u.po.signUp.enterTestOtpCode();
+    // Verify phone number
+    await u.po.signUp.enterTestOtpCode();
+
+    // Check if user is signed in
+    await u.po.expect.toBeSignedIn();
+    await u.po.signUp.waitForModal('closed');
     await fakeUser.deleteIfExists();
   });
 

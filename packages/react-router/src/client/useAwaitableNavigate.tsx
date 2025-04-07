@@ -23,7 +23,7 @@ export const useAwaitableNavigate = () => {
   return (to: string, opts?: NavigateOptions) => {
     return new Promise(res => {
       resolveFunctionsRef.current.push(res);
-      navigate(to, opts);
+      void navigate(to, opts);
     });
   };
 };

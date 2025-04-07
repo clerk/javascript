@@ -19,7 +19,9 @@ export {
   isEmailLinkError,
   isKnownError,
   isMetamaskError,
+  isReverificationCancelledError,
   EmailLinkErrorCode,
+  EmailLinkErrorCodeStatus,
 } from '@clerk/clerk-react/errors';
 
 export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';

@@ -52,7 +52,7 @@ export const vercelDeployment = async (config: ApplicationConfig) => {
   );
 
   // get the deployment url from vercel
-  const serverUrl = await createVercelApiClient().getDeploymentUrlForProject(process.env.VERCEL_PROJECT_ID as string);
+  const serverUrl = await createVercelApiClient().getDeploymentUrlForProject(process.env.VERCEL_PROJECT_ID);
   logger.info(`Deployment URL: ${serverUrl}`);
   return { ...app, serverUrl };
 };

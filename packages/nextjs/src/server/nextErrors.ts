@@ -10,7 +10,7 @@ const CONTROL_FLOW_ERROR = {
  * In-house implementation of `notFound()`
  * https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/not-found.ts
  */
-const LEGACY_NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND' as const;
+const LEGACY_NOT_FOUND_ERROR_CODE = 'NEXT_NOT_FOUND';
 
 type LegacyNotFoundError = Error & {
   digest: typeof LEGACY_NOT_FOUND_ERROR_CODE;
@@ -35,7 +35,7 @@ const HTTPAccessErrorStatusCodes = {
 
 const ALLOWED_CODES = new Set(Object.values(HTTPAccessErrorStatusCodes));
 
-export const HTTP_ERROR_FALLBACK_ERROR_CODE = 'NEXT_HTTP_ERROR_FALLBACK' as const;
+export const HTTP_ERROR_FALLBACK_ERROR_CODE = 'NEXT_HTTP_ERROR_FALLBACK';
 
 export type HTTPAccessFallbackError = Error & {
   digest: `${typeof HTTP_ERROR_FALLBACK_ERROR_CODE};${string}`;

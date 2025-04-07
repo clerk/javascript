@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Nazad',
+  badge__currentPlan: undefined,
   badge__default: 'Podrazumevano',
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
   badge__primary: 'Primarni',
@@ -129,6 +138,7 @@ export const srRS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozovi',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ukloni člana',
         tableHeader__actions: undefined,
@@ -276,6 +286,7 @@ export const srRS: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const srRS: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -459,6 +475,7 @@ export const srRS: LocalizationResource = {
       actionText: 'Nemaš nalog?',
       actionText__join_waitlist: undefined,
       subtitle: 'Dobro došao nazad! Molimo prijavi se da nastaviš',
+      subtitleCombined: undefined,
       title: 'Prijavi se na {{applicationName}}',
       titleCombined: undefined,
     },
@@ -538,7 +555,9 @@ export const srRS: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Već imaš nalog?',
       subtitle: 'Dobrodošao! Molimo popuni detalje da započneš.',
+      subtitleCombined: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',
+      titleCombined: 'Kreiraj svoj nalog',
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
@@ -644,6 +663,14 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -695,6 +722,11 @@ export const srRS: LocalizationResource = {
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
         messageLine2: 'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',
@@ -761,6 +793,7 @@ export const srRS: LocalizationResource = {
     mobileButton__menu: 'Meni',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Upravljaj informacijama svog naloga.',
       security: 'Sigurnost',
       title: 'Nalog',
@@ -860,6 +893,7 @@ export const srRS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ukloni',
         menuAction__rename: 'Preimenuj',
+        primaryButton: undefined,
         title: 'Ključevi za prolaz',
       },
       passwordSection: {
@@ -886,6 +920,7 @@ export const srRS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ukloni novčanik',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 novčanici',
         title: 'Web3 novčanici',
       },

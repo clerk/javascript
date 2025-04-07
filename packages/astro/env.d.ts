@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+
 declare namespace App {
   interface Locals {
     authToken: string | null;

@@ -71,7 +71,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     }
 
     // We will try to grab the SDK data lazily when an event is triggered, so it should always be defined once the event is sent.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#metadata.sdk = options.sdk!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.#metadata.sdkVersion = options.sdkVersion!;
 
     this.#metadata.publishableKey = options.publishableKey ?? '';
@@ -135,14 +137,15 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
   #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     const randomSeed = Math.random();
 
-    if (this.#eventThrottler.isEventThrottled(preparedPayload)) {
+    const toBeSampled =
+      randomSeed <= this.#config.samplingRate &&
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+
+    if (!toBeSampled) {
       return false;
     }
 
-    return (
-      randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
-    );
+    return !this.#eventThrottler.isEventThrottled(preparedPayload);
   }
 
   #scheduleFlush(): void {

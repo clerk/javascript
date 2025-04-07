@@ -27,8 +27,7 @@ export function SDKWorkflow(props) {
   const [runCodemod, setRunCodemod] = useState(false);
   const [upgradeComplete, setUpgradeComplete] = useState(false);
 
-  // eslint-disable-next-line no-unused-vars
-  const [version, setVersion] = useState(getClerkSdkVersion(sdk));
+  const [version] = useState(getClerkSdkVersion(sdk));
 
   if (sdk !== 'nextjs') {
     return (

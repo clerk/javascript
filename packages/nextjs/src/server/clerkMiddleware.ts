@@ -1,7 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -11,6 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { createCSPHeader, type CSPDirective, type CSPMode } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -48,11 +49,32 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+/**
+ * The `clerkMiddleware()` function accepts an optional object. The following options are available.
+ * @interface
+ */
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  /**
+   * If true, additional debug information will be logged to the console.
+   */
   debug?: boolean;
+
+  /**
+   * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
+   */
+  contentSecurityPolicy?: {
+    /**
+     * The CSP mode to use - either 'standard' or 'strict-dynamic'
+     */
+    mode: CSPMode;
+    /**
+     * Custom CSP directives to merge with Clerk's default directives
+     */
+    directives?: Partial<Record<CSPDirective, string[]>>;
+  };
 };
 
-type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions;
+type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -84,17 +106,19 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-// @ts-expect-error TS is not happy here. Will dig into it
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
+/**
+ * The `clerkMiddleware()` helper integrates Clerk authentication into your Next.js application through Middleware. `clerkMiddleware()` is compatible with both the App and Pages routers.
+ */
+export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddlewareReturn => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
+  const middleware = clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
     const baseNextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
       // Handles the case where `options` is a callback function to dynamically access `NextRequest`
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
 
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
 
       const publishableKey = assertKey(
         resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey,
@@ -119,20 +143,24 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       clerkMiddlewareRequestDataStore.set('requestData', options);
       const resolvedClerkClient = await clerkClient();
 
-      resolvedClerkClient.telemetry.record(
-        eventMethodCalled('clerkMiddleware', {
-          handler: Boolean(handler),
-          satellite: Boolean(options.isSatellite),
-          proxy: Boolean(options.proxyUrl),
-        }),
-      );
-
       if (options.debug) {
         logger.enable();
       }
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
+
+      const authHeader = request.headers.get(constants.Headers.Authorization);
+      if (authHeader && authHeader.startsWith('Basic ')) {
+        logger.debug('Basic Auth detected');
+      }
+
+      const cspHeader = request.headers.get(constants.Headers.ContentSecurityPolicy);
+      if (cspHeader) {
+        logger.debug('Content-Security-Policy detected', () => ({
+          value: cspHeader,
+        }));
+      }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
         clerkRequest,
@@ -173,11 +201,33 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
+      if (options.contentSecurityPolicy) {
+        const { header, nonce } = createCSPHeader(
+          options.contentSecurityPolicy.mode,
+          (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
+          options.contentSecurityPolicy.directives,
+        );
+
+        setHeader(handlerResult, constants.Headers.ContentSecurityPolicy, header);
+        if (nonce) {
+          setHeader(handlerResult, constants.Headers.Nonce, nonce);
+        }
+
+        logger.debug('Clerk generated CSP', () => ({
+          header,
+          nonce,
+        }));
+      }
 
       // TODO @nikos: we need to make this more generic
       // and move the logic in clerk/backend
       if (requestState.headers) {
         requestState.headers.forEach((value, key) => {
+          if (key === constants.Headers.ContentSecurityPolicy) {
+            logger.debug('Content-Security-Policy detected', () => ({
+              value,
+            }));
+          }
           handlerResult.headers.append(key, value);
         });
       }
@@ -191,10 +241,16 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, {
-        publishableKey: keyless?.publishableKey,
-        secretKey: keyless?.secretKey,
-      });
+      const keylessKeysForRequestData =
+        // Only pass keyless credentials when there are no explicit keys
+        secretKey === keyless?.secretKey
+          ? {
+              publishableKey: keyless?.publishableKey,
+              secretKey: keyless?.secretKey,
+            }
+          : {};
+
+      decorateRequest(clerkRequest, handlerResult, requestState, resolvedParams, keylessKeysForRequestData);
 
       return handlerResult;
     });
@@ -207,8 +263,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
         return returnBackFromKeylessSync(request);
       }
 
-      const resolvedParams = typeof params === 'function' ? params(request) : params;
-      const keyless = getKeylessCookieValue(name => request.cookies.get(name)?.value);
+      const resolvedParams = typeof params === 'function' ? await params(request) : params;
+      const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
@@ -242,7 +298,9 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     // eg, export default clerkMiddleware(auth => { ... });
     return nextMiddleware;
   });
-};
+
+  return middleware;
+}) as ClerkMiddleware;
 
 const parseRequestAndEvent = (args: unknown[]) => {
   return [args[0] instanceof Request ? args[0] : undefined, args[0] instanceof Request ? args[1] : undefined] as [
@@ -339,6 +397,7 @@ const handleControlFlowErrors = (
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
+      sessionStatus: requestState.toAuth()?.sessionStatus,
     }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
   }
 

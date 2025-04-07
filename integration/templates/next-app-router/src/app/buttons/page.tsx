@@ -6,8 +6,18 @@ export default function Home() {
       <SignInButton
         mode='modal'
         forceRedirectUrl='/protected'
+        signUpForceRedirectUrl='/protected'
       >
         Sign in button (force)
+      </SignInButton>
+
+      <SignInButton
+        mode='modal'
+        oauthFlow='popup'
+        forceRedirectUrl='/protected'
+        signUpForceRedirectUrl='/protected'
+      >
+        Sign in button (force, popup)
       </SignInButton>
 
       <SignInButton
@@ -20,6 +30,7 @@ export default function Home() {
       <SignUpButton
         mode='modal'
         forceRedirectUrl='/protected'
+        signInForceRedirectUrl='/protected'
       >
         Sign up button (force)
       </SignUpButton>

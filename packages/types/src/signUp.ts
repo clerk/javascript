@@ -9,7 +9,7 @@ import type {
 } from './identifiers';
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AttemptPhoneNumberVerificationParams, PreparePhoneNumberVerificationParams } from './phoneNumber';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
@@ -42,7 +42,13 @@ declare global {
   }
 }
 
+/**
+ * The `SignUp` object holds the state of the current sign-up and provides helper methods to navigate and complete the sign-up process. Once a sign-up is complete, a new user is created.
+ */
 export interface SignUpResource extends ClerkResource {
+  /**
+   * The current status of the sign-up.
+   */
   status: SignUpStatus | null;
   requiredFields: SignUpField[];
   optionalFields: SignUpField[];
@@ -67,6 +73,8 @@ export interface SignUpResource extends ClerkResource {
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
+  upsert: (params: SignUpCreateParams | SignUpUpdateParams) => Promise<SignUpResource>;
+
   prepareVerification: (params: PrepareVerificationParams) => Promise<SignUpResource>;
 
   attemptVerification: (params: AttemptVerificationParams) => Promise<SignUpResource>;
@@ -89,6 +97,10 @@ export interface SignUpResource extends ClerkResource {
 
   authenticateWithRedirect: (
     params: AuthenticateWithRedirectParams & { unsafeMetadata?: SignUpUnsafeMetadata },
+  ) => Promise<void>;
+
+  authenticateWithPopup: (
+    params: AuthenticateWithPopupParams & { unsafeMetadata?: SignUpUnsafeMetadata },
   ) => Promise<void>;
 
   authenticateWithWeb3: (

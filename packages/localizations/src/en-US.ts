@@ -2,8 +2,18 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  __experimental_commerce: {
+    billedAnnually: 'Billed annually',
+    free: 'Free',
+    getStarted: 'Get started',
+    manageMembership: 'Manage membership',
+    month: 'Month',
+    switchPlan: 'Switch to this plan',
+  },
   backButton: 'Back',
+  badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
+  badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
   badge__requiresAction: 'Requires action',
@@ -118,6 +128,7 @@ export const enUS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: 'Search',
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -162,6 +173,7 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+      billing: 'Billing',
     },
     profilePage: {
       dangerSection: {
@@ -265,6 +277,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__passkey: 'Use your passkey',
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -292,9 +305,15 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
+    passkey: {
+      blockButton__passkey: 'Use your passkey',
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Use your passkey',
+    },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
@@ -449,6 +468,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
+      subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
     },
@@ -530,7 +550,9 @@ export const enUS: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
+      titleCombined: 'Create your account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -640,6 +662,31 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__plans: 'Plans',
+      },
+      title: 'Billing & Payments',
+      paymentSourcesSection: {
+        title: 'Available options',
+        add: 'Add new payment source',
+        addSubtitle: 'Add a new payment source to your account.',
+        cancelButton: 'Cancel',
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        removeResource: {
+          title: 'Remove payment source',
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+        },
+      },
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -692,6 +739,11 @@ export const enUS: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      enterpriseSSOLink: {
+        formButton: 'Click to sign-in',
+        formSubtitle: 'Complete the sign-in with {{identifier}}',
+      },
+      formHint: "You'll need to verify this email address before it can be added to your account.",
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',
@@ -758,6 +810,7 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -857,6 +910,7 @@ export const enUS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: 'Add a passkey',
         title: 'Passkeys',
       },
       passwordSection: {
@@ -883,6 +937,7 @@ export const enUS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
+        detailsAction__nonPrimary: 'Set as primary',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },

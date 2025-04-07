@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Portal } from '../uiComponents';
+import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
 import type { SignInProps } from '@clerk/types';
 
@@ -9,7 +9,7 @@ const props = defineProps<SignInProps>();
 </script>
 
 <template>
-  <Portal
+  <ClerkHostRenderer
     :mount="clerk?.mountSignIn"
     :unmount="clerk?.unmountSignIn"
     :props="props"

@@ -34,7 +34,9 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module 'vitest' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Assertion<T = any> extends CustomMatchers<T> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
 
@@ -248,7 +250,7 @@ const mockOptions = (options?) => {
 };
 
 const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
-  return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
+  return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
@@ -453,6 +455,30 @@ describe('tokens.authenticateRequest(options)', () => {
   // HTTP Authorization exists
   //
 
+  test('does not throw error with missing auth scheme from Authorization header', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json({}, { status: 200 });
+      }),
+    );
+
+    await expect(
+      authenticateRequest(mockRequestWithHeaderAuth({ authorization: mockInvalidSignatureJwt }), mockOptions()),
+    ).resolves.not.toThrow();
+  });
+
+  test('does not throw error with Basic auth scheme from Authorization header', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json({}, { status: 200 });
+      }),
+    );
+
+    await expect(
+      authenticateRequest(mockRequestWithHeaderAuth({ authorization: 'Basic dXNlcjpwYXNzd29yZA==' }), mockOptions()),
+    ).resolves.not.toThrow();
+  });
+
   test('returns signed out state if jwk fails to load from remote', async () => {
     server.use(
       http.get('https://api.clerk.test/v1/jwks', () => {
@@ -543,7 +569,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
     const requestState = await authenticateRequest(
       mockRequestWithHeaderAuth({
-        authorization: mockInvalidSignatureJwt,
+        authorization: `Bearer ${mockInvalidSignatureJwt}`,
       }),
       mockOptions(),
     );
@@ -558,7 +584,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
   test('headerToken: returns signed out state when an malformed token [1y.1n]', async () => {
     const requestState = await authenticateRequest(
-      mockRequestWithHeaderAuth({ authorization: 'test_header_token' }),
+      mockRequestWithHeaderAuth({ authorization: 'Bearer test_header_token' }),
       mockOptions(),
     );
 

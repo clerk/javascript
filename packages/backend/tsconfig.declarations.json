@@ -1,12 +1,13 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "skipLibCheck": true,
-    "noEmit": false,
     "declaration": true,
-    "emitDeclarationOnly": true,
+    "declarationDir": "./dist",
     "declarationMap": true,
-    "sourceMap": false,
-    "declarationDir": "./dist"
-  }
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "skipLibCheck": true,
+    "sourceMap": false
+  },
+  "exclude": ["node_modules", "dist", "/src/runtime/*", "src/**/__tests__/*.test.ts", "src/tests"]
 }

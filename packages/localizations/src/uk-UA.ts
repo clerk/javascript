@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'За замовчуванням',
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
   badge__primary: 'Основний',
@@ -129,6 +138,7 @@ export const ukUA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Запросити',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Видалити учасника',
         tableHeader__actions: undefined,
@@ -276,6 +286,7 @@ export const ukUA: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const ukUA: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -458,6 +474,7 @@ export const ukUA: LocalizationResource = {
       actionText: 'Немає акаунта?',
       actionText__join_waitlist: undefined,
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Увійти',
       titleCombined: undefined,
     },
@@ -537,7 +554,9 @@ export const ukUA: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Уже є акаунт?',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
+      subtitleCombined: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
+      titleCombined: 'Створіть Ваш акаунт',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
@@ -641,6 +660,14 @@ export const ukUA: LocalizationResource = {
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопійовано!',
       actionLabel__copy: 'Копіювати все',
@@ -693,6 +720,11 @@ export const ukUA: LocalizationResource = {
         resendButton: 'Надіслати посилання повторно',
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} буде видалено з цього акаунта.',
         messageLine2: 'Ви більше не зможете увійти з використанням цієї адреси електронної пошти.',
@@ -760,6 +792,7 @@ export const ukUA: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -858,6 +891,7 @@ export const ukUA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -884,6 +918,7 @@ export const ukUA: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Видалити гаманець',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
       },

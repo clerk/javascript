@@ -7,7 +7,7 @@
  * @param {Object} _options - Additional options (unused)
  * @returns {string|undefined} - The transformed source code if modifications were made, otherwise undefined
  */
-module.exports = function transformAsyncRequest({ path, source }, { jscodeshift: j }, _options) {
+module.exports = function transformAsyncRequest({ source }, { jscodeshift: j }) {
   const root = j(source);
   let dirtyFlag = false;
 

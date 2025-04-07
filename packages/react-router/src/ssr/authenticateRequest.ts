@@ -36,6 +36,7 @@ export async function authenticateRequest(
   const hasLocationHeader = requestState.headers.get('location');
   if (hasLocationHeader) {
     // triggering a handshake redirect
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw new Response(null, { status: 307, headers: requestState.headers });
   }
 

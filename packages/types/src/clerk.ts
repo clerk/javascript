@@ -1,9 +1,11 @@
 import type {
   Appearance,
+  CheckoutTheme,
   CreateOrganizationTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PricingTableTheme,
   SignInTheme,
   SignUpTheme,
   UserButtonTheme,
@@ -12,6 +14,7 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -31,7 +34,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { ActiveSessionResource } from './session';
+import type { PendingSessionOptions, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -43,27 +46,26 @@ import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 /**
- * Contains information about the SDK that the host application is using.
- * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+ * @inline
  */
 export type SDKMetadata = {
   /**
-   * The npm package name of the SDK
+   * The npm package name of the SDK.
    */
   name: string;
   /**
-   * The npm package version of the SDK
+   * The npm package version of the SDK.
    */
   version: string;
   /**
-   * Typically this will be the NODE_ENV that the SDK is currently running in
+   * Typically this will be the `NODE_ENV` that the SDK is currently running in.
    */
   environment?: string;
 };
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: ActiveSessionResource | null) => void | Promise<any>;
+export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -74,11 +76,14 @@ export type SignOutOptions = {
    */
   sessionId?: string;
   /**
-   * Specify a redirect URL to navigate after sign out is complete.
+   * Specify a redirect URL to navigate to after sign out is complete.
    */
   redirectUrl?: string;
 };
 
+/**
+ * @inline
+ */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
 
@@ -105,6 +110,9 @@ export interface Clerk {
    */
   loaded: boolean;
 
+  /**
+   * @internal
+   */
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   frontendApi: string;
@@ -127,17 +135,25 @@ export interface Clerk {
   /** Clerk flag for loading Clerk in a standard browser setup */
   isStandardBrowser: boolean | undefined;
 
+  /**
+   * Indicates whether the current user has a valid signed-in client session
+   */
+  isSignedIn: boolean;
+
   /** Client handling most Clerk operations. */
   client: ClientResource | undefined;
 
-  /** Active Session. */
-  session: ActiveSessionResource | null | undefined;
+  /** Current Session. */
+  session: SignedInSessionResource | null | undefined;
 
   /** Active Organization */
   organization: OrganizationResource | null | undefined;
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /** Commerce Object */
+  __experimental_commerce: __experimental_CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -161,6 +177,17 @@ export interface Clerk {
    * Closes the Clerk SignIn modal.
    */
   closeSignIn: () => void;
+
+  /**
+   * Opens the Clerk Checkout component in a drawer.
+   * @param props Optional checkout configuration parameters.
+   */
+  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+
+  /**
+   * Closes the Clerk Checkout drawer.
+   */
+  __internal_closeCheckout: () => void;
 
   /**
    * Opens the Clerk UserVerification component in a modal.
@@ -378,6 +405,21 @@ export interface Clerk {
   unmountWaitlist: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a pricing table component at the target element.
+   * @param targetNode Target node to mount the PricingTable component.
+   * @param props configuration parameters.
+   */
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+
+  /**
+   * Unmount a pricing table component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the PricingTable component from.
+   */
+  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -390,6 +432,20 @@ export interface Clerk {
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+
+  /**
+   * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
+   * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   * @internal
+   */
+  __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
+
+  /**
+   * Registers the internal navigation context from UI components in order to
+   * be triggered from `Clerk` methods
+   * @internal
+   */
+  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
 
   /**
    * Set the active session and organization explicitly.
@@ -443,12 +499,12 @@ export interface Clerk {
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignInUrl(): string;
+  buildAfterSignInUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
    */
-  buildAfterSignUpUrl(): string;
+  buildAfterSignUpUrl({ params }?: { params?: URLSearchParams }): string;
 
   /**
    * Returns the configured afterSignOutUrl of the instance.
@@ -594,17 +650,33 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
+   * Navigates to the next task or redirects to completion URL.
+   * If the current session has pending tasks, it navigates to the next task.
+   * If all tasks are complete, it navigates to the provided completion URL.
+   * @experimental
+   */
+  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+
+  /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   * @internal
    */
   __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
     | undefined;
 
   /**
-   * This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
-   **/
+   * This function is used to reload the initial resources (Environment/Client) from the Frontend API.
+   * @internal
+   */
   __internal_reloadInitialResources: () => Promise<void>;
+
+  /**
+   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * initiated outside of the Clerk class.
+   */
+  __internal_setActiveInProgress: boolean;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -622,30 +694,30 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     signUpUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if identifier verification is required.
      */
     firstFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if 2FA is enabled.
      */
     secondFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if the user is required to reset their password.
      */
     resetPasswordUrl?: string;
     /**
-     * Full URL or path to navigate after an incomplete sign up.
+     * Full URL or path to navigate to after an incomplete sign up.
      */
     continueSignUpUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting email verification.
+     * Full URL or path to navigate to after requesting email verification.
      */
     verifyEmailAddressUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting phone verification.
+     * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
   };
@@ -673,18 +745,13 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     }
   | {
-      /**
-       * A function which takes the destination path as an argument and performs a "push" navigation.
-       */
       routerPush: RouterFn;
-      /**
-       * A function which takes the destination path as an argument and performs a "replace" navigation.
-       */
       routerReplace: RouterFn;
       routerDebug?: boolean;
     };
 
 export type ClerkOptions = ClerkOptionsDangerous &
+  PendingSessionOptions &
   ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -703,9 +770,9 @@ export type ClerkOptions = ClerkOptionsDangerous &
     localization?: LocalizationResource;
     polling?: boolean;
     /**
-     * By default, the last active session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
+     * By default, the last signed-in session is used during client initialization. This option allows you to override that behavior, e.g. by selecting a specific session.
      */
-    selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
+    selectInitialSession?: (client: ClientResource) => SignedInSessionResource | null;
     /**
      * By default, ClerkJS is loaded with the assumption that cookies can be set (browser setup). On native platforms this value must be set to `false`.
      */
@@ -715,14 +782,16 @@ export type ClerkOptions = ClerkOptionsDangerous &
      */
     supportEmail?: string;
     /**
-     * By default, the [FAPI `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
+     * By default, the [Clerk Frontend API `touch` endpoint](https://clerk.com/docs/reference/frontend-api/tag/Sessions#operation/touchSession) is called during page focus to keep the last active session alive. This option allows you to disable this behavior.
      */
     touchSession?: boolean;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signInUrl?: string;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     */
     signUpUrl?: string;
     /**
      * An optional array of domains to validate user-provided redirect URLs against. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning logged in the console.
@@ -737,7 +806,7 @@ export type ClerkOptions = ClerkOptionsDangerous &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry)
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
       | false
@@ -753,35 +822,46 @@ export type ClerkOptions = ClerkOptionsDangerous &
      * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
      */
     sdkMetadata?: SDKMetadata;
-    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
+    /**
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
+     */
     waitlistUrl?: string;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
       {
+        /**
+         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         */
         persistClient: boolean;
+        /**
+         * Clerk will rethrow network errors that occur while the user is offline.
+         */
         rethrowOfflineNetworkErrors: boolean;
-        combinedFlow: boolean;
+        commerce: boolean;
       },
       Record<string, any>
     >;
 
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
+     * @internal
      */
     __internal_keyless_claimKeylessApplicationUrl?: string;
 
     /**
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     * @internal
      */
     __internal_keyless_copyInstanceKeysUrl?: string;
 
     /**
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     * @internal
      */
-    __internal_keyless_dismissPrompt?: () => Promise<void>;
+    __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
   };
 
 export interface ClerkOptionsDangerous {
@@ -801,7 +881,7 @@ export interface NavigateOptions {
 
 export interface Resources {
   client: ClientResource;
-  session?: ActiveSessionResource | null;
+  session?: SignedInSessionResource | null;
   user?: UserResource | null;
   organization?: OrganizationResource | null;
 }
@@ -835,9 +915,27 @@ type NavigationType =
 
 type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
 
+/**
+ * @inline
+ */
 type RouterFn = (
+  /**
+   * The destination path
+   */
   to: string,
-  metadata?: { __internal_metadata?: RouterMetadata; windowNavigate: (to: URL | string) => void },
+  /**
+   * Optional metadata
+   */
+  metadata?: {
+    /**
+     * @internal
+     */
+    __internal_metadata?: RouterMetadata;
+    /**
+     * Provide a function to be used for navigation.
+     */
+    windowNavigate: (to: URL | string) => void;
+  },
 ) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
@@ -872,34 +970,38 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+/**
+ * The parameters for the `setActive()` method.
+ * @interface
+ */
 export type SetActiveParams = {
   /**
-   * The session resource or session id (string version) to be set as active.
-   * If `null`, the current session is deleted.
+   * The session resource or session ID (string version) to be set as active. If `null`, the current session is deleted.
    */
-  session?: ActiveSessionResource | string | null;
+  session?: SignedInSessionResource | string | null;
 
   /**
-   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
-   * If `null`, the currently active organization is removed as active.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session. If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated use the redirectUrl parameter to redirect a user
+   * @deprecated in favor of `redirectUrl`.
    *
-   * Callback run just before the active session and/or organization is set to the passed object.
-   * Can be used to hook up for pre-navigation actions.
+   * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
   beforeEmit?: BeforeEmitCallback;
 
   /**
-   * The URL to redirect a user to just before the active session and/or organization is set to the passed object.
+   * The full URL or path to redirect to just before the active session and/or organization is set.
    */
   redirectUrl?: string;
 };
 
-export type SetActive = (params: SetActiveParams) => Promise<void>;
+/**
+ * @inline
+ */
+export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
@@ -907,14 +1009,14 @@ export type RoutingOptions =
 
 export type SignInProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -956,6 +1058,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1001,6 +1107,27 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
+export type __internal_ComponentNavigationContext = {
+  /**
+   * The `navigate` reference within the component router context
+   */
+  navigate: (
+    to: string,
+    options?: {
+      searchParams?: URLSearchParams;
+    },
+  ) => Promise<unknown>;
+  /**
+   * This path represents the root route for a specific component type and is used
+   * for internal routing and navigation.
+   *
+   * @example
+   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
+   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
+   */
+  indexPath: string;
+};
+
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
@@ -1027,14 +1154,14 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
 
 export type SignUpProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -1068,6 +1195,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1122,7 +1253,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
@@ -1180,23 +1311,23 @@ export type UserButtonProps = UserButtonProfileMode & {
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
-   * Full URL or path to navigate after sign out is complete
+   * Full URL or path to navigate to after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterSignOutUrl?: string;
   /**
-   * Full URL or path to navigate after signing out the current user is complete.
+   * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
    * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**
-   * Full URL or path to navigate on "Add another account" action.
+   * Full URL or path to navigate to on "Add another account" action.
    * Multi-session mode only.
    */
   signInUrl?: string;
   /**
-   * Full URL or path to navigate after successful account change.
+   * Full URL or path to navigate to after successful account change.
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
@@ -1258,20 +1389,20 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     hidePersonal?: boolean;
     /**
-     * Full URL or path to navigate after a successful organization switch.
+     * Full URL or path to navigate to after a successful organization switch.
      * @default undefined
      * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
      */
     afterSwitchOrganizationUrl?: string;
     /**
-     * Full URL or path to navigate after creating a new organization.
+     * Full URL or path to navigate to after creating a new organization.
      * @default undefined
      */
     afterCreateOrganizationUrl?:
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful organization selection.
+     * Full URL or path to navigate to after a successful organization selection.
      * Accepts a function that returns URL or path
      * @default undefined`
      */
@@ -1279,7 +1410,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful selection of personal workspace.
+     * Full URL or path to navigate to after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
      * @default undefined
      */
@@ -1315,14 +1446,14 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Full URL or path to navigate after a successful organization selection.
+   * Full URL or path to navigate to after a successful organization selection.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1350,7 +1481,7 @@ export type OrganizationListProps = {
    */
   hidePersonal?: boolean;
   /**
-   * Full URL or path to navigate after a successful selection of personal workspace.
+   * Full URL or path to navigate to after a successful selection of personal workspace.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1364,7 +1495,7 @@ export type OrganizationListProps = {
 
 export type WaitlistProps = {
   /**
-   * Full URL or path to navigate after join waitlist.
+   * Full URL or path to navigate to after join waitlist.
    */
   afterJoinWaitlistUrl?: string;
   /**
@@ -1381,14 +1512,46 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
+type __experimental_PricingTableDefaultProps = {
+  layout?: 'default';
+  ctaPosition?: 'top' | 'bottom';
+  collapseFeatures?: boolean;
+};
+
+type __experimental_PricingTableMatrixProps = {
+  layout?: 'matrix';
+  highlightPlan?: string;
+};
+
+type __experimental_PricingTableBaseProps = {
+  appearance?: PricingTableTheme;
+  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
+};
+
+export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
+  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
+
+export type __experimental_CheckoutProps = {
+  appearance?: CheckoutTheme;
+  planId?: string;
+  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
+  orgId?: string;
+  onSubscriptionComplete?: () => void;
+  portalId?: string;
+};
+
+export type __experimental_PaymentSourcesProps = {
+  orgId?: string;
+};
+
 export interface HandleEmailLinkVerificationParams {
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on completed sign up or sign in on the same device.
    */
   redirectUrlComplete?: string;
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on the same device, but not completed sign in or sign up.
    */
   redirectUrl?: string;
@@ -1398,6 +1561,42 @@ export interface HandleEmailLinkVerificationParams {
    */
   onVerifiedOnOtherDevice?: () => void;
 }
+
+type ButtonPropsModal<T extends SignInProps | SignUpProps> = {
+  mode: 'modal';
+  appearance?: T['appearance'];
+};
+
+type ButtonPropsRedirect = {
+  mode?: 'redirect';
+};
+
+type ButtonProps<T extends SignInProps | SignUpProps> = ButtonPropsModal<T> | ButtonPropsRedirect;
+
+export type SignInButtonProps = ButtonProps<SignInProps> &
+  Pick<
+    SignInProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signUpForceRedirectUrl'
+    | 'signUpFallbackRedirectUrl'
+    | 'initialValues'
+    | 'withSignUp'
+    | 'oauthFlow'
+  >;
+
+export type SignUpButtonProps = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+} & ButtonProps<SignUpProps> &
+  Pick<
+    SignUpProps,
+    | 'fallbackRedirectUrl'
+    | 'forceRedirectUrl'
+    | 'signInForceRedirectUrl'
+    | 'signInFallbackRedirectUrl'
+    | 'initialValues'
+    | 'oauthFlow'
+  >;
 
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
@@ -1409,6 +1608,9 @@ export type CreateBulkOrganizationInvitationParams = {
   role: OrganizationCustomRoleKey;
 };
 
+/**
+ * @inline
+ */
 export interface CreateOrganizationParams {
   name: string;
   slug?: string;
@@ -1454,6 +1656,14 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
+}
+
+export interface NextTaskParams {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {

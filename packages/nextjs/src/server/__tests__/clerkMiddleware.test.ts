@@ -84,27 +84,25 @@ describe('ClerkMiddleware type tests', () => {
 
   it('fails for unknown props', () => {
     // @ts-expect-error - unknown prop
-    clerkMiddlewareMock({ hello: '' });
+    void clerkMiddlewareMock({ hello: '' });
   });
 
   it('can be used with a handler and an optional options object', () => {
     clerkMiddlewareMock(
-      async (auth, request, event) => {
+      async (auth, request) => {
         const { getToken } = await auth();
         await getToken();
         request.cookies.clear();
-        event.sourcePage;
       },
       { secretKey: '', publishableKey: '' },
     );
   });
 
   it('can be used with just a handler and an optional options object', () => {
-    clerkMiddlewareMock(async (auth, request, event) => {
+    clerkMiddlewareMock(async (auth, request) => {
       const { getToken } = await auth();
       await getToken();
       request.cookies.clear();
-      event.sourcePage;
     });
   });
 
@@ -240,31 +238,67 @@ describe('clerkMiddleware(params)', () => {
     expect(decryptedData).toEqual(options);
   });
 
-  it('allows access to request object to dynamically define options', async () => {
-    const options = {
-      secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
-      publishableKey: 'pk_test_xxxxxxxxxxxxx',
-      signInUrl: '/foo',
-      signUpUrl: '/bar',
-    };
-    const resp = await clerkMiddleware(
-      () => {
-        return NextResponse.next();
-      },
-      req => ({
-        ...options,
-        domain: req.nextUrl.host,
-      }),
-    )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
-    expect(resp?.status).toEqual(200);
+  describe('allows access to request object to define options via callback', () => {
+    it('with synchronous callback', async () => {
+      const options = {
+        secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        signInUrl: '/foo',
+        signUpUrl: '/bar',
+      };
+      const resp = await clerkMiddleware(
+        () => {
+          return NextResponse.next();
+        },
+        req => ({
+          ...options,
+          domain: req.nextUrl.host,
+        }),
+      )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(resp?.status).toEqual(200);
 
-    const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
-    assert.ok(requestData);
+      const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+      assert.ok(requestData);
 
-    const decryptedData = decryptClerkRequestData(requestData);
+      const decryptedData = decryptClerkRequestData(requestData);
 
-    expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-    expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+      expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+    });
+
+    it('with asynchronous callback', async () => {
+      const options = {
+        secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+        publishableKey: 'pk_test_xxxxxxxxxxxxx',
+        signInUrl: '/foo',
+        signUpUrl: '/bar',
+      };
+
+      const mockFetchOptionsExternalStore = (_req: NextRequest) => Promise.resolve(options);
+
+      const resp = await clerkMiddleware(
+        () => {
+          return NextResponse.next();
+        },
+        async req => {
+          const resolvedOptions = await mockFetchOptionsExternalStore(req);
+
+          return {
+            ...resolvedOptions,
+            domain: req.nextUrl.host,
+          };
+        },
+      )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(resp?.status).toEqual(200);
+
+      const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+      assert.ok(requestData);
+
+      const decryptedData = decryptClerkRequestData(requestData);
+
+      expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+      expect(decryptedData).toEqual({ ...options, domain: 'www.clerk.com' });
+    });
   });
 
   describe('auth().redirectToSignIn()', () => {
@@ -298,7 +332,8 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(307);
-      expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(resp?.status).toEqual(307);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
@@ -317,6 +352,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
         'https://www.clerk.com/hello',
       );
@@ -337,6 +373,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });

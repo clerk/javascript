@@ -18,6 +18,7 @@ export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
 export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
   FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
+  FORM_PASSWORD_PWNED: 'form_password_pwned',
   INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',
@@ -34,6 +35,7 @@ export const ERROR_CODES = {
   SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'saml_email_address_domain_mismatch',
   INVITATION_ACCOUNT_NOT_EXISTS: 'invitation_account_not_exists',
   ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO: 'organization_membership_quota_exceeded_for_sso',
+  CAPTCHA_INVALID: 'captcha_invalid',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];

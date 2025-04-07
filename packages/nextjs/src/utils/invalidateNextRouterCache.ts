@@ -51,7 +51,7 @@ export const invalidateNextRouterCache = () => {
   try {
     invalidate((window as any).next.router.sdc);
     invalidate((window as any).next.router.sbc);
-  } catch (e) {
+  } catch {
     return;
   }
 };

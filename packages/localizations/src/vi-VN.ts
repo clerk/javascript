@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Quay lại',
+  badge__currentPlan: undefined,
   badge__default: 'Mặc định',
   badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
   badge__primary: 'Chính',
@@ -129,6 +138,7 @@ export const viVN: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Mời',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Gỡ bỏ thành viên',
         tableHeader__actions: undefined,
@@ -276,6 +286,7 @@ export const viVN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const viVN: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -458,6 +474,7 @@ export const viVN: LocalizationResource = {
       actionText: 'Chưa có tài khoản?',
       actionText__join_waitlist: undefined,
       subtitle: 'để tiếp tục với {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Đăng nhập',
       titleCombined: undefined,
     },
@@ -537,7 +554,9 @@ export const viVN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
+      subtitleCombined: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
+      titleCombined: 'Tạo tài khoản của bạn',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -642,6 +661,14 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -694,6 +721,11 @@ export const viVN: LocalizationResource = {
         resendButton: 'Không nhận được liên kết? Gửi lại',
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không thể đăng nhập bằng địa chỉ email này nữa.',
@@ -760,6 +792,7 @@ export const viVN: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -858,6 +891,7 @@ export const viVN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -884,6 +918,7 @@ export const viVN: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Xóa ví',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Ví Web3',
         title: 'Ví Web3',
       },

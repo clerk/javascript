@@ -1,5 +1,12 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
-import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  GetToken,
+  PendingSessionOptions,
+  SignOut,
+  UseAuthReturn,
+} from '@clerk/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -9,33 +16,77 @@ import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
-type UseAuth = (initialAuthState?: any) => UseAuthReturn;
+type Nullish<T> = T | undefined | null;
+type InitialAuthState = Record<string, any>;
+type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
 
 /**
- * Returns the current auth state, the user and session ids and the `getToken`
- * that can be used to retrieve the given template or the default Clerk token.
+ * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
- * Until Clerk loads, `isLoaded` will be set to `false`.
- * Once Clerk loads, `isLoaded` will be set to `true`, and you can
- * safely access the `userId` and `sessionId` variables.
+ * <If sdk="nextjs">
+ * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
+ * </If>
  *
- * For projects using NextJs or Remix, you can have immediate access to this data during SSR
- * simply by using the `ClerkProvider`.
+ * @param [initialAuthState] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
  *
  * @example
+ *
+ * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
+ *
+ * <Tabs items='React,Next.js'>
+ * <Tab>
+ *
+ * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
  * import { useAuth } from '@clerk/clerk-react'
  *
- * function Hello() {
- *   const { isSignedIn, sessionId, userId } = useAuth();
- *   if(isSignedIn) {
- *     return null;
+ * export default function ExternalDataPage() {
+ *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
+ *
+ *   const fetchExternalData = async () => {
+ *     const token = await getToken()
+ *
+ *     // Fetch data from an external API
+ *     const response = await fetch('https://api.example.com/data', {
+ *       headers: {
+ *         Authorization: `Bearer ${token}`,
+ *       },
+ *     })
+ *
+ *     return response.json()
  *   }
- *   console.log(sessionId, userId)
- *   return <div>...</div>
+ *
+ *   if (!isLoaded) {
+ *     return <div>Loading...</div>
+ *   }
+ *
+ *   if (!isSignedIn) {
+ *     return <div>Sign in to view this page</div>
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <p>
+ *         Hello, {userId}! Your current active session is {sessionId}.
+ *       </p>
+ *       <button onClick={fetchExternalData}>Fetch Data</button>
+ *     </div>
+ *   )
  * }
+ * ```
+ *
+ * </Tab>
+ * <Tab>
+ *
+ * {@include ../../docs/use-auth.md#nextjs-01}
+ *
+ * </Tab>
+ * </Tabs>
  */
-export const useAuth: UseAuth = (initialAuthState = {}) => {
+export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
+
+  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
+  const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
@@ -44,24 +95,23 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
-
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
-  return useDerivedAuth({
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    getToken,
-    signOut,
-    orgPermissions,
-    factorVerificationAge,
-  });
+  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
+
+  return useDerivedAuth(
+    {
+      ...authContext,
+      getToken,
+      signOut,
+    },
+    {
+      treatPendingAsSignedOut:
+        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption?.('treatPendingAsSignedOut'),
+    },
+  );
 };
 
 /**
@@ -77,7 +127,7 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
  * session and user identifiers, organization roles, and a `has` function for authorization checks.
  * Additionally, it provides `signOut` and `getToken` functions if applicable.
  *
- * Example usage:
+ * @example
  * ```tsx
  * const {
  *   isLoaded,
@@ -90,20 +140,11 @@ export const useAuth: UseAuth = (initialAuthState = {}) => {
  * } = useDerivedAuth(authObject);
  * ```
  */
-export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const {
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    has,
-    signOut,
-    getToken,
-    orgPermissions,
-    factorVerificationAge,
-  } = authObject ?? {};
+export function useDerivedAuth(
+  authObject: any,
+  { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
+): UseAuthReturn {
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -118,72 +159,24 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
         factorVerificationAge,
       })(params);
     },
-    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
   );
 
-  if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: undefined,
-      orgId: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      has: undefined,
-      signOut,
+  const payload = resolveAuthState({
+    authObject: {
+      ...authObject,
       getToken,
-    };
-  }
-
-  if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
       signOut,
-      getToken,
-    };
-  }
-
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId,
-      orgRole,
-      orgSlug: orgSlug || null,
       has: derivedHas,
-      signOut,
-      getToken,
-    };
+    },
+    options: {
+      treatPendingAsSignedOut,
+    },
+  });
+
+  if (!payload) {
+    return errorThrower.throw(invalidStateError);
   }
 
-  if (!!sessionId && !!userId && !orgId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: derivedHas,
-      signOut,
-      getToken,
-    };
-  }
-
-  return errorThrower.throw(invalidStateError);
+  return payload;
 }

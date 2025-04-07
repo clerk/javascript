@@ -1,5 +1,8 @@
 import type {
   InvitationStatus,
+  OrganizationDomainVerificationStatus,
+  OrganizationDomainVerificationStrategy,
+  OrganizationEnrollmentMode,
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
@@ -19,6 +22,7 @@ export const ObjectType = {
   Invitation: 'invitation',
   OauthAccessToken: 'oauth_access_token',
   Organization: 'organization',
+  OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
@@ -30,6 +34,7 @@ export const ObjectType = {
   SignUpAttempt: 'sign_up_attempt',
   SmsMessage: 'sms_message',
   User: 'user',
+  WaitlistEntry: 'waitlist_entry',
   Web3Wallet: 'web3_wallet',
   Token: 'token',
   TotalCount: 'total_count',
@@ -175,6 +180,27 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   created_by?: string;
   created_at: number;
   updated_at: number;
+}
+
+export interface OrganizationDomainJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OrganizationDomain;
+  id: string;
+  name: string;
+  organization_id: string;
+  enrollment_mode: OrganizationEnrollmentMode;
+  verification: OrganizationDomainVerificationJSON | null;
+  affiliation_email_address: string | null;
+  created_at: number;
+  updated_at: number;
+  total_pending_invitations: number;
+  total_pending_suggestions: number;
+}
+
+export interface OrganizationDomainVerificationJSON {
+  status: OrganizationDomainVerificationStatus;
+  strategy: OrganizationDomainVerificationStrategy;
+  attempts: number;
+  expires_at: number;
 }
 
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
@@ -355,6 +381,17 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string | null;
   nonce?: string | null;
   message?: string | null;
+}
+
+export interface WaitlistEntryJSON extends ClerkResourceJSON {
+  created_at: number;
+  email_address: string;
+  id: string;
+  invitation: InvitationJSON | null;
+  is_locked: boolean;
+  object: typeof ObjectType.WaitlistEntry;
+  status: string;
+  updated_at: number;
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {

@@ -1,4 +1,4 @@
-import { runWithExponentialBackOff } from './utils';
+import { retry } from './retry';
 
 const NO_DOCUMENT_ERROR = 'loadScript cannot be called when document does not exist';
 const NO_SRC_ERROR = 'loadScript cannot be called without a src';
@@ -17,7 +17,7 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
   const load = () => {
     return new Promise<HTMLScriptElement>((resolve, reject) => {
       if (!src) {
-        reject(NO_SRC_ERROR);
+        reject(new Error(NO_SRC_ERROR));
       }
 
       if (!document || !document.body) {
@@ -26,7 +26,7 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
 
       const script = document.createElement('script');
 
-      crossOrigin && script.setAttribute('crossorigin', crossOrigin);
+      if (crossOrigin) script.setAttribute('crossorigin', crossOrigin);
       script.async = async || false;
       script.defer = defer || false;
 
@@ -47,5 +47,5 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
     });
   };
 
-  return runWithExponentialBackOff(load, { shouldRetry: (_, iterations) => iterations < 5 });
+  return retry(load, { shouldRetry: (_, iterations) => iterations <= 5 });
 }

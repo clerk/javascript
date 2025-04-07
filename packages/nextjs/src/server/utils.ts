@@ -4,14 +4,11 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
-import AES from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
-import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { canUseKeyless } from '../utils/feature-flags';
+import { AES, HmacSHA1, Utf8 } from '../vendor/crypto-es';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import {
   authSignatureInvalid,
@@ -21,23 +18,8 @@ import {
   missingSignInUrlInDev,
 } from './errors';
 import { errorThrower } from './errorThrower';
-import { detectClerkMiddleware, isNextRequest } from './headers-utils';
+import { detectClerkMiddleware } from './headers-utils';
 import type { RequestLike } from './types';
-
-export function getCookie(req: RequestLike, name: string): string | undefined {
-  if (isNextRequest(req)) {
-    // Nextjs broke semver in the 13.0.0 -> 13.0.1 release, so even though
-    // this should be RequestCookie in all updated apps. In order to support apps
-    // using v13.0.0 still, we explicitly add the string type
-    // https://github.com/vercel/next.js/pull/41526
-    const reqCookieOrString = req.cookies.get(name) as ReturnType<NextRequest['cookies']['get']> | string | undefined;
-    if (!reqCookieOrString) {
-      return undefined;
-    }
-    return typeof reqCookieOrString === 'string' ? reqCookieOrString : reqCookieOrString.value;
-  }
-  return req.cookies[name];
-}
 
 const OVERRIDE_HEADERS = 'x-middleware-override-headers';
 const MIDDLEWARE_HEADER_PREFIX = 'x-middleware-request' as string;
@@ -50,7 +32,7 @@ export const setRequestHeadersOnNextResponse = (
   if (!res.headers.get(OVERRIDE_HEADERS)) {
     // Emulate a user setting overrides by explicitly adding the required nextjs headers
     // https://github.com/vercel/next.js/pull/41380
-    // @ts-expect-error
+    // @ts-expect-error -- property keys does not exist on type Headers
     res.headers.set(OVERRIDE_HEADERS, [...req.headers.keys()]);
     req.headers.forEach((val, key) => {
       res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);
@@ -176,7 +158,7 @@ export function assertKey(key: string | undefined, onError: () => never): string
  * Compute a cryptographic signature from a session token and provided secret key. Used to validate that the token has not been modified when transferring between middleware and the Next.js origin.
  */
 function createTokenSignature(token: string, key: string): string {
-  return hmacSHA1(token, key).toString();
+  return HmacSHA1(token, key).toString();
 }
 
 /**
@@ -201,7 +183,7 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
  **/
 export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
-  keylessMode: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
+  keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
     if (!obj) {
@@ -210,7 +192,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessMode)) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys)) {
     return;
   }
 
@@ -227,7 +209,7 @@ export function encryptClerkRequestData(
     ? ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError())
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
-  return AES.encrypt(JSON.stringify({ ...keylessMode, ...requestData }), maybeKeylessEncryptionKey).toString();
+  return AES.encrypt(JSON.stringify({ ...keylessModeKeys, ...requestData }), maybeKeylessEncryptionKey).toString();
 }
 
 /**
@@ -247,7 +229,7 @@ export function decryptClerkRequestData(
 
   try {
     return decryptData(encryptedRequestData, maybeKeylessEncryptionKey);
-  } catch (err) {
+  } catch {
     /**
      * There is a great chance when running in Keyless mode that the above fails,
      * because the keys hot-swapped and the Next.js dev server has not yet fully rebuilt middleware and routes.
@@ -257,7 +239,7 @@ export function decryptClerkRequestData(
     if (canUseKeyless) {
       try {
         return decryptData(encryptedRequestData, KEYLESS_ENCRYPTION_KEY);
-      } catch (e) {
+      } catch {
         throwInvalidEncryptionKey();
       }
     }
@@ -274,6 +256,6 @@ function throwInvalidEncryptionKey(): never {
 
 function decryptData(data: string, key: string) {
   const decryptedBytes = AES.decrypt(data, key);
-  const encoded = decryptedBytes.toString(encUtf8);
+  const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }

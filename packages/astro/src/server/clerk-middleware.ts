@@ -3,11 +3,9 @@ import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestStat
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromPublishableKey, isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { APIContext } from 'astro';
 
-// @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
 import { NETLIFY_CACHE_BUST_PARAM } from '../internal';
@@ -68,14 +66,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     const clerkRequest = createClerkRequest(context.request);
-
-    clerkClient(context).telemetry.record(
-      eventMethodCalled('clerkMiddleware', {
-        handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
-      }),
-    );
 
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
@@ -169,9 +159,15 @@ export const createAuthenticateRequestOptions = (
 
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
 export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
-  requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
-  requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
-  requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
+  if (requestState.message) {
+    res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
+  }
+  if (requestState.reason) {
+    res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
+  }
+  if (requestState.status) {
+    res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
+  }
   return res;
 };
 
@@ -205,6 +201,7 @@ export const handleMultiDomainAndProxy = (
   if (
     isSatellite &&
     !isHttpOrHttps(signInUrl) &&
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     isDevelopmentFromSecretKey(opts.secretKey || getSafeEnv(context).sk!)
   ) {
     throw new Error(missingSignInUrlInDev);
@@ -276,9 +273,11 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
         redirectAdapter,
         devBrowserToken: devBrowserToken,
         baseUrl: clerkUrl.toString(),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
+        sessionStatus: requestState.toAuth()?.sessionStatus,
       }).redirectToSignIn({
         returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
       });
@@ -316,6 +315,7 @@ function decorateRequest(locals: APIContext['locals'], res: Response): Response 
     );
     const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const stream = res.body!.pipeThrough(
       new TransformStream({
         transform(chunk, controller) {
@@ -394,7 +394,9 @@ const handleControlFlowErrors = (
         baseUrl: clerkRequest.clerkUrl,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
+        sessionStatus: requestState.toAuth()?.sessionStatus,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

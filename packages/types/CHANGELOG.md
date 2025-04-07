@@ -1,5 +1,193 @@
 # Change Log
 
+## 4.50.2
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5457](https://github.com/clerk/javascript/pull/5457)) by [@alexisintech](https://github.com/alexisintech)
+
+- Remove usage of `<PlanCard />` from `<SubscriptionDetailDrawer />`. ([#5469](https://github.com/clerk/javascript/pull/5469)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add payment source section to `UserProfile` ([#5492](https://github.com/clerk/javascript/pull/5492)) by [@aeliox](https://github.com/aeliox)
+
+## 4.50.1
+
+### Patch Changes
+
+- Add billing page to `OrgProfile`, use new `usePlans` hook, and adds new subscription methods ([#5423](https://github.com/clerk/javascript/pull/5423)) by [@aeliox](https://github.com/aeliox)
+
+- Refactor `<PricingTableDefault />` to use local sub components to align with `<PricingTableMatrix />` implementation and descriptors. ([#5450](https://github.com/clerk/javascript/pull/5450)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.50.0
+
+### Minor Changes
+
+- Add support for the `oauthFlow` prop on `<SignIn />` and `<SignUp />`, allowing developers to opt-in to using a popup for OAuth authorization instead of redirects. ([#5239](https://github.com/clerk/javascript/pull/5239)) by [@dstaley](https://github.com/dstaley)
+
+  With the new `oauthFlow` prop, developers can opt-in to using a popup window instead of redirects for their OAuth flows by setting `oauthFlow` to `"popup"`. While we still recommend the default `"redirect"` for most scenarios, the `"popup"` option is useful in environments where the redirect flow does not currently work, such as when your application is embedded into an `iframe`. We also opt applications into the `"popup"` flow when we detect that your application is running on a domain that's typically embedded into an `iframe`, such as `loveable.app`.
+
+### Patch Changes
+
+- Load tasks based on environment settings ([#5422](https://github.com/clerk/javascript/pull/5422)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Derive session status from server-side state ([#5447](https://github.com/clerk/javascript/pull/5447)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.49.2
+
+### Patch Changes
+
+- Wrap nested `<Checkout />` component in its own AppearanceProvider to recieve its own appearance object. ([#5443](https://github.com/clerk/javascript/pull/5443)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.49.1
+
+### Patch Changes
+
+- Introduce `__experimental_nextTask` method for navigating to next tasks on a after-auth flow ([#5377](https://github.com/clerk/javascript/pull/5377)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.49.0
+
+### Minor Changes
+
+- Navigate to tasks on after sign-in/sign-up ([#5280](https://github.com/clerk/javascript/pull/5280)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Allow user set primary web3 wallet in `<UserProfile />` when more than one web3 wallets presented ([#5353](https://github.com/clerk/javascript/pull/5353)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Deprecate out of date jwt types in favour of existing that are up-to-date. ([#5354](https://github.com/clerk/javascript/pull/5354)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Simplify plan card avatar badge container styling. ([#5355](https://github.com/clerk/javascript/pull/5355)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `<Drawer.Confirmation />` component to be used within Commerce cancel subscription flow. ([#5376](https://github.com/clerk/javascript/pull/5376)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Hide personal workspace options when organization selection is enforced ([#5391](https://github.com/clerk/javascript/pull/5391)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Allow token refresh when Client failed to resolve. ([#5345](https://github.com/clerk/javascript/pull/5345)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve JSDoc documentation ([#5372](https://github.com/clerk/javascript/pull/5372)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce experimental billing APIs and components ([#5248](https://github.com/clerk/javascript/pull/5248)) by [@aeliox](https://github.com/aeliox)
+
+- Introduce `<Drawer />` component and update commerce components implementations to make use of it. ([#5337](https://github.com/clerk/javascript/pull/5337)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Conditionally render the avatar and badge components within PlanCard. ([#5348](https://github.com/clerk/javascript/pull/5348)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor `<Checkout />` components to apply descriptors and ensure styling is properly connected to theming layer. ([#5359](https://github.com/clerk/javascript/pull/5359)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.48.0
+
+### Minor Changes
+
+- Support passkeys as a first factor strategy for reverification ([#5242](https://github.com/clerk/javascript/pull/5242)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Improve JSDoc documentation ([#5296](https://github.com/clerk/javascript/pull/5296)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve the UX on Reverification by not requiring the user's current password. ([#5284](https://github.com/clerk/javascript/pull/5284)) by [@chanioxaris](https://github.com/chanioxaris)
+
+  The user has already verified themselves using Reverification, so there is no point to maintain a two level verification in case they would like to change their password. Also, Reverification is a stronger verification factor, as it includes strategies such as email code.
+
+- Remove unused `experimental.combinedFlow` option. ([#5290](https://github.com/clerk/javascript/pull/5290)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.47.0
+
+### Minor Changes
+
+- Introduce the `appearance.captcha` property for the CAPTCHA widget ([#5184](https://github.com/clerk/javascript/pull/5184)) by [@anagstef](https://github.com/anagstef)
+
+- Surface new `pending` session as a signed-in state ([#5136](https://github.com/clerk/javascript/pull/5136)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Initialize `tasks` on `Session` resource ([#5170](https://github.com/clerk/javascript/pull/5170)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.46.1
+
+### Patch Changes
+
+- Support passing additional properties to `eventPrebuiltComponentMounted()`, and ensure `withSignUp` is collected on `SignIn` mount. ([#5150](https://github.com/clerk/javascript/pull/5150)) by [@brkalow](https://github.com/brkalow)
+
+## 4.46.0
+
+### Minor Changes
+
+- Introduce `__internal_addNavigationListener` method the `Clerk` singleton. ([#5092](https://github.com/clerk/javascript/pull/5092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Extract common button component props. ([#5125](https://github.com/clerk/javascript/pull/5125)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.45.1
+
+### Patch Changes
+
+- Add `menuButtonEllipsis` element descriptor. ([#5090](https://github.com/clerk/javascript/pull/5090)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Small JSDoc and type improvements ([#5099](https://github.com/clerk/javascript/pull/5099)) by [@LekoArts](https://github.com/LekoArts)
+
+- Replaces hard-coded string `"Add a passkey"` with a new localization key `userProfile.start.passkeysSection.primaryButton` ([#5105](https://github.com/clerk/javascript/pull/5105)) by [@Philitician](https://github.com/Philitician)
+
+## 4.45.0
+
+### Minor Changes
+
+- - `@clerk/clerk-js`, `@clerk/types`: Add `redirectUrl` option to `buildAfterSignInUrl()` and `buildAfterSignUpUrl()` methods. ([#5052](https://github.com/clerk/javascript/pull/5052)) by [@brkalow](https://github.com/brkalow)
+
+  - `@clerk/elements`: Ensure redirect_url params passed to Elements components are always passed to Clerk's underlying `build*Url()` methods.
+
+### Patch Changes
+
+- Reverts [#4977](https://github.com/clerk/javascript/pull/4977) ([#5057](https://github.com/clerk/javascript/pull/5057)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Marks virtual routing as deprecated.
+
+## 4.44.3
+
+### Patch Changes
+
+- Improve JSDoc comments to provide better IntelliSense in your IDE ([#5053](https://github.com/clerk/javascript/pull/5053)) by [@LekoArts](https://github.com/LekoArts)
+
+## 4.44.2
+
+### Patch Changes
+
+- Remove `'virtual'` from the `routing` option. The `'virtual'` value is only used internally and should not be part of the public API. ([#4977](https://github.com/clerk/javascript/pull/4977)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.44.1
+
+### Patch Changes
+
+- Add `subtitleCombined` localizations to sign-in-or-up flow. ([#4988](https://github.com/clerk/javascript/pull/4988)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduced searching for members list on `OrganizationProfile` ([#4942](https://github.com/clerk/javascript/pull/4942)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.44.0
+
+### Minor Changes
+
+- Deprecated `userProfile.emailAddressPage.emailLink.formHint` and `userProfile.emailAddressPage.emailCode.formHint` in favor of `userProfile.emailAddressPage.formHint` ([#4406](https://github.com/clerk/javascript/pull/4406)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+### Patch Changes
+
+- Add sign up title localization for use in sign-in-or-up flow. ([#4983](https://github.com/clerk/javascript/pull/4983)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.43.0
+
+### Minor Changes
+
+- - Introduced an `upsert` method to the `SignUp` resource, which reuses the existing sign-up attempt ID if it exists. ([#4720](https://github.com/clerk/javascript/pull/4720)) by [@kostaspt](https://github.com/kostaspt)
+
+  - Fix a ticket flow issue on `<SignUp />` component, where in some rare cases the initial ticket/context is lost, because of creating a new sign-up attempt ID.
+
+## 4.42.0
+
+### Minor Changes
+
+- Display keyless prompt until the developer manually dismisses it. ([#4940](https://github.com/clerk/javascript/pull/4940)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update modal methods to use the correct types. ([#4931](https://github.com/clerk/javascript/pull/4931)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.41.2
 
 ### Patch Changes
@@ -69,16 +257,16 @@
 
 ### Patch Changes
 
-- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internall usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
+- Introduce `__internal_copyInstanceKeysUrl` as property in `ClerkOptions`. It is intented for internal usage from other Clerk SDKs and will be used in Keyless mode. ([#4755](https://github.com/clerk/javascript/pull/4755)) by [@panteliselef](https://github.com/panteliselef)
 
-- Add `claimedAt` proprty inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
+- Add `claimedAt` property inside AuthConfig for the environment. It describes when a instance that was created from the Keyless mode was finally claimed. ([#4752](https://github.com/clerk/javascript/pull/4752)) by [@panteliselef](https://github.com/panteliselef)
 
 - Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
 
   This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
 
   - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
-  - `__internal_reloadInitialResources()`: This funtion is used to reload the initial resources (Environment/Client) from the Frontend API.
+  - `__internal_reloadInitialResources()`: This function is used to reload the initial resources (Environment/Client) from the Frontend API.
 
 ## 4.39.2
 
@@ -281,7 +469,7 @@
 
 - The Legal consent feature is now stable. ([#4487](https://github.com/clerk/javascript/pull/4487)) by [@octoper](https://github.com/octoper)
 
-  Removed the `__experimental_` preffix.
+  Removed the `__experimental_` prefix.
 
 ### Patch Changes
 
@@ -1760,7 +1948,7 @@
 
 ### Minor Changes
 
-- Introduces three new element appearence descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
+- Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
 
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.
@@ -1827,7 +2015,7 @@
 
 - Drop `password` property from `UserJSON` since it's not being returned by the Frontend API ([#1805](https://github.com/clerk/javascript/pull/1805)) by [@dimkl](https://github.com/dimkl)
 
-- Remove experimenta jsdoc tags from multi-domain types. ([#1819](https://github.com/clerk/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
+- Remove experimental jsdoc tags from multi-domain types. ([#1819](https://github.com/clerk/javascript/pull/1819)) by [@panteliselef](https://github.com/panteliselef)
 
 - Warn about `publicUserData.profileImageUrl` nested property deprecation in `OrganizationMembership` & `OrganizationMembershipRequest` resources. ([#1812](https://github.com/clerk/javascript/pull/1812)) by [@dimkl](https://github.com/dimkl)
 
@@ -1870,7 +2058,7 @@
 
 ### Patch Changes
 
-- Organization Switcher now diplays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerk/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
+- Organization Switcher now displays organization invitations and suggestions in a more compact form. ([#1675](https://github.com/clerk/javascript/pull/1675)) by [@panteliselef](https://github.com/panteliselef)
 
 ## 3.50.0
 

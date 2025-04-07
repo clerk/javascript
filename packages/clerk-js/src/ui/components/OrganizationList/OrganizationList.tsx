@@ -3,7 +3,7 @@ import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { OrganizationListPage } from './OrganizationListPage';
 
-const _OrganizationList = () => {
+const OrganizationListInternal = () => {
   return (
     <Flow.Root flow='organizationList'>
       <Flow.Part>
@@ -19,4 +19,4 @@ const _OrganizationList = () => {
 
 const AuthenticatedRoutes = withCoreUserGuard(OrganizationListPage);
 
-export const OrganizationList = _OrganizationList;
+export const OrganizationList = OrganizationListInternal;

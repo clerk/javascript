@@ -9,7 +9,7 @@ import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
 
-function _OneTapStart(): JSX.Element | null {
+function OneTapStartInternal(): JSX.Element | null {
   const clerk = useClerk();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -42,6 +42,7 @@ function _OneTapStart(): JSX.Element | null {
     const google = await loadGIS();
 
     google.accounts.id.initialize({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       client_id: environmentClientID!,
       callback: oneTapCallback,
       itp_support: ctx.itpSupport,
@@ -87,4 +88,4 @@ function _OneTapStart(): JSX.Element | null {
   return null;
 }
 
-export const OneTapStart = withCardStateProvider(_OneTapStart);
+export const OneTapStart = withCardStateProvider(OneTapStartInternal);

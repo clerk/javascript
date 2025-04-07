@@ -11,7 +11,7 @@ export class CaptchaChallenge {
    * This will always use the non-interactive variant of the CAPTCHA challenge and will
    * always use the fallback key.
    */
-  public async invisible() {
+  public async invisible(opts?: Partial<CaptchaOptions>) {
     const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible } = retrieveCaptchaInfo(this.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
@@ -20,15 +20,16 @@ export class CaptchaChallenge {
         invisibleSiteKey: captchaPublicKeyInvisible,
         widgetType: 'invisible',
         captchaProvider: 'turnstile',
+        action: opts?.action,
       }).catch(e => {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        return { captchaError: e?.message || e };
       });
     }
 
-    return undefined;
+    return { captchaError: 'captcha_unavailable' };
   }
 
   /**
@@ -54,23 +55,24 @@ export class CaptchaChallenge {
         if (e.captchaError) {
           return { captchaError: e.captchaError };
         }
-        return undefined;
+        return opts?.action === 'verify' ? { captchaError: e?.message || e } : undefined;
       });
     }
 
-    return {};
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable' } : {};
   }
 
   /**
    * Similar to managed() but will render the CAPTCHA challenge in a modal
    * managed by clerk-js itself.
    */
-  public async managedInModal() {
+  public async managedInModal(opts?: Partial<CaptchaOptions>) {
     return this.managedOrInvisible({
       modalWrapperQuerySelector: '#cl-modal-captcha-wrapper',
       modalContainerQuerySelector: '#cl-modal-captcha-container',
       openModal: () => this.clerk.__internal_openBlankCaptchaModal(),
       closeModal: () => this.clerk.__internal_closeBlankCaptchaModal(),
+      action: opts?.action,
     });
   }
 }

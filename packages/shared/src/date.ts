@@ -24,7 +24,7 @@ export function differenceInCalendarDays(a: Date, b: Date, { absolute = true } =
 export function normalizeDate(d: Date | string | number): Date {
   try {
     return new Date(d || new Date());
-  } catch (e) {
+  } catch {
     return new Date();
   }
 }

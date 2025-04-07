@@ -2,7 +2,7 @@ import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { CustomMenuItem } from '@clerk/types';
 import { ref } from 'vue';
 
-import { MenuAction, MenuLink } from '../components/uiComponents';
+import { MenuAction, MenuLink } from '../components/ui-components/UserButton';
 import { userButtonMenuItemActionWrongProps, userButtonMenuItemLinkWrongProps } from '../errors/messages';
 import type { AddCustomMenuItemParams, UserButtonActionProps, UserButtonLinkProps } from '../types';
 import { isThatComponent } from './componentValidation';
@@ -25,6 +25,7 @@ export const useUserButtonCustomMenuItems = () => {
         const baseItem: CustomMenuItem = {
           label,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,
@@ -58,6 +59,7 @@ export const useUserButtonCustomMenuItems = () => {
           label,
           href,
           mountIcon(el) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             mount(el, slots.labelIcon!);
           },
           unmountIcon: unmount,

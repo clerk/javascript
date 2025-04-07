@@ -25,6 +25,7 @@ interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
   clerkTraceId?: string;
+  retryAfter?: number;
 }
 
 // For a comprehensive Metamask error list, please see
@@ -61,6 +62,10 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
  */
 export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
   return 'clerkRuntimeError' in err;
+}
+
+export function isReverificationCancelledError(err: any) {
+  return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
 }
 
 export function isMetamaskError(err: any): err is MetamaskError {
@@ -115,10 +120,11 @@ export class ClerkAPIResponseError extends Error {
   status: number;
   message: string;
   clerkTraceId?: string;
+  retryAfter?: number;
 
   errors: ClerkAPIError[];
 
-  constructor(message: string, { data, status, clerkTraceId }: ClerkAPIResponseOptions) {
+  constructor(message: string, { data, status, clerkTraceId, retryAfter }: ClerkAPIResponseOptions) {
     super(message);
 
     Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
@@ -126,6 +132,7 @@ export class ClerkAPIResponseError extends Error {
     this.status = status;
     this.message = message;
     this.clerkTraceId = clerkTraceId;
+    this.retryAfter = retryAfter;
     this.clerkError = true;
     this.errors = parseErrors(data);
   }
@@ -201,19 +208,31 @@ export class EmailLinkError extends Error {
   constructor(code: string) {
     super(code);
     this.code = code;
+    this.name = 'EmailLinkError' as const;
     Object.setPrototypeOf(this, EmailLinkError.prototype);
   }
 }
 
 export function isEmailLinkError(err: Error): err is EmailLinkError {
-  return err instanceof EmailLinkError;
+  return err.name === 'EmailLinkError';
 }
 
+/**
+ * @deprecated Please use `EmailLinkErrorCodeStatus` instead.
+ *
+ * @hidden
+ */
 export const EmailLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
   ClientMismatch: 'client_mismatch',
 };
+
+export const EmailLinkErrorCodeStatus = {
+  Expired: 'expired',
+  Failed: 'failed',
+  ClientMismatch: 'client_mismatch',
+} as const;
 
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,

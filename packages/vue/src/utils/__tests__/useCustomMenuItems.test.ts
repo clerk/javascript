@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { h } from 'vue';
 
-import { MenuAction, MenuLink } from '../../components/uiComponents';
+import { MenuAction, MenuLink } from '../../components/ui-components/UserButton';
 import { useUserButtonCustomMenuItems } from '../useCustomMenuItems';
 
 describe('useUserButtonCustomMenuItems', () => {

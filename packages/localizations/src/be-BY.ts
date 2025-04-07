@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'Па-змаўчанні',
   badge__otherImpersonatorDevice: 'Іншая прылада',
   badge__primary: 'Асноўная',
@@ -130,6 +139,7 @@ export const beBY: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить удзельніка',
         tableHeader__actions: 'Дзеянні',
@@ -281,6 +291,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Паспрабуйце іншы метад для верыфікацыі.',
       blockButton__backupCode: 'Увядзіце код з рэзервовага кода',
       blockButton__emailCode: 'Увядзіце код, адправлены на электронную пошту',
+      blockButton__passkey: undefined,
       blockButton__password: 'Увядзіце пароль',
       blockButton__phoneCode: 'Увядзіце код, адправлены на тэлефон',
       blockButton__totp: 'Выкарыстайце TOTP',
@@ -306,6 +317,11 @@ export const beBY: LocalizationResource = {
       message: 'Няма даступных метадаў для верыфікацыі.',
       subtitle: 'Калі ласка, выберыце іншы метад або звярніцеся ў службу падтрымкі.',
       title: 'Няма даступных метадаў верыфікацыі',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Вярнуцца да ўводу пароля',
@@ -464,6 +480,7 @@ export const beBY: LocalizationResource = {
       actionText: 'Няма ўліковага запісу?',
       actionText__join_waitlist: 'Далучыцеся да чакання',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Увайсці',
       titleCombined: undefined,
     },
@@ -544,7 +561,9 @@ export const beBY: LocalizationResource = {
       actionLink__use_phone: 'Увайсці з дапамогай тэлефона',
       actionText: 'Ужо ёсць акаўнт?',
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      subtitleCombined: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Стварыце Ваш акаўнт',
+      titleCombined: 'Стварыце Ваш акаўнт',
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
@@ -650,6 +669,14 @@ export const beBY: LocalizationResource = {
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скапіравана!',
       actionLabel__copy: 'Скапіраваць усё',
@@ -702,6 +729,11 @@ export const beBY: LocalizationResource = {
         resendButton: 'Адправіць спасылку паўторна',
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будзе выдалены з гэтага ўліковага запісу.',
         messageLine2: 'Вы больш не зможаце ўваходзіць, выкарыстоўваючы гэты адрас электроннай пошты.',
@@ -770,6 +802,7 @@ export const beBY: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профіль',
+      billing: undefined,
       description: 'Кіруйце інфармацыяй аб вашым уліковым запісе.',
       security: 'Бяспека',
       title: 'Уліковы запіс',
@@ -869,6 +902,7 @@ export const beBY: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Выдаліць passkey',
         menuAction__rename: 'Перайменаваць passkey',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -895,6 +929,7 @@ export const beBY: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Выдаліць кашалёк',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кашалькі',
         title: 'Web3 кашалькі',
       },

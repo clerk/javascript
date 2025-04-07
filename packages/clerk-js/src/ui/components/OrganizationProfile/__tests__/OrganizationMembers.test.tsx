@@ -514,11 +514,12 @@ describe('OrganizationMembers', () => {
       await waitForLoadingCompleted(container);
 
       const inviteButton = queryByRole('button', { name: 'Invite' });
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await userEvent.click(inviteButton!);
       await waitFor(async () =>
         expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
       );
-      expect(inviteButton).not.toBeInTheDocument();
+      expect(inviteButton).toBeInTheDocument();
       await userEvent.click(getByRole('button', { name: 'Cancel' }));
 
       await waitFor(async () => expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument());

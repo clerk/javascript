@@ -10,6 +10,7 @@ const snapshot = `---
 '@clerk/clerk-js': patch
 '@clerk/backend': patch
 '@clerk/fastify': patch
+'@clerk/agent-toolkit': patch
 '@clerk/nextjs': patch
 '@clerk/shared': patch
 '@clerk/themes': patch
@@ -39,7 +40,7 @@ try {
   // generate a temp .md file that indicates that all packages have changes
   // in order to force a snapshot release
   await $`touch .changeset/snap.md && echo ${snapshot} > .changeset/snap.md`;
-} catch (e) {
+} catch {
   // otherwise, do nothing
 }
 

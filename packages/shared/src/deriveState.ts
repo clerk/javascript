@@ -1,10 +1,10 @@
 import type {
-  ActiveSessionResource,
   InitialState,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
   Resources,
+  SignedInSessionResource,
   UserResource,
 } from '@clerk/types';
 
@@ -22,7 +22,8 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   const userId = initialState.userId;
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
-  const session = initialState.session as ActiveSessionResource;
+  const sessionStatus = initialState.sessionStatus;
+  const session = initialState.session as SignedInSessionResource;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as OrganizationCustomRoleKey;
@@ -36,6 +37,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     user,
     sessionId,
     session,
+    sessionStatus,
     organization,
     orgId,
     orgRole,
@@ -51,6 +53,7 @@ const deriveFromClientSideState = (state: Resources) => {
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
+  const sessionStatus = state.session?.status;
   const factorVerificationAge: [number, number] | null = state.session ? state.session.factorVerificationAge : null;
   const actor = session?.actor;
   const organization = state.organization;
@@ -67,6 +70,7 @@ const deriveFromClientSideState = (state: Resources) => {
     user,
     sessionId,
     session,
+    sessionStatus,
     organization,
     orgId,
     orgRole,

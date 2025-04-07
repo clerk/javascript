@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Vissza',
+  badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
   badge__primary: 'Elsődleges',
@@ -129,6 +138,7 @@ export const huHU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Meghívás',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Tag eltávolítása',
         tableHeader__actions: undefined,
@@ -277,6 +287,7 @@ export const huHU: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -300,6 +311,11 @@ export const huHU: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -460,6 +476,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Nincs fiókod?',
       actionText__join_waitlist: undefined,
       subtitle: 'Üdv újra! A folytatáshoz kérlek jelentkezz be.',
+      subtitleCombined: undefined,
       title: 'Bejelentkezés a(z) {{applicationName}} fiókba',
       titleCombined: undefined,
     },
@@ -539,7 +556,9 @@ export const huHU: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
+      subtitleCombined: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
+      titleCombined: 'Fiók létrehozása',
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
@@ -646,6 +665,14 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',
@@ -697,6 +724,11 @@ export const huHU: LocalizationResource = {
         resendButton: 'Nem kaptad meg a linket? Újraküldés',
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} el lesz távolítva ebből a fiókból.',
         messageLine2: 'Nem fogsz tudni többet bejelentkezni ezzel az email címmel.',
@@ -765,6 +797,7 @@ export const huHU: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Fiók információk kezelése',
       security: 'Biztonság',
       title: 'Fiók',
@@ -864,6 +897,7 @@ export const huHU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eltávolítás',
         menuAction__rename: 'Átnevezés',
+        primaryButton: undefined,
         title: 'Passkey-k',
       },
       passwordSection: {
@@ -890,6 +924,7 @@ export const huHU: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Tárca eltávolítása',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 tárcák',
         title: 'Web3 tárcák',
       },

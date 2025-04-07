@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Takaisin',
+  badge__currentPlan: undefined,
   badge__default: 'Oletus',
   badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
   badge__primary: 'Ensisijainen',
@@ -130,6 +139,7 @@ export const fiFI: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Kutsu',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Poista jäsen',
         tableHeader__actions: undefined,
@@ -278,6 +288,7 @@ export const fiFI: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -301,6 +312,11 @@ export const fiFI: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -461,6 +477,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Eikö sinulla ole tiliä?',
       actionText__join_waitlist: undefined,
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
       titleCombined: undefined,
     },
@@ -509,13 +526,14 @@ export const fiFI: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Hyväksyn {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
+        label__onlyTermsOfService: 'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Hyväksyn {{ termsOfServiceLink || link("käyttöehdot") }} ja {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Lue ja hyväksy ehdot jatkaaksesi',
+        title: 'Käyttöehdot ja tietosuojaseloste',
       },
     },
     phoneCode: {
@@ -540,7 +558,9 @@ export const fiFI: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
+      subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
+      titleCombined: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -644,6 +664,14 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopioitu',
       actionLabel__copy: 'Kopioi',
@@ -696,6 +724,11 @@ export const fiFI: LocalizationResource = {
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
         messageLine2:
@@ -763,6 +796,7 @@ export const fiFI: LocalizationResource = {
     mobileButton__menu: 'Valikko',
     navbar: {
       account: 'Profiili',
+      billing: undefined,
       description: 'Hallitse tilisi tietoja',
       security: 'Turvallisuus',
       title: 'Tili',
@@ -863,6 +897,7 @@ export const fiFI: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Poista',
         menuAction__rename: 'Nimeä uudelleen',
+        primaryButton: undefined,
         title: 'Pääsyavaimet',
       },
       passwordSection: {
@@ -889,6 +924,7 @@ export const fiFI: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Poista lompakko',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
       },

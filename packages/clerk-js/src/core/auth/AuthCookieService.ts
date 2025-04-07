@@ -1,8 +1,10 @@
+import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
-import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
+import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
@@ -36,6 +38,7 @@ export class AuthCookieService {
   private poller: SessionCookiePoller | null = null;
   private clientUat: ClientUatCookieHandler;
   private sessionCookie: SessionCookieHandler;
+  private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
 
   public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
@@ -62,6 +65,7 @@ export class AuthCookieService {
 
     this.clientUat = createClientUatCookie(cookieSuffix);
     this.sessionCookie = createSessionCookie(cookieSuffix);
+    this.activeOrgCookie = createCookieHandler('clerk_active_org');
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
@@ -106,11 +110,18 @@ export class AuthCookieService {
     this.devBrowser.clear();
   }
 
-  private startPollingForToken() {
+  public startPollingForToken() {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
+      this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+  }
+
+  public stopPollingForToken() {
+    if (this.poller) {
+      this.poller.stopPollingForSessionToken();
+      this.poller = null;
+    }
   }
 
   private refreshTokenOnFocus() {
@@ -121,6 +132,7 @@ export class AuthCookieService {
         // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
+        // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
         void this.refreshSessionToken({ updateCookieImmediately: true });
       }
     });
@@ -169,47 +181,50 @@ export class AuthCookieService {
   }
 
   private handleGetTokenError(e: any) {
-    //throw if not a clerk error
-    if (!isClerkAPIResponseError(e)) {
-      clerkCoreErrorTokenRefreshFailed(e.message || e);
+    //early return if not a clerk api error (aka fapi error) and not a network error
+    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e) && !isNetworkError(e)) {
+      return;
     }
 
     //sign user out if a 4XX error
     if (is4xxError(e)) {
-      void this.clerk.handleUnauthenticated();
+      void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
 
-    if (isNetworkError(e)) {
-      return;
-    }
-
-    clerkCoreErrorTokenRefreshFailed(e.toString());
+    // --------
+    // Treat any other error as a noop
+    // TODO(debug-logs): Once debug logs is available log this error.
+    // --------
   }
 
   /**
    * The below methods are used to determine whether or not an unfocused tab can be responsible
    * for setting the session cookie. A session cookie should only be set by a tab who's selected
    * organization matches the session's active organization. By storing the active organization
-   * ID in local storage, we can check the value across tabs. If a tab's organization ID does not
-   * match the value in local storage, it is not responsible for updating the session cookie.
+   * ID in a cookie, we can check the value across tabs. If a tab's organization ID does not
+   * match the value in the active org cookie, it is not responsible for updating the session cookie.
    */
 
   public setActiveOrganizationInStorage() {
     if (this.clerk.organization?.id) {
-      localStorage.setItem('clerk_active_org', this.clerk.organization.id);
+      this.activeOrgCookie.set(this.clerk.organization.id);
     } else {
-      localStorage.removeItem('clerk_active_org');
+      this.activeOrgCookie.remove();
     }
   }
 
   private isCurrentOrganizationActive() {
-    const activeOrganizationId = localStorage.getItem('clerk_active_org');
+    const activeOrganizationId = this.activeOrgCookie.get();
 
     if (!activeOrganizationId && !this.clerk.organization?.id) {
       return true;
     }
 
     return this.clerk.organization?.id === activeOrganizationId;
+  }
+
+  public getSessionCookie() {
+    return this.sessionCookie.get();
   }
 }

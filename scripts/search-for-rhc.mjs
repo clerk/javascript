@@ -7,17 +7,32 @@
 
 import { $, argv } from 'zx';
 
-async function run() {
-  const buildFolder = argv._[0];
-  console.log(`🔍 Inspecting folder: ${buildFolder}`);
-  const flags = ['--recursive', '--quiet', '--include=*.js', '--include=*.mjs'];
+const targetType = argv._[0]; // file | directory
+const target = argv._[1]; // Target of the resource
 
-  // Leveraging https://google.github.io/zx/process-promise#nothrow to avoid throwing an error if the command fails
-  if ((await $`grep ${flags} 'https://\${scriptHost}/npm/@clerk/clerk-js' ${buildFolder}`.exitCode) === 0) {
-    throw new Error('Found RHC in build output');
-  } else {
-    console.log('✅ No RHC found in build output');
+async function asyncSearchRHC(name, search) {
+  const cmd = () =>
+    targetType === 'directory'
+      ? $`grep -rFq --include=\\*.js --include=\\*.mjs "${search}" ${target}`
+      : $`grep -Fq "${search}" ${target}`;
+
+  if ((await cmd().exitCode) === 0) {
+    throw new Error(`Found ${name} related RHC in build output. (Search: \`${search}\`)`);
   }
+
+  return;
 }
 
-run();
+await Promise.allSettled([
+  asyncSearchRHC('Turnstile', 'cloudflare.com/turnstile/v0/api.js'),
+  asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
+  asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
+]).then(results => {
+  const errors = results.filter(result => result.status === 'rejected').map(result => result.reason.message);
+
+  if (errors.length > 0) {
+    throw new Error(`\n${errors.join('\n')}`);
+  }
+
+  console.log('✅ No RHC found in build output');
+});

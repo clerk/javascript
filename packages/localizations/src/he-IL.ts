@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'חזור',
+  badge__currentPlan: undefined,
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
   badge__primary: 'ראשי',
@@ -128,6 +137,7 @@ export const heIL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'הזמן',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'הסר חבר',
         tableHeader__actions: undefined,
@@ -272,6 +282,7 @@ export const heIL: LocalizationResource = {
       actionText: 'אין לך אף אחד מאלה?',
       blockButton__backupCode: 'השתמש בקוד גיבוי',
       blockButton__emailCode: 'קוד אימייל ל {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'המשך עם הסיסמה שלך',
       blockButton__phoneCode: 'שלח קוד SMS ל {{identifier}}',
       blockButton__totp: 'השתמש באפליקציית האימות שלך',
@@ -297,6 +308,11 @@ export const heIL: LocalizationResource = {
       message: 'לא ניתן להמשיך עם האימות. אין גורם אימות זמין',
       subtitle: 'קרתה תקלה',
       title: 'לא ניתן לאמת את חשבונך',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'השתמש בשיטה אחרת',
@@ -453,6 +469,7 @@ export const heIL: LocalizationResource = {
       actionText: 'אין לך חשבון?',
       actionText__join_waitlist: undefined,
       subtitle: 'להמשיך אל {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'התחבר',
       titleCombined: undefined,
     },
@@ -532,7 +549,9 @@ export const heIL: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
+      subtitleCombined: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
+      titleCombined: 'צור את החשבון שלך',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -635,6 +654,14 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -684,6 +711,11 @@ export const heIL: LocalizationResource = {
         resendButton: 'שלח קישור מחדש',
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות כתובת אימייל זו.',
@@ -745,6 +777,7 @@ export const heIL: LocalizationResource = {
     mobileButton__menu: 'תפריט',
     navbar: {
       account: 'פרופיל',
+      billing: undefined,
       description: 'נהל את פרטי החשבון שלך.',
       security: 'אבטחה',
       title: 'חשבון',
@@ -841,6 +874,7 @@ export const heIL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'הגדר סיסמה',
         menuAction__rename: 'עדכן סיסמה',
+        primaryButton: undefined,
         title: 'סיסמה',
       },
       passwordSection: {
@@ -867,6 +901,7 @@ export const heIL: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'הסר ארנק',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
       },

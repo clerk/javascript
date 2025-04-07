@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Retour',
+  badge__currentPlan: undefined,
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
@@ -131,6 +140,7 @@ export const frFR: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Inviter',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Supprimer',
         tableHeader__actions: 'Actions',
@@ -280,6 +290,7 @@ export const frFR: LocalizationResource = {
       actionText: 'Vous ne pouvez pas accéder à votre compte ?',
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Recevoir un code par e-mail',
+      blockButton__passkey: undefined,
       blockButton__password: 'Utiliser le mot de passe',
       blockButton__phoneCode: 'Recevoir un code par téléphone',
       blockButton__totp: 'Utiliser un code d’application d’authentification',
@@ -306,6 +317,11 @@ export const frFR: LocalizationResource = {
       message: "Aucune méthode de vérification n'est disponible.",
       subtitle: 'Impossible de procéder à la vérification.',
       title: 'Aucune méthode disponible',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Réinitialiser le mot de passe',
@@ -464,6 +480,7 @@ export const frFR: LocalizationResource = {
       actionText: "Vous n'avez pas encore de compte ?",
       actionText__join_waitlist: "Inscrivez-vous sur la liste d'attente",
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: undefined,
       title: "S'identifier",
       titleCombined: undefined,
     },
@@ -514,8 +531,7 @@ export const frFR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "J'accepte la Politique de confidentialité.",
         label__onlyTermsOfService: "J'accepte les Conditions d'utilisation.",
-        label__termsOfServiceAndPrivacyPolicy:
-          "J'accepte les Conditions d'utilisation et la Politique de confidentialité.",
+        label__termsOfServiceAndPrivacyPolicy: `J'accepte les {{ termsOfServiceLink || link("Conditions d'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.`,
       },
       continue: {
         subtitle: 'Lisez et acceptez les conditions pour continuer.',
@@ -544,7 +560,9 @@ export const frFR: LocalizationResource = {
       actionLink__use_phone: 'Utiliser votre téléphone',
       actionText: 'Vous avez déjà un compte ?',
       subtitle: 'pour continuer vers {{applicationName}}',
+      subtitleCombined: 'pour continuer vers {{applicationName}}',
       title: 'Créez votre compte',
+      titleCombined: 'Créez votre compte',
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
@@ -650,6 +668,14 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -702,6 +728,11 @@ export const frFR: LocalizationResource = {
         resendButton: 'Renvoyer le lien',
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec cette adresse e-mail.',
@@ -769,6 +800,7 @@ export const frFR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Compte',
+      billing: undefined,
       description: 'Gérer votre compte.',
       security: 'Sécurité',
       title: 'Profil',
@@ -869,6 +901,7 @@ export const frFR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Supprimer',
         menuAction__rename: 'Renommer',
+        primaryButton: undefined,
         title: 'Clés de sécurité',
       },
       passwordSection: {
@@ -895,6 +928,7 @@ export const frFR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Supprimer le portefeuille',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
       },

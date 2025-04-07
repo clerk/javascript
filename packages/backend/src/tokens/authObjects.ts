@@ -7,6 +7,7 @@ import type {
   OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
+  SessionStatusClaim,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
@@ -26,9 +27,10 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-export type SignedInAuthObject = {
+type SignedInAuthObjectProperties = {
   sessionClaims: JwtPayload;
   sessionId: string;
+  sessionStatus: SessionStatusClaim | null;
   actor: ActClaim | undefined;
   userId: string;
   orgId: string | undefined;
@@ -41,6 +43,12 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    */
   factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+};
+
+/**
+ * @internal
+ */
+export type SignedInAuthObject = SignedInAuthObjectProperties & {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -52,6 +60,7 @@ export type SignedInAuthObject = {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
+  sessionStatus: null;
   actor: null;
   userId: null;
   orgId: null;
@@ -83,6 +92,31 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
   };
 };
 
+const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthObjectProperties => {
+  // fva can be undefined for instances that have not opt-in
+  const factorVerificationAge = claims.fva ?? null;
+
+  // sts can be undefined for instances that have not opt-in
+  const sessionStatus = claims.sts ?? null;
+
+  // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
+  // anything since the JWT v2 is not yet available
+  const orgPermissions = claims.org_permissions;
+
+  return {
+    sessionClaims: claims,
+    sessionId: claims.sid,
+    sessionStatus,
+    actor: claims.act,
+    userId: claims.sub,
+    orgId: claims.org_id,
+    orgRole: claims.org_role,
+    orgSlug: claims.org_slug,
+    orgPermissions,
+    factorVerificationAge,
+  };
+};
+
 /**
  * @internal
  */
@@ -91,16 +125,8 @@ export function signedInAuthObject(
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
-  const {
-    act: actor,
-    sid: sessionId,
-    org_id: orgId,
-    org_role: orgRole,
-    org_slug: orgSlug,
-    org_permissions: orgPermissions,
-    sub: userId,
-    fva,
-  } = sessionClaims;
+  const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
+    generateSignedInAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
@@ -108,13 +134,11 @@ export function signedInAuthObject(
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
 
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = fva ?? null;
-
   return {
     actor,
     sessionClaims,
     sessionId,
+    sessionStatus,
     userId,
     orgId,
     orgRole,
@@ -134,6 +158,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   return {
     sessionClaims: null,
     sessionId: null,
+    sessionStatus: null,
     userId: null,
     actor: null,
     orgId: null,

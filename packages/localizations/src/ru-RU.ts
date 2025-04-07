@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__primary: 'Основной',
@@ -133,6 +142,7 @@ export const ruRU: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Пригласить',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Удалить участника',
         tableHeader__actions: 'Действия',
@@ -284,6 +294,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'У вас нет ничего из этого?',
       blockButton__backupCode: 'Использовать резервный код',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Продолжить с вашим паролем',
       blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
       blockButton__totp: 'Использовать приложение аутентификации',
@@ -310,6 +321,11 @@ export const ruRU: LocalizationResource = {
       message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',
       subtitle: 'Произошла ошибка',
       title: 'Невозможно подтвердить учетную запись',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Используйте другой метод',
@@ -469,6 +485,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'Нет учетной записи?',
       actionText__join_waitlist: undefined,
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: undefined,
       title: 'Войти',
       titleCombined: undefined,
     },
@@ -551,7 +568,9 @@ export const ruRU: LocalizationResource = {
       actionLink__use_phone: 'Использовать телефон вместо этого',
       actionText: 'Уже есть учетная запись?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
+      subtitleCombined: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
+      titleCombined: 'Создайте Вашу учетную запись',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -658,6 +677,14 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -710,6 +737,11 @@ export const ruRU: LocalizationResource = {
         resendButton: 'Отправить ссылку повторно',
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти с использованием этого адреса электронной почты.',
@@ -778,6 +810,7 @@ export const ruRU: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профиль',
+      billing: undefined,
       description: 'Управление информацией вашей учетной записи.',
       security: 'Безопасность',
       title: 'Учетная запись',
@@ -878,6 +911,7 @@ export const ruRU: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Удалить',
         menuAction__rename: 'Переименовать',
+        primaryButton: undefined,
         title: 'Ключи доступа',
       },
       passwordSection: {
@@ -904,6 +938,7 @@ export const ruRU: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Удалить кошелек',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
       },

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Terug',
+  badge__currentPlan: undefined,
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
   badge__primary: 'Primair',
@@ -40,9 +49,9 @@ export const nlNL: LocalizationResource = {
   },
   dividerText: 'of',
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
-  footerPageLink__help: 'Helppagina: ',
-  footerPageLink__privacy: 'Privacybeleid: ',
-  footerPageLink__terms: 'Algemene voorwaarden: ',
+  footerPageLink__help: 'Helppagina',
+  footerPageLink__privacy: 'Privacybeleid',
+  footerPageLink__terms: 'Algemene voorwaarden',
   formButtonPrimary: 'Doorgaan',
   formButtonPrimary__verify: 'Verifieer',
   formFieldAction__forgotPassword: 'Wachtwoord vergeten?',
@@ -65,7 +74,7 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
-  formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor deze domein',
+  formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
   formFieldLabel__confirmPassword: 'Wachtwoord bevestigen',
@@ -80,7 +89,7 @@ export const nlNL: LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: 'Verwijder uitnodigingen en suggesties',
   formFieldLabel__organizationDomainEmailAddress: 'Verificatie-e-mailadres',
   formFieldLabel__organizationDomainEmailAddressDescription:
-    'Voer een e-mailadres onder deze domein in om een code te ontvangen en deze domein te verifiëren.',
+    'Voer een e-mailadres onder dit domein in om een code te ontvangen en dit domein te verifiëren.',
   formFieldLabel__organizationName: 'Organisatienaam',
   formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__passkeyName: 'Naam',
@@ -109,8 +118,8 @@ export const nlNL: LocalizationResource = {
     titleWithoutPersonal: 'Kies een organisatie',
   },
   organizationProfile: {
-    badge__automaticInvitation: 'Automatic invitations',
-    badge__automaticSuggestion: 'Automatic suggestions',
+    badge__automaticInvitation: 'Automatische Uitnodiging',
+    badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
     createDomainPage: {
@@ -129,6 +138,7 @@ export const nlNL: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Uitnodigen',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Verwijder lid',
         tableHeader__actions: 'Acties',
@@ -278,6 +288,7 @@ export const nlNL: LocalizationResource = {
       actionText: 'Heb je geen van deze?',
       blockButton__backupCode: 'Backupcode gebruiken',
       blockButton__emailCode: 'Email code naar {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Doorgaan met je wachtwoord',
       blockButton__phoneCode: 'Verzend SMS code naar {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -304,6 +315,11 @@ export const nlNL: LocalizationResource = {
       message: 'Kan niet verder gaan met verificatie. Er is geen beschikbare verificatiefactor.',
       subtitle: 'Er is een fout opgetreden',
       title: 'Kan je account niet verifiëren',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gebruik een andere methode',
@@ -346,8 +362,8 @@ export const nlNL: LocalizationResource = {
       blockButton__phoneCode: 'Verzend code naar {{identifier}}',
       blockButton__totp: 'Gebruik je authenticator app',
       getHelp: {
-        blockButton__emailSupport: 'E-mail klantenservice',
-        content: 'Als je geen toegang hebt neem dan contact op met de klantenservice en we helpen je verder.',
+        blockButton__emailSupport: 'E-mail {{applicationName}}',
+        content: 'Als je geen toegang hebt neem dan contact op met {{applicationName}} en we helpen je verder.',
         title: 'Help',
       },
       subtitle: 'Problemen? Je kan een van deze methoden gebruiken om in te loggen.',
@@ -408,7 +424,7 @@ export const nlNL: LocalizationResource = {
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Wachtwoord resetten',
-      label__alternativeMethods: 'Of, inloggen met een andere methode',
+      label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
     noAvailableMethods: {
@@ -458,8 +474,9 @@ export const nlNL: LocalizationResource = {
       actionLink__use_phone: 'Gebruik telefoon',
       actionLink__use_username: 'Gebruik gebruikersnaam',
       actionText: 'Geen account?',
-      actionText__join_waitlist: 'Nog geen account? Meld je aan voor de wachtlijst.',
+      actionText__join_waitlist: 'Nog geen account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Inloggen',
       titleCombined: undefined,
     },
@@ -539,7 +556,9 @@ export const nlNL: LocalizationResource = {
       actionLink__use_phone: 'Gebruik telefoon',
       actionText: 'Heb je al een account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
+      subtitleCombined: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
+      titleCombined: 'Maak je account aan',
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -643,6 +662,14 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -695,6 +722,11 @@ export const nlNL: LocalizationResource = {
         resendButton: 'Verstuur link opnieuw',
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} zal verwijderd worden uit dit account.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit e-mailadres.',
@@ -760,6 +792,7 @@ export const nlNL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
+      billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',
       title: 'Account',
@@ -858,6 +891,7 @@ export const nlNL: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Verwijderen',
         menuAction__rename: 'Hernoemen',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -884,6 +918,7 @@ export const nlNL: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Verwijder portefeuille',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
       },
@@ -909,10 +944,10 @@ export const nlNL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: 'Neem deel aan de wachtlijst',
-      actionText: 'Nog geen account? Maak er een aan en voeg je bij de wachtlijst.',
+      actionLink: 'Inloggen',
+      actionText: 'Heb je al toegang?',
       formButton: 'Verstuur',
-      subtitle: 'Je wordt toegevoegd aan de wachtlijst en wordt op de hoogte gehouden.',
+      subtitle: 'Je wordt toegevoegd aan de wachtlijst en op de hoogte gehouden.',
       title: 'Wachtlijst aanmelding',
     },
     success: {

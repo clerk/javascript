@@ -134,7 +134,7 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
-  button: WithOptions;
+  button: WithOptions<string>;
   input: WithOptions;
   checkbox: WithOptions;
   radio: WithOptions;
@@ -145,6 +145,23 @@ export type ElementsConfig = {
   card: WithOptions;
   actionCard: WithOptions;
   popoverBox: WithOptions;
+
+  disclosureRoot: WithOptions;
+  disclosureTrigger: WithOptions;
+  disclosureContentRoot: WithOptions;
+  disclosureContentInner: WithOptions;
+  disclosureContent: WithOptions;
+
+  lineItemsRoot: WithOptions;
+  lineItemsDivider: WithOptions;
+  lineItemsGroup: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitle: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsTitleDescription: WithOptions;
+  lineItemsDescription: WithOptions<'primary' | 'secondary' | 'tertiary'>;
+  lineItemsDescriptionInner: WithOptions;
+  lineItemsDescriptionText: WithOptions;
+  lineItemsDescriptionSuffix: WithOptions;
+  lineItemsDescriptionPrefix: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -184,6 +201,15 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
 
+  checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormElementsRoot: WithOptions;
+
+  checkoutSuccessRoot: WithOptions;
+  checkoutSuccessRing: WithOptions;
+  checkoutSuccessBadge: WithOptions;
+  checkoutSuccessTitle: WithOptions;
+  checkoutSuccessDescription: WithOptions;
+
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
   otpCodeFieldInput: WithOptions;
@@ -192,6 +218,19 @@ export type ElementsConfig = {
   dividerRow: WithOptions;
   dividerText: WithOptions;
   dividerLine: WithOptions;
+
+  drawerBackdrop: WithOptions;
+  drawerContent: WithOptions;
+  drawerHeader: WithOptions;
+  drawerTitle: WithOptions;
+  drawerBody: WithOptions;
+  drawerFooter: WithOptions;
+  drawerClose: WithOptions;
+  drawerConfirmationBackdrop: WithOptions;
+  drawerConfirmationRoot: WithOptions;
+  drawerConfirmationTitle: WithOptions;
+  drawerConfirmationDescription: WithOptions;
+  drawerConfirmationActions: WithOptions;
 
   formHeader: WithOptions<never, ErrorState>;
   formHeaderTitle: WithOptions<never, ErrorState>;
@@ -235,6 +274,9 @@ export type ElementsConfig = {
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
 
+  segmentedControlRoot: WithOptions;
+  segmentedControlButton: WithOptions;
+
   avatarBox: WithOptions;
   avatarImage: WithOptions;
   avatarImageActions: WithOptions;
@@ -277,6 +319,9 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverFooter: WithOptions;
 
+  organizationProfileMembersSearchInputIcon: WithOptions;
+  organizationProfileMembersSearchInput: WithOptions;
+
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
   organizationListPreviewButton: WithOptions;
@@ -317,6 +362,72 @@ export type ElementsConfig = {
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
+  pricingTable: WithOptions;
+  pricingTableCard: WithOptions<string>;
+  pricingTableCardHeader: WithOptions;
+  pricingTableCardAvatarBadgeContainer: WithOptions;
+  pricingTableCardAvatar: WithOptions;
+  pricingTableCardBadgeContainer: WithOptions;
+  pricingTableCardBadge: WithOptions;
+  pricingTableCardTitle: WithOptions;
+  pricingTableCardDescription: WithOptions;
+  pricingTableCardFeatures: WithOptions;
+  pricingTableCardFeaturesList: WithOptions<string>;
+  pricingTableCardFeaturesListItem: WithOptions<string>;
+  pricingTableCardFeaturesListItemContent: WithOptions;
+  pricingTableCardFeaturesListItemTitle: WithOptions;
+  pricingTableCardFeaturesListItemDescription: WithOptions;
+  pricingTableCardAction: WithOptions;
+  pricingTableCardPeriodToggle: WithOptions;
+  pricingTableCardFeeContainer: WithOptions;
+  pricingTableCardFee: WithOptions;
+  pricingTableCardFeePeriod: WithOptions;
+  pricingTableCardFeePeriodNotice: WithOptions;
+  pricingTableCardFeePeriodNoticeInner: WithOptions;
+  pricingTableCardFeePeriodNoticeLabel: WithOptions;
+
+  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrixTable: WithOptions;
+  pricingTableMatrixRowGroup: WithOptions;
+  pricingTableMatrixRowGroupHeader: WithOptions;
+  pricingTableMatrixRowGroupBody: WithOptions;
+  pricingTableMatrixRow: WithOptions;
+  pricingTableMatrixRowHeader: WithOptions;
+  pricingTableMatrixRowBody: WithOptions;
+  pricingTableMatrixColumnHeader: WithOptions;
+  pricingTableMatrixCell: WithOptions;
+  pricingTableMatrixCellFooter: WithOptions;
+  pricingTableMatrixAvatar: WithOptions;
+  pricingTableMatrixBadge: WithOptions;
+  pricingTableMatrixPlanName: WithOptions;
+  pricingTableMatrixFee: WithOptions;
+  pricingTableMatrixFeePeriod: WithOptions;
+  pricingTableMatrixFeePeriodNotice: WithOptions;
+  pricingTableMatrixFeePeriodNoticeInner: WithOptions;
+  pricingTableMatrixFeePeriodNoticeLabel: WithOptions;
+  pricingTableMatrixFooter: WithOptions;
+
+  subscriptionDetailHeader: WithOptions;
+  subscriptionDetailAvatarBadgeContainer: WithOptions;
+  subscriptionDetailAvatar: WithOptions;
+  subscriptionDetailBadgeContainer: WithOptions;
+  subscriptionDetailBadge: WithOptions;
+  subscriptionDetailTitle: WithOptions;
+  subscriptionDetailDescription: WithOptions;
+  subscriptionDetailAction: WithOptions;
+  subscriptionDetailFeeContainer: WithOptions;
+  subscriptionDetailFee: WithOptions;
+  subscriptionDetailFeePeriod: WithOptions;
+  subscriptionDetailFeePeriodNotice: WithOptions;
+  subscriptionDetailFeePeriodNoticeInner: WithOptions;
+  subscriptionDetailFeePeriodNoticeLabel: WithOptions;
+  subscriptionDetailFeatures: WithOptions;
+  subscriptionDetailFeaturesList: WithOptions<string>;
+  subscriptionDetailFeaturesListItem: WithOptions<string>;
+  subscriptionDetailFeaturesListItemContent: WithOptions;
+  subscriptionDetailFeaturesListItemTitle: WithOptions;
+  subscriptionDetailFeaturesListItemDescription: WithOptions;
+
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
   alertText: WithOptions<AlertId>;
@@ -343,6 +454,7 @@ export type ElementsConfig = {
   selectOption: WithOptions<SelectId>;
 
   menuButton: WithOptions<MenuId>;
+  menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
@@ -499,7 +611,7 @@ export type Variables = {
   /**
    * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
    * for normal, medium, semibold and bold text respectively.
-   * You can override the default weights by passing a {@FontWeightScale} object
+   * You can override the default weights by passing a {@link FontWeightScale} object
    * @default { normal: 400, medium: 500, semibold: 600, bold: 700 };
    */
   fontWeight?: FontWeightScale;
@@ -547,6 +659,12 @@ export type Theme = {
    * Eg: `formButtonPrimary__loading: { backgroundColor: 'gray' }`
    */
   elements?: Elements;
+  /**
+   * The appearance of the CAPTCHA widget.
+   * This will be used to style the CAPTCHA widget.
+   * Eg: `theme: 'dark'`
+   */
+  captcha?: CaptchaAppearanceOptions;
 };
 
 export type Layout = {
@@ -628,6 +746,24 @@ export type Layout = {
   unsafe_disableDevelopmentModeWarnings?: boolean;
 };
 
+export type CaptchaAppearanceOptions = {
+  /**
+   * The widget theme. Can take the following values: light, dark, auto.
+   * @default 'auto'
+   */
+  theme?: 'auto' | 'light' | 'dark';
+  /**
+   * The widget size. Can take the following values: normal, flexible, compact.
+   * @default 'normal'
+   */
+  size?: 'normal' | 'flexible' | 'compact';
+  /**
+   * Language to display, must be either: auto (default) to use the language that the visitor has chosen, or an ISO 639-1 two-letter language code (e.g. en) or language and country code (e.g. en-US).
+   * Refer to the list of supported languages for more information: https://developers.cloudflare.com/turnstile/reference/supported-languages
+   */
+  language?: string;
+};
+
 export type SignInTheme = Theme;
 export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
@@ -638,6 +774,8 @@ export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
+export type PricingTableTheme = Theme;
+export type CheckoutTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
@@ -684,4 +822,12 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<Waitlist />` component
    */
   waitlist?: T;
+  /**
+   * Theme overrides that only apply to the `<PricingTable />` component
+   */
+  pricingTable?: T;
+  /**
+   * Theme overrides that only apply to the `<Checkout />` component
+   */
+  checkout?: T;
 };

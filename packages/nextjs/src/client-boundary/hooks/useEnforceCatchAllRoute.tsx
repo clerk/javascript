@@ -77,7 +77,7 @@ To resolve this, ensure that the middleware does not protect the catch-all route
             window.location.pathname
           }/${component}_clerk_catchall_check_${Date.now()}`;
           res = await fetch(url, { signal: ac.signal });
-        } catch (e) {
+        } catch {
           // no op
         }
         if (res?.status === 404) {

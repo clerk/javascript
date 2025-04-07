@@ -6,7 +6,10 @@ import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
+import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
+import { createOrganizationsService } from './organizationsService';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
+import { createSessionTaskComponentPageObject } from './sessionTaskPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
@@ -35,14 +38,23 @@ const createExpectPageObject = ({ page }: TestArgs) => {
       expect(redirect.status()).toBe(307);
       expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
     },
-    toBeSignedOut: () => {
-      return page.waitForFunction(() => {
-        return !window.Clerk?.user;
-      });
+    toBeSignedOut: (args?: { timeOut: number }) => {
+      return page.waitForFunction(
+        () => {
+          return !window.Clerk?.user;
+        },
+        null,
+        { timeout: args?.timeOut },
+      );
     },
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
         return !!window.Clerk?.user;
+      });
+    },
+    toHaveResolvedTask: async () => {
+      return page.waitForFunction(() => {
+        return !window.Clerk?.session?.currentTask;
       });
     },
   };
@@ -50,6 +62,11 @@ const createExpectPageObject = ({ page }: TestArgs) => {
 
 const createClerkUtils = ({ page }: TestArgs) => {
   return {
+    toBeLoaded: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.loaded;
+      });
+    },
     getClientSideUser: () => {
       return page.evaluate(() => {
         return window.Clerk?.user;
@@ -77,6 +94,7 @@ export const createTestUtils = <
     email: createEmailService(),
     users: createUserService(clerkClient),
     invitations: createInvitationService(clerkClient),
+    organizations: createOrganizationsService(clerkClient),
     clerk: clerkClient,
   };
 
@@ -88,6 +106,7 @@ export const createTestUtils = <
   const testArgs = { page, context, browser };
 
   const pageObjects = {
+    keylessPopover: createKeylessPopoverPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),
@@ -95,6 +114,7 @@ export const createTestUtils = <
     userButton: createUserButtonPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
+    sessionTask: createSessionTaskComponentPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     clerk: createClerkUtils(testArgs),
   };

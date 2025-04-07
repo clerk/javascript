@@ -1,5 +1,4 @@
 import { waitFor } from '@testing-library/dom';
-import React from 'react';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -68,8 +67,8 @@ describe('SignUpVerifyEmail', () => {
       screen.getByRole('button', {
         name: /edit/i,
       }),
-    ),
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    );
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
   });
 
   it('Resend link button exists', async () => {

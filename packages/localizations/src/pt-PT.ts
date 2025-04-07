@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Voltar',
+  badge__currentPlan: undefined,
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__primary: 'Principal',
@@ -128,6 +137,7 @@ export const ptPT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convidar',
+      action__search: 'Pesquisar',
       activeMembersTab: {
         menuAction__remove: 'Remover membro',
         tableHeader__actions: 'Ações',
@@ -276,6 +286,7 @@ export const ptPT: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const ptPT: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -458,6 +474,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Não possui uma conta?',
       actionText__join_waitlist: 'Ainda não tem uma conta? Junte-se à lista de espera.',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
       titleCombined: undefined,
     },
@@ -537,7 +554,9 @@ export const ptPT: LocalizationResource = {
       actionLink__use_phone: 'Usar telemóvel',
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
+      subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
+      titleCombined: 'Criar a sua conta',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -643,6 +662,14 @@ export const ptPT: LocalizationResource = {
     action__signOutAll: 'Terminar sessão de todas as contas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -694,6 +721,11 @@ export const ptPT: LocalizationResource = {
         resendButton: 'Não recebeu um código? Reenviar',
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
+      enterpriseSSOLink: {
+        formButton: 'Clique para autenticar',
+        formSubtitle: 'Complete a autenticação com {{identifier}}',
+      },
+      formHint: 'Você precisará verificar este endereço de email antes de poder adicioná-lo à sua conta.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este endereço de e-mail.',
@@ -761,6 +793,7 @@ export const ptPT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -859,6 +892,7 @@ export const ptPT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remover chave de acesso',
         menuAction__rename: 'Renomear chave de acesso',
+        primaryButton: undefined,
         title: 'Chaves de Acesso',
       },
       passwordSection: {
@@ -885,6 +919,7 @@ export const ptPT: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remover carteira',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
       },

@@ -6,6 +6,12 @@ import { SamlAccount } from './SamlAccount';
 import { Web3Wallet } from './Web3Wallet';
 
 export class User {
+  private _raw: UserJSON | null = null;
+
+  public get raw(): UserJSON | null {
+    return this._raw;
+  }
+
   constructor(
     readonly id: string,
     readonly passwordEnabled: boolean,
@@ -42,7 +48,7 @@ export class User {
   ) {}
 
   static fromJSON(data: UserJSON): User {
-    return new User(
+    const res = new User(
       data.id,
       data.password_enabled,
       data.totp_enabled,
@@ -76,6 +82,8 @@ export class User {
       data.delete_self_enabled,
       data.legal_accepted_at,
     );
+    res._raw = data;
+    return res;
   }
 
   get primaryEmailAddress() {

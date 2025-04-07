@@ -1,6 +1,6 @@
 import type { TelemetryEventRaw } from '@clerk/types';
 
-const EVENT_METHOD_CALLED = 'METHOD_CALLED' as const;
+const EVENT_METHOD_CALLED = 'METHOD_CALLED';
 
 type EventMethodCalled = {
   method: string;

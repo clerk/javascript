@@ -1,3 +1,4 @@
+import type { __experimental_CommerceSubscriptionResource, __experimental_GetSubscriptionsParams } from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -48,6 +49,9 @@ export interface OrganizationResource extends ClerkResource {
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>>;
+  __experimental_getSubscriptions: (
+    params?: __experimental_GetSubscriptionsParams,
+  ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;
@@ -64,6 +68,7 @@ export type GetRolesParams = ClerkPaginationParams;
 
 export type GetMembersParams = ClerkPaginationParams<{
   role?: OrganizationCustomRoleKey[];
+  query?: string;
 }>;
 
 export type GetDomainsParams = ClerkPaginationParams<{

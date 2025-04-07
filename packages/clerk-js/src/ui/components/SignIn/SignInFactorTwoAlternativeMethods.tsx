@@ -100,6 +100,6 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
     case 'backup_code':
       return localizationKeys('signIn.alternativeMethods.blockButton__backupCode');
     default:
-      throw `Invalid sign in strategy: "${factor.strategy}"`;
+      throw new Error(`Invalid sign in strategy: "${factor.strategy}"`);
   }
 }

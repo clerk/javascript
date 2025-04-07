@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Indietro',
+  badge__currentPlan: undefined,
   badge__default: 'Predefinito',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
   badge__primary: 'Primario',
@@ -130,6 +139,7 @@ export const itIT: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invita',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Rimuovi membro',
         tableHeader__actions: 'Azioni',
@@ -278,6 +288,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Usa un metodo di verifica alternativo',
       blockButton__backupCode: 'Verifica con il codice di backup',
       blockButton__emailCode: 'Verifica con il codice via email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Verifica con la password',
       blockButton__phoneCode: 'Verifica con il codice SMS',
       blockButton__totp: 'Verifica con il TOTP',
@@ -303,6 +314,11 @@ export const itIT: LocalizationResource = {
       message: 'Non sono disponibili metodi di verifica.',
       subtitle: 'Contatta il supporto per assistenza.',
       title: 'Nessun metodo disponibile',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Reimposta la password',
@@ -460,6 +476,7 @@ export const itIT: LocalizationResource = {
       actionText: 'Non hai un account?',
       actionText__join_waitlist: "Unisciti alla lista d'attesa",
       subtitle: 'per continuare su {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Accedi',
       titleCombined: undefined,
     },
@@ -540,7 +557,9 @@ export const itIT: LocalizationResource = {
       actionLink__use_phone: 'Usa telefono',
       actionText: 'Hai già un account?',
       subtitle: 'per continuare su {{applicationName}}',
+      subtitleCombined: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
+      titleCombined: 'Crea il tuo account',
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
@@ -645,6 +664,14 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -697,6 +724,11 @@ export const itIT: LocalizationResource = {
         resendButton: 'Rinvia link',
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} sarà rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo indirizzo email.',
@@ -764,6 +796,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profilo',
+      billing: undefined,
       description: 'Gestisci il tuo account.',
       security: 'Sicurezza',
       title: 'Account',
@@ -864,6 +897,7 @@ export const itIT: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Rimuovi chiave di accesso',
         menuAction__rename: 'Rinomina chiave di accesso',
+        primaryButton: undefined,
         title: 'Gestisci le tue chiavi di accesso',
       },
       passwordSection: {
@@ -890,6 +924,7 @@ export const itIT: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Rimuovi wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },

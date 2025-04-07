@@ -135,7 +135,7 @@ function hasSupportedLockfile() {
 async function importPackageLock() {
   return new Promise((resolve, reject) => {
     if (!hasSupportedLockfile()) {
-      resolve();
+      return resolve();
     }
     console.log('Supported non-pnpm lockfile detected, importing with `pnpm import`...');
 
@@ -148,7 +148,7 @@ async function importPackageLock() {
 
     child.on('close', code => {
       if (code !== 0) {
-        reject();
+        reject(new Error());
         return;
       }
       resolve();
@@ -183,7 +183,7 @@ async function linkDependencies() {
 
     child.on('close', code => {
       if (code !== 0) {
-        reject();
+        reject(new Error());
         return;
       }
       resolve();

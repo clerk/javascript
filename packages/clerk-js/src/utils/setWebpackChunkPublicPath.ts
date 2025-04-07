@@ -33,7 +33,7 @@ if (!__DEV__) {
       let hrefWithoutFilename = new URL(scriptUrl.href.split('/').slice(0, -1).join('/')).href;
       hrefWithoutFilename += hrefWithoutFilename.endsWith('/') ? '' : '/';
       __webpack_public_path__ = hrefWithoutFilename.replace(CLERKJS_NPM_PATH_REGEX, `$1${__PKG_VERSION__}$3`);
-    } catch (e) {
+    } catch {
       //
     }
   };

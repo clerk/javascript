@@ -1,9 +1,9 @@
 import type {
   Attributes,
   EmailAddressResource,
-  EnvironmentResource,
   PhoneNumberResource,
   UserResource,
+  Web3WalletResource,
 } from '@clerk/types';
 
 type IDable = { id: string };
@@ -16,23 +16,19 @@ export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ?
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 
-export function emailLinksEnabledForInstance(env: EnvironmentResource): boolean {
-  const { userSettings } = env;
-  const { email_address } = userSettings.attributes;
-  return email_address.enabled && email_address.verifications.includes('email_link');
-}
-
-export function getSecondFactors(attributes: Attributes): string[] {
+export function getSecondFactors(attributes: Partial<Attributes>): string[] {
   const secondFactors: string[] = [];
 
   Object.entries(attributes).forEach(([, attr]) => {
-    attr.used_for_second_factor ? secondFactors.push(...attr.second_factors) : null;
+    if (attr.used_for_second_factor) {
+      secondFactors.push(...attr.second_factors);
+    }
   });
 
   return secondFactors;
 }
 
-export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: UserResource): string[] {
+export function getSecondFactorsAvailableToAdd(attributes: Partial<Attributes>, user: UserResource): string[] {
   let sfs = getSecondFactors(attributes);
 
   // If user.totp_enabled, skip totp from the list of choices
@@ -48,10 +44,9 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   return sfs;
 }
 
-export function sortIdentificationBasedOnVerification<T extends Array<EmailAddressResource | PhoneNumberResource>>(
-  array: T | null | undefined,
-  primaryId: string | null | undefined,
-): T {
+export function sortIdentificationBasedOnVerification<
+  T extends Array<EmailAddressResource | PhoneNumberResource | Web3WalletResource>,
+>(array: T | null | undefined, primaryId: string | null | undefined): T {
   if (!array) {
     return [] as unknown as T;
   }

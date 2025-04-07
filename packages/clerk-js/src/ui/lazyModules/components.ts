@@ -17,6 +17,9 @@ const componentImportPaths = {
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
+  PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
+  Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
+  SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -88,6 +91,18 @@ export const KeylessPrompt = lazy(() =>
   componentImportPaths.KeylessPrompt().then(module => ({ default: module.KeylessPrompt })),
 );
 
+export const PricingTable = lazy(() =>
+  componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
+);
+
+export const Checkout = lazy(() =>
+  componentImportPaths.Checkout().then(module => ({ default: module.__experimental_Checkout })),
+);
+
+export const SessionTasks = lazy(() =>
+  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
+);
+
 export const preloadComponent = async (component: unknown) => {
   return componentImportPaths[component as keyof typeof componentImportPaths]?.();
 };
@@ -112,6 +127,8 @@ export const ClerkComponents = {
   Waitlist,
   WaitlistModal,
   BlankCaptchaModal,
+  PricingTable,
+  Checkout,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

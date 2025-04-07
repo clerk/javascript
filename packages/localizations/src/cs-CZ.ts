@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Zpět',
+  badge__currentPlan: undefined,
   badge__default: 'Výchozí',
   badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
   badge__primary: 'Hlavní',
@@ -130,6 +139,7 @@ export const csCZ: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvat',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstranit člena',
         tableHeader__actions: 'Akce',
@@ -276,6 +286,7 @@ export const csCZ: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const csCZ: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -458,6 +474,7 @@ export const csCZ: LocalizationResource = {
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: 'Připojit se k čekací listině',
       subtitle: 'pro pokračování do {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Přihlásit se',
       titleCombined: undefined,
     },
@@ -537,7 +554,9 @@ export const csCZ: LocalizationResource = {
       actionLink__use_phone: 'Použít telefon',
       actionText: 'Máte účet?',
       subtitle: 'pro pokračování do {{applicationName}}',
+      subtitleCombined: 'pro pokračování do {{applicationName}}',
       title: 'Vytvořte si účet',
+      titleCombined: 'Vytvořte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
@@ -641,6 +660,14 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -692,6 +719,11 @@ export const csCZ: LocalizationResource = {
         resendButton: 'Znovu odeslat odkaz',
         successMessage: 'E-mailová adresa {{identifier}} byla přidána k vašemu účtu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstraněna z tohoto účtu.',
         messageLine2: 'Nebudete se moci přihlásit pomocí této e-mailové adresy.',
@@ -759,6 +791,7 @@ export const csCZ: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Spravujte své údaje.',
       security: 'Zabezpečení',
       title: 'Účet',
@@ -857,6 +890,7 @@ export const csCZ: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Odstranit',
         menuAction__rename: 'Přejmenovat',
+        primaryButton: undefined,
         title: 'Správa klíčů',
       },
       passwordSection: {
@@ -883,6 +917,7 @@ export const csCZ: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Odstranit peněženku',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 peněženky',
         title: 'Web3 peněženky',
       },

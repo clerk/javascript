@@ -283,7 +283,7 @@ describe('TelemetryCollector', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
 
-      randomSpy.mockRestore;
+      randomSpy.mockRestore();
     });
 
     test('generates unique key without credentials based on event payload', () => {

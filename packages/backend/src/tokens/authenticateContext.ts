@@ -8,7 +8,7 @@ import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../
 import type { ClerkRequest } from './clerkRequest';
 import type { AuthenticateRequestOptions } from './types';
 
-interface AuthenticateContextInterface extends AuthenticateRequestOptions {
+interface AuthenticateContext extends AuthenticateRequestOptions {
   // header-based values
   sessionTokenInHeader: string | undefined;
   origin: string | undefined;
@@ -29,15 +29,11 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   handshakeRedirectLoopCounter: number;
   // url derived from headers
   clerkUrl: URL;
-  // cookie or header session token
-  sessionToken: string | undefined;
   // enforce existence of the following props
   publishableKey: string;
   instanceType: string;
   frontendApi: string;
 }
-
-interface AuthenticateContext extends AuthenticateContextInterface {}
 
 /**
  * All data required to authenticate a request.
@@ -45,7 +41,12 @@ interface AuthenticateContext extends AuthenticateContextInterface {}
  * is in a signed in or signed out state or if we need
  * to perform a handshake.
  */
-class AuthenticateContext {
+class AuthenticateContext implements AuthenticateContext {
+  /**
+   * Retrieves the session token from either the cookie or the header.
+   *
+   * @returns {string | undefined} The session token if available, otherwise undefined.
+   */
   public get sessionToken(): string | undefined {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
@@ -170,7 +171,7 @@ class AuthenticateContext {
   }
 
   private initHeaderValues() {
-    this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.sessionTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);
     this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
@@ -199,10 +200,6 @@ class AuthenticateContext {
     this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
   }
 
-  private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
-    return authValue?.replace('Bearer ', '');
-  }
-
   private getQueryParam(name: string) {
     return this.clerkRequest.clerkUrl.searchParams.get(name);
   }
@@ -224,6 +221,26 @@ class AuthenticateContext {
       return this.getSuffixedCookie(cookieName);
     }
     return this.getCookie(cookieName);
+  }
+
+  private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
+    if (!authorizationHeader) {
+      return undefined;
+    }
+
+    const [scheme, token] = authorizationHeader.split(' ', 2);
+
+    if (!token) {
+      // No scheme specified, treat the entire value as the token
+      return scheme;
+    }
+
+    if (scheme === 'Bearer') {
+      return token;
+    }
+
+    // Skip all other schemes
+    return undefined;
   }
 
   private tokenHasIssuer(token: string): boolean {

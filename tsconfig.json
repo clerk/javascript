@@ -13,7 +13,6 @@
     "noEmitHelpers": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "noImplicitUseStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,

@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Til baka',
+  badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
@@ -130,6 +139,7 @@ export const isIS: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjóða',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Fjarlægja meðlim',
         tableHeader__actions: undefined,
@@ -278,6 +288,7 @@ export const isIS: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -301,6 +312,11 @@ export const isIS: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -462,6 +478,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Ertu ekki með reikning?',
       actionText__join_waitlist: undefined,
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
+      subtitleCombined: undefined,
       title: 'Skrá inn í {{applicationName}}',
       titleCombined: undefined,
     },
@@ -542,7 +559,9 @@ export const isIS: LocalizationResource = {
       actionLink__use_phone: 'Nota síma í staðinn',
       actionText: 'Ertu með reikning?',
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
+      subtitleCombined: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
+      titleCombined: 'Stofna reikning',
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
@@ -648,6 +667,14 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Afritað!',
       actionLabel__copy: 'Afrita allt',
@@ -700,6 +727,11 @@ export const isIS: LocalizationResource = {
         resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
         messageLine2: 'Þú munt ekki lengur geta skráð þig inn með þessu netfangi.',
@@ -767,6 +799,7 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
+      billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',
       title: 'Reikningur',
@@ -867,6 +900,7 @@ export const isIS: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Fjarlægja',
         menuAction__rename: 'Endurnefna',
+        primaryButton: undefined,
         title: 'Lyklar',
       },
       passwordSection: {
@@ -893,6 +927,7 @@ export const isIS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Fjarlægja veski',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
       },

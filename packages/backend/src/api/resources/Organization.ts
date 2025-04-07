@@ -1,6 +1,12 @@
 import type { OrganizationJSON } from './JSON';
 
 export class Organization {
+  private _raw: OrganizationJSON | null = null;
+
+  public get raw(): OrganizationJSON | null {
+    return this._raw;
+  }
+
   constructor(
     readonly id: string,
     readonly name: string,
@@ -18,7 +24,7 @@ export class Organization {
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
-    return new Organization(
+    const res = new Organization(
       data.id,
       data.name,
       data.slug,
@@ -33,5 +39,7 @@ export class Organization {
       data.members_count,
       data.created_by,
     );
+    res._raw = data;
+    return res;
   }
 }

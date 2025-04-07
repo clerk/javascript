@@ -9,7 +9,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     goToAppHome: async () => {
       try {
         await page.goto(app.serverUrl);
-      } catch (e) {
+      } catch {
         // do not fail the test if interstitial is returned (401)
       }
     },
@@ -24,7 +24,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         } else {
           url = new URL(path, page.url());
         }
-      } catch (e) {
+      } catch {
         // However, in most tests we don't need to manually navigate to the domain
         // as the test is using a localhost app directly
         // This handles the case where the page is at about:blank

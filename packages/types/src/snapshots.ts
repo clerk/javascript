@@ -1,5 +1,6 @@
 // this file contains the types returned by the __internal_toSnapshot method of the resources
 
+import type { __experimental_CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
@@ -30,9 +31,7 @@ import type {
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
-import type { Nullable } from './utils';
-
-type Override<T, U> = Omit<T, keyof U> & U;
+import type { Nullable, Override } from './utils';
 
 export type SignInJSONSnapshot = Override<
   Nullable<SignInJSON, 'status' | 'identifier' | 'supported_first_factors' | 'supported_second_factors'>,
@@ -184,3 +183,5 @@ export type Web3WalletJSONSnapshot = Override<
 >;
 
 export type PublicUserDataJSONSnapshot = PublicUserDataJSON;
+
+export type __experimental_CommerceSettingsJSONSnapshot = __experimental_CommerceSettingsJSON;

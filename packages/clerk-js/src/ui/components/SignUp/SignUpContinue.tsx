@@ -25,7 +25,7 @@ import {
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { completeSignUpFlow } from './util';
 
-function _SignUpContinue() {
+function SignUpContinueInternal() {
   const card = useCardState();
   const clerk = useClerk();
   const { navigate } = useRouter();
@@ -59,7 +59,7 @@ function _SignUpContinue() {
       label: localizationKeys('formFieldLabel__lastName'),
       placeholder: localizationKeys('formFieldInputPlaceholder__lastName'),
     }),
-    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
+    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || signUp.emailAddress || '', {
       type: 'email',
       label: localizationKeys('formFieldLabel__emailAddress'),
       placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
@@ -91,13 +91,18 @@ function _SignUpContinue() {
   } as const;
 
   const onlyLegalConsentMissing = useMemo(
-    () => signUp.missingFields && signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted',
-    [signUp.missingFields],
+    () =>
+      signUp.missingFields &&
+      signUp.missingFields.length === 1 &&
+      signUp.missingFields[0] === 'legal_accepted' &&
+      signUp.unverifiedFields &&
+      signUp.unverifiedFields.length === 0,
+    [signUp.missingFields, signUp.unverifiedFields],
   );
 
   useEffect(() => {
     // Redirect to sign-up if there is no persisted sign-up
-    if (!signUp.id) {
+    if (!signUp.id && clerk.__internal_setActiveInProgress !== true) {
       void navigate(displayConfig.signUpUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +114,6 @@ function _SignUpContinue() {
 
   const hasEmail = !!formState.emailAddress.value;
   const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
-  const hasVerifiedWeb3 = signUp.verifications?.web3Wallet?.status == 'verified';
 
   const fields = determineActiveFields({
     attributes,
@@ -122,7 +126,6 @@ function _SignUpContinue() {
   minimizeFieldsForExistingSignup(fields, signUp);
 
   const oauthOptions = userSettings.authenticatableSocialStrategies;
-  const web3Options = userSettings.web3FirstFactors;
 
   const handleChangeActive = (type: ActiveIdentifier) => {
     if (!emailOrPhone(attributes, isProgressiveSignUp)) {
@@ -184,7 +187,6 @@ function _SignUpContinue() {
 
   const canToggleEmailPhone = emailOrPhone(attributes, isProgressiveSignUp);
   const showOauthProviders = !hasVerifiedExternalAccount && oauthOptions.length > 0;
-  const showWeb3Providers = !hasVerifiedWeb3 && web3Options.length > 0;
 
   const headerTitle = !onlyLegalConsentMissing
     ? localizationKeys('signUp.continue.title')
@@ -209,10 +211,10 @@ function _SignUpContinue() {
             gap={8}
           >
             <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && !onlyLegalConsentMissing && (
+              {showOauthProviders && !onlyLegalConsentMissing && (
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
-                  enableWeb3Providers={showWeb3Providers}
+                  enableWeb3Providers={false}
                   continueSignUp
                 />
               )}
@@ -245,4 +247,4 @@ function _SignUpContinue() {
 }
 
 // TODO: flow / page naming
-export const SignUpContinue = withCardStateProvider(_SignUpContinue);
+export const SignUpContinue = withCardStateProvider(SignUpContinueInternal);

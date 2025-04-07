@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '돌아가기',
+  badge__currentPlan: undefined,
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
   badge__primary: '기본',
@@ -129,6 +138,7 @@ export const koKR: LocalizationResource = {
     },
     membersPage: {
       action__invite: '초대',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '회원 제거',
         tableHeader__actions: undefined,
@@ -274,6 +284,7 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -297,6 +308,11 @@ export const koKR: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -455,6 +471,7 @@ export const koKR: LocalizationResource = {
       actionText: '계정이 없으신가요?',
       actionText__join_waitlist: undefined,
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
+      subtitleCombined: undefined,
       title: '{{applicationName}}에 로그인',
       titleCombined: undefined,
     },
@@ -534,7 +551,9 @@ export const koKR: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '계정이 있으신가요?',
       subtitle: '환영합니다! 아래 정보를 입력해주세요.',
+      subtitleCombined: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
+      titleCombined: '계정 만들기',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
@@ -638,6 +657,14 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -688,6 +715,11 @@ export const koKR: LocalizationResource = {
         resendButton: '링크 재전송',
         successMessage: '{{identifier}} 이메일이 당신의 계정에 추가되었습니다.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 이메일이 이 계정에서 제거 될 에정입니다.',
         messageLine2: '더 이상 이 이메일 주소로 로그인할 수 없습니다.',
@@ -750,6 +782,7 @@ export const koKR: LocalizationResource = {
     mobileButton__menu: '메뉴',
     navbar: {
       account: '프로필',
+      billing: undefined,
       description: '계정 정보를 관리하세요.',
       security: '보안',
       title: '계정',
@@ -847,6 +880,7 @@ export const koKR: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -873,6 +907,7 @@ export const koKR: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '지갑 제거',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 지갑',
         title: 'Web3 지갑',
       },

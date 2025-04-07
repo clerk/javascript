@@ -163,9 +163,12 @@ export class RedirectUrls {
     assertNoLegacyProp(obj);
     const res = {} as typeof this.fromSearchParams;
     RedirectUrls.keys.forEach(key => {
-      res[key] = obj[camelToSnake(key)];
+      if (obj instanceof URLSearchParams) {
+        res[key] = obj.get(camelToSnake(key));
+      } else {
+        res[key] = obj[camelToSnake(key)];
+      }
     });
-    res['redirectUrl'] = obj.redirect_url;
     return applyFunctionToObj(this.#filterRedirects(this.#toAbsoluteUrls(filterProps(res, Boolean))), val =>
       val.toString(),
     );

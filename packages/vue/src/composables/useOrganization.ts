@@ -1,3 +1,4 @@
+import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
 import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
 import { computed } from 'vue';
 
@@ -77,6 +78,7 @@ export const useOrganization: UseOrganization = () => {
       isLoaded: clerk.value.loaded,
       organization: organizationCtx.value,
       membership: getCurrentOrganizationMembership(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         session.value!.user.organizationMemberships,
         organizationCtx.value.id,
       ),
@@ -85,12 +87,3 @@ export const useOrganization: UseOrganization = () => {
 
   return toComputedRefs(result);
 };
-
-function getCurrentOrganizationMembership(
-  organizationMemberships: OrganizationMembershipResource[],
-  activeOrganizationId: string,
-) {
-  return organizationMemberships.find(
-    organizationMembership => organizationMembership.organization.id === activeOrganizationId,
-  );
-}

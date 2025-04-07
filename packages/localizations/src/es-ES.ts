@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Atrás',
+  badge__currentPlan: undefined,
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
@@ -130,6 +139,7 @@ export const esES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invitar',
+      action__search: 'Buscar',
       activeMembersTab: {
         menuAction__remove: 'Quitar miembro',
         tableHeader__actions: 'Acciones',
@@ -278,6 +288,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes acceso a este método? Prueba otra opción.',
       blockButton__backupCode: 'Usar código de respaldo',
       blockButton__emailCode: 'Usar código de correo electrónico',
+      blockButton__passkey: undefined,
       blockButton__password: 'Usar contraseña',
       blockButton__phoneCode: 'Usar código de teléfono',
       blockButton__totp: 'Usar verificación TOTP',
@@ -304,6 +315,11 @@ export const esES: LocalizationResource = {
       message: 'Lo sentimos, no tienes ningún método de verificación disponible. Contacta con soporte.',
       subtitle: 'No se encontraron métodos alternativos disponibles.',
       title: 'Métodos de verificación no disponibles',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '¿Olvidaste tu contraseña? Recupérala aquí.',
@@ -461,6 +477,7 @@ export const esES: LocalizationResource = {
       actionText: '¿No tienes cuenta?',
       actionText__join_waitlist: '¿Te gustaría unirte a la lista de espera?',
       subtitle: 'para continuar a {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Entrar',
       titleCombined: undefined,
     },
@@ -540,7 +557,9 @@ export const esES: LocalizationResource = {
       actionLink__use_phone: 'Usar teléfono',
       actionText: '¿Ya tienes una cuenta?',
       subtitle: 'para continuar en {{applicationName}}',
+      subtitleCombined: 'para continuar en {{applicationName}}',
       title: 'Crea tu cuenta',
+      titleCombined: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
@@ -647,6 +666,14 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '¡Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -700,6 +727,11 @@ export const esES: LocalizationResource = {
         resendButton: 'Reenviar enlace',
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a su cuenta.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} será eliminado de esta cuenta.',
         messageLine2: 'Ya no podrá iniciar sesión con esta dirección de correo electrónico.',
@@ -767,6 +799,7 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',
       title: 'Cuenta',
@@ -866,6 +899,7 @@ export const esES: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Eliminar Clave de Acceso',
         menuAction__rename: 'Renombrar Clave de Acceso',
+        primaryButton: undefined,
         title: 'Sección de Claves de Acceso',
       },
       passwordSection: {
@@ -882,7 +916,7 @@ export const esES: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: 'Guardar Cambios',
+        primaryButton: 'Actualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {
@@ -892,6 +926,7 @@ export const esES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Quitar cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Agregar cartera Web3',
         title: 'Cartera Web3',
       },

@@ -2,11 +2,11 @@ import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Buffer } from 'buffer';
 export { ClerkWebAuthnError };
 
-export function encodeBase64(data: ArrayLike<number> | ArrayBufferLike) {
+export function encodeBase64(data: ArrayBufferLike) {
   return btoa(String.fromCharCode(...new Uint8Array(data)));
 }
 
-export function encodeBase64Url(data: ArrayLike<number> | ArrayBufferLike) {
+export function encodeBase64Url(data: ArrayBufferLike) {
   return encodeBase64(data).replaceAll('=', '').replaceAll('+', '-').replaceAll('/', '_');
 }
 

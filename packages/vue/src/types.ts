@@ -1,6 +1,5 @@
 import type {
-  ActiveSessionResource,
-  ActJWTClaim,
+  ActClaim,
   Clerk,
   ClerkOptions,
   ClientResource,
@@ -9,6 +8,8 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
+  SessionStatusClaim,
+  SignedInSessionResource,
   UserResource,
   Without,
 } from '@clerk/types';
@@ -19,16 +20,18 @@ export interface VueClerkInjectionKeyType {
   authCtx: ComputedRef<{
     userId: string | null | undefined;
     sessionId: string | null | undefined;
-    actor: ActJWTClaim | null | undefined;
+    actor: ActClaim | null | undefined;
+    sessionStatus: SessionStatusClaim | null | undefined;
     orgId: string | null | undefined;
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;
     orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
   }>;
   clientCtx: ComputedRef<ClientResource | null | undefined>;
-  sessionCtx: ComputedRef<ActiveSessionResource | null | undefined>;
+  sessionCtx: ComputedRef<SignedInSessionResource | null | undefined>;
   userCtx: ComputedRef<UserResource | null | undefined>;
   organizationCtx: ComputedRef<OrganizationResource | null | undefined>;
+  treatPendingAsSignedOut?: boolean;
 }
 
 // Copied from `@clerk/clerk-react`

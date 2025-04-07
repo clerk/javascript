@@ -156,6 +156,7 @@ export async function authenticateRequest(
       'Access-Control-Allow-Credentials': 'true',
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
     const cookiesToSet = handshakePayload.handshake;
 
@@ -211,10 +212,10 @@ ${error.getFullMessage()}`,
         return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
-      throw retryError;
+      throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
     }
 
-    throw error;
+    throw new Error(error?.message || 'Clerk: Handshake failed.');
   }
 
   async function refreshToken(
@@ -445,11 +446,13 @@ ${error.getFullMessage()}`,
     const { sessionTokenInHeader } = authenticateContext;
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
       if (errors) {
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
@@ -543,6 +546,7 @@ ${error.getFullMessage()}`,
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const redirectURL = new URL(authenticateContext.signInUrl!);
       redirectURL.searchParams.append(
         constants.QueryParameters.ClerkRedirectUrl,
@@ -593,6 +597,7 @@ ${error.getFullMessage()}`,
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
 
     if (decodedErrors) {
@@ -604,6 +609,7 @@ ${error.getFullMessage()}`,
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { data, errors } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
       if (errors) {
         throw errors[0];
@@ -612,6 +618,7 @@ ${error.getFullMessage()}`,
         authenticateContext,
         data,
         undefined,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         authenticateContext.sessionTokenInCookie!,
       );
 

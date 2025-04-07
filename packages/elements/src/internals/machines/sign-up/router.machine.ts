@@ -81,7 +81,9 @@ export const SignUpRouterMachine = setup({
 
       void context.clerk.setActive({
         session,
-        redirectUrl: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+        redirectUrl: context.clerk.buildAfterSignUpUrl({
+          params: context.router?.searchParams(),
+        }),
       });
     },
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
@@ -114,6 +116,7 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
         case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
         case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
         default:
@@ -199,8 +202,9 @@ export const SignUpRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -215,8 +219,9 @@ export const SignUpRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -231,8 +236,9 @@ export const SignUpRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete:
-            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
+            params: context.router?.searchParams(),
+          }),
         },
       })),
     },
@@ -313,7 +319,9 @@ export const SignUpRouterMachine = setup({
             {
               type: 'navigateExternal',
               params: ({ context }) => ({
-                path: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+                path: context.clerk.buildAfterSignUpUrl({
+                  params: context.router?.searchParams(),
+                }),
               }),
             },
           ],

@@ -10,6 +10,8 @@ import SignUp from './sign-up';
 import UserProfile from './user';
 import UserProfileCustom from './custom-user-profile';
 import UserButtonCustom from './custom-user-button';
+import UserButtonCustomDynamicLabels from './custom-user-button/with-dynamic-labels.tsx';
+import UserButtonCustomDynamicLabelsAndCustomPages from './custom-user-button/with-dynamic-label-and-custom-pages.tsx';
 import UserButtonCustomTrigger from './custom-user-button-trigger';
 import UserButton from './user-button';
 import Waitlist from './waitlist';
@@ -17,6 +19,7 @@ import OrganizationProfile from './organization-profile';
 import OrganizationList from './organization-list';
 import CreateOrganization from './create-organization';
 import OrganizationSwitcher from './organization-switcher';
+import Buttons from './buttons';
 
 const Root = () => {
   const navigate = useNavigate();
@@ -68,12 +71,24 @@ const router = createBrowserRouter([
         element: <Protected />,
       },
       {
+        path: '/buttons',
+        element: <Buttons />,
+      },
+      {
         path: '/custom-user-profile/*',
         element: <UserProfileCustom />,
       },
       {
         path: '/custom-user-button',
         element: <UserButtonCustom />,
+      },
+      {
+        path: '/custom-user-button-dynamic-labels',
+        element: <UserButtonCustomDynamicLabels />,
+      },
+      {
+        path: '/custom-user-button-dynamic-labels-and-custom-pages',
+        element: <UserButtonCustomDynamicLabelsAndCustomPages />,
       },
       {
         path: '/custom-user-button-trigger',

@@ -5,7 +5,12 @@ import { createContext, useContext, useMemo } from 'react';
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '../../../core/constants';
 import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
-import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  buildRedirectUrl,
+  buildSessionTaskRedirectUrl,
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -22,6 +27,7 @@ export type SignUpContextType = SignUpCtx & {
   afterSignUpUrl: string;
   afterSignInUrl: string;
   waitlistUrl: string;
+  sessionTaskUrl: string | null;
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
@@ -32,11 +38,17 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
   const { navigate } = useRouter();
-  const { displayConfig } = useEnvironment();
+  const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
+  const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
-  const isCombinedFlow = Boolean(!options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl));
+  const isCombinedFlow =
+    (signUpMode !== 'restricted' &&
+      Boolean(
+        !options.signUpUrl && options.signInUrl && !isAbsoluteUrl(options.signInUrl) && signUpMode === 'public',
+      )) ||
+    false;
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -101,8 +113,16 @@ export const useSignUpContext = (): SignUpContextType => {
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
 
+  const sessionTaskUrl = buildSessionTaskRedirectUrl({
+    task: clerk.session?.currentTask,
+    path: ctx.path,
+    routing: ctx.routing,
+    baseUrl: signUpUrl,
+  });
+
   return {
     ...ctx,
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signInUrl,
     signUpUrl,
@@ -112,6 +132,7 @@ export const useSignUpContext = (): SignUpContextType => {
     afterSignInUrl,
     emailLinkRedirectUrl,
     ssoCallbackUrl,
+    sessionTaskUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },

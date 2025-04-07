@@ -1,15 +1,18 @@
 import type { LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
 import {
   addComponent,
+  addImports,
   addImportsDir,
   addPlugin,
   addServerHandler,
+  addTypeTemplate,
   createResolver,
   defineNuxtModule,
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace'> & {
+export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+  publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
    * register the middleware manually in your application.
@@ -23,7 +26,7 @@ export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'route
    * import { clerkMiddleware } from '@clerk/nuxt/server'
    *
    * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth)
+   *   console.log('auth', event.context.auth())
    * })
    * ```
    */
@@ -72,6 +75,7 @@ export default defineNuxtModule<ModuleOptions>({
       clerk: {
         secretKey: undefined,
         jwtKey: undefined,
+        webhookSigningSecret: undefined,
       },
     });
 
@@ -97,8 +101,37 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // Add auto-imports for Clerk components and composables
+    // Adds TS support for `event.context.auth()` in event handlers
+    addTypeTemplate(
+      {
+        filename: 'types/clerk.d.ts',
+        getContents: () => `import type { AuthObject } from '@clerk/backend';
+          declare module 'h3' {
+            type AuthObjectHandler = AuthObject & {
+              (): AuthObject;
+            }
+
+            interface H3EventContext {
+              auth: AuthObjectHandler;
+            }
+          }
+        `,
+      },
+      { nitro: true },
+    );
+
+    // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
+    addImports([
+      {
+        name: 'createRouteMatcher',
+        from: resolver.resolve('./runtime/client'),
+      },
+      {
+        name: 'updateClerkOptions',
+        from: resolver.resolve('./runtime/client'),
+      },
+    ]);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const components: Array<keyof typeof import('@clerk/vue')> = [
@@ -129,6 +162,7 @@ export default defineNuxtModule<ModuleOptions>({
       'RedirectToCreateOrganization',
       'SignedIn',
       'SignedOut',
+      'Waitlist',
     ];
     components.forEach(component => {
       void addComponent({

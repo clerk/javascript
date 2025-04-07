@@ -14,8 +14,8 @@ export const run = (cmd: string, options?: Options & { log?: typeof console.log 
   // by streaming the output to the file and reading the file from the parent process
   const proc = execa(file, args, { ...opts, stdin: opts.detached ? 'ignore' : undefined });
   if (log) {
-    proc.stdout.on('data', chunkLogger(log));
-    proc.stderr.on('data', chunkLogger(log));
+    proc.stdout?.on('data', chunkLogger(log));
+    proc.stderr?.on('data', chunkLogger(log));
   }
   return proc;
 };

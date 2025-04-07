@@ -3,7 +3,7 @@ declare const PACKAGE_VERSION: string;
 declare const JS_PACKAGE_VERSION: string;
 declare const __DEV__: boolean;
 
-declare module globalThis {
+declare namespace globalThis {
   // eslint-disable-next-line no-var
   var __BUILD_DISABLE_RHC__: boolean;
 }

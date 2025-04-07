@@ -24,6 +24,9 @@ export type StartOAuthFlowReturnType = {
   authSessionResult?: WebBrowser.WebBrowserAuthSessionResult;
 };
 
+/**
+ * @deprecated Use `useSSO` instead
+ */
 export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { strategy } = useOAuthParams || {};
   if (!strategy) {
@@ -92,6 +95,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     let createdSessionId = '';
 
     if (status === 'complete') {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       createdSessionId = signIn.createdSessionId!;
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({

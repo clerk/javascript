@@ -3,19 +3,29 @@ import type { AccountlessApplication } from '@clerk/backend';
 import { cookies, headers } from 'next/headers';
 import { redirect, RedirectType } from 'next/navigation';
 
+import { errorThrower } from '../server/errorThrower';
 import { detectClerkMiddleware } from '../server/headers-utils';
-import { getKeylessCookieName } from '../server/keyless';
+import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
 
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   const cookieStore = await cookies();
-  cookieStore.set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  const request = new Request('https://placeholder.com', { headers: await headers() });
+
+  const keyless = await getKeylessCookieValue(name => cookieStore.get(name)?.value);
+  const pksMatch = keyless?.publishableKey === publishableKey;
+  const sksMatch = keyless?.secretKey === secretKey;
+  if (pksMatch && sksMatch) {
+    // Return early, syncing in not needed.
+    return;
+  }
+
+  // Set the new keys in the cookie.
+  cookieStore.set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: true,
     httpOnly: true,
   });
-
-  const request = new Request('https://placeholder.com', { headers: await headers() });
 
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
   // @ts-expect-error Request will work as well
@@ -35,25 +45,26 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
     return null;
   }
 
-  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless());
+  const result = await import('../server/keyless-node.js').then(m => m.createOrReadKeyless()).catch(() => null);
 
   if (!result) {
+    errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
-  const { keylessLogger, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
+  const { clerkDevelopmentCache, createKeylessModeMessage } = await import('../server/keyless-log-cache.js');
 
   /**
    * Notify developers.
    */
-  keylessLogger?.log({
+  clerkDevelopmentCache?.log({
     cacheKey: result.publishableKey,
     msg: createKeylessModeMessage(result),
   });
 
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
-  void (await cookies()).set(getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
+  void (await cookies()).set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
     secure: false,
     httpOnly: false,
   });
@@ -70,6 +81,6 @@ export async function deleteKeylessAction() {
     return;
   }
 
-  await import('../server/keyless-node.js').then(m => m.removeKeyless());
+  await import('../server/keyless-node.js').then(m => m.removeKeyless()).catch(() => {});
   return;
 }

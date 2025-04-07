@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'กลับ',
+  badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__primary: 'หลัก',
@@ -129,6 +138,7 @@ export const thTH: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'เชิญ',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'ลบสมาชิก',
         tableHeader__actions: 'การดำเนินการ',
@@ -274,6 +284,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่มีวิธีใดที่กล่าวมาหรือ?',
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสไปที่อีเมล {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'ดำเนินการต่อด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
       blockButton__totp: 'ใช้แอปยืนยันตัวตนของคุณ',
@@ -299,6 +310,11 @@ export const thTH: LocalizationResource = {
       message: 'ไม่สามารถดำเนินการยืนยันได้ ไม่มีปัจจัยการยืนยันตัวตนที่เหมาะสมที่ถูกกำหนดค่า',
       subtitle: 'เกิดข้อผิดพลาด',
       title: 'ไม่สามารถยืนยันบัญชีของคุณได้',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',
@@ -456,6 +472,7 @@ export const thTH: LocalizationResource = {
       actionText: 'ไม่มีบัญชีหรือ?',
       actionText__join_waitlist: 'ต้องการเข้าถึงก่อนใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับกลับ! โปรดเข้าสู่ระบบเพื่อดำเนินการต่อ',
+      subtitleCombined: undefined,
       title: 'เข้าสู่ระบบ {{applicationName}}',
       titleCombined: 'ดำเนินการต่อไปยัง {{applicationName}}',
     },
@@ -537,7 +554,9 @@ export const thTH: LocalizationResource = {
       actionLink__use_phone: 'ใช้โทรศัพท์แทน',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
+      subtitleCombined: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
+      titleCombined: 'สร้างบัญชีของคุณ',
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
@@ -643,6 +662,14 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -693,6 +720,11 @@ export const thTH: LocalizationResource = {
         resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} จะถูกนำออกจากบัญชีนี้',
         messageLine2: 'คุณจะไม่สามารถเข้าสู่ระบบโดยใช้อีเมลที่อยู่นี้ได้อีกต่อไป',
@@ -757,6 +789,7 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
+      billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
       title: 'บัญชี',
@@ -854,6 +887,7 @@ export const thTH: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'ลบ',
         menuAction__rename: 'เปลี่ยนชื่อ',
+        primaryButton: undefined,
         title: 'พาสคีย์',
       },
       passwordSection: {
@@ -880,6 +914,7 @@ export const thTH: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'ลบวอลเล็ต',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'วอลเล็ต Web3',
         title: 'วอลเล็ต Web3',
       },

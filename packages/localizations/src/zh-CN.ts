@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默认',
   badge__otherImpersonatorDevice: '其他模拟器设备',
   badge__primary: '主要',
@@ -126,6 +135,7 @@ export const zhCN: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀请',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成员',
         tableHeader__actions: undefined,
@@ -268,6 +278,7 @@ export const zhCN: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -291,6 +302,11 @@ export const zhCN: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -449,6 +465,7 @@ export const zhCN: LocalizationResource = {
       actionText: '还没有账户？',
       actionText__join_waitlist: undefined,
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: undefined,
       title: '登录',
       titleCombined: undefined,
     },
@@ -528,7 +545,9 @@ export const zhCN: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '已经有账户了？',
       subtitle: '继续使用 {{applicationName}}',
+      subtitleCombined: '继续使用 {{applicationName}}',
       title: '创建您的账户',
+      titleCombined: '创建您的账户',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
@@ -629,6 +648,14 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
@@ -678,6 +705,11 @@ export const zhCN: LocalizationResource = {
         resendButton: '重发链接',
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电子邮件地址登录。',
@@ -736,6 +768,7 @@ export const zhCN: LocalizationResource = {
     mobileButton__menu: '菜单',
     navbar: {
       account: '账户',
+      billing: undefined,
       description: '管理您的账户。',
       security: '安全',
       title: '账户',
@@ -832,6 +865,7 @@ export const zhCN: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -858,6 +892,7 @@ export const zhCN: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '移除钱包',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 钱包',
         title: 'Web3 钱包',
       },

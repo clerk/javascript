@@ -263,7 +263,7 @@ describe('PasswordSection', () => {
 
         expect(getByRole('button', { name: /save$/i })).toBeDisabled();
       });
-      it('hides screen when when pressing cancel', async () => {
+      it('hides screen when pressing cancel', async () => {
         const { wrapper } = await createFixtures(initConfig);
 
         const { userEvent, getByRole, queryByRole } = render(<PasswordSection />, { wrapper });
@@ -308,6 +308,30 @@ describe('PasswordSection', () => {
       await userEvent.click(getByRole('button', { name: /save$/i }));
       expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
         currentPassword: 'testtest1234',
+        newPassword: 'testtest',
+        signOutOfOtherSessions: true,
+      });
+      await waitFor(() => getByRole('button', { name: /update password/i }));
+      expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
+    });
+
+    it('current password is not required when Reverification enabled', async () => {
+      const config = createFixtures.config(f => {
+        f.withReverification();
+        f.withPassword();
+        f.withUser({ password_enabled: true });
+      });
+      const { wrapper, fixtures } = await createFixtures(config);
+
+      fixtures.clerk.user?.updatePassword.mockResolvedValue({});
+      const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: /update password/i }));
+      await waitFor(() => getByRole('heading', { name: /update password/i }));
+
+      await userEvent.type(getByLabelText(/new password/i), 'testtest');
+      await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
+      await userEvent.click(getByRole('button', { name: /save$/i }));
+      expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
         newPassword: 'testtest',
         signOutOfOtherSessions: true,
       });
@@ -476,6 +500,24 @@ describe('PasswordSection', () => {
         await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
 
         expect(getByRole('button', { name: /save$/i })).toBeDisabled();
+      });
+
+      it('current password is not required when Reverification enabled', async () => {
+        const config = createFixtures.config(f => {
+          f.withReverification();
+          f.withPassword();
+          f.withUser({ password_enabled: true });
+        });
+
+        const { wrapper } = await createFixtures(config);
+        const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: /update password/i }));
+        await waitFor(() => getByRole('heading', { name: /update password/i }));
+
+        await userEvent.type(getByLabelText(/new password/i), 'testtest');
+        await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
+
+        expect(getByRole('button', { name: /save$/i })).toBeEnabled();
       });
     });
   });

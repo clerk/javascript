@@ -7,6 +7,7 @@
   "globalDependencies": [
     ".github/.cache-version",
     ".npmrc",
+    "eslint.config.mjs",
     "jest.*.ts",
     "package.json",
     "pnpm-lock.yaml",
@@ -17,18 +18,19 @@
   ],
   "globalEnv": [
     "CLERK_*",
+    "EXPO_PUBLIC_CLERK_*",
+    "NEXT_PHASE",
     "NEXT_PUBLIC_CLERK_*",
-    "PLASMO_PUBLIC_CLERK_*",
-    "PUBLIC_CLERK_*",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
+    "PLASMO_PUBLIC_CLERK_*",
+    "PUBLIC_CLERK_*",
+    "REACT_APP_CLERK_*",
+    "RSDOCTOR",
     "TZ",
     "VERCEL",
-    "VITE_CLERK_*",
-    "EXPO_PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*",
-    "NEXT_PHASE"
+    "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
   "tasks": {
@@ -57,6 +59,12 @@
       ],
       "outputLogs": "new-only",
       "outputs": ["*/package.json", "dist/**", "scripts/**"]
+    },
+    "build:declarations": {
+      "dependsOn": ["build"],
+      "inputs": ["tsconfig.declarations.json"],
+      "outputLogs": "new-only",
+      "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
     "dev": {
       "cache": false
@@ -185,9 +193,15 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:sessions": {
+    "//#test:integration:localhost": {
       "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:sessions": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
@@ -203,14 +217,14 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:tanstack-start": {
-      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-start#build", "@clerk/clerk-react#build"],
+    "//#test:integration:tanstack-react-start": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-react-start#build", "@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:tanstack-router": {
-      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-start#build", "@clerk/clerk-react#build"],
+    "//#test:integration:tanstack-react-router": {
+      "dependsOn": ["@clerk/clerk-js#build", "@clerk/tanstack-react-start#build", "@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"

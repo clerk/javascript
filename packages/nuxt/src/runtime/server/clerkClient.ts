@@ -3,7 +3,6 @@ import { isTruthy } from '@clerk/shared/underscore';
 import type { H3Event } from 'h3';
 
 // @ts-expect-error: Nitro import. Handled by Nuxt.
-// eslint-disable-next-line import/no-unresolved
 import { useRuntimeConfig } from '#imports';
 
 export function clerkClient(event: H3Event) {

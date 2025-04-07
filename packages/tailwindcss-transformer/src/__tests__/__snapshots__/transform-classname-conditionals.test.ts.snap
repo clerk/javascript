@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`className with conditionals 1`] = `
-"const Button: React.FC<ButtonProps> = ({ children, display }) => {
-    return <button className={dislay === 'flex' ? "cl-222f930b" : "cl-12330685"}>{children}</button>;
-  }"
-`;

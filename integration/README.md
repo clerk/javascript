@@ -35,6 +35,8 @@ You'll only need to follow these instructions once when you setup the integratio
    ```
 1. Open Clerk's 1Password and search for **JS SDKs integration tests**. Inside the secure note you'll find the secret keys that should go into `.env.local` and `.keys.json`. Copy them over.
 
+1. Generate the required session keys by running the following command in the `./certs` directory: `mkcert -cert-file sessions.pem -key-file sessions-key.pem "example.com" "*.example.com"`.
+
 > [!CAUTION]
 > Make sure to not accidentally commit any keys. Double check that the two new files are ignored by git.
 
@@ -565,7 +567,7 @@ Currently, `u` has:
   This handler runs in the context of a new browser, as the second browser is completely isolated. The nested `u` variable shadows the `u` variable of the parent scope to make this distinction apparent.
 
 > [!TIP]
-> You can find more details in the [source code](./testUtils/index.ts) of `createTestUtils`. For example inside [`appPageObject`](./testUtils/appPageObject.ts) you can find out that `u.page` allows you to programatically go to the index page through `u.page.goToStart()`.
+> You can find more details in the [source code](./testUtils/index.ts) of `createTestUtils`. For example inside [`appPageObject`](./testUtils/appPageObject.ts) you can find out that `u.page` allows you to programmatically go to the index page through `u.page.goToStart()`.
 
 ## Concepts
 

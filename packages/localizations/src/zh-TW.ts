@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '返回',
+  badge__currentPlan: undefined,
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
   badge__primary: '主要',
@@ -128,6 +137,7 @@ export const zhTW: LocalizationResource = {
     },
     membersPage: {
       action__invite: '邀請',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: '移除成員',
         tableHeader__actions: undefined,
@@ -274,6 +284,7 @@ export const zhTW: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -297,6 +308,11 @@ export const zhTW: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -455,6 +471,7 @@ export const zhTW: LocalizationResource = {
       actionText: '還沒有帳戶？',
       actionText__join_waitlist: undefined,
       subtitle: '繼續使用 {{applicationName}}',
+      subtitleCombined: undefined,
       title: '登錄',
       titleCombined: undefined,
     },
@@ -503,13 +520,14 @@ export const zhTW: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: '我同意 {{ privacyPolicyLink || link("隱私條款") }}',
+        label__onlyTermsOfService: '我同意 {{ termsOfServiceLink || link("使用條款") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          '我同意 {{ termsOfServiceLink || link("使用條款") }} and {{ privacyPolicyLink || link("隱私條款") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '請閱讀並接受條款以繼續',
+        title: '同意條款',
       },
     },
     phoneCode: {
@@ -534,7 +552,9 @@ export const zhTW: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
+      subtitleCombined: '繼續使用 {{applicationName}}',
       title: '創建您的帳戶',
+      titleCombined: '創建您的帳戶',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登錄',
@@ -636,6 +656,14 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -685,6 +713,11 @@ export const zhTW: LocalizationResource = {
         resendButton: '重發連結',
         successMessage: '電子郵件 {{identifier}} 已被添加到您的帳戶。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
         messageLine2: '您將無法使用這個電子郵件地址登錄。',
@@ -745,6 +778,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -842,6 +876,7 @@ export const zhTW: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -858,7 +893,7 @@ export const zhTW: LocalizationResource = {
         title: '電話號碼',
       },
       profileSection: {
-        primaryButton: undefined,
+        primaryButton: '更新個人資料',
         title: '個人資料',
       },
       usernameSection: {
@@ -868,6 +903,7 @@ export const zhTW: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: '移除錢包',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 錢包',
         title: 'Web3 錢包',
       },

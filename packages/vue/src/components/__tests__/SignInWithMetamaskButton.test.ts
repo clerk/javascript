@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/vue';
 import { vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 
-import { SignInWithMetamaskButton } from '../SignInWithMetamaskButton';
+import SignInWithMetamaskButton from '../SignInWithMetamaskButton.vue';
 
 const mockAuthenticatewithMetamask = vi.fn();
 const originalError = console.error;

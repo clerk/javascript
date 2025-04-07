@@ -27,15 +27,15 @@ export class CaptchaHeartbeat {
     }
 
     try {
-      const params = await this.captchaChallenge.invisible();
+      const params = await this.captchaChallenge.invisible({ action: 'heartbeat' });
       await this.clerk.client.sendCaptchaToken(params);
-    } catch (e) {
+    } catch {
       // Ignore unhandled errors
     }
   }
 
   private isEnabled() {
-    return !!this.clerk.__unstable__environment?.displayConfig.captchaHeartbeat;
+    return !!this.clerk.__unstable__environment?.displayConfig?.captchaHeartbeat;
   }
 
   private clientBypass() {
@@ -43,6 +43,6 @@ export class CaptchaHeartbeat {
   }
 
   private intervalInMs() {
-    return this.clerk.__unstable__environment?.displayConfig.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
+    return this.clerk.__unstable__environment?.displayConfig?.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
   }
 }

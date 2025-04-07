@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Enrere',
+  badge__currentPlan: undefined,
   badge__default: 'Per defecte',
   badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
   badge__primary: 'Principal',
@@ -83,6 +92,7 @@ export const caES: LocalizationResource = {
     'Introdueix una adreça de correu electrònic sota aquest domini per rebre un codi i verificar aquest domini.',
   formFieldLabel__organizationName: 'Nom',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Contrasenya',
   formFieldLabel__phoneNumber: 'Número de telèfon',
   formFieldLabel__role: 'Rol',
@@ -92,6 +102,7 @@ export const caES: LocalizationResource = {
     action__signOut: 'Tanca la sessió',
     title: 'Connectat com a {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membre',
   membershipRole__guestMember: 'Convidat',
@@ -127,6 +138,7 @@ export const caES: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Convida',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Elimina membre',
         tableHeader__actions: undefined,
@@ -269,6 +281,67 @@ export const caES: LocalizationResource = {
   paginationButton__previous: 'Anterior',
   paginationRowText__displaying: 'Mostrant',
   paginationRowText__of: 'de',
+  reverification: {
+    alternativeMethods: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__backupCode: undefined,
+      blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
+      blockButton__password: undefined,
+      blockButton__phoneCode: undefined,
+      blockButton__totp: undefined,
+      getHelp: {
+        blockButton__emailSupport: undefined,
+        content: undefined,
+        title: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    backupCodeMfa: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    emailCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    noAvailableMethods: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    password: {
+      actionLink: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    phoneCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    totpMfa: {
+      formTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   signIn: {
     accountSwitcher: {
       action__addAccount: 'Afegeix compte',
@@ -282,6 +355,7 @@ export const caES: LocalizationResource = {
       blockButton__backupCode: 'Utilitza un codi de seguretat',
       blockButton__emailCode: 'Envia codi per correu electrònic a {{identifier}}',
       blockButton__emailLink: 'Envia enllaç per correu electrònic a {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Inicia sessió amb la teva contrasenya',
       blockButton__phoneCode: 'Envia codi SMS a {{identifier}}',
       blockButton__totp: "Utilitza la teva aplicació d'autenticació",
@@ -305,6 +379,10 @@ export const caES: LocalizationResource = {
       title: 'Comprova el teu correu electrònic',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Torna a la pestanya original per continuar.',
         title: 'Aquest enllaç de verificació ha caducat',
@@ -353,10 +431,17 @@ export const caES: LocalizationResource = {
       subtitle: "S'ha produït un error",
       title: 'No es pot iniciar sessió',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utilitza un altre mètode',
       subtitle: 'Introdueix la contrasenya associada al teu compte',
       title: 'Introdueix la teva contrasenya',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Codi de verificació',
@@ -382,13 +467,18 @@ export const caES: LocalizationResource = {
     },
     start: {
       actionLink: "Registra't",
+      actionLink__join_waitlist: undefined,
       actionLink__use_email: 'Utilitza correu electrònic',
       actionLink__use_email_username: "Utilitza correu electrònic o nom d'usuari",
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utilitza telèfon',
       actionLink__use_username: "Utilitza nom d'usuari",
       actionText: 'No tens un compte?',
+      actionText__join_waitlist: undefined,
       subtitle: 'Benvingut de nou! Si us plau, inicia sessió per continuar',
+      subtitleCombined: undefined,
       title: 'Inicia sessió a {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Codi de verificació',
@@ -412,6 +502,10 @@ export const caES: LocalizationResource = {
       title: 'Verifica el teu correu electrònic',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: "Utilitza l'enllaç de verificació enviat a la teva adreça de correu electrònic",
       formTitle: 'Enllaç de verificació',
       loading: {
@@ -429,6 +523,17 @@ export const caES: LocalizationResource = {
         title: 'Correu electrònic verificat amb èxit',
       },
     },
+    legalConsent: {
+      checkbox: {
+        label__onlyPrivacyPolicy: undefined,
+        label__onlyTermsOfService: undefined,
+        label__termsOfServiceAndPrivacyPolicy: undefined,
+      },
+      continue: {
+        subtitle: undefined,
+        title: undefined,
+      },
+    },
     phoneCode: {
       formSubtitle: 'Introdueix el codi de verificació enviat al teu número de telèfon',
       formTitle: 'Codi de verificació',
@@ -436,21 +541,38 @@ export const caES: LocalizationResource = {
       subtitle: 'Introdueix el codi de verificació enviat al teu telèfon',
       title: 'Verifica el teu telèfon',
     },
+    restrictedAccess: {
+      actionLink: undefined,
+      actionText: undefined,
+      blockButton__emailSupport: undefined,
+      blockButton__joinWaitlist: undefined,
+      subtitle: undefined,
+      subtitleWaitlist: undefined,
+      title: undefined,
+    },
     start: {
       actionLink: 'Inicia sessió',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Ja tens un compte?',
       subtitle: 'Benvingut! Si us plau, completa els detalls per començar.',
+      subtitleCombined: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
+      titleCombined: 'Crea el teu compte',
     },
   },
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
+    already_a_member_in_organization: undefined,
     captcha_invalid:
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
-    form_identifier_exists: 'Aquest identificador ja existeix. Si us plau, tria un altre identificador.',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: "No s'ha trobat cap identificador coincident. Si us plau, comprova el valor introduït.",
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
@@ -459,11 +581,13 @@ export const caES: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Els cognoms no han de superar els 256 caràcters.',
     form_param_max_length_exceeded__name: 'El nom no ha de superar els 256 caràcters.',
     form_param_nil: 'El valor del camp no pot ser nul. Si us plau, completa aquest camp.',
+    form_param_value_invalid: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_pwned:
       'Aquesta contrasenya ha aparegut en una filtració i no es pot utilitzar, si us plau, prova una altra contrasenya.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'La teva contrasenya ha superat el nombre màxim de bytes permesos, si us plau, redueix-la o elimina alguns caràcters especials.',
     form_password_validation_failed: 'Contrasenya incorrecta',
@@ -471,6 +595,16 @@ export const caES: LocalizationResource = {
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
     not_allowed_access: "No tens permís per accedir a aquesta pàgina. Si us plau, posa't en contacte amb el suport.",
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'menys de {{length}} caràcters',
       minimumLength: '{{length}} o més caràcters',
@@ -481,6 +615,7 @@ export const caES: LocalizationResource = {
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',
       goodPassword: 'La teva contrasenya compleix tots els requisits necessaris.',
@@ -529,6 +664,14 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -583,6 +726,11 @@ export const caES: LocalizationResource = {
         resendButton: "No has rebut l'enllaç? Reenvia",
         successMessage: "El correu electrònic {{identifier}} s'ha afegit al teu compte.",
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: "{{identifier}} serà eliminat d'aquest compte.",
         messageLine2: 'Ja no podràs iniciar sessió utilitzant aquesta adreça de correu electrònic.',
@@ -650,9 +798,18 @@ export const caES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      billing: undefined,
       description: 'Gestiona la informació del teu compte.',
       security: 'Seguretat',
       title: 'Compte',
+    },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -698,6 +855,7 @@ export const caES: LocalizationResource = {
         actionLabel__reauthorize: 'Autoritza ara',
         destructiveActionTitle: 'Elimina',
         primaryButton: 'Connecta compte',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Els àmbits requerits han estat actualitzats, i podràs estar experimentant funcionalitat limitada. Si us plau, reautoritza aquesta aplicació per evitar qualsevol problema',
         title: 'Comptes connectats',
@@ -738,6 +896,12 @@ export const caES: LocalizationResource = {
           headerTitle: "Aplicació d'autenticació",
         },
       },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        primaryButton: undefined,
+        title: undefined,
+      },
       passwordSection: {
         primaryButton__setPassword: 'Estableix contrasenya',
         primaryButton__updatePassword: 'Actualitza contrasenya',
@@ -762,6 +926,7 @@ export const caES: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Elimina cartera',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteres Web3',
         title: 'Carteres Web3',
       },
@@ -782,6 +947,21 @@ export const caES: LocalizationResource = {
       subtitle__unavailableWallets: 'No hi ha carteres Web3 disponibles.',
       successMessage: 'La cartera ha estat afegida al teu compte.',
       title: 'Afegeix cartera Web3',
+      web3WalletButtonsBlockButton: undefined,
+    },
+  },
+  waitlist: {
+    start: {
+      actionLink: undefined,
+      actionText: undefined,
+      formButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    success: {
+      message: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
   },
 } as const;

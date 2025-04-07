@@ -38,8 +38,9 @@ export type ProfileSectionId =
   | 'organizationProfile'
   | 'organizationDanger'
   | 'organizationDomains'
-  | 'manageVerifiedDomains';
-export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers';
+  | 'manageVerifiedDomains'
+  | 'paymentSources';
+export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =

@@ -12,7 +12,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
   const { onSuccess, onReset } = props;
   const { user } = useUser();
 
-  const [updateUsername] = useReverification((username: string) => user?.update({ username }));
+  const updateUsername = useReverification((username: string) => user?.update({ username }));
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
@@ -26,7 +26,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
     return null;
   }
 
-  const isUsernameRequired = userSettings.attributes.username.required;
+  const isUsernameRequired = userSettings.attributes.username?.required;
 
   const canSubmit =
     (isUsernameRequired ? usernameField.value.length > 0 : true) && user.username !== usernameField.value;

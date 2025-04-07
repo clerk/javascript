@@ -1,8 +1,16 @@
 export type { Clerk } from '../clerk';
 export * from './Base';
 export * from './UserSettings';
+export * from './CommerceSettings';
 export * from './AuthConfig';
 export * from './Client';
+export * from './CommerceCheckout';
+export * from './CommerceFeature';
+export * from './CommerceInvoice';
+export * from './CommercePaymentSource';
+export * from './CommercePlan';
+export * from './CommerceProduct';
+export * from './CommerceSubscription';
 export * from './DeletedObject';
 export * from './DisplayConfig';
 export * from './EmailAddress';

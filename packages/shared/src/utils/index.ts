@@ -1,8 +1,8 @@
 export * from './createDeferredPromise';
+export * from './allSettled';
 export { isStaging } from './instance';
 export { logErrorInDevMode } from './logErrorInDevMode';
 export { noop } from './noop';
-export * from './runWithExponentialBackOff';
 export * from './runtimeEnvironment';
 export { handleValueOrFn } from './handleValueOrFn';
 export { fastDeepMergeAndReplace, fastDeepMergeAndKeep } from './fastDeepMerge';

@@ -49,7 +49,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
+    if (passkeySettings.allow_autofill && attributes.passkey?.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -59,7 +59,7 @@ const useAutoFillPasskey = () => {
   };
 };
 
-export function _SignInStart(): JSX.Element {
+function SignInStartInternal(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
   const status = useLoadingStatus();
@@ -345,7 +345,9 @@ export function _SignInStart(): JSX.Element {
     }
     const instantPasswordError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER || e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT,
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
     const alreadySignedInError: ClerkAPIError = e.errors.find(
@@ -359,6 +361,7 @@ export function _SignInStart(): JSX.Element {
     if (instantPasswordError) {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else if (isCombinedFlow && accountDoesNotExistError) {
@@ -393,7 +396,7 @@ export function _SignInStart(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
-        passwordEnabled: userSettings.attributes.password.required,
+        passwordEnabled: userSettings.attributes.password?.required ?? false,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
@@ -429,14 +432,23 @@ export function _SignInStart(): JSX.Element {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            {isCombinedFlow ? (
-              <Header.Title localizationKey={localizationKeys('signIn.start.titleCombined')} />
-            ) : (
-              <>
-                <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-                <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
-              </>
-            )}
+            <Header.Title
+              localizationKey={
+                isCombinedFlow ? localizationKeys('signIn.start.titleCombined') : localizationKeys('signIn.start.title')
+              }
+            />
+            <Header.Subtitle
+              localizationKey={
+                isCombinedFlow
+                  ? localizationKeys('signIn.start.subtitleCombined')
+                  : localizationKeys('signIn.start.subtitle')
+              }
+              sx={{
+                '&:empty': {
+                  display: 'none',
+                },
+              }}
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -472,7 +484,7 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.attributes.passkey.enabled &&
+            {userSettings.attributes.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (
                 <Card.Action elementId={'usePasskey'}>
@@ -559,4 +571,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(_SignInStart));
+export const SignInStart = withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal));

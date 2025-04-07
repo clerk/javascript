@@ -61,6 +61,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.expect.toBeSignedIn();
     });
 
+    test('(modal) sign in with email code', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/buttons');
+      await u.page.getByText('Sign in button (fallback)').click();
+      await u.po.signIn.waitForModal();
+      await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.getUseAnotherMethodLink().click();
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
+      await u.po.signIn.enterTestOtpCode();
+      await u.po.expect.toBeSignedIn();
+      await u.po.signIn.waitForModal('closed');
+    });
+
     test('sign in with phone number and password', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
@@ -177,8 +191,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
-      expect(prefilledEmail).toBe(fakeUser.email);
+      const prefilledEmail = u.po.signUp.getEmailAddressInput();
+      await expect(prefilledEmail).toHaveValue(fakeUser.email);
 
       await u.po.signUp.setPassword(fakeUser.password);
       await u.po.signUp.continue();
@@ -207,8 +221,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledUsername = await u.po.signUp.getUsernameInput().inputValue();
-      expect(prefilledUsername).toBe(fakeUser.username);
+      const prefilledUsername = u.po.signUp.getUsernameInput();
+      await expect(prefilledUsername).toHaveValue(fakeUser.username);
 
       await u.po.signUp.setEmailAddress(fakeUser.email);
       await u.po.signUp.setPassword(fakeUser.password);
@@ -217,6 +231,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signUp.enterTestOtpCode();
 
       await u.po.expect.toBeSignedIn();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('(modal) sign up with username, email, and password', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const fakeUser = u.services.users.createFakeUser({
+        fictionalEmail: true,
+        withPassword: true,
+        withUsername: true,
+      });
+
+      await u.page.goToRelative('/buttons');
+      await u.page.getByText('Sign in button (fallback)').click();
+      await u.po.signIn.waitForModal();
+      await u.po.signIn.setIdentifier(fakeUser.username);
+      await u.po.signIn.continue();
+
+      const prefilledUsername = u.po.signUp.getUsernameInput();
+      await expect(prefilledUsername).toHaveValue(fakeUser.username);
+
+      await u.po.signUp.setEmailAddress(fakeUser.email);
+      await u.po.signUp.setPassword(fakeUser.password);
+      await u.po.signUp.continue();
+
+      await u.po.signUp.enterTestOtpCode();
+
+      await u.po.expect.toBeSignedIn();
+      await u.po.signIn.waitForModal('closed');
 
       await fakeUser.deleteIfExists();
     });
@@ -237,8 +280,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.page.waitForAppUrl('/sign-in/create');
 
-      const prefilledEmail = await u.po.signUp.getEmailAddressInput().inputValue();
-      expect(prefilledEmail).toBe(fakeUser.email);
+      const prefilledEmail = u.po.signUp.getEmailAddressInput();
+      await expect(prefilledEmail).toHaveValue(fakeUser.email);
 
       await u.po.signUp.setPassword(fakeUser.password);
       await u.po.signUp.continue();

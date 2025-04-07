@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Späť',
+  badge__currentPlan: undefined,
   badge__default: 'Predvolené',
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
   badge__primary: 'Hlavný',
@@ -129,6 +138,7 @@ export const skSK: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Pozvať',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Odstrániť člena',
         tableHeader__actions: undefined,
@@ -276,6 +286,7 @@ export const skSK: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -299,6 +310,11 @@ export const skSK: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -458,6 +474,7 @@ export const skSK: LocalizationResource = {
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: undefined,
       subtitle: 'pre pokračovanie do {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Prihlásiť sa',
       titleCombined: undefined,
     },
@@ -537,7 +554,9 @@ export const skSK: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
       subtitle: 'pre pokračovanie do {{applicationName}}',
+      subtitleCombined: 'pre pokračovanie do {{applicationName}}',
       title: 'Vytvorte si účet',
+      titleCombined: 'Vytvorte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
@@ -641,6 +660,14 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -692,6 +719,11 @@ export const skSK: LocalizationResource = {
         resendButton: 'Znovu odoslať odkaz',
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} bude odstránená z tohto účtu.',
         messageLine2: 'Nebudete sa môcť prihlásiť pomocou tejto e-mailovej adresy.',
@@ -759,6 +791,7 @@ export const skSK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -857,6 +890,7 @@ export const skSK: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -883,6 +917,7 @@ export const skSK: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Odstrániť peňaženku',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
       },

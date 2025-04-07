@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 export type State<Data = any, Error = any> = {
   data: Data | null;
@@ -79,6 +79,7 @@ export const useCache = <K = any, V = any>(
  * @param fetcher If fetcher is undefined no action will be performed
  * @param params
  * @param options
+ * @param resourceId
  */
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
@@ -88,8 +89,11 @@ export const useFetch = <K, T>(
     onSuccess?: (data: T) => void;
     staleTime?: number;
   },
+  resourceId?: string,
 ) => {
-  const { subscribeCache, getCache, setCache, clearCache } = useCache<K, T>(params);
+  const cacheKey = { resourceId, params };
+  const { subscribeCache, getCache, setCache, clearCache } = useCache<typeof cacheKey, T>(cacheKey);
+  const [revalidationCounter, setRevalidationCounter] = useState(0);
 
   const staleTime = options?.staleTime ?? 1000 * 60 * 2; //cache for 2 minutes by default
   const throttleTime = options?.throttleTime || 0;
@@ -101,9 +105,15 @@ export const useFetch = <K, T>(
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
+  const revalidate = useCallback(() => {
+    clearCache();
+    setRevalidationCounter(prev => prev + 1);
+  }, [clearCache]);
+
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) >= staleTime;
+    const isCacheStale =
+      typeof getCache()?.cachedAt === 'undefined' ? true : Date.now() - (getCache()?.cachedAt || 0) >= staleTime;
     const isRequestOnGoing = getCache()?.isValidating ?? false;
 
     if (fetcherMissing || !isCacheStale || isRequestOnGoing) {
@@ -118,6 +128,7 @@ export const useFetch = <K, T>(
       isValidating: true,
       error: null,
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fetcherRef.current!(params)
       .then(result => {
         if (typeof result !== 'undefined') {
@@ -146,11 +157,12 @@ export const useFetch = <K, T>(
           cachedAt: Date.now(),
         });
       });
-  }, [serialize(params), setCache, getCache]);
+  }, [serialize(params), setCache, getCache, revalidationCounter]);
 
   return {
     ...cached,
     setCache,
     invalidate: clearCache,
+    revalidate,
   };
 };

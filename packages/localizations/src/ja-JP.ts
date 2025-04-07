@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: '戻る',
+  badge__currentPlan: undefined,
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
   badge__primary: 'プライマリ',
@@ -129,6 +138,7 @@ export const jaJP: LocalizationResource = {
     },
     membersPage: {
       action__invite: '招待',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'メンバーの削除',
         tableHeader__actions: undefined,
@@ -277,6 +287,7 @@ export const jaJP: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -300,6 +311,11 @@ export const jaJP: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -460,6 +476,7 @@ export const jaJP: LocalizationResource = {
       actionText: 'アカウントをお持ちでないですか？',
       actionText__join_waitlist: undefined,
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: undefined,
       title: 'サインイン',
       titleCombined: undefined,
     },
@@ -539,7 +556,9 @@ export const jaJP: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
+      subtitleCombined: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
+      titleCombined: 'アカウントを作成',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
@@ -644,6 +663,14 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -694,6 +721,11 @@ export const jaJP: LocalizationResource = {
         resendButton: 'リンクを再送信',
         successMessage: 'メールアドレス{{identifier}}がアカウントに追加されました。',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
         messageLine2: 'このメールアドレスを使用してのサインインはできなくなります。',
@@ -758,6 +790,7 @@ export const jaJP: LocalizationResource = {
     mobileButton__menu: 'メニュー',
     navbar: {
       account: 'プロファイル',
+      billing: undefined,
       description: 'アカウント情報管理',
       security: 'セキュリティ',
       title: 'アカウント',
@@ -856,6 +889,7 @@ export const jaJP: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -882,6 +916,7 @@ export const jaJP: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'ウォレットの削除',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3ウォレット',
         title: 'Web3ウォレット',
       },

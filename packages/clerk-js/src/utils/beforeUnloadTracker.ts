@@ -11,22 +11,52 @@ import { CLERK_BEFORE_UNLOAD_EVENT } from './windowNavigate';
  *
  * @internal
  */
-export const createBeforeUnloadTracker = () => {
+const createBeforeUnloadListener = () => {
   let _isUnloading = false;
 
   const toggle = () => (_isUnloading = true);
 
-  const startTracking = () => {
+  const startListening = () => {
     window.addEventListener('beforeunload', toggle);
     window.addEventListener(CLERK_BEFORE_UNLOAD_EVENT, toggle);
   };
 
-  const stopTracking = () => {
+  const stopListening = () => {
     window.removeEventListener('beforeunload', toggle);
     window.removeEventListener(CLERK_BEFORE_UNLOAD_EVENT, toggle);
   };
 
   const isUnloading = () => _isUnloading;
 
-  return { startTracking, stopTracking, isUnloading };
+  return { startListening, stopListening, isUnloading };
+};
+
+/**
+ * Creates a beforeUnload event tracker to prevent state updates and re-renders during hard
+ * navigation events.
+ *
+ * It can be wrapped around navigation-related operations to ensure they don't trigger unnecessary
+ * state updates during page transitions.
+ *
+ * @internal
+ */
+export const createBeforeUnloadTracker = (enabled = false) => {
+  if (!enabled) {
+    return {
+      track: async (fn: () => Promise<void>) => {
+        await fn();
+      },
+      isUnloading: () => false,
+    };
+  }
+
+  const l = createBeforeUnloadListener();
+  return {
+    track: async (fn: () => Promise<void>) => {
+      l.startListening();
+      await fn();
+      l.stopListening();
+    },
+    isUnloading: l.isUnloading,
+  };
 };

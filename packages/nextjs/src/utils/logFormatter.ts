@@ -8,7 +8,7 @@ const maskSecretKey = (str: any) => {
 
   try {
     return (str || '').replace(/^(sk_(live|test)_)(.+?)(.{3})$/, '$1*********$4');
-  } catch (e) {
+  } catch {
     return '';
   }
 };

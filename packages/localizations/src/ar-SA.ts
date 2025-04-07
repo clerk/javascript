@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'الرجوع',
+  badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
   badge__primary: 'الرئيسي',
@@ -129,6 +138,7 @@ export const arSA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'دعوة',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: undefined,
@@ -275,6 +285,7 @@ export const arSA: LocalizationResource = {
       actionText: undefined,
       blockButton__backupCode: undefined,
       blockButton__emailCode: undefined,
+      blockButton__passkey: undefined,
       blockButton__password: undefined,
       blockButton__phoneCode: undefined,
       blockButton__totp: undefined,
@@ -298,6 +309,11 @@ export const arSA: LocalizationResource = {
     },
     noAvailableMethods: {
       message: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkey: {
+      blockButton__passkey: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -459,6 +475,7 @@ export const arSA: LocalizationResource = {
       actionText: 'ليس لديك حساب؟',
       actionText__join_waitlist: undefined,
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: 'للمتابعة إلى {{applicationName}}',
       title: 'تسجيل الدخول',
       titleCombined: undefined,
     },
@@ -538,7 +555,9 @@ export const arSA: LocalizationResource = {
       actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'أنشاء حساب جديد',
+      titleCombined: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -642,6 +661,14 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -693,6 +720,11 @@ export const arSA: LocalizationResource = {
         resendButton: 'لم يصلك الرابط؟ حاول مرة أخرى',
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: 'سيتم حذف هذا الإيميل من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول باستخدام عنوان البريد الإلكتروني هذا.',
@@ -756,6 +788,7 @@ export const arSA: LocalizationResource = {
     mobileButton__menu: 'القائمة',
     navbar: {
       account: 'الملف الشخصي',
+      billing: undefined,
       description: 'إدارة معلومات ملفك الشخصي.',
       security: 'حماية',
       title: 'الملف الشخصي',
@@ -854,6 +887,7 @@ export const arSA: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'إزالة',
         menuAction__rename: 'إعادة تسمية',
+        primaryButton: undefined,
         title: 'مفاتيح المرور',
       },
       passwordSection: {
@@ -880,6 +914,7 @@ export const arSA: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'حذف المحفظة',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
       },

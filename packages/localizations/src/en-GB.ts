@@ -1,8 +1,29 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Back',
+  badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
@@ -50,9 +71,9 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'you@example.com',
   formFieldInputPlaceholder__organizationName: 'Organisation name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
-  formFieldInputPlaceholder__username: undefined,
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -118,6 +139,7 @@ export const enGB: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Invite',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Remove member',
         tableHeader__actions: 'Actions',
@@ -265,6 +287,7 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -292,9 +315,14 @@ export const enGB: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
@@ -449,7 +477,9 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
       subtitle: 'Welcome back! Please sign in to continue',
+      subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
+      titleCombined: undefined,
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -529,7 +559,9 @@ export const enGB: LocalizationResource = {
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
+      subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
+      titleCombined: 'Create your account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -591,6 +623,7 @@ export const enGB: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
@@ -638,6 +671,14 @@ export const enGB: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -690,6 +731,11 @@ export const enGB: LocalizationResource = {
         resendButton: "Didn't receive a link? Resend",
         successMessage: 'The email {{identifier}} has been added to your account.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this email address.',
@@ -756,6 +802,7 @@ export const enGB: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
       title: 'Account',
@@ -855,6 +902,7 @@ export const enGB: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -881,6 +929,7 @@ export const enGB: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },

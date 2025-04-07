@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Tillbaka',
+  badge__currentPlan: undefined,
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
   badge__primary: 'Primär',
@@ -129,6 +138,7 @@ export const svSE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Bjud in',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Ta bort medlem',
         tableHeader__actions: 'Åtgärder',
@@ -277,6 +287,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget av dessa?',
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod via e-post till {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Fortsätt med ditt lösenord',
       blockButton__phoneCode: 'Skicka SMS-kod till {{identifier}}',
       blockButton__totp: 'Använd din autentiseringsapp',
@@ -303,6 +314,11 @@ export const svSE: LocalizationResource = {
       message: 'Kan inte fortsätta med verifieringen. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte verifiera ditt konto',
+    },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Använd en annan metod',
@@ -462,6 +478,7 @@ export const svSE: LocalizationResource = {
       actionText: 'Har du inget konto?',
       actionText__join_waitlist: undefined,
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: undefined,
       title: 'Logga in',
       titleCombined: undefined,
     },
@@ -511,13 +528,14 @@ export const svSE: LocalizationResource = {
     },
     legalConsent: {
       checkbox: {
-        label__onlyPrivacyPolicy: undefined,
-        label__onlyTermsOfService: undefined,
-        label__termsOfServiceAndPrivacyPolicy: undefined,
+        label__onlyPrivacyPolicy: 'Jag godkänner {{ privacyPolicyLink || link("Integritetspolicyn") }}',
+        label__onlyTermsOfService: 'Jag godkänner de {{ termsOfServiceLink || link("Allmänna villkoren") }}',
+        label__termsOfServiceAndPrivacyPolicy:
+          'Jag godkänner de {{ termsOfServiceLink || link("Allmänna villkoren") }} och {{ privacyPolicyLink || link("Integritetspolicyn") }}',
       },
       continue: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Vänligen läs och godkänn villkoren för att fortsätta',
+        title: 'Juridiskt samtycke',
       },
     },
     phoneCode: {
@@ -542,7 +560,9 @@ export const svSE: LocalizationResource = {
       actionLink__use_phone: 'Använd telefon istället',
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
+      subtitleCombined: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
+      titleCombined: 'Skapa ditt konto',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -646,6 +666,14 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -698,6 +726,11 @@ export const svSE: LocalizationResource = {
         resendButton: 'Skicka länken igen',
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2: 'Du kommer inte längre att kunna logga in med denna e-postadress.',
@@ -763,6 +796,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',
       title: 'Konto',
@@ -862,6 +896,7 @@ export const svSE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Ta bort',
         menuAction__rename: 'Byt namn',
+        primaryButton: undefined,
         title: 'Passkeys',
       },
       passwordSection: {
@@ -888,6 +923,7 @@ export const svSE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Ta bort plånbok',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
       },

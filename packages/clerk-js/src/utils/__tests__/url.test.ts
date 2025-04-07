@@ -511,26 +511,39 @@ describe('isAllowedRedirect', () => {
 });
 
 describe('createAllowedRedirectOrigins', () => {
-  it('contains the default allowed origin values if no value is provided', async () => {
-    const frontendApi = 'https://somename.clerk.accounts.dev';
-    const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi);
-    const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi);
+  it('contains the default allowed origin values if no value is provided when production instance', () => {
+    const frontendApi = 'clerk.example.com';
+    const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi, 'production');
+    const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi, 'production');
 
-    expect(allowedRedirectOriginsValuesUndefined).toEqual([
-      'http://localhost',
-      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-    ]);
+    const expectedAllowedRedirectOrigins = [
+      'http://localhost', // Current location
+      `https://example.com`, // Primary domain
+      `https://*.example.com`, // Wildcard subdomains
+    ];
 
-    expect(allowedRedirectOriginsValuesEmptyArray).toEqual([
-      'http://localhost',
-      `https://${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-      `https://*.${getETLDPlusOneFromFrontendApi(frontendApi)}`,
-    ]);
+    expect(allowedRedirectOriginsValuesUndefined).toEqual(expectedAllowedRedirectOrigins);
+    expect(allowedRedirectOriginsValuesEmptyArray).toEqual(expectedAllowedRedirectOrigins);
+  });
+
+  it('contains the default allowed origin values and FAPI if no value is provided when development instance', () => {
+    const frontendApi = 'foo-bar-42.clerk.accounts.dev';
+    const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi, 'development');
+    const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi, 'development');
+
+    const expectedAllowedRedirectOrigins = [
+      'http://localhost', // Current location
+      `https://foo-bar-42.accounts.dev`, // Account Portal
+      `https://*.foo-bar-42.accounts.dev`, // Account Portal subdomains
+      `https://foo-bar-42.clerk.accounts.dev`, // Frontend API
+    ];
+
+    expect(allowedRedirectOriginsValuesUndefined).toEqual(expectedAllowedRedirectOrigins);
+    expect(allowedRedirectOriginsValuesEmptyArray).toEqual(expectedAllowedRedirectOrigins);
   });
 
   it('contains only the allowedRedirectOrigins options given', async () => {
-    const frontendApi = 'https://somename.clerk.accounts.dev';
+    const frontendApi = 'somename.clerk.accounts.dev';
     const allowedRedirectOriginsValues = createAllowedRedirectOrigins(
       ['https://test.host', 'https://*.test.host'],
       frontendApi,

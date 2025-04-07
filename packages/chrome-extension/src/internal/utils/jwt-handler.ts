@@ -1,12 +1,10 @@
-import { Poller } from '@clerk/shared/poller';
-
-import { STORAGE_KEY_CLIENT_JWT } from '../constants';
-import type { GetClientCookieParams } from './cookies';
-import { getClientCookie } from './cookies';
+import { CLIENT_UAT_KEY, STORAGE_KEY_CLIENT_JWT } from '../constants';
+import type { ChangeInfo, GetClientCookieParams } from './cookies';
+import { createClientCookieListener, getClientCookie } from './cookies';
 import { errorLogger } from './errors';
 import type { StorageCache } from './storage';
 
-type JWTHandlerParams = { frontendApi: string } & (
+export type JWTHandlerParams = { frontendApi: string } & (
   | {
       sync?: false;
     }
@@ -59,22 +57,33 @@ export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
     return await store.get<string>(CACHE_KEY);
   };
 
-  /**
-   * Polls for the synced session JWT via the get() function.
-   *
-   * @param delayInMs: Polling delay in milliseconds (default: 1500ms)
-   */
-  const poll = async (delayInMs = 1500) => {
-    const { run, stop } = Poller({ delayInMs });
+  const listener = () => {
+    if (!shouldSync(sync, cookieParams)) {
+      return;
+    }
 
-    void run(async () => {
-      const currentJWT = await get();
+    const { onListenerCallback, ...restCookieParams } = cookieParams;
 
-      if (currentJWT) {
-        stop();
-      }
+    return createClientCookieListener({
+      ...restCookieParams,
+      callback: async (changeInfo: ChangeInfo) => {
+        const existingJWT = await get();
+
+        if (existingJWT === changeInfo.cookie.value) {
+          const syncedUAT = await getClientCookie({ ...restCookieParams, name: CLIENT_UAT_KEY }).catch(errorLogger);
+
+          if (!syncedUAT || syncedUAT?.value === '0') {
+            onListenerCallback?.();
+          }
+
+          return;
+        }
+
+        await set(changeInfo.cookie.value);
+        onListenerCallback?.();
+      },
     });
   };
 
-  return { get, poll, set, remove };
+  return { get, listener, set, remove };
 }

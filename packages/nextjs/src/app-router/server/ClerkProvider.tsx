@@ -1,16 +1,15 @@
 import type { InitialState, Without } from '@clerk/types';
 import { headers } from 'next/headers';
+import type { ReactNode } from 'react';
 import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
-import { safeParseClerkFile } from '../../server/keyless-node';
 import type { NextClerkProviderProps } from '../../types';
-import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
-import { deleteKeylessAction } from '../keyless-actions';
+import { getKeylessStatus, KeylessProvider } from './keyless-provider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
 const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
@@ -20,8 +19,13 @@ const getDynamicClerkState = React.cache(async function getDynamicClerkState() {
   return data;
 });
 
-const getNonceFromCSPHeader = React.cache(async function getNonceFromCSPHeader() {
-  return getScriptNonceFromHeader((await headers()).get('Content-Security-Policy') || '') || '';
+const getNonceHeaders = React.cache(async function getNonceHeaders() {
+  const headersList = await headers();
+  const nonce = headersList.get('X-Nonce');
+  return nonce
+    ? nonce
+    : // Fallback to extracting from CSP header
+      getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
 export async function ClerkProvider(
@@ -52,76 +56,40 @@ export async function ClerkProvider(
        * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
        * Without the await here, Next will throw a DynamicServerError during build.
        */
-      return Promise.resolve(await getNonceFromCSPHeader());
+      return Promise.resolve(await getNonceHeaders());
     }
-    return getNonceFromCSPHeader();
+    return getNonceHeaders();
   }
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
   });
 
-  let output = (
-    <ClientClerkProvider
-      {...mergeNextClerkPropsWithEnv(rest)}
-      nonce={await generateNonce()}
-      initialState={await generateStatePromise()}
-    >
-      {children}
-    </ClientClerkProvider>
-  );
+  const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
 
-  const runningWithClaimedKeys = propsWithEnvs.publishableKey === safeParseClerkFile()?.publishableKey;
-  const shouldRunAsKeyless = (!propsWithEnvs.publishableKey || runningWithClaimedKeys) && canUseKeyless;
+  let output: ReactNode;
 
   if (shouldRunAsKeyless) {
-    // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
-    const newOrReadKeys = await import('../../server/keyless-node.js').then(mod => mod.createOrReadKeyless());
-    const { keylessLogger, createConfirmationMessage, createKeylessModeMessage } = await import(
-      '../../server/keyless-log-cache.js'
+    output = (
+      <KeylessProvider
+        rest={propsWithEnvs}
+        generateNonce={generateNonce}
+        generateStatePromise={generateStatePromise}
+        runningWithClaimedKeys={runningWithClaimedKeys}
+      >
+        {children}
+      </KeylessProvider>
     );
-
-    if (newOrReadKeys) {
-      const clientProvider = (
-        <ClientClerkProvider
-          {...mergeNextClerkPropsWithEnv({
-            ...rest,
-            publishableKey: newOrReadKeys.publishableKey,
-            __internal_keyless_claimKeylessApplicationUrl: newOrReadKeys.claimUrl,
-            __internal_keyless_copyInstanceKeysUrl: newOrReadKeys.apiKeysUrl,
-            __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : undefined,
-          })}
-          nonce={await generateNonce()}
-          initialState={await generateStatePromise()}
-        >
-          {children}
-        </ClientClerkProvider>
-      );
-
-      if (runningWithClaimedKeys) {
-        /**
-         * Notify developers.
-         */
-        keylessLogger?.log({
-          cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
-          msg: createConfirmationMessage(),
-        });
-
-        output = clientProvider;
-      } else {
-        const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
-
-        /**
-         * Notify developers.
-         */
-        keylessLogger?.log({
-          cacheKey: newOrReadKeys.publishableKey,
-          msg: createKeylessModeMessage(newOrReadKeys),
-        });
-
-        output = <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
-      }
-    }
+  } else {
+    output = (
+      <ClientClerkProvider
+        {...propsWithEnvs}
+        nonce={await generateNonce()}
+        initialState={await generateStatePromise()}
+      >
+        {children}
+      </ClientClerkProvider>
+    );
   }
 
   if (dynamic) {
@@ -132,6 +100,5 @@ export async function ClerkProvider(
       </PromisifiedAuthProvider>
     );
   }
-
   return output;
 }

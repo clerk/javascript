@@ -1,5 +1,414 @@
 # @clerk/nuxt
 
+## 1.5.0
+
+### Minor Changes
+
+- Deprecate `event.context.auth` in favor of `event.context.auth()` as function ([#5513](https://github.com/clerk/javascript/pull/5513)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```diff
+  export default clerkMiddleware((event) => {
+  + const { userId } = event.context.auth()
+  - const { userId } = event.context.auth
+    const isAdminRoute = event.path.startsWith('/api/admin')
+
+    if (!userId && isAdminRoute) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: 'Unauthorized: User not signed in',
+      })
+    }
+  })
+  ```
+
+- Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and fullstack SDKs. ([#5468](https://github.com/clerk/javascript/pull/5468)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  To get started, install [`svix`](https://www.npmjs.com/package/svix), which Clerk uses to verify its webhooks:
+
+  ```shell
+  npm install svix
+  ```
+
+  Then in your webhook route handler, import `verifyWebhook()` from the Nuxt SDK:
+
+  ```ts
+  // server/api/webhooks.post.ts
+  import { verifyWebhook } from '@clerk/nuxt/webhooks';
+
+  export default eventHandler(async event => {
+    try {
+      const evt = await verifyWebhook(event);
+
+      // Do something with payload
+      const { id } = evt.data;
+      const eventType = evt.type;
+      console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
+      console.log('Webhook payload:', body);
+
+      return 'Webhook received';
+    } catch (err) {
+      console.error('Error: Could not verify webhook:', err);
+      setResponseStatus(event, 400);
+      return 'Error: Verification error';
+    }
+  });
+  ```
+
+  For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data).
+
+### Patch Changes
+
+- Remove telemtry event from `clerkMiddleware()`. ([#5501](https://github.com/clerk/javascript/pull/5501)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`60a9a51`](https://github.com/clerk/javascript/commit/60a9a51dff7d59e7397536586cf1cfe029bc021b), [`e984494`](https://github.com/clerk/javascript/commit/e984494416dda9a6f04acaaba61f8c2683090961), [`cd6ee92`](https://github.com/clerk/javascript/commit/cd6ee92d5b427ca548216f429ca4e31c6acd263c), [`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`38828ae`](https://github.com/clerk/javascript/commit/38828ae58d6d4e8e3c60945284930179b2b6bb40), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a), [`fe065a9`](https://github.com/clerk/javascript/commit/fe065a934c583174ad4c140e04dedbe6d88fc3a0), [`619cde8`](https://github.com/clerk/javascript/commit/619cde8c532d635d910ebbc08ad6abcc025694b4)]:
+  - @clerk/backend@1.26.0
+  - @clerk/shared@3.3.0
+  - @clerk/types@4.50.2
+  - @clerk/vue@1.4.6
+
+## 1.4.6
+
+### Patch Changes
+
+- Updated dependencies [[`e20fb6b`](https://github.com/clerk/javascript/commit/e20fb6b397fb69c9d5af4e321267b82f12a5f127), [`77e6462`](https://github.com/clerk/javascript/commit/77e64628560cab688af214edb5922e67cd68a951)]:
+  - @clerk/shared@3.2.3
+  - @clerk/types@4.50.1
+  - @clerk/backend@1.25.8
+  - @clerk/vue@1.4.5
+
+## 1.4.5
+
+### Patch Changes
+
+- Improved type-safety in Vue plugin installation. ([#5458](https://github.com/clerk/javascript/pull/5458)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`1da28a2`](https://github.com/clerk/javascript/commit/1da28a28bf602069b433c15b92df21f682779294), [`7babfb2`](https://github.com/clerk/javascript/commit/7babfb2e620e6f581a92b526b58d05e6b20acca0), [`a9b618d`](https://github.com/clerk/javascript/commit/a9b618dfa97a0dacc462186c8b2588ad5ddb6902), [`f20dc15`](https://github.com/clerk/javascript/commit/f20dc159f542449e7f5b437b70d3eb3ba04d6975), [`4d9f1ee`](https://github.com/clerk/javascript/commit/4d9f1ee8c22fe1e4a166ff054d0af4d37b829f0a)]:
+  - @clerk/types@4.50.0
+  - @clerk/vue@1.4.4
+  - @clerk/shared@3.2.2
+  - @clerk/backend@1.25.7
+
+## 1.4.4
+
+### Patch Changes
+
+- Updated dependencies [[`27d66a5`](https://github.com/clerk/javascript/commit/27d66a5b252afd18a3491b2746ef2f2f05632f2a), [`466ed13`](https://github.com/clerk/javascript/commit/466ed136af73b59b267d92ad3296039d1c3a4fcc)]:
+  - @clerk/backend@1.25.6
+  - @clerk/types@4.49.2
+  - @clerk/shared@3.2.1
+  - @clerk/vue@1.4.3
+
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [[`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483), [`892bc0e`](https://github.com/clerk/javascript/commit/892bc0eee9e0bb04d327eb84b44201fa34806483)]:
+  - @clerk/backend@1.25.5
+  - @clerk/shared@3.2.0
+  - @clerk/vue@1.4.2
+
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`facefaf`](https://github.com/clerk/javascript/commit/facefafdaf6d602de0acee9218c66c61a0a9ba24), [`3910ebe`](https://github.com/clerk/javascript/commit/3910ebea85817273f18fd2f3f142dd1c728e2220), [`e513333`](https://github.com/clerk/javascript/commit/e5133330a196c5c3742634cc9c3d3233ff488b0d)]:
+  - @clerk/backend@1.25.4
+  - @clerk/types@4.49.1
+  - @clerk/shared@3.1.0
+  - @clerk/vue@1.4.1
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`725918d`](https://github.com/clerk/javascript/commit/725918df2e74cea15e9b748aaf103a52df8e8500), [`10247ba`](https://github.com/clerk/javascript/commit/10247ba2d08d98d6c440b254a4b786f4f1e8967a), [`91d0f0b`](https://github.com/clerk/javascript/commit/91d0f0b0dccab7168ad4dc06c8629808938c235f), [`9572bf5`](https://github.com/clerk/javascript/commit/9572bf5bdfb7dc309ec8714989b98ab12174965b), [`39bbc51`](https://github.com/clerk/javascript/commit/39bbc5189a33dc6cebdc269ac2184dc4ffff2534), [`ba2b00c`](https://github.com/clerk/javascript/commit/ba2b00c83fd4a4ffc59d2bb60f5402466650ab94), [`3dddcda`](https://github.com/clerk/javascript/commit/3dddcda191d8f8d6a9b02464f1f6374d3c6aacb9), [`7524943`](https://github.com/clerk/javascript/commit/7524943300d7e693d61cc1820b520abfadec1c64), [`150b5c8`](https://github.com/clerk/javascript/commit/150b5c89477abb0feab15e0a886179473f653cac), [`23c931e`](https://github.com/clerk/javascript/commit/23c931e9e95e6de992549ad499b477aca9a9c344), [`730262f`](https://github.com/clerk/javascript/commit/730262f0f973923c8749b09078c80c2fc966a8ec), [`5601a15`](https://github.com/clerk/javascript/commit/5601a15e69a7d5e2496dcd82541ca3e6d73b0a3f), [`0b18bb1`](https://github.com/clerk/javascript/commit/0b18bb1fe6fa3ded97547bb6b4d2c73030aad329), [`021bc5f`](https://github.com/clerk/javascript/commit/021bc5f40044d34e49956ce3c9b61d833d815b42), [`1a61390`](https://github.com/clerk/javascript/commit/1a61390d3482bd4af58508b972ad89dea56fa224)]:
+  - @clerk/types@4.49.0
+  - @clerk/backend@1.25.3
+  - @clerk/vue@1.4.0
+  - @clerk/shared@3.0.2
+
+## 1.4.0
+
+### Minor Changes
+
+- Bump `@nuxt/*` dependencies to 3.16.0 and add proper typing for `event.context.auth` object in event handlers ([#5300](https://github.com/clerk/javascript/pull/5300)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  export default eventHandler(event => {
+    const { userId } = event.context.auth; // auth is now typed
+
+    // ...
+
+    return { userId };
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`8182f6711e25cc4a78baa95b023a4158280b31e8`](https://github.com/clerk/javascript/commit/8182f6711e25cc4a78baa95b023a4158280b31e8), [`75879672c5805bfba1caca906ac0729497744164`](https://github.com/clerk/javascript/commit/75879672c5805bfba1caca906ac0729497744164), [`7ec95a7e59033600958aca4b86f3bcd5da947dec`](https://github.com/clerk/javascript/commit/7ec95a7e59033600958aca4b86f3bcd5da947dec), [`3c225d90227141dc62d955e76c7f8e0202524bc7`](https://github.com/clerk/javascript/commit/3c225d90227141dc62d955e76c7f8e0202524bc7), [`2a66c16af08573000bb619607346ac420cd4ce56`](https://github.com/clerk/javascript/commit/2a66c16af08573000bb619607346ac420cd4ce56)]:
+  - @clerk/backend@1.25.2
+  - @clerk/shared@3.0.1
+  - @clerk/types@4.48.0
+  - @clerk/vue@1.3.1
+
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`67f1743aa1e0705d89ee6b532007f2686929240b`](https://github.com/clerk/javascript/commit/67f1743aa1e0705d89ee6b532007f2686929240b)]:
+  - @clerk/backend@1.25.1
+
+## 1.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`4fa5e27e33d229492c77e06ca4b26d552ff3d92f`](https://github.com/clerk/javascript/commit/4fa5e27e33d229492c77e06ca4b26d552ff3d92f), [`29a44b0e5c551e52915f284545699010a87e1a48`](https://github.com/clerk/javascript/commit/29a44b0e5c551e52915f284545699010a87e1a48), [`4d7761a24af5390489653923165e55cbf69a8a6d`](https://github.com/clerk/javascript/commit/4d7761a24af5390489653923165e55cbf69a8a6d)]:
+  - @clerk/backend@1.25.0
+
+## 1.3.0
+
+### Minor Changes
+
+- Introduce `updateClerkOptions()` utility function to update Clerk options on the fly. ([#5235](https://github.com/clerk/javascript/pull/5235)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```vue
+  <script setup>
+  import { updateClerkOptions } from '@clerk/vue';
+  import { dark } from '@clerk/themes';
+  import { frFR } from '@clerk/localizations';
+
+  function enableDarkTheme() {
+    updateClerkOptions({
+      appearance: {
+        baseTheme: dark,
+      },
+    });
+  }
+
+  function changeToFrench() {
+    updateClerkOptions({
+      localization: frFR,
+    });
+  }
+  </script>
+
+  <template>
+    <button @click="enableDarkTheme">Enable Dark Theme</button>
+    <button @click="changeToFrench">Change to French</button>
+  </template>
+  ```
+
+### Patch Changes
+
+- Fixes an issue where duplicated imports caused warnings in the console. ([#5227](https://github.com/clerk/javascript/pull/5227)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- The [`exports` map](https://nodejs.org/api/packages.html#conditional-exports) inside `package.json` has been slightly adjusted to allow for [`require(esm)`](https://joyeecheung.github.io/blog/2024/03/18/require-esm-in-node-js/) to work correctly. The `"import"` conditions have been changed to `"default"`. ([#5188](https://github.com/clerk/javascript/pull/5188)) by [@LekoArts](https://github.com/LekoArts)
+
+  You shouldn't see any change in behavior/functionality on your end.
+
+- Updated dependencies [[`54a3b5b7fbdbbf3655ccabf10370313728d4d7be`](https://github.com/clerk/javascript/commit/54a3b5b7fbdbbf3655ccabf10370313728d4d7be), [`28179323d9891bd13625e32c5682a3276e73cdae`](https://github.com/clerk/javascript/commit/28179323d9891bd13625e32c5682a3276e73cdae), [`7ae77b74326e378bf161e29886ee82e1556d9840`](https://github.com/clerk/javascript/commit/7ae77b74326e378bf161e29886ee82e1556d9840), [`c5c246ce91c01db9f1eaccbd354f646bcd24ec0a`](https://github.com/clerk/javascript/commit/c5c246ce91c01db9f1eaccbd354f646bcd24ec0a), [`de89c4fb319c0a86a6785b344969f542723229f9`](https://github.com/clerk/javascript/commit/de89c4fb319c0a86a6785b344969f542723229f9), [`bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a`](https://github.com/clerk/javascript/commit/bcbe5f6382ebcc70ef4fddb950d052bf6b7d693a), [`382c30240f563e58bc4d4832557c6825da40ce7f`](https://github.com/clerk/javascript/commit/382c30240f563e58bc4d4832557c6825da40ce7f)]:
+  - @clerk/vue@1.3.0
+  - @clerk/types@4.47.0
+  - @clerk/shared@3.0.0
+  - @clerk/backend@1.24.3
+
+## 1.2.0
+
+### Minor Changes
+
+- Introduce `getAuth()` helper to retrieve authentication state from the [event](https://h3.unjs.io/guide/event) object. ([#5158](https://github.com/clerk/javascript/pull/5158)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  import { getAuth } from '@clerk/nuxt/server';
+
+  export default eventHandler(event => {
+    const { userId } = getAuth(event);
+
+    if (!userId) {
+      // User is not authenticated
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Re-export error handling utilities from `@clerk/shared` ([#5155](https://github.com/clerk/javascript/pull/5155)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```vue
+  <script setup lang="ts">
+  import { useSignIn } from '@clerk/vue';
+  import { isClerkAPIResponseError } from '@clerk/vue/errors';
+
+  // ... form state refs and other setup ...
+  const { signIn } = useSignIn();
+
+  const handleSubmit = async () => {
+    try {
+      const signInAttempt = await signIn.value.create({
+        identifier: email.value,
+        password: password.value,
+      });
+      // ... handle successful sign in ...
+    } catch (err) {
+      // Type guard to safely handle Clerk API errors
+      if (isClerkAPIResponseError(err)) {
+        errors.value = err.errors; // err.errors is properly typed as ClerkAPIError[]
+      }
+    }
+  };
+  </script>
+
+  <template>
+    <!-- Form template here -->
+  </template>
+  ```
+
+- Updated dependencies [[`d76c4699990b8477745c2584b1b98d5c92f9ace6`](https://github.com/clerk/javascript/commit/d76c4699990b8477745c2584b1b98d5c92f9ace6), [`a9b0087fca3f427f65907b358d9b5bc0c95921d8`](https://github.com/clerk/javascript/commit/a9b0087fca3f427f65907b358d9b5bc0c95921d8), [`92d17d7c087470b262fa5407cb6720fe6b17d333`](https://github.com/clerk/javascript/commit/92d17d7c087470b262fa5407cb6720fe6b17d333), [`62200fad4431d625fcb4bf2a521e4650eb615381`](https://github.com/clerk/javascript/commit/62200fad4431d625fcb4bf2a521e4650eb615381)]:
+  - @clerk/shared@2.22.0
+  - @clerk/types@4.46.1
+  - @clerk/vue@1.2.1
+  - @clerk/backend@1.24.2
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`dd2cbfe9f30358b6b298901bb52fa378b0acdca3`](https://github.com/clerk/javascript/commit/dd2cbfe9f30358b6b298901bb52fa378b0acdca3), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`570d8386f6aa596bf7bb1659bdddb8dd4d992b1d`](https://github.com/clerk/javascript/commit/570d8386f6aa596bf7bb1659bdddb8dd4d992b1d), [`9b6102c551dcd5500e29e3a3de9e6483796f6686`](https://github.com/clerk/javascript/commit/9b6102c551dcd5500e29e3a3de9e6483796f6686), [`128fd8909ae083c0d274dee7c6810e8574e1ce33`](https://github.com/clerk/javascript/commit/128fd8909ae083c0d274dee7c6810e8574e1ce33), [`98436f018fb19170a1b5781401577dcab6ec706a`](https://github.com/clerk/javascript/commit/98436f018fb19170a1b5781401577dcab6ec706a)]:
+  - @clerk/types@4.46.0
+  - @clerk/vue@1.2.0
+  - @clerk/backend@1.24.1
+  - @clerk/shared@2.21.1
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`ce44176efd4f2132001c49b815cbee409463bbea`](https://github.com/clerk/javascript/commit/ce44176efd4f2132001c49b815cbee409463bbea), [`4089ca43c3fea5a2acedc86c6fc8a88e7cbea16b`](https://github.com/clerk/javascript/commit/4089ca43c3fea5a2acedc86c6fc8a88e7cbea16b), [`f41081c563ddd2afc05b837358e0de087ae0c895`](https://github.com/clerk/javascript/commit/f41081c563ddd2afc05b837358e0de087ae0c895), [`767ac85fe6ce0ee0594c923e9af701bb05f40a0b`](https://github.com/clerk/javascript/commit/767ac85fe6ce0ee0594c923e9af701bb05f40a0b), [`225b38c7187d31fc755155ea99834ca03894d36b`](https://github.com/clerk/javascript/commit/225b38c7187d31fc755155ea99834ca03894d36b), [`c0f2daebe15642cd0cef16aafa1df1ece8ef771d`](https://github.com/clerk/javascript/commit/c0f2daebe15642cd0cef16aafa1df1ece8ef771d), [`429f1bfe5f7a554ab1fdf265475ba6c8b3f78472`](https://github.com/clerk/javascript/commit/429f1bfe5f7a554ab1fdf265475ba6c8b3f78472), [`5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2`](https://github.com/clerk/javascript/commit/5faa60e805ef14d9496a6caf9ff4dd8ec500c7e2)]:
+  - @clerk/backend@1.24.0
+  - @clerk/vue@1.1.11
+  - @clerk/shared@2.21.0
+  - @clerk/types@4.45.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Add `<Waitlist />` component to the set of auto-imported components ([#5067](https://github.com/clerk/javascript/pull/5067)) by [@davidpattaguan](https://github.com/davidpattaguan)
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`d3152be7f01fbb5ca26aeddc2437021f4b7ecc83`](https://github.com/clerk/javascript/commit/d3152be7f01fbb5ca26aeddc2437021f4b7ecc83), [`f976349243da2b75023e59e802460e6f3592ebbd`](https://github.com/clerk/javascript/commit/f976349243da2b75023e59e802460e6f3592ebbd)]:
+  - @clerk/types@4.45.0
+  - @clerk/backend@1.23.11
+  - @clerk/shared@2.20.18
+  - @clerk/vue@1.1.10
+
+## 1.1.0
+
+### Minor Changes
+
+- Add `createRouteMatcher()` helper function that allows you to protect multiple pages or API routes. ([#5050](https://github.com/clerk/javascript/pull/5050)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  For protecting pages (in a global route middleware):
+
+  ```ts
+  // createRouteMatcher is automatically imported
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/forum(.*)']);
+
+  export default defineNuxtRouteMiddleware(to => {
+    const { userId } = useAuth();
+
+    if (!userId.value && isProtectedRoute(to)) {
+      // Add custom logic to run before redirecting
+      return navigateTo('/sign-in');
+    }
+  });
+  ```
+
+  For protecting API routes:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
+
+  // Unlike pages, you need to import `createRouteMatcher` from `@clerk/nuxt/server`
+  const isProtectedRoute = createRouteMatcher(['/api/user(.*)', '/api/projects(.*)']);
+
+  export default clerkMiddleware(event => {
+    const { userId } = event.context.auth;
+
+    if (!userId && isProtectedRoute(event)) {
+      setResponseStatus(event, 401);
+      return 'You are not authorized to access this resource.';
+    }
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`26225f2c31a22560f7ece2e02f1d0080b5b89520`](https://github.com/clerk/javascript/commit/26225f2c31a22560f7ece2e02f1d0080b5b89520), [`833693a6792b621e72162d70673e7bdfa84a69b6`](https://github.com/clerk/javascript/commit/833693a6792b621e72162d70673e7bdfa84a69b6)]:
+  - @clerk/shared@2.20.17
+  - @clerk/types@4.44.3
+  - @clerk/backend@1.23.10
+  - @clerk/vue@1.1.9
+
+## 1.0.13
+
+### Patch Changes
+
+- Updated dependencies [[`a309be354275b91a7b17d5a67e8ef6aa230a9935`](https://github.com/clerk/javascript/commit/a309be354275b91a7b17d5a67e8ef6aa230a9935), [`83f145621397986c8eca828c0001fba83e3fc941`](https://github.com/clerk/javascript/commit/83f145621397986c8eca828c0001fba83e3fc941), [`4773d0ad4ed27928fa53357906c0f3a349b9f871`](https://github.com/clerk/javascript/commit/4773d0ad4ed27928fa53357906c0f3a349b9f871), [`1345cb487970a7347351897e80dfb829d85c41ea`](https://github.com/clerk/javascript/commit/1345cb487970a7347351897e80dfb829d85c41ea)]:
+  - @clerk/shared@2.20.16
+  - @clerk/vue@1.1.8
+  - @clerk/backend@1.23.9
+  - @clerk/types@4.44.2
+
+## 1.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`57c983fdc2b8d883623a2294daae0ac6c02c48f6`](https://github.com/clerk/javascript/commit/57c983fdc2b8d883623a2294daae0ac6c02c48f6), [`a26cf0ff10c76244975c454fdf6c615475d4bcd5`](https://github.com/clerk/javascript/commit/a26cf0ff10c76244975c454fdf6c615475d4bcd5), [`dd58c2507f8a7af4ebfc1241e2672a5678a83eaa`](https://github.com/clerk/javascript/commit/dd58c2507f8a7af4ebfc1241e2672a5678a83eaa)]:
+  - @clerk/types@4.44.1
+  - @clerk/shared@2.20.15
+  - @clerk/backend@1.23.8
+  - @clerk/vue@1.1.7
+
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies [[`2179690c10a61b117e82fdd566b34939f4d28bc1`](https://github.com/clerk/javascript/commit/2179690c10a61b117e82fdd566b34939f4d28bc1), [`bdb537a9902c0f0ae58ca1d4b7590d929f28fedb`](https://github.com/clerk/javascript/commit/bdb537a9902c0f0ae58ca1d4b7590d929f28fedb)]:
+  - @clerk/types@4.44.0
+  - @clerk/backend@1.23.7
+  - @clerk/shared@2.20.14
+  - @clerk/vue@1.1.6
+
+## 1.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`f87ede848265d75ea1e880a3ab80c53a250f42cf`](https://github.com/clerk/javascript/commit/f87ede848265d75ea1e880a3ab80c53a250f42cf), [`e0cea9a9bf8b90858067154cba9c149d1634dc91`](https://github.com/clerk/javascript/commit/e0cea9a9bf8b90858067154cba9c149d1634dc91), [`6126cc98281bca96797fd8a55b6ec6aeda397e46`](https://github.com/clerk/javascript/commit/6126cc98281bca96797fd8a55b6ec6aeda397e46), [`6e096564a459db4eaf953e99e570905b10be6c84`](https://github.com/clerk/javascript/commit/6e096564a459db4eaf953e99e570905b10be6c84)]:
+  - @clerk/shared@2.20.13
+  - @clerk/backend@1.23.6
+  - @clerk/types@4.43.0
+  - @clerk/vue@1.1.5
+
+## 1.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`fe3e49f61acefe8d7f1992405f7cb415fea2e5c8`](https://github.com/clerk/javascript/commit/fe3e49f61acefe8d7f1992405f7cb415fea2e5c8), [`4427c4702f64d4f28f7564ce5889d41e260aa519`](https://github.com/clerk/javascript/commit/4427c4702f64d4f28f7564ce5889d41e260aa519)]:
+  - @clerk/types@4.42.0
+  - @clerk/backend@1.23.5
+  - @clerk/shared@2.20.12
+  - @clerk/vue@1.1.4
+
 ## 1.0.8
 
 ### Patch Changes

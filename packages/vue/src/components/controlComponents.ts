@@ -1,9 +1,10 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
   CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams as HandleOAuthCallbackParamsOriginal,
+  HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PendingSessionOptions,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -13,14 +14,14 @@ import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
 import { useClerkLoaded } from '../utils/useClerkLoaded';
 
-export const SignedIn = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value ? slots.default?.() : null);
 });
 
-export const SignedOut = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedOut = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value === null ? slots.default?.() : null);
 });
@@ -41,9 +42,9 @@ export const RedirectToSignIn = defineComponent((props: RedirectOptions) => {
   const { sessionCtx, clientCtx } = useClerkContext();
 
   useClerkLoaded(clerk => {
-    const hasActiveSessions = clientCtx.value?.activeSessions && clientCtx.value.activeSessions.length > 0;
+    const hasSignedInSessions = clientCtx.value?.signedInSessions && clientCtx.value.signedInSessions.length > 0;
 
-    if (sessionCtx.value === null && hasActiveSessions) {
+    if (sessionCtx.value === null && hasSignedInSessions) {
       void clerk.redirectToAfterSignOut();
     } else {
       void clerk.redirectToSignIn(props);
@@ -97,17 +98,6 @@ export const RedirectToCreateOrganization = defineComponent(() => {
   return () => null;
 });
 
-// TODO: Fix this later and export `Transferable` type from @clerk/types
-// to fix the exported variable error in TS
-type HandleOAuthCallbackParams = Omit<HandleOAuthCallbackParamsOriginal, 'transferable'> & {
-  /**
-   * Indicates whether or not sign in attempts are transferable to the sign up flow.
-   * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
-   * @default true
-   */
-  transferable?: boolean;
-};
-
 export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOAuthCallbackParams) => {
   useClerkLoaded(clerk => {
     void clerk.handleRedirectCallback(props);
@@ -116,7 +106,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps =
+export type ProtectProps = (
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -136,10 +126,12 @@ export type ProtectProps =
       condition?: never;
       role?: never;
       permission?: never;
-    };
+    }
+) &
+  PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
-  const { isLoaded, has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   return () => {
     /**
@@ -160,6 +152,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
      * Check against the results of `has` called inside the callback
      */
     if (typeof props.condition === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (props.condition(has.value!)) {
         return slots.default?.();
       }

@@ -61,8 +61,10 @@ export const withRedirectToAfterSignIn = <P extends AvailableComponentProps>(Com
     return withRedirect(
       Component,
       sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
-      warnings.cannotRenderSignInComponentWhenSessionExists,
+      ({ clerk }) => signInCtx.sessionTaskUrl || signInCtx.afterSignInUrl || clerk.buildAfterSignInUrl(),
+      signInCtx.sessionTaskUrl
+        ? warnings.cannotRenderSignInComponentWhenTaskExists
+        : warnings.cannotRenderSignInComponentWhenSessionExists,
     )(props);
   };
 
@@ -80,8 +82,10 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
     return withRedirect(
       Component,
       sessionExistsAndSingleSessionModeEnabled,
-      ({ clerk }) => signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
-      warnings.cannotRenderSignUpComponentWhenSessionExists,
+      ({ clerk }) => signUpCtx.sessionTaskUrl || signUpCtx.afterSignUpUrl || clerk.buildAfterSignUpUrl(),
+      signUpCtx.sessionTaskUrl
+        ? warnings.cannotRenderSignUpComponentWhenTaskExists
+        : warnings.cannotRenderSignUpComponentWhenSessionExists,
     )(props);
   };
 
@@ -89,11 +93,3 @@ export const withRedirectToAfterSignUp = <P extends AvailableComponentProps>(Com
 
   return HOC;
 };
-
-export const withRedirectToHomeSingleSessionGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) =>
-  withRedirect(
-    Component,
-    sessionExistsAndSingleSessionModeEnabled,
-    ({ environment }) => environment.displayConfig.homeUrl,
-    warnings.cannotRenderComponentWhenSessionExists,
-  );

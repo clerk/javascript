@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/vue';
 import { vi } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 
-import { SignOutButton } from '../SignOutButton';
+import SignOutButton from '../SignOutButton.vue';
 
 const mockSignOut = vi.fn();
 const originalError = console.error;

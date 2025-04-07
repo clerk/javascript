@@ -150,6 +150,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -184,6 +185,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -206,6 +208,7 @@ describe('ConnectedAccountsSection ', () => {
       // Still displays a remove button
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -226,6 +229,7 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -246,6 +250,7 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -267,6 +272,7 @@ describe('ConnectedAccountsSection ', () => {
       const item = getByText(/github/i);
       const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
       getByRole('menuitem', { name: /remove/i });
@@ -274,6 +280,31 @@ describe('ConnectedAccountsSection ', () => {
       await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
       await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
       expect(queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Handles opening/closing actions', () => {
+    it('closes remove account form when connect account action is clicked', async () => {
+      const { wrapper } = await createFixtures(withSomeConnections);
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/google/i);
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        await userEvent.click(menuButton!);
+      });
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /remove connected account/i }));
+
+      await expect(queryByRole('heading', { name: /remove connected account/i })).toBeInTheDocument();
+
+      await userEvent.click(getByRole('button', { name: /connect account/i }));
+
+      await waitFor(() =>
+        expect(queryByRole('heading', { name: /remove connected account/i })).not.toBeInTheDocument(),
+      );
     });
   });
 });

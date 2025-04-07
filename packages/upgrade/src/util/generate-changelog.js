@@ -16,7 +16,10 @@ async function generate() {
       // Note: make sure to add a custom anchor link here to match the cli output
       // anchor should be `entry.slug`
       output += `<details>
-<summary>${parseInline(entry.title)}</summary>
+<summary>${
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        parseInline(entry.title)
+      }</summary>
                 
 Regex matcher: \`${entry.matcher}\`
 

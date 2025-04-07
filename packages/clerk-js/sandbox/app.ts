@@ -1,4 +1,20 @@
+import * as l from '../../localizations';
 import type { Clerk as ClerkType } from '../';
+
+const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
+
+function fillLocalizationSelect() {
+  const select = document.getElementById('localizationSelect') as HTMLSelectElement;
+
+  for (const locale of AVAILABLE_LOCALES) {
+    if (locale === 'enUS') {
+      select.add(new Option(locale, locale, true, true));
+      continue;
+    }
+
+    select.add(new Option(locale, locale));
+  }
+}
 
 interface ComponentPropsControl {
   setProps: (props: unknown) => void;
@@ -16,6 +32,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationProfile',
   'organizationSwitcher',
   'waitlist',
+  'pricingTable',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -73,6 +90,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationProfile: buildComponentControls('organizationProfile'),
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
+  pricingTable: buildComponentControls('pricingTable'),
 };
 
 declare global {
@@ -95,10 +113,10 @@ const app = document.getElementById('app') as HTMLDivElement;
 function mountIndex(element: HTMLDivElement) {
   assertClerkIsLoaded(Clerk);
   const user = Clerk.user;
-  element.innerHTML = `<pre><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
+  element.innerHTML = `<pre class="text-left whitespace-pre overflow-x-auto bg-white p-4 border border-gray-100 rounded-md text-sm"><code>${JSON.stringify({ user }, null, 2)}</code></pre>`;
 }
 
-function mountOpenSignInButton(element: HTMLDivElement, props) {
+function mountOpenSignInButton(element: HTMLDivElement, props: any) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign In';
   button.onclick = () => {
@@ -107,7 +125,7 @@ function mountOpenSignInButton(element: HTMLDivElement, props) {
   element.appendChild(button);
 }
 
-function mountOpenSignUpButton(element: HTMLDivElement, props) {
+function mountOpenSignUpButton(element: HTMLDivElement, props: any) {
   const button = document.createElement('button');
   button.textContent = 'Open Sign Up';
   button.onclick = () => {
@@ -125,8 +143,130 @@ function addCurrentRouteIndicator(currentRoute: string) {
   link.setAttribute('aria-current', 'page');
 }
 
-(async () => {
+function appearanceVariableOptions() {
   assertClerkIsLoaded(Clerk);
+
+  const resetVariablesBtn = document.getElementById('resetVariablesBtn');
+
+  const variableInputIds = [
+    'colorPrimary',
+    'colorNeutral',
+    'colorBackground',
+    'colorTextOnPrimaryBackground',
+    'colorDanger',
+    'colorSuccess',
+    'colorWarning',
+    'colorText',
+    'colorTextSecondary',
+    'colorInputText',
+    'colorInputBackground',
+    'colorShimmer',
+    'spacingUnit',
+    'borderRadius',
+  ] as const;
+
+  const variableInputs = variableInputIds.reduce(
+    (acc, id) => {
+      const element = document.getElementById(id) as HTMLInputElement | null;
+      if (!element) {
+        throw new Error(`Could not find input element with id: ${id}`);
+      }
+      acc[id] = element;
+      return acc;
+    },
+    {} as Record<(typeof variableInputIds)[number], HTMLInputElement>,
+  );
+
+  Object.entries(variableInputs).forEach(([key, input]) => {
+    const savedColor = sessionStorage.getItem(key);
+    if (savedColor) {
+      input.value = savedColor;
+    }
+  });
+
+  const updateVariables = () => {
+    void Clerk.__unstable__updateProps({
+      appearance: {
+        variables: Object.fromEntries(
+          Object.entries(variableInputs).map(([key, input]) => {
+            sessionStorage.setItem(key, input.value);
+            return [key, input.value];
+          }),
+        ),
+      },
+    });
+  };
+
+  Object.values(variableInputs).forEach(input => {
+    input.addEventListener('change', updateVariables);
+  });
+
+  resetVariablesBtn?.addEventListener('click', () => {
+    Object.values(variableInputs).forEach(input => {
+      input.value = input.defaultValue;
+    });
+    updateVariables();
+  });
+
+  return { updateVariables };
+}
+
+function otherOptions() {
+  assertClerkIsLoaded(Clerk);
+
+  const resetOtherOptionsBtn = document.getElementById('resetOtherOptionsBtn');
+
+  const otherOptionsInputs: Record<string, HTMLSelectElement> = {
+    localization: document.getElementById('localizationSelect') as HTMLSelectElement,
+  };
+
+  Object.entries(otherOptionsInputs).forEach(([key, input]) => {
+    const savedValue = sessionStorage.getItem(key);
+    if (savedValue) {
+      input.value = savedValue;
+    }
+  });
+
+  const updateOtherOptions = () => {
+    void Clerk.__unstable__updateProps({
+      options: Object.fromEntries(
+        Object.entries(otherOptionsInputs).map(([key, input]) => {
+          sessionStorage.setItem(key, input.value);
+
+          if (key === 'localization') {
+            return [key, l[input.value as keyof typeof l]];
+          }
+
+          return [key, input.value];
+        }),
+      ),
+    });
+  };
+
+  Object.values(otherOptionsInputs).forEach(input => {
+    input.addEventListener('change', updateOtherOptions);
+  });
+
+  resetOtherOptionsBtn?.addEventListener('click', () => {
+    otherOptionsInputs.localization.value = 'enUS';
+    updateOtherOptions();
+  });
+
+  return { updateOtherOptions };
+}
+
+void (async () => {
+  assertClerkIsLoaded(Clerk);
+  fillLocalizationSelect();
+  const { updateVariables } = appearanceVariableOptions();
+  const { updateOtherOptions } = otherOptions();
+
+  const sidebars = document.querySelectorAll('[data-sidebar]');
+  document.addEventListener('keydown', e => {
+    if (e.key === '/') {
+      sidebars.forEach(s => s.classList.toggle('hidden'));
+    }
+  });
 
   const routes = {
     '/': () => {
@@ -160,12 +300,15 @@ function addCurrentRouteIndicator(currentRoute: string) {
       Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
     },
     '/keyless': () => {
-      Clerk.__unstable__updateProps({
+      void Clerk.__unstable__updateProps({
         options: {
-          __internal_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
-          __internal_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
+          __internal_keyless_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
+          __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
         },
       });
+    },
+    '/pricing-table': () => {
+      Clerk.__experimental_mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
@@ -175,7 +318,7 @@ function addCurrentRouteIndicator(currentRoute: string) {
     },
   };
 
-  const route = window.location.pathname;
+  const route = window.location.pathname as keyof typeof routes;
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
@@ -183,8 +326,11 @@ function addCurrentRouteIndicator(currentRoute: string) {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      experimental: { commerce: true },
     });
     renderCurrentRoute();
+    updateVariables();
+    updateOtherOptions();
   } else {
     console.error(`Unknown route: "${route}".`);
   }

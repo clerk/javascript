@@ -14,7 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  __experimental_commerce: {
+    billedAnnually: undefined,
+    free: undefined,
+    getStarted: undefined,
+    manageMembership: undefined,
+    month: undefined,
+    switchPlan: undefined,
+  },
   backButton: 'Назад',
+  badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
   badge__primary: 'Основен',
@@ -129,6 +138,7 @@ export const bgBG: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Покани',
+      action__search: undefined,
       activeMembersTab: {
         menuAction__remove: 'Премахване на член',
         tableHeader__actions: undefined,
@@ -277,6 +287,7 @@ export const bgBG: LocalizationResource = {
       actionText: "Don't have one of these?",
       blockButton__backupCode: 'Use backup code',
       blockButton__emailCode: 'Send code to email',
+      blockButton__passkey: undefined,
       blockButton__password: 'Login with password',
       blockButton__phoneCode: 'Send code to phone',
       blockButton__totp: 'Use authenticator app',
@@ -303,9 +314,14 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Something went wrong.',
       title: 'Authentication failed',
     },
+    passkey: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue using "{{applicationName}}"',
+      subtitle: 'Enter your current password to continue using "{{applicationName}}"',
       title: 'Enter your password',
     },
     phoneCode: {
@@ -459,6 +475,7 @@ export const bgBG: LocalizationResource = {
       actionText: 'Нямате акаунт?',
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
+      subtitleCombined: undefined,
       title: 'Влезте в {{applicationName}}',
       titleCombined: undefined,
     },
@@ -539,7 +556,9 @@ export const bgBG: LocalizationResource = {
       actionLink__use_phone: 'Използвайте телефон',
       actionText: 'Вече имате акаунт?',
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
+      subtitleCombined: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
+      titleCombined: 'Създайте своя акаунт',
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
@@ -641,6 +660,14 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    __experimental_billingPage: {
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__paymentSources: undefined,
+        headerTitle__plans: undefined,
+      },
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -693,6 +720,11 @@ export const bgBG: LocalizationResource = {
         resendButton: 'Не сте получили линк? Изпрати отново',
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
+      enterpriseSSOLink: {
+        formButton: undefined,
+        formSubtitle: undefined,
+      },
+      formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} ще бъде премахнат от този профил.',
         messageLine2: 'Няма да можете да влезете в профила си, използвайки този имейл адрес.',
@@ -760,6 +792,7 @@ export const bgBG: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      billing: undefined,
       description: 'Управлявайте информацията в профила си.',
       security: 'Security',
       title: 'Профил',
@@ -859,6 +892,7 @@ export const bgBG: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: undefined,
         menuAction__rename: undefined,
+        primaryButton: undefined,
         title: undefined,
       },
       passwordSection: {
@@ -885,6 +919,7 @@ export const bgBG: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Премахни портфейл',
+        detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 портфейли',
         title: 'Web3 портфейли',
       },

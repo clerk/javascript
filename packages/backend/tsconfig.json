@@ -2,25 +2,22 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "rootDir": "src",
-    "declaration": true,
-    "declarationMap": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "moduleResolution": "NodeNext",
+    "isolatedModules": true,
     "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     "outDir": "dist",
     "resolveJsonModule": true,
+    "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2020",
-    "isolatedModules": true
+    "target": "ES2020"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "/src/runtime/*", "src/**/__tests__/*.test.ts", "src/tests"]
+  "include": ["src"]
 }

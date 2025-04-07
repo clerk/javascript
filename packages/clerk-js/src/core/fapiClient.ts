@@ -1,6 +1,6 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
+import { retry } from '@clerk/shared/retry';
 import { camelToSnake } from '@clerk/shared/underscore';
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
@@ -67,6 +67,7 @@ type FapiClientOptions = {
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  isSatellite?: boolean;
 };
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
@@ -114,7 +115,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       searchParams.append('rotating_token_nonce', rotatingTokenNonce);
     }
 
-    if (options.domain) {
+    if (options.domain && options.instanceType === 'development' && options.isSatellite) {
       searchParams.append('__domain', options.domain);
     }
 
@@ -144,8 +145,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   function buildUrl(requestInit: FapiRequestInit): URL {
     const { path, pathPrefix = 'v1' } = requestInit;
 
-    const domainOnlyInProd = options.instanceType === 'production' ? options.domain : '';
-
     if (options.proxyUrl) {
       const proxyBase = new URL(options.proxyUrl);
       const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
@@ -158,6 +157,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         { stringify: false },
       );
     }
+
+    // We only use the domain option in production, in development it should always match the frontendApi
+    const domainOnlyInProd = options.instanceType === 'production' ? options.domain : '';
 
     const baseUrl = `https://${domainOnlyInProd || options.frontendApi}`;
 
@@ -230,17 +232,20 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
-        response =
-          // retry only on GET requests for safety
-          overwrittenRequestMethod === 'GET'
-            ? await runWithExponentialBackOff(() => fetch(urlStr, fetchOpts), {
-                firstDelay: 500,
-                maxDelay: 3000,
-                shouldRetry: (_: unknown, iterationsCount: number) => {
-                  return iterationsCount < maxTries;
-                },
-              })
-            : await fetch(urlStr, fetchOpts);
+        response = await retry(() => fetch(urlStr, fetchOpts), {
+          // This retry handles only network errors, not 4xx or 5xx responses,
+          // so we want to try once immediately to handle simple network blips.
+          // Since fapiClient is responsible for the network layer only,
+          // callers need to use their own retry logic where needed.
+          retryImmediately: true,
+          // And then exponentially back off with a max delay of 5 seconds.
+          initialDelay: 700,
+          maxDelayBetweenRetries: 5000,
+          shouldRetry: (_: unknown, iterations: number) => {
+            // We want to retry only GET requests, as other methods are not idempotent.
+            return overwrittenRequestMethod === 'GET' && iterations < maxTries;
+          },
+        });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
@@ -248,7 +253,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    const json: FapiResponseJSON<T> = await response.json();
+    // 204 No Content responses do not have a body so we should not try to parse it
+    const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
