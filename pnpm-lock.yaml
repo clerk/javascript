@@ -17,8 +17,8 @@ catalogs:
       specifier: 18.3.20
       version: 18.3.20
     '@types/react-dom':
-      specifier: 18.3.5
-      version: 18.3.5
+      specifier: 18.3.6
+      version: 18.3.6
     react:
       specifier: 18.3.1
       version: 18.3.1
@@ -105,7 +105,7 @@ importers:
         version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.8.2)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.13.14)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0))
       '@testing-library/react':
         specifier: ^16.0.0
-        version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@10.1.0)
@@ -123,7 +123,7 @@ importers:
         version: 18.3.20
       '@types/react-dom':
         specifier: catalog:react
-        version: 18.3.5(@types/react@18.3.20)
+        version: 18.3.6(@types/react@18.3.20)
       '@vitest/coverage-v8':
         specifier: 3.0.2
         version: 3.0.2(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.13.14)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0))
@@ -548,7 +548,7 @@ importers:
         version: 1.1.1
       '@radix-ui/react-form':
         specifier: ^0.1.0
-        version: 0.1.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.1.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
         specifier: ^1.1.0
         version: 1.1.2(@types/react@18.3.20)(react@18.3.1)
@@ -5082,8 +5082,8 @@ packages:
   '@types/range-parser@1.2.4':
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
 
-  '@types/react-dom@18.3.5':
-    resolution: {integrity: sha512-P4t6saawp+b/dFrUr2cvkVsfvPguwsxtH6dNIYRllMsefqFzkZk5UIjzyDOv5g1dXIPdG4Sp1yCR4Z6RCUsG/Q==}
+  '@types/react-dom@18.3.6':
+    resolution: {integrity: sha512-nf22//wEbKXusP6E9pfOCDwFdHAX4u172eaJI4YkDRQEZiorm6KfYnSC2SWLDMVWUOWPERmJnN0ujeAfTBLvrw==}
     peerDependencies:
       '@types/react': ^18.0.0
 
@@ -18065,19 +18065,19 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.20
 
-  '@radix-ui/react-form@0.1.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-form@0.1.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@radix-ui/primitive': 1.1.0
       '@radix-ui/react-compose-refs': 1.1.0(@types/react@18.3.20)(react@18.3.1)
       '@radix-ui/react-context': 1.1.0(@types/react@18.3.20)(react@18.3.1)
       '@radix-ui/react-id': 1.1.0(@types/react@18.3.20)(react@18.3.1)
-      '@radix-ui/react-label': 2.1.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-primitive': 2.0.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-label': 2.1.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-primitive': 2.0.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.20
-      '@types/react-dom': 18.3.5(@types/react@18.3.20)
+      '@types/react-dom': 18.3.6(@types/react@18.3.20)
 
   '@radix-ui/react-id@1.1.0(@types/react@18.3.20)(react@18.3.1)':
     dependencies:
@@ -18086,23 +18086,23 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.20
 
-  '@radix-ui/react-label@2.1.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-label@2.1.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@radix-ui/react-primitive': 2.0.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-primitive': 2.0.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.20
-      '@types/react-dom': 18.3.5(@types/react@18.3.20)
+      '@types/react-dom': 18.3.6(@types/react@18.3.20)
 
-  '@radix-ui/react-primitive@2.0.0(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-primitive@2.0.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@radix-ui/react-slot': 1.1.0(@types/react@18.3.20)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.20
-      '@types/react-dom': 18.3.5(@types/react@18.3.20)
+      '@types/react-dom': 18.3.6(@types/react@18.3.20)
 
   '@radix-ui/react-slot@1.1.0(@types/react@18.3.20)(react@18.3.1)':
     dependencies:
@@ -19647,7 +19647,7 @@ snapshots:
       jest: 29.7.0(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.8.2))
       vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.13.14)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(terser@5.37.0)(tsx@4.19.2)(yaml@2.7.0)
 
-  '@testing-library/react@16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.5(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@testing-library/react@16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@testing-library/dom': 10.1.0
@@ -19655,7 +19655,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.20
-      '@types/react-dom': 18.3.5(@types/react@18.3.20)
+      '@types/react-dom': 18.3.6(@types/react@18.3.20)
 
   '@testing-library/user-event@14.5.2(@testing-library/dom@10.1.0)':
     dependencies:
@@ -19898,7 +19898,7 @@ snapshots:
 
   '@types/range-parser@1.2.4': {}
 
-  '@types/react-dom@18.3.5(@types/react@18.3.20)':
+  '@types/react-dom@18.3.6(@types/react@18.3.20)':
     dependencies:
       '@types/react': 18.3.20
 
