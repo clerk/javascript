@@ -1,5 +1,5 @@
 ---
-'@clerk/tanstack-start': minor
+'@clerk/tanstack-react-start': minor
 '@clerk/react-router': minor
 '@clerk/clerk-js': minor
 '@clerk/nextjs': minor
