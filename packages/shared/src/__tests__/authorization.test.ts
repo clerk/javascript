@@ -30,12 +30,11 @@ describe('resolveSignedInAuthStateFromJWTClaims', () => {
       org_role: 'admin',
       org_slug: 'org_slug',
       org_permissions: ['permission1', 'permission2'],
-      v: undefined,
     });
     expect(signedInAuthObjectV1).toMatchObject(signedInAuthObjectV2);
   });
 
-  test('produced auth object with v2 matches v1 without having orgs', () => {
+  test('produced auth object with v2 matches v1 without having orgs related claims', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = resolveSignedInAuthStateFromJWTClaims({
       ...baseClaims,
       v: 2,
