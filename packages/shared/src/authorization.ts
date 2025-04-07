@@ -2,6 +2,7 @@ import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   PendingSessionOptions,
@@ -272,4 +273,74 @@ const resolveAuthState = ({
   }
 };
 
-export { createCheckAuthorization, validateReverificationConfig, resolveAuthState };
+/**
+ * @internal
+ */
+type SignedInAuthObjectProperties = {
+  sessionClaims: JwtPayload;
+  sessionId: string;
+  sessionStatus: SessionStatusClaim | null;
+  actor: ActClaim | undefined;
+  userId: string;
+  orgId: string | undefined;
+  orgRole: OrganizationCustomRoleKey | undefined;
+  orgSlug: string | undefined;
+  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   */
+  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+};
+
+/**
+ * @experimental
+ *
+ * Resolves the signed-in auth state from JWT claims.
+ */
+const resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuthObjectProperties => {
+  let orgId: string | undefined;
+  let orgRole: OrganizationCustomRoleKey | undefined;
+  let orgSlug: string | undefined;
+
+  // fva can be undefined for instances that have not opt-in
+  const factorVerificationAge = claims.fva ?? null;
+
+  // sts can be undefined for instances that have not opt-in
+  const sessionStatus = claims.sts ?? null;
+
+  // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
+  // anything since the JWT v2 is not yet available
+  const orgPermissions = claims.ver === 2 ? undefined : claims.org_permissions;
+
+  if (claims.ver === 2) {
+    orgId = claims.org?.id;
+    orgRole = claims.org?.rol;
+    orgSlug = claims.org?.slg;
+  } else {
+    orgId = claims.org_id;
+    orgRole = claims.org_role;
+    orgSlug = claims.org_slug;
+  }
+
+  return {
+    sessionClaims: claims,
+    sessionId: claims.sid,
+    sessionStatus,
+    actor: claims.act,
+    userId: claims.sub,
+    orgId: orgId,
+    orgRole: orgRole,
+    orgSlug: orgSlug,
+    orgPermissions,
+    factorVerificationAge,
+  };
+};
+
+export {
+  createCheckAuthorization,
+  validateReverificationConfig,
+  resolveAuthState,
+  resolveSignedInAuthStateFromJWTClaims,
+};

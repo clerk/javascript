@@ -1,4 +1,4 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { createCheckAuthorization, resolveSignedInAuthStateFromJWTClaims } from '@clerk/shared/authorization';
 import type {
   ActClaim,
   CheckAuthorizationFromSessionClaims,
@@ -92,31 +92,6 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
   };
 };
 
-const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthObjectProperties => {
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = claims.fva ?? null;
-
-  // sts can be undefined for instances that have not opt-in
-  const sessionStatus = claims.sts ?? null;
-
-  // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
-  // anything since the JWT v2 is not yet available
-  const orgPermissions = claims.org_permissions;
-
-  return {
-    sessionClaims: claims,
-    sessionId: claims.sid,
-    sessionStatus,
-    actor: claims.act,
-    userId: claims.sub,
-    orgId: claims.org_id,
-    orgRole: claims.org_role,
-    orgSlug: claims.org_slug,
-    orgPermissions,
-    factorVerificationAge,
-  };
-};
-
 /**
  * @internal
  */
@@ -126,7 +101,7 @@ export function signedInAuthObject(
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
   const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
-    generateSignedInAuthObjectProperties(sessionClaims);
+    resolveSignedInAuthStateFromJWTClaims(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
