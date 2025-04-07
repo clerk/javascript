@@ -9,7 +9,6 @@ export class FraudProtection {
 
   private captchaRetryCount = 0;
   private readonly MAX_RETRY_ATTEMPTS = 3;
-  private hasReachedDeadEnd = false;
 
   public static getInstance(): FraudProtection {
     if (!FraudProtection.instance) {
@@ -24,10 +23,10 @@ export class FraudProtection {
   ) {}
 
   public async execute<T extends () => Promise<any>, R = Awaited<ReturnType<T>>>(clerk: Clerk, cb: T): Promise<R> {
-    if (this.hasReachedDeadEnd) {
+    if (this.captchaAttemptsExceeded()) {
       throw new ClerkRuntimeError(
         'Security verification failed. Please try again by refreshing the page, clearing your browser cookies, or using a different web browser.',
-        { code: 'captcha_client_dead_end' },
+        { code: 'captcha_client_attempts_exceeded' },
       );
     }
 
@@ -66,9 +65,6 @@ export class FraudProtection {
         }
       } catch (err) {
         this.captchaRetryCount++;
-        if (this.captchaRetryCount >= this.MAX_RETRY_ATTEMPTS && !this.hasReachedDeadEnd) {
-          this.hasReachedDeadEnd = true;
-        }
         throw err;
       } finally {
         // Resolve the exception placeholder promise so that other exceptions can be handled
@@ -83,4 +79,8 @@ export class FraudProtection {
   public managedChallenge(clerk: Clerk) {
     return new this.CaptchaChallengeImpl(clerk).managedInModal({ action: 'verify' });
   }
+
+  private captchaAttemptsExceeded = () => {
+    return this.captchaRetryCount >= this.MAX_RETRY_ATTEMPTS;
+  };
 }
