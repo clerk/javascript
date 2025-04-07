@@ -128,7 +128,7 @@
     "tsup": "catalog:repo",
     "turbo": "^2.4.4",
     "turbo-ignore": "^2.4.4",
-    "typedoc": "0.28.1",
+    "typedoc": "0.28.2",
     "typedoc-plugin-markdown": "4.6.1",
     "typedoc-plugin-replace-text": "4.1.0",
     "typescript": "catalog:repo",
