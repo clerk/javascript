@@ -1,5 +1,50 @@
 # @clerk/astro
 
+## 2.6.0
+
+### Minor Changes
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `clerk({ treatPendingAsSignedOut: false })` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Introduce `treatPendingAsSignedOut` prop to client control components ([#5512](https://github.com/clerk/javascript/pull/5512)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <SignedIn>
+    <p>You have selected an organization!</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <SignedIn treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <Protect>
+    <p>You have selected an organization!</p>
+  </Protect>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <Protect treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </Protect>
+  ```
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`2cceeba`](https://github.com/clerk/javascript/commit/2cceeba177ecf5a28138da308cbba18015e3a646), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+  - @clerk/backend@1.27.0
+  - @clerk/shared@3.4.0
+
 ## 2.5.0
 
 ### Minor Changes
