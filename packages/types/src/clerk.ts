@@ -723,7 +723,7 @@ export type HandleOAuthCallbackParams = TransferableOption &
     /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
-    reloadResource?: 'signIn' | 'signUp' | null;
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
