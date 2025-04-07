@@ -27,10 +27,10 @@ export class CaptchaChallenge {
         }
         return { captchaError: e?.message || e || 'unexpected_captcha_error' };
       });
-      return { ...captchaResult, action: opts?.action };
+      return { ...captchaResult, captchaAction: opts?.action };
     }
 
-    return { captchaError: 'captcha_unavailable', action: opts?.action };
+    return { captchaError: 'captcha_unavailable', captchaAction: opts?.action };
   }
 
   /**
@@ -54,19 +54,17 @@ export class CaptchaChallenge {
         ...opts,
       }).catch(e => {
         if (e.captchaError) {
-          return opts?.action === 'verify'
-            ? { captchaError: e.captchaError, action: 'verify' }
-            : { captchaError: e.captchaError };
+          return { captchaError: e.captchaError };
         }
         // if captcha action is signup, we return undefined, because we don't want to make the call to FAPI
         return opts?.action === 'verify' ? { captchaError: e?.message || e || 'unexpected_captcha_error' } : undefined;
       });
-      return opts?.action === 'verify' ? { ...captchaResult, action: 'verify' } : captchaResult;
+      return opts?.action === 'verify' ? { ...captchaResult, captchaAction: 'verify' } : captchaResult;
     }
 
     // if captcha action is signup, we return an empty object, because it means that the bot protection is disabled
     // and the user should be able to sign up without solving a captcha
-    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', action: opts?.action } : {};
+    return opts?.action === 'verify' ? { captchaError: 'captcha_unavailable', captchaAction: opts?.action } : {};
   }
 
   /**
