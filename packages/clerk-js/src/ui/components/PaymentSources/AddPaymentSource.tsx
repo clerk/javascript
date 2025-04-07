@@ -11,7 +11,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Button, descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
+import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
@@ -23,16 +23,10 @@ type AddPaymentSourceProps = {
   checkout?: __experimental_CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
-  cancelButtonText?: string;
-  onExpand?: () => void;
 };
 
-type AddPaymentSourceFormProps = {
-  isCheckout?: boolean;
-} & Omit<AddPaymentSourceProps, 'checkout'>;
-
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
-  const { checkout, submitLabel, onSuccess, onExpand, cancelAction, cancelButtonText } = props;
+  const { checkout, submitLabel, onSuccess, cancelAction } = props;
   const { __experimental_commerce } = useClerk();
   const { __experimental_commerceSettings } = useEnvironment();
 
@@ -117,28 +111,20 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
       <AddPaymentSourceForm
         submitLabel={submitLabel}
         onSuccess={onSuccess}
-        onExpand={onExpand}
         cancelAction={cancelAction}
-        cancelButtonText={cancelButtonText}
-        isCheckout={!!checkout}
+        checkout={checkout}
       />
     </Elements>
   );
 };
 
 const AddPaymentSourceForm = withCardStateProvider(
-  ({ submitLabel, onSuccess, onExpand, cancelAction, cancelButtonText, isCheckout }: AddPaymentSourceFormProps) => {
+  ({ submitLabel, onSuccess, cancelAction, checkout }: AddPaymentSourceProps) => {
     const { __experimental_commerce } = useClerk();
     const stripe = useStripe();
     const elements = useElements();
-    const [collapsed, setCollapsed] = useState(true);
+    const { displayConfig } = useEnvironment();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-
-    useEffect(() => {
-      if (!collapsed) {
-        onExpand?.();
-      }
-    }, [collapsed, onExpand]);
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -173,10 +159,10 @@ const AddPaymentSourceForm = withCardStateProvider(
     return (
       <FormContainer
         headerTitle={
-          !isCheckout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
+          checkout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
         }
         headerSubtitle={
-          !isCheckout
+          !checkout
             ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
             : undefined
         }
@@ -189,85 +175,47 @@ const AddPaymentSourceForm = withCardStateProvider(
             rowGap: t.space.$3,
           })}
         >
-          {collapsed ? (
-            <>
-              <Button
-                elementId={descriptors.button.setId('applePay')}
-                variant='unstyled'
-                size='md'
-                textVariant={'buttonLarge'}
-                sx={{
-                  width: '100%',
-                  backgroundColor: 'black',
-                  color: 'white',
-                }}
-              >
-                {/* TODO(@COMMERCE): needs localization */}
-                Pay with ApplePay
-              </Button>
-              <Button
-                elementId={descriptors.button.setId('gPay')}
-                variant='unstyled'
-                size='md'
-                textVariant={'buttonLarge'}
-                block
-                sx={{
-                  backgroundColor: 'black',
-                  color: 'white',
-                }}
-              >
-                {/* TODO(@COMMERCE): needs localization */}
-                Pay with GPay
-              </Button>
-              <Button
-                colorScheme='secondary'
-                variant='bordered'
-                size='md'
-                textVariant={'buttonLarge'}
-                block
-                onClick={() => setCollapsed(false)}
-              >
-                {/* TODO(@COMMERCE): needs localization */}
-                More Payment Methods
-              </Button>
-              {cancelAction ? (
-                <Button
-                  variant='ghost'
-                  size='md'
-                  textVariant={'buttonLarge'}
-                  block
-                  onClick={cancelAction}
-                >
-                  {cancelButtonText ?? 'Cancel'}
-                </Button>
-              ) : null}
-            </>
-          ) : (
-            <>
-              <PaymentElement options={{ layout: { type: 'tabs', defaultCollapsed: false } }} />
-              {submitError && (
-                <Alert
-                  variant='danger'
-                  sx={t => ({
-                    animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
-                  })}
-                >
-                  {typeof submitError === 'string' ? submitError : submitError.message}
-                </Alert>
-              )}
-              <FormButtons
-                submitLabel={
-                  submitLabel ??
-                  localizationKeys(
-                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add',
-                  )
-                }
-                onReset={cancelAction}
-                hideReset={!cancelAction}
-                sx={{ flex: isCheckout ? 1 : undefined }}
-              />
-            </>
+          <PaymentElement
+            options={{
+              layout: {
+                type: 'tabs',
+                defaultCollapsed: false,
+              },
+              paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+              applePay: checkout
+                ? {
+                    recurringPaymentRequest: {
+                      paymentDescription: `${checkout.planPeriod === 'month' ? 'Monthly' : 'Annual'} payment`,
+                      managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
+                      regularBilling: {
+                        amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
+                        label: checkout.plan.name,
+                        recurringPaymentIntervalUnit: checkout.planPeriod === 'annual' ? 'year' : 'month',
+                      },
+                    },
+                  }
+                : undefined,
+            }}
+          />
+          {submitError && (
+            <Alert
+              variant='danger'
+              sx={t => ({
+                animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
+              })}
+            >
+              {typeof submitError === 'string' ? submitError : submitError.message}
+            </Alert>
           )}
+          <FormButtons
+            submitLabel={
+              submitLabel ??
+              localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add')
+            }
+            onReset={cancelAction}
+            hideReset={!cancelAction}
+            sx={{ flex: checkout ? 1 : undefined }}
+          />
         </Form.Root>
       </FormContainer>
     );

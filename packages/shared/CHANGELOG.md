@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.3.0
+
+### Minor Changes
+
+- Expose `retryAfter` value on `ClerkAPIResponseError` for 429 responses. ([#5480](https://github.com/clerk/javascript/pull/5480)) by [@dstaley](https://github.com/dstaley)
+
+- Set `retryImmediately: false` as the default for `retry()`. ([#5397](https://github.com/clerk/javascript/pull/5397)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bump `swr` to `2.3.3`. ([#5467](https://github.com/clerk/javascript/pull/5467)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Create a utility that implements `Promise.allSettled` with ES6/ES2015 compatibility. ([#5491](https://github.com/clerk/javascript/pull/5491)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a)]:
+  - @clerk/types@4.50.2
+
 ## 3.2.3
 
 ### Patch Changes

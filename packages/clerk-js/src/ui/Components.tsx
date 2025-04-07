@@ -1,6 +1,7 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -24,6 +25,7 @@ import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
+  Checkout,
   CreateOrganizationModal,
   ImpersonationFab,
   KeylessPrompt,
@@ -37,6 +39,7 @@ import {
 } from './lazyModules/components';
 import {
   LazyComponentRenderer,
+  LazyDrawerRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -99,6 +102,16 @@ export type ComponentControls = {
       notify?: boolean;
     },
   ) => void;
+  openDrawer: <T extends 'checkout'>(
+    drawer: T,
+    props: T extends 'checkout' ? __experimental_CheckoutProps : never,
+  ) => void;
+  closeDrawer: (
+    drawer: 'checkout',
+    options?: {
+      notify?: boolean;
+    },
+  ) => void;
   prefetch: (component: 'organizationSwitcher') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
@@ -131,6 +144,10 @@ interface ComponentsState {
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
+  checkoutDrawer: {
+    open: false;
+    props: null | __experimental_CheckoutProps;
+  };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -212,6 +229,10 @@ const Components = (props: ComponentsProps) => {
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
+    checkoutDrawer: {
+      open: false,
+      props: null,
+    },
     nodes: new Map(),
     impersonationFab: false,
   });
@@ -226,6 +247,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
+    checkoutDrawer,
     nodes,
   } = state;
 
@@ -320,6 +342,26 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.openDrawer = (name, props) => {
+      setState(s => ({
+        ...s,
+        [`${name}Drawer`]: {
+          open: true,
+          props,
+        },
+      }));
+    };
+
+    componentsControls.closeDrawer = name => {
+      setState(s => ({
+        ...s,
+        [`${name}Drawer`]: {
+          ...s[`${name}Drawer`],
+          open: false,
+        },
+      }));
     };
 
     componentsControls.prefetch = component => {
@@ -481,6 +523,26 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedCheckoutDrawer = checkoutDrawer.props && (
+    <LazyDrawerRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'checkout' as any}
+      componentAppearance={{}}
+      flowName={'checkout'}
+      open={checkoutDrawer.open}
+      onOpenChange={() => componentsControls.closeDrawer('checkout')}
+      componentName={'Checkout'}
+      portalId={checkoutDrawer.props.portalId}
+    >
+      <Checkout
+        planId={checkoutDrawer.props.planId}
+        planPeriod={checkoutDrawer.props.planPeriod}
+        orgId={checkoutDrawer.props.orgId}
+        onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
+      />
+    </LazyDrawerRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -511,6 +573,7 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
+        {mountedCheckoutDrawer}
 
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
