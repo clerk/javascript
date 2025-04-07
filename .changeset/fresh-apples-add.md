@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Stop retrying after 5 tries on `/verify`
+Stop retrying on `/verify` if the client cannot solve the challenge
