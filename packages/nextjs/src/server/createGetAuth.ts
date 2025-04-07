@@ -75,8 +75,8 @@ export const createSyncGetAuth = ({
 /**
  * The `getAuth()` helper retrieves authentication state from the request object.
  *
- * @note
- * If you are using App Router, use the [`auth()` helper](https://clerk.com/docs/references/nextjs/auth) instead.
+ * > [!NOTE]
+ * > If you are using App Router, use the [`auth()` helper](https://clerk.com/docs/references/nextjs/auth) instead.
  *
  * @param req - The Next.js request object.
  * @param [options] - An optional object that can be used to configure the behavior of the `getAuth()` function.
