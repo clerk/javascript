@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Move `eventBus` to shared.
+Move `createEventBus` to shared.
