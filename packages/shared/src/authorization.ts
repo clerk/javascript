@@ -303,6 +303,7 @@ const resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuth
   let orgId: string | undefined;
   let orgRole: OrganizationCustomRoleKey | undefined;
   let orgSlug: string | undefined;
+  let orgPermissions: string[] | undefined;
 
   // fva can be undefined for instances that have not opt-in
   const factorVerificationAge = claims.fva ?? null;
@@ -310,18 +311,21 @@ const resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuth
   // sts can be undefined for instances that have not opt-in
   const sessionStatus = claims.sts ?? null;
 
-  // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
-  // anything since the JWT v2 is not yet available
-  const orgPermissions = claims.v === 2 ? undefined : claims.org_permissions;
+  switch (claims.v) {
+    case 2:
+      orgId = claims.org?.id;
+      orgRole = claims.org?.rol;
+      orgSlug = claims.org?.slg;
 
-  if (claims.v === 2) {
-    orgId = claims.org?.id;
-    orgRole = claims.org?.rol;
-    orgSlug = claims.org?.slg;
-  } else {
-    orgId = claims.org_id;
-    orgRole = claims.org_role;
-    orgSlug = claims.org_slug;
+      // TODO(jwt-v2): when JWT version 2 is available, do proper handling for org permissions
+      orgPermissions = (claims?.org_permissions as string[] | undefined) ?? undefined;
+      break;
+    default:
+      orgId = claims.org_id;
+      orgRole = claims.org_role;
+      orgSlug = claims.org_slug;
+      orgPermissions = claims.org_permissions;
+      break;
   }
 
   return {
