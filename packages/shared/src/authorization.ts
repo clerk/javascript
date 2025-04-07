@@ -312,9 +312,9 @@ const resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuth
 
   // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
   // anything since the JWT v2 is not yet available
-  const orgPermissions = claims.ver === 2 ? undefined : claims.org_permissions;
+  const orgPermissions = claims.v === 2 ? undefined : claims.org_permissions;
 
-  if (claims.ver === 2) {
+  if (claims.v === 2) {
     orgId = claims.org?.id;
     orgRole = claims.org?.rol;
     orgSlug = claims.org?.slg;

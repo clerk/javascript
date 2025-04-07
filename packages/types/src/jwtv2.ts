@@ -115,7 +115,7 @@ export type VersionedJwtPayload =
        *
        * The version of the JWT payload.
        */
-      ver?: never;
+      v?: never;
 
       /**
        *
@@ -144,7 +144,7 @@ export type VersionedJwtPayload =
        *
        * The version of the JWT payload.
        */
-      ver: 2;
+      v: 2;
 
       /**
        * @experimental - This structure is subject to change.
