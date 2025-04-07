@@ -4,6 +4,7 @@
 const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
+  REDIRECT_TO_SIGN_UP: 'CLERK_PROTECT_REDIRECT_TO_SIGN_UP',
 };
 
 /**
@@ -92,10 +93,21 @@ function nextjsRedirectError(
   throw error;
 }
 
+function buildReturnBackUrl(url: string, returnBackUrl?: string | URL | null): string | URL {
+  return returnBackUrl === null ? '' : returnBackUrl || url;
+}
+
 function redirectToSignInError(url: string, returnBackUrl?: string | URL | null): never {
   nextjsRedirectError(url, {
     clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN,
-    returnBackUrl: returnBackUrl === null ? '' : returnBackUrl || url,
+    returnBackUrl: buildReturnBackUrl(url, returnBackUrl),
+  });
+}
+
+function redirectToSignUpError(url: string, returnBackUrl?: string | URL | null): never {
+  nextjsRedirectError(url, {
+    clerk_digest: CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_UP,
+    returnBackUrl: buildReturnBackUrl(url, returnBackUrl),
   });
 }
 
@@ -135,11 +147,21 @@ function isRedirectToSignInError(error: unknown): error is RedirectError<{ retur
   return false;
 }
 
+function isRedirectToSignUpError(error: unknown): error is RedirectError<{ returnBackUrl: string | URL }> {
+  if (isNextjsRedirectError(error) && 'clerk_digest' in error) {
+    return error.clerk_digest === CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_UP;
+  }
+
+  return false;
+}
+
 export {
   isNextjsNotFoundError,
   isLegacyNextjsNotFoundError,
   redirectToSignInError,
+  redirectToSignUpError,
   nextjsRedirectError,
   isNextjsRedirectError,
   isRedirectToSignInError,
+  isRedirectToSignUpError,
 };
