@@ -8,10 +8,9 @@ import type {
 import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { __experimental_CheckoutContext, usePricingTableContext } from '../../contexts';
+import { usePricingTableContext } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { usePlans } from '../../hooks';
-import { __experimental_Checkout } from '../Checkout';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
@@ -25,10 +24,8 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
   const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
-  const [checkoutPlan, setCheckoutPlan] = useState<__experimental_CommercePlanResource>();
   const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
 
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showSubscriptionDetailDrawer, setShowSubscriptionDetailDrawer] = useState(false);
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
@@ -40,8 +37,13 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
       setDetailSubscription(activeSubscription);
       setShowSubscriptionDetailDrawer(true);
     } else {
-      setCheckoutPlan(plan);
-      setShowCheckout(true);
+      clerk.__internal_openCheckout({
+        planId: plan.id,
+        planPeriod,
+        orgId: subscriberType === 'org' ? organization?.id : undefined,
+        onSubscriptionComplete: onSubscriptionChange,
+        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+      });
     }
   };
 
@@ -74,26 +76,6 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
         appearanceKey='checkout'
         appearance={props.checkoutProps?.appearance}
       >
-        <__experimental_CheckoutContext.Provider
-          value={{
-            componentName: 'Checkout',
-            mode,
-            isOpen: showCheckout,
-            setIsOpen: setShowCheckout,
-          }}
-        >
-          {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-          <div>
-            {checkoutPlan && (
-              <__experimental_Checkout
-                planPeriod={planPeriod}
-                planId={checkoutPlan.id}
-                orgId={subscriberType === 'org' ? organization?.id : undefined}
-                onSubscriptionComplete={onSubscriptionChange}
-              />
-            )}
-          </div>
-        </__experimental_CheckoutContext.Provider>
         <SubscriptionDetailDrawer
           isOpen={showSubscriptionDetailDrawer}
           setIsOpen={setShowSubscriptionDetailDrawer}

@@ -13,6 +13,7 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
+  __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
@@ -230,6 +231,8 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnSupported: (() => boolean) | undefined;
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
+
+  public __internal_setActiveInProgress = false;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -516,6 +519,18 @@ export class Clerk implements ClerkInterface {
   public closeSignIn = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
+  };
+
+  public __internal_openCheckout = (props?: __experimental_CheckoutProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'Checkout' })
+      .then(controls => controls.openDrawer('checkout', props || {}));
+  };
+
+  public __internal_closeCheckout = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
@@ -964,122 +979,127 @@ export class Clerk implements ClerkInterface {
    * `setActive` can be used to set the active session and/or organization.
    */
   public setActive = async ({ session, organization, beforeEmit, redirectUrl }: SetActiveParams): Promise<void> => {
-    if (!this.client) {
-      throw new Error('setActive is being called before the client is loaded. Wait for init.');
-    }
-
-    if (session === undefined && !this.session) {
-      throw new Error(
-        'setActive should either be called with a session param or there should be already an active session.',
-      );
-    }
-
-    const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
-        : noop;
-
-    const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
-        : noop;
-
-    if (typeof session === 'string') {
-      session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
-    }
-
-    let newSession = session === undefined ? this.session : session;
-
-    // At this point, the `session` variable should contain either an `SignedInSessionResource`
-    // ,`null` or `undefined`.
-    // We now want to set the last active organization id on that session (if it exists).
-    // However, if the `organization` parameter is not given (i.e. `undefined`), we want
-    // to keep the organization id that the session had.
-    const shouldSwitchOrganization = organization !== undefined;
-
-    if (newSession && shouldSwitchOrganization) {
-      const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
-
-      if (isOrganizationId(organizationIdOrSlug)) {
-        newSession.lastActiveOrganizationId = organizationIdOrSlug || null;
-      } else {
-        const matchingOrganization = newSession.user.organizationMemberships.find(
-          mem => mem.organization.slug === organizationIdOrSlug,
-        );
-        newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+    this.__internal_setActiveInProgress = true;
+    try {
+      if (!this.client) {
+        throw new Error('setActive is being called before the client is loaded. Wait for init.');
       }
-    }
 
-    if (newSession?.status === 'pending') {
-      await this.#handlePendingSession(newSession);
-      return;
-    }
+      if (session === undefined && !this.session) {
+        throw new Error(
+          'setActive should either be called with a session param or there should be already an active session.',
+        );
+      }
 
-    if (session?.lastActiveToken) {
-      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
-    }
+      const onBeforeSetActive: SetActiveHook =
+        typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
+          ? window.__unstable__onBeforeSetActive
+          : noop;
 
-    /**
-     * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
-     */
-    await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+      const onAfterSetActive: SetActiveHook =
+        typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
+          ? window.__unstable__onAfterSetActive
+          : noop;
 
-    //1. setLastActiveSession to passed user session (add a param).
-    //   Note that this will also update the session's active organization
-    //   id.
-    if (inActiveBrowserTab() || !this.#options.standardBrowser) {
-      await this.#touchCurrentSession(newSession);
-      // reload session from updated client
-      newSession = this.#getSessionFromClient(newSession?.id);
-    }
+      if (typeof session === 'string') {
+        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
+      }
 
-    // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    const token = await newSession?.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
+      let newSession = session === undefined ? this.session : session;
 
-    //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
-    //   undefined, then wait for beforeEmit to complete before emitting the new session.
-    //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
-    //   automatic reloading when reloading shouldn't be happening.
-    const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+      // At this point, the `session` variable should contain either an `SignedInSessionResource`
+      // ,`null` or `undefined`.
+      // We now want to set the last active organization id on that session (if it exists).
+      // However, if the `organization` parameter is not given (i.e. `undefined`), we want
+      // to keep the organization id that the session had.
+      const shouldSwitchOrganization = organization !== undefined;
 
-    if (beforeEmit) {
-      deprecated(
-        'Clerk.setActive({beforeEmit})',
-        'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
-      );
-      await tracker.track(async () => {
-        this.#setTransitiveState();
-        await beforeEmit(newSession);
-      });
-    }
+      if (newSession && shouldSwitchOrganization) {
+        const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
 
-    if (redirectUrl && !beforeEmit) {
-      await tracker.track(async () => {
-        if (!this.client) {
-          // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
-          return;
-        }
-        this.#setTransitiveState();
-        if (this.client.isEligibleForTouch()) {
-          const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
-          await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+        if (isOrganizationId(organizationIdOrSlug)) {
+          newSession.lastActiveOrganizationId = organizationIdOrSlug || null;
         } else {
-          await this.navigate(redirectUrl);
+          const matchingOrganization = newSession.user.organizationMemberships.find(
+            mem => mem.organization.slug === organizationIdOrSlug,
+          );
+          newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
         }
-      });
-    }
+      }
 
-    //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
-    if (tracker.isUnloading()) {
-      return;
-    }
+      if (newSession?.status === 'pending') {
+        await this.#handlePendingSession(newSession);
+        return;
+      }
 
-    this.#setAccessors(newSession);
-    this.#emit();
-    await onAfterSetActive();
+      if (session?.lastActiveToken) {
+        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+      }
+
+      /**
+       * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
+       */
+      await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
+
+      //1. setLastActiveSession to passed user session (add a param).
+      //   Note that this will also update the session's active organization
+      //   id.
+      if (inActiveBrowserTab() || !this.#options.standardBrowser) {
+        await this.#touchCurrentSession(newSession);
+        // reload session from updated client
+        newSession = this.#getSessionFromClient(newSession?.id);
+      }
+
+      // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
+      const token = await newSession?.getToken();
+      if (!token) {
+        eventBus.dispatch(events.TokenUpdate, { token: null });
+      }
+
+      //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
+      //   undefined, then wait for beforeEmit to complete before emitting the new session.
+      //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
+      //   automatic reloading when reloading shouldn't be happening.
+      const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
+
+      if (beforeEmit) {
+        deprecated(
+          'Clerk.setActive({beforeEmit})',
+          'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
+        );
+        await tracker.track(async () => {
+          this.#setTransitiveState();
+          await beforeEmit(newSession);
+        });
+      }
+
+      if (redirectUrl && !beforeEmit) {
+        await tracker.track(async () => {
+          if (!this.client) {
+            // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
+            return;
+          }
+          this.#setTransitiveState();
+          if (this.client.isEligibleForTouch()) {
+            const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
+            await this.navigate(this.buildUrlWithAuth(this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl })));
+          } else {
+            await this.navigate(redirectUrl);
+          }
+        });
+      }
+
+      //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
+      if (tracker.isUnloading()) {
+        return;
+      }
+
+      this.#setAccessors(newSession);
+      this.#emit();
+      await onAfterSetActive();
+    } finally {
+      this.__internal_setActiveInProgress = false;
+    }
   };
 
   #handlePendingSession = async (session: PendingSessionResource) => {
@@ -1103,20 +1123,17 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
-    if (newSession?.currentTask) {
+    // Only triggers navigation for internal routing, in order to not affect custom flows
+    if (newSession?.currentTask && this.#componentNavigationContext) {
       await navigateToTask(session.currentTask.key, {
-        globalNavigate: this.navigate,
-        componentNavigationContext: this.#componentNavigationContext,
         options: this.#options,
         environment: this.environment,
+        globalNavigate: this.navigate,
+        componentNavigationContext: this.#componentNavigationContext,
       });
-
-      // Delay updating session accessors until active status transition to prevent premature component unmounting.
-      // This is particularly important when SignIn components are wrapped in SignedOut components,
-      // as early state updates could cause unwanted unmounting during the transition.
-      this.#setAccessors(session);
     }
 
+    this.#setAccessors(session);
     this.#emit();
   };
 

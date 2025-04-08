@@ -79,6 +79,7 @@ export const useCache = <K = any, V = any>(
  * @param fetcher If fetcher is undefined no action will be performed
  * @param params
  * @param options
+ * @param resourceId
  */
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
@@ -88,8 +89,10 @@ export const useFetch = <K, T>(
     onSuccess?: (data: T) => void;
     staleTime?: number;
   },
+  resourceId?: string,
 ) => {
-  const { subscribeCache, getCache, setCache, clearCache } = useCache<K, T>(params);
+  const cacheKey = { resourceId, params };
+  const { subscribeCache, getCache, setCache, clearCache } = useCache<typeof cacheKey, T>(cacheKey);
   const [revalidationCounter, setRevalidationCounter] = useState(0);
 
   const staleTime = options?.staleTime ?? 1000 * 60 * 2; //cache for 2 minutes by default

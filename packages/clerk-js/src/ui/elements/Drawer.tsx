@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react/index';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -20,7 +20,7 @@ import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
-import { common, InternalThemeProvider } from '../styledSystem';
+import { common } from '../styledSystem';
 import { colors } from '../utils';
 import { IconButton } from './IconButton';
 
@@ -102,21 +102,19 @@ function Root({
   ]);
 
   return (
-    <InternalThemeProvider>
-      <DrawerContext.Provider
-        value={{
-          isOpen: open,
-          setIsOpen: onOpenChange,
-          strategy,
-          portalProps: portalProps || {},
-          refs,
-          context,
-          getFloatingProps,
-        }}
-      >
-        {children}
-      </DrawerContext.Provider>
-    </InternalThemeProvider>
+    <DrawerContext.Provider
+      value={{
+        isOpen: open,
+        setIsOpen: onOpenChange,
+        strategy,
+        portalProps: portalProps || {},
+        refs,
+        context,
+        getFloatingProps,
+      }}
+    >
+      <FloatingPortal {...portalProps}>{children}</FloatingPortal>
+    </DrawerContext.Provider>
   );
 }
 
@@ -196,7 +194,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const { strategy, portalProps, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, refs, context, getFloatingProps } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -213,47 +211,45 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   if (!isMounted) return null;
 
   return (
-    <FloatingPortal {...portalProps}>
-      <FloatingFocusManager
-        context={context}
-        modal
-        outsideElementsInert
-        initialFocus={refs.floating}
+    <FloatingFocusManager
+      context={context}
+      modal
+      outsideElementsInert
+      initialFocus={refs.floating}
+    >
+      <Flex
+        ref={mergedRefs}
+        elementDescriptor={descriptors.drawerContent}
+        {...getFloatingProps()}
+        style={transitionStyles}
+        direction='col'
+        sx={t => ({
+          // Apply the conditional right offset + the spread of the
+          // box shadow to ensure it is fully offscreen before unmounting
+          '--transform-offset':
+            strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+          willChange: 'transform',
+          position: strategy,
+          insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
+          insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
+          outline: 0,
+          width: t.sizes.$100,
+          backgroundColor: t.colors.$colorBackground,
+          borderStartStartRadius: t.radii.$xl,
+          borderEndStartRadius: t.radii.$xl,
+          borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+          borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$neutralAlpha100,
+          boxShadow: t.shadows.$cardBoxShadow,
+          overflow: 'hidden',
+          zIndex: t.zIndices.$modal,
+        })}
       >
-        <Flex
-          ref={mergedRefs}
-          elementDescriptor={descriptors.drawerContent}
-          {...getFloatingProps()}
-          style={transitionStyles}
-          direction='col'
-          sx={t => ({
-            // Apply the conditional right offset + the spread of the
-            // box shadow to ensure it is fully offscreen before unmounting
-            '--transform-offset':
-              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
-            willChange: 'transform',
-            position: strategy,
-            insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
-            insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
-            outline: 0,
-            width: t.sizes.$100,
-            backgroundColor: t.colors.$colorBackground,
-            borderStartStartRadius: t.radii.$xl,
-            borderEndStartRadius: t.radii.$xl,
-            borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-            borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-            boxShadow: t.shadows.$cardBoxShadow,
-            overflow: 'hidden',
-            zIndex: t.zIndices.$modal,
-          })}
-        >
-          {children}
-        </Flex>
-      </FloatingFocusManager>
-    </FloatingPortal>
+        {children}
+      </Flex>
+    </FloatingFocusManager>
   );
 });
 

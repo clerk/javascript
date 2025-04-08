@@ -1,5 +1,12 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
-import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  GetToken,
+  PendingSessionOptions,
+  SignOut,
+  UseAuthReturn,
+} from '@clerk/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -8,6 +15,10 @@ import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
+
+type Nullish<T> = T | undefined | null;
+type InitialAuthState = Record<string, any>;
+type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
@@ -73,8 +84,11 @@ import { createGetToken, createSignOut } from './utils';
  * </Tab>
  * </Tabs>
  */
-export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
+export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
+
+  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
+  const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
@@ -83,24 +97,23 @@ export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
-
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
-  return useDerivedAuth({
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    getToken,
-    signOut,
-    orgPermissions,
-    factorVerificationAge,
-  });
+  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
+
+  return useDerivedAuth(
+    {
+      ...authContext,
+      getToken,
+      signOut,
+    },
+    {
+      treatPendingAsSignedOut:
+        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption?.('treatPendingAsSignedOut'),
+    },
+  );
 };
 
 /**
@@ -129,20 +142,11 @@ export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
  * } = useDerivedAuth(authObject);
  * ```
  */
-export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const {
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    has,
-    signOut,
-    getToken,
-    orgPermissions,
-    factorVerificationAge,
-  } = authObject ?? {};
+export function useDerivedAuth(
+  authObject: any,
+  { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
+): UseAuthReturn {
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -157,72 +161,24 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
         factorVerificationAge,
       })(params);
     },
-    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
   );
 
-  if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: undefined,
-      orgId: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      has: undefined,
-      signOut,
+  const payload = resolveAuthState({
+    authObject: {
+      ...authObject,
       getToken,
-    };
-  }
-
-  if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
       signOut,
-      getToken,
-    };
-  }
-
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId,
-      orgRole,
-      orgSlug: orgSlug || null,
       has: derivedHas,
-      signOut,
-      getToken,
-    };
+    },
+    options: {
+      treatPendingAsSignedOut,
+    },
+  });
+
+  if (!payload) {
+    return errorThrower.throw(invalidStateError);
   }
 
-  if (!!sessionId && !!userId && !orgId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: derivedHas,
-      signOut,
-      getToken,
-    };
-  }
-
-  return errorThrower.throw(invalidStateError);
+  return payload;
 }

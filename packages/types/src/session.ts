@@ -29,7 +29,8 @@ import type { UserResource } from './user';
 
 export type PendingSessionOptions = {
   /**
-   * Determines if pending sessions are considered as signed-out state. This option is set to `true` by default.
+   * Determines if pending sessions are considered as signed-out state.
+   * @default true
    */
   treatPendingAsSignedOut?: boolean;
 };

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-react-start",
-  "version": "0.12.2",
+  "version": "0.13.1",
   "description": "Clerk SDK for TanStack React Start",
   "keywords": [
     "clerk",
@@ -72,8 +72,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "^1.114.29",
-    "@tanstack/react-start": "^1.114.29",
+    "@tanstack/react-router": "^1.114.34",
+    "@tanstack/react-start": "^1.114.34",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {
