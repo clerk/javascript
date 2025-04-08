@@ -85,16 +85,16 @@ const createTestingTokenUtils = ({ page }: TestArgs) => {
 export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
 export const createTestUtils = <
-  Params extends { app: Application } & Partial<CreateAppPageObjectArgs>,
+  Params extends { app: Application; useTestingToken?: boolean } & Partial<CreateAppPageObjectArgs>,
   Services = typeof services,
   PO = typeof pageObjects,
   BH = typeof browserHelpers,
-  FullReturn = { services: Services; po: PO; tabs: BH; page: EnchancedPage; nexJsVersion: string },
+  FullReturn = { services: Services; po: PO; tabs: BH; page: EnchancedPage; nextJsVersion: string },
   OnlyAppReturn = { services: Services },
 >(
   params: Params,
 ): Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn => {
-  const { app, context, browser } = params || {};
+  const { app, context, browser, useTestingToken = true } = params || {};
 
   const clerkClient = createClerkClient(app);
   const services = {
@@ -109,7 +109,7 @@ export const createTestUtils = <
     return { services } as any;
   }
 
-  const page = createAppPageObject({ page: params.page }, app);
+  const page = createAppPageObject({ page: params.page, useTestingToken }, app);
   const testArgs = { page, context, browser };
 
   const pageObjects = {
@@ -131,7 +131,10 @@ export const createTestUtils = <
     runInNewTab: async (
       cb: (u: { services: Services; po: PO; page: EnchancedPage }, context: BrowserContext) => Promise<unknown>,
     ) => {
-      const u = createTestUtils({ app, page: createAppPageObject({ page: await context.newPage() }, app) });
+      const u = createTestUtils({
+        app,
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+      });
       await cb(u as any, context);
       return u;
     },
@@ -142,7 +145,10 @@ export const createTestUtils = <
         throw new Error('Browser is not defined. Did you forget to pass it to createPageObjects?');
       }
       const context = await browser.newContext();
-      const u = createTestUtils({ app, page: createAppPageObject({ page: await context.newPage() }, app) });
+      const u = createTestUtils({
+        app,
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+      });
       await cb(u as any, context);
       return u;
     },
@@ -154,7 +160,7 @@ export const createTestUtils = <
     po: pageObjects,
     tabs: browserHelpers,
     // eslint-disable-next-line turbo/no-undeclared-env-vars
-    nexJsVersion: process.env.E2E_NEXTJS_VERSION,
+    nextJsVersion: process.env.E2E_NEXTJS_VERSION,
   } as any;
 };
 

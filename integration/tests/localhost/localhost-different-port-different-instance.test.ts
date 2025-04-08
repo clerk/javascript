@@ -41,11 +41,11 @@ test.describe('multiple apps running on localhost using different Clerk instance
   test('sessions are independent between the different apps', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context }),
+      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
-    await u[0].po.signIn.goTo({ useSessionToken: false });
+    await u[0].po.signIn.goTo();
     await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
     await u[0].po.expect.toBeSignedIn();
     const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -61,7 +61,7 @@ test.describe('multiple apps running on localhost using different Clerk instance
     expect(tab0Cookies.filter(c => c.name.startsWith('__client_uat'))).toHaveLength(2);
 
     await u[1].po.expect.toBeSignedOut();
-    await u[1].po.signIn.goTo({ useSessionToken: false });
+    await u[1].po.signIn.goTo();
     await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
     await u[1].po.expect.toBeSignedIn();
 
@@ -86,17 +86,17 @@ test.describe('multiple apps running on localhost using different Clerk instance
   test('signing out from the root domains does not affect the sub domain', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context }),
+      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
     // signin in tab0
-    await u[0].po.signIn.goTo({ useSessionToken: false });
+    await u[0].po.signIn.goTo();
     await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
     await u[0].po.expect.toBeSignedIn();
 
     // signin in tab1
-    await u[1].po.signIn.goTo({ useSessionToken: false });
+    await u[1].po.signIn.goTo();
     await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
     await u[1].po.expect.toBeSignedIn();
 

@@ -82,12 +82,12 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are aligned for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo({ useSessionToken: false });
+      await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -138,12 +138,12 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the sub domains signs out the user from the root domain as well', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo({ useSessionToken: false });
+      await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u[0].po.expect.toBeSignedIn();
 
@@ -219,12 +219,12 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo({ useSessionToken: false });
+      await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -250,7 +250,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
-      await u[1].po.signIn.goTo({ useSessionToken: false });
+      await u[1].po.signIn.goTo();
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();
@@ -277,19 +277,19 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the root domains does not affect the sub domain', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       // signin in tab0
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo({ useSessionToken: false });
+      await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
 
       // signin in tab1
       await u[1].page.goto(`https://${hosts[1]}`);
-      await u[1].po.signIn.goTo({ useSessionToken: false });
+      await u[1].po.signIn.goTo();
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
 
@@ -351,12 +351,12 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo({ useSessionToken: false });
+      await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -367,7 +367,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
-      await u[1].po.signIn.goTo({ useSessionToken: false });
+      await u[1].po.signIn.goTo();
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();

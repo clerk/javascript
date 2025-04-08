@@ -29,13 +29,13 @@ test.describe('switching instances on localhost same port @localhost', () => {
     // Create app and user for the 1st app
     const { app } = await prepareApplication('sessions-dev-1', port);
     let page = await context.newPage();
-    let u = createTestUtils({ app, page, context });
+    let u = createTestUtils({ app, page, context, useTestingToken: false });
     let fakeUser = u.services.users.createFakeUser();
     fakeUsers.push(fakeUser);
 
     await u.services.users.createBapiUser(fakeUser);
 
-    await u.po.signIn.goTo({ timeout: 30000, useSessionToken: false });
+    await u.po.signIn.goTo({ timeout: 30000 });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);
@@ -46,12 +46,12 @@ test.describe('switching instances on localhost same port @localhost', () => {
     await app.dev({ port });
 
     page = await context.newPage();
-    u = createTestUtils({ app, page, context });
+    u = createTestUtils({ app, page, context, useTestingToken: false });
     fakeUser = u.services.users.createFakeUser();
     fakeUsers.push(fakeUser);
     await u.services.users.createBapiUser(fakeUser);
 
-    await u.po.signIn.goTo({ timeout: 30000, useSessionToken: false });
+    await u.po.signIn.goTo({ timeout: 30000 });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);

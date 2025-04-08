@@ -11,17 +11,10 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
   const { page } = testArgs;
   const self = {
     ...common(testArgs),
-    goTo: async (
-      opts: {
-        searchParams?: URLSearchParams;
-        headlessSelector?: string;
-        timeout?: number;
-        useSessionToken?: boolean;
-      } = {},
-    ) => {
+    goTo: async (opts?: { searchParams?: URLSearchParams; headlessSelector?: string; timeout?: number }) => {
       const navRes = await page.goToRelative('/sign-in', opts);
 
-      if (typeof opts.headlessSelector !== 'undefined') {
+      if (typeof opts?.headlessSelector !== 'undefined') {
         await self.waitForMounted(opts.headlessSelector);
       } else {
         await self.waitForMounted();

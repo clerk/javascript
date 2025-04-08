@@ -3,17 +3,16 @@ import type { Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
 
-export const createAppPageObject = (testArgs: { page: Page }, app: Application) => {
-  const { page } = testArgs;
+export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: Application) => {
+  const { page, useTestingToken = true } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
-    goToAppHome: async (opts: { useSessionToken?: boolean } = {}) => {
-      const { useSessionToken = true } = opts;
-
+    goToAppHome: async () => {
       try {
-        if (useSessionToken) {
+        if (useTestingToken) {
           await setupClerkTestingToken({ page });
         }
+
         await page.goto(app.serverUrl);
       } catch {
         // do not fail the test if interstitial is returned (401)
@@ -21,9 +20,8 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     },
     goToRelative: async (
       path: string,
-      opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number; useSessionToken?: boolean } = {},
+      opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {},
     ) => {
-      const { useSessionToken = true } = opts;
       let url: URL;
 
       try {
@@ -46,7 +44,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         url.search = opts.searchParams.toString();
       }
 
-      if (useSessionToken) {
+      if (useTestingToken) {
         await setupClerkTestingToken({ page });
       }
 

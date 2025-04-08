@@ -39,11 +39,11 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
   test('the cookies are aligned for the root and sub domains', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context }),
+      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
-    await u[0].po.signIn.goTo({ useSessionToken: false });
+    await u[0].po.signIn.goTo();
     await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
     await u[0].po.expect.toBeSignedIn();
     const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -57,7 +57,7 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
     expect(tab0Cookies.filter(c => c.name.startsWith('__clerk_db_jwt'))).toHaveLength(2);
     expect(tab0Cookies.filter(c => c.name.startsWith('__client_uat'))).toHaveLength(2);
 
-    await u[1].page.goToAppHome({ useSessionToken: false });
+    await u[1].page.goToAppHome();
     await u[1].po.expect.toBeSignedIn();
 
     // We should have the same number of cookies here as this is the same instance running
@@ -81,17 +81,17 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
   test('signing out from the root domain affects the sub domain', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context }),
+      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
     // sign tab0
-    await u[0].po.signIn.goTo({ useSessionToken: false });
+    await u[0].po.signIn.goTo();
     await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
     await u[0].po.expect.toBeSignedIn();
 
     // sign out from tab1
-    await u[1].page.goToAppHome({ useSessionToken: false });
+    await u[1].page.goToAppHome();
     await u[1].page.evaluate(() => window.Clerk.signOut());
     await u[1].po.expect.toBeSignedOut();
 
