@@ -30,7 +30,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { __experimental_commerce } = useClerk();
   const { __experimental_commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
-  const { subscriberType = 'user' } = usePaymentSourcesContext();
+  const { subscriberType } = usePaymentSourcesContext();
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -130,7 +130,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     const elements = useElements();
     const { displayConfig } = useEnvironment();
     const { organization } = useOrganization();
-    const { subscriberType = 'user' } = usePaymentSourcesContext();
+    const { subscriberType } = usePaymentSourcesContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

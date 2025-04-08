@@ -10,7 +10,6 @@ import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
 import { ApplePay, CreditCard } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource } from './AddPaymentSource';
 
@@ -40,7 +39,7 @@ const RemoveScreen = ({
 }) => {
   const { close } = useActionContext();
   const card = useCardState();
-  const { subscriberType = 'user' } = usePaymentSourcesContext();
+  const { subscriberType } = usePaymentSourcesContext();
   const { organization } = useOrganization();
   const ref = useRef(
     `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
@@ -87,7 +86,7 @@ const RemoveScreen = ({
 const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { subscriberType = 'user' } = usePaymentSourcesContext();
+  const { subscriberType } = usePaymentSourcesContext();
 
   const { data, revalidate } = useFetch(
     __experimental_commerce?.getPaymentSources,
@@ -182,30 +181,32 @@ const PaymentSourceMenu = ({
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
+  const card = useCardState();
   const { organization } = useOrganization();
-  const { subscriberType = 'user' } = usePaymentSourcesContext();
+  const { subscriberType } = usePaymentSourcesContext();
 
-  const actions = (
-    [
-      paymentSource.isDefault
-        ? null
-        : {
-            label: localizationKeys(
-              'userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__default',
-            ),
-            onClick: () => {
-              paymentSource
-                .makeDefault({ orgId: subscriberType === 'org' ? organization?.id : undefined })
-                .then(revalidate);
-            },
-          },
-      {
-        label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
-        isDestructive: true,
-        onClick: () => open(`remove-${paymentSource.id}`),
+  const actions = [
+    {
+      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
+      isDestructive: true,
+      onClick: () => open(`remove-${paymentSource.id}`),
+    },
+  ];
+
+  if (!paymentSource.isDefault) {
+    actions.unshift({
+      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__default'),
+      isDestructive: false,
+      onClick: () => {
+        paymentSource
+          .makeDefault({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+          .then(revalidate)
+          .catch((error: Error) => {
+            handleError(error, [], card.setError);
+          });
       },
-    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
-  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+    });
+  }
 
   return <ThreeDotsMenu actions={actions} />;
 };

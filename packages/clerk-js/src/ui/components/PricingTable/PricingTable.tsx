@@ -15,9 +15,9 @@ import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
-export const __experimental_PricingTable = (props: __experimental_PricingTableProps) => {
+const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType = 'user' } = usePricingTableContext();
+  const { mode = 'mounted', subscriberType } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
   const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
@@ -91,3 +91,5 @@ export const __experimental_PricingTable = (props: __experimental_PricingTablePr
     </>
   );
 };
+
+export const __experimental_PricingTable = PricingTable;

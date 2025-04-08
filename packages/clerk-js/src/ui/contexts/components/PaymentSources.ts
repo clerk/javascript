@@ -16,5 +16,6 @@ export const usePaymentSourcesContext = () => {
   return {
     ...ctx,
     componentName,
+    subscriberType: ctx.subscriberType || 'user',
   };
 };
