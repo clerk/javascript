@@ -37,7 +37,7 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/subscriptions` : `/me/subscriptions`,
+      path: orgId ? `/organizations/${orgId}/subscriptions` : `/me/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {

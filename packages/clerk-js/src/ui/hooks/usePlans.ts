@@ -32,7 +32,7 @@ export const usePlans = (props: UsePlansProps) => {
     return (
       allPlans?.map(plan => {
         const activeSubscription = subscriptions.data.find(sub => {
-          return sub.plan.id === plan.id;
+          return sub.plan.id === plan.id && sub.status === 'active';
         });
         plan.subscriptionIdForCurrentSubscriber = activeSubscription?.id;
         return plan;
