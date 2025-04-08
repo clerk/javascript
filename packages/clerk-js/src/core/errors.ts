@@ -46,10 +46,6 @@ export function clerkMissingFapiClientInResources(): never {
   throw new Error(`${errorPrefix} Missing FAPI client in resources.`);
 }
 
-export function clerkCoreErrorTokenRefreshFailed(message: string): never {
-  throw new Error(`${errorPrefix} Token refresh failed (error='${message}')`);
-}
-
 export function clerkOAuthCallbackDidNotCompleteSignInSignUp(type: 'sign in' | 'sign up'): never {
   throw new Error(
     `${errorPrefix} Something went wrong initializing Clerk during the ${type} flow. Please contact support.`,

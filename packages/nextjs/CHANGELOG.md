@@ -1,5 +1,125 @@
 # Change Log
 
+## 6.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/backend@1.27.1
+  - @clerk/types@4.51.1
+  - @clerk/clerk-react@5.26.1
+  - @clerk/shared@3.4.1
+
+## 6.14.0
+
+### Minor Changes
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `<ClerkProvider treatPendingAsSignedOut={false} />` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- - Introduce `auth().redirectToSignUp()` that can be used in API routes and pages. Originally effort by [@sambarnes](https://github.com/clerk/javascript/pull/5407) ([#5533](https://github.com/clerk/javascript/pull/5533)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```ts
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware(async auth => {
+    const { userId, redirectToSignUp } = await auth();
+
+    if (!userId) {
+      return redirectToSignUp();
+    }
+  });
+  ```
+
+- Added Content Security Policy (CSP) header generation functionality to `clerkMiddleware` with support for both standard and strict-dynamic modes. Key features: ([#5493](https://github.com/clerk/javascript/pull/5493)) by [@jacekradko](https://github.com/jacekradko)
+
+  - Automatic generation of CSP headers with default security policies compatible with Clerk requirements
+  - Support for both standard and strict-dynamic CSP modes
+  - Automatic nonce generation for strict-dynamic mode
+  - Ability to add custom directives to match project requirements
+
+  Example
+
+  ```
+  export default clerkMiddleware(
+    async (auth, request) => {
+      if (!isPublicRoute(request)) {
+        await auth.protect();
+      }
+    },
+    {
+      contentSecurityPolicy: {
+        mode: "strict-dynamic",
+        directives: {
+          "connect-src": ["external.api.com"],
+          "script-src": ["external.scripts.com"]
+        }
+      }
+    }
+  );
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`a8180ce`](https://github.com/clerk/javascript/commit/a8180ceef447a13d84eac6a64ed7a04d791d8d64), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`2cceeba`](https://github.com/clerk/javascript/commit/2cceeba177ecf5a28138da308cbba18015e3a646), [`026ad57`](https://github.com/clerk/javascript/commit/026ad5717cf661182c219fb0ffab4522083065c3), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/clerk-react@5.26.0
+  - @clerk/types@4.51.0
+  - @clerk/backend@1.27.0
+  - @clerk/shared@3.4.0
+
+## 6.13.0
+
+### Minor Changes
+
+- Introduce a `verifyWebhook()` function to verify incoming Clerk webhook requests and process the payload. This function handles webhook signature verification using `Svix` and is now available across all backend and fullstack SDKs. ([#5468](https://github.com/clerk/javascript/pull/5468)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  To get started, install [`svix`](https://www.npmjs.com/package/svix), which Clerk uses to verify its webhooks:
+
+  ```shell
+  npm install svix
+  ```
+
+  Then in your webhook route handler, import `verifyWebhook()` from the Next.js SDK:
+
+  ```ts
+  // app/api/webhooks/route.ts
+  import { verifyWebhook } from '@clerk/nextjs/webhooks';
+
+  export async function POST(req: Request) {
+    try {
+      const evt = await verifyWebhook(req);
+
+      // Do something with payload
+      const { id } = evt.data;
+      const eventType = evt.type;
+      console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
+      console.log('Webhook payload:', body);
+
+      return new Response('Webhook received', { status: 200 });
+    } catch (err) {
+      console.error('Error: Could not verify webhook:', err);
+      return new Response('Error: Verification error', {
+        status: 400,
+      });
+    }
+  }
+  ```
+
+  For more information on how to sync Clerk data to your app with webhooks, [see our guide](https://clerk.com/docs/webhooks/sync-data).
+
+- Redirect to tasks on `auth.protect` and `auth.redirectToSignIn` ([#5440](https://github.com/clerk/javascript/pull/5440)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fixing a Typing error in clerkMiddleware ([#5470](https://github.com/clerk/javascript/pull/5470)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove telemtry event from `clerkMiddleware()`. ([#5501](https://github.com/clerk/javascript/pull/5501)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`60a9a51`](https://github.com/clerk/javascript/commit/60a9a51dff7d59e7397536586cf1cfe029bc021b), [`e984494`](https://github.com/clerk/javascript/commit/e984494416dda9a6f04acaaba61f8c2683090961), [`cd6ee92`](https://github.com/clerk/javascript/commit/cd6ee92d5b427ca548216f429ca4e31c6acd263c), [`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`38828ae`](https://github.com/clerk/javascript/commit/38828ae58d6d4e8e3c60945284930179b2b6bb40), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a), [`fe065a9`](https://github.com/clerk/javascript/commit/fe065a934c583174ad4c140e04dedbe6d88fc3a0), [`619cde8`](https://github.com/clerk/javascript/commit/619cde8c532d635d910ebbc08ad6abcc025694b4)]:
+  - @clerk/backend@1.26.0
+  - @clerk/shared@3.3.0
+  - @clerk/clerk-react@5.25.6
+  - @clerk/types@4.50.2
+
 ## 6.12.12
 
 ### Patch Changes

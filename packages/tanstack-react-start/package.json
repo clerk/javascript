@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-react-start",
-  "version": "0.12.2",
+  "version": "0.13.2",
   "description": "Clerk SDK for TanStack React Start",
   "keywords": [
     "clerk",
@@ -39,6 +39,10 @@
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
     },
+    "./webhooks": {
+      "types": "./dist/webhooks.d.ts",
+      "default": "./dist/webhooks.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
@@ -46,7 +50,8 @@
   "files": [
     "dist",
     "errors",
-    "server"
+    "server",
+    "webhooks"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
@@ -67,8 +72,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "^1.114.17",
-    "@tanstack/react-start": "^1.114.19",
+    "@tanstack/react-router": "^1.114.34",
+    "@tanstack/react-start": "^1.114.34",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {

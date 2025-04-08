@@ -83,6 +83,8 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       sessionCtx,
       userCtx,
       organizationCtx,
+      treatPendingAsSignedOut:
+        options.treatPendingAsSignedOut ?? clerk.value?.__internal_getOption?.('treatPendingAsSignedOut'),
     });
   },
 };

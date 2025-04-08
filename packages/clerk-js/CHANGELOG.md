@@ -1,5 +1,86 @@
 # Change Log
 
+## 5.59.2
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Stop retrying on `/verify` if the client cannot solve the challenge ([#5526](https://github.com/clerk/javascript/pull/5526)) by [@anagstef](https://github.com/anagstef)
+
+- Handle two factor redirect when authenticate with web3 and multifactor has been enabled ([#5352](https://github.com/clerk/javascript/pull/5352)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/localizations@3.13.7
+  - @clerk/shared@3.4.1
+
+## 5.59.1
+
+### Patch Changes
+
+- Adds support for Apple Pay to `AddPaymentSource` component, and removes the unusable "collapsed" state. ([#5506](https://github.com/clerk/javascript/pull/5506)) by [@aeliox](https://github.com/aeliox)
+
+- Fixes an issue where a race condition was caused by triggering navigations during a call to `setActive`. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `clerk.__internal_openCheckout()` and `clerk.__internal_closeCheckout()` methods and remove `<Checkout />` from within the `<PricingTable />` component. ([#5481](https://github.com/clerk/javascript/pull/5481)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add optional `resourceId` to `useFetch` hook ([#5536](https://github.com/clerk/javascript/pull/5536)) by [@aeliox](https://github.com/aeliox)
+
+- Fix routing issue in `<Checkout />` component by wrapping the `LazyDrawerRenderer` with nested `VirtualRouter`. ([#5527](https://github.com/clerk/javascript/pull/5527)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the SSO callback URL was incorrectly set for combined sign-in/sign-up. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Trigger navigation to tasks on `setActive` for internal routing only ([#5535](https://github.com/clerk/javascript/pull/5535)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`c3e7886`](https://github.com/clerk/javascript/commit/c3e7886d111d32b80a4d95837ad4abf768e1dbf4), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5), [`26ce4c1`](https://github.com/clerk/javascript/commit/26ce4c15794ca27a3c02ff7cea3428a3985d4d10)]:
+  - @clerk/types@4.51.0
+  - @clerk/localizations@3.13.6
+  - @clerk/shared@3.4.0
+
+## 5.59.0
+
+### Minor Changes
+
+- Improve session refresh logic. ([#5397](https://github.com/clerk/javascript/pull/5397)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Switched from interval-based polling to timeout-based polling, ensuring retries for a `getToken()` call complete before the next poll begins.
+  - `Clerk.handleUnauthenticated()` now sets the session to null when a `/client` request returns a `500` status code, preventing infinite request loops.
+  - Improved error handling: If the `/client` request fails during initialization, the poller stops, a dummy client is created, a manual request to `/tokens` is attempted, and polling resumes.
+
+- Expose `retryAfter` value on `ClerkAPIResponseError` for 429 responses. ([#5480](https://github.com/clerk/javascript/pull/5480)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove non-actionable error from Session poller. ([#5494](https://github.com/clerk/javascript/pull/5494)) by [@panteliselef](https://github.com/panteliselef)
+
+- Treat pending sessions as signed-out by default in `Clerk.isSignedIn` ([#5505](https://github.com/clerk/javascript/pull/5505)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- add v0 preview domain to opt-in to pop-up auth flow ([#5502](https://github.com/clerk/javascript/pull/5502)) by [@mwickett](https://github.com/mwickett)
+
+- Fix sign in prepare first factor cache key ([#5474](https://github.com/clerk/javascript/pull/5474)) by [@octoper](https://github.com/octoper)
+
+- Create a utility that implements `Promise.allSettled` with ES6/ES2015 compatibility. ([#5491](https://github.com/clerk/javascript/pull/5491)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove usage of `<PlanCard />` from `<SubscriptionDetailDrawer />`. ([#5469](https://github.com/clerk/javascript/pull/5469)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add payment source section to `UserProfile` ([#5492](https://github.com/clerk/javascript/pull/5492)) by [@aeliox](https://github.com/aeliox)
+
+- Update secured by clerk link URL. ([#5504](https://github.com/clerk/javascript/pull/5504)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Emit captcha errors if the turnstile fails to execute ([#5520](https://github.com/clerk/javascript/pull/5520)) by [@anagstef](https://github.com/anagstef)
+
+- - Sorting available factors so factors with primary will always be on top ([#5465](https://github.com/clerk/javascript/pull/5465)) by [@octoper](https://github.com/octoper)
+
+  - Allows to set primary phone number action when reverification is enabled
+
+- Filters out non supported strategies for reverification ([#5475](https://github.com/clerk/javascript/pull/5475)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`60a9a51`](https://github.com/clerk/javascript/commit/60a9a51dff7d59e7397536586cf1cfe029bc021b), [`e984494`](https://github.com/clerk/javascript/commit/e984494416dda9a6f04acaaba61f8c2683090961), [`67d34eb`](https://github.com/clerk/javascript/commit/67d34eb28b42ab0b111ed7ff03edc55668fddd3d), [`ec4521b`](https://github.com/clerk/javascript/commit/ec4521b4fe56602f524a0c6d1b09d21aef5d8bd0), [`38828ae`](https://github.com/clerk/javascript/commit/38828ae58d6d4e8e3c60945284930179b2b6bb40), [`f30fa75`](https://github.com/clerk/javascript/commit/f30fa750754f19030f932a666d2bdbdf0d86743d), [`9c68678`](https://github.com/clerk/javascript/commit/9c68678e87047e6312b708b775ebfb23a3e22f8a), [`619cde8`](https://github.com/clerk/javascript/commit/619cde8c532d635d910ebbc08ad6abcc025694b4)]:
+  - @clerk/shared@3.3.0
+  - @clerk/localizations@3.13.5
+  - @clerk/types@4.50.2
+
 ## 5.58.1
 
 ### Patch Changes

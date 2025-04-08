@@ -3,7 +3,6 @@ import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestStat
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromPublishableKey, isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { APIContext } from 'astro';
 
@@ -67,14 +66,6 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     const clerkRequest = createClerkRequest(context.request);
-
-    clerkClient(context).telemetry.record(
-      eventMethodCalled('clerkMiddleware', {
-        handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
-      }),
-    );
 
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
@@ -286,6 +277,7 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
         publishableKey: getSafeEnv(context).pk!,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
+        sessionStatus: requestState.toAuth()?.sessionStatus,
       }).redirectToSignIn({
         returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
       });
@@ -404,6 +396,7 @@ const handleControlFlowErrors = (
         signUpUrl: requestState.signUpUrl,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         publishableKey: getSafeEnv(context).pk!,
+        sessionStatus: requestState.toAuth()?.sessionStatus,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;
