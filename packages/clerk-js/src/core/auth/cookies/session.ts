@@ -23,8 +23,8 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
   const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
   const remove = () => {
-    suffixedSessionCookie.remove();
     sessionCookie.remove();
+    suffixedSessionCookie.remove();
   };
 
   const set = (token: string) => {
@@ -40,8 +40,8 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
       suffixedSessionCookie.remove();
     }
 
-    suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });
     sessionCookie.set(token, { expires, sameSite, secure, partitioned });
+    suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });
   };
 
   const get = () => suffixedSessionCookie.get() || sessionCookie.get();
