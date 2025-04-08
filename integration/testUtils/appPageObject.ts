@@ -7,9 +7,13 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
   const { page } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
-    goToAppHome: async () => {
+    goToAppHome: async (opts: { useSessionToken?: boolean } = {}) => {
+      const { useSessionToken = true } = opts;
+
       try {
-        await setupClerkTestingToken({ page });
+        if (useSessionToken) {
+          await setupClerkTestingToken({ page });
+        }
         await page.goto(app.serverUrl);
       } catch {
         // do not fail the test if interstitial is returned (401)
@@ -17,8 +21,9 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     },
     goToRelative: async (
       path: string,
-      opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {},
+      opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number; useSessionToken?: boolean } = {},
     ) => {
+      const { useSessionToken = true } = opts;
       let url: URL;
 
       try {
@@ -41,7 +46,10 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         url.search = opts.searchParams.toString();
       }
 
-      await setupClerkTestingToken({ page });
+      if (useSessionToken) {
+        await setupClerkTestingToken({ page });
+      }
+
       return page.goto(url.toString(), { timeout: opts.timeout ?? 20000, waitUntil: opts.waitUntil });
     },
     waitForClerkJsLoaded: async () => {

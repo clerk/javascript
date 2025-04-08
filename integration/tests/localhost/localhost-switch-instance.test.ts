@@ -35,7 +35,7 @@ test.describe('switching instances on localhost same port @localhost', () => {
 
     await u.services.users.createBapiUser(fakeUser);
 
-    await u.po.signIn.goTo({ timeout: 30000 });
+    await u.po.signIn.goTo({ timeout: 30000, useSessionToken: false });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);
@@ -51,7 +51,7 @@ test.describe('switching instances on localhost same port @localhost', () => {
     fakeUsers.push(fakeUser);
     await u.services.users.createBapiUser(fakeUser);
 
-    await u.po.signIn.goTo({ timeout: 30000 });
+    await u.po.signIn.goTo({ timeout: 30000, useSessionToken: false });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);

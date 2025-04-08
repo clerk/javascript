@@ -86,9 +86,8 @@ test.describe('root and subdomain production apps @sessions', () => {
         createTestUtils({ app: apps[1].app, page: pages[1], context }),
       ];
 
-      await u[0].po.testingToken.setup();
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.goTo({ useSessionToken: false });
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -109,7 +108,6 @@ test.describe('root and subdomain production apps @sessions', () => {
       expect(tab0Cookies.get('__client_uat').domain).toEqual(tab0Cookies.get('__client_uat_*').domain);
       expect(tab0Cookies.get('__client_uat_*').name.split('__client_uat_')[1].length).toEqual(8);
 
-      await u[1].po.testingToken.setup();
       await u[1].page.goto(`https://${hosts[1]}`);
       // user should be signed in already
       await u[1].po.expect.toBeSignedIn();
@@ -145,7 +143,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.goTo({ useSessionToken: false });
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u[0].po.expect.toBeSignedIn();
 
@@ -226,7 +224,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.goTo({ useSessionToken: false });
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -252,7 +250,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
-      await u[1].po.signIn.goTo();
+      await u[1].po.signIn.goTo({ useSessionToken: false });
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();
@@ -285,13 +283,13 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       // signin in tab0
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.goTo({ useSessionToken: false });
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
 
       // signin in tab1
       await u[1].page.goto(`https://${hosts[1]}`);
-      await u[1].po.signIn.goTo();
+      await u[1].po.signIn.goTo({ useSessionToken: false });
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
 
@@ -358,7 +356,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
-      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.goTo({ useSessionToken: false });
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
@@ -369,7 +367,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
-      await u[1].po.signIn.goTo();
+      await u[1].po.signIn.goTo({ useSessionToken: false });
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
       const tab1User = await u[1].po.clerk.getClientSideUser();
