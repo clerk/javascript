@@ -34,6 +34,7 @@ export * from './User';
 export * from './Verification';
 export * from './SamlConnection';
 export * from './TestingToken';
+export * from './M2MToken';
 
 export type {
   EmailWebhookEvent,

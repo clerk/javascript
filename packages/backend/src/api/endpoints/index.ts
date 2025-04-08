@@ -5,6 +5,7 @@ export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
 export * from './InvitationApi';
+export * from './M2MTokensApi';
 export * from './OrganizationApi';
 export * from './PhoneNumberApi';
 export * from './RedirectUrlApi';
