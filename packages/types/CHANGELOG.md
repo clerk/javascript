@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.51.0
+
+### Minor Changes
+
+- Introduces `ver` as JWT claim to allow versioning of the session token. ([#5521](https://github.com/clerk/javascript/pull/5521)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fixes an issue where a race condition was caused by triggering navigations during a call to `setActive`. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `clerk.__internal_openCheckout()` and `clerk.__internal_closeCheckout()` methods and remove `<Checkout />` from within the `<PricingTable />` component. ([#5481](https://github.com/clerk/javascript/pull/5481)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Mark `ver` claim as experimental ([#5548](https://github.com/clerk/javascript/pull/5548)) by [@octoper](https://github.com/octoper)
+
 ## 4.50.2
 
 ### Patch Changes

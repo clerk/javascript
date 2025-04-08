@@ -15,15 +15,15 @@ import type { LocalizationResource } from '@clerk/types';
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
+    billedAnnually: 'Jährlich abgerechnet',
+    free: 'Kostenlos',
+    getStarted: 'Jetzt starten',
+    manageMembership: 'Mitgliedschaft verwalten',
+    month: 'Monat',
+    switchPlan: 'Zu diesem Plan wechseln',
   },
   backButton: 'Zurück',
-  badge__currentPlan: undefined,
+  badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
@@ -63,16 +63,16 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account löschen',
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
-  formFieldInputPlaceholder__emailAddresses: undefined,
+  formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
   formFieldInputPlaceholder__firstName: 'Vorname eingeben',
   formFieldInputPlaceholder__lastName: 'Nachname eingeben',
   formFieldInputPlaceholder__organizationDomain: 'Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'E-Mail-Adresse der Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationName: 'Name der Organisation eingeben',
-  formFieldInputPlaceholder__organizationSlug: undefined,
+  formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
@@ -141,7 +141,7 @@ export const deDE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Einladen',
-      action__search: undefined,
+      action__search: 'Suchen',
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
@@ -290,7 +290,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
       blockButton__backupCode: 'Mit Backup-Code verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       blockButton__password: 'Mit Passwort verifizieren',
       blockButton__phoneCode: 'Mit SMS-Code verifizieren',
       blockButton__totp: 'Mit TOTP verifizieren',
@@ -318,9 +318,10 @@ export const deDE: LocalizationResource = {
       title: 'Keine verfügbaren Methoden',
     },
     passkey: {
-      blockButton__passkey: undefined,
-      subtitle: undefined,
-      title: undefined,
+      blockButton__passkey: 'Verwenden Sie Ihren Passkey',
+      subtitle:
+        'Die Verwendung Ihres Passkeys bestätigt Ihre Identität. Ihr Gerät kann nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen.',
+      title: 'Verwenden Sie Ihren Passkey',
     },
     password: {
       actionLink: 'Passwort zurücksetzen',
@@ -482,7 +483,7 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Einloggen',
-      titleCombined: undefined,
+      titleCombined: 'Weiter zu {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
@@ -568,7 +569,7 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:
@@ -602,12 +603,16 @@ export const deDE: LocalizationResource = {
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
-    not_allowed_access: undefined,
-    organization_domain_blocked: undefined,
-    organization_domain_common: undefined,
-    organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
-    organization_minimum_permissions_needed: undefined,
+    not_allowed_access:
+      'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte kontaktieren Sie den Support, wenn Sie glauben, dass dies ein Fehler ist.',
+    organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
+    organization_domain_common: 'Dies ist eine gängige E-Mail-Provider-Domain. Bitte verwenden Sie eine andere.',
+    organization_domain_exists_for_enterprise_connection:
+      'Diese Domain wird bereits für das SSO Ihrer Organisation verwendet',
+    organization_membership_quota_exceeded:
+      'Sie haben Ihr Limit an Organisationsmitgliedschaften einschließlich ausstehender Einladungen erreicht.',
+    organization_minimum_permissions_needed:
+      'Es muss mindestens ein Organisationsmitglied mit den erforderlichen Mindestberechtigungen geben.',
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:
@@ -625,7 +630,8 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    web3_missing_identifier: undefined,
+    web3_missing_identifier:
+      'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -676,11 +682,11 @@ export const deDE: LocalizationResource = {
   userProfile: {
     __experimental_billingPage: {
       start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
+        headerTitle__invoices: 'Rechnungen',
+        headerTitle__paymentSources: 'Zahlungsquellen',
+        headerTitle__plans: 'Pläne',
       },
-      title: undefined,
+      title: 'Abrechnung & Zahlungen',
     },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
@@ -735,10 +741,10 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       enterpriseSSOLink: {
-        formButton: undefined,
-        formSubtitle: undefined,
+        formButton: 'Klicken Sie zum Anmelden',
+        formSubtitle: 'Schließen Sie die Anmeldung mit {{identifier}} ab',
       },
-      formHint: undefined,
+      formHint: 'Sie müssen diese E-Mail-Adresse verifizieren, bevor sie Ihrem Konto hinzugefügt werden kann.',
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',
@@ -807,7 +813,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
-      billing: undefined,
+      billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
       title: 'Benutzerkonto',
@@ -907,7 +913,7 @@ export const deDE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Entfernen',
         menuAction__rename: 'Umbenennen',
-        primaryButton: undefined,
+        primaryButton: 'Passkey hinzufügen',
         title: 'Passkeys',
       },
       passwordSection: {
@@ -934,7 +940,7 @@ export const deDE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Wallet entfernen',
-        detailsAction__nonPrimary: undefined,
+        detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
       },
@@ -955,7 +961,7 @@ export const deDE: LocalizationResource = {
       subtitle__unavailableWallets: 'Es sind keine Web3-Wallets verfügbar.',
       successMessage: 'Die Brieftasche wurde Ihrem Konto hinzugefügt.',
       title: 'Web3-Wallet hinzufügen',
-      web3WalletButtonsBlockButton: undefined,
+      web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
   waitlist: {

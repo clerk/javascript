@@ -59,7 +59,7 @@ jobs:
 
       - name: Deduplicate lockfile
         run: pnpm dedupe
-  
+
       - name: Check for changed lockfile
         run: |
           if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
@@ -179,7 +179,7 @@ jobs:
             next-version: '13'
           - test-name: 'nextjs'
             test-project: 'chrome'
-            next-version: '14'
+            next-version: '14.2.26'
           - test-name: 'nextjs'
             test-project: 'chrome'
             next-version: '15'
