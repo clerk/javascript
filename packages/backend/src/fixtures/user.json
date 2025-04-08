@@ -83,6 +83,7 @@
       "last_name": "Doe",
       "avatar_url": "https://clerk.com/test.jpg",
       "username": "jdoe",
+      "phone_number": "+306900000000",
       "public_metadata": {},
       "label": null,
       "verification": null,
