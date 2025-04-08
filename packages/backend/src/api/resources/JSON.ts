@@ -120,6 +120,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   last_name: string;
   image_url?: string;
   username: string | null;
+  phone_number: string | null;
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
   verification: VerificationJSON | null;
