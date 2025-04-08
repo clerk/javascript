@@ -11,16 +11,18 @@ const baseClaims = {
   __raw: '',
 };
 
-describe('resolveSignedInAuthStateFromJWTClaims', () => {
-  test.skip('produced auth object is the same for v1 and v2', () => {
+describe('JWTPayloadToAuthObjectProperties', () => {
+  test('produced auth object is the same for v1 and v2', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
       v: 2,
+      fea: 'o:impersonation',
       o: {
         id: 'org_id',
         rol: 'admin',
         slg: 'org_slug',
-        per: 'permission1,permission2',
+        per: 'read,manage',
+        fpm: '3',
       },
     });
 
@@ -29,7 +31,7 @@ describe('resolveSignedInAuthStateFromJWTClaims', () => {
       org_id: 'org_id',
       org_role: 'admin',
       org_slug: 'org_slug',
-      org_permissions: ['org:permission1', 'permission2'],
+      org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
     });
     expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
   });

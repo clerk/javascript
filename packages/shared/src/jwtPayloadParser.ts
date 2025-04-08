@@ -1,31 +1,9 @@
 import type {
-  ActClaim,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
-  SessionStatusClaim,
+  SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
-
-/**
- * @internal
- */
-type SignedInAuthObjectProperties = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  sessionStatus: SessionStatusClaim | null;
-  actor: ActClaim | undefined;
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
-  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
-};
 
 const parseFeatures = (fea: string | undefined) => {
   const features = fea ? fea.split(',').map(f => f.trim()) : [];
@@ -100,7 +78,7 @@ function buildOrgPermissions({
  *
  * Resolves the signed-in auth state from JWT claims.
  */
-const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): SignedInAuthObjectProperties => {
+const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): SharedSignedInAuthObjectProperties => {
   let orgId: string | undefined;
   let orgRole: OrganizationCustomRoleKey | undefined;
   let orgSlug: string | undefined;
