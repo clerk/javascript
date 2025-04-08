@@ -1,4 +1,4 @@
-import type { Status } from '@clerk/types';
+import type { ClerkStatus } from '@clerk/types';
 
 type EventHandler<Events extends Record<string, unknown>, Key extends keyof Events, R = void> = (
   payload: Events[Key],
@@ -74,7 +74,7 @@ export const clerkEvents = {
 } as const;
 
 type ClerkEvent = {
-  [clerkEvents.Status]: Status;
+  [clerkEvents.Status]: ClerkStatus;
 };
 
 export const createClerkEventBus = () => {

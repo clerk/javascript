@@ -64,7 +64,6 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
-export type StatusListenerCallback = (status: Status) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 
@@ -91,15 +90,11 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
-export const events = {
-  Status: 'status',
-} as const;
-
-type ClerkEvent = (typeof events)[keyof typeof events];
+type ClerkEvent = keyof EventPayload;
 type EventHandler<E extends ClerkEvent> = (payload: EventPayload[E]) => void;
 
 type EventPayload = {
-  [events.Status]: Status;
+  status: ClerkStatus;
 };
 
 type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
@@ -108,7 +103,7 @@ type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E
 /**
  * @inline
  */
-export type Status = 'degraded' | 'error' | 'loading' | 'ready';
+export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
 /**
  * Main Clerk SDK object.
@@ -137,7 +132,7 @@ export interface Clerk {
    * - `"ready"`: Clerk singleton is fully operational.
    * - `"degraded"`: Clerk singleton is partially operational.
    */
-  status: Status;
+  status: ClerkStatus;
 
   /**
    * @internal

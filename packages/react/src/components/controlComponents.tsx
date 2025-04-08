@@ -69,7 +69,6 @@ export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) =>
   useAssertWrappedByClerkProvider('ClerkDegraded');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  // What if status form  clerk js is not available ?
   if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
