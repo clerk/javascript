@@ -1,4 +1,3 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
@@ -47,6 +46,11 @@ import {
   OrganizationSwitcherPrefetch,
 } from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
+
+/**
+ * Avoid importing from `@clerk/shared/react` to prevent extra dependencies being added to the bundle.
+ */
+export const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
 const ROOT_ELEMENT_ID = 'clerk-components';
 
