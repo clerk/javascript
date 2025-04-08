@@ -11,8 +11,8 @@ type CreateM2MTokenParams = {
 };
 
 type UpdateM2MTokenParams = {
-  name?: string;
-  subject?: string;
+  name: string;
+  subject: string;
   expiration?: number | null;
 };
 
