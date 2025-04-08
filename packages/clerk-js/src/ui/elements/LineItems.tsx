@@ -120,11 +120,12 @@ function Title({ title, description }: TitleProps) {
 
 interface DescriptionProps {
   text: string | LocalizationKey;
+  truncateText?: boolean;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
 }
 
-function Description({ text, prefix, suffix }: DescriptionProps) {
+function Description({ text, prefix, suffix, truncateText = false }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -147,6 +148,7 @@ function Description({ text, prefix, suffix }: DescriptionProps) {
           justifyContent: 'flex-end',
           alignItems: 'center',
           gap: t.space.$1,
+          minWidth: '0',
         })}
       >
         {prefix ? (
@@ -164,6 +166,14 @@ function Description({ text, prefix, suffix }: DescriptionProps) {
           elementDescriptor={descriptors.lineItemsDescriptionText}
           sx={t => ({
             ...common.textVariants(t).body,
+            minWidth: '0',
+            ...(truncateText
+              ? {
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }
+              : {}),
           })}
         />
       </Span>
