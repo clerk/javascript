@@ -16,7 +16,7 @@ The computed value of `useClerk().loaded` is:
 - `true` when `useClerk().status` is either `"ready"` or `"degraded"`.
 - `false` when `useClerk().status` is `"loading"` or `"error"`.
 
-### `<ClerkFailed/>`
+### `<ClerkFailed />`
 ```tsx
 <ClerkLoaded>
   <MyCustomSignInForm/>
