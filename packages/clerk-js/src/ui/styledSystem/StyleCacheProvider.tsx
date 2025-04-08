@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useState } from 'react';
  * @param layerName - The name of the CSS layer to wrap the styles in
  * @returns A Stylis plugin function
  */
-const wrapInLayer: (layerName: string) => StylisPlugin = layerName => node => {
+export const wrapInLayer: (layerName: string) => StylisPlugin = layerName => node => {
   // if we're not at the root of a <style> tag, leave the tree intact
   if (node.parent) return;
 
@@ -33,7 +33,7 @@ const wrapInLayer: (layerName: string) => StylisPlugin = layerName => node => {
  * Finds the appropriate insertion point for Emotion styles in the DOM
  * @returns The HTMLElement to use as insertion point, or undefined if none found
  */
-const getInsertionPoint = (): HTMLElement | undefined => {
+export const getInsertionPoint = (): HTMLElement | undefined => {
   try {
     const metaTag = document.querySelector('meta[name="emotion-insertion-point"]');
     if (metaTag) {
