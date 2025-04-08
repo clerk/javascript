@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.27.0
+
+### Minor Changes
+
+- Introduces `ver` as JWT claim to allow versioning of the session token. ([#5521](https://github.com/clerk/javascript/pull/5521)) by [@octoper](https://github.com/octoper)
+
+- Added constants.Headers.ContentSecurityPolicy and constants.Headers.Nonce ([#5493](https://github.com/clerk/javascript/pull/5493)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+  - @clerk/shared@3.4.0
+
 ## 1.26.0
 
 ### Minor Changes
