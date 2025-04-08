@@ -56,7 +56,8 @@ export function buildSSOCallbackURL(
 ): string {
   const { routing, authQueryString, path } = ctx;
   // If the context contains an SSO callback URL, use it instead of building a new one, as it likely contains the
-  // combined flow path.
+  // combined flow path. However, if the routing is virtual, the callback URL from context will not have factored in
+  // baseUrl, so we fallback to buildRedirectUrl instead.
   if ('ssoCallbackUrl' in ctx && ctx.ssoCallbackUrl && routing !== 'virtual') {
     return ctx.ssoCallbackUrl;
   }
