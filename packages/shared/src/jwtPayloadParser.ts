@@ -93,7 +93,7 @@ const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): Sh
   switch (claims.v) {
     case 2: {
       orgId = claims.o?.id;
-      orgRole = claims.o?.rol;
+      orgRole = `org:${claims.o?.rol}`;
       orgSlug = claims.o?.slg;
 
       const { orgFeatures } = parseFeatures(claims.fea);
