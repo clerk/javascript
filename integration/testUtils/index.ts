@@ -1,4 +1,5 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
+import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import type { Browser, BrowserContext, Page, Response } from '@playwright/test';
 import { expect } from '@playwright/test';
 
@@ -75,6 +76,12 @@ const createClerkUtils = ({ page }: TestArgs) => {
   };
 };
 
+const createTestingTokenUtils = ({ page }: TestArgs) => {
+  return {
+    setup: async () => setupClerkTestingToken({ page }),
+  };
+};
+
 export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
 export const createTestUtils = <
@@ -91,11 +98,11 @@ export const createTestUtils = <
 
   const clerkClient = createClerkClient(app);
   const services = {
+    clerk: clerkClient,
     email: createEmailService(),
     users: createUserService(clerkClient),
     invitations: createInvitationService(clerkClient),
     organizations: createOrganizationsService(clerkClient),
-    clerk: clerkClient,
   };
 
   if (!params.page) {
@@ -106,17 +113,18 @@ export const createTestUtils = <
   const testArgs = { page, context, browser };
 
   const pageObjects = {
+    clerk: createClerkUtils(testArgs),
+    expect: createExpectPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
-    signUp: createSignUpComponentPageObject(testArgs),
-    signIn: createSignInComponentPageObject(testArgs),
-    userProfile: createUserProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
+    sessionTask: createSessionTaskComponentPageObject(testArgs),
+    signIn: createSignInComponentPageObject(testArgs),
+    signUp: createSignUpComponentPageObject(testArgs),
+    testingToken: createTestingTokenUtils(testArgs),
     userButton: createUserButtonPageObject(testArgs),
+    userProfile: createUserProfileComponentPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
-    sessionTask: createSessionTaskComponentPageObject(testArgs),
-    expect: createExpectPageObject(testArgs),
-    clerk: createClerkUtils(testArgs),
   };
 
   const browserHelpers = {

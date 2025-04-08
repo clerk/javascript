@@ -70,6 +70,9 @@ importers:
       '@clerk/shared':
         specifier: workspace:*
         version: link:packages/shared
+      '@clerk/testing':
+        specifier: workspace:*
+        version: link:packages/testing
       '@commitlint/cli':
         specifier: ^19.7.1
         version: 19.7.1(@types/node@22.14.0)(typescript@5.8.2)
@@ -2966,7 +2969,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.22':
     resolution: {integrity: sha512-sOttVuk/8gdnsiSeDpnRNpLgBJHLbyQQC0QBGd2iHpr/x6xSYpgoRO6AqwAwGtQsk4ZEPZ83ulvccei1IIPdwg==}

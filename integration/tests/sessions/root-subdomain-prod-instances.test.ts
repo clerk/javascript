@@ -86,6 +86,7 @@ test.describe('root and subdomain production apps @sessions', () => {
         createTestUtils({ app: apps[1].app, page: pages[1], context }),
       ];
 
+      await u[0].po.testingToken.setup();
       await u[0].page.goto(`https://${hosts[0]}`);
       await u[0].po.signIn.goTo();
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
@@ -108,6 +109,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       expect(tab0Cookies.get('__client_uat').domain).toEqual(tab0Cookies.get('__client_uat_*').domain);
       expect(tab0Cookies.get('__client_uat_*').name.split('__client_uat_')[1].length).toEqual(8);
 
+      await u[1].po.testingToken.setup();
       await u[1].page.goto(`https://${hosts[1]}`);
       // user should be signed in already
       await u[1].po.expect.toBeSignedIn();
@@ -246,7 +248,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       // The client_uat cookie should always be set on etld+1
       expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0].split(':')[0]);
 
-      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
+      await u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
@@ -363,7 +365,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       // make sure that the backend user now matches the user we signed in with on the client
       expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
 
-      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
+      await u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
