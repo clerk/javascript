@@ -1,7 +1,9 @@
 import * as React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
+import { Box, Button, Dd, descriptors, Dl, Dt, Icon, Span } from '../customizables';
+import { useClipboard } from '../hooks';
+import { Check, Copy } from '../icons';
 import { common } from '../styledSystem';
 
 /* -------------------------------------------------------------------------------------------------
@@ -121,11 +123,12 @@ function Title({ title, description }: TitleProps) {
 interface DescriptionProps {
   text: string | LocalizationKey;
   truncateText?: boolean;
+  copyText?: boolean;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
 }
 
-function Description({ text, prefix, suffix, truncateText = false }: DescriptionProps) {
+function Description({ text, prefix, suffix, truncateText = false, copyText = false }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -161,21 +164,40 @@ function Description({ text, prefix, suffix, truncateText = false }: Description
             })}
           />
         ) : null}
-        <Span
-          localizationKey={text}
-          elementDescriptor={descriptors.lineItemsDescriptionText}
-          sx={t => ({
-            ...common.textVariants(t).body,
-            minWidth: '0',
-            ...(truncateText
-              ? {
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }
-              : {}),
-          })}
-        />
+        {typeof text === 'string' && truncateText ? (
+          <Span
+            elementDescriptor={descriptors.lineItemsDescriptionText}
+            sx={t => ({
+              ...common.textVariants(t).body,
+              display: 'flex',
+              minWidth: '0',
+            })}
+          >
+            <Span
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {text.slice(0, -5)}
+            </Span>
+            <Span>{text.slice(-5)}</Span>
+          </Span>
+        ) : (
+          <Span
+            localizationKey={text}
+            elementDescriptor={descriptors.lineItemsDescriptionText}
+            sx={t => ({
+              ...common.textVariants(t).body,
+              minWidth: '0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            })}
+          />
+        )}
+        {typeof text === 'string' && copyText ? <CopyButton text={text} /> : null}
       </Span>
       {suffix ? (
         <Span
@@ -188,6 +210,29 @@ function Description({ text, prefix, suffix, truncateText = false }: Description
         />
       ) : null}
     </Dd>
+  );
+}
+
+function CopyButton({ text }: { text: string }) {
+  const { onCopy, hasCopied } = useClipboard(text || '');
+
+  return (
+    <Button
+      variant='unstyled'
+      onClick={onCopy}
+      sx={t => ({
+        color: 'inherit',
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        padding: 0,
+      })}
+      focusRing={false}
+    >
+      <Icon
+        size='sm'
+        icon={hasCopied ? Check : Copy}
+      />
+    </Button>
   );
 }
 
