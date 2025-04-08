@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.59.1
+
+### Patch Changes
+
+- Adds support for Apple Pay to `AddPaymentSource` component, and removes the unusable "collapsed" state. ([#5506](https://github.com/clerk/javascript/pull/5506)) by [@aeliox](https://github.com/aeliox)
+
+- Fixes an issue where a race condition was caused by triggering navigations during a call to `setActive`. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `clerk.__internal_openCheckout()` and `clerk.__internal_closeCheckout()` methods and remove `<Checkout />` from within the `<PricingTable />` component. ([#5481](https://github.com/clerk/javascript/pull/5481)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add optional `resourceId` to `useFetch` hook ([#5536](https://github.com/clerk/javascript/pull/5536)) by [@aeliox](https://github.com/aeliox)
+
+- Fix routing issue in `<Checkout />` component by wrapping the `LazyDrawerRenderer` with nested `VirtualRouter`. ([#5527](https://github.com/clerk/javascript/pull/5527)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the SSO callback URL was incorrectly set for combined sign-in/sign-up. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Trigger navigation to tasks on `setActive` for internal routing only ([#5535](https://github.com/clerk/javascript/pull/5535)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`c3e7886`](https://github.com/clerk/javascript/commit/c3e7886d111d32b80a4d95837ad4abf768e1dbf4), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5), [`26ce4c1`](https://github.com/clerk/javascript/commit/26ce4c15794ca27a3c02ff7cea3428a3985d4d10)]:
+  - @clerk/types@4.51.0
+  - @clerk/localizations@3.13.6
+  - @clerk/shared@3.4.0
+
 ## 5.59.0
 
 ### Minor Changes

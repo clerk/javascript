@@ -688,7 +688,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_nextTask = async (params: NextTaskParams): Promise<void> => {
+  __experimental_nextTask = async (params?: NextTaskParams): Promise<void> => {
     if (this.clerkjs) {
       return this.clerkjs.__experimental_nextTask(params);
     } else {

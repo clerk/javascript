@@ -1640,6 +1640,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
   legalAccepted?: boolean;
+  secondFactorUrl?: string;
 }
 
 export type JoinWaitlistParams = {
