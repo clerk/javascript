@@ -31,9 +31,17 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
     const secure = getSecureAttribute(sameSite);
+    const partitioned = secure;
 
-    suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned: secure });
-    sessionCookie.set(token, { expires, sameSite, secure, partitioned: secure });
+    // If setting Partitioned to true, remove the existing session cookies.
+    // This is to avoid conflicts with the same cookie name without Partitioned attribute.
+    if (partitioned) {
+      sessionCookie.remove();
+      suffixedSessionCookie.remove();
+    }
+
+    suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });
+    sessionCookie.set(token, { expires, sameSite, secure, partitioned });
   };
 
   const get = () => suffixedSessionCookie.get() || sessionCookie.get();
