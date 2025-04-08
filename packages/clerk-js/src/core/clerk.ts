@@ -1851,6 +1851,7 @@ export class Clerk implements ClerkInterface {
     unsafeMetadata,
     strategy,
     legalAccepted,
+    secondFactorUrl,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
@@ -1860,6 +1861,9 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.environment) {
       return;
     }
+
+    const { displayConfig } = this.environment;
+
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
@@ -1869,8 +1873,23 @@ export class Clerk implements ClerkInterface {
           ? generateSignatureWithCoinbaseWallet
           : generateSignatureWithOKXWallet;
 
-    const navigate = (to: string) =>
+    const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    const navigateToFactorTwo = makeNavigate(
+      secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+    );
+
+    const navigateToContinueSignUp = makeNavigate(
+      signUpContinueUrl ||
+        buildURL(
+          {
+            base: displayConfig.signUpUrl,
+            hashPath: '/continue',
+          },
+          { stringify: true },
+        ),
+    );
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -1894,7 +1913,7 @@ export class Clerk implements ClerkInterface {
           signInOrSignUp.status === 'missing_requirements' &&
           signInOrSignUp.verifications.web3Wallet.status === 'verified'
         ) {
-          await navigate(signUpContinueUrl);
+          await navigateToContinueSignUp();
         }
       } else {
         throw err;
@@ -1903,7 +1922,7 @@ export class Clerk implements ClerkInterface {
 
     switch (signInOrSignUp.status) {
       case 'needs_second_factor':
-        await navigate('factor-two');
+        await navigateToFactorTwo();
         break;
       case 'complete':
         if (signInOrSignUp.createdSessionId) {
