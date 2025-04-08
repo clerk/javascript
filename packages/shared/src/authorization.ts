@@ -2,7 +2,6 @@ import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
-  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   PendingSessionOptions,
@@ -13,6 +12,7 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/types';
+import { permission } from 'process';
 
 type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
 type AuthorizationOptions = {
@@ -273,77 +273,4 @@ const resolveAuthState = ({
   }
 };
 
-/**
- * @internal
- */
-type SignedInAuthObjectProperties = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  sessionStatus: SessionStatusClaim | null;
-  actor: ActClaim | undefined;
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
-  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
-};
-
-/**
- * @experimental
- *
- * Resolves the signed-in auth state from JWT claims.
- */
-const __experimental_resolveSignedInAuthStateFromJWTClaims = (claims: JwtPayload): SignedInAuthObjectProperties => {
-  let orgId: string | undefined;
-  let orgRole: OrganizationCustomRoleKey | undefined;
-  let orgSlug: string | undefined;
-  let orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = claims.fva ?? null;
-
-  // sts can be undefined for instances that have not opt-in
-  const sessionStatus = claims.sts ?? null;
-
-  switch (claims.v) {
-    case 2: {
-      orgId = claims.org?.id;
-      orgRole = claims.org?.rol;
-      orgSlug = claims.org?.slg;
-      orgPermissions = claims.org?.per?.split(',').map((permission: string) => permission.trim()) || undefined;
-      break;
-    }
-    default:
-      orgId = claims.org_id;
-      orgRole = claims.org_role;
-      orgSlug = claims.org_slug;
-      orgPermissions = claims.org_permissions;
-      break;
-  }
-
-  return {
-    sessionClaims: claims,
-    sessionId: claims.sid,
-    sessionStatus,
-    actor: claims.act,
-    userId: claims.sub,
-    orgId: orgId,
-    orgRole: orgRole,
-    orgSlug: orgSlug,
-    orgPermissions,
-    factorVerificationAge,
-  };
-};
-
-export {
-  createCheckAuthorization,
-  validateReverificationConfig,
-  resolveAuthState,
-  __experimental_resolveSignedInAuthStateFromJWTClaims,
-};
+export { createCheckAuthorization, validateReverificationConfig, resolveAuthState };

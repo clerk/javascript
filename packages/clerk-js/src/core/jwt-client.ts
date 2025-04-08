@@ -1,4 +1,4 @@
-import { __experimental_resolveSignedInAuthStateFromJWTClaims } from '@clerk/shared/authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   ClientJSON,
   OrganizationMembershipJSON,
@@ -45,7 +45,7 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
   }
 
   const { sessionId, userId, orgId, orgRole, orgPermissions, orgSlug, factorVerificationAge } =
-    __experimental_resolveSignedInAuthStateFromJWTClaims(token.jwt.claims);
+    __experimental_JWTPayloadToAuthObjectProperties(token.jwt.claims);
 
   // TODO(jwt-v2): when JWT version 2 is available, we should revise org permissions
   const defaultClient = {

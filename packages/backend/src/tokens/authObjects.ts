@@ -1,7 +1,5 @@
-import {
-  __experimental_resolveSignedInAuthStateFromJWTClaims,
-  createCheckAuthorization,
-} from '@clerk/shared/authorization';
+import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   ActClaim,
   CheckAuthorizationFromSessionClaims,
@@ -104,7 +102,7 @@ export function signedInAuthObject(
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
   const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
-    __experimental_resolveSignedInAuthStateFromJWTClaims(sessionClaims);
+    __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,

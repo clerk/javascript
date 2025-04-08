@@ -135,12 +135,18 @@ export type VersionedJwtPayload =
     }
   | {
       v: 2;
+
+      /**
+       * Features for session.
+       */
+      fea?: string;
+
       /**
        * @experimental - This structure is subject to change.
        *
        * Active organization information.
        */
-      org?: {
+      o?: {
         /**
          * Active organization ID.
          */
@@ -157,11 +163,20 @@ export type VersionedJwtPayload =
         rol?: OrganizationCustomRoleKey;
 
         /**
-         *
          * Active organization permissions.
          */
         per?: string;
+
+        /**
+         * Feature mapping.
+         */
+        fpm?: string;
       };
+
+      org_permissions?: never;
+      org_id?: never;
+      org_slug?: never;
+      org_role?: never;
     };
 
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;
