@@ -1,8 +1,8 @@
 import { joinPaths } from '../../util/path';
-import type { M2MToken } from '../resources';
+import type { MachineToken } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
-type CreateM2MTokenParams = {
+type CreateMachineTokenParams = {
   name: string;
   subject: string;
   creationReason?: string | null;
@@ -10,7 +10,7 @@ type CreateM2MTokenParams = {
   expiration?: number | null;
 };
 
-type UpdateM2MTokenParams = {
+type UpdateMachineTokenParams = {
   name: string;
   subject: string;
   expiration?: number | null;
@@ -18,17 +18,17 @@ type UpdateM2MTokenParams = {
 
 const basePath = '/m2m_tokens';
 
-export class M2MTokensAPI extends AbstractAPI {
-  public async createM2MToken(params: CreateM2MTokenParams) {
-    return this.request<M2MToken>({
+export class MachineTokensAPI extends AbstractAPI {
+  public async createMachineToken(params: CreateMachineTokenParams) {
+    return this.request<MachineToken>({
       method: 'POST',
       path: basePath,
       bodyParams: params,
     });
   }
 
-  public async updateM2MToken(tokenId: string, params: UpdateM2MTokenParams) {
-    return this.request<M2MToken>({
+  public async updateMachineToken(tokenId: string, params: UpdateMachineTokenParams) {
+    return this.request<MachineToken>({
       method: 'PATCH',
       path: joinPaths(basePath, tokenId),
       bodyParams: params,

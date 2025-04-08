@@ -41,7 +41,7 @@ export const ObjectType = {
   TestingToken: 'testing_token',
   Role: 'role',
   Permission: 'permission',
-  M2MToken: 'm2m_token',
+  MachineToken: 'm2m_token',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -483,8 +483,8 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface M2MTokenJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.M2MToken;
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
   secret: string;
   id: string;
   name: string;
