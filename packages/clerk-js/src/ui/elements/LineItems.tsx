@@ -97,7 +97,6 @@ function Title({ title, description }: TitleProps) {
       sx={t => ({
         display: 'grid',
         color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
-        marginTop: variant !== 'primary' ? t.space.$0x25 : undefined,
         ...common.textVariants(t)[textVariant],
       })}
     >
@@ -122,13 +121,26 @@ function Title({ title, description }: TitleProps) {
 
 interface DescriptionProps {
   text: string | LocalizationKey;
+  /**
+   * When true, the text will be truncated to 15 characters.
+   * @default `false`
+   */
   truncateText?: boolean;
+  /**
+   * When true, there will be a button to copy the text.
+   * @default `false`
+   */
   copyText?: boolean;
+  /**
+   * The visually hidden label of the copy button.
+   * @default `Copy`
+   */
+  copyLabel?: string;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
 }
 
-function Description({ text, prefix, suffix, truncateText = false, copyText = false }: DescriptionProps) {
+function Description({ text, prefix, suffix, truncateText = false, copyText = false, copyLabel }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -197,7 +209,12 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
             })}
           />
         )}
-        {typeof text === 'string' && copyText ? <CopyButton text={text} /> : null}
+        {typeof text === 'string' && copyText ? (
+          <CopyButton
+            text={text}
+            copyLabel={copyLabel}
+          />
+        ) : null}
       </Span>
       {suffix ? (
         <Span
@@ -206,6 +223,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
           sx={t => ({
             color: t.colors.$colorTextSecondary,
             ...common.textVariants(t).caption,
+            justifySelf: 'flex-end',
           })}
         />
       ) : null}
@@ -213,7 +231,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
   );
 }
 
-function CopyButton({ text }: { text: string }) {
+function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
   const { onCopy, hasCopied } = useClipboard(text || '');
 
   return (
@@ -227,6 +245,7 @@ function CopyButton({ text }: { text: string }) {
         padding: 0,
       })}
       focusRing={false}
+      aria-label={hasCopied ? 'Copied' : copyLabel}
     >
       <Icon
         size='sm'
