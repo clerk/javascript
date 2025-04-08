@@ -92,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   /**
    * Sometimes utilities from `/server` may use Node APIs even if `clerkMiddleware` does not consumes them.
-   * This happends because of code for node runtime and edge runtime is bundled together in the `/server/index.ts` barrel file.
+   * This happens because of code for node runtime and edge runtime is bundled together in the `/server/index.ts` barrel file.
    * This test ensures that developers will not end up with warnings on `next build`.
    */
   test('Avoid import traces logs indicating misuse of node apis inside middleware', () => {
