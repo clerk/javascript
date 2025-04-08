@@ -465,7 +465,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     {
       ...subscriptionsParams,
     },
-    clerk.__experimental_commerce?.__experimental_billing.getSubscriptions,
+    organization?.__experimental_getSubscriptions,
     {
       keepPreviousData: subscriptionsSafeValues.keepPreviousData,
       infinite: subscriptionsSafeValues.infinite,
