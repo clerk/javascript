@@ -264,7 +264,7 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!popup) {
       clerkMissingOptionError('popup');
     }
-    return _authenticateWithPopup(SignIn.clerk, this.authenticateWithRedirectOrPopup, params, url => {
+    return _authenticateWithPopup(SignIn.clerk, 'signIn', this.authenticateWithRedirectOrPopup, params, url => {
       popup.location.href = url.toString();
     });
   };

@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.59.2
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Stop retrying on `/verify` if the client cannot solve the challenge ([#5526](https://github.com/clerk/javascript/pull/5526)) by [@anagstef](https://github.com/anagstef)
+
+- Handle two factor redirect when authenticate with web3 and multifactor has been enabled ([#5352](https://github.com/clerk/javascript/pull/5352)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/localizations@3.13.7
+  - @clerk/shared@3.4.1
+
 ## 5.59.1
 
 ### Patch Changes

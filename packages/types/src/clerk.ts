@@ -720,6 +720,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The underlying resource to optionally reload before processing an OAuth callback.
+     */
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1612,6 +1616,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
   legalAccepted?: boolean;
+  secondFactorUrl?: string;
 }
 
 export type JoinWaitlistParams = {
