@@ -1,6 +1,7 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -10,6 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { createCSPHeader, type CSPDirective, type CSPMode } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -17,8 +19,10 @@ import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
   isRedirectToSignInError,
+  isRedirectToSignUpError,
   nextjsRedirectError,
   redirectToSignInError,
+  redirectToSignUpError,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -33,6 +37,7 @@ import {
 
 export type ClerkMiddlewareAuthObject = AuthObject & {
   redirectToSignIn: RedirectFun<Response>;
+  redirectToSignUp: RedirectFun<Response>;
 };
 
 export interface ClerkMiddlewareAuth {
@@ -56,6 +61,20 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    * If true, additional debug information will be logged to the console.
    */
   debug?: boolean;
+
+  /**
+   * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
+   */
+  contentSecurityPolicy?: {
+    /**
+     * The CSP mode to use - either 'standard' or 'strict-dynamic'
+     */
+    mode: CSPMode;
+    /**
+     * Custom CSP directives to merge with Clerk's default directives
+     */
+    directives?: Partial<Record<CSPDirective, string[]>>;
+  };
 };
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -134,9 +153,16 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
 
-      const authHeader = request.headers.get('authorization');
+      const authHeader = request.headers.get(constants.Headers.Authorization);
       if (authHeader && authHeader.startsWith('Basic ')) {
         logger.debug('Basic Auth detected');
+      }
+
+      const cspHeader = request.headers.get(constants.Headers.ContentSecurityPolicy);
+      if (cspHeader) {
+        logger.debug('Content-Security-Policy detected', () => ({
+          value: cspHeader,
+        }));
       }
 
       const requestState = await resolvedClerkClient.authenticateRequest(
@@ -162,9 +188,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
       const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
+      const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
+      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
+        redirectToSignIn,
+        redirectToSignUp,
+      });
       const authHandler = () => Promise.resolve(authObjWithMethods);
       authHandler.protect = protect;
 
@@ -178,11 +208,33 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
+      if (options.contentSecurityPolicy) {
+        const { header, nonce } = createCSPHeader(
+          options.contentSecurityPolicy.mode,
+          (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
+          options.contentSecurityPolicy.directives,
+        );
+
+        setHeader(handlerResult, constants.Headers.ContentSecurityPolicy, header);
+        if (nonce) {
+          setHeader(handlerResult, constants.Headers.Nonce, nonce);
+        }
+
+        logger.debug('Clerk generated CSP', () => ({
+          header,
+          nonce,
+        }));
+      }
 
       // TODO @nikos: we need to make this more generic
       // and move the logic in clerk/backend
       if (requestState.headers) {
         requestState.headers.forEach((value, key) => {
+          if (key === constants.Headers.ContentSecurityPolicy) {
+            logger.debug('Content-Security-Policy detected', () => ({
+              value,
+            }));
+          }
           handlerResult.headers.append(key, value);
         });
       }
@@ -303,6 +355,15 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
+const createMiddlewareRedirectToSignUp = (
+  clerkRequest: ClerkRequest,
+): ClerkMiddlewareAuthObject['redirectToSignUp'] => {
+  return (opts = {}) => {
+    const url = clerkRequest.clerkUrl.toString();
+    redirectToSignUpError(url, opts.returnBackUrl);
+  };
+};
+
 const createMiddlewareProtect = (
   clerkRequest: ClerkRequest,
   authObject: AuthObject,
@@ -345,14 +406,21 @@ const handleControlFlowErrors = (
     );
   }
 
-  if (isRedirectToSignInError(e)) {
-    return createRedirect({
+  const isRedirectToSignIn = isRedirectToSignInError(e);
+  const isRedirectToSignUp = isRedirectToSignUpError(e);
+
+  if (isRedirectToSignIn || isRedirectToSignUp) {
+    const redirect = createRedirect({
       redirectAdapter,
       baseUrl: clerkRequest.clerkUrl,
       signInUrl: requestState.signInUrl,
       signUpUrl: requestState.signUpUrl,
       publishableKey: requestState.publishableKey,
-    }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+      sessionStatus: requestState.toAuth()?.sessionStatus,
+    });
+
+    const { returnBackUrl } = e;
+    return redirect[isRedirectToSignIn ? 'redirectToSignIn' : 'redirectToSignUp']({ returnBackUrl });
   }
 
   if (isNextjsRedirectError(e)) {

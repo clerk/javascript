@@ -102,7 +102,7 @@ function SignUpContinueInternal() {
 
   useEffect(() => {
     // Redirect to sign-up if there is no persisted sign-up
-    if (!signUp.id) {
+    if (!signUp.id && clerk.__internal_setActiveInProgress !== true) {
       void navigate(displayConfig.signUpUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

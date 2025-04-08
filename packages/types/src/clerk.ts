@@ -34,7 +34,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -177,6 +177,17 @@ export interface Clerk {
    * Closes the Clerk SignIn modal.
    */
   closeSignIn: () => void;
+
+  /**
+   * Opens the Clerk Checkout component in a drawer.
+   * @param props Optional checkout configuration parameters.
+   */
+  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+
+  /**
+   * Closes the Clerk Checkout drawer.
+   */
+  __internal_closeCheckout: () => void;
 
   /**
    * Opens the Clerk UserVerification component in a modal.
@@ -660,6 +671,12 @@ export interface Clerk {
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
+
+  /**
+   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * initiated outside of the Clerk class.
+   */
+  __internal_setActiveInProgress: boolean;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -733,7 +750,8 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = ClerkOptionsNavigation &
+export type ClerkOptions = PendingSessionOptions &
+  ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
@@ -1508,6 +1526,7 @@ export type __experimental_CheckoutProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   orgId?: string;
   onSubscriptionComplete?: () => void;
+  portalId?: string;
 };
 
 export type __experimental_PaymentSourcesProps = {

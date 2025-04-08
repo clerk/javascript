@@ -1,14 +1,13 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
-import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
-import { Drawer, LineItems } from '../../elements';
+import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { Check } from '../../icons';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
-  const { setIsOpen } = useCheckoutContext();
+  const { setIsOpen } = useDrawerContext();
 
   const handleClose = () => {
     if (setIsOpen) {

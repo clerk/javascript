@@ -6,7 +6,7 @@ import type {
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Box, Button, Col, descriptors, Flex, Form, Icon, localizationKeys, Text } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
@@ -98,10 +98,6 @@ const CheckoutFormElements = ({
   const { data } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-payment-sources');
   const { data: paymentSources } = data || { data: [] };
 
-  const didExpandStripePaymentMethods = useCallback(() => {
-    setOpenAccountFundsDropDown(false);
-  }, []);
-
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
     return checkout
       .confirm({ paymentSourceId })
@@ -183,7 +179,6 @@ const CheckoutFormElements = ({
           <AddPaymentSource
             checkout={checkout}
             onSuccess={onAddPaymentSourceSuccess}
-            onExpand={didExpandStripePaymentMethods}
             submitLabel={localizationKeys(
               'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
               {

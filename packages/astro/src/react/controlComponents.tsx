@@ -1,4 +1,4 @@
-import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions } from '@clerk/types';
 import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -9,21 +9,21 @@ import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
 import { withClerk } from './utils';
 
-export function SignedOut(props: PropsWithChildren) {
-  const { userId } = useAuth();
+export function SignedOut({ children, treatPendingAsSignedOut }: PropsWithChildren<PendingSessionOptions>) {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   if (userId) {
     return null;
   }
-  return props.children;
+  return children;
 }
 
-export function SignedIn(props: PropsWithChildren) {
-  const { userId } = useAuth();
+export function SignedIn({ children, treatPendingAsSignedOut }: PropsWithChildren<PendingSessionOptions>) {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
   if (!userId) {
     return null;
   }
-  return props.children;
+  return children;
 }
 
 const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
@@ -69,7 +69,9 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element
   return <>{children}</>;
 };
 
-export type ProtectProps = React.PropsWithChildren<_ProtectProps & { fallback?: React.ReactNode }>;
+export type ProtectProps = React.PropsWithChildren<
+  _ProtectProps & { fallback?: React.ReactNode } & PendingSessionOptions
+>;
 
 /**
  * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
@@ -83,8 +85,8 @@ export type ProtectProps = React.PropsWithChildren<_ProtectProps & { fallback?: 
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export const Protect = ({ children, fallback, ...restAuthorizedParams }: ProtectProps) => {
-  const { isLoaded, has, userId } = useAuth();
+export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
 
   /**
    * Avoid flickering children or fallback while clerk is loading sessionId or userId
@@ -108,7 +110,7 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
    * Check against the results of `has` called inside the callback
    */
   if (typeof restAuthorizedParams.condition === 'function') {
-    if (restAuthorizedParams.condition(has as CheckAuthorizationWithCustomPermissions)) {
+    if (restAuthorizedParams.condition(has)) {
       return authorized;
     }
     return unauthorized;

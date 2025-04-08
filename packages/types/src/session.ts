@@ -27,6 +27,14 @@ import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
+export type PendingSessionOptions = {
+  /**
+   * Determines if pending sessions are considered as signed-out state.
+   * @default true
+   */
+  treatPendingAsSignedOut?: boolean;
+};
+
 type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSystemPermissionPrefix}${string}`
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;

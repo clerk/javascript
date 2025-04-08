@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "2.4.5",
+  "version": "2.6.0",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -55,6 +55,10 @@
       "types": "./dist/server/index.d.ts",
       "default": "./dist/server/index.js"
     },
+    "./webhooks": {
+      "types": "./dist/webhooks.d.ts",
+      "default": "./dist/webhooks.js"
+    },
     "./env": "./env.d.ts",
     "./components": "./components/index.ts",
     "./package.json": "./package.json"
@@ -67,6 +71,7 @@
     "server",
     "internal",
     "components",
+    "webhooks",
     "env.d.ts",
     "types.ts"
   ],
