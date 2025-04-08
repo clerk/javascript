@@ -1,5 +1,71 @@
 # Change Log
 
+## 6.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/backend@1.27.1
+  - @clerk/types@4.51.1
+  - @clerk/clerk-react@5.26.1
+  - @clerk/shared@3.4.1
+
+## 6.14.0
+
+### Minor Changes
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `<ClerkProvider treatPendingAsSignedOut={false} />` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- - Introduce `auth().redirectToSignUp()` that can be used in API routes and pages. Originally effort by [@sambarnes](https://github.com/clerk/javascript/pull/5407) ([#5533](https://github.com/clerk/javascript/pull/5533)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```ts
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware(async auth => {
+    const { userId, redirectToSignUp } = await auth();
+
+    if (!userId) {
+      return redirectToSignUp();
+    }
+  });
+  ```
+
+- Added Content Security Policy (CSP) header generation functionality to `clerkMiddleware` with support for both standard and strict-dynamic modes. Key features: ([#5493](https://github.com/clerk/javascript/pull/5493)) by [@jacekradko](https://github.com/jacekradko)
+
+  - Automatic generation of CSP headers with default security policies compatible with Clerk requirements
+  - Support for both standard and strict-dynamic CSP modes
+  - Automatic nonce generation for strict-dynamic mode
+  - Ability to add custom directives to match project requirements
+
+  Example
+
+  ```
+  export default clerkMiddleware(
+    async (auth, request) => {
+      if (!isPublicRoute(request)) {
+        await auth.protect();
+      }
+    },
+    {
+      contentSecurityPolicy: {
+        mode: "strict-dynamic",
+        directives: {
+          "connect-src": ["external.api.com"],
+          "script-src": ["external.scripts.com"]
+        }
+      }
+    }
+  );
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`a8180ce`](https://github.com/clerk/javascript/commit/a8180ceef447a13d84eac6a64ed7a04d791d8d64), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`2cceeba`](https://github.com/clerk/javascript/commit/2cceeba177ecf5a28138da308cbba18015e3a646), [`026ad57`](https://github.com/clerk/javascript/commit/026ad5717cf661182c219fb0ffab4522083065c3), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/clerk-react@5.26.0
+  - @clerk/types@4.51.0
+  - @clerk/backend@1.27.0
+  - @clerk/shared@3.4.0
+
 ## 6.13.0
 
 ### Minor Changes

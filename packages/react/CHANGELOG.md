@@ -1,5 +1,63 @@
 # Change Log
 
+## 5.26.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/shared@3.4.1
+
+## 5.26.0
+
+### Minor Changes
+
+- Update `useSession` to handle pending sessions as signed-out by default, with opt-out via `useSession({ treatPendingAsSignedOut: false })` or `<ClerkProvider treatPendingAsSignedOut={false} />` ([#5525](https://github.com/clerk/javascript/pull/5525)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `<ClerkProvider treatPendingAsSignedOut={false} />` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fixes an issue where a race condition was caused by triggering navigations during a call to `setActive`. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `clerk.__internal_openCheckout()` and `clerk.__internal_closeCheckout()` methods and remove `<Checkout />` from within the `<PricingTable />` component. ([#5481](https://github.com/clerk/javascript/pull/5481)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce `treatPendingAsSignedOut` prop to client control components ([#5512](https://github.com/clerk/javascript/pull/5512)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <SignedIn>
+    <p>You have selected an organization!</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <SignedIn treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <Protect>
+    <p>You have selected an organization!</p>
+  </Protect>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <Protect treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </Protect>
+  ```
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+  - @clerk/shared@3.4.0
+
 ## 5.25.6
 
 ### Patch Changes
