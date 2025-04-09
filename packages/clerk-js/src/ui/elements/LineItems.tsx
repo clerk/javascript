@@ -123,17 +123,17 @@ function Title({ title, description }: TitleProps) {
 interface DescriptionProps {
   text: string | LocalizationKey;
   /**
-   * When true, the text will be truncated to 15 characters.
+   * When true, the text will be truncated with an ellipsis in the middle and the last 5 characters will be visible.
    * @default `false`
    */
   truncateText?: boolean;
   /**
-   * When true, there will be a button to copy the text.
+   * When true, there will be a button to copy the providedtext.
    * @default `false`
    */
   copyText?: boolean;
   /**
-   * The visually hidden label of the copy button.
+   * The visually hidden label for the copy button.
    * @default `Copy`
    */
   copyLabel?: string;
