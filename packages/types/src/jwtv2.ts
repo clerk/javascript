@@ -39,13 +39,6 @@ declare global {
 
 type JWTPayloadBase = {
   /**
-   * @experimental
-   *
-   * The version of the JWT payload.
-   */
-  v?: number | undefined;
-
-  /**
    * Encoded token supporting the `getRawString` method.
    */
   __raw: string;
@@ -134,6 +127,11 @@ export type VersionedJwtPayload =
       org_role?: OrganizationCustomRoleKey;
     }
   | {
+      /**
+       * @experimental
+       *
+       * The version of the JWT payload.
+       */
       v: 2;
 
       /**

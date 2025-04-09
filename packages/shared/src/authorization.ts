@@ -12,7 +12,6 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/types';
-import { permission } from 'process';
 
 type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
 type AuthorizationOptions = {
