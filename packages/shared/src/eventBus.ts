@@ -31,7 +31,7 @@ type EventBus<Events extends Record<string, unknown>> = {
    * @param handler - The callback function to execute when the event is dispatched
    * @returns void
    */
-  onBefore: <Event extends keyof Events>(event: Event, handler: EventHandler<Events, Event>) => void;
+  prioritizedOn: <Event extends keyof Events>(event: Event, handler: EventHandler<Events, Event>) => void;
 
   /**
    * Publish an event with a payload
@@ -59,7 +59,7 @@ type EventBus<Events extends Record<string, unknown>> = {
    * @param handler - Optional specific handler to remove. If omitted, all pre-dispatch handlers for the event are removed
    * @returns void
    */
-  offBefore: <Event extends keyof Events>(event: Event, handler?: EventHandler<Events, Event>) => void;
+  prioritizedOff: <Event extends keyof Events>(event: Event, handler?: EventHandler<Events, Event>) => void;
 
   /**
    * Internal utilities for the event bus
@@ -175,7 +175,7 @@ const _off: InternalOff = (eventToHandlersMap, event, handler) => {
  * }, { notify: true });
  *
  * // Publish an event
- * eventBus.dispatch('user-login', { userId: 'abc123', timestamp: Date.now() });
+ * eventBus.emit('user-login', { userId: 'abc123', timestamp: Date.now() });
  *
  * // Unsubscribe from event
  * const handler = (payload) => console.log(payload);
@@ -198,11 +198,20 @@ export const createEventBus = <Events extends Record<string, unknown>>(): EventB
   };
 
   return {
+    // Subscribe to an event
     on: (...args) => _on(eventToHandlersMap, latestPayloadMap, ...args),
-    onBefore: (...args) => _on(eventToPredispatchHandlersMap, latestPayloadMap, ...args),
+    // Subscribe to an event with priority
+    // Registered handlers with `prioritizedOn` will be called before handlers registered with `on`
+    prioritizedOn: (...args) => _on(eventToPredispatchHandlersMap, latestPayloadMap, ...args),
+    // Dispatch an event
     emit,
+    // Unsubscribe from an event
     off: (...args) => _off(eventToHandlersMap, ...args),
-    offBefore: (...args) => _off(eventToPredispatchHandlersMap, ...args),
+    // Unsubscribe from an event with priority
+    // Unsubscribes handlers only registered with `prioritizedOn`
+    prioritizedOff: (...args) => _off(eventToPredispatchHandlersMap, ...args),
+
+    // Internal utilities
     internal: {
       retrieveListeners: event => eventToHandlersMap.get(event) || [],
     },
