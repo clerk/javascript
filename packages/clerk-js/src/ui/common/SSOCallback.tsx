@@ -24,7 +24,9 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
   React.useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
     if (__internal_setActiveInProgress !== true) {
-      handleRedirectCallback({ ...props }, navigate).catch(e => {
+      const intent = new URLSearchParams(window.location.search).get('intent');
+      const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
+      handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {
         handleError(e, [], card.setError);
         timeoutId = setTimeout(() => void navigate('../'), 4000);
       });

@@ -1528,16 +1528,15 @@ export class Clerk implements ClerkInterface {
     // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
     // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
     // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
-    if (!window.opener) {
+    if (!window.opener && params.reloadResource) {
       try {
-        await signIn.reload();
+        if (params.reloadResource === 'signIn') {
+          await signIn.reload();
+        } else if (params.reloadResource === 'signUp') {
+          await signUp.reload();
+        }
       } catch {
-        // This can be safely ignored
-      }
-      try {
-        await signUp.reload();
-      } catch {
-        // This can be safely ignored
+        // This catch intentionally left blank.
       }
     }
 

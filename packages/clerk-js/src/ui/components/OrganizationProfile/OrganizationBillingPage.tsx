@@ -1,4 +1,4 @@
-import { __experimental_PricingTableContext } from '../../contexts';
+import { __experimental_PaymentSourcesContext, __experimental_PricingTableContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -11,6 +11,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
 
 export const OrganizationBillingPage = withCardStateProvider(() => {
@@ -58,7 +59,13 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
-            <TabPanel sx={{ width: '100%' }}>Payment Sources</TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <__experimental_PaymentSourcesContext.Provider
+                value={{ componentName: 'PaymentSources', subscriberType: 'org' }}
+              >
+                <__experimental_PaymentSources />
+              </__experimental_PaymentSourcesContext.Provider>
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Col>
