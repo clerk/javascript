@@ -178,16 +178,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
           />
         ) : null}
         {typeof text === 'string' && truncateText ? (
-          <Span
-            elementDescriptor={descriptors.lineItemsDescriptionText}
-            sx={t => ({
-              ...common.textVariants(t).body,
-              display: 'flex',
-              minWidth: '0',
-            })}
-          >
-            {truncateWithEndVisible(text)}
-          </Span>
+          <TruncatedText text={text} />
         ) : (
           <Span
             localizationKey={text}
@@ -220,6 +211,26 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         />
       ) : null}
     </Dd>
+  );
+}
+
+function TruncatedText({ text }: { text: string }) {
+  const { onCopy } = useClipboard(text);
+  return (
+    <Span
+      elementDescriptor={descriptors.lineItemsDescriptionText}
+      sx={t => ({
+        ...common.textVariants(t).body,
+        display: 'flex',
+        minWidth: '0',
+      })}
+      onCopy={async e => {
+        e.preventDefault();
+        await onCopy();
+      }}
+    >
+      {truncateWithEndVisible(text)}
+    </Span>
   );
 }
 
