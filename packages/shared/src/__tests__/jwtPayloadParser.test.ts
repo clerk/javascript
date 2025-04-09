@@ -18,9 +18,9 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       v: 2,
       fea: 'o:impersonation',
       o: {
-        id: 'org_id',
+        id: 'org_xxxxxxx',
         rol: 'admin',
-        slg: 'org_slug',
+        slg: '/test',
         per: 'read,manage',
         fpm: '3',
       },
@@ -28,9 +28,9 @@ describe('JWTPayloadToAuthObjectProperties', () => {
 
     const { sessionClaims: v1Claims, ...signedInAuthObjectV1 } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
-      org_id: 'org_id',
-      org_role: 'admin',
-      org_slug: 'org_slug',
+      org_id: 'org_xxxxxxx',
+      org_role: 'org:admin',
+      org_slug: '/test',
       org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
     });
     expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
@@ -42,9 +42,9 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       v: 2,
       fea: 'o:impersonation,o:memberships',
       o: {
-        id: 'org_id',
+        id: 'org_xxxxxxx',
         rol: 'admin',
-        slg: 'org_slug',
+        slg: '/test',
         per: 'read,manage',
         fpm: '2,3',
       },
