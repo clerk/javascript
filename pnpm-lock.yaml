@@ -556,8 +556,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.2(@types/react@18.3.20)(react@18.3.1)
       '@xstate/react':
-        specifier: ^4.1.1
-        version: 4.1.1(@types/react@18.3.20)(react@18.3.1)(xstate@5.15.0)
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@18.3.20)(react@18.3.1)(xstate@5.19.2)
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -571,12 +571,12 @@ importers:
         specifier: catalog:repo
         version: 2.8.1
       xstate:
-        specifier: ^5.15.0
-        version: 5.15.0
+        specifier: ^5.19.2
+        version: 5.19.2
     devDependencies:
       '@statelyai/inspect':
         specifier: ^0.4.0
-        version: 0.4.0(ws@8.18.1)(xstate@5.15.0)
+        version: 0.4.0(ws@8.18.1)(xstate@5.19.2)
       concurrently:
         specifier: ^8.2.2
         version: 8.2.2
@@ -5632,11 +5632,11 @@ packages:
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
 
-  '@xstate/react@4.1.1':
-    resolution: {integrity: sha512-pFp/Y+bnczfaZ0V8B4LOhx3d6Gd71YKAPbzerGqydC2nsYN/mp7RZu3q/w6/kvI2hwR/jeDeetM7xc3JFZH2NA==}
+  '@xstate/react@5.0.3':
+    resolution: {integrity: sha512-Zdnn0VTPcVdoaAiW0OX6Nkvdoe7SNGjfaZqM61NKhjt2aNULqiicmDu2tOd1ChzlRWYDxGTdbzVqqVyMLpoHJw==}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      xstate: ^5.11.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      xstate: ^5.19.2
     peerDependenciesMeta:
       xstate:
         optional: true
@@ -14451,8 +14451,8 @@ packages:
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
 
-  xstate@5.15.0:
-    resolution: {integrity: sha512-0DGArbj+ych7PcCqHzhEvXH1qVG41lhenwdbEPBRJyxQP9TLooUsR7oiR4YWYHblLOVWvz/esiw8HUtHXp/kZA==}
+  xstate@5.19.2:
+    resolution: {integrity: sha512-B8fL2aP0ogn5aviAXFzI5oZseAMqN00fg/TeDa3ZtatyDcViYLIfuQl4y8qmHCiKZgGEzmnTyNtNQL9oeJE2gw==}
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -18952,7 +18952,7 @@ snapshots:
 
   '@stablelib/base64@1.0.1': {}
 
-  '@statelyai/inspect@0.4.0(ws@8.18.1)(xstate@5.15.0)':
+  '@statelyai/inspect@0.4.0(ws@8.18.1)(xstate@5.19.2)':
     dependencies:
       fast-safe-stringify: 2.1.1
       isomorphic-ws: 5.0.0(ws@8.18.1)
@@ -18960,7 +18960,7 @@ snapshots:
       safe-stable-stringify: 2.4.3
       superjson: 1.13.3
       uuid: 9.0.1
-      xstate: 5.15.0
+      xstate: 5.19.2
     transitivePeerDependencies:
       - ws
 
@@ -20707,13 +20707,13 @@ snapshots:
 
   '@xmldom/xmldom@0.8.10': {}
 
-  '@xstate/react@4.1.1(@types/react@18.3.20)(react@18.3.1)(xstate@5.15.0)':
+  '@xstate/react@5.0.3(@types/react@18.3.20)(react@18.3.1)(xstate@5.19.2)':
     dependencies:
       react: 18.3.1
       use-isomorphic-layout-effect: 1.1.2(@types/react@18.3.20)(react@18.3.1)
       use-sync-external-store: 1.4.0(react@18.3.1)
     optionalDependencies:
-      xstate: 5.15.0
+      xstate: 5.19.2
     transitivePeerDependencies:
       - '@types/react'
 
@@ -31482,7 +31482,7 @@ snapshots:
 
   xmlchars@2.2.0: {}
 
-  xstate@5.15.0: {}
+  xstate@5.19.2: {}
 
   xtend@4.0.2: {}
 
