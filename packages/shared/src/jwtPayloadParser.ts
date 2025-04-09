@@ -16,26 +16,24 @@ const parseFeatures = (fea: string | undefined) => {
 };
 
 const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
-  if (!per && !fpm) {
+  if (!per || !fpm) {
     return { permissions: [], featurePermissionMap: [] };
   }
 
-  const permissions = per ? per.split(',').map(p => p.trim()) : [];
+  const permissions = per.split(',').map(p => p.trim());
 
   // TODO: make this more efficient
   const featurePermissionMap = fpm
-    ? fpm
-        .split(',')
-        .map(permission => Number.parseInt(permission.trim(), 10))
-        .map((permission: number) =>
-          permission
-            .toString(2)
-            .padStart(permissions.length, '0')
-            .split('')
-            .map(bit => Number.parseInt(bit, 10)),
-        )
-        .filter(Boolean)
-    : [];
+    .split(',')
+    .map(permission => Number.parseInt(permission.trim(), 10))
+    .map((permission: number) =>
+      permission
+        .toString(2)
+        .padStart(permissions.length, '0')
+        .split('')
+        .map(bit => Number.parseInt(bit, 10)),
+    )
+    .filter(Boolean);
 
   return { permissions, featurePermissionMap };
 };
@@ -96,14 +94,13 @@ const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): Sh
 
   switch (claims.v) {
     case 2: {
-      orgId = claims.o?.id;
-      orgSlug = claims.o?.slg;
+      if (claims.o) {
+        orgId = claims.o?.id;
+        orgSlug = claims.o?.slg;
 
-      if (claims.o?.rol) {
-        orgRole = `org:${claims.o?.rol}`;
-      }
-
-      if (claims.o?.per && claims.o?.fpm) {
+        if (claims.o?.rol) {
+          orgRole = `org:${claims.o?.rol}`;
+        }
         const { orgFeatures } = parseFeatures(claims.fea);
         const { permissions, featurePermissionMap } = parsePermissions({
           per: claims.o?.per,

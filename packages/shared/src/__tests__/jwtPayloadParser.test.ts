@@ -12,6 +12,47 @@ const baseClaims = {
 };
 
 describe('JWTPayloadToAuthObjectProperties', () => {
+  test('auth object with JWT v2 does not produces anything org related if there is no org active', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'u:impersonation,u:memberships',
+    });
+
+    const { sessionClaims: v1Claims, ...signedInAuthObjectV1 } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+    });
+    expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
+    expect(signedInAuthObjectV1.orgId).toBeUndefined();
+    expect(signedInAuthObjectV1.orgPermissions).toBeUndefined();
+    expect(signedInAuthObjectV1.orgRole).toBeUndefined();
+    expect(signedInAuthObjectV1.orgSlug).toBeUndefined();
+  });
+
+  test('produced auth object is the same for v1 and v2', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:impersonation',
+      o: {
+        id: 'org_xxxxxxx',
+        rol: 'admin',
+        slg: '/test',
+        per: 'read,manage',
+        fpm: '3',
+      },
+    });
+
+    const { sessionClaims: v1Claims, ...signedInAuthObjectV1 } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      org_id: 'org_xxxxxxx',
+      org_role: 'org:admin',
+      org_slug: '/test',
+      org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
+    });
+    expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
+  });
+
   test('produced auth object is the same for v1 and v2', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
@@ -93,7 +134,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     );
   });
 
-  test('feature are user scoped only', () => {
+  test('if there is no o.fpm and o.per org permissions should be empty arrat', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
       v: 2,
@@ -105,6 +146,21 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       },
     });
 
-    expect(signedInAuthObject.orgPermissions?.sort()).toEqual([]);
+    expect(signedInAuthObject.orgPermissions).toEqual([]);
+  });
+
+  test('org role is prefixed with org:', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'u:impersonation,u:memberships,u:feature3',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+      },
+    });
+
+    expect(signedInAuthObject.orgRole).toBe('org:admin');
   });
 });
