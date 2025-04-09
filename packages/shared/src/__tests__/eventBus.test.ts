@@ -86,13 +86,13 @@ describe('eventBus', () => {
     });
   });
 
-  describe('onPreDispatch()', () => {
+  describe('prioritizedOn()', () => {
     it('registers a pre-dispatch event handler', () => {
       // Arrange
       const handler = jest.fn();
 
       // Act
-      eventBus.onBefore('test-event', handler);
+      eventBus.prioritizedOn('test-event', handler);
 
       // Assert - using dispatch to verify pre-dispatch handler is called
       const payload = 'test-message';
@@ -101,7 +101,7 @@ describe('eventBus', () => {
     });
   });
 
-  describe('dispatch()', () => {
+  describe('emit()', () => {
     it('calls all handlers for the given event', () => {
       // Arrange
       const handler1 = jest.fn();
@@ -133,14 +133,14 @@ describe('eventBus', () => {
       expect(handler).toHaveBeenCalledWith(payload);
     });
 
-    it('calls pre-dispatch handlers before regular handlers', () => {
+    it('calls prioritized handlers before regular handlers', () => {
       // Arrange
       const calls: string[] = [];
       const preHandler = jest.fn(() => calls.push('pre'));
       const regularHandler = jest.fn(() => calls.push('regular'));
       const payload = 'test-message';
 
-      eventBus.onBefore('test-event', preHandler);
+      eventBus.prioritizedOn('test-event', preHandler);
       eventBus.on('test-event', regularHandler);
 
       // Act
@@ -228,11 +228,11 @@ describe('eventBus', () => {
       const preHandler1 = jest.fn();
       const preHandler2 = jest.fn();
 
-      eventBus.onBefore('test-event', preHandler1);
-      eventBus.onBefore('test-event', preHandler2);
+      eventBus.prioritizedOn('test-event', preHandler1);
+      eventBus.prioritizedOn('test-event', preHandler2);
 
       // Act
-      eventBus.offBefore('test-event', preHandler1);
+      eventBus.prioritizedOff('test-event', preHandler1);
       eventBus.emit('test-event', 'test-message');
 
       // Assert
@@ -245,11 +245,11 @@ describe('eventBus', () => {
       const preHandler1 = jest.fn();
       const preHandler2 = jest.fn();
 
-      eventBus.onBefore('test-event', preHandler1);
-      eventBus.offBefore('test-event', preHandler2);
+      eventBus.prioritizedOn('test-event', preHandler1);
+      eventBus.prioritizedOff('test-event', preHandler2);
 
       // Act
-      eventBus.offBefore('test-event');
+      eventBus.prioritizedOff('test-event');
       eventBus.emit('test-event', 'test-message');
 
       // Assert
