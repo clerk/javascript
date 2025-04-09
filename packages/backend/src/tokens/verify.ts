@@ -1,5 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 
+import { createBackendApiClient } from '../api/factory';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType } from '../jwt/types';
@@ -50,5 +51,18 @@ export async function verifyToken(
     return await verifyJwt(token, { ...options, key });
   } catch (error) {
     return { errors: [error as TokenVerificationError] };
+  }
+}
+
+export async function verifyMachineToken(
+  secret: string,
+  options: VerifyTokenOptions,
+): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
+  try {
+    const client = createBackendApiClient(options);
+    const verifiedToken = await client.machineTokens.verifyMachineToken(secret);
+    return { data: verifiedToken, errors: undefined };
+  } catch (err) {
+    return { data: undefined, errors: [err as TokenVerificationError] };
   }
 }

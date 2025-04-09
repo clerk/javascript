@@ -1,6 +1,8 @@
 import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
+export type Entity = 'machine' | 'user' | 'any';
+
 export type AuthenticateRequestOptions = {
   /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
@@ -44,6 +46,10 @@ export type AuthenticateRequestOptions = {
    * @internal
    */
   apiClient?: ApiClient;
+  /**
+   * TODO: Add docs
+   */
+  entity?: Entity;
 } & VerifyTokenOptions;
 
 /**
