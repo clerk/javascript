@@ -5,6 +5,7 @@ import { Box, Button, Dd, descriptors, Dl, Dt, Icon, Span } from '../customizabl
 import { useClipboard } from '../hooks';
 import { Check, Copy } from '../icons';
 import { common } from '../styledSystem';
+import { truncateWithEndVisible } from '../utils/truncateTextWithEndVisible';
 
 /* -------------------------------------------------------------------------------------------------
  * LineItems.Root
@@ -185,16 +186,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
               minWidth: '0',
             })}
           >
-            <Span
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {text.slice(0, -5)}
-            </Span>
-            <Span>{text.slice(-5)}</Span>
+            {truncateWithEndVisible(text)}
           </Span>
         ) : (
           <Span
