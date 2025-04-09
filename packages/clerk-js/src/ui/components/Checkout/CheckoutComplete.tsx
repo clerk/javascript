@@ -127,6 +127,8 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             <LineItems.Description
               text={checkout.invoice ? checkout.invoice.id : '–'}
               truncateText
+              copyText
+              copyLabel='Copy invoice ID'
             />
           </LineItems.Group>
         </LineItems.Root>
