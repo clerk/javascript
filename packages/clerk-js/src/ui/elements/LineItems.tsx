@@ -224,7 +224,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
 }
 
 function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
-  const { onCopy, hasCopied } = useClipboard(text || '');
+  const { onCopy, hasCopied } = useClipboard(text);
 
   return (
     <Button
@@ -247,6 +247,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
       <Icon
         size='sm'
         icon={hasCopied ? Check : Copy}
+        aria-hidden
       />
     </Button>
   );
