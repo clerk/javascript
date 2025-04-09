@@ -47,7 +47,6 @@ const stubSessionClaims = (input: {
   sid: input.sessionId,
   sub: input.userId,
   org_id: input.orgId,
-  ver: undefined,
 });
 
 describe('useAuth', () => {
