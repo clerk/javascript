@@ -5,8 +5,8 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/m2m_tokens';
 
 export class M2MTokensApi extends AbstractAPI {
-  async verifySecret(secret: string): Promise<M2MToken> {
-    return this.request({
+  async verifySecret(secret: string) {
+    return this.request<M2MToken>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
       bodyParams: { secret },

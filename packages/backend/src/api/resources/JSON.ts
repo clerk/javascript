@@ -496,3 +496,7 @@ export interface M2MTokenJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface APIKeyJSON extends M2MTokenJSON {
+  [key: string]: unknown; // todo
+}
