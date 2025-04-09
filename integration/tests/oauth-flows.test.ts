@@ -184,7 +184,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();
 
-      await u.page.getByText('Legal consent').waitFor();
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
       await u.page.getByLabel(/I agree to the/).check();
       await u.po.signIn.continue();
 
@@ -212,7 +212,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();
 
-      await u.page.getByText('Legal consent').waitFor();
+      await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
       await u.page.getByLabel(/I agree to the/).check();
       await u.po.signIn.continue();
 
