@@ -1,4 +1,5 @@
 import type {
+  __experimental_CancelSubscriptionParams,
   __experimental_CommerceSubscriptionJSON,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
@@ -37,10 +38,13 @@ export class __experimental_CommerceSubscription
     return this;
   }
 
-  public async cancel() {
+  public async cancel(params: __experimental_CancelSubscriptionParams) {
+    const { orgId } = params;
     const json = (
       await BaseResource._fetch({
-        path: `/me/commerce/subscriptions/${this.id}`,
+        path: orgId
+          ? `/organizations/${orgId}/commerce/subscriptions/${this.id}`
+          : `/me/commerce/subscriptions/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

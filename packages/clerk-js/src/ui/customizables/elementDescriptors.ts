@@ -42,6 +42,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'lineItemsDescriptionSuffix',
   'lineItemsDescriptionPrefix',
   'lineItemsDescriptionText',
+  'lineItemsCopyButton',
 
   'actionCard',
 

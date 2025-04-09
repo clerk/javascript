@@ -1,3 +1,4 @@
+import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   ClientJSON,
   OrganizationMembershipJSON,
@@ -43,47 +44,47 @@ export function createClientFromJwt(jwt: string | undefined | null): Client {
     } as unknown as ClientJSON);
   }
 
-  const { sid, sub, org_id, org_role, org_permissions, org_slug, fva } = token.jwt.claims;
+  const { sessionId, userId, orgId, orgRole, orgPermissions, orgSlug, factorVerificationAge } =
+    __experimental_JWTPayloadToAuthObjectProperties(token.jwt.claims);
 
-  // TODO(jwt-v2): when JWT version 2 is available, we should use the new claims instead of the old ones
-
+  // TODO(jwt-v2): when JWT version 2 is available, we should revise org permissions
   const defaultClient = {
     object: 'client',
-    last_active_session_id: sid,
+    last_active_session_id: sessionId,
     id: 'client_init',
     sessions: [
       {
         object: 'session',
-        id: sid,
+        id: sessionId,
         status: 'active',
-        last_active_organization_id: org_id || null,
+        last_active_organization_id: orgId || null,
         // @ts-expect-error - ts is not happy about `id:undefined`, but this is allowed and expected
         last_active_token: {
           id: undefined,
           object: 'token',
           jwt,
         } as TokenJSON,
-        factor_verification_age: fva || null,
+        factor_verification_age: factorVerificationAge || null,
         public_user_data: {
-          user_id: sub,
+          user_id: userId,
         } as PublicUserDataJSON,
         user: {
           object: 'user',
-          id: sub,
+          id: userId,
           organization_memberships:
-            org_id && org_slug && org_role
+            orgId && orgSlug && orgRole
               ? [
                   {
                     object: 'organization_membership',
-                    id: org_id,
-                    role: org_role,
-                    permissions: org_permissions || [],
+                    id: orgId,
+                    role: orgRole,
+                    permissions: orgPermissions || [],
                     organization: {
                       object: 'organization',
-                      id: org_id,
+                      id: orgId,
                       // Use slug as name for the organization, since name is not available in the token.
-                      name: org_slug,
-                      slug: org_slug,
+                      name: orgSlug,
+                      slug: orgSlug,
                       members_count: 1,
                       max_allowed_memberships: 1,
                     },

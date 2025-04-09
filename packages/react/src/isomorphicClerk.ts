@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { createClerkEventBus } from '@clerk/shared/eventBus';
+import { createEventBus } from '@clerk/shared/eventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
@@ -15,6 +15,7 @@ import type {
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClerkStatus,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
@@ -142,7 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
-  #eventBus = createClerkEventBus();
+  #eventBus = createEventBus();
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -239,9 +240,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
     }
-
-    this.#eventBus.dispatch('status', 'loading');
-    this.#eventBus.onPreDispatch('status', status => (this.#status = status));
+    this.#eventBus.emit('status', 'loading');
+    this.#eventBus.on('status', status => (this.#status = status as ClerkStatus));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -462,7 +462,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     } catch (err) {
       const error = err as Error;
-      this.#eventBus.dispatch('status', 'error');
+      this.#eventBus.emit('status', 'error');
       console.error(error.stack || error.message || error);
       return;
     }
@@ -473,6 +473,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs?.on) {
       return this.clerkjs.on(...args);
     } else {
+      // @ts-expect-error
       this.#eventBus.on(...args);
     }
   };
@@ -482,6 +483,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs?.off) {
       return this.clerkjs.off(...args);
     } else {
+      // @ts-expect-error
       this.#eventBus.off(...args);
     }
   };
@@ -599,7 +601,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
     if (typeof this.clerkjs.status === 'undefined') {
-      this.#eventBus.dispatch('status', 'ready');
+      this.#eventBus.emit('status', 'ready');
     }
 
     this.emitLoaded();
@@ -867,22 +869,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
-    if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_mountPricingTable(node, props);
-    } else {
-      this.premountPricingTableNodes.set(node, props);
-    }
-  };
-
-  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
-    if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_unmountPricingTable(node);
-    } else {
-      this.premountPricingTableNodes.delete(node);
-    }
-  };
-
   mountSignUp = (node: HTMLDivElement, props?: SignUpProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountSignUp(node, props);
@@ -1017,6 +1003,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountWaitlist(node);
     } else {
       this.premountWaitlistNodes.delete(node);
+    }
+  };
+
+  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_mountPricingTable(node, props);
+    } else {
+      this.premountPricingTableNodes.set(node, props);
+    }
+  };
+
+  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_unmountPricingTable(node);
+    } else {
+      this.premountPricingTableNodes.delete(node);
     }
   };
 

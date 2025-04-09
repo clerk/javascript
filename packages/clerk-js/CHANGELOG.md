@@ -1,5 +1,43 @@
 # Change Log
 
+## 5.59.3
+
+### Patch Changes
+
+- Uses the helper function `__experimental_JWTPayloadToAuthObjectProperties` from `@clerk/shared` to handle the new JWT v2 schema. ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+- Remove Stripe from non-RHC build ([#5569](https://github.com/clerk/javascript/pull/5569)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add Payment Sources to `<OrgProfile />`, hook up all org-related payment source and checkout methods to the org-specific endpoints ([#5554](https://github.com/clerk/javascript/pull/5554)) by [@aeliox](https://github.com/aeliox)
+
+- Fix issue where the SSO callback URL was incorrectly generated when using the transfer flow within a modal. ([#5562](https://github.com/clerk/javascript/pull/5562)) by [@dstaley](https://github.com/dstaley)
+
+- Add copy and truncation options to `<LineItems.Description />` component. ([#5560](https://github.com/clerk/javascript/pull/5560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update the supported API version to `2025-04-10` ([#5568](https://github.com/clerk/javascript/pull/5568)) by [@octoper](https://github.com/octoper)
+
+- Optionally handle the `intent` parameter on SSO redirects to reload specific resources. ([#5553](https://github.com/clerk/javascript/pull/5553)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+  - @clerk/localizations@3.13.8
+
+## 5.59.2
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Stop retrying on `/verify` if the client cannot solve the challenge ([#5526](https://github.com/clerk/javascript/pull/5526)) by [@anagstef](https://github.com/anagstef)
+
+- Handle two factor redirect when authenticate with web3 and multifactor has been enabled ([#5352](https://github.com/clerk/javascript/pull/5352)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/localizations@3.13.7
+  - @clerk/shared@3.4.1
+
 ## 5.59.1
 
 ### Patch Changes

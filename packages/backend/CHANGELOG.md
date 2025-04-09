@@ -1,5 +1,27 @@
 # Change Log
 
+## 1.27.2
+
+### Patch Changes
+
+- Uses the helper function `__experimental_JWTPayloadToAuthObjectProperties` from `@clerk/shared` to handle the new JWT v2 schema. ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+- Update the supported API version to `2025-04-10` ([#5568](https://github.com/clerk/javascript/pull/5568)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+
+## 1.27.1
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/shared@3.4.1
+
 ## 1.27.0
 
 ### Minor Changes

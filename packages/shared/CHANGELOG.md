@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.5.0
+
+### Minor Changes
+
+- Adding the new `o` claim that contains all organization related info for JWT v2 schema ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add Payment Sources to `<OrgProfile />`, hook up all org-related payment source and checkout methods to the org-specific endpoints ([#5554](https://github.com/clerk/javascript/pull/5554)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/types@4.52.0
+
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+
 ## 3.4.0
 
 ### Minor Changes

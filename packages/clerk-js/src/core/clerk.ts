@@ -1,7 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
-import { createClerkEventBus } from '@clerk/shared/eventBus';
+import { createEventBus } from '@clerk/shared/eventBus';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -27,6 +27,7 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
+  ClerkStatus,
   ClientJSONSnapshot,
   ClientResource,
   CreateOrganizationParams,
@@ -209,7 +210,7 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
-  #publicEventBus = createClerkEventBus();
+  #publicEventBus = createEventBus();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -366,9 +367,10 @@ export class Clerk implements ClerkInterface {
       },
       proxyUrl: this.proxyUrl,
     });
-
-    this.#publicEventBus.dispatch('status', 'loading');
-    this.#publicEventBus.onPreDispatch('status', s => (this.#status = s));
+    this.#publicEventBus.emit('status', 'loading');
+    this.#publicEventBus.prioritizedOn('status', (status: unknown) => {
+      this.#status = status as ClerkStatus;
+    });
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -412,7 +414,7 @@ export class Clerk implements ClerkInterface {
         await this.#loadInNonStandardBrowser();
       }
     } catch (e) {
-      this.#publicEventBus.dispatch('status', 'error');
+      this.#publicEventBus.emit('status', 'error');
       // bubble up the error
       throw e;
     }
@@ -446,9 +448,9 @@ export class Clerk implements ClerkInterface {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out.
-      eventBus.dispatch(events.UserSignOut, null);
+      eventBus.emit(events.UserSignOut, null);
       // Clean up cookies
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -1048,7 +1050,7 @@ export class Clerk implements ClerkInterface {
       }
 
       if (session?.lastActiveToken) {
-        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+        eventBus.emit(events.TokenUpdate, { token: session.lastActiveToken });
       }
 
       /**
@@ -1068,7 +1070,7 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
-        eventBus.dispatch(events.TokenUpdate, { token: null });
+        eventBus.emit(events.TokenUpdate, { token: null });
       }
 
       //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
@@ -1135,7 +1137,7 @@ export class Clerk implements ClerkInterface {
     // has expired, it needs to trigger a sign-out
     const token = await session.getToken();
     if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
     }
 
     // Only triggers navigation for internal routing, in order to not affect custom flows
@@ -1203,13 +1205,14 @@ export class Clerk implements ClerkInterface {
     };
     return unsubscribe;
   };
-
-  public on: ClerkInterface['on'] = (...args) => {
-    this.#publicEventBus.on(...args);
+  public on: ClerkInterface['on'] = (event, handler, _opts?: { notify?: boolean }) => {
+    // @ts-expect-error
+    this.#publicEventBus.on(event as string, handler);
   };
 
-  public off: ClerkInterface['off'] = (...args) => {
-    this.#publicEventBus.off(...args);
+  public off: ClerkInterface['off'] = (event, handler) => {
+    // @ts-expect-error
+    this.#publicEventBus.off(event as string, handler);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -1551,16 +1554,15 @@ export class Clerk implements ClerkInterface {
     // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
     // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
     // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
-    if (!window.opener) {
+    if (!window.opener && params.reloadResource) {
       try {
-        await signIn.reload();
+        if (params.reloadResource === 'signIn') {
+          await signIn.reload();
+        } else if (params.reloadResource === 'signUp') {
+          await signUp.reload();
+        }
       } catch {
-        // This can be safely ignored
-      }
-      try {
-        await signUp.reload();
-      } catch {
-        // This can be safely ignored
+        // This catch intentionally left blank.
       }
     }
 
@@ -1789,7 +1791,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        eventBus.dispatch(events.UserSignOut, null);
+        eventBus.emit(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -2008,7 +2010,7 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
-      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
+      eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();
@@ -2307,7 +2309,7 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.emit('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
@@ -2344,7 +2346,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    this.#publicEventBus.dispatch('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.emit('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

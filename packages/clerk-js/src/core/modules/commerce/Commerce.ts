@@ -9,6 +9,7 @@ import type {
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   __experimental_CommerceInitializedPaymentSource,
   __experimental_CommercePaymentSource,
@@ -27,35 +28,42 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
   }
 
   initializePaymentSource = async (params: __experimental_InitializePaymentSourceParams) => {
+    const { orgId, ...rest } = params;
     const json = (
       await BaseResource._fetch({
-        path: `/me/commerce/payment_sources/initialize`,
+        path: orgId
+          ? `/organizations/${orgId}/commerce/payment_sources/initialize`
+          : `/me/commerce/payment_sources/initialize`,
         method: 'POST',
-        body: params as any,
+        body: rest as any,
       })
     )?.response as unknown as __experimental_CommerceInitializedPaymentSourceJSON;
     return new __experimental_CommerceInitializedPaymentSource(json);
   };
 
   addPaymentSource = async (params: __experimental_AddPaymentSourceParams) => {
+    const { orgId, ...rest } = params;
+
     const json = (
       await BaseResource._fetch({
-        path: `/me/commerce/payment_sources`,
+        path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
         method: 'POST',
-        body: params as any,
+        body: rest as any,
       })
     )?.response as unknown as __experimental_CommercePaymentSourceJSON;
     return new __experimental_CommercePaymentSource(json);
   };
 
   getPaymentSources = async (params: __experimental_GetPaymentSourcesParams) => {
+    const { orgId, ...rest } = params;
+
     return await BaseResource._fetch({
-      path: `/me/commerce/payment_sources`,
+      path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
       method: 'GET',
-      search: { orgId: params.orgId || '' },
+      search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: paymentSources, total_count } =
-        res as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;
       return {
         total_count,
         data: paymentSources.map(paymentSource => new __experimental_CommercePaymentSource(paymentSource)),
