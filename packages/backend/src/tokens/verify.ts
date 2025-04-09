@@ -54,6 +54,16 @@ export async function verifyToken(
   }
 }
 
+/**
+ * Verifies a machine token.
+ *
+ * NOTE: Currently, C1s need to provide their CLERK_SECRET_KEY in options for BAPI authorization.
+ * In the future, this will be replaced with a dedicated Machine Secret that has limited privileges
+ * specifically for M2M token operations.
+ *
+ * @param secret - The machine token secret (starts with "m2m_")
+ * @param options - Options including secretKey for BAPI authorization (temporarily using SK, will support Machine Secret in future)
+ */
 export async function verifyMachineToken(
   secret: string,
   options: VerifyTokenOptions,

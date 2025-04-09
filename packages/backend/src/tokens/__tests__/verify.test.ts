@@ -53,3 +53,5 @@ describe('tokens.verify(token, options)', () => {
     expect(data).toEqual(mockJwtPayload);
   });
 });
+
+describe.todo('tokens.verifyMachineToken(token, options)', () => {});
