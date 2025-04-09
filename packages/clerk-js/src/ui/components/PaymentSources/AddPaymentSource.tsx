@@ -10,6 +10,7 @@ import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
+import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, usePaymentSourcesContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
@@ -74,12 +75,16 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   useEffect(() => {
     if (!stripePromiseRef.current && externalGatewayId && __experimental_commerceSettings.stripePublishableKey) {
-      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-        stripeAccount: externalGatewayId,
-      });
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
+      if (!__BUILD_DISABLE_RHC__) {
+        stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
+          stripeAccount: externalGatewayId,
+        });
+        void stripePromiseRef.current.then(stripeInstance => {
+          setStripe(stripeInstance);
+        });
+      } else {
+        clerkUnsupportedEnvironmentWarning('Stripe');
+      }
     }
   }, [externalGatewayId, __experimental_commerceSettings]);
 
