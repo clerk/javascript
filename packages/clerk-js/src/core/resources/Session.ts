@@ -103,6 +103,18 @@ export class Session extends BaseResource implements SessionResource {
       shouldRetry: (error, iterationsCount) => {
         return !is4xxError(error) && iterationsCount <= 8;
       },
+    }).then(token => {
+      if (token) {
+        this.lastActiveToken = new Token({
+          // @ts-expect-error This is safe to ignore.
+          id: undefined,
+          object: 'token',
+          jwt: token,
+        });
+        // Emits the updated session with the new token to the state listeners
+        eventBus.dispatch(events.SessionTokenResolved, null);
+      }
+      return token;
     });
   };
 
