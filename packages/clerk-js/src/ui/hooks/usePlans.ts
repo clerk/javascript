@@ -9,52 +9,46 @@ type UsePlansProps = {
 };
 
 export const usePlans = (props: UsePlansProps) => {
-  const { subscriberType } = props;
+  const { subscriberType = 'user' } = props;
   const { __experimental_commerce } = useClerk();
+  const { organization } = useOrganization();
 
-  const { data: userSubscriptions, revalidate: revalidateUserSubscriptions } = useFetch(
+  const { data: subscriptions, revalidate: revalidateSubscriptions } = useFetch(
     __experimental_commerce?.__experimental_billing.getSubscriptions,
-    'commerce-user-subscriptions',
+    { orgId: subscriberType === 'org' ? organization?.id : undefined },
+    undefined,
+    'commerce-subscriptions',
   );
-  const { subscriptions: orgSubscriptions } = useOrganization({ subscriptions: true });
 
   const { data: allPlans, revalidate: revalidatePlans } = useFetch(
     __experimental_commerce?.__experimental_billing.getPlans,
     { subscriberType },
   );
 
-  const activeSubscriptions = useMemo(() => {
-    if ((subscriberType === 'user' && !userSubscriptions) || (subscriberType === 'org' && !orgSubscriptions)) {
-      return undefined;
-    }
-    return [...(subscriberType === 'user' ? userSubscriptions?.data || [] : orgSubscriptions?.data || [])];
-  }, [userSubscriptions, orgSubscriptions, subscriberType]);
-
   const plans = useMemo(() => {
-    if (!activeSubscriptions) {
+    if (!subscriptions) {
       return [];
     }
     return (
       allPlans?.map(plan => {
-        const activeSubscription = activeSubscriptions.find(sub => {
-          return sub.plan.id === plan.id;
+        const activeSubscription = subscriptions.data.find(sub => {
+          return sub.plan.id === plan.id && sub.status === 'active';
         });
         plan.subscriptionIdForCurrentSubscriber = activeSubscription?.id;
         return plan;
       }) || []
     );
-  }, [allPlans, activeSubscriptions]);
+  }, [allPlans, subscriptions]);
 
-  const revalidate = async () => {
+  const revalidate = () => {
     // Revalidate the plans and subscriptions
-    await orgSubscriptions?.revalidate?.();
-    revalidateUserSubscriptions();
+    revalidateSubscriptions();
     revalidatePlans();
   };
 
   return {
     plans,
-    subscriptions: activeSubscriptions || [],
+    subscriptions: subscriptions?.data || [],
     revalidate,
   };
 };

@@ -5,6 +5,7 @@ import type { Clerk } from '../core/clerk';
 
 export async function _authenticateWithPopup(
   client: Clerk,
+  reloadResource: 'signIn' | 'signUp',
   authenticateMethod: (
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
@@ -27,6 +28,7 @@ export async function _authenticateWithPopup(
   const r = new URL(redirectUrl);
   r.searchParams.set('sign_in_force_redirect_url', params.redirectUrlComplete);
   r.searchParams.set('sign_up_force_redirect_url', params.redirectUrlComplete);
+  r.searchParams.set('intent', reloadResource);
   // All URLs are decorated with the dev browser token in development mode since we're moving between AP and the app.
   const redirectUrlWithForceRedirectUrl = client.buildUrlWithAuth(r.toString());
 

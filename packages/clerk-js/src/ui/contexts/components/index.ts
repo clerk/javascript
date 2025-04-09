@@ -12,3 +12,4 @@ export * from './GoogleOneTap';
 export * from './Waitlist';
 export * from './PricingTable';
 export * from './Checkout';
+export * from './PaymentSources';

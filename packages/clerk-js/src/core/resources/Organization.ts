@@ -240,16 +240,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   __experimental_getSubscriptions = async (
     getSubscriptionsParams?: __experimental_GetSubscriptionsParams,
   ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/subscriptions`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(getSubscriptionsParams),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/subscriptions`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getSubscriptionsParams),
+    }).then(res => {
       const { data: subscriptions, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
 
