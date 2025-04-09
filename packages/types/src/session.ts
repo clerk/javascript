@@ -27,6 +27,9 @@ import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
+/**
+ * @inline
+ */
 export type PendingSessionOptions = {
   /**
    * Determines if pending sessions are considered as signed-out state.

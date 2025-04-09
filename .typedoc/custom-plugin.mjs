@@ -36,12 +36,20 @@ const LINK_REPLACEMENTS = [
  * It also shouldn't matter how level deep the relative link is.
  *
  * This function returns an array of `{ pattern: string, replace: string }` to pass into the `typedoc-plugin-replace-text` plugin.
+ *
+ * @example
+ * [foo](../../bar.mdx) -> [foo](/new-path)
+ * [foo](./bar.mdx) -> [foo](/new-path)
+ * [foo](bar.mdx) -> [foo](/new-path)
+ * [foo](bar.mdx#some-id) -> [foo](/new-path#some-id)
  */
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      pattern: new RegExp(`\\((?:\\.{1,2}\\/)+[^()]*?${fileName}\\.mdx\\)`, 'g'),
-      replace: `(${newPath})`,
+      // Match both path and optional anchor
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Preserve the anchor in replacement if it exists
+      replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
 }
