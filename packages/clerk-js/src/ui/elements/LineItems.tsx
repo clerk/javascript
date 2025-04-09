@@ -235,6 +235,11 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
         width: t.sizes.$4,
         height: t.sizes.$4,
         padding: 0,
+        borderRadius: t.radii.$sm,
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: t.colors.$neutralAlpha200,
+        },
       })}
       focusRing={false}
       aria-label={hasCopied ? 'Copied' : copyLabel}
