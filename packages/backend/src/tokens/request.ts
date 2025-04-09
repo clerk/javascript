@@ -27,7 +27,6 @@ import {
   signedIn,
   signedOut,
 } from './authStatus';
-import type { ClerkRequest } from './clerkRequest';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
@@ -106,26 +105,23 @@ function isRequestEligibleForRefresh(
 }
 
 export async function authenticateRequest(
-  request: ClerkRequest,
-  options: AuthenticateRequestOptions & { entity: 'machine' },
+  request: Request,
+  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'machine' },
 ): Promise<MachineAuthenticatedState | MachineUnauthenticatedState>;
 
 export async function authenticateRequest(
-  request: ClerkRequest,
-  options: AuthenticateRequestOptions & { entity: 'user' },
+  request: Request,
+  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'user' },
 ): Promise<RequestState>;
 
 export async function authenticateRequest(
-  request: ClerkRequest,
-  options: AuthenticateRequestOptions & { entity: 'any' },
+  request: Request,
+  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'any' },
 ): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>;
 
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
 
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions & { entity?: 'machine' | 'user' | 'any' },
-): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState> {
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
