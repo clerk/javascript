@@ -32,6 +32,7 @@ type SignedInAuthObjectProperties = {
   sessionId: string;
   sessionStatus: SessionStatusClaim | null;
   actor: ActClaim | undefined;
+  entity: 'user';
   userId: string;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
@@ -62,6 +63,7 @@ export type SignedOutAuthObject = {
   sessionId: null;
   sessionStatus: null;
   actor: null;
+  entity: 'user';
   userId: null;
   orgId: null;
   orgRole: null;
@@ -81,7 +83,39 @@ export type SignedOutAuthObject = {
 /**
  * @internal
  */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthenticatedMachineObject = {
+  isMachine: true;
+  userId: string | null;
+  claims: JwtPayload;
+  entity: 'machine';
+  machineId: string | null;
+  has: CheckAuthorizationFromSessionClaims;
+  getToken: () => string;
+  debug: AuthObjectDebug;
+};
+
+/**
+ * @internal
+ */
+export type UnauthenticatedMachineObject = {
+  isMachine: false;
+  userId: string | null;
+  claims: null;
+  entity: 'machine';
+  machineId: string | null;
+  has: CheckAuthorizationFromSessionClaims;
+  getToken: ServerGetToken;
+  debug: AuthObjectDebug;
+};
+
+/**
+ * @internal
+ */
+export type AuthObject =
+  | SignedInAuthObject
+  | SignedOutAuthObject
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -104,6 +138,7 @@ const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthO
   const orgPermissions = claims.org_permissions;
 
   return {
+    entity: 'user',
     sessionClaims: claims,
     sessionId: claims.sid,
     sessionStatus,
@@ -135,6 +170,7 @@ export function signedInAuthObject(
   });
 
   return {
+    entity: 'user',
     actor,
     sessionClaims,
     sessionId,
@@ -156,6 +192,7 @@ export function signedInAuthObject(
  */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
+    entity: 'user',
     sessionClaims: null,
     sessionId: null,
     sessionStatus: null,
@@ -166,6 +203,40 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgSlug: null,
     orgPermissions: null,
     factorVerificationAge: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+export function authenticatedMachineObject(
+  machineToken: string,
+  claims: JwtPayload,
+  debugData?: AuthObjectDebugData,
+): AuthenticatedMachineObject {
+  const { sub: machineId } = claims;
+  const getToken = () => {
+    return machineToken;
+  };
+  return {
+    isMachine: true,
+    claims,
+    entity: 'machine',
+    machineId,
+    userId: null,
+    getToken,
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
+  return {
+    isMachine: false,
+    entity: 'machine',
+    claims: null,
+    machineId: null,
+    userId: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
