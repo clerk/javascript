@@ -14,7 +14,11 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
+import type {
+  __experimental_CommerceNamespace,
+  __experimental_CommerceSubscriberType,
+  __experimental_CommerceSubscriptionPlanPeriod,
+} from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -720,6 +724,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The underlying resource to optionally reload before processing an OAuth callback.
+     */
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -1524,13 +1532,13 @@ export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
 };
 
 export type __experimental_PaymentSourcesProps = {
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export interface HandleEmailLinkVerificationParams {

@@ -82,8 +82,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are aligned for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -138,8 +138,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the sub domains signs out the user from the root domain as well', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -219,8 +219,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -246,7 +246,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       // The client_uat cookie should always be set on etld+1
       expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0].split(':')[0]);
 
-      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
+      await u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
@@ -277,8 +277,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the root domains does not affect the sub domain', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       // signin in tab0
@@ -351,8 +351,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -363,7 +363,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       // make sure that the backend user now matches the user we signed in with on the client
       expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
 
-      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
+      await u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
       expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
