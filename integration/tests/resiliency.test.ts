@@ -81,7 +81,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     await u.po.expect.toBeSignedIn();
   });
 
-  test('resiliency to not break devBroswer - dummy client and is not created on `/client` 4xx errors', async ({
+  test('resiliency to not break devBrowser - dummy client and is not created on `/client` 4xx errors', async ({
     page,
     context,
   }) => {
@@ -100,6 +100,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
         clerk_trace_id: 'some-trace-id',
       }),
     };
+
+    const u = createTestUtils({ app, page, context, useTestingToken: false });
+
     await page.route('**/v1/client?**', route => {
       return route.fulfill(response);
     });
@@ -107,8 +110,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     await page.route('**/v1/environment?**', route => {
       return route.fulfill(response);
     });
-
-    const u = createTestUtils({ app, page, context });
 
     const waitForClientImmediately = page.waitForResponse(
       response => response.url().includes('/client?') && response.status() === 401,

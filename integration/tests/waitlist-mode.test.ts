@@ -129,6 +129,7 @@ test.describe('Waitlist mode', () => {
 
     const invitation = await u.services.invitations.createBapiInvitation(invitedUser.email);
 
+    await u.po.testingToken.setup();
     await u.page.goto(invitation.url);
     await u.po.signUp.waitForMounted();
     await expect(u.page.getByText(/Create your account/i).first()).toBeVisible();

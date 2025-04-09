@@ -61,6 +61,7 @@
     "@changesets/get-github-info": "^0.6.0",
     "@clerk/backend": "workspace:*",
     "@clerk/shared": "workspace:*",
+    "@clerk/testing": "workspace:*",
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@emotion/jest": "^11.13.0",
