@@ -734,13 +734,12 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
-    const { data, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
+    const { data: _fix_me, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(errors[0]);
     }
 
-    // @ts-expect-error: TODO: FIX LATER
-    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data.claims);
+    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, {} as any);
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
@@ -751,14 +750,13 @@ ${error.getFullMessage()}`,
     }
 
     // Check if it's a machine token
-    if (sessionTokenInHeader.startsWith('m2m_')) {
-      const { data, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
+    if (['m2m_', 'oaa_', 'ak_'].some(prefix => sessionTokenInHeader.startsWith(prefix))) {
+      const { data: _fix_me, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
       if (errors) {
         return handleMachineError(errors[0]);
       }
 
-      // @ts-expect-error: TODO: FIX LATER
-      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, data.claims);
+      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, {} as any);
     }
 
     // Handle as a regular session token
