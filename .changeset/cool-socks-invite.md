@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-Added new `org` claim for JWT v2 schema
+Adding the new `o` claim that contains all organization related info for JWT v2 schema
