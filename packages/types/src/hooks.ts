@@ -2,7 +2,7 @@ import type { OrganizationCustomRoleKey } from 'organizationMembership';
 import type { SignInResource } from 'signIn';
 
 import type { SetActive, SignOut } from './clerk';
-import type { ActClaim } from './jwtv2';
+import type { ActClaim, JwtPayload } from './jwtv2';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -37,6 +37,10 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
+       * The JWT claims for the current session.
+       */
+      sessionClaims: undefined;
+      /**
        * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
        */
       actor: undefined;
@@ -70,6 +74,7 @@ export type UseAuthReturn =
       isSignedIn: false;
       userId: null;
       sessionId: null;
+      sessionClaims: null;
       actor: null;
       orgId: null;
       orgRole: null;
@@ -83,6 +88,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActClaim | null;
       orgId: null;
       orgRole: null;
@@ -96,6 +102,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
