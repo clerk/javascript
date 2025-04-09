@@ -32,7 +32,9 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
   return (
     prev.id !== next.id ||
     prev.updatedAt.getTime() < next.updatedAt.getTime() ||
+    // TODO: Optimize this to once JWT v2 formatting is out.
     prev.lastActiveToken?.jwt?.claims?.__raw !== next.lastActiveToken?.jwt?.claims?.__raw ||
+    sessionUserMembershipPermissionsChanged(prev, next) ||
     sessionUserChanged(prev, next)
   );
 }
@@ -57,6 +59,22 @@ function sessionUserChanged(prev: SessionResource, next: SessionResource): boole
     return true;
   }
   return !!prev.user && !!next.user && userChanged(prev.user, next.user);
+}
+
+function sessionUserMembershipPermissionsChanged(prev: SessionResource, next: SessionResource): boolean {
+  if (prev.lastActiveOrganizationId !== next.lastActiveOrganizationId) {
+    return true;
+  }
+
+  const prevActiveMembership = prev.user?.organizationMemberships?.find(
+    mem => mem.organization.id === prev.lastActiveOrganizationId,
+  );
+
+  const nextActiveMembership = next.user?.organizationMemberships?.find(
+    mem => mem.organization.id === prev.lastActiveOrganizationId,
+  );
+
+  return prevActiveMembership?.permissions?.length !== nextActiveMembership?.permissions?.length;
 }
 
 // TODO: Decide if this belongs in the resources
