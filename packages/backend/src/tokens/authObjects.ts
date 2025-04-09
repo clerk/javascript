@@ -1,14 +1,11 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
-  ActClaim,
   CheckAuthorizationFromSessionClaims,
   JwtPayload,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
-  SessionStatusClaim,
+  SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
@@ -28,28 +25,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-type SignedInAuthObjectProperties = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  sessionStatus: SessionStatusClaim | null;
-  actor: ActClaim | undefined;
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
-  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
-};
-
-/**
- * @internal
- */
-export type SignedInAuthObject = SignedInAuthObjectProperties & {
+export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
