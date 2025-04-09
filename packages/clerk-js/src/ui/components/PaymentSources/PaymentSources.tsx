@@ -1,14 +1,15 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { __experimental_CommercePaymentSourceResource, __experimental_PaymentSourcesProps } from '@clerk/types';
 import { Fragment, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
+import { usePaymentSourcesContext } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
-import { CreditCard } from '../../icons';
+import { ApplePay, CreditCard } from '../../icons';
 import { handleError } from '../../utils';
 import { AddPaymentSource } from './AddPaymentSource';
 
@@ -38,6 +39,8 @@ const RemoveScreen = ({
 }) => {
   const { close } = useActionContext();
   const card = useCardState();
+  const { subscriberType } = usePaymentSourcesContext();
+  const { organization } = useOrganization();
   const ref = useRef(
     `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
   );
@@ -48,7 +51,7 @@ const RemoveScreen = ({
 
   const removePaymentSource = async () => {
     await paymentSource
-      .remove()
+      .remove({ orgId: subscriberType === 'org' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
         handleError(error, [], card.setError);
@@ -80,11 +83,17 @@ const RemoveScreen = ({
   );
 };
 
-export const __experimental_PaymentSources = (props: __experimental_PaymentSourcesProps) => {
-  const { orgId } = props;
+const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
   const { __experimental_commerce } = useClerk();
+  const { organization } = useOrganization();
+  const { subscriberType } = usePaymentSourcesContext();
 
-  const { data, revalidate } = useFetch(__experimental_commerce?.getPaymentSources, { orgId });
+  const { data, revalidate } = useFetch(
+    __experimental_commerce?.getPaymentSources,
+    { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
+    undefined,
+    'commerce-user-payment-sources',
+  );
   const { data: paymentSources } = data || { data: [] };
 
   return (
@@ -104,12 +113,10 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
                   gap={2}
                   align='baseline'
                 >
-                  {paymentSource.paymentMethod === 'card' && (
-                    <Icon
-                      icon={CreditCard}
-                      sx={{ alignSelf: 'center' }}
-                    />
-                  )}
+                  <Icon
+                    icon={paymentSource.walletType === 'apple_pay' ? ApplePay : CreditCard}
+                    sx={{ alignSelf: 'center' }}
+                  />
                   <Text
                     sx={t => ({ color: t.colors.$colorText, textTransform: 'capitalize' })}
                     truncate
@@ -131,7 +138,10 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
                     />
                   )}
                 </Flex>
-                <PaymentSourceMenu paymentSource={paymentSource} />
+                <PaymentSourceMenu
+                  paymentSource={paymentSource}
+                  revalidate={revalidate}
+                />
               </ProfileSection.Item>
 
               <Action.Open value={`remove-${paymentSource.id}`}>
@@ -161,8 +171,19 @@ export const __experimental_PaymentSources = (props: __experimental_PaymentSourc
   );
 };
 
-const PaymentSourceMenu = ({ paymentSource }: { paymentSource: __experimental_CommercePaymentSourceResource }) => {
+export const __experimental_PaymentSources = PaymentSources;
+
+const PaymentSourceMenu = ({
+  paymentSource,
+  revalidate,
+}: {
+  paymentSource: __experimental_CommercePaymentSourceResource;
+  revalidate: () => void;
+}) => {
   const { open } = useActionContext();
+  const card = useCardState();
+  const { organization } = useOrganization();
+  const { subscriberType } = usePaymentSourcesContext();
 
   const actions = [
     {
@@ -171,6 +192,21 @@ const PaymentSourceMenu = ({ paymentSource }: { paymentSource: __experimental_Co
       onClick: () => open(`remove-${paymentSource.id}`),
     },
   ];
+
+  if (!paymentSource.isDefault) {
+    actions.unshift({
+      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__default'),
+      isDestructive: false,
+      onClick: () => {
+        paymentSource
+          .makeDefault({ orgId: subscriberType === 'org' ? organization?.id : undefined })
+          .then(revalidate)
+          .catch((error: Error) => {
+            handleError(error, [], card.setError);
+          });
+      },
+    });
+  }
 
   return <ThreeDotsMenu actions={actions} />;
 };

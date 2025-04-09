@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.51.1
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.51.0
 
 ### Minor Changes

@@ -59,7 +59,7 @@ jobs:
 
       - name: Deduplicate lockfile
         run: pnpm dedupe
-  
+
       - name: Check for changed lockfile
         run: |
           if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then

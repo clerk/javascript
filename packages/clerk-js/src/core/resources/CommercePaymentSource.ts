@@ -4,6 +4,8 @@ import type {
   __experimental_CommercePaymentSourceJSON,
   __experimental_CommercePaymentSourceResource,
   __experimental_CommercePaymentSourceStatus,
+  __experimental_MakeDefaultPaymentSourceParams,
+  __experimental_RemovePaymentSourceParams,
   DeletedObjectJSON,
 } from '@clerk/types';
 
@@ -19,6 +21,7 @@ export class __experimental_CommercePaymentSource
   cardType!: string;
   isDefault!: boolean;
   status!: __experimental_CommercePaymentSourceStatus;
+  walletType: string | undefined;
 
   constructor(data: __experimental_CommercePaymentSourceJSON) {
     super();
@@ -34,20 +37,38 @@ export class __experimental_CommercePaymentSource
     this.last4 = data.last4;
     this.paymentMethod = data.payment_method;
     this.cardType = data.card_type;
-    this.isDefault = false;
+    this.isDefault = data.is_default;
     this.status = data.status;
+    this.walletType = data.wallet_type ?? undefined;
+
     return this;
   }
 
-  public async remove() {
+  public async remove(params?: __experimental_RemovePaymentSourceParams) {
+    const { orgId } = params ?? {};
     const json = (
       await BaseResource._fetch({
-        path: `/me/commerce/payment_sources/${this.id}`,
+        path: orgId
+          ? `/organizations/${orgId}/commerce/payment_sources/${this.id}`
+          : `/me/commerce/payment_sources/${this.id}`,
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  }
+
+  public async makeDefault(params?: __experimental_MakeDefaultPaymentSourceParams) {
+    const { orgId } = params ?? {};
+    await BaseResource._fetch({
+      path: orgId
+        ? `/organizations/${orgId}/commerce/payers/default_payment_source`
+        : `/me/commerce/payers/default_payment_source`,
+      method: 'PUT',
+      body: { payment_source_id: this.id } as any,
+    });
+
+    return null;
   }
 }
 

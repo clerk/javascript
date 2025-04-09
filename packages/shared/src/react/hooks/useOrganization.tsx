@@ -341,7 +341,6 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   const subscriptionsSafeValues = useWithSafeValues(subscriptionsListParams, {
     initialPage: 1,
     pageSize: 10,
-    status: undefined,
     keepPreviousData: false,
     infinite: false,
   });
@@ -393,7 +392,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       : {
           initialPage: subscriptionsSafeValues.initialPage,
           pageSize: subscriptionsSafeValues.pageSize,
-          status: subscriptionsSafeValues.status,
+          orgId: organization?.id,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
