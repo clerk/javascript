@@ -516,7 +516,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
-    console.log('hydrateClerkJS');
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
