@@ -60,7 +60,7 @@ async function verifyM2MToken(
 ): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2mTokens.verifyToken(secret);
+    const verifiedToken = await client.m2mTokens.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err) {
     return { data: undefined, errors: [err as TokenVerificationError] };
@@ -73,20 +73,20 @@ async function verifyOAuthToken(
 ): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.oauthAccessTokens.verifyToken(secret);
+    const verifiedToken = await client.oAuthAccessTokens.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err) {
     return { data: undefined, errors: [err as TokenVerificationError] };
   }
 }
 
-async function verifyAPIKeyToken(
+async function verifyAPIKey(
   secret: string,
   options: VerifyTokenOptions,
 ): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.apiKeyTokens.verifyToken(secret);
+    const verifiedToken = await client.apiKeys.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err) {
     return { data: undefined, errors: [err as TokenVerificationError] };
@@ -96,7 +96,7 @@ async function verifyAPIKeyToken(
 /**
  * Verifies any type of machine token by detecting its type from the prefix.
  *
- * @param token - The token to verify (e.g. starts with "m2m_", "oaa_", "ak_", etc.)
+ * @param token - The token to verify (e.g. starts with "m2m_", "oaa_", "api_key_", etc.)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineToken(
@@ -109,8 +109,8 @@ export async function verifyMachineToken(
   if (token.startsWith('oaa_')) {
     return verifyOAuthToken(token, options);
   }
-  if (token.startsWith('ak_')) {
-    return verifyAPIKeyToken(token, options);
+  if (token.startsWith('api_key_')) {
+    return verifyAPIKey(token, options);
   }
 
   // TODO: Update error message

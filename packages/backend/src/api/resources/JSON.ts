@@ -481,3 +481,18 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface M2MTokenJSON {
+  id: string;
+  type: string;
+  subject: string;
+  name: string;
+  claims: Record<string, string>;
+  revoked: boolean;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason?: string | null;
+  created_at: number;
+  updated_at: number;
+}

@@ -1,17 +1,11 @@
 import { joinPaths } from '../../util/path';
+import type { M2MToken } from '../resources/M2MToken';
 import { AbstractAPI } from './AbstractApi';
-
-// TODO: Temporary response
-interface VerifyMachineTokenResponse {
-  id: string;
-  subject: string;
-  [key: string]: unknown;
-}
 
 const basePath = '/m2m_tokens';
 
 export class M2MTokensApi extends AbstractAPI {
-  async verifyToken(secret: string): Promise<VerifyMachineTokenResponse> {
+  async verifySecret(secret: string): Promise<M2MToken> {
     return this.request({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),

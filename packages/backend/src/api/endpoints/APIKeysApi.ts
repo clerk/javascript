@@ -16,9 +16,9 @@ interface VerifyTokenResponse {
   updated_at: number;
 }
 
-const basePath = '/oauth_access_tokens';
+const basePath = '/api_keys';
 
-export class OAuthAccessTokensAPI extends AbstractAPI {
+export class APIKeysAPI extends AbstractAPI {
   async verifySecret(secret: string): Promise<VerifyTokenResponse> {
     return this.request({
       method: 'POST',

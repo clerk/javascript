@@ -7,7 +7,7 @@ export * from './EmailAddressApi';
 export * from './InvitationApi';
 export * from './M2MTokensApi';
 export * from './OAuthAccessTokensApi';
-export * from './APIKeyTokensApi';
+export * from './APIKeysApi';
 export * from './OrganizationApi';
 export * from './PhoneNumberApi';
 export * from './RedirectUrlApi';
