@@ -381,6 +381,15 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
+    /**
+     * Listen to `Session.getToken` resolving to emit the updated session
+     * with the new token to the state listeners.
+     */
+    eventBus.on(events.SessionTokenResolved, () => {
+      this.#setAccessors(this.session);
+      this.#emit();
+    });
+
     assertNoLegacyProp(this.#options);
 
     if (this.#options.sdkMetadata) {
