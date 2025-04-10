@@ -1,7 +1,7 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { deprecated } from '@clerk/shared/deprecated';
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
-import { createEventBus } from '@clerk/shared/eventBus';
+import { createClerkEventBus, clerkEvents } from '@clerk/shared/eventBus';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -27,7 +27,6 @@ import type {
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
-  ClerkStatus,
   ClientJSONSnapshot,
   ClientResource,
   CreateOrganizationParams,
@@ -210,7 +209,7 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
-  #publicEventBus = createEventBus();
+  #publicEventBus = createClerkEventBus();
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -367,10 +366,8 @@ export class Clerk implements ClerkInterface {
       },
       proxyUrl: this.proxyUrl,
     });
-    this.#publicEventBus.emit('status', 'loading');
-    this.#publicEventBus.prioritizedOn('status', (status: unknown) => {
-      this.#status = status as ClerkStatus;
-    });
+    this.#publicEventBus.emit(clerkEvents.Status, 'loading');
+    this.#publicEventBus.prioritizedOn(clerkEvents.Status, s => (this.#status = s));
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
@@ -414,7 +411,7 @@ export class Clerk implements ClerkInterface {
         await this.#loadInNonStandardBrowser();
       }
     } catch (e) {
-      this.#publicEventBus.emit('status', 'error');
+      this.#publicEventBus.emit(clerkEvents.Status, 'error');
       // bubble up the error
       throw e;
     }
@@ -1205,14 +1202,12 @@ export class Clerk implements ClerkInterface {
     };
     return unsubscribe;
   };
-  public on: ClerkInterface['on'] = (event, handler, _opts?: { notify?: boolean }) => {
-    // @ts-expect-error
-    this.#publicEventBus.on(event as string, handler);
+  public on: ClerkInterface['on'] = (...args) => {
+    this.#publicEventBus.on(...args);
   };
 
-  public off: ClerkInterface['off'] = (event, handler) => {
-    // @ts-expect-error
-    this.#publicEventBus.off(event as string, handler);
+  public off: ClerkInterface['off'] = (...args) => {
+    this.#publicEventBus.off(...args);
   };
 
   public __internal_addNavigationListener = (listener: () => void): UnsubscribeCallback => {
@@ -2309,7 +2304,7 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
-    this.#publicEventBus.emit('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   private shouldFallbackToCachedResources = (): boolean => {
@@ -2346,7 +2341,7 @@ export class Clerk implements ClerkInterface {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
 
-    this.#publicEventBus.emit('status', initializationDegradedCounter > 0 ? 'degraded' : 'ready');
+    this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
   // This is used by @clerk/clerk-expo

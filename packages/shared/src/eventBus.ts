@@ -1,3 +1,5 @@
+import type { ClerkEventPayload } from '@clerk/types';
+
 /**
  * Type definition for event handler functions
  */
@@ -218,4 +220,12 @@ export const createEventBus = <Events extends Record<string, unknown>>(): EventB
       retrieveListeners: event => eventToHandlersMap.get(event) || [],
     },
   };
+};
+
+export const clerkEvents = {
+  Status: 'status',
+} satisfies Record<string, keyof ClerkEventPayload>;
+
+export const createClerkEventBus = () => {
+  return createEventBus<ClerkEventPayload>();
 };

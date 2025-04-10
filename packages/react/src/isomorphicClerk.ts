@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { createEventBus } from '@clerk/shared/eventBus';
+import { clerkEvents, createClerkEventBus } from '@clerk/shared/eventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
@@ -143,7 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
-  #eventBus = createEventBus();
+  #eventBus = createClerkEventBus();
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -240,8 +240,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
     }
-    this.#eventBus.emit('status', 'loading');
-    this.#eventBus.on('status', status => (this.#status = status as ClerkStatus));
+    this.#eventBus.emit(clerkEvents.Status, 'loading');
+    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status as ClerkStatus));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -462,7 +462,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     } catch (err) {
       const error = err as Error;
-      this.#eventBus.emit('status', 'error');
+      this.#eventBus.emit(clerkEvents.Status, 'error');
       console.error(error.stack || error.message || error);
       return;
     }
@@ -598,7 +598,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
     if (typeof this.clerkjs.status === 'undefined') {
-      this.#eventBus.emit('status', 'ready');
+      this.#eventBus.emit(clerkEvents.Status, 'ready');
     }
 
     this.emitLoaded();
