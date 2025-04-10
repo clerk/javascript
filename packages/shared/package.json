@@ -118,7 +118,8 @@
     "getEnvVariable",
     "pathMatcher",
     "organization",
-    "jwtPayloadParser"
+    "jwtPayloadParser",
+    "eventBus"
   ],
   "scripts": {
     "build": "tsup",
