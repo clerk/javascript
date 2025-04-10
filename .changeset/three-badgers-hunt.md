@@ -10,6 +10,6 @@ Adds the ability to create and revoke actor tokens to the Backend API client.
 
   const clerkClient = createClerkClient(...);
 
-  const { id } = await clerkClient.actor_tokens.create({...});
-  await clerkClient.actor_tokens.revoke(id);
+  const { id } = await clerkClient.actorTokens.create({...});
+  await clerkClient.actorTokens.revoke(id);
 ```
