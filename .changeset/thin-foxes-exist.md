@@ -14,18 +14,18 @@ Adds the following User-centric functionality to the Backend API client.
     userId: 'user_xxxxxx',
     status: 'pending',
   });
-  await clerkClient.actorTokens.deleteUserPasskey({
+  await clerkClient.users.deleteUserPasskey({
     userId: 'user_xxxxxx',
     passkeyIdentificationId: 'xxxxxxx',
   });
-  await clerkClient.actorTokens.deleteUserWeb3Wallet({
+  await clerkClient.users.deleteUserWeb3Wallet({
     userId: 'user_xxxxxx',
     web3WalletIdentificationId: 'xxxxxxx',
   });
-  await clerkClient.actorTokens.deleteUserExternalAccount({
+  await clerkClient.users.deleteUserExternalAccount({
     userId: 'user_xxxxxx',
     externalAccountId: 'xxxxxxx',
   });
-  await clerkClient.actorTokens.deleteUserBackupCodes('user_xxxxxx');
-  await clerkClient.actorTokens.deleteUserTOTP('user_xxxxxx');
+  await clerkClient.users.deleteUserBackupCodes('user_xxxxxx');
+  await clerkClient.users.deleteUserTOTP('user_xxxxxx');
 ```
