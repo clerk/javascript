@@ -96,7 +96,72 @@ If you want to run the `dev` script of an individual package, navigate to the fo
 
 Updating documentation is an important part of the contribution process. If you are changing existing behavior or adding a new feature, make sure [Clerk's documentation](https://github.com/clerk/clerk-docs) is also updated.
 
-To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately. When you use links inside the JSDoc comment, make sure that they are **absolute** links (e.g. `[Clerk docs](https://clerk.com/docs)`).
+To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
+
+There are some styleguide decisions you should follow when authoring JSDoc comments:
+
+- In addition to the description, also annotate the parameters and return types (if applicable)
+- Provide one or more `@example` if you're documenting a function
+  - Use `###` (h3) headings and a description for each example
+- When using links, make sure that they are **absolute** links (e.g. `[Clerk docs](https://clerk.com/docs)`).
+- Provide a `@default` annotation when describing an optional property that will receive a default value
+- Follow the `clerk-docs` styleguides on [code blocks](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#code-blocks), [callouts](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#callouts)
+
+Here's an example of an excellent documented function that showcases the different styleguide instructions:
+
+````ts
+type FnParameters = {
+  /**
+   * Input to the function with a lengthy and good description.
+   */
+  input: string | Array<string>;
+  /**
+   * Optional parameter with a default value.
+   * @default false
+   */
+  isOffline?: boolean;
+};
+
+type FnReturn = Array<string>;
+
+/**
+ * Some long description goes here.
+ *
+ * > [!NOTE]
+ * > This is a note that will be rendered in the documentation.
+ *
+ * @example
+ * ### Example 1
+ *
+ * This shows how to use the function with a single string input.
+ *
+ * ```tsx
+ * const result = exampleFunction({ input: 'example' });
+ * console.log(result); // Output: ['example']
+ * ```
+ *
+ * @example
+ * ### Example 2
+ *
+ * This shows how to use the function with an array of strings as input.
+ *
+ * ```tsx
+ * const result = exampleFunction({ input: ['example1', 'example2'] });
+ * console.log(result); // Output: ['example1', 'example2']
+ * ```
+ */
+export function exampleFunction({ input, isOffline = false }: FnParameters): FnReturn {
+  if (isOffline) {
+    return [];
+  }
+
+  if (Array.isArray(input)) {
+    return input;
+  }
+
+  return [input];
+}
+````
 
 ### Writing tests
 
