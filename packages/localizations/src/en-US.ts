@@ -560,7 +560,7 @@ export const enUS: LocalizationResource = {
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid:
-      'Sign up unsuccessful due to failed security validations - please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
+      'Sign up unsuccessful due to failed security validations. Please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
