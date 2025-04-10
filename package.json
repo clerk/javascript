@@ -47,6 +47,7 @@
     "test:integration:tanstack-react-router": "E2E_APP_ID=tanstack.react-router pnpm test:integration:base --grep @tanstack-react-router",
     "test:integration:tanstack-react-start": "E2E_APP_ID=tanstack.react-start pnpm test:integration:base --grep @tanstack-react-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
+    "test:typedoc": "cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
     "typedoc:generate": "pnpm build:declarations && typedoc --tsconfig tsconfig.typedoc.json",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
