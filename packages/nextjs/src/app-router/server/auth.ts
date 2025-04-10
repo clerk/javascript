@@ -21,8 +21,8 @@ type Auth = AuthObject & {
    *
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign in.
    *
-   * @note
-   * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > [!NOTE]
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
 
@@ -31,8 +31,8 @@ type Auth = AuthObject & {
    *
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign up.
    *
-   * @note
-   * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > [!NOTE]
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
 };
@@ -53,8 +53,8 @@ export interface AuthFn {
    * | Yes | No | Return a `404` error. |
    * | No | No | Redirect the user to the sign-in page\*. |
    *
-   * @important
-   * \*For non-document requests, such as API requests, `auth.protect()` returns a `404` error to users who aren't authenticated.
+   * > [!IMPORTANT]
+   * > \*For non-document requests, such as API requests, `auth.protect()` returns a `404` error to users who aren't authenticated.
    *
    * `auth.protect()` can be used to check if a user is authenticated or authorized to access certain parts of your application or even entire routes. See detailed examples in the [dedicated guide](https://clerk.com/docs/organizations/verify-user-permissions).
    */
