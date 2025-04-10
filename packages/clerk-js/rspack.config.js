@@ -72,7 +72,7 @@ const common = ({ mode, disableRHC = false }) => {
      * Necessary to prevent the Stripe dependencies from being bundled into
      * SDKs such as Browser Extensions.
      */
-    externals: disableRHC ? ['@stripe/stripe-js'] : undefined,
+    externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
         cacheGroups: {
