@@ -126,6 +126,19 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
+export interface JwksJSON {
+  keys?: JwksKeyJSON[];
+}
+
+export interface JwksKeyJSON {
+  use: string;
+  kty: string;
+  kid: string;
+  alg: string;
+  n: string;
+  e: string;
+}
+
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SamlAccount;
   provider: string;
