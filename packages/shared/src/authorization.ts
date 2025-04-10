@@ -168,28 +168,48 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
 //   };
 // };
 
-const parseScope = (fea: string | null | undefined) => {
-  const features = fea ? fea.split(',').map(f => f.trim()) : [];
+export const parseScope = (fea: string | null | undefined) => {
+  const features = (fea ? fea.split(',').map(f => f.trim()) : []).map(f => {
+    const partsLength = f.split(':').length;
 
-  const featuresByScope = features
-    .map(feature => {
-      const [scope, id] = feature.split(':');
-      return { scope, id };
-    })
-    .reduce(
-      (acc, curr) => {
-        acc[curr.scope] = [...(acc[curr.scope] || []), curr.id];
-        return acc;
-      },
-      {} as Record<string, string[]>,
-    );
+    if (partsLength === 1) {
+      return `uo:${f}`;
+    }
+
+    return f;
+  });
+
+  console.log('features', features);
 
   // TODO: make this more efficient
   return {
-    org: [...(featuresByScope['o'] || []), ...(featuresByScope['uo'] || [])],
-    user: [...(featuresByScope['u'] || []), ...(featuresByScope['uo'] || [])],
+    org: features.filter(f => f.split(':')[0].includes('o')).map(f => f.split(':')[1]),
+    user: features.filter(f => f.split(':')[0].includes('u')).map(f => f.split(':')[1]),
   };
 };
+//
+// const parseScope = (fea: string | null | undefined) => {
+//   const features = fea ? fea.split(',').map(f => f.trim()) : [];
+//
+//   const featuresByScope = features
+//     .map(feature => {
+//       const [scope, id] = feature.split(':');
+//       return { scope, id };
+//     })
+//     .reduce(
+//       (acc, curr) => {
+//         acc[curr.scope] = [...(acc[curr.scope] || []), curr.id];
+//         return acc;
+//       },
+//       {} as Record<string, string[]>,
+//     );
+//
+//   // TODO: make this more efficient
+//   return {
+//     org: [...(featuresByScope['o'] || []), ...(featuresByScope['uo'] || [])],
+//     user: [...(featuresByScope['u'] || []), ...(featuresByScope['uo'] || [])],
+//   };
+// };
 
 const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
@@ -215,8 +235,10 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
         }
       }
     } else if (restParams.plan) {
-      const { org: orgPlans, user: userPlans } = parseScope(options.features);
-      const [scope, id] = restParams.plan.split(':');
+      const { org: orgPlans, user: userPlans } = parseScope(options.plans);
+      const [scope, _id] = restParams.plan.split(':');
+      const id = _id || scope;
+      console.log('orgPlans', orgPlans, scope, id);
       if (scope === 'org') {
         commerceAuthorization = orgPlans.includes(id);
       } else if (scope === 'user') {
@@ -224,8 +246,10 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       } else {
         if (options.orgId) {
           commerceAuthorization = orgPlans.includes(id);
+          console.log('orgId', options.orgId);
         } else {
           commerceAuthorization = userPlans.includes(id);
+          console.log('user', options.userId);
         }
       }
     }
