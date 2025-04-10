@@ -278,8 +278,8 @@ importers:
         specifier: 0.28.2
         version: 0.28.2(typescript@5.8.2)
       typedoc-plugin-markdown:
-        specifier: 4.6.1
-        version: 4.6.1(typedoc@0.28.2(typescript@5.8.2))
+        specifier: 4.6.2
+        version: 4.6.2(typedoc@0.28.2(typescript@5.8.2))
       typedoc-plugin-replace-text:
         specifier: 4.1.0
         version: 4.1.0(typedoc@0.28.2(typescript@5.8.2))
@@ -2969,7 +2969,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.22':
     resolution: {integrity: sha512-sOttVuk/8gdnsiSeDpnRNpLgBJHLbyQQC0QBGd2iHpr/x6xSYpgoRO6AqwAwGtQsk4ZEPZ83ulvccei1IIPdwg==}
@@ -13462,8 +13462,8 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typedoc-plugin-markdown@4.6.1:
-    resolution: {integrity: sha512-SrJv9zkpCWdG1cvtWniFU6M7MkCZuheN2R3fuqDPF+O+PeZ8bzmfj1ju/BJwoPWIKyFJVPhK8Sg6tBrM1y+VoA==}
+  typedoc-plugin-markdown@4.6.2:
+    resolution: {integrity: sha512-JVCIoK7FDN3t3PSLkwDyrBFyjtDznqDCJotP9evxhLyb6bEZTqhAGB0tPy1RmgHuY2WoAONMrsWs8LfLsD+A6A==}
     engines: {node: '>= 18'}
     peerDependencies:
       typedoc: 0.28.x
@@ -30305,7 +30305,7 @@ snapshots:
       possible-typed-array-names: 1.0.0
       reflect.getprototypeof: 1.0.10
 
-  typedoc-plugin-markdown@4.6.1(typedoc@0.28.2(typescript@5.8.2)):
+  typedoc-plugin-markdown@4.6.2(typedoc@0.28.2(typescript@5.8.2)):
     dependencies:
       typedoc: 0.28.2(typescript@5.8.2)
 

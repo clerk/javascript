@@ -37,7 +37,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       ...superPartials,
       /**
        * Copied from default theme / source code. This hides the return type heading over the table from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/9fe11dcbee410a5747427dbe0439b9b18dfce0a2/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/7032ebd3679aead224cf23bffd0f3fb98443d16e/packages/typedoc-plugin-markdown/src/theme/context/partials/member.signatureReturns.ts
        * @param {import('typedoc').SignatureReflection} model
        * @param {{ headingLevel: number }} options
        */
@@ -54,6 +54,22 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const typeDeclaration = modelType?.declaration;
 
         md.push(heading(options.headingLevel, i18n.theme_returns()));
+
+        if (!typeDeclaration?.signatures) {
+          if (model.type && this.helpers.hasUsefulTypeDetails(model.type)) {
+            if (model.type instanceof UnionType) {
+              md.push(
+                this.partials.typeDeclarationUnionContainer(
+                  // @ts-expect-error - Some type error
+                  model,
+                  options,
+                ),
+              );
+            }
+          } else {
+            md.push(this.helpers.getReturnType(model.type));
+          }
+        }
 
         const returnsTag = model.comment?.getTag('@returns');
 
@@ -250,7 +266,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * Copied from default theme / source code. This hides the "Type parameters" section and the declaration title from the output
-       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/5d7c3c7fb816b6b009f3425cf284c95400f53929/packages/typedoc-plugin-markdown/src/theme/context/partials/member.declaration.ts
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/7032ebd3679aead224cf23bffd0f3fb98443d16e/packages/typedoc-plugin-markdown/src/theme/context/partials/member.declaration.ts
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
@@ -321,15 +337,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           if (model.type instanceof UnionType) {
             if (this.helpers.hasUsefulTypeDetails(model.type)) {
               md.push(heading(opts.headingLevel, i18n.theme_type_declaration()));
-
-              model.type.types.forEach(type => {
-                if (type instanceof ReflectionType) {
-                  md.push(this.partials.someType(type, { forceCollapse: true }));
-                  md.push(this.partials.typeDeclarationContainer(model, type.declaration, options));
-                } else {
-                  md.push(`${this.partials.someType(type)}`);
-                }
-              });
+              md.push(this.partials.typeDeclarationUnionContainer(model, options));
             }
           } else {
             const useHeading =
@@ -367,8 +375,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           // So, .someType adds the backticks to the string and we don't want to deal with modifying that partial. So just remove any backticks in the next step again :shrug:
           const defaultResult = this.partials.someType(unionType, { forceCollapse: true });
 
+          // Escape stuff that would be turned into markdown
+          const escapedResult = defaultResult.replace(/__experimental_/g, '\\_\\_experimental\\_');
+
           // Remove any backticks
-          return defaultResult.replace(/`/g, '');
+          return escapedResult.replace(/`/g, '');
         });
 
         const shouldFormat = useCodeBlocks && (typesOut?.join('').length > 70 || typesOut?.join('').includes('\n'));
