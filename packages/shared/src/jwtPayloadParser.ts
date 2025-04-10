@@ -5,17 +5,17 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-const parseFeatures = (fea: string | undefined) => {
+export const parseFeatures = (fea: string | undefined) => {
   const features = fea ? fea.split(',').map(f => f.trim()) : [];
 
   // TODO: make this more efficient
   return {
-    orgFeatures: features.filter(f => f.includes('o')).map(f => f.split(':')[1]),
-    userFeatures: features.filter(f => f.includes('u')).map(f => f.split(':')[1]),
+    orgFeatures: features.filter(f => f.split(':')[0].includes('o')).map(f => f.split(':')[1]),
+    userFeatures: features.filter(f => f.split(':')[0].includes('u')).map(f => f.split(':')[1]),
   };
 };
 
-const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
+export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
   if (!per || !fpm) {
     return { permissions: [], featurePermissionMap: [] };
   }
