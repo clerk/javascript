@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { clerkEvents, createClerkEventBus } from '@clerk/shared/eventBus';
+import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {

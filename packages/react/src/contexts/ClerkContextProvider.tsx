@@ -1,7 +1,7 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
@@ -107,7 +107,7 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     void isomorphicClerk.__unstable__updateProps({ options });
   }, [options.localization]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     isomorphicClerk.on('status', setStatus);
     return () => isomorphicClerk.off('status', setStatus);
   }, [isomorphicClerk]);
