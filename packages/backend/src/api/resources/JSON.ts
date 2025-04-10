@@ -207,13 +207,16 @@ export interface OrganizationDomainVerificationJSON {
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   role: OrganizationMembershipRole;
+  role_name: string;
   organization_id: string;
   public_organization_data?: PublicOrganizationDataJSON | null;
   status?: OrganizationInvitationStatus;
   public_metadata: OrganizationInvitationPublicMetadata;
   private_metadata: OrganizationInvitationPrivateMetadata;
+  url: string | null;
   created_at: number;
   updated_at: number;
+  expires_at: number;
 }
 
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
