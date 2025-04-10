@@ -57,7 +57,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
     const promise = touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
 
     return promise.then(data => {
-      eventBus.dispatch(events.EnvironmentUpdate, null);
+      eventBus.emit(events.EnvironmentUpdate, null);
       return data;
     });
   }

@@ -162,6 +162,7 @@ export type ElementsConfig = {
   lineItemsDescriptionText: WithOptions;
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
+  lineItemsCopyButton: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
