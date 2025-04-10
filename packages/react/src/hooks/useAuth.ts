@@ -3,6 +3,7 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  JwtPayload,
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
@@ -144,7 +145,8 @@ export function useDerivedAuth(
   authObject: any,
   { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
 ): UseAuthReturn {
-  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge, sessionClaims } =
+    authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -157,8 +159,8 @@ export function useDerivedAuth(
         orgRole,
         orgPermissions,
         factorVerificationAge,
-        features: '',
-        plans: '',
+        features: ((sessionClaims as JwtPayload | undefined)?.fea as string) || '',
+        plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
     [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
