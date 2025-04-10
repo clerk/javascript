@@ -7,6 +7,7 @@ import type {
   OrganizationMembershipRole,
   SignInStatus,
   SignUpStatus,
+  WaitlistEntryStatus,
 } from './Enums';
 
 export const ObjectType = {
@@ -385,13 +386,13 @@ export interface VerificationJSON extends ClerkResourceJSON {
 }
 
 export interface WaitlistEntryJSON extends ClerkResourceJSON {
-  created_at: number;
-  email_address: string;
+  object: typeof ObjectType.WaitlistEntry;
   id: string;
+  status: WaitlistEntryStatus;
+  email_address: string;
   invitation: InvitationJSON | null;
   is_locked: boolean;
-  object: typeof ObjectType.WaitlistEntry;
-  status: string;
+  created_at: number;
   updated_at: number;
 }
 
@@ -482,3 +483,29 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+// export type WaitlistEntry = {
+//   object: WaitlistEntryObject;
+//   id: string;
+//   emailAddress: string;
+//   status: WaitlistEntryStatus;
+//   /**
+//    * Indicates if the waitlist entry is locked. Locked entries are being processed in a batch action and are unavailable for other actions.
+//    *
+//    * @remarks
+//    */
+//   isLocked?: boolean | undefined;
+//   /**
+//    * Unix timestamp of creation.
+//    *
+//    * @remarks
+//    */
+//   createdAt: number;
+//   /**
+//    * Unix timestamp of last update.
+//    *
+//    * @remarks
+//    */
+//   updatedAt: number;
+//   invitation?: WaitlistEntryInvitation | null | undefined;
+// };
