@@ -26,6 +26,7 @@ export const ObjectType = {
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
+  ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
   Session: 'session',
@@ -254,6 +255,17 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   linked_to: IdentificationLinkJSON[];
   backup_codes: string[];
 }
+
+export type ProxyCheckJSON = {
+  object: typeof ObjectType.ProxyCheck;
+  id: string;
+  domain_id: string;
+  last_run_at: number | null;
+  proxy_url: string;
+  successful: boolean;
+  created_at: number;
+  updated_at: number;
+};
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
   object: typeof ObjectType.RedirectUrl;
