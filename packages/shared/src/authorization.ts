@@ -179,8 +179,6 @@ export const parseScope = (fea: string | null | undefined) => {
     return f;
   });
 
-  console.log('features', features);
-
   // TODO: make this more efficient
   return {
     org: features.filter(f => f.split(':')[0].includes('o')).map(f => f.split(':')[1]),
@@ -238,7 +236,7 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       const { org: orgPlans, user: userPlans } = parseScope(options.plans);
       const [scope, _id] = restParams.plan.split(':');
       const id = _id || scope;
-      console.log('orgPlans', orgPlans, scope, id);
+
       if (scope === 'org') {
         commerceAuthorization = orgPlans.includes(id);
       } else if (scope === 'user') {
@@ -246,10 +244,8 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       } else {
         if (options.orgId) {
           commerceAuthorization = orgPlans.includes(id);
-          console.log('orgId', options.orgId);
         } else {
           commerceAuthorization = userPlans.includes(id);
-          console.log('user', options.userId);
         }
       }
     }
