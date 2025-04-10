@@ -139,7 +139,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   >();
   private loadedListeners: Array<() => void> = [];
 
-  #status: Clerk['status'] = 'loading';
+  #status: ClerkStatus = 'loading';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
@@ -153,7 +153,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.clerkjs?.loaded || false;
   }
 
-  get status(): Clerk['status'] {
+  get status(): ClerkStatus {
     /**
      * If clerk-js is not available the returned value can either be "loading" or "error".
      */
@@ -473,7 +473,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs?.on) {
       return this.clerkjs.on(...args);
     } else {
-      // @ts-expect-error
       this.#eventBus.on(...args);
     }
   };
@@ -483,7 +482,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs?.off) {
       return this.clerkjs.off(...args);
     } else {
-      // @ts-expect-error
       this.#eventBus.off(...args);
     }
   };

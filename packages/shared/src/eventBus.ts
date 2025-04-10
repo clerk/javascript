@@ -219,5 +219,3 @@ export const createEventBus = <Events extends Record<string, unknown>>(): EventB
     },
   };
 };
-
-
