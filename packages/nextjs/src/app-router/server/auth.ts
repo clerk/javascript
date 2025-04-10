@@ -31,8 +31,8 @@ type Auth = AuthObject & {
    *
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign up.
    *
-   * @note
-   * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > [!NOTE]
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
 };
