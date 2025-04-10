@@ -1,8 +1,8 @@
 ---
-'@clerk/backend': patch
+'@clerk/backend': minor
 ---
 
-Adds the ability to verify proxy checks to the Backend API client.
+Adds the ability to grab an instance's JWKS to the Backend API client.
 
 ```ts
   import { createClerkClient } from '@clerk/backend';
