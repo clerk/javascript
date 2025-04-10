@@ -11,6 +11,7 @@ import type {
   OrganizationMembershipRole,
   SignInStatus,
   SignUpStatus,
+  WaitlistEntryStatus,
 } from './Enums';
 
 export const ObjectType = {
@@ -543,13 +544,13 @@ export interface VerificationJSON extends ClerkResourceJSON {
 }
 
 export interface WaitlistEntryJSON extends ClerkResourceJSON {
-  created_at: number;
-  email_address: string;
+  object: typeof ObjectType.WaitlistEntry;
   id: string;
+  status: WaitlistEntryStatus;
+  email_address: string;
   invitation: InvitationJSON | null;
   is_locked: boolean;
-  object: typeof ObjectType.WaitlistEntry;
-  status: string;
+  created_at: number;
   updated_at: number;
 }
 
