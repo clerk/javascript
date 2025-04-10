@@ -23,7 +23,7 @@ describe('Session', () => {
     let dispatchSpy;
 
     beforeEach(() => {
-      dispatchSpy = jest.spyOn(eventBus, 'dispatch');
+      dispatchSpy = jest.spyOn(eventBus, 'emit');
       BaseResource.clerk = clerkMock() as any;
     });
 

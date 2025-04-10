@@ -5,24 +5,29 @@ import dotenv from 'dotenv';
 import type { ClerkSetupOptions, ClerkSetupReturn } from './types';
 
 export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSetupReturn> => {
+  const { debug = false, dotenv: loadDotEnv = true, ...rest } = options || {};
+
   const log = (msg: string) => {
-    if (options?.debug) {
+    if (debug) {
       console.log(`Clerk: ${msg}`);
     }
   };
 
   log('Setting up Clerk...');
-  dotenv.config({ path: ['.env.local', '.env'] });
+
+  if (loadDotEnv) {
+    dotenv.config({ path: ['.env.local', '.env'] });
+  }
 
   const publishableKey =
-    options?.publishableKey ||
+    rest.publishableKey ||
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
     process.env.VITE_CLERK_PUBLISHABLE_KEY ||
     process.env.CLERK_PUBLISHABLE_KEY ||
     process.env.REACT_APP_CLERK_PUBLISHABLE_KEY ||
     process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-  const secretKey = process.env.CLERK_SECRET_KEY;
+  const secretKey = rest.secretKey || process.env.CLERK_SECRET_KEY;
   let testingToken = process.env.CLERK_TESTING_TOKEN;
 
   if (!publishableKey) {

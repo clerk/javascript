@@ -1,19 +1,27 @@
+import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import type { Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
 
-export const createAppPageObject = (testArgs: { page: Page }, app: Application) => {
-  const { page } = testArgs;
+export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: Application) => {
+  const { page, useTestingToken = true } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
     goToAppHome: async () => {
       try {
+        if (useTestingToken) {
+          await setupClerkTestingToken({ page });
+        }
+
         await page.goto(app.serverUrl);
       } catch {
         // do not fail the test if interstitial is returned (401)
       }
     },
-    goToRelative: (path: string, opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {}) => {
+    goToRelative: async (
+      path: string,
+      opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {},
+    ) => {
       let url: URL;
 
       try {
@@ -35,6 +43,11 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       if (opts.searchParams) {
         url.search = opts.searchParams.toString();
       }
+
+      if (useTestingToken) {
+        await setupClerkTestingToken({ page });
+      }
+
       return page.goto(url.toString(), { timeout: opts.timeout ?? 20000, waitUntil: opts.waitUntil });
     },
     waitForClerkJsLoaded: async () => {
