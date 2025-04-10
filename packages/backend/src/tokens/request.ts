@@ -6,6 +6,7 @@ import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
+import { isMachineToken } from '../util/machineTokens';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
@@ -739,7 +740,7 @@ ${error.getFullMessage()}`,
       return handleMachineError(errors[0]);
     }
 
-    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, {} as any);
+    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, _fix_me as any);
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
@@ -750,13 +751,13 @@ ${error.getFullMessage()}`,
     }
 
     // Check if it's a machine token
-    if (['m2m_', 'oaa_', 'ak_'].some(prefix => sessionTokenInHeader.startsWith(prefix))) {
+    if (isMachineToken(sessionTokenInHeader)) {
       const { data: _fix_me, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
       if (errors) {
         return handleMachineError(errors[0]);
       }
 
-      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, {} as any);
+      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, _fix_me as any);
     }
 
     // Handle as a regular session token

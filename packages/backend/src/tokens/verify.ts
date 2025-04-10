@@ -1,10 +1,12 @@
 import type { JwtPayload } from '@clerk/types';
 
+import type { APIKey, M2MToken, OAuthApplicationToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
-import type { JwtReturnType } from '../jwt/types';
+import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
+import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from '../util/machineTokens';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 
@@ -57,7 +59,7 @@ export async function verifyToken(
 async function verifyM2MToken(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<M2MToken, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.m2mTokens.verifySecret(secret);
@@ -70,10 +72,10 @@ async function verifyM2MToken(
 async function verifyOAuthToken(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<OAuthApplicationToken, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.oAuthAccessTokens.verifySecret(secret);
+    const verifiedToken = await client.oAuthApplicationTokens.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err) {
     return { data: undefined, errors: [err as TokenVerificationError] };
@@ -83,7 +85,7 @@ async function verifyOAuthToken(
 async function verifyAPIKey(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<APIKey, TokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.apiKeys.verifySecret(secret);
@@ -96,20 +98,22 @@ async function verifyAPIKey(
 /**
  * Verifies any type of machine token by detecting its type from the prefix.
  *
- * @param token - The token to verify (e.g. starts with "m2m_", "oaa_", "api_key_", etc.)
+ * @param token - The token to verify (e.g. starts with "m2m_", "oauth_", "api_key_", etc.)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineToken(
   token: string,
   options: VerifyTokenOptions,
-): Promise<JwtReturnType<{ id: string; subject: string }, TokenVerificationError>> {
-  if (token.startsWith('m2m_')) {
+): Promise<
+  MachineTokenReturnType<{ id: string; subject: string; claims: Record<string, string> }, TokenVerificationError>
+> {
+  if (token.startsWith(M2M_TOKEN_PREFIX)) {
     return verifyM2MToken(token, options);
   }
-  if (token.startsWith('oaa_')) {
+  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
     return verifyOAuthToken(token, options);
   }
-  if (token.startsWith('api_key_')) {
+  if (token.startsWith(API_KEY_PREFIX)) {
     return verifyAPIKey(token, options);
   }
 

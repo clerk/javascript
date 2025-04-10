@@ -188,7 +188,7 @@ export function handshake(
   });
 }
 
-// TODO: Returned properties are temporary
+// TODO: Do we need the authenticateContext properties here?
 export function machineAuthenticated(
   authenticateContext: AuthenticateContext,
   headers: Headers = new Headers(),
@@ -216,7 +216,7 @@ export function machineAuthenticated(
   };
 }
 
-// TODO: Returned properties are temporary
+// TODO: Do we need the authenticateContext properties here?
 export function machineUnauthenticated(
   authenticateContext: AuthenticateContext,
   reason: AuthReason,

@@ -497,6 +497,28 @@ export interface M2MTokenJSON {
   updated_at: number;
 }
 
-export interface APIKeyJSON extends M2MTokenJSON {
-  [key: string]: unknown; // todo
+export interface APIKeyJSON {
+  id: string;
+  type: string;
+  subject: string;
+  name: string;
+  claims: Record<string, string>;
+  revoked: boolean;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason?: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface OAuthApplicationTokenJSON {
+  id: string;
+  subject: string;
+  claims: Record<string, string>;
+  revoked: boolean;
+  expired: boolean;
+  expiration: number | null;
+  created_at: number;
+  updated_at: number;
 }

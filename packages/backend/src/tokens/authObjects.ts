@@ -223,7 +223,7 @@ export function authenticatedMachineObject(
     claims,
     entity: 'machine',
     machineId,
-    userId: null,
+    userId: null, // TODO: m2m has creator id?
     getToken,
     has: () => false,
     debug: createDebug(debugData),
