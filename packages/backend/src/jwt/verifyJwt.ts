@@ -75,42 +75,43 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
 
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
   const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
+  //
+  //   const raw_payload = `{
+  //   "azp": "http://localhost:3000",
+  //   "exp": 1744288791,
+  //   "fva": [
+  //     20,
+  //     -1
+  //   ],
+  //   "fea": "o:impersonation,u:repositories,uo:my-feature",
+  //   "iat": 1744288731,
+  //   "iss": "https://epic-mammoth-55.clerk.accountsstage.dev",
+  //   "nbf": 1744288721,
+  //   "o": {
+  //     "id": "org_2vXOaNaTIBUx0etrjyWXdX7aQV9",
+  //     "rol": "admin",
+  //     "slg": "hehey"
+  //   },
+  //   "pla": "some-free,o:org-pro,u:free,ou:add-on",
+  //   "sid": "sess_2vXNZkTegRbHoZQqcBZJ4ZHNVFO",
+  //   "sub": "user_2vXNZrXa8m2aFuObT5hxcZfslZB",
+  //   "v": 2
+  // }`;
 
-  const raw_payload = `{
-  "azp": "http://localhost:3000",
-  "exp": 1744288791,
-  "fva": [
-    20,
-    -1
-  ],
-  "fea": "o:impersonation,u:repositories,uo:my-feature",
-  "iat": 1744288731,
-  "iss": "https://epic-mammoth-55.clerk.accountsstage.dev",
-  "nbf": 1744288721,
-  "o": {
-    "id": "org_2vXOaNaTIBUx0etrjyWXdX7aQV9",
-    "rol": "admin",
-    "slg": "hehey"
-  },
-  "pla": "some-free,o:org-pro,u:free,ou:add-on",
-  "sid": "sess_2vXNZkTegRbHoZQqcBZJ4ZHNVFO",
-  "sub": "user_2vXNZrXa8m2aFuObT5hxcZfslZB",
-  "v": 2
-}`;
-
-  console.log('rawPayload', rawPayload);
-  console.log('raw_payload', raw_payload);
+  // console.log('rawPayload', rawPayload);
+  // console.log('raw_payload', raw_payload);
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
   // const payload = JSON.parse(raw_payload);
   const signature = base64url.parse(rawSignature, { loose: true });
 
   const data = {
     header,
-    payload: {
-      ...payload,
-      pla: JSON.parse(raw_payload).pla,
-      fea: JSON.parse(raw_payload).fea,
-    },
+    payload,
+    // payload: {
+    //   ...payload,
+    //   pla: JSON.parse(raw_payload).pla,
+    //   fea: JSON.parse(raw_payload).fea,
+    // },
     signature,
     raw: {
       header: rawHeader,
