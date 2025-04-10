@@ -6,7 +6,6 @@ import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
-import { isMachineToken } from '../util/machineTokens';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
@@ -31,8 +30,9 @@ import {
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
+import { isMachineToken } from './machine';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
-import { verifyMachineToken, verifyToken } from './verify';
+import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
@@ -125,6 +125,9 @@ export async function authenticateRequest(request: Request, options: Authenticat
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
+
+  // Default entity is user for backwards compatibility.
+  options.entity ??= 'user';
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -722,10 +725,10 @@ ${error.getFullMessage()}`,
 
   function handleMachineError(err: unknown): MachineUnauthenticatedState {
     if (!(err instanceof TokenVerificationError)) {
-      return machineUnauthenticated(authenticateContext, AuthErrorReason.UnexpectedError);
+      return machineUnauthenticated(AuthErrorReason.UnexpectedError);
     }
 
-    return machineUnauthenticated(authenticateContext, err.reason, err.getFullMessage());
+    return machineUnauthenticated(err.reason, err.getFullMessage());
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {
@@ -735,12 +738,12 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
-    const { data: _fix_me, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
+    const { data, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(errors[0]);
     }
 
-    return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, _fix_me as any);
+    return machineAuthenticated(undefined, sessionTokenInHeader, data);
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
@@ -750,14 +753,13 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
-    // Check if it's a machine token
     if (isMachineToken(sessionTokenInHeader)) {
-      const { data: _fix_me, errors } = await verifyMachineToken(sessionTokenInHeader, authenticateContext);
+      const { data, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
       if (errors) {
         return handleMachineError(errors[0]);
       }
 
-      return machineAuthenticated(authenticateContext, undefined, sessionTokenInHeader, _fix_me as any);
+      return machineAuthenticated(undefined, sessionTokenInHeader, data);
     }
 
     // Handle as a regular session token
@@ -777,9 +779,9 @@ ${error.getFullMessage()}`,
     return authenticateRequestWithTokenInHeader();
   }
 
-  // machine requests cannot have the token in the cookie, it must be in header
+  // Machine requests cannot have the token in the cookie, it must be in header.
   if (options.entity === 'machine') {
-    return machineUnauthenticated(authenticateContext, 'no token in header');
+    return machineUnauthenticated('No token in header');
   }
   return authenticateRequestWithTokenInCookie();
 }
@@ -787,7 +789,7 @@ ${error.getFullMessage()}`,
 /**
  * @internal
  */
-export const debugRequestState = (params: RequestState) => {
+export const debugRequestState = (params: SignedInState | SignedOutState | HandshakeState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };

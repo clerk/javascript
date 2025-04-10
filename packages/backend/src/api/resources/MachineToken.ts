@@ -1,25 +1,23 @@
-import type { APIKeyJSON } from './JSON';
+import type { MachineTokenJSON } from './JSON';
 
-export class APIKey {
+export class MachineToken {
   constructor(
     readonly id: string,
-    readonly type: string,
-    readonly subject: string,
     readonly name: string,
-    readonly claims: Record<string, string> | null,
+    readonly subject: string,
+    readonly secondsUntilExpiration: number,
     readonly createdBy: string | null,
     readonly createdAt: number,
     readonly expiresAt: number | null,
     readonly creationReason?: string | null,
   ) {}
 
-  static fromJSON(data: APIKeyJSON) {
-    return new APIKey(
+  static fromJSON(data: MachineTokenJSON) {
+    return new MachineToken(
       data.id,
-      data.type,
       data.subject,
       data.name,
-      data.claims,
+      data.seconds_until_expiration,
       data.created_by,
       data.created_at,
       data.expires_at,

@@ -13,6 +13,7 @@ import type {
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
+import type { MachineAuthType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -86,7 +87,7 @@ export type SignedOutAuthObject = {
 export type AuthenticatedMachineObject = {
   isMachine: true;
   userId: string | null;
-  claims: JwtPayload;
+  claims: Record<string, string>;
   entity: 'machine';
   machineId: string | null;
   has: CheckAuthorizationFromSessionClaims;
@@ -99,10 +100,10 @@ export type AuthenticatedMachineObject = {
  */
 export type UnauthenticatedMachineObject = {
   isMachine: false;
-  userId: string | null;
+  userId: null;
   claims: null;
   entity: 'machine';
-  machineId: string | null;
+  machineId: null;
   has: CheckAuthorizationFromSessionClaims;
   getToken: ServerGetToken;
   debug: AuthObjectDebug;
@@ -209,27 +210,31 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   };
 }
 
+/**
+ * @internal
+ */
 export function authenticatedMachineObject(
   machineToken: string,
-  claims: JwtPayload,
+  verificationResult: MachineAuthType,
   debugData?: AuthObjectDebugData,
 ): AuthenticatedMachineObject {
-  const { sub: machineId } = claims;
-  const getToken = () => {
-    return machineToken;
-  };
   return {
     isMachine: true,
-    claims,
+    // @ts-expect-error: Fix this. Machine token doesn't have claims.
+    claims: verificationResult?.claims ?? null,
     entity: 'machine',
-    machineId,
-    userId: null, // TODO: m2m has creator id?
-    getToken,
+    machineId: verificationResult.id,
+    // @ts-expect-error: Fix this. OAuth token doesn't have created_by.
+    userId: verificationResult.createdBy,
+    getToken: () => machineToken,
     has: () => false,
     debug: createDebug(debugData),
   };
 }
 
+/**
+ * @internal
+ */
 export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
   return {
     isMachine: false,

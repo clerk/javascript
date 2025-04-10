@@ -15,6 +15,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
+import type { MachineAuthType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -62,20 +63,24 @@ export type SignedOutState = {
   token: null;
 };
 
-export type MachineAuthenticatedState = Omit<SignedOutState, 'status' | 'toAuth' | 'token' | 'reason' | 'message'> & {
+export type MachineAuthenticatedState = {
   status: typeof AuthStatus.MachineAuthenticated;
   reason: null;
   message: null;
   isMachineAuthenticated: true;
   toAuth: () => AuthenticatedMachineObject;
+  headers: Headers;
   token: string;
 };
 
-export type MachineUnauthenticatedState = Omit<SignedOutState, 'status' | 'toAuth'> & {
+export type MachineUnauthenticatedState = {
   status: typeof AuthStatus.MachineUnauthenticated;
   message: string;
+  reason: AuthReason;
   isMachineAuthenticated: false;
   toAuth: () => UnauthenticatedMachineObject;
+  token: null;
+  headers: Headers;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
@@ -188,27 +193,16 @@ export function handshake(
   });
 }
 
-// TODO: Do we need the authenticateContext properties here?
 export function machineAuthenticated(
-  authenticateContext: AuthenticateContext,
   headers: Headers = new Headers(),
   token: string,
-  claims: JwtPayload,
+  verificationResult: MachineAuthType,
 ): MachineAuthenticatedState {
-  const machineAuthObject = authenticatedMachineObject(token, claims);
+  const machineAuthObject = authenticatedMachineObject(token, verificationResult);
   return {
     status: AuthStatus.MachineAuthenticated,
     reason: null,
     message: null,
-    proxyUrl: authenticateContext.proxyUrl || '',
-    publishableKey: authenticateContext.publishableKey || '',
-    isSatellite: authenticateContext.isSatellite || false,
-    domain: authenticateContext.domain || '',
-    signInUrl: authenticateContext.signInUrl || '',
-    signUpUrl: authenticateContext.signUpUrl || '',
-    afterSignInUrl: authenticateContext.afterSignInUrl || '',
-    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
-    isSignedIn: false,
     isMachineAuthenticated: true,
     toAuth: () => machineAuthObject,
     headers,
@@ -216,9 +210,7 @@ export function machineAuthenticated(
   };
 }
 
-// TODO: Do we need the authenticateContext properties here?
 export function machineUnauthenticated(
-  authenticateContext: AuthenticateContext,
   reason: AuthReason,
   message = '',
   headers: Headers = new Headers(),
@@ -227,15 +219,6 @@ export function machineUnauthenticated(
     status: AuthStatus.MachineUnauthenticated,
     reason,
     message,
-    proxyUrl: authenticateContext.proxyUrl || '',
-    publishableKey: authenticateContext.publishableKey || '',
-    isSatellite: authenticateContext.isSatellite || false,
-    domain: authenticateContext.domain || '',
-    signInUrl: authenticateContext.signInUrl || '',
-    signUpUrl: authenticateContext.signUpUrl || '',
-    afterSignInUrl: authenticateContext.afterSignInUrl || '',
-    afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
-    isSignedIn: false,
     isMachineAuthenticated: false,
     toAuth: () => unauthenticatedMachineObject(),
     headers,

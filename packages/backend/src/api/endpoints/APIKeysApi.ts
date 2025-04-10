@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/api_keys';
 
 export class APIKeysAPI extends AbstractAPI {
-  async verifySecret(secret: string) {
+  async verifyApiKey(secret: string) {
     return this.request<APIKey>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),

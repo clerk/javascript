@@ -21,7 +21,7 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
 export * from './JSON';
-export * from './M2MToken';
+export * from './MachineToken';
 export * from './OauthAccessToken';
 export * from './OAuthApplicationToken';
 export * from './Organization';

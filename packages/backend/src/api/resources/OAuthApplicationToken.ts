@@ -3,25 +3,23 @@ import type { OAuthApplicationTokenJSON } from './JSON';
 export class OAuthApplicationToken {
   constructor(
     readonly id: string,
+    readonly type: string,
+    readonly name: string,
     readonly subject: string,
-    readonly claims: Record<string, string>,
-    readonly revoked: boolean,
-    readonly expired: boolean,
-    readonly expiration: number | null,
+    readonly claims: Record<string, string> | null,
     readonly createdAt: number,
-    readonly updatedAt: number,
+    readonly expiresAt: number,
   ) {}
 
   static fromJSON(data: OAuthApplicationTokenJSON) {
     return new OAuthApplicationToken(
       data.id,
+      data.type,
+      data.name,
       data.subject,
       data.claims,
-      data.revoked,
-      data.expired,
-      data.expiration,
       data.created_at,
-      data.updated_at,
+      data.expires_at,
     );
   }
 }

@@ -482,43 +482,36 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface M2MTokenJSON {
+export interface MachineTokenJSON {
   id: string;
-  type: string;
-  subject: string;
   name: string;
-  claims: Record<string, string>;
-  revoked: boolean;
-  expired: boolean;
-  expiration: number | null;
-  created_by: string | null;
+  subject: string;
   creation_reason?: string | null;
+  created_by: string | null;
+  seconds_until_expiration: number;
   created_at: number;
-  updated_at: number;
+  expires_at: number | null;
 }
 
 export interface APIKeyJSON {
   id: string;
   type: string;
-  subject: string;
   name: string;
-  claims: Record<string, string>;
-  revoked: boolean;
-  expired: boolean;
-  expiration: number | null;
+  subject: string;
+  claims: Record<string, string> | null;
   created_by: string | null;
-  creation_reason?: string | null;
+  creation_reason: string | null;
+  seconds_until_expiration: number | null;
   created_at: number;
-  updated_at: number;
+  expires_at: number | null;
 }
 
 export interface OAuthApplicationTokenJSON {
   id: string;
+  type: string; // right now it's just oauth:access_token
+  name: string;
   subject: string;
-  claims: Record<string, string>;
-  revoked: boolean;
-  expired: boolean;
-  expiration: number | null;
+  claims: Record<string, string> | null;
   created_at: number;
-  updated_at: number;
+  expires_at: number;
 }
