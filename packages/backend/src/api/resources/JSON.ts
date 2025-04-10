@@ -483,29 +483,3 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-
-// export type WaitlistEntry = {
-//   object: WaitlistEntryObject;
-//   id: string;
-//   emailAddress: string;
-//   status: WaitlistEntryStatus;
-//   /**
-//    * Indicates if the waitlist entry is locked. Locked entries are being processed in a batch action and are unavailable for other actions.
-//    *
-//    * @remarks
-//    */
-//   isLocked?: boolean | undefined;
-//   /**
-//    * Unix timestamp of creation.
-//    *
-//    * @remarks
-//    */
-//   createdAt: number;
-//   /**
-//    * Unix timestamp of last update.
-//    *
-//    * @remarks
-//    */
-//   updatedAt: number;
-//   invitation?: WaitlistEntryInvitation | null | undefined;
-// };
