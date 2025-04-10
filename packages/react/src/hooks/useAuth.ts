@@ -157,6 +157,8 @@ export function useDerivedAuth(
         orgRole,
         orgPermissions,
         factorVerificationAge,
+        features: '',
+        plans: '',
       })(params);
     },
     [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
