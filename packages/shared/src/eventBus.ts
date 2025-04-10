@@ -1,15 +1,13 @@
 /**
  * Type definition for event handler functions
  */
-export type EventHandler<Events extends Record<string, unknown>, Key extends keyof Events> = (
-  payload: Events[Key],
-) => void;
+type EventHandler<Events extends Record<string, unknown>, Key extends keyof Events> = (payload: Events[Key]) => void;
 
 /**
  * @interface
  * Strongly-typed event bus interface that enables type-safe publish/subscribe patterns
  */
-export type EventBus<Events extends Record<string, unknown>> = {
+type EventBus<Events extends Record<string, unknown>> = {
   /**
    * Subscribe to an event
    *
