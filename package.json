@@ -49,7 +49,7 @@
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
-    "typedoc:generate": "pnpm build:declarations && typedoc --tsconfig tsconfig.typedoc.json",
+    "typedoc:generate": "typedoc --tsconfig tsconfig.typedoc.json",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
