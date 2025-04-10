@@ -64,6 +64,10 @@ function getUnlinkedTypesReplacements() {
       pattern: /`_LocalizationResource`/g,
       replace: '[Localization](/docs/customization/localization)',
     },
+    {
+      pattern: /`LoadedClerk`/g,
+      replace: '[Clerk](/docs/references/javascript/clerk)',
+    },
   ];
 }
 
