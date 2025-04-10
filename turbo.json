@@ -66,6 +66,11 @@
       "outputLogs": "new-only",
       "outputs": ["dist/**/*.d.ts", "dist/**/*.d.ts.map"]
     },
+    "typedoc:generate": {
+      "dependsOn": ["^build:declarations"],
+      "outputLogs": "new-only",
+      "outputs": [".typedoc/docs/**/*.mdx"]
+    },
     "dev": {
       "cache": false
     },
@@ -251,6 +256,12 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "//#typedoc:generate": {
+      "dependsOn": ["^build:declarations"]
+    },
+    "//#test:typedoc": {
+      "dependsOn": ["^typedoc:generate"]
     }
   }
 }
