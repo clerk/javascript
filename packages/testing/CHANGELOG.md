@@ -1,5 +1,18 @@
 # @clerk/testing
 
+## 1.4.37
+
+### Patch Changes
+
+- Update `setupClerk` to handle the explict setting of secret keys via `setupClerk({ secretKey: 'sk_test_***' })` ([#5561](https://github.com/clerk/javascript/pull/5561)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update `setupClerk` to enable skipping of the automatic loading of dot env files via `setupClerk({ dotenv: false })` ([#5561](https://github.com/clerk/javascript/pull/5561)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`1b34bcb`](https://github.com/clerk/javascript/commit/1b34bcb17e1a7f22644c0ea073857c528a8f81b7), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+  - @clerk/backend@1.27.2
+
 ## 1.4.36
 
 ### Patch Changes

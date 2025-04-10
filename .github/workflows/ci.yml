@@ -164,6 +164,17 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
+      - name: Run Typedoc tests
+        run: |
+          # Only run Typedoc tests for one matrix version
+          if [ "${{ matrix.node-version }}" == "22" ]; then
+            pnpm build:declarations
+            pnpm typedoc:generate
+            pnpm test:typedoc
+          fi
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
