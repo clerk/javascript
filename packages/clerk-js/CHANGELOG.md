@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.60.0
+
+### Minor Changes
+
+- Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
+
+  - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5575](https://github.com/clerk/javascript/pull/5575)) by [@LekoArts](https://github.com/LekoArts)
+
+- Move `createEventBus` to shared. ([#5546](https://github.com/clerk/javascript/pull/5546)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`f17e445`](https://github.com/clerk/javascript/commit/f17e445de1318ebc553953b1b9abc71567ed6b87), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/shared@3.6.0
+  - @clerk/types@4.53.0
+  - @clerk/localizations@3.13.9
+
 ## 5.59.3
 
 ### Patch Changes

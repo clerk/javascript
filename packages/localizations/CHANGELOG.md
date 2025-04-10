@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.13.9
+
+### Patch Changes
+
+- Improve the CAPTCHA error message to better assist users ([#5577](https://github.com/clerk/javascript/pull/5577)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5)]:
+  - @clerk/types@4.53.0
+
 ## 3.13.8
 
 ### Patch Changes
