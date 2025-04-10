@@ -459,8 +459,20 @@ export interface Clerk {
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
+  /**
+   * Registers an event handler for a specific Clerk event.
+   * @param event - The event name to subscribe to
+   * @param handler - The callback function to execute when the event is dispatched
+   * @param opt - Optional configuration object
+   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   */
   on: OnEventListener;
 
+  /**
+   * Removes an event handler for a specific Clerk event.
+   * @param event - The event name to unsubscribe from
+   * @param handler - The callback function to remove
+   */
   off: OffEventListener;
 
   /**
