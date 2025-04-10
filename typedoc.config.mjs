@@ -95,7 +95,7 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags, '@warning', '@note', '@important', '@memberof'],
+    blockTags: [...OptionDefaults.blockTags],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
