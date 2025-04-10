@@ -1,5 +1,6 @@
 import {
   AccountlessApplicationAPI,
+  ActorTokenAPI,
   AllowlistIdentifierAPI,
   ClientAPI,
   DomainAPI,
@@ -27,6 +28,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     __experimental_accountlessApplications: new AccountlessApplicationAPI(
       buildRequest({ ...options, requireSecretKey: false }),
     ),
+    actorTokens: new ActorTokenAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),

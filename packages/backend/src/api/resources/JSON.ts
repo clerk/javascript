@@ -1,4 +1,5 @@
 import type {
+  ActorTokenStatus,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -11,6 +12,7 @@ import type {
 
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
+  ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
   Client: 'client',
   Cookies: 'cookies',
@@ -66,6 +68,18 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
   secret_key: string;
   claim_url: string;
   api_keys_url: string;
+}
+
+export interface ActorTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ActorToken;
+  id: string;
+  status: ActorTokenStatus;
+  user_id: string;
+  actor: Record<string, unknown> | null;
+  token?: string | null;
+  url?: string | null;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
