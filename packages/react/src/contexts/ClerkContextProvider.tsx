@@ -44,6 +44,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   const {
     sessionId,
     sessionStatus,
+    sessionClaims,
     session,
     userId,
     user,
@@ -60,6 +61,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     const value = {
       sessionId,
       sessionStatus,
+      sessionClaims,
       userId,
       actor,
       orgId,
@@ -69,7 +71,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       factorVerificationAge,
     };
     return { value };
-  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge]);
+  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge, sessionClaims?.__raw]);
+
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const organizationCtx = React.useMemo(() => {
