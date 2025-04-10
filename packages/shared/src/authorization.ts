@@ -21,6 +21,8 @@ type AuthorizationOptions = {
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
   factorVerificationAge: [number, number] | null;
+  features: string | null | undefined;
+  plans: string | null | undefined;
 };
 
 type CheckOrgAuthorization = (
@@ -149,20 +151,93 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
  * The returned function authorizes if both checks pass, or if at least one passes
  * when the other is indeterminate. Fails if userId is missing.
  */
+// const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
+//   return (params): boolean => {
+//     if (!options.userId) {
+//       return false;
+//     }
+
+//     const orgAuthorization = checkOrgAuthorization(params, options);
+//     const reverificationAuthorization = checkReverificationAuthorization(params, options);
+
+//     if ([orgAuthorization, reverificationAuthorization].some(a => a === null)) {
+//       return [orgAuthorization, reverificationAuthorization].some(a => a === true);
+//     }
+
+//     return [orgAuthorization, reverificationAuthorization].every(a => a === true);
+//   };
+// };
+
+const parseScope = (fea: string | null | undefined) => {
+  const features = fea ? fea.split(',').map(f => f.trim()) : [];
+
+  const featuresByScope = features
+    .map(feature => {
+      const [scope, id] = feature.split(':');
+      return { scope, id };
+    })
+    .reduce(
+      (acc, curr) => {
+        acc[curr.scope] = [...(acc[curr.scope] || []), curr.id];
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
+
+  // TODO: make this more efficient
+  return {
+    org: [...(featuresByScope['o'] || []), ...(featuresByScope['uo'] || [])],
+    user: [...(featuresByScope['u'] || []), ...(featuresByScope['uo'] || [])],
+  };
+};
+
 const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthorizationWithCustomPermissions => {
   return (params): boolean => {
     if (!options.userId) {
       return false;
     }
 
+    let commerceAuthorization: boolean | null = null;
+    const { reverification, ...restParams } = params;
+
+    if (restParams.feature) {
+      const [scope, id] = restParams.feature.split(':');
+      const { org: orgFeatures, user: userFeatures } = parseScope(options.features);
+      if (scope === 'org') {
+        commerceAuthorization = orgFeatures.includes(id);
+      } else if (scope === 'user') {
+        commerceAuthorization = userFeatures.includes(id);
+      } else {
+        if (options.orgId) {
+          commerceAuthorization = orgFeatures.includes(id);
+        } else {
+          commerceAuthorization = userFeatures.includes(id);
+        }
+      }
+    } else if (restParams.plan) {
+      const { org: orgPlans, user: userPlans } = parseScope(options.features);
+      const [scope, id] = restParams.plan.split(':');
+      if (scope === 'org') {
+        commerceAuthorization = orgPlans.includes(id);
+      } else if (scope === 'user') {
+        commerceAuthorization = userPlans.includes(id);
+      } else {
+        if (options.orgId) {
+          commerceAuthorization = orgPlans.includes(id);
+        } else {
+          commerceAuthorization = userPlans.includes(id);
+        }
+      }
+    }
+
     const orgAuthorization = checkOrgAuthorization(params, options);
     const reverificationAuthorization = checkReverificationAuthorization(params, options);
 
-    if ([orgAuthorization, reverificationAuthorization].some(a => a === null)) {
-      return [orgAuthorization, reverificationAuthorization].some(a => a === true);
+    if ([commerceAuthorization, orgAuthorization, reverificationAuthorization].some(a => a === null)) {
+      return [commerceAuthorization, orgAuthorization, reverificationAuthorization].some(a => a === true);
     }
 
-    return [orgAuthorization, reverificationAuthorization].every(a => a === true);
+    return [commerceAuthorization, orgAuthorization, reverificationAuthorization].every(a => a === true);
   };
 };
 
