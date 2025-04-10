@@ -58,7 +58,9 @@ type PasswordHasher =
   | 'phpass'
   | 'scrypt_firebase'
   | 'scrypt_werkzeug'
-  | 'sha256';
+  | 'sha256'
+  | 'md5_phpass'
+  | 'ldap_ssha';
 
 type UserPasswordHashingParams = {
   passwordDigest: string;
