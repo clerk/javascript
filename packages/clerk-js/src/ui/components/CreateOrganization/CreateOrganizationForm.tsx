@@ -194,7 +194,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
                 {...slugField.props}
                 onChange={onChangeSlug}
                 isRequired
-                pattern='^[a-z0-9\-]+$'
+                pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
                 ignorePasswordManager
               />
             </Form.ControlRow>
