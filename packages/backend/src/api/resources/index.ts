@@ -1,3 +1,4 @@
+export * from './ActorToken';
 export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
 export * from './Client';

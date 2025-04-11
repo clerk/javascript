@@ -36,3 +36,10 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+
+export const ActorTokenStatus = {
+  Pending: 'pending',
+  Accepted: 'accepted',
+  Revoked: 'revoked',
+} as const;
+export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorTokenStatus];
