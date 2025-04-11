@@ -15,6 +15,7 @@ import {
   SignInTokenAPI,
   TestingTokenAPI,
   UserAPI,
+  WaitlistEntryAPI,
 } from './endpoints';
 import { buildRequest } from './request';
 
@@ -44,5 +45,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     domains: new DomainAPI(request),
     samlConnections: new SamlConnectionAPI(request),
     testingTokens: new TestingTokenAPI(request),
+    waitlistEntries: new WaitlistEntryAPI(request),
   };
 }

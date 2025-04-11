@@ -15,3 +15,4 @@ export * from './SignInTokenApi';
 export * from './UserApi';
 export * from './SamlConnectionApi';
 export * from './TestingTokenApi';
+export * from './WaitlistEntryApi';
