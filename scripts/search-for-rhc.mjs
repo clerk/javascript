@@ -10,11 +10,12 @@ import { $, argv } from 'zx';
 const targetType = argv._[0]; // file | directory
 const target = argv._[1]; // Target of the resource
 
-async function asyncSearchRHC(name, search) {
+async function asyncSearchRHC(name, search, regex = false) {
+  const flag = regex ? 'E' : 'F';
   const cmd = () =>
     targetType === 'directory'
-      ? $`grep -rFq --include=\\*.js --include=\\*.mjs "${search}" ${target}`
-      : $`grep -Fq "${search}" ${target}`;
+      ? $`grep -${flag}q --include=\\*.js --include=\\*.mjs ${search} ${target}`
+      : $`grep -${flag}q ${search} ${target}`;
 
   if ((await cmd().exitCode) === 0) {
     throw new Error(`Found ${name} related RHC in build output. (Search: \`${search}\`)`);
@@ -28,6 +29,7 @@ await Promise.allSettled([
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
   asyncSearchRHC('Stripe', 'js.stripe.com'),
+  asyncSearchRHC('Stripe import', 'import\s*"@stripe/stripe-js', true), // eslint-disable-line no-useless-escape
 ]).then(results => {
   const errors = results.filter(result => result.status === 'rejected').map(result => result.reason.message);
 
