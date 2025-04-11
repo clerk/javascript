@@ -68,6 +68,10 @@ function getUnlinkedTypesReplacements() {
       pattern: /`LoadedClerk`/g,
       replace: '[Clerk](/docs/references/javascript/clerk)',
     },
+    {
+      pattern: /`OrganizationCustomRoleKey`/g,
+      replace: '[OrganizationCustomRoleKey](/docs/references/javascript/types/organization-custom-role-key)',
+    },
   ];
 }
 

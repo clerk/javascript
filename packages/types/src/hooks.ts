@@ -25,6 +25,9 @@ type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorization
  * @inline
  */
 export type UseAuthReturn =
+  /**
+   * During initialization
+   */
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -71,6 +74,9 @@ export type UseAuthReturn =
        */
       getToken: GetToken;
     }
+  /**
+   * When signed out
+   */
   | {
       isLoaded: true;
       isSignedIn: false;
@@ -84,6 +90,9 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
+  /**
+   * When signed in (no active organization)
+   */
   | {
       isLoaded: true;
       isSignedIn: true;
@@ -97,6 +106,9 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
+  /**
+   * When signed in (with active organization)
+   */
   | {
       isLoaded: true;
       isSignedIn: true;

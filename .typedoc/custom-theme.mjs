@@ -1,4 +1,5 @@
 // @ts-check
+import { ReflectionType, UnionType } from 'typedoc';
 import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 
 /**
@@ -127,6 +128,35 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           .join(delimiter);
 
         return `<code>${output}</code>`;
+      },
+      /**
+       * Copied from original theme.
+       * Changes:
+       * - Remove summaries over tables (TODO: Use elementSummaries instead)
+       * - Only use one newline between items
+       * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/7032ebd3679aead224cf23bffd0f3fb98443d16e/packages/typedoc-plugin-markdown/src/theme/context/partials/member.typeDeclarationUnionContainer.ts
+       * @param {import('typedoc').DeclarationReflection} model
+       * @param {{ headingLevel: number }} options
+       */
+      typeDeclarationUnionContainer: (model, options) => {
+        /**
+         * @type {string[]}
+         */
+        const md = [];
+        if (model.type instanceof UnionType) {
+          const elementSummaries = model.type?.elementSummaries;
+          model.type.types.forEach((type, i) => {
+            if (type instanceof ReflectionType) {
+              md.push(this.partials.typeDeclarationContainer(model, type.declaration, options));
+            } else {
+              md.push(`${this.partials.someType(type)}`);
+            }
+            if (elementSummaries?.[i]) {
+              md.push(this.helpers.getCommentParts(elementSummaries[i]));
+            }
+          });
+        }
+        return md.join('\n');
       },
     };
   }
