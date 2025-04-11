@@ -21,6 +21,7 @@ export * from './IdentificationLink';
 export * from './Invitation';
 export * from './JSON';
 export * from './OauthAccessToken';
+export * from './OauthApplication';
 export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';

@@ -7,6 +7,7 @@ export * from './EmailAddressApi';
 export * from './InvitationApi';
 export * from './JwksApi';
 export * from './OrganizationApi';
+export * from './OauthApplicationsApi';
 export * from './PhoneNumberApi';
 export * from './ProxyCheckApi';
 export * from './RedirectUrlApi';

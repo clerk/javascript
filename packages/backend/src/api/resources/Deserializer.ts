@@ -7,6 +7,7 @@ import {
   EmailAddress,
   Invitation,
   OauthAccessToken,
+  OauthApplication,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
@@ -84,6 +85,8 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
+    case ObjectType.OauthApplication:
+      return OauthApplication.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
     case ObjectType.OrganizationInvitation:
