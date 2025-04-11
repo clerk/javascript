@@ -76,7 +76,7 @@
     "h3": "^1.15.1"
   },
   "devDependencies": {
-    "nuxt": "^3.16.1",
+    "nuxt": "^3.16.2",
     "typescript": "catalog:repo"
   },
   "engines": {
