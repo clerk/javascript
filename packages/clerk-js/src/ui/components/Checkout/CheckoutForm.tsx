@@ -244,7 +244,7 @@ const PaymentSourceMethods = ({
       })}
     >
       <Select
-        elementId='role'
+        elementId='paymentSource'
         options={options}
         value={selectedPaymentSource?.id || null}
         onChange={option => {
