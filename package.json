@@ -54,13 +54,16 @@
     "version-packages:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm yalc push --replace --sig; cd '../../'; done"
   },
+  "dependencies": {
+    "@clerk/types": "^4.51.0"
+  },
   "devDependencies": {
     "@actions/core": "^1.11.1",
     "@arethetypeswrong/cli": "0.17.4",
     "@changesets/cli": "^2.28.1",
     "@changesets/get-github-info": "^0.6.0",
-    "@clerk/backend": "workspace:*",
-    "@clerk/shared": "workspace:*",
+    "@clerk/backend": "^1.27.0",
+    "@clerk/shared": "^3.4.0",
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@emotion/jest": "^11.13.0",

@@ -22,8 +22,6 @@ export const TokenVerificationErrorReason = {
   RemoteJWKMissing: 'jwk-remote-missing',
   JWKFailedToResolve: 'jwk-failed-to-resolve',
   JWKKidMismatch: 'jwk-kid-mismatch',
-  MachineTokenUsedForUserRequest: 'machine-token-used-for-user-request',
-  UserTokenUsedForMachineRequest: 'user-token-used-for-machine-request',
 };
 
 export type TokenVerificationErrorReason =
@@ -71,3 +69,30 @@ export class TokenVerificationError extends Error {
 }
 
 export class SignJWTError extends Error {}
+
+export const MachineTokenVerificationErrorCode = {
+  TokenInvalid: 'token-invalid',
+  InvalidSecretKey: 'secret-key-invalid',
+  UnexpectedError: 'unexpected-error',
+} as const;
+
+export type MachineTokenVerificationErrorCode =
+  (typeof MachineTokenVerificationErrorCode)[keyof typeof MachineTokenVerificationErrorCode];
+
+export class MachineTokenVerificationError extends Error {
+  code: MachineTokenVerificationErrorCode;
+  long_message?: string;
+  status: number;
+
+  constructor({ message, code, status }: { message: string; code: MachineTokenVerificationErrorCode; status: number }) {
+    super(message);
+    Object.setPrototypeOf(this, MachineTokenVerificationError.prototype);
+
+    this.code = code;
+    this.status = status;
+  }
+
+  public getFullMessage() {
+    return `${this.message} (code=${this.code}, status=${this.status})`;
+  }
+}

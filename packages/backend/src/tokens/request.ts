@@ -4,7 +4,7 @@ import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
-import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
+import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
@@ -724,11 +724,11 @@ ${error.getFullMessage()}`,
   }
 
   function handleMachineError(err: unknown): MachineUnauthenticatedState {
-    if (!(err instanceof TokenVerificationError)) {
+    if (!(err instanceof MachineTokenVerificationError)) {
       return machineUnauthenticated(AuthErrorReason.UnexpectedError);
     }
 
-    return machineUnauthenticated(err.reason, err.getFullMessage());
+    return machineUnauthenticated(err.code, err.getFullMessage());
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {

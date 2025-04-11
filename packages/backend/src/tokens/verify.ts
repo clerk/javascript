@@ -1,8 +1,15 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { JwtPayload } from '@clerk/types';
 
 import type { APIKey, MachineToken, OAuthApplicationToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
-import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
+import {
+  MachineTokenVerificationError,
+  MachineTokenVerificationErrorCode,
+  TokenVerificationError,
+  TokenVerificationErrorAction,
+  TokenVerificationErrorReason,
+} from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
@@ -56,42 +63,145 @@ export async function verifyToken(
   }
 }
 
+function handleUnexpectedMachineError(err: any): MachineTokenReturnType<any, MachineTokenVerificationError> {
+  return {
+    data: undefined,
+    errors: [
+      new MachineTokenVerificationError({
+        message: 'Unexpected error',
+        code: MachineTokenVerificationErrorCode.UnexpectedError,
+        status: err.status,
+      }),
+    ],
+  };
+}
+
 async function verifyMachineToken(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<MachineToken, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.m2mTokens.verifyMachineToken(secret);
     return { data: verifiedToken, errors: undefined };
-  } catch (err) {
-    return { data: undefined, errors: [err as TokenVerificationError] };
+  } catch (err: any) {
+    if (isClerkAPIResponseError(err)) {
+      let code: MachineTokenVerificationErrorCode;
+      let message: string;
+
+      switch (err.status) {
+        case 401:
+          code = MachineTokenVerificationErrorCode.InvalidSecretKey;
+          message = err.errors[0].message;
+          break;
+        case 404:
+          code = MachineTokenVerificationErrorCode.TokenInvalid;
+          message = 'Machine token not found';
+          break;
+        default:
+          code = MachineTokenVerificationErrorCode.UnexpectedError;
+          message = 'Unexpected error';
+      }
+
+      return {
+        data: undefined,
+        errors: [
+          new MachineTokenVerificationError({
+            message,
+            code,
+            status: err.status,
+          }),
+        ],
+      };
+    }
+
+    return handleUnexpectedMachineError(err);
   }
 }
 
 async function verifyOAuthToken(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<OAuthApplicationToken, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<OAuthApplicationToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.oAuthApplicationTokens.verifyToken(secret);
     return { data: verifiedToken, errors: undefined };
-  } catch (err) {
-    return { data: undefined, errors: [err as TokenVerificationError] };
+  } catch (err: any) {
+    if (isClerkAPIResponseError(err)) {
+      let code: MachineTokenVerificationErrorCode;
+      let message: string;
+
+      switch (err.status) {
+        case 401:
+          code = MachineTokenVerificationErrorCode.InvalidSecretKey;
+          message = err.errors[0].message;
+          break;
+        case 404:
+          code = MachineTokenVerificationErrorCode.TokenInvalid;
+          message = 'OAuth token not found';
+          break;
+        default:
+          code = MachineTokenVerificationErrorCode.UnexpectedError;
+          message = 'Unexpected error';
+      }
+
+      return {
+        data: undefined,
+        errors: [
+          new MachineTokenVerificationError({
+            message,
+            code,
+            status: err.status,
+          }),
+        ],
+      };
+    }
+
+    return handleUnexpectedMachineError(err);
   }
 }
 
 async function verifyAPIKey(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<APIKey, TokenVerificationError>> {
+): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.apiKeys.verifyApiKey(secret);
     return { data: verifiedToken, errors: undefined };
-  } catch (err) {
-    return { data: undefined, errors: [err as TokenVerificationError] };
+  } catch (err: any) {
+    if (isClerkAPIResponseError(err)) {
+      let code: MachineTokenVerificationErrorCode;
+      let message: string;
+
+      switch (err.status) {
+        case 401:
+          code = MachineTokenVerificationErrorCode.InvalidSecretKey;
+          message = err.errors[0].message;
+          break;
+        case 404:
+          code = MachineTokenVerificationErrorCode.TokenInvalid;
+          message = 'API key not found';
+          break;
+        default:
+          code = MachineTokenVerificationErrorCode.UnexpectedError;
+          message = 'Unexpected error';
+      }
+
+      return {
+        data: undefined,
+        errors: [
+          new MachineTokenVerificationError({
+            message,
+            code,
+            status: err.status,
+          }),
+        ],
+      };
+    }
+
+    return handleUnexpectedMachineError(err);
   }
 }
 
@@ -112,6 +222,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
     return verifyAPIKey(token, options);
   }
 
-  // TODO: This should be unreachable.
-  throw new Error('Unknown machine token type');
+  // TODO: Remove this later once API keys have prefix.
+  return verifyAPIKey(token, options);
+  // throw new Error('Unknown machine token type');
 }
