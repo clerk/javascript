@@ -12,13 +12,22 @@ import type {
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
+/**
+ * @inline
+ */
 type CheckAuthorizationSignedOut = undefined;
+/**
+ * @inline
+ */
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
  * @inline
  */
 export type UseAuthReturn =
+  /**
+   * During initialization
+   */
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -69,6 +78,9 @@ export type UseAuthReturn =
        */
       getToken: GetToken;
     }
+  /**
+   * When signed out
+   */
   | {
       isLoaded: true;
       isSignedIn: false;
@@ -83,6 +95,9 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
+  /**
+   * When signed in (no active organization)
+   */
   | {
       isLoaded: true;
       isSignedIn: true;
@@ -97,6 +112,9 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
+  /**
+   * When signed in (with active organization)
+   */
   | {
       isLoaded: true;
       isSignedIn: true;
@@ -227,7 +245,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }
