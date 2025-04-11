@@ -1,7 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
-  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
+  ClerkCustomFeatureKey,
+  ClerkCustomPlanKey,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -83,7 +84,7 @@ export type ProtectProps = React.PropsWithChildren<
         condition?: never;
         role?: never;
         permission?: never;
-        feature: Autocomplete<`user:${string}` | `org:${string}`>;
+        feature: ClerkCustomFeatureKey;
         plan?: never;
       }
     | {
@@ -91,7 +92,7 @@ export type ProtectProps = React.PropsWithChildren<
         role?: never;
         permission?: never;
         feature?: never;
-        plan: Autocomplete<`user:${string}` | `org:${string}`>;
+        plan: ClerkCustomPlanKey;
       }
     | {
         condition?: never;
