@@ -29,7 +29,7 @@ describe('FraudProtectionService', () => {
     );
 
     const mockClientInstance = {
-      sendCaptchaToken: jest.fn().mockResolvedValue({}),
+      __internal_sendCaptchaToken: jest.fn().mockResolvedValue({}),
     };
 
     mockClient = {
@@ -55,7 +55,7 @@ describe('FraudProtectionService', () => {
 
     // only one will need to call the captcha as the other will be blocked
     expect(mockManagedInModal).toHaveBeenCalledTimes(0);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(0);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(0);
     expect(fn1).toHaveBeenCalledTimes(1);
   });
 
@@ -68,7 +68,7 @@ describe('FraudProtectionService', () => {
     const fn1res = sut.execute(mockClerk, fn1);
     expect(fn1res).rejects.toEqual(unrelatedError);
     expect(mockManagedInModal).toHaveBeenCalledTimes(0);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(0);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(0);
     expect(fn1).toHaveBeenCalledTimes(1);
   });
 
@@ -88,7 +88,7 @@ describe('FraudProtectionService', () => {
 
     // only one will need to call the captcha as the other will be blocked
     expect(mockManagedInModal).toHaveBeenCalledTimes(1);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(1);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(1);
     expect(fn1).toHaveBeenCalledTimes(2);
   });
 
@@ -108,7 +108,7 @@ describe('FraudProtectionService', () => {
 
     // captcha will only be called once
     expect(mockManagedInModal).toHaveBeenCalledTimes(1);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(1);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(1);
     // but all failed requests will be retried
     expect(fn1).toHaveBeenCalledTimes(2);
     expect(fn2).toHaveBeenCalledTimes(2);
@@ -135,7 +135,7 @@ describe('FraudProtectionService', () => {
     await Promise.all([fn1res, fn2res]);
 
     expect(mockManagedInModal).toHaveBeenCalledTimes(1);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(1);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(1);
     expect(fn1).toHaveBeenCalledTimes(2);
     expect(fn2).toHaveBeenCalledTimes(1);
   });
@@ -168,7 +168,7 @@ describe('FraudProtectionService', () => {
     await Promise.all([fn2res, fn3res]);
 
     expect(mockManagedInModal).toHaveBeenCalledTimes(1);
-    expect(mockClient.getOrCreateInstance().sendCaptchaToken).toHaveBeenCalledTimes(1);
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(1);
 
     expect(fn1).toHaveBeenCalledTimes(2);
     expect(fn2).toHaveBeenCalledTimes(2);
