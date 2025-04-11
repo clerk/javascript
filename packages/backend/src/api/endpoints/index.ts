@@ -8,6 +8,7 @@ export * from './InvitationApi';
 export * from './JwksApi';
 export * from './OrganizationApi';
 export * from './PhoneNumberApi';
+export * from './ProxyCheckApi';
 export * from './RedirectUrlApi';
 export * from './SessionApi';
 export * from './SignInTokenApi';

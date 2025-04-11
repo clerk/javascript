@@ -11,6 +11,7 @@ import {
   OrganizationInvitation,
   OrganizationMembership,
   PhoneNumber,
+  ProxyCheck,
   RedirectUrl,
   Session,
   SignInToken,
@@ -91,6 +92,8 @@ function jsonToObject(item: any): any {
       return OrganizationMembership.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
+    case ObjectType.ProxyCheck:
+      return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
     case ObjectType.SignInToken:
