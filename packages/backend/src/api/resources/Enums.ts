@@ -36,3 +36,10 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+
+export const DomainsEnrollmentModes = {
+  ManualInvitation: 'manual_invitation',
+  AutomaticInvitation: 'automatic_invitation',
+  AutomaticSuggestion: 'automatic_suggestion',
+} as const;
+export type DomainsEnrollmentModes = (typeof DomainsEnrollmentModes)[keyof typeof DomainsEnrollmentModes];
