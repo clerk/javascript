@@ -119,7 +119,8 @@
     "pathMatcher",
     "organization",
     "jwtPayloadParser",
-    "eventBus"
+    "eventBus",
+    "clerkEventBus"
   ],
   "scripts": {
     "build": "tsup",

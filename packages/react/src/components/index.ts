@@ -14,6 +14,8 @@ export {
 export {
   ClerkLoaded,
   ClerkLoading,
+  ClerkDegraded,
+  ClerkFailed,
   SignedOut,
   SignedIn,
   Protect,

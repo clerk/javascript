@@ -5,6 +5,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/type-aliases/check-authorization-from-session-claims.mdx",
   "types/type-aliases/clerk-host-router.mdx",
   "types/type-aliases/clerk-pagination-request.mdx",
+  "types/type-aliases/clerk-status.mdx",
   "types/type-aliases/element-object-key.mdx",
   "types/type-aliases/elements-config.mdx",
   "types/type-aliases/id-selectors.mdx",

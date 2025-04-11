@@ -3,6 +3,8 @@
 exports[`public exports should not include a breaking change 1`] = `
 [
   "AuthenticateWithRedirectCallback",
+  "ClerkDegraded",
+  "ClerkFailed",
   "ClerkLoaded",
   "ClerkLoading",
   "ClerkProvider",

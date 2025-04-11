@@ -94,6 +94,19 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+type ClerkEvent = keyof ClerkEventPayload;
+type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
+export type ClerkEventPayload = {
+  status: ClerkStatus;
+};
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * @inline
+ */
+export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
+
 /**
  * Main Clerk SDK object.
  */
@@ -113,6 +126,15 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
+   */
+  status: ClerkStatus;
 
   /**
    * @internal
@@ -436,6 +458,22 @@ export interface Clerk {
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+
+  /**
+   * Registers an event handler for a specific Clerk event.
+   * @param event - The event name to subscribe to
+   * @param handler - The callback function to execute when the event is dispatched
+   * @param opt - Optional configuration object
+   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   */
+  on: OnEventListener;
+
+  /**
+   * Removes an event handler for a specific Clerk event.
+   * @param event - The event name to unsubscribe from
+   * @param handler - The callback function to remove
+   */
+  off: OffEventListener;
 
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.

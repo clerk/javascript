@@ -6,6 +6,8 @@ export {
   AuthenticateWithRedirectCallback,
   ClerkLoaded,
   ClerkLoading,
+  ClerkDegraded,
+  ClerkFailed,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
