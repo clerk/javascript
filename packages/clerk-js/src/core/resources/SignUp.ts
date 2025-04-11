@@ -85,8 +85,15 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
     let params: Record<string, unknown> = _params;
+    const shouldSkipCaptcha = params?.__internal_skipCaptcha;
+    delete params?.__internal_skipCaptcha;
 
-    if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
+    if (
+      !__BUILD_DISABLE_RHC__ &&
+      !this.clientBypass() &&
+      !this.shouldBypassCaptchaForAttempt(params) &&
+      !shouldSkipCaptcha
+    ) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
       const captchaParams = await captchaChallenge.managedOrInvisible({ action: 'signup' });
       if (!captchaParams) {
