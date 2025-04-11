@@ -30,6 +30,9 @@ type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
  * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
  * </If>
  *
+ * @unionReturnHeadings
+ * ["During initialization", "When signed out", "When signed in (no active organization)", "When signed in (with active organization)"]
+ *
  * @param [initialAuthStateOrOptions] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
  *
  * @function
