@@ -27,6 +27,8 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/localization-resource.mdx",
   "types/multi-domain-and-or-proxy.mdx",
   "types/organization-custom-role-key.mdx",
+  "types/organization-domain-verification-status.mdx",
+  "types/organization-enrollment-mode.mdx",
   "types/organization-invitation-status.mdx",
   "types/organization-permission-key.mdx",
   "types/organization-suggestion-status.mdx",
