@@ -8,6 +8,9 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 /**
  * The `useSignUp()` hook provides access to the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up/sign-up) object, which allows you to check the current state of a sign-up attempt and manage the sign-up flow. You can use this to create a [custom sign-up flow](https://clerk.com/docs/custom-flows/overview#sign-up-flow).
  *
+ * @unionReturnHeadings
+ * ["During initialization", "Once loaded"]
+ *
  * @example
  * ### Check the current state of a sign-up
  *

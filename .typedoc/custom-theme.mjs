@@ -132,7 +132,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       /**
        * Copied from original theme.
        * Changes:
-       * - Remove summaries over tables (TODO: Use elementSummaries instead)
+       * - Remove summaries over tables and instead use `@unionReturnHeadings` to add headings
        * - Only use one newline between items
        * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/7032ebd3679aead224cf23bffd0f3fb98443d16e/packages/typedoc-plugin-markdown/src/theme/context/partials/member.typeDeclarationUnionContainer.ts
        * @param {import('typedoc').DeclarationReflection} model
@@ -147,6 +147,16 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           const elementSummaries = model.type?.elementSummaries;
           model.type.types.forEach((type, i) => {
             if (type instanceof ReflectionType) {
+              const possibleUnionHeadings = model.comment?.getTag('@unionReturnHeadings');
+              if (possibleUnionHeadings) {
+                if (possibleUnionHeadings.content.length > 0) {
+                  const content = this.helpers.getCommentParts(possibleUnionHeadings.content);
+                  const unionHeadings = JSON.parse(content);
+
+                  md.push(heading(3, unionHeadings[i]));
+                }
+              }
+
               md.push(this.partials.typeDeclarationContainer(model, type.declaration, options));
             } else {
               md.push(`${this.partials.someType(type)}`);
@@ -160,4 +170,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
     };
   }
+}
+
+/**
+ * Returns a heading in markdown format
+ * @param {number} level The level of the heading
+ * @param {string} text The text of the heading
+ */
+function heading(level, text) {
+  level = level > 6 ? 6 : level;
+  return `${[...Array(level)].map(() => '#').join('')} ${text}`;
 }
