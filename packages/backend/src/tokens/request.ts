@@ -105,23 +105,22 @@ function isRequestEligibleForRefresh(
   );
 }
 
+// Overloads
 export async function authenticateRequest(
   request: Request,
-  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'machine' },
+  options: AuthenticateRequestOptions & { entity: 'machine' },
 ): Promise<MachineAuthenticatedState | MachineUnauthenticatedState>;
-
 export async function authenticateRequest(
   request: Request,
-  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'user' },
+  options: AuthenticateRequestOptions & { entity: 'user' },
 ): Promise<RequestState>;
-
 export async function authenticateRequest(
   request: Request,
-  options: Omit<AuthenticateRequestOptions, 'entity'> & { entity: 'any' },
+  options: AuthenticateRequestOptions & { entity: 'any' },
 ): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>;
-
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
 
+// Implementation
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
@@ -785,14 +784,6 @@ ${error.getFullMessage()}`,
   }
   return authenticateRequestWithTokenInCookie();
 }
-
-// async function C1APP(req: Request) {
-//   const requestState = await authenticateRequest(req, { entity: 'any' });
-
-//   if (requestState.isMachineAuthenticated) {
-
-//   }
-// }
 
 /**
  * @internal

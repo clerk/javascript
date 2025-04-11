@@ -1,7 +1,8 @@
 import type { ApiClient } from '../api';
+import type { MachineAuthenticatedState, MachineUnauthenticatedState, RequestState } from '../tokens/authStatus';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, Entity } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
 type BuildTimeOptions = Partial<
@@ -39,6 +40,16 @@ export type CreateAuthenticateRequestOptions = {
   apiClient: ApiClient;
 };
 
+// This generic allows the types to show up in autocomplete when used like clerkClient.authenticateRequest(request, { entity: 'machine' })
+// We also need to redefine the types here because they don't show up outside the factory and should match the function signature from request.ts
+type EntityTypeToState<T extends Entity> = T extends 'machine'
+  ? MachineUnauthenticatedState | MachineAuthenticatedState
+  : T extends 'user'
+    ? RequestState
+    : T extends 'any'
+      ? RequestState | MachineAuthenticatedState | MachineUnauthenticatedState
+      : RequestState;
+
 /**
  * @internal
  */
@@ -46,7 +57,21 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
-  const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
+  // No options case. Default to user entity.
+  function authenticateRequest(request: Request): Promise<RequestState>;
+  // With entity case
+  function authenticateRequest<T extends Entity>(
+    request: Request,
+    options: RunTimeOptions & { entity: T },
+  ): Promise<EntityTypeToState<T>>;
+  // With options but no entity case. Default to user entity.
+  function authenticateRequest(request: Request, options: RunTimeOptions): Promise<RequestState>;
+
+  // Implementation
+  function authenticateRequest(
+    request: Request,
+    options: RunTimeOptions = {},
+  ): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState> {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal(request, {
@@ -58,7 +83,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       apiClient,
     });
-  };
+  }
 
   return {
     authenticateRequest,
