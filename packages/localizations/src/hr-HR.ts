@@ -18,7 +18,7 @@ export const hrHR: LocalizationResource = {
     billedAnnually: undefined,
     free: undefined,
     getStarted: undefined,
-    manageMembership: undefined,
+    manageSubscription: undefined,
     month: undefined,
     switchPlan: undefined,
   },

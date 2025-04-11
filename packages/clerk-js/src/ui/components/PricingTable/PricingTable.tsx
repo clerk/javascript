@@ -20,7 +20,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   const { mode = 'mounted', subscriberType } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
-  const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
+  const { plans, revalidate } = usePlans({ subscriberType });
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
   const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
@@ -31,9 +31,9 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
     if (!clerk.isSignedIn) {
       void clerk.redirectToSignIn();
     }
-    const activeSubscription = subscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
-    if (activeSubscription) {
-      setDetailSubscription(activeSubscription);
+
+    if (plan.activeOrUpcomingSubscription && !plan.activeOrUpcomingSubscription.canceledAt) {
+      setDetailSubscription(plan.activeOrUpcomingSubscription);
       setShowSubscriptionDetailDrawer(true);
     } else {
       clerk.__internal_openCheckout({

@@ -305,32 +305,36 @@ export function PricingTableMatrix({
                         )}
                       </Flex>
                     </Box>
-                    <Box
-                      sx={t => ({
-                        width: '100%',
-                        marginBlockStart: 'auto',
-                        marginBlockEnd: t.space.$8,
-                        paddingBlockStart: t.space.$2,
-                        paddingBlockEnd: t.space.$4,
-                        paddingInline: t.space.$4,
-                      })}
-                    >
-                      <Button
-                        block
-                        variant='bordered'
-                        colorScheme={highlight ? 'primary' : 'secondary'}
-                        textVariant='buttonSmall'
-                        size='xs'
-                        onClick={() => {
-                          onSelect(plan);
-                        }}
-                        localizationKey={
-                          plan.subscriptionIdForCurrentSubscriber
-                            ? 'Manage'
-                            : localizationKeys('__experimental_commerce.getStarted')
-                        }
-                      />
-                    </Box>
+                    {!plan.isDefault ? (
+                      <Box
+                        sx={t => ({
+                          width: '100%',
+                          marginBlockStart: 'auto',
+                          marginBlockEnd: t.space.$8,
+                          paddingBlockStart: t.space.$2,
+                          paddingBlockEnd: t.space.$4,
+                          paddingInline: t.space.$4,
+                        })}
+                      >
+                        <Button
+                          block
+                          variant='bordered'
+                          colorScheme={highlight ? 'primary' : 'secondary'}
+                          textVariant='buttonSmall'
+                          size='xs'
+                          onClick={() => {
+                            onSelect(plan);
+                          }}
+                          localizationKey={
+                            plan.activeOrUpcomingSubscription?.status === 'active'
+                              ? plan.activeOrUpcomingSubscription?.canceledAt
+                                ? localizationKeys('__experimental_commerce.reSubscribe')
+                                : localizationKeys('__experimental_commerce.manageSubscription')
+                              : localizationKeys('__experimental_commerce.getStarted')
+                          }
+                        />
+                      </Box>
+                    ) : null}
                   </Box>
                 );
               })}

@@ -14,6 +14,7 @@ import {
   Badge,
   Box,
   Button,
+  Col,
   descriptors,
   Flex,
   Heading,
@@ -25,7 +26,7 @@ import {
 import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
 import { InformationCircle } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
-import { handleError } from '../../utils';
+import { formatDate, handleError } from '../../utils';
 
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
 
@@ -167,17 +168,38 @@ export function SubscriptionDetailDrawer({
           ) : null}
 
           <Drawer.Footer>
-            <Button
-              variant='bordered'
-              colorScheme='secondary'
-              size='sm'
-              textVariant='buttonLarge'
-              block
-              onClick={() => setShowConfirmation(true)}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Cancel Subscription
-            </Button>
+            <Col gap={2}>
+              {subscription.status === 'upcoming' ? (
+                <>
+                  <Heading
+                    elementDescriptor={descriptors.drawerConfirmationTitle}
+                    as='h2'
+                    textVariant='h3'
+                  >
+                    {/* TODO(@COMMERCE): needs localization */}
+                    Subscription starts {formatDate(new Date(subscription.periodStart), 'short')}
+                  </Heading>
+                  <Text
+                    elementDescriptor={descriptors.drawerConfirmationDescription}
+                    colorScheme='secondary'
+                  >
+                    {/* TODO(@COMMERCE): needs localization */}
+                    Your subscription to &ldquo;{subscription.plan.name}&rdquo; begins on{' '}
+                    {formatDate(new Date(subscription.periodStart))}. You have access to all your previous plan&rsquo;s
+                    features until then.
+                  </Text>
+                </>
+              ) : null}
+              <Button
+                variant='bordered'
+                colorScheme='secondary'
+                size='sm'
+                textVariant='buttonLarge'
+                block
+                onClick={() => setShowConfirmation(true)}
+                localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
+              />
+            </Col>
           </Drawer.Footer>
 
           <Drawer.Confirmation
@@ -194,10 +216,8 @@ export function SubscriptionDetailDrawer({
                       setCancelError(undefined);
                       setShowConfirmation(false);
                     }}
-                  >
-                    {/* TODO(@COMMERCE): needs localization */}
-                    Keep Subscription
-                  </Button>
+                    localizationKey={localizationKeys('__experimental_commerce.keepSubscription')}
+                  />
                 )}
                 <Button
                   variant='solid'
@@ -205,11 +225,13 @@ export function SubscriptionDetailDrawer({
                   size='sm'
                   textVariant='buttonLarge'
                   isLoading={isSubmitting}
-                  onClick={cancelSubscription}
-                >
-                  {/* TODO(@COMMERCE): needs localization */}
-                  Cancel Subscription
-                </Button>
+                  onClick={() => {
+                    setCancelError(undefined);
+                    setShowConfirmation(false);
+                    void cancelSubscription();
+                  }}
+                  localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
+                />
               </>
             }
           >
@@ -219,15 +241,22 @@ export function SubscriptionDetailDrawer({
               textVariant='h3'
             >
               {/* TODO(@COMMERCE): needs localization */}
-              Cancel {subscription.plan.name} Subscription?
+              Cancel {subscription.status === 'upcoming' ? 'upcoming ' : ''}
+              {subscription.plan.name} Subscription?
             </Heading>
             <Text
               elementDescriptor={descriptors.drawerConfirmationDescription}
               colorScheme='secondary'
             >
               {/* TODO(@COMMERCE): needs localization */}
-              You can keep using &ldquo;{subscription.plan.name}&rdquo; features until [DATE], after which you will no
-              longer have access.
+              {subscription.status === 'upcoming' ? (
+                <>You will not be charged for this subscription.</>
+              ) : (
+                <>
+                  You can keep using &ldquo;{subscription.plan.name}&rdquo; features until{' '}
+                  {formatDate(new Date(subscription.periodEnd))}, after which you will no longer have access.
+                </>
+              )}
             </Text>
             {cancelError && (
               // TODO(@COMMERCE): needs localization
@@ -254,13 +283,15 @@ interface HeaderProps {
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, planPeriod, closeSlot } = props;
-  const { name, avatarUrl, subscriptionIdForCurrentSubscriber, annualMonthlyAmount } = plan;
+  const { name, avatarUrl, activeOrUpcomingSubscription, isImplicitlyActive, annualMonthlyAmount } = plan;
   const getPlanFee = React.useMemo(() => {
     if (annualMonthlyAmount <= 0) {
       return plan.amountFormatted;
     }
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
+
+  const showBadge = !!activeOrUpcomingSubscription || isImplicitlyActive;
 
   return (
     <Box
@@ -271,7 +302,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         padding: t.space.$4,
       })}
     >
-      {avatarUrl || !!subscriptionIdForCurrentSubscriber || closeSlot ? (
+      {avatarUrl || showBadge || closeSlot ? (
         <Box
           elementDescriptor={descriptors.subscriptionDetailAvatarBadgeContainer}
           sx={t => ({
@@ -281,7 +312,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: t.space.$3,
-            float: !avatarUrl && !subscriptionIdForCurrentSubscriber ? 'right' : undefined,
+            float: !avatarUrl && !showBadge ? 'right' : undefined,
           })}
         >
           {avatarUrl ? (
@@ -296,18 +327,28 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           ) : null}
           <ReversibleContainer reverse={!avatarUrl}>
             {closeSlot}
-            {subscriptionIdForCurrentSubscriber ? (
+            {showBadge ? (
               <Span
                 elementDescriptor={descriptors.subscriptionDetailBadgeContainer}
                 sx={{
                   flexBasis: closeSlot && avatarUrl ? '100%' : undefined,
                 }}
               >
-                <Badge
-                  elementDescriptor={descriptors.subscriptionDetailBadge}
-                  localizationKey={localizationKeys('badge__currentPlan')}
-                  colorScheme='secondary'
-                />
+                {isImplicitlyActive || activeOrUpcomingSubscription?.status === 'active' ? (
+                  <Badge
+                    elementDescriptor={descriptors.pricingTableCardBadge}
+                    localizationKey={localizationKeys('badge__currentPlan')}
+                    colorScheme={'primary'}
+                  />
+                ) : (
+                  <Badge
+                    elementDescriptor={descriptors.pricingTableCardBadge}
+                    localizationKey={localizationKeys('badge__startsAt', {
+                      date: activeOrUpcomingSubscription?.periodStart,
+                    })}
+                    colorScheme={'secondary'}
+                  />
+                )}
               </Span>
             ) : null}
           </ReversibleContainer>

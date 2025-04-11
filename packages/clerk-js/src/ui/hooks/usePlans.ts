@@ -31,10 +31,9 @@ export const usePlans = (props: UsePlansProps) => {
     }
     return (
       allPlans?.map(plan => {
-        const activeSubscription = subscriptions.data.find(sub => {
-          return sub.plan.id === plan.id && sub.status === 'active';
-        });
-        plan.subscriptionIdForCurrentSubscriber = activeSubscription?.id;
+        const activeOrUpcomingSubscription = subscriptions.data.find(sub => sub.plan.id === plan.id);
+        plan.activeOrUpcomingSubscription = activeOrUpcomingSubscription;
+        plan.isImplicitlyActive = plan.isDefault && subscriptions.total_count === 0;
         return plan;
       }) || []
     );

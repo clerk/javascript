@@ -11,11 +11,13 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { usePlans } from '../../hooks';
 import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
 
 export const OrganizationBillingPage = withCardStateProvider(() => {
   const card = useCardState();
+  const { subscriptions } = usePlans({ subscriberType: 'org' });
 
   return (
     <Col
@@ -39,7 +41,11 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
         <Tabs>
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')}
+              localizationKey={
+                subscriptions.length > 0
+                  ? localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__subscriptions')
+                  : localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')
+              }
             />
             <Tab
               localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
