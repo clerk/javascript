@@ -115,6 +115,10 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     );
   }
 
+  if (__BUILD_DISABLE_RHC__) {
+    return null;
+  }
+
   return (
     <Elements
       stripe={stripe}
