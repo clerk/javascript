@@ -2,6 +2,7 @@ import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   PendingSessionOptions,
@@ -170,6 +171,7 @@ type AuthStateOptions = {
     userId?: string | null;
     sessionId?: string | null;
     sessionStatus?: SessionStatusClaim | null;
+    sessionClaims?: JwtPayload | null;
     actor?: ActClaim | null;
     orgId?: string | null;
     orgRole?: OrganizationCustomRoleKey | null;
@@ -188,7 +190,19 @@ type AuthStateOptions = {
  * @internal
  */
 const resolveAuthState = ({
-  authObject: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
+  authObject: {
+    sessionId,
+    sessionStatus,
+    userId,
+    actor,
+    orgId,
+    orgRole,
+    orgSlug,
+    signOut,
+    getToken,
+    has,
+    sessionClaims,
+  },
   options: { treatPendingAsSignedOut = true },
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
@@ -196,6 +210,7 @@ const resolveAuthState = ({
       isLoaded: false,
       isSignedIn: undefined,
       sessionId,
+      sessionClaims: undefined,
       userId,
       actor: undefined,
       orgId: undefined,
@@ -213,6 +228,7 @@ const resolveAuthState = ({
       isSignedIn: false,
       sessionId,
       userId,
+      sessionClaims: null,
       actor: null,
       orgId: null,
       orgRole: null,
@@ -229,6 +245,7 @@ const resolveAuthState = ({
       isSignedIn: false,
       sessionId: null,
       userId: null,
+      sessionClaims: null,
       actor: null,
       orgId: null,
       orgRole: null,
@@ -239,11 +256,12 @@ const resolveAuthState = ({
     } as const;
   }
 
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+  if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId,
@@ -255,11 +273,12 @@ const resolveAuthState = ({
     } as const;
   }
 
-  if (!!sessionId && !!userId && !orgId) {
+  if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId: null,

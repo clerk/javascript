@@ -381,6 +381,15 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
+    /**
+     * Listen to `Session.getToken` resolving to emit the updated session
+     * with the new token to the state listeners.
+     */
+    eventBus.on(events.SessionTokenResolved, () => {
+      this.#setAccessors(this.session);
+      this.#emit();
+    });
+
     assertNoLegacyProp(this.#options);
 
     if (this.#options.sdkMetadata) {
@@ -431,9 +440,9 @@ export class Clerk implements ClerkInterface {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out.
-      eventBus.dispatch(events.UserSignOut, null);
+      eventBus.emit(events.UserSignOut, null);
       // Clean up cookies
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -1033,7 +1042,7 @@ export class Clerk implements ClerkInterface {
       }
 
       if (session?.lastActiveToken) {
-        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+        eventBus.emit(events.TokenUpdate, { token: session.lastActiveToken });
       }
 
       /**
@@ -1053,7 +1062,7 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
-        eventBus.dispatch(events.TokenUpdate, { token: null });
+        eventBus.emit(events.TokenUpdate, { token: null });
       }
 
       //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
@@ -1120,7 +1129,7 @@ export class Clerk implements ClerkInterface {
     // has expired, it needs to trigger a sign-out
     const token = await session.getToken();
     if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
     }
 
     // Only triggers navigation for internal routing, in order to not affect custom flows
@@ -1765,7 +1774,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        eventBus.dispatch(events.UserSignOut, null);
+        eventBus.emit(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -1984,7 +1993,7 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
-      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
+      eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();

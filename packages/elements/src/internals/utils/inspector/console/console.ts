@@ -1,4 +1,4 @@
-import type { AnyActorRef, AnyEventObject, InspectionEvent, Observer } from 'xstate';
+import type { ActorRefLike, AnyEventObject, InspectionEvent, Observer } from 'xstate';
 
 let consoleInspector: Observer<InspectionEvent> | undefined;
 
@@ -24,17 +24,19 @@ export function createConsoleInspector({
     return undefined;
   }
 
-  const parseRefId = (ref: AnyActorRef | undefined, includeSystemId?: false): string | undefined => {
+  const parseRefId = (ref: ActorRefLike | undefined, includeSystemId?: false): string | undefined => {
     if (!ref) {
       return undefined;
     }
 
     // @ts-expect-error - Exists on the ref.src
-    const id = ref.src.id;
+    const id = ref.src?.id;
 
+    // @ts-expect-error - id exists on ActorRefLike
     let output = id || ref.id;
 
     if (includeSystemId) {
+      // @ts-expect-error - id exists on ActorRefLike
       output += `(${ref.id})`;
     }
 
@@ -152,6 +154,7 @@ export function createConsoleInspector({
           },
           () => {
             logEvent('Type', inspectionEvent.event.type);
+            // @ts-expect-error - _parent exists on ActorRefLike
             logEvent('Parent', parseRefId(inspectionEvent.actorRef._parent));
             logEvent('Actor', inspectionEvent.actorRef);
             logEvent('Event', inspectionEvent.event);

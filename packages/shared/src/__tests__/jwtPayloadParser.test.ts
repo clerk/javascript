@@ -1,4 +1,7 @@
-import { __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties } from '../jwtPayloadParser';
+import {
+  __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties,
+  parseFeatures,
+} from '../jwtPayloadParser';
 
 const baseClaims = {
   exp: 1234567890,
@@ -162,5 +165,59 @@ describe('JWTPayloadToAuthObjectProperties', () => {
     });
 
     expect(signedInAuthObject.orgRole).toBe('org:admin');
+  });
+
+  test('org permissions are constructed correctly', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'ou:memberships,u:impersonation',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'read,manage',
+        fpm: '3',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      ['org:memberships:read', 'org:memberships:manage'].sort(),
+    );
+  });
+});
+
+describe('parseFeatures ', () => {
+  test('returns empty array when no features are present', () => {
+    const { orgFeatures } = parseFeatures('');
+    expect(orgFeatures).toEqual([]);
+  });
+
+  test('only org features included', () => {
+    const { orgFeatures, userFeatures } = parseFeatures('o:impersonation,o:payments');
+    expect(orgFeatures).toEqual(['impersonation', 'payments']);
+
+    expect(userFeatures).toEqual([]);
+  });
+
+  test('only user features included', () => {
+    const { orgFeatures, userFeatures } = parseFeatures('u:impersonation,u:payments');
+    expect(orgFeatures).toEqual([]);
+
+    expect(userFeatures).toEqual(['impersonation', 'payments']);
+  });
+
+  test('both org and user features included', () => {
+    const { orgFeatures, userFeatures } = parseFeatures('o:payments,u:impersonation');
+    expect(orgFeatures).toEqual(['payments']);
+
+    expect(userFeatures).toEqual(['impersonation']);
+  });
+
+  test('features have multiple scopes', () => {
+    const { orgFeatures, userFeatures } = parseFeatures('ou:payments,u:impersonation');
+    expect(orgFeatures).toEqual(['payments']);
+
+    expect(userFeatures).toEqual(['payments', 'impersonation']);
   });
 });

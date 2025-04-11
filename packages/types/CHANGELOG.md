@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.53.0
+
+### Minor Changes
+
+- Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
+
+  - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
+
 ## 4.52.0
 
 ### Minor Changes

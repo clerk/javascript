@@ -27,6 +27,9 @@ import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
+/**
+ * @inline
+ */
 export type PendingSessionOptions = {
   /**
    * Determines if pending sessions are considered as signed-out state.
@@ -39,8 +42,10 @@ type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSyst
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
+/** @inline */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
+/** @inline */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
@@ -243,6 +248,9 @@ export type GetTokenOptions = {
   leewayInSeconds?: number;
   skipCache?: boolean;
 };
+/**
+ * @inline
+ */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
 export type SessionVerifyCreateParams = {

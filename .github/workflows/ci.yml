@@ -141,7 +141,7 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Run tests
+      - name: Run tests in packages
         run: |
           if [ "${{ matrix.node-version }}" == "18" ]; then
             echo "Running tests on Node 18 only for packages with LTS support."
@@ -149,6 +149,15 @@ jobs:
           else
             echo "Running tests for all packages on Node 22."
             pnpm turbo test $TURBO_ARGS
+          fi
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Run Typedoc tests
+        run: |
+          # Only run Typedoc tests for one matrix version
+          if [ "${{ matrix.node-version }}" == "22" ]; then
+            pnpm test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}

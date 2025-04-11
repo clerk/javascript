@@ -1,5 +1,8 @@
 import type { ClerkResource } from './resource';
 
+/**
+ * @inline
+ */
 export type OrganizationSuggestionStatus = 'pending' | 'accepted';
 
 export interface OrganizationSuggestionResource extends ClerkResource {

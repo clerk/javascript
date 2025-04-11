@@ -169,7 +169,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -500,7 +500,7 @@ describe('Clerk singleton', () => {
       let eventBusSpy;
 
       beforeEach(() => {
-        eventBusSpy = jest.spyOn(eventBus, 'dispatch');
+        eventBusSpy = jest.spyOn(eventBus, 'emit');
       });
 
       afterEach(() => {
@@ -596,7 +596,7 @@ describe('Clerk singleton', () => {
             jwt: {},
             getRawString: () => 'updated-jwt',
           } as TokenResource;
-          eventBus.dispatch(events.TokenUpdate, { token });
+          eventBus.emit(events.TokenUpdate, { token });
 
           expect(document.cookie).toContain('updated-jwt');
         });

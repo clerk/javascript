@@ -27,7 +27,7 @@ await Promise.allSettled([
   asyncSearchRHC('Turnstile', 'cloudflare.com/turnstile/v0/api.js'),
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
-  asyncSearchRHC('Stripe', 'loadStripe('),
+  asyncSearchRHC('Stripe', 'js.stripe.com'),
 ]).then(results => {
   const errors = results.filter(result => result.status === 'rejected').map(result => result.reason.message);
 
