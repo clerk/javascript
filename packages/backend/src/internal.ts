@@ -13,7 +13,13 @@ export type { SignedInAuthObjectOptions, SignedInAuthObject, SignedOutAuthObject
 export { makeAuthObjectSerializable, signedOutAuthObject, signedInAuthObject } from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';
-export type { RequestState, SignedInState, SignedOutState } from './tokens/authStatus';
+export type {
+  RequestState,
+  SignedInState,
+  SignedOutState,
+  MachineAuthenticatedState,
+  MachineUnauthenticatedState,
+} from './tokens/authStatus';
 
 export { decorateObjectWithResources, stripPrivateDataFromObject } from './util/decorateObjectWithResources';
 

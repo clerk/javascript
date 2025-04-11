@@ -15,7 +15,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { Entity, MachineAuthType } from './types';
+import type { MachineAuthType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -26,10 +26,6 @@ export const AuthStatus = {
 } as const;
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
-
-export type ToAuthOptions = {
-  entity: Entity;
-};
 
 export type SignedInState = {
   status: typeof AuthStatus.SignedIn;
@@ -44,7 +40,7 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  toAuth: (options?: ToAuthOptions) => SignedInAuthObject;
+  toAuth: () => SignedInAuthObject;
   headers: Headers;
   token: string;
 };
@@ -62,7 +58,7 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  toAuth: (options?: ToAuthOptions) => SignedOutAuthObject;
+  toAuth: () => SignedOutAuthObject;
   headers: Headers;
   token: null;
 };
@@ -72,7 +68,7 @@ export type MachineAuthenticatedState = {
   reason: null;
   message: null;
   isMachineAuthenticated: true;
-  toAuth: (options?: ToAuthOptions) => AuthenticatedMachineObject;
+  toAuth: () => AuthenticatedMachineObject;
   headers: Headers;
   token: string;
 };
@@ -82,7 +78,7 @@ export type MachineUnauthenticatedState = {
   message: string;
   reason: AuthReason;
   isMachineAuthenticated: false;
-  toAuth: (options?: ToAuthOptions) => UnauthenticatedMachineObject;
+  toAuth: () => UnauthenticatedMachineObject;
   token: null;
   headers: Headers;
 };
@@ -114,12 +110,7 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState =
-  | SignedInState
-  | SignedOutState
-  | HandshakeState
-  | MachineAuthenticatedState
-  | MachineUnauthenticatedState;
+export type RequestState = SignedInState | SignedOutState | HandshakeState;
 
 export function signedIn(
   authenticateContext: AuthenticateContext,
@@ -230,7 +221,9 @@ export function machineUnauthenticated(
   });
 }
 
-const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+const withDebugHeaders = <T extends RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>(
+  requestState: T,
+): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {
@@ -261,3 +254,15 @@ const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
 
   return requestState;
 };
+
+export function isMachineRequest(
+  state: RequestState | MachineAuthenticatedState | MachineUnauthenticatedState,
+): state is MachineAuthenticatedState | MachineUnauthenticatedState {
+  return ['machine-authenticated', 'machine-unauthenticated'].includes(state.status);
+}
+
+export function isUserRequest(
+  state: RequestState | MachineAuthenticatedState | MachineUnauthenticatedState,
+): state is RequestState {
+  return ['signed-in', 'signed-out', 'handshake'].includes(state.status);
+}
