@@ -157,8 +157,6 @@ jobs:
         run: |
           # Only run Typedoc tests for one matrix version
           if [ "${{ matrix.node-version }}" == "22" ]; then
-            pnpm build:declarations
-            pnpm typedoc:generate
             pnpm test:typedoc
           fi
         env:
