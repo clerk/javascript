@@ -1,7 +1,4 @@
-import {
-  __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties,
-  parseFeatures,
-} from '../jwtPayloadParser';
+import { __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties } from '../jwtPayloadParser';
 
 const baseClaims = {
   exp: 1234567890,
@@ -187,35 +184,35 @@ describe('JWTPayloadToAuthObjectProperties', () => {
   });
 });
 
-describe('parseFeatures ', () => {
+describe('splitByScope ', () => {
   test('returns empty array when no features are present', () => {
-    const { orgFeatures } = parseFeatures('');
+    const { orgFeatures } = splitByScope('');
     expect(orgFeatures).toEqual([]);
   });
 
   test('only org features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:impersonation,o:payments');
+    const { orgFeatures, userFeatures } = splitByScope('o:impersonation,o:payments');
     expect(orgFeatures).toEqual(['impersonation', 'payments']);
 
     expect(userFeatures).toEqual([]);
   });
 
   test('only user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('u:impersonation,u:payments');
+    const { orgFeatures, userFeatures } = splitByScope('u:impersonation,u:payments');
     expect(orgFeatures).toEqual([]);
 
     expect(userFeatures).toEqual(['impersonation', 'payments']);
   });
 
   test('both org and user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:payments,u:impersonation');
+    const { orgFeatures, userFeatures } = splitByScope('o:payments,u:impersonation');
     expect(orgFeatures).toEqual(['payments']);
 
     expect(userFeatures).toEqual(['impersonation']);
   });
 
   test('features have multiple scopes', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('ou:payments,u:impersonation');
+    const { orgFeatures, userFeatures } = splitByScope('ou:payments,u:impersonation');
     expect(orgFeatures).toEqual(['payments']);
 
     expect(userFeatures).toEqual(['payments', 'impersonation']);
