@@ -2,7 +2,7 @@
 '@clerk/backend': minor
 ---
 
-Adds the ability to list and create waitlist entries to the Backend API client.
+Adds the ability to perform CRUD operations on JWT Templates to the Backend API client.
 
 
 ```ts
