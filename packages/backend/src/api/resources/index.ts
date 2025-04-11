@@ -25,6 +25,7 @@ export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
 export * from './PhoneNumber';
+export * from './ProxyCheck';
 export * from './RedirectUrl';
 export * from './Session';
 export * from './SignInTokens';
