@@ -209,11 +209,11 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
     const orgAuthorization = checkOrgAuthorization(params, options);
     const reverificationAuthorization = checkReverificationAuthorization(params, options);
 
-    if ([billingAuthorization, orgAuthorization, reverificationAuthorization].some(a => a === null)) {
-      return [billingAuthorization, orgAuthorization, reverificationAuthorization].some(a => a === true);
+    if ([billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === null)) {
+      return [billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === true);
     }
 
-    return [billingAuthorization, orgAuthorization, reverificationAuthorization].every(a => a === true);
+    return [billingAuthorization || orgAuthorization, reverificationAuthorization].every(a => a === true);
   };
 };
 
