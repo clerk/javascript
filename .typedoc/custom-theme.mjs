@@ -147,6 +147,16 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           const elementSummaries = model.type?.elementSummaries;
           model.type.types.forEach((type, i) => {
             if (type instanceof ReflectionType) {
+              const possibleUnionHeadings = model.comment?.getTag('@unionReturnHeadings');
+              if (possibleUnionHeadings) {
+                if (possibleUnionHeadings.content.length > 0) {
+                  const content = this.helpers.getCommentParts(possibleUnionHeadings.content);
+                  const unionHeadings = JSON.parse(content);
+
+                  md.push(heading(3, unionHeadings[i]));
+                }
+              }
+
               md.push(this.partials.typeDeclarationContainer(model, type.declaration, options));
             } else {
               md.push(`${this.partials.someType(type)}`);
@@ -160,4 +170,14 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
     };
   }
+}
+
+/**
+ * Returns a heading in markdown format
+ * @param {number} level The level of the heading
+ * @param {string} text The text of the heading
+ */
+function heading(level, text) {
+  level = level > 6 ? 6 : level;
+  return `${[...Array(level)].map(() => '#').join('')} ${text}`;
 }
