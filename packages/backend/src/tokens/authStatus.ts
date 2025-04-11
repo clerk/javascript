@@ -15,7 +15,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { MachineAuthType } from './types';
+import type { Entity, MachineAuthType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -26,6 +26,10 @@ export const AuthStatus = {
 } as const;
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
+
+export type ToAuthOptions = {
+  entity: Entity;
+};
 
 export type SignedInState = {
   status: typeof AuthStatus.SignedIn;
@@ -40,7 +44,7 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  toAuth: () => SignedInAuthObject;
+  toAuth: (options?: ToAuthOptions) => SignedInAuthObject;
   headers: Headers;
   token: string;
 };
@@ -58,7 +62,7 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  toAuth: () => SignedOutAuthObject;
+  toAuth: (options?: ToAuthOptions) => SignedOutAuthObject;
   headers: Headers;
   token: null;
 };
@@ -68,7 +72,7 @@ export type MachineAuthenticatedState = {
   reason: null;
   message: null;
   isMachineAuthenticated: true;
-  toAuth: () => AuthenticatedMachineObject;
+  toAuth: (options?: ToAuthOptions) => AuthenticatedMachineObject;
   headers: Headers;
   token: string;
 };
@@ -78,7 +82,7 @@ export type MachineUnauthenticatedState = {
   message: string;
   reason: AuthReason;
   isMachineAuthenticated: false;
-  toAuth: () => UnauthenticatedMachineObject;
+  toAuth: (options?: ToAuthOptions) => UnauthenticatedMachineObject;
   token: null;
   headers: Headers;
 };

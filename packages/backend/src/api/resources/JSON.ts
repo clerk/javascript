@@ -486,6 +486,7 @@ export interface MachineTokenJSON {
   id: string;
   name: string;
   subject: string;
+  claims: Record<string, string> | null;
   creation_reason?: string | null;
   created_by: string | null;
   seconds_until_expiration: number;

@@ -786,6 +786,14 @@ ${error.getFullMessage()}`,
   return authenticateRequestWithTokenInCookie();
 }
 
+// async function C1APP(req: Request) {
+//   const requestState = await authenticateRequest(req, { entity: 'any' });
+
+//   if (requestState.isMachineAuthenticated) {
+
+//   }
+// }
+
 /**
  * @internal
  */

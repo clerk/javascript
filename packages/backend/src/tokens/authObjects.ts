@@ -11,7 +11,7 @@ import type {
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
-import { createBackendApiClient } from '../api';
+import { APIKey, createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineAuthType } from './types';
 
@@ -87,7 +87,7 @@ export type SignedOutAuthObject = {
 export type AuthenticatedMachineObject = {
   isMachine: true;
   userId: string | null;
-  claims: Record<string, string>;
+  claims: Record<string, string> | null;
   entity: 'machine';
   machineId: string | null;
   has: CheckAuthorizationFromSessionClaims;
@@ -220,12 +220,10 @@ export function authenticatedMachineObject(
 ): AuthenticatedMachineObject {
   return {
     isMachine: true,
-    // @ts-expect-error: Fix this. Machine token doesn't have claims.
-    claims: verificationResult?.claims ?? null,
+    claims: verificationResult.claims,
     entity: 'machine',
     machineId: verificationResult.id,
-    // @ts-expect-error: Fix this. OAuth token doesn't have created_by.
-    userId: verificationResult.createdBy,
+    userId: verificationResult instanceof APIKey ? verificationResult.createdBy : null,
     getToken: () => machineToken,
     has: () => false,
     debug: createDebug(debugData),
