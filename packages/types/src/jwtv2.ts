@@ -140,6 +140,11 @@ export type VersionedJwtPayload =
       fea?: string;
 
       /**
+       * Plans for session.
+       */
+      pla?: string;
+
+      /**
        * @experimental - This structure is subject to change.
        *
        * Active organization information.

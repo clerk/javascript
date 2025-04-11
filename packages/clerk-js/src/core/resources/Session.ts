@@ -115,6 +115,8 @@ export class Session extends BaseResource implements SessionResource {
       orgId: activeMembership?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
+      features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
+      plans: (this.lastActiveToken?.jwt?.claims.pla as string) || '',
     })(params);
   };
 
