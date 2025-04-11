@@ -847,6 +847,22 @@ export type ClerkOptions = PendingSessionOptions &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        /**
+         * The name of the CSS layer to use for Clerk components.
+         * @example
+         * ```tsx
+         * <ClerkProvider cssLayerName="components">
+         *   <App />
+         * </ClerkProvider>
+         * ```
+         * This will wrap all Clerk styles in a `components` CSS layer to work with tools like Tailwind CSS V4.
+         *```css
+         * @layer components {
+         *   ... clerk styles ...
+         * }
+         *```
+         */
+        cssLayerName?: string;
       },
       Record<string, any>
     >;
