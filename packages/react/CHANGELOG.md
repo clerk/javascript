@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.27.1
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc)]:
+  - @clerk/shared@3.6.1
+  - @clerk/types@4.53.1
+
 ## 5.27.0
 
 ### Minor Changes

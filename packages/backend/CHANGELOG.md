@@ -1,5 +1,76 @@
 # Change Log
 
+## 1.28.0
+
+### Minor Changes
+
+- Adds the ability to grab an instance's JWKS to the Backend API client. ([#5588](https://github.com/clerk/javascript/pull/5588)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.jwks.getJWKS();
+  ```
+
+- Adds the ability to create an active session to the Backend API client. ([#5592](https://github.com/clerk/javascript/pull/5592)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.sessions.createSession({
+      userId: 'user_xxxxxx',
+    });
+  ```
+
+### Patch Changes
+
+- Add support for phpass_md5 and ldap_ssha hashers ([#5583](https://github.com/clerk/javascript/pull/5583)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Adds the ability to verify proxy checks to the Backend API client. ([#5589](https://github.com/clerk/javascript/pull/5589)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.proxyChecks.verify({
+      domainId: 'dmn_xxxxxx',
+      proxyUrl: 'https://[your-domain].com'
+    });
+  ```
+
+- Adds the following User-centric functionality to the Backend API client. ([#5593](https://github.com/clerk/javascript/pull/5593)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.users.getOrganizationInvitationList({
+      userId: 'user_xxxxxx',
+      status: 'pending',
+    });
+    await clerkClient.users.deleteUserPasskey({
+      userId: 'user_xxxxxx',
+      passkeyIdentificationId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserWeb3Wallet({
+      userId: 'user_xxxxxx',
+      web3WalletIdentificationId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserExternalAccount({
+      userId: 'user_xxxxxx',
+      externalAccountId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserBackupCodes('user_xxxxxx');
+    await clerkClient.users.deleteUserTOTP('user_xxxxxx');
+  ```
+
+- Updated dependencies [[`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc)]:
+  - @clerk/shared@3.6.1
+  - @clerk/types@4.53.1
+
 ## 1.27.3
 
 ### Patch Changes
