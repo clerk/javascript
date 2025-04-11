@@ -124,7 +124,8 @@ export type TSignUpRouterParentMachine = StateMachine<
   any, // input
   SignUpRouterOuptut, // output
   any, // emitted
-  any // meta - Introduced in XState 5.12.x
+  any, // meta - Introduced in XState 5.12.x
+  any // config - Required in newer XState versions
 >;
 
 // ---------------------------------- Machine Actor Ref ---------------------------------- //

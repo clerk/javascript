@@ -58,6 +58,7 @@ test.describe('root and subdomain production apps @manual-run', () => {
       fakeUsers.push(fakeUser);
       await u.services.users.createBapiUser(fakeUser);
 
+      await u.po.testingToken.setup();
       await u.page.goto(`https://${host}`);
       await u.po.signIn.goTo({ timeout: 30000 });
       await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);

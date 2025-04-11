@@ -1,5 +1,75 @@
 # Change Log
 
+## 3.6.0
+
+### Minor Changes
+
+- Export `createEventBus` from `@clerk/shared/eventBus`. ([#5546](https://github.com/clerk/javascript/pull/5546)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```ts
+  // Create a type-safe event bus
+  const bus = createEventBus<{
+    'user:login': { id: string };
+    error: Error;
+  }>();
+
+  // Subscribe to events
+  const onLogin = ({ id }: { id: string }) => console.log('User logged in:', id);
+  bus.on('user:login', onLogin);
+
+  // Subscribe with priority (runs before regular handlers)
+  bus.onBefore('error', error => console.error('Error occurred:', error));
+
+  // Emit events
+  bus.emit('user:login', { id: 'user_123' });
+
+  // Unsubscribe specific handler
+  bus.off('user:login', onLogin);
+
+  // Unsubscribe all handlers
+  bus.off('error');
+  ```
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5575](https://github.com/clerk/javascript/pull/5575)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix JWT v2 feature parsing ([#5580](https://github.com/clerk/javascript/pull/5580)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5)]:
+  - @clerk/types@4.53.0
+
+## 3.5.0
+
+### Minor Changes
+
+- Adding the new `o` claim that contains all organization related info for JWT v2 schema ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add Payment Sources to `<OrgProfile />`, hook up all org-related payment source and checkout methods to the org-specific endpoints ([#5554](https://github.com/clerk/javascript/pull/5554)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/types@4.52.0
+
+## 3.4.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+
+## 3.4.0
+
+### Minor Changes
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `<ClerkProvider treatPendingAsSignedOut={false} />` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+
 ## 3.3.0
 
 ### Minor Changes

@@ -1,5 +1,51 @@
 # Change Log
 
+## 1.27.3
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5575](https://github.com/clerk/javascript/pull/5575)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/shared@3.6.0
+  - @clerk/types@4.53.0
+
+## 1.27.2
+
+### Patch Changes
+
+- Uses the helper function `__experimental_JWTPayloadToAuthObjectProperties` from `@clerk/shared` to handle the new JWT v2 schema. ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+- Update the supported API version to `2025-04-10` ([#5568](https://github.com/clerk/javascript/pull/5568)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+
+## 1.27.1
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/shared@3.4.1
+
+## 1.27.0
+
+### Minor Changes
+
+- Introduces `ver` as JWT claim to allow versioning of the session token. ([#5521](https://github.com/clerk/javascript/pull/5521)) by [@octoper](https://github.com/octoper)
+
+- Added constants.Headers.ContentSecurityPolicy and constants.Headers.Nonce ([#5493](https://github.com/clerk/javascript/pull/5493)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+  - @clerk/shared@3.4.0
+
 ## 1.26.0
 
 ### Minor Changes

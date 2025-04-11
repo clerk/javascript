@@ -196,6 +196,7 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   last_name: string;
   image_url: string;
   username: string;
+  phone_number: string;
   public_metadata: Record<string, unknown>;
   label: string;
   verification?: VerificationJSON;
@@ -626,7 +627,9 @@ export interface __experimental_CommercePaymentSourceJSON extends ClerkResourceJ
   last4: string;
   payment_method: string;
   card_type: string;
+  is_default: boolean;
   status: __experimental_CommercePaymentSourceStatus;
+  wallet_type: string | null;
 }
 
 export interface __experimental_CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON {

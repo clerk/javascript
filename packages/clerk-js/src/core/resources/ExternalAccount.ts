@@ -22,6 +22,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   lastName = '';
   imageUrl = '';
   username = '';
+  phoneNumber = '';
   publicMetadata = {};
   label = '';
   verification: VerificationResource | null = null;
@@ -59,6 +60,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
     // TODO: Send the provider name the `oauth` prefix from FAPI
     this.provider = (data.provider || '').replace('oauth_', '') as OAuthProvider;
     this.username = data.username;
+    this.phoneNumber = data.phone_number;
     this.publicMetadata = data.public_metadata;
     this.label = data.label;
 
@@ -81,6 +83,7 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
       last_name: this.lastName,
       image_url: this.imageUrl,
       username: this.username,
+      phone_number: this.phoneNumber,
       public_metadata: this.publicMetadata,
       label: this.label,
       verification: this.verification?.__internal_toSnapshot() || null,

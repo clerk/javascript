@@ -953,16 +953,16 @@ export const esMX: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Acceder',
+      actionText: 'Cuentas con acceso?',
+      formButton: 'Unete a la lista de espera',
+      subtitle: 'Ingresa tu correo electrónico y te avisaremos cuando tu lugar esté listo',
+      title: 'Unete a la lista de espera',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Serás redirigido pronto...',
+      subtitle: 'Nos pondremos en contacto contigo cuando tu lugar esté listo',
+      title: 'Gracias por unirte a la lista de espera!',
     },
   },
 } as const;

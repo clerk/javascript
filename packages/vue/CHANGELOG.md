@@ -1,5 +1,81 @@
 # @clerk/vue
 
+## 1.6.0
+
+### Minor Changes
+
+- Introduce `sessionClaims` to useAuth(). ([#5587](https://github.com/clerk/javascript/pull/5587)) by [@panteliselef](https://github.com/panteliselef)
+
+  - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
+
+### Patch Changes
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/shared@3.6.0
+  - @clerk/types@4.53.0
+
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/shared@3.4.1
+
+## 1.5.0
+
+### Minor Changes
+
+- Update `useSession` to handle pending sessions as signed-out by default, with opt-out via `useSession({ treatPendingAsSignedOut: false })` or `app.use(clerkPlugin, { treatPendingAsSignedOut: false })` ([#5525](https://github.com/clerk/javascript/pull/5525)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Update `useAuth` to handle pending sessions as signed-out by default, with opt-out via `useAuth({ treatPendingAsSignedOut: false })` or `app.use(clerkPlugin, { treatPendingAsSignedOut: false })` ([#5507](https://github.com/clerk/javascript/pull/5507)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Introduce `treatPendingAsSignedOut` prop to client control components ([#5512](https://github.com/clerk/javascript/pull/5512)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <SignedIn>
+    <p>You have selected an organization!</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <SignedIn treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </SignedIn>
+  ```
+
+  ```tsx
+  // Children node only mounts when session is active
+  // Example: Organization selection must be completed if enforced
+  <Protect>
+    <p>You have selected an organization!</p>
+  </Protect>
+  ```
+
+  ```tsx
+  // Children node mounts for both active and pending session
+  <Protect treatPendingAsSignedOut={false}>
+    <p>You might not have an organization selected</p>
+  </Protect>
+  ```
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+  - @clerk/shared@3.4.0
+
 ## 1.4.6
 
 ### Patch Changes

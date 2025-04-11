@@ -1,5 +1,39 @@
 # Change Log
 
+## 3.13.9
+
+### Patch Changes
+
+- Improve the CAPTCHA error message to better assist users ([#5577](https://github.com/clerk/javascript/pull/5577)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5)]:
+  - @clerk/types@4.53.0
+
+## 3.13.8
+
+### Patch Changes
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/types@4.52.0
+
+## 3.13.7
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+
+## 3.13.6
+
+### Patch Changes
+
+- feat(localizations): Add waitlist values for es-MX ([#5392](https://github.com/clerk/javascript/pull/5392)) by [@Gledros](https://github.com/Gledros)
+
+- Improve `de-DE` localization by defining previously `undefined` values ([#5508](https://github.com/clerk/javascript/pull/5508)) by [@vaihtovirta](https://github.com/vaihtovirta)
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5)]:
+  - @clerk/types@4.51.0
+
 ## 3.13.5
 
 ### Patch Changes

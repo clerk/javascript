@@ -67,6 +67,12 @@ const common = ({ mode, disableRHC = false }) => {
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
     },
+    /**
+     * Remove the Stripe dependencies from the bundle, if RHC is disabled.
+     * Necessary to prevent the Stripe dependencies from being bundled into
+     * SDKs such as Browser Extensions.
+     */
+    externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
         cacheGroups: {

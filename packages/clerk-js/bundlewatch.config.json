@@ -1,10 +1,10 @@
 {
   "files": [
     { "path": "./dist/clerk.js", "maxSize": "590kB" },
-    { "path": "./dist/clerk.browser.js", "maxSize": "81KB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "73.5KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "55KB" },
-    { "path": "./dist/ui-common*.js", "maxSize": "96KB" },
-    { "path": "./dist/vendors*.js", "maxSize": "35KB" },
+    { "path": "./dist/ui-common*.js", "maxSize": "99KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "36KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "35.5KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
@@ -21,7 +21,7 @@
     { "path": "./dist/keylessPrompt*.js", "maxSize": "5.9KB" },
     { "path": "./dist/pricingTable*.js", "maxSize": "5KB" },
     { "path": "./dist/checkout*.js", "maxSize": "3KB" },
-    { "path": "./dist/paymentSources*.js", "maxSize": "8KB" },
+    { "path": "./dist/paymentSources*.js", "maxSize": "8.1KB" },
     { "path": "./dist/up-billing-page*.js", "maxSize": "1KB" },
     { "path": "./dist/op-billing-page*.js", "maxSize": "1KB" },
     { "path": "./dist/sessionTasks*.js", "maxSize": "1KB" }
