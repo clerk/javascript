@@ -17,7 +17,7 @@ export default defineConfig(overrideOptions => {
     legacyOutput: true,
     treeshake: true,
     noExternal: ['@clerk/clerk-react', '@clerk/shared'],
-    external: ['use-sync-external-store'],
+    external: ['use-sync-external-store', '@stripe/stripe-js', '@stripe/react-stripe-js'],
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
