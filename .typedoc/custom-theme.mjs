@@ -132,7 +132,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       /**
        * Copied from original theme.
        * Changes:
-       * - Remove summaries over tables (TODO: Use elementSummaries instead)
+       * - Remove summaries over tables and instead use `@unionReturnHeadings` to add headings
        * - Only use one newline between items
        * https://github.com/typedoc2md/typedoc-plugin-markdown/blob/7032ebd3679aead224cf23bffd0f3fb98443d16e/packages/typedoc-plugin-markdown/src/theme/context/partials/member.typeDeclarationUnionContainer.ts
        * @param {import('typedoc').DeclarationReflection} model
