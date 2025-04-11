@@ -72,6 +72,7 @@ import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
 /**
  * The `SignIn` object holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
+ * @interface
  */
 export interface SignInResource extends ClerkResource {
   /**

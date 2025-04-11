@@ -7,8 +7,14 @@ export interface OrganizationDomainVerification {
   expiresAt: Date;
 }
 
+/**
+ * @inline
+ */
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
+/**
+ * @inline
+ */
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 export interface OrganizationDomainResource extends ClerkResource {

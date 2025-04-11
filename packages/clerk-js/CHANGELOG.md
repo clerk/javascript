@@ -1,5 +1,85 @@
 # Change Log
 
+## 5.60.0
+
+### Minor Changes
+
+- Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
+
+  - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5575](https://github.com/clerk/javascript/pull/5575)) by [@LekoArts](https://github.com/LekoArts)
+
+- Move `createEventBus` to shared. ([#5546](https://github.com/clerk/javascript/pull/5546)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`f17e445`](https://github.com/clerk/javascript/commit/f17e445de1318ebc553953b1b9abc71567ed6b87), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/shared@3.6.0
+  - @clerk/types@4.53.0
+  - @clerk/localizations@3.13.9
+
+## 5.59.3
+
+### Patch Changes
+
+- Uses the helper function `__experimental_JWTPayloadToAuthObjectProperties` from `@clerk/shared` to handle the new JWT v2 schema. ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+- Remove Stripe from non-RHC build ([#5569](https://github.com/clerk/javascript/pull/5569)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add Payment Sources to `<OrgProfile />`, hook up all org-related payment source and checkout methods to the org-specific endpoints ([#5554](https://github.com/clerk/javascript/pull/5554)) by [@aeliox](https://github.com/aeliox)
+
+- Fix issue where the SSO callback URL was incorrectly generated when using the transfer flow within a modal. ([#5562](https://github.com/clerk/javascript/pull/5562)) by [@dstaley](https://github.com/dstaley)
+
+- Add copy and truncation options to `<LineItems.Description />` component. ([#5560](https://github.com/clerk/javascript/pull/5560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update the supported API version to `2025-04-10` ([#5568](https://github.com/clerk/javascript/pull/5568)) by [@octoper](https://github.com/octoper)
+
+- Optionally handle the `intent` parameter on SSO redirects to reload specific resources. ([#5553](https://github.com/clerk/javascript/pull/5553)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+  - @clerk/localizations@3.13.8
+
+## 5.59.2
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Stop retrying on `/verify` if the client cannot solve the challenge ([#5526](https://github.com/clerk/javascript/pull/5526)) by [@anagstef](https://github.com/anagstef)
+
+- Handle two factor redirect when authenticate with web3 and multifactor has been enabled ([#5352](https://github.com/clerk/javascript/pull/5352)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+  - @clerk/localizations@3.13.7
+  - @clerk/shared@3.4.1
+
+## 5.59.1
+
+### Patch Changes
+
+- Adds support for Apple Pay to `AddPaymentSource` component, and removes the unusable "collapsed" state. ([#5506](https://github.com/clerk/javascript/pull/5506)) by [@aeliox](https://github.com/aeliox)
+
+- Fixes an issue where a race condition was caused by triggering navigations during a call to `setActive`. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Introduce `clerk.__internal_openCheckout()` and `clerk.__internal_closeCheckout()` methods and remove `<Checkout />` from within the `<PricingTable />` component. ([#5481](https://github.com/clerk/javascript/pull/5481)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add optional `resourceId` to `useFetch` hook ([#5536](https://github.com/clerk/javascript/pull/5536)) by [@aeliox](https://github.com/aeliox)
+
+- Fix routing issue in `<Checkout />` component by wrapping the `LazyDrawerRenderer` with nested `VirtualRouter`. ([#5527](https://github.com/clerk/javascript/pull/5527)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue where the SSO callback URL was incorrectly set for combined sign-in/sign-up. ([#5515](https://github.com/clerk/javascript/pull/5515)) by [@dstaley](https://github.com/dstaley)
+
+- Trigger navigation to tasks on `setActive` for internal routing only ([#5535](https://github.com/clerk/javascript/pull/5535)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`e1ec52b`](https://github.com/clerk/javascript/commit/e1ec52b93038c9cb24e030dc06e53825a384a480), [`bebb6d8`](https://github.com/clerk/javascript/commit/bebb6d8af66b2bb7a4b3bdf96f9d480e65b31ba2), [`c3e7886`](https://github.com/clerk/javascript/commit/c3e7886d111d32b80a4d95837ad4abf768e1dbf4), [`d0d5203`](https://github.com/clerk/javascript/commit/d0d5203e4ee9e2e1bed5c00ef0f87f0130f1d298), [`6112420`](https://github.com/clerk/javascript/commit/6112420889f1577fb16d7bfa706aaffe1090093d), [`9b25e31`](https://github.com/clerk/javascript/commit/9b25e311cf5e15f896c7948faa42ace45df364c5), [`26ce4c1`](https://github.com/clerk/javascript/commit/26ce4c15794ca27a3c02ff7cea3428a3985d4d10)]:
+  - @clerk/types@4.51.0
+  - @clerk/localizations@3.13.6
+  - @clerk/shared@3.4.0
+
 ## 5.59.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.9",
+  "version": "0.23.13",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -76,10 +76,10 @@
     "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-form": "^0.1.0",
     "@radix-ui/react-slot": "^1.1.0",
-    "@xstate/react": "^4.1.1",
+    "@xstate/react": "^5.0.3",
     "client-only": "^0.0.1",
     "tslib": "catalog:repo",
-    "xstate": "^5.15.0"
+    "xstate": "^5.19.2"
   },
   "devDependencies": {
     "@statelyai/inspect": "^0.4.0",

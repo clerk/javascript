@@ -1,11 +1,14 @@
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
 import type { Clerk } from './resources/internal';
-import { Client, isClerkAPIResponseError } from './resources/internal';
+import { ClerkRuntimeError, Client, isClerkAPIResponseError } from './resources/internal';
 
 export class FraudProtection {
   private static instance: FraudProtection;
 
   private inflightException: Promise<unknown> | null = null;
+
+  private captchaRetryCount = 0;
+  private readonly MAX_RETRY_ATTEMPTS = 3;
 
   public static getInstance(): FraudProtection {
     if (!FraudProtection.instance) {
@@ -20,6 +23,13 @@ export class FraudProtection {
   ) {}
 
   public async execute<T extends () => Promise<any>, R = Awaited<ReturnType<T>>>(clerk: Clerk, cb: T): Promise<R> {
+    if (this.captchaAttemptsExceeded()) {
+      throw new ClerkRuntimeError(
+        'Security verification failed. Please try again by refreshing the page, clearing your browser cookies, or using a different web browser.',
+        { code: 'captcha_client_attempts_exceeded' },
+      );
+    }
+
     try {
       if (this.inflightException) {
         await this.inflightException;
@@ -47,10 +57,15 @@ export class FraudProtection {
       let resolve: any;
       this.inflightException = new Promise<unknown>(r => (resolve = r));
 
-      const captchaParams = await this.managedChallenge(clerk);
-
       try {
-        await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
+        const captchaParams: any = await this.managedChallenge(clerk);
+        if (captchaParams?.captchaError !== 'modal_component_not_ready') {
+          await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
+          this.captchaRetryCount = 0; // Reset the retry count on success
+        }
+      } catch (err) {
+        this.captchaRetryCount++;
+        throw err;
       } finally {
         // Resolve the exception placeholder promise so that other exceptions can be handled
         resolve();
@@ -64,4 +79,8 @@ export class FraudProtection {
   public managedChallenge(clerk: Clerk) {
     return new this.CaptchaChallengeImpl(clerk).managedInModal({ action: 'verify' });
   }
+
+  private captchaAttemptsExceeded = () => {
+    return this.captchaRetryCount >= this.MAX_RETRY_ATTEMPTS;
+  };
 }

@@ -60,7 +60,11 @@ export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeho
   : Base['permission'];
 
 /**
- * OrganizationCustomRoleKey will be string unless the developer has provided their own types through `ClerkAuthorization`
+ * `OrganizationCustomRoleKey` is a type that represents the user's role in an organization. It will be string unless the developer has provided their own types through [`ClerkAuthorization`](https://clerk.com/docs/guides/custom-types#example-custom-roles-and-permissions).
+ *
+ * Clerk provides the [default roles](https://clerk.com/docs/organizations/roles-permissions#default-roles) `org:admin` and `org:member`. However, you can create [custom roles](https://clerk.com/docs/organizations/create-roles-permissions) as well.
+ *
+ * @interface
  */
 export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
   ? ClerkAuthorization['role'] extends string

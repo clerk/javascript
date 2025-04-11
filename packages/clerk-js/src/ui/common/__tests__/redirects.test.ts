@@ -209,8 +209,16 @@ describe('buildSSOCallbackURL(ctx, baseUrl)', () => {
     ).toBe('http://test.host/#/sso-callback?redirect_url=%2Ffoo');
 
     // Custom SSO callback URL in the context
-    expect(buildSSOCallbackURL({ ssoCallbackUrl: 'http://test.host/ctx-sso-callback' })).toBe(
+    expect(buildSSOCallbackURL({ isCombinedFlow: true, ssoCallbackUrl: 'http://test.host/ctx-sso-callback' })).toBe(
       'http://test.host/ctx-sso-callback',
     );
+    // Does not use SSO callback URL from context when routing is virtual
+    expect(
+      buildSSOCallbackURL({
+        isCombinedFlow: true,
+        ssoCallbackUrl: 'http://test.host/ctx-sso-callback',
+        routing: 'virtual',
+      }),
+    ).toBe('http://localhost/#/sso-callback');
   });
 });

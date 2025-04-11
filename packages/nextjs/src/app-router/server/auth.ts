@@ -21,10 +21,20 @@ type Auth = AuthObject & {
    *
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign in.
    *
-   * @note
-   * `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > [!NOTE]
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+
+  /**
+   * The `auth()` helper returns the `redirectToSignUp()` method, which you can use to redirect the user to the sign-up page.
+   *
+   * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign up.
+   *
+   * > [!NOTE]
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   */
+  redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
 };
 
 export interface AuthFn {
@@ -43,8 +53,8 @@ export interface AuthFn {
    * | Yes | No | Return a `404` error. |
    * | No | No | Redirect the user to the sign-in page\*. |
    *
-   * @important
-   * \*For non-document requests, such as API requests, `auth.protect()` returns a `404` error to users who aren't authenticated.
+   * > [!IMPORTANT]
+   * > \*For non-document requests, such as API requests, `auth.protect()` returns a `404` error to users who aren't authenticated.
    *
    * `auth.protect()` can be used to check if a user is authenticated or authorized to access certain parts of your application or even entire routes. See detailed examples in the [dedicated guide](https://clerk.com/docs/organizations/verify-user-permissions).
    */
@@ -83,7 +93,8 @@ export const auth: AuthFn = async () => {
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 
-  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+  const createRedirectForRequest = (...args: Parameters<RedirectFun<never>>) => {
+    const { returnBackUrl } = args[0] || {};
     const clerkRequest = createClerkRequest(request);
     const devBrowserToken =
       clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
@@ -91,21 +102,35 @@ export const auth: AuthFn = async () => {
 
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+    return [
+      createRedirect({
+        redirectAdapter: redirect,
+        devBrowserToken: devBrowserToken,
+        baseUrl: clerkRequest.clerkUrl.toString(),
+        publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
+        signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
+        signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
+        sessionStatus: authObject.sessionStatus,
+      }),
+      returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
+    ] as const;
+  };
 
-    return createRedirect({
-      redirectAdapter: redirect,
-      devBrowserToken: devBrowserToken,
-      baseUrl: clerkRequest.clerkUrl.toString(),
-      publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-      signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
-      signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-      sessionStatus: authObject.sessionStatus,
-    }).redirectToSignIn({
-      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
+  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+    const [r, returnBackUrl] = createRedirectForRequest(opts);
+    return r.redirectToSignIn({
+      returnBackUrl,
     });
   };
 
-  return Object.assign(authObject, { redirectToSignIn });
+  const redirectToSignUp: RedirectFun<never> = (opts = {}) => {
+    const [r, returnBackUrl] = createRedirectForRequest(opts);
+    return r.redirectToSignUp({
+      returnBackUrl,
+    });
+  };
+
+  return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
 };
 
 auth.protect = async (...args: any[]) => {
