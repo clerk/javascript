@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.60.1
+
+### Patch Changes
+
+- Ensure Stripe dependencies aren't bundled for non-RHC environments ([#5594](https://github.com/clerk/javascript/pull/5594)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc)]:
+  - @clerk/shared@3.6.1
+  - @clerk/types@4.53.1
+  - @clerk/localizations@3.13.10
+
 ## 5.60.0
 
 ### Minor Changes

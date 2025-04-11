@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.53.1
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.53.0
 
 ### Minor Changes
