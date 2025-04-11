@@ -127,15 +127,7 @@ const checkBillingAuthorization: CheckBillingAuthorization = (params, options) =
 };
 
 const splitByScope = (fea: string | null | undefined) => {
-  const features = (fea ? fea.split(',').map(f => f.trim()) : []).map(f => {
-    const partsLength = f.split(':').length;
-
-    if (partsLength === 1) {
-      return `uo:${f}`;
-    }
-
-    return f;
-  });
+  const features = fea ? fea.split(',').map(f => f.trim()) : [];
 
   // TODO: make this more efficient
   return {
