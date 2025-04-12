@@ -61,6 +61,8 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
       })
     )?.response as unknown as __experimental_CommerceCheckoutJSON;
 
-    return new __experimental_CommerceCheckout(json);
+    const checkout = new __experimental_CommerceCheckout(json);
+    checkout.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
+    return checkout;
   };
 }
