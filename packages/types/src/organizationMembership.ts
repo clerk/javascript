@@ -112,9 +112,11 @@ type Util<T extends string> = T extends ValidFeaturePattern
   ? T | ExtractAfterPrefix<T, 'user:'> | ExtractAfterPrefix<T, 'org:'>
   : `Expected format: "user:<string>" | "org:<string>", but got "${T}"`;
 
+type ExtractMiddlePart<T extends string> = T extends `${'org:'}${infer Rest}:${string}` ? `org:${Rest}` : never;
+
 interface FakeClerkAuthorization {
   // @ts-ignore
-  feature: Util<ClerkAuthorization['feature']>;
+  feature: Util<ClerkAuthorization['feature']> | Util<ExtractMiddlePart<ClerkAuthorization['permission']>>;
   // @ts-ignore
   plan: Util<ClerkAuthorization['plan']>;
 }
