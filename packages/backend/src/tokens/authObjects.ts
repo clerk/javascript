@@ -11,7 +11,7 @@ import type {
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
-import { APIKey, createBackendApiClient } from '../api';
+import { createBackendApiClient, OAuthApplicationToken } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineAuthType } from './types';
 
@@ -223,7 +223,7 @@ export function authenticatedMachineObject(
     claims: verificationResult.claims,
     entity: 'machine',
     machineId: verificationResult.id,
-    userId: verificationResult instanceof APIKey ? verificationResult.createdBy : null,
+    userId: !(verificationResult instanceof OAuthApplicationToken) ? verificationResult.createdBy : null,
     getToken: () => machineToken,
     has: () => false,
     debug: createDebug(debugData),
