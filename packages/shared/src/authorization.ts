@@ -112,9 +112,6 @@ const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
 
 const checkBillingAuthorization: CheckBillingAuthorization = (params, options) => {
   const { features, plans } = options;
-  if (!params.feature && !params.plan) {
-    return null;
-  }
 
   if (params.feature && features) {
     return checkForFeatureOrPlan(features, params.feature);
