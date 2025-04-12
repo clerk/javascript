@@ -76,6 +76,7 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
   const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
+
   const signature = base64url.parse(rawSignature, { loose: true });
 
   const data = {

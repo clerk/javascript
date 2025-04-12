@@ -1,5 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
+  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -61,21 +62,43 @@ export type ProtectProps = React.PropsWithChildren<
         condition?: never;
         role: OrganizationCustomRoleKey;
         permission?: never;
+        feature?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
+        feature?: never;
+        plan?: never;
         permission: OrganizationCustomPermissionKey;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
         role?: never;
         permission?: never;
+        feature?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission?: never;
+        feature: Autocomplete<`user:${string}` | `org:${string}`>;
+        plan?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        feature?: never;
+        plan: Autocomplete<`user:${string}` | `org:${string}`>;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        feature?: never;
+        plan?: never;
       }
   ) & {
     fallback?: React.ReactNode;
@@ -127,7 +150,12 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (
+    restAuthorizedParams.role ||
+    restAuthorizedParams.permission ||
+    restAuthorizedParams.feature ||
+    restAuthorizedParams.plan
+  ) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }
