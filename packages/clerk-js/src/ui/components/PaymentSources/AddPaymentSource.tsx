@@ -75,16 +75,18 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   useEffect(() => {
     if (!stripePromiseRef.current && externalGatewayId && __experimental_commerceSettings.stripePublishableKey) {
-      if (!__BUILD_DISABLE_RHC__) {
-        stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-          stripeAccount: externalGatewayId,
-        });
-        void stripePromiseRef.current.then(stripeInstance => {
-          setStripe(stripeInstance);
-        });
-      } else {
+      if (__BUILD_DISABLE_RHC__) {
         clerkUnsupportedEnvironmentWarning('Stripe');
+        return;
       }
+
+      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
+        stripeAccount: externalGatewayId,
+      });
+
+      void stripePromiseRef.current.then(stripeInstance => {
+        setStripe(stripeInstance);
+      });
     }
   }, [externalGatewayId, __experimental_commerceSettings]);
 

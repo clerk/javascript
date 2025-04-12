@@ -26,6 +26,8 @@ const LINK_REPLACEMENTS = [
   ['session-resource', '/docs/references/javascript/session'],
   ['signed-in-session-resource', '/docs/references/javascript/session'],
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
+  ['user-resource', '/docs/references/javascript/user'],
+  ['session-status-claim', '/docs/references/javascript/types/session-status'],
 ];
 
 /**
@@ -34,14 +36,43 @@ const LINK_REPLACEMENTS = [
  * It also shouldn't matter how level deep the relative link is.
  *
  * This function returns an array of `{ pattern: string, replace: string }` to pass into the `typedoc-plugin-replace-text` plugin.
+ *
+ * @example
+ * [foo](../../bar.mdx) -> [foo](/new-path)
+ * [foo](./bar.mdx) -> [foo](/new-path)
+ * [foo](bar.mdx) -> [foo](/new-path)
+ * [foo](bar.mdx#some-id) -> [foo](/new-path#some-id)
  */
 function getRelativeLinkReplacements() {
   return LINK_REPLACEMENTS.map(([fileName, newPath]) => {
     return {
-      pattern: new RegExp(`\\((?:\\.{1,2}\\/)+.*?${fileName}\\.mdx\\)`, 'g'),
-      replace: `(${newPath})`,
+      // Match both path and optional anchor
+      pattern: new RegExp(`\\((?:(?:\\.{1,2}\\/)+[^()]*?|)${fileName}\\.mdx(#[^)]+)?\\)`, 'g'),
+      // Preserve the anchor in replacement if it exists
+      replace: (/** @type {string} */ _match, anchor = '') => `(${newPath}${anchor})`,
     };
   });
+}
+
+function getUnlinkedTypesReplacements() {
+  return [
+    {
+      pattern: /\(setActiveParams\)/g,
+      replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',
+    },
+    {
+      pattern: /`_LocalizationResource`/g,
+      replace: '[Localization](/docs/customization/localization)',
+    },
+    {
+      pattern: /`LoadedClerk`/g,
+      replace: '[Clerk](/docs/references/javascript/clerk)',
+    },
+    {
+      pattern: /`OrganizationCustomRoleKey`/g,
+      replace: '[OrganizationCustomRoleKey](/docs/references/javascript/types/organization-custom-role-key)',
+    },
+  ];
 }
 
 /**
@@ -53,6 +84,14 @@ export function load(app) {
     const linkReplacements = getRelativeLinkReplacements();
 
     for (const { pattern, replace } of linkReplacements) {
+      if (output.contents) {
+        output.contents = output.contents.replace(pattern, replace);
+      }
+    }
+
+    const unlinkedTypesReplacements = getUnlinkedTypesReplacements();
+
+    for (const { pattern, replace } of unlinkedTypesReplacements) {
       if (output.contents) {
         output.contents = output.contents.replace(pattern, replace);
       }
