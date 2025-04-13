@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommercePaymentSourceResource,
@@ -10,7 +10,8 @@ import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
-import { useEnvironment } from '../../contexts';
+import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
+import { useEnvironment, usePaymentSourcesContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
@@ -29,6 +30,8 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { checkout, submitLabel, onSuccess, cancelAction } = props;
   const { __experimental_commerce } = useClerk();
   const { __experimental_commerceSettings } = useEnvironment();
+  const { organization } = useOrganization();
+  const { subscriberType } = usePaymentSourcesContext();
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -61,7 +64,10 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     !checkout ? __experimental_commerce.initializePaymentSource : undefined,
     {
       gateway: 'stripe',
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
+    undefined,
+    'commerce-payment-source-initialize',
   );
 
   const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
@@ -69,9 +75,15 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   useEffect(() => {
     if (!stripePromiseRef.current && externalGatewayId && __experimental_commerceSettings.stripePublishableKey) {
+      if (__BUILD_DISABLE_RHC__) {
+        clerkUnsupportedEnvironmentWarning('Stripe');
+        return;
+      }
+
       stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
         stripeAccount: externalGatewayId,
       });
+
       void stripePromiseRef.current.then(stripeInstance => {
         setStripe(stripeInstance);
       });
@@ -124,6 +136,8 @@ const AddPaymentSourceForm = withCardStateProvider(
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
+    const { organization } = useOrganization();
+    const { subscriberType } = usePaymentSourcesContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -148,6 +162,7 @@ const AddPaymentSourceForm = withCardStateProvider(
         const paymentSource = await __experimental_commerce.addPaymentSource({
           gateway: 'stripe',
           paymentToken: setupIntent.payment_method as string,
+          ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
         });
 
         void onSuccess(paymentSource);

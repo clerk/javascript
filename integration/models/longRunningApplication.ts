@@ -1,3 +1,6 @@
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { clerkSetup } from '@clerk/testing/playwright';
+
 import { awaitableTreekill, fs } from '../scripts';
 import type { Application } from './application';
 import type { ApplicationConfig } from './applicationConfig';
@@ -56,6 +59,25 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.setup.ts and by the test runner
       // the first time this is called, the app starts and the state is persisted in the state file
       init: async () => {
+        try {
+          const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+          const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
+          const { instanceType, frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
+
+          if (instanceType !== 'development') {
+            console.log('Clerk: skipping setup of testing tokens for non-development instance');
+          } else {
+            await clerkSetup({
+              publishableKey,
+              frontendApiUrl,
+              secretKey,
+              dotenv: false,
+            });
+          }
+        } catch (error) {
+          console.error('Error setting up testing tokens:', error);
+          throw error;
+        }
         try {
           app = await config.commit();
         } catch (error) {

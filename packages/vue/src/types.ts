@@ -5,6 +5,7 @@ import type {
   ClientResource,
   CustomMenuItem,
   CustomPage,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
@@ -22,6 +23,7 @@ export interface VueClerkInjectionKeyType {
     sessionId: string | null | undefined;
     actor: ActClaim | null | undefined;
     sessionStatus: SessionStatusClaim | null | undefined;
+    sessionClaims: JwtPayload | null | undefined;
     orgId: string | null | undefined;
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;

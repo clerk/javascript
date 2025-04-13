@@ -73,6 +73,7 @@ export type {
   OrganizationMembershipJSON,
   OrganizationMembershipPublicUserDataJSON,
   PhoneNumberJSON,
+  ProxyCheckJSON,
   RedirectUrlJSON,
   SessionJSON,
   SignInJSON,

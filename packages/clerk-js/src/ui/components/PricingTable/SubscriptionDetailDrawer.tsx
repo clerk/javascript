@@ -1,5 +1,7 @@
+import { useOrganization } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
   ClerkAPIError,
@@ -33,6 +35,7 @@ type SubscriptionDetailDrawerProps = {
   portalProps?: DrawerRootProps['portalProps'];
   strategy: DrawerRootProps['strategy'];
   subscription?: __experimental_CommerceSubscriptionResource;
+  subscriberType: __experimental_CommerceSubscriberType;
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSubscriptionCancel: () => void;
 };
@@ -43,9 +46,11 @@ export function SubscriptionDetailDrawer({
   portalProps,
   strategy,
   subscription,
+  subscriberType,
   setPlanPeriod,
   onSubscriptionCancel,
 }: SubscriptionDetailDrawerProps) {
+  const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
@@ -59,7 +64,7 @@ export function SubscriptionDetailDrawer({
     setIsSubmitting(true);
 
     await subscription
-      .cancel()
+      .cancel({ orgId: subscriberType === 'org' ? organization?.id : undefined })
       .then(() => {
         setIsSubmitting(false);
         onSubscriptionCancel();

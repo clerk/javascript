@@ -50,4 +50,4 @@ export const SIGN_UP_MODES: Record<string, SignUpModes> = {
 };
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2024-10-01';
+export const SUPPORTED_FAPI_VERSION = '2025-04-10';

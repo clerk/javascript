@@ -124,7 +124,12 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='tertiary'>
             {/* TODO(@COMMERCE): needs localization */}
             <LineItems.Title title='Invoice ID' />
-            <LineItems.Description text={checkout.invoice ? checkout.invoice.id : '–'} />
+            <LineItems.Description
+              text={checkout.invoice ? checkout.invoice.id : '–'}
+              truncateText
+              copyText
+              copyLabel='Copy invoice ID'
+            />
           </LineItems.Group>
         </LineItems.Root>
         <Button

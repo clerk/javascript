@@ -6,12 +6,12 @@ import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, orgId, onSubscriptionComplete } = props;
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
 
   const { checkout, updateCheckout, isLoading } = useCheckout({
     planId,
     planPeriod,
-    orgId,
+    subscriberType,
   });
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {

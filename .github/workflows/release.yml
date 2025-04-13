@@ -95,6 +95,13 @@ jobs:
                 ref: 'main',
                 inputs: { version: nextjsVersion }
               })
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'generated-typedoc',
+                workflow_id: 'update-docs.yml',
+                ref: 'main',
+              })
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }

@@ -23,7 +23,7 @@ describe('Session', () => {
     let dispatchSpy;
 
     beforeEach(() => {
-      dispatchSpy = jest.spyOn(eventBus, 'dispatch');
+      dispatchSpy = jest.spyOn(eventBus, 'emit');
       BaseResource.clerk = clerkMock() as any;
     });
 
@@ -46,8 +46,9 @@ describe('Session', () => {
 
       await session.getToken();
 
-      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+      expect(dispatchSpy.mock.calls[1]).toMatchSnapshot();
     });
 
     it('hydrates token cache from lastActiveToken', async () => {
@@ -95,8 +96,9 @@ describe('Session', () => {
 
       await session.getToken();
 
-      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+      expect(dispatchSpy.mock.calls[1]).toMatchSnapshot();
     });
 
     it('does not dispatch token:update if template is provided', async () => {
@@ -138,7 +140,7 @@ describe('Session', () => {
 
       await session.getToken({ organizationId: 'activeOrganization' });
 
-      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
     });
 
     it('does not dispatch token:update when provided organization ID does not match current active organization', async () => {

@@ -2,6 +2,9 @@ import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
 
+type WithOptionalOrgType<T> = T & {
+  orgId?: string;
+};
 export interface __experimental_CommerceNamespace {
   __experimental_billing: __experimental_CommerceBillingNamespace;
   getPaymentSources: (
@@ -18,7 +21,7 @@ export interface __experimental_CommerceNamespace {
 export interface __experimental_CommerceBillingNamespace {
   getPlans: () => Promise<__experimental_CommercePlanResource[]>;
   getSubscriptions: (
-    params?: __experimental_GetSubscriptionsParams,
+    params: __experimental_GetSubscriptionsParams,
   ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
@@ -69,18 +72,19 @@ export interface __experimental_CommerceFeatureResource extends ClerkResource {
 
 export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 'disconnected';
 
-export interface __experimental_InitializePaymentSourceParams {
-  gateway: 'stripe' | 'paypal';
-}
+export type __experimental_GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
-export interface __experimental_AddPaymentSourceParams {
+export type __experimental_InitializePaymentSourceParams = WithOptionalOrgType<{
+  gateway: 'stripe' | 'paypal';
+}>;
+
+export type __experimental_AddPaymentSourceParams = WithOptionalOrgType<{
   gateway: 'stripe' | 'paypal';
   paymentToken: string;
-}
+}>;
 
-export interface __experimental_GetPaymentSourcesParams {
-  orgId?: string;
-}
+export type __experimental_RemovePaymentSourceParams = WithOptionalOrgType<unknown>;
+export type __experimental_MakeDefaultPaymentSourceParams = WithOptionalOrgType<unknown>;
 
 export interface __experimental_CommercePaymentSourceResource extends ClerkResource {
   id: string;
@@ -89,7 +93,9 @@ export interface __experimental_CommercePaymentSourceResource extends ClerkResou
   cardType: string;
   isDefault: boolean;
   status: __experimental_CommercePaymentSourceStatus;
-  remove: () => Promise<DeletedObjectResource>;
+  walletType: string | undefined;
+  remove: (params?: __experimental_RemovePaymentSourceParams) => Promise<DeletedObjectResource>;
+  makeDefault: (params?: __experimental_MakeDefaultPaymentSourceParams) => Promise<null>;
 }
 
 export interface __experimental_CommerceInitializedPaymentSourceResource extends ClerkResource {
@@ -107,9 +113,8 @@ export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   status: string;
 }
 
-export type __experimental_GetSubscriptionsParams = ClerkPaginationParams<{
-  status?: __experimental_CommerceSubscriptionStatus;
-}>;
+export type __experimental_GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
+export type __experimental_CancelSubscriptionParams = WithOptionalOrgType<unknown>;
 
 export interface __experimental_CommerceSubscriptionResource extends ClerkResource {
   id: string;
@@ -117,7 +122,7 @@ export interface __experimental_CommerceSubscriptionResource extends ClerkResour
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   status: __experimental_CommerceSubscriptionStatus;
-  cancel: () => Promise<DeletedObjectResource>;
+  cancel: (params: __experimental_CancelSubscriptionParams) => Promise<DeletedObjectResource>;
 }
 
 export interface __experimental_CommerceMoney {
@@ -134,15 +139,14 @@ export interface __experimental_CommerceTotals {
   totalDueNow?: __experimental_CommerceMoney;
 }
 
-export interface __experimental_CreateCheckoutParams {
+export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
   planId: string;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  orgId?: string;
-}
+}>;
 
-export interface __experimental_ConfirmCheckoutParams {
+export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<{
   paymentSourceId?: string;
-}
+}>;
 
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
@@ -155,5 +159,5 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   status: string;
   totals: __experimental_CommerceTotals;
   subscription?: __experimental_CommerceSubscriptionResource;
-  confirm: (params?: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
+  confirm: (params: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }

@@ -3,6 +3,7 @@ import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  JwtPayload,
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
@@ -18,6 +19,9 @@ import { createGetToken, createSignOut } from './utils';
 
 type Nullish<T> = T | undefined | null;
 type InitialAuthState = Record<string, any>;
+/**
+ * @inline
+ */
 type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
 
 /**
@@ -27,7 +31,9 @@ type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
  * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
  * </If>
  *
- * @param [initialAuthState] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
+ * @param [initialAuthStateOrOptions] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
+ *
+ * @function
  *
  * @example
  *
@@ -144,7 +150,8 @@ export function useDerivedAuth(
   authObject: any,
   { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
 ): UseAuthReturn {
-  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge } = authObject ?? {};
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge, sessionClaims } =
+    authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -157,6 +164,8 @@ export function useDerivedAuth(
         orgRole,
         orgPermissions,
         factorVerificationAge,
+        features: ((sessionClaims as JwtPayload | undefined)?.fea as string) || '',
+        plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
     [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],

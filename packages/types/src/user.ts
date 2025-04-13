@@ -51,6 +51,15 @@ declare global {
   }
 }
 
+/**
+ * The `User` object holds all of the information for a single user of your application and provides a set of methods to manage their account. Each `User` has at least one authentication [identifier](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers), which might be their email address, phone number, or a username.
+ *
+ * A user can be contacted at their primary email address or primary phone number. They can have more than one registered email address, but only one of them will be their primary email address. This goes for phone numbers as well; a user can have more than one, but only one phone number will be their primary. At the same time, a user can also have one or more external accounts by connecting to [social providers](https://clerk.com/docs/authentication/social-connections/oauth) such as Google, Apple, Facebook, and many more.
+ *
+ * Finally, a `User` object holds profile data like the user's name, profile picture, and a set of [metadata](/docs/users/metadata) that can be used internally to store arbitrary information. The metadata are split into `publicMetadata` and `privateMetadata`. Both types are set from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}, but public metadata can also be accessed from the [Frontend API](https://clerk.com/docs/reference/frontend-api){{ target: '_blank' }}.
+ *
+ * The ClerkJS SDK provides some helper [methods](#methods) on the `User` object to help retrieve and update user information and authentication status.
+ */
 export interface UserResource extends ClerkResource {
   id: string;
   externalId: string | null;

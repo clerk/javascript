@@ -26,6 +26,7 @@ export const ObjectType = {
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
+  ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
   Session: 'session',
@@ -126,6 +127,19 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
+export interface JwksJSON {
+  keys?: JwksKeyJSON[];
+}
+
+export interface JwksKeyJSON {
+  use: string;
+  kty: string;
+  kid: string;
+  alg: string;
+  n: string;
+  e: string;
+}
+
 export interface SamlAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SamlAccount;
   provider: string;
@@ -207,13 +221,16 @@ export interface OrganizationDomainVerificationJSON {
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   role: OrganizationMembershipRole;
+  role_name: string;
   organization_id: string;
   public_organization_data?: PublicOrganizationDataJSON | null;
   status?: OrganizationInvitationStatus;
   public_metadata: OrganizationInvitationPublicMetadata;
   private_metadata: OrganizationInvitationPrivateMetadata;
+  url: string | null;
   created_at: number;
   updated_at: number;
+  expires_at: number;
 }
 
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
@@ -254,6 +271,17 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   linked_to: IdentificationLinkJSON[];
   backup_codes: string[];
 }
+
+export type ProxyCheckJSON = {
+  object: typeof ObjectType.ProxyCheck;
+  id: string;
+  domain_id: string;
+  last_run_at: number | null;
+  proxy_url: string;
+  successful: boolean;
+  created_at: number;
+  updated_at: number;
+};
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
   object: typeof ObjectType.RedirectUrl;

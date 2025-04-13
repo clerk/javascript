@@ -16,7 +16,7 @@ type TestParams = {
 };
 
 export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
   // Begin in localhost
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
@@ -79,7 +79,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
 };
 
 export const testSignUp = async ({ app, page, context }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
   const tempUser = u.services.users.createFakeUser({ fictionalEmail: true });
 
   // Begin in localhost
@@ -148,7 +148,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
 };
 
 export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
 
   // Begin in localhost
   await u.page.goToAppHome();

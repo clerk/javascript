@@ -53,6 +53,8 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
 
     test('sign-in flow', async ({ page }) => {
       const u = createTestUtils({ app, page });
+
+      await u.po.testingToken.setup();
       await u.page.goto(`http://${APP_HOST}`, { timeout: 50000 });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
