@@ -27,9 +27,10 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   subscription?: __experimental_CommerceSubscription;
   totals!: __experimental_CommerceTotals;
 
-  constructor(data: __experimental_CommerceCheckoutJSON) {
+  constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();
     this.fromJSON(data);
+    this.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
   }
 
   protected fromJSON(data: __experimental_CommerceCheckoutJSON | null): this {
