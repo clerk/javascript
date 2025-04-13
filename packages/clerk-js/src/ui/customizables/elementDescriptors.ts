@@ -330,6 +330,13 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectOptionsContainer',
   'selectOption',
 
+  'paymentSourceRow',
+  'paymentSourceRowIcon',
+  'paymentSourceRowText',
+  'paymentSourceRowType',
+  'paymentSourceRowValue',
+  'paymentSourceRowBadge',
+
   'menuButton',
   'menuButtonEllipsis',
   'menuList',
