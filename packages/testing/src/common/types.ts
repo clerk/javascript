@@ -29,6 +29,8 @@ export type ClerkSetupOptions = {
    */
   secretKey?: string;
 
+  apiUrl?: string;
+
   /*
    * Automatic loading of environment variables from .env files.
    * Default: true

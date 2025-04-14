@@ -62,6 +62,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         try {
           const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
           const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
+          const apiUrl = params.env.privateVariables.get('CLERK_API_URL');
           const { instanceType, frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
 
           if (instanceType !== 'development') {
@@ -71,6 +72,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
               publishableKey,
               frontendApiUrl,
               secretKey,
+              apiUrl,
               dotenv: false,
             });
           }
