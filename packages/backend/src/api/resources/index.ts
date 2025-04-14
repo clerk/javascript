@@ -17,8 +17,9 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpStatus,
 } from './Enums';
+
+export type { SignUpStatus } from '@clerk/types';
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
