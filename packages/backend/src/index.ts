@@ -58,6 +58,7 @@ export type {
   ClerkResourceJSON,
   TokenJSON,
   AllowlistIdentifierJSON,
+  BlocklistIdentifierJSON,
   ClientJSON,
   EmailJSON,
   EmailAddressJSON,
@@ -88,6 +89,7 @@ export type {
   DeletedObjectJSON,
   PaginatedResponseJSON,
   TestingTokenJSON,
+  WebhooksSvixJSON,
 } from './api/resources/JSON';
 
 /**
@@ -96,6 +98,7 @@ export type {
 export type {
   AccountlessApplication,
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
   EmailAddress,
   ExternalAccount,

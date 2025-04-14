@@ -768,11 +768,11 @@ export type ClerkOptions = PendingSessionOptions &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -785,7 +785,7 @@ export type ClerkOptions = PendingSessionOptions &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1606,7 +1606,6 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * Parameters for the `createOrganization()` method.
  * @interface
  */
 export interface CreateOrganizationParams {

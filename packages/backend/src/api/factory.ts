@@ -1,6 +1,7 @@
 import {
   AccountlessApplicationAPI,
   AllowlistIdentifierAPI,
+  BlocklistIdentifierAPI,
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
@@ -16,6 +17,7 @@ import {
   SignInTokenAPI,
   TestingTokenAPI,
   UserAPI,
+  WebhookAPI,
 } from './endpoints';
 import { buildRequest } from './request';
 
@@ -31,6 +33,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
       buildRequest({ ...options, requireSecretKey: false }),
     ),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
+    blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),
     invitations: new InvitationAPI(request),
@@ -46,5 +49,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     domains: new DomainAPI(request),
     samlConnections: new SamlConnectionAPI(request),
     testingTokens: new TestingTokenAPI(request),
+    webhooks: new WebhookAPI(request),
   };
 }

@@ -1,5 +1,6 @@
 export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
+export * from './BlocklistIdentifier';
 export * from './Client';
 export * from './Cookies';
 export * from './DeletedObject';

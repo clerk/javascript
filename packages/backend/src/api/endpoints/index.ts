@@ -1,6 +1,7 @@
 export * from './AccountlessApplicationsAPI';
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
+export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
@@ -16,3 +17,4 @@ export * from './SignInTokenApi';
 export * from './UserApi';
 export * from './SamlConnectionApi';
 export * from './TestingTokenApi';
+export * from './WebhookApi';
