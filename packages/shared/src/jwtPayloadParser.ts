@@ -12,7 +12,10 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
     return { permissions: [], featurePermissionMap: [] };
   }
 
-  const permissions = per.split(',').map(p => p.trim());
+  const permissions = per
+    .split(',')
+    .map(p => p.trim())
+    .reverse();
 
   // TODO: make this more efficient
   const featurePermissionMap = fpm
@@ -21,6 +24,7 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
     .map((permission: number) =>
       permission
         .toString(2)
+        .padStart(permissions.length, '0')
         .split('')
         .map(bit => Number.parseInt(bit, 10)),
     )
