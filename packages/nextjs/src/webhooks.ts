@@ -3,7 +3,7 @@ import type { VerifyWebhookOptions } from '@clerk/backend/webhooks';
 import { verifyWebhook as verifyWebhookBase } from '@clerk/backend/webhooks';
 import type { NextApiRequest } from 'next';
 
-import { isNextRequest, isRequestWebAPI } from './server/headers-utils';
+import { getHeader, isNextRequest, isRequestWebAPI } from './server/headers-utils';
 import type { GsspRequest, RequestLike } from './server/types';
 // Ordering of exports matter here since
 // we're overriding the base verifyWebhook
@@ -59,9 +59,13 @@ export async function verifyWebhook(request: RequestLike, options?: VerifyWebhoo
 
 function nextApiRequestToWebRequest(req: NextApiRequest | GsspRequest): Request {
   const headers = new Headers();
-  headers.set(SVIX_ID_HEADER, req.headers[SVIX_ID_HEADER] as string);
-  headers.set(SVIX_TIMESTAMP_HEADER, req.headers[SVIX_TIMESTAMP_HEADER] as string);
-  headers.set(SVIX_SIGNATURE_HEADER, req.headers[SVIX_SIGNATURE_HEADER] as string);
+  const svixId = getHeader(req, SVIX_ID_HEADER) || '';
+  const svixTimestamp = getHeader(req, SVIX_TIMESTAMP_HEADER) || '';
+  const svixSignature = getHeader(req, SVIX_SIGNATURE_HEADER) || '';
+
+  headers.set(SVIX_ID_HEADER, svixId);
+  headers.set(SVIX_TIMESTAMP_HEADER, svixTimestamp);
+  headers.set(SVIX_SIGNATURE_HEADER, svixSignature);
 
   // Create a dummy URL since NextApiRequest doesn't have a full URL
   const protocol = req.headers['x-forwarded-proto'] || 'http';
