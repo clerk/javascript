@@ -67,7 +67,7 @@ function nextApiRequestToWebRequest(req: NextApiRequest | GsspRequest): Request 
   headers.set(SVIX_TIMESTAMP_HEADER, svixTimestamp);
   headers.set(SVIX_SIGNATURE_HEADER, svixSignature);
 
-  // Create a dummy URL since NextApiRequest doesn't have a full URL
+  // Create a dummy URL to make a Request object
   const protocol = req.headers['x-forwarded-proto'] || 'http';
   const host = req.headers.host || 'clerk-dummy';
   const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://${host}`);
