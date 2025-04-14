@@ -74,7 +74,7 @@ function nextApiRequestToWebRequest(req: RequestLike): Request {
   const body = 'body' in req && req.body ? JSON.stringify(req.body) : undefined;
 
   return new Request(dummyOriginReqUrl, {
-    method: req.method || 'GET',
+    method: req.method,
     headers,
     body,
   });

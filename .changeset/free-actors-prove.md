@@ -9,6 +9,12 @@ Add support for webhook verification with Next.js Pages Router.
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
