@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { BlocklistIdentifier } from '../resources/BlocklistIdentifier';
 import type { DeletedObject } from '../resources/DeletedObject';
@@ -11,10 +13,11 @@ type BlocklistIdentifierCreateParams = {
 };
 
 export class BlocklistIdentifierAPI extends AbstractAPI {
-  public async getBlocklistIdentifierList() {
+  public async getBlocklistIdentifierList(params: ClerkPaginationRequest = {}) {
     return this.request<PaginatedResourceResponse<BlocklistIdentifier[]>>({
       method: 'GET',
       path: basePath,
+      queryParams: params,
     });
   }
 
@@ -26,7 +29,7 @@ export class BlocklistIdentifierAPI extends AbstractAPI {
     });
   }
 
-  public async deleteBlcoklistIdentifier(blocklistIdentifierId: string) {
+  public async deleteBlocklistIdentifier(blocklistIdentifierId: string) {
     this.requireId(blocklistIdentifierId);
     return this.request<DeletedObject>({
       method: 'DELETE',

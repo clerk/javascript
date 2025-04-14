@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
 import type { DeletedObject } from '../resources/DeletedObject';
@@ -12,11 +14,11 @@ type AllowlistIdentifierCreateParams = {
 };
 
 export class AllowlistIdentifierAPI extends AbstractAPI {
-  public async getAllowlistIdentifierList() {
+  public async getAllowlistIdentifierList(params: ClerkPaginationRequest = {}) {
     return this.request<PaginatedResourceResponse<AllowlistIdentifier[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: { paginated: true },
+      queryParams: { ...params, paginated: true },
     });
   }
 
