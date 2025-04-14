@@ -89,6 +89,30 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return output;
       },
       /**
+       * This ensures that everything is wrapped in a single codeblock
+       * @param {import('typedoc').DeclarationReflection} model
+       * @param {{ forceCollapse?: boolean }} [options]
+       */
+      declarationType: (model, options) => {
+        const defaultOutput = superPartials.declarationType(model, options);
+
+        // Ensure that the output starts with `\{ `. Some strings will do, some will have e.g. `\{<code>` or `\{[]`
+        const withCorrectWhitespaceAtStart = defaultOutput.startsWith('\\{ ')
+          ? defaultOutput
+          : defaultOutput.startsWith('\\{')
+            ? defaultOutput.replace('\\{', '\\{ ')
+            : defaultOutput;
+
+        const output = withCorrectWhitespaceAtStart
+          // Remove any backticks
+          .replace(/`/g, '')
+          // Remove any `<code>` and `</code>` tags
+          .replace(/<code>/g, '')
+          .replace(/<\/code>/g, '');
+
+        return `<code>${output}</code>`;
+      },
+      /**
        * This modifies the output of union types by wrapping everything in a single `<code>foo | bar</code>` tag instead of doing `<code>foo</code>` | `<code>bar</code>`
        * @param {import('typedoc').UnionType} model
        */
@@ -107,7 +131,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return `<code>${output}</code>`;
       },
       /**
-       * This ensures that everything is wrapped in a single codeblock (not individual ones)
+       * This ensures that everything is wrapped in a single codeblock
        * @param {import('typedoc').SignatureReflection[]} model
        * @param {{ forceParameterType?: boolean; typeSeparator?: string }} [options]
        */
@@ -167,6 +191,22 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           });
         }
         return md.join('\n');
+      },
+      /**
+       * This ensures that everything is wrapped in a single codeblock
+       * @param {import('typedoc').ArrayType} model
+       */
+      arrayType: model => {
+        const defaultOutput = superPartials.arrayType(model);
+
+        const output = defaultOutput
+          // Remove any backticks
+          .replace(/`/g, '')
+          // Remove any `<code>` and `</code>` tags
+          .replace(/<code>/g, '')
+          .replace(/<\/code>/g, '');
+
+        return `<code>${output}</code>`;
       },
     };
   }

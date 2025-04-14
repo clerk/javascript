@@ -1606,7 +1606,6 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * Parameters for the `createOrganization()` method.
  * @interface
  */
 export interface CreateOrganizationParams {
