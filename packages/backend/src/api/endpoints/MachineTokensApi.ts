@@ -5,7 +5,7 @@ import { AbstractAPI } from './AbstractApi';
 const basePath = '/m2m_tokens';
 
 export class MachineTokensApi extends AbstractAPI {
-  async verifyMachineToken(secret: string) {
+  async verifySecret(secret: string) {
     return this.request<MachineToken>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),

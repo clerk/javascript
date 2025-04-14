@@ -82,7 +82,7 @@ async function verifyMachineToken(
 ): Promise<MachineTokenReturnType<MachineToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2mTokens.verifyMachineToken(secret);
+    const verifiedToken = await client.machineTokens.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {
@@ -125,7 +125,7 @@ async function verifyOAuthToken(
 ): Promise<MachineTokenReturnType<OAuthApplicationToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.oAuthApplicationTokens.verifyToken(secret);
+    const verifiedToken = await client.oAuthApplicationTokens.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {
@@ -168,7 +168,7 @@ async function verifyAPIKey(
 ): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.apiKeys.verifyApiKey(secret);
+    const verifiedToken = await client.apiKeys.verifySecret(secret);
     return { data: verifiedToken, errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {

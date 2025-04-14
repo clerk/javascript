@@ -34,7 +34,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),
     invitations: new InvitationAPI(request),
-    m2mTokens: new MachineTokensApi(request),
+    machineTokens: new MachineTokensApi(request),
     oAuthApplicationTokens: new OAuthApplicationTokensApi(request),
     apiKeys: new APIKeysAPI(request),
     organizations: new OrganizationAPI(request),
