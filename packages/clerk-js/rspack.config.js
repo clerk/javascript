@@ -31,10 +31,11 @@ const variantToSourceFile = {
  *
  * @param {object} config
  * @param {'development'|'production'} config.mode
+ * @param {string} config.variant
  * @param {boolean} [config.disableRHC=false]
  * @returns { import('@rspack/cli').Configuration }
  */
-const common = ({ mode, disableRHC = false }) => {
+const common = ({ mode, variant, disableRHC = false }) => {
   return {
     mode,
     resolve: {
@@ -67,7 +68,7 @@ const common = ({ mode, disableRHC = false }) => {
         }),
     ].filter(Boolean),
     output: {
-      chunkFilename: `[name]_[runtime]_[fullhash:6]_${packageJSON.version}.js`,
+      chunkFilename: `[name]_${variant}_[fullhash:6]_${packageJSON.version}.js`,
     },
     /**
      * Remove the Stripe dependencies from the bundle, if RHC is disabled.
@@ -358,21 +359,21 @@ const prodConfig = ({ mode, env, analysis }) => {
           ],
         }
       : {},
-    common({ mode }),
+    common({ mode, variant: variants.clerkBrowser }),
     commonForProd(),
     commonForProdChunked({ targets: packageJSON.browserslist }),
   );
 
   const clerkLegacyBrowser = merge(
     entryForVariant(variants.clerkLegacyBrowser),
-    common({ mode }),
+    common({ mode, variant: variants.clerkLegacyBrowser }),
     commonForProd(),
     commonForProdChunked({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
   );
 
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
-    common({ mode }),
+    common({ mode, variant: variants.clerkHeadless }),
     commonForProd(),
     commonForProdChunked({ targets: packageJSON.browserslist }),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
@@ -391,7 +392,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkHeadlessBrowser = merge(
     entryForVariant(variants.clerkHeadlessBrowser),
-    common({ mode }),
+    common({ mode, variant: variants.clerkHeadlessBrowser }),
     commonForProd(),
     commonForProdChunked({ targets: packageJSON.browserslist }),
     // externalsForHeadless(),
@@ -399,7 +400,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
-    common({ mode }),
+    common({ mode, variant: variants.clerk }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
     {
@@ -426,7 +427,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkCjs = merge(
     entryForVariant(variants.clerk),
-    common({ mode }),
+    common({ mode, variant: variants.clerk }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
     {
@@ -465,7 +466,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkEsmNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
-    common({ mode, disableRHC: true }),
+    common({ mode, disableRHC: true, variant: variants.clerkNoRHC }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
     commonForNoRHC(),
@@ -482,7 +483,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   const clerkCjsNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
-    common({ mode, disableRHC: true }),
+    common({ mode, disableRHC: true, variant: variants.clerkNoRHC }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
     commonForNoRHC(),
@@ -577,31 +578,31 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerk]: merge(
       entryForVariant(variants.clerk),
-      common({ mode }),
+      common({ mode, variant: variants.clerk }),
       commonForDev(),
     ),
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
       isSandbox ? { entry: { sandbox: './sandbox/app.ts' } } : {},
-      common({ mode }),
+      common({ mode, variant: variants.clerkBrowser }),
       commonForDev(),
     ),
     // prettier-ignore
     [variants.clerkBrowserNoRHC]: merge(
       entryForVariant(variants.clerkBrowserNoRHC),
-      common({ mode, disableRHC: true }),
+      common({ mode, disableRHC: true, variants: variant.clerkBrowserNoRHC }),
       commonForDev(),
     ),
     [variants.clerkHeadless]: merge(
       entryForVariant(variants.clerkHeadless),
-      common({ mode }),
+      common({ mode, variant: variants.clerkHeadless }),
       commonForDev(),
       // externalsForHeadless(),
     ),
     [variants.clerkHeadlessBrowser]: merge(
       entryForVariant(variants.clerkHeadlessBrowser),
-      common({ mode }),
+      common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
       // externalsForHeadless(),
     ),
