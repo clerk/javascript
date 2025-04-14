@@ -19,6 +19,17 @@ class ClerkMarkdownTheme extends MarkdownTheme {
 }
 
 /**
+ * This map stores the comment for the first item in a union type.
+ * It'll be used to add that comment to the other items of the union type.
+ * This way the comment only has to be added once.
+ * @type {Map<string, import('typedoc').Comment>}
+ *
+ * The key is a concenation of the model's type name and the union type's declaration name.
+ * The value is the comment
+ */
+const unionCommentMap = new Map();
+
+/**
  * Our custom Clerk theme
  * @extends MarkdownThemeContext
  */
@@ -167,17 +178,48 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
          * @type {string[]}
          */
         const md = [];
+        /**
+         * @type {string[]}
+         */
+        const headings = [];
+        /**
+         * Search for the `@unionReturnHeadings` tag in the comment of the model
+         */
+        const unionReturnHeadings = model.comment?.getTag('@unionReturnHeadings');
+
         if (model.type instanceof UnionType) {
           const elementSummaries = model.type?.elementSummaries;
           model.type.types.forEach((type, i) => {
             if (type instanceof ReflectionType) {
-              const possibleUnionHeadings = model.comment?.getTag('@unionReturnHeadings');
-              if (possibleUnionHeadings) {
-                if (possibleUnionHeadings.content.length > 0) {
-                  const content = this.helpers.getCommentParts(possibleUnionHeadings.content);
-                  const unionHeadings = JSON.parse(content);
+              if (unionReturnHeadings && unionReturnHeadings.content.length > 0) {
+                const content = this.helpers.getCommentParts(unionReturnHeadings.content);
+                const unionHeadings = JSON.parse(content);
 
-                  md.push(heading(3, `${unionHeadings[i]} {{ combineTables: true, toc: false }}`));
+                /**
+                 * While iterating over the union types, the headings are pulled from `@unionReturnHeadings` and added to the array
+                 */
+                headings.push(unionHeadings[i]);
+
+                /**
+                 * The `model.type.types` is the array of the individual items of the union type.
+                 * We're documenting our code by only adding the comment to the first item of the union type.
+                 *
+                 * In this block, we're doing the following:
+                 * 1. Generate an ID for the item in the unionCommentMap
+                 * 2. Check if the union type has a comment (truthy for the first item)
+                 * 3. Add the comment to the map
+                 * 4. If the union doesn't have a comment for the given ID, add the comment from the map to the item
+                 */
+                if (type.declaration.children) {
+                  for (const decl of type.declaration.children) {
+                    const id = `${model.name}-${decl.name}`;
+
+                    if (decl.comment && !unionCommentMap.has(id)) {
+                      unionCommentMap.set(id, decl.comment);
+                    } else if (!decl.comment && unionCommentMap.has(id)) {
+                      decl.comment = unionCommentMap.get(id);
+                    }
+                  }
                 }
               }
 
@@ -190,7 +232,17 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
             }
           });
         }
-        return md.join('\n');
+
+        if (!unionReturnHeadings) {
+          return md.join('\n');
+        }
+
+        const items = headings.map(i => `'${i}'`).join(', ');
+        const tabs = md.map(i => `<Tab>${i}</Tab>`).join('\n');
+
+        return `<Tabs items={[${items}]}>
+${tabs}
+</Tabs>`;
       },
       /**
        * This ensures that everything is wrapped in a single codeblock
@@ -210,14 +262,4 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
     };
   }
-}
-
-/**
- * Returns a heading in markdown format
- * @param {number} level The level of the heading
- * @param {string} text The text of the heading
- */
-function heading(level, text) {
-  level = level > 6 ? 6 : level;
-  return `${[...Array(level)].map(() => '#').join('')} ${text}`;
 }
