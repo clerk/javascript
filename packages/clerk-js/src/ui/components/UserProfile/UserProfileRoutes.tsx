@@ -5,6 +5,7 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
+import { InvoicePage } from './InvoicePage';
 import { SecurityPage } from './SecurityPage';
 
 const BillingPage = lazy(() =>
@@ -63,6 +64,9 @@ export const UserProfileRoutes = () => {
                 <Suspense fallback={''}>
                   <BillingPage />
                 </Suspense>
+              </Route>
+              <Route path='invoice'>
+                <InvoicePage />
               </Route>
             </Switch>
           </Route>
