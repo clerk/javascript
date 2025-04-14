@@ -25,7 +25,7 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
   protected fromJSON(
     data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null,
   ): this {
-    if (!data?.billing) {
+    if (!data) {
       return this;
     }
 
