@@ -6,6 +6,7 @@ export * from './DomainApi';
 export * from './EmailAddressApi';
 export * from './InvitationApi';
 export * from './JwksApi';
+export * from './JwtTemplatesApi';
 export * from './OrganizationApi';
 export * from './PhoneNumberApi';
 export * from './ProxyCheckApi';
