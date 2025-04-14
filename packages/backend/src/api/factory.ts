@@ -5,7 +5,7 @@ import {
   DomainAPI,
   EmailAddressAPI,
   InvitationAPI,
-  JwksAPI,  
+  JwksAPI,
   JwtTemplatesApi,
   OAuthApplicationsApi,
   OrganizationAPI,
