@@ -4,7 +4,7 @@ import { createSession, createSignIn, createSignUp, createUser } from '../../tes
 import { BaseResource, Client } from '../internal';
 
 describe('Client Singleton', () => {
-  describe('sendCaptchaToken', () => {
+  describe('__internal_sendCaptchaToken', () => {
     it('sends captcha token', async () => {
       const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
       const session = createSession({ id: 'session_1' }, user);
@@ -24,7 +24,7 @@ describe('Client Singleton', () => {
       BaseResource._baseFetch = jest.fn();
 
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
-      await client.sendCaptchaToken({ captcha_token: 'test_captcha_token' });
+      await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
       // @ts-expect-error This is a private method that we are mocking
       expect(BaseResource._baseFetch).toHaveBeenCalledWith({
         method: 'POST',
@@ -54,7 +54,7 @@ describe('Client Singleton', () => {
       BaseResource._baseFetch = jest.fn().mockResolvedValueOnce(Promise.resolve(null));
 
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
-      await client.sendCaptchaToken({ captcha_token: 'test_captcha_token' });
+      await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
       // @ts-expect-error This is a private method that we are mocking
       expect(BaseResource._baseFetch).toHaveBeenCalledWith({
         method: 'POST',
