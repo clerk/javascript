@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignUp()` hook provides access to the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up/sign-up) object, which allows you to check the current state of a sign-up attempt and manage the sign-up flow. You can use this to create a [custom sign-up flow](https://clerk.com/docs/custom-flows/overview#sign-up-flow).
+ * The `useSignUp()` hook provides access to the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up) object, which allows you to check the current state of a sign-up attempt and manage the sign-up flow. You can use this to create a [custom sign-up flow](https://clerk.com/docs/custom-flows/overview#sign-up-flow).
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
@@ -14,7 +14,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * @example
  * ### Check the current state of a sign-up
  *
- * The following example uses the `useSignUp()` hook to access the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up/sign-up) object, which contains the current sign-up attempt status and methods to create a new sign-up attempt. The `isLoaded` property is used to handle the loading state.
+ * The following example uses the `useSignUp()` hook to access the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up) object, which contains the current sign-up attempt status and methods to create a new sign-up attempt. The `isLoaded` property is used to handle the loading state.
  *
  * <Tabs items='React,Next.js'>
  * <Tab>
