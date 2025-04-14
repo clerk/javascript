@@ -1,4 +1,6 @@
 import type {
+  AllowlistIdentifierType,
+  BlocklistIdentifierType,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -12,6 +14,7 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
+  BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
   Email: 'email',
@@ -73,9 +76,20 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
+  identifier_type: AllowlistIdentifierType;
+  instance_id?: string;
+  invitation_id?: string;
   created_at: number;
   updated_at: number;
-  invitation_id?: string;
+}
+
+export interface BlocklistIdentifierJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BlocklistIdentifier;
+  identifier: string;
+  identifier_type: BlocklistIdentifierType;
+  instance_id?: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

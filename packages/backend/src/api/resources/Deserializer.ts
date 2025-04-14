@@ -1,5 +1,6 @@
 import {
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
   Cookies,
   DeletedObject,
@@ -73,6 +74,8 @@ function jsonToObject(item: any): any {
       return AccountlessApplication.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
+    case ObjectType.BlocklistIdentifier:
+      return BlocklistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
     case ObjectType.Cookies:
