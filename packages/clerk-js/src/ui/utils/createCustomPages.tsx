@@ -91,7 +91,8 @@ const createCustomPages = (
     commerce:
       clerk.sdkMetadata?.environment === 'test'
         ? false
-        : clerk.__internal_getOption('experimental')?.commerce && environment?.__experimental_commerceSettings.enabled,
+        : clerk.__internal_getOption('experimental')?.commerce &&
+          environment?.__experimental_commerceSettings?.billing.enabled,
   });
 
   if (isDevelopmentSDK(clerk)) {

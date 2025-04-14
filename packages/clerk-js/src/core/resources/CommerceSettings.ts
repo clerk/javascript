@@ -10,8 +10,10 @@ import { BaseResource } from './internal';
  * @internal
  */
 export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
-  stripePublishableKey: string = '';
-  enabled: boolean = false;
+  billing = {
+    stripePublishableKey: '',
+    enabled: false,
+  };
 
   public constructor(
     data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null = null,
@@ -23,18 +25,22 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
   protected fromJSON(
     data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null,
   ): this {
-    if (!data) {
+    if (!data?.billing) {
       return this;
     }
-    this.stripePublishableKey = data.stripe_publishable_key;
-    this.enabled = data.enabled;
+
+    this.billing.stripePublishableKey = data.billing.stripe_publishable_key || '';
+    this.billing.enabled = data.billing.enabled || false;
+
     return this;
   }
 
   public __internal_toSnapshot(): __experimental_CommerceSettingsJSONSnapshot {
     return {
-      stripe_publishable_key: this.stripePublishableKey,
-      enabled: this.enabled,
+      billing: {
+        stripe_publishable_key: this.billing.stripePublishableKey,
+        enabled: this.billing.enabled,
+      },
     } as unknown as __experimental_CommerceSettingsJSONSnapshot;
   }
 }
