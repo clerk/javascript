@@ -1,10 +1,9 @@
 /* eslint-disable import/export */
 import type { VerifyWebhookOptions } from '@clerk/backend/webhooks';
 import { verifyWebhook as verifyWebhookBase } from '@clerk/backend/webhooks';
-import type { NextApiRequest } from 'next';
 
 import { getHeader, isNextRequest, isRequestWebAPI } from './server/headers-utils';
-import type { GsspRequest, RequestLike } from './server/types';
+import type { RequestLike } from './server/types';
 // Ordering of exports matter here since
 // we're overriding the base verifyWebhook
 export * from '@clerk/backend/webhooks';
@@ -57,7 +56,7 @@ export async function verifyWebhook(request: RequestLike, options?: VerifyWebhoo
   return verifyWebhookBase(webRequest, options);
 }
 
-function nextApiRequestToWebRequest(req: NextApiRequest | GsspRequest): Request {
+function nextApiRequestToWebRequest(req: RequestLike): Request {
   const headers = new Headers();
   const svixId = getHeader(req, SVIX_ID_HEADER) || '';
   const svixTimestamp = getHeader(req, SVIX_TIMESTAMP_HEADER) || '';
@@ -68,8 +67,8 @@ function nextApiRequestToWebRequest(req: NextApiRequest | GsspRequest): Request 
   headers.set(SVIX_SIGNATURE_HEADER, svixSignature);
 
   // Create a dummy URL to make a Request object
-  const protocol = req.headers['x-forwarded-proto'] || 'http';
-  const host = req.headers.host || 'clerk-dummy';
+  const protocol = getHeader(req, 'x-forwarded-proto') || 'http';
+  const host = getHeader(req, 'x-forwarded-host') || 'clerk-dummy';
   const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://${host}`);
 
   const body = 'body' in req && req.body ? JSON.stringify(req.body) : undefined;
