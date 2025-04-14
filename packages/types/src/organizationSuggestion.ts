@@ -5,6 +5,10 @@ import type { ClerkResource } from './resource';
  */
 export type OrganizationSuggestionStatus = 'pending' | 'accepted';
 
+/**
+ * An interface representing an organization suggestion.
+ * @interface
+ */
 export interface OrganizationSuggestionResource extends ClerkResource {
   id: string;
   publicOrganizationData: {
