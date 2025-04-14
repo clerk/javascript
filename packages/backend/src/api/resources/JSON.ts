@@ -538,3 +538,7 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
+
+export interface WebhooksSvixJSON {
+  svix_url: string;
+}
