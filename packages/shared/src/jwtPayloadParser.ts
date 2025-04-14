@@ -21,7 +21,6 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
     .map((permission: number) =>
       permission
         .toString(2)
-        .padStart(permissions.length, '0')
         .split('')
         .map(bit => Number.parseInt(bit, 10)),
     )
