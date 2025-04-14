@@ -1,8 +1,11 @@
 import * as React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Box, Dd, descriptors, Dl, Dt, Span } from '../customizables';
+import { Box, Button, Dd, descriptors, Dl, Dt, Icon, Span } from '../customizables';
+import { useClipboard } from '../hooks';
+import { Check, Copy } from '../icons';
 import { common } from '../styledSystem';
+import { truncateWithEndVisible } from '../utils/truncateTextWithEndVisible';
 
 /* -------------------------------------------------------------------------------------------------
  * LineItems.Root
@@ -95,7 +98,6 @@ function Title({ title, description }: TitleProps) {
       sx={t => ({
         display: 'grid',
         color: variant === 'primary' ? t.colors.$colorText : t.colors.$colorTextSecondary,
-        marginTop: variant !== 'primary' ? t.space.$0x25 : undefined,
         ...common.textVariants(t)[textVariant],
       })}
     >
@@ -120,11 +122,26 @@ function Title({ title, description }: TitleProps) {
 
 interface DescriptionProps {
   text: string | LocalizationKey;
+  /**
+   * When true, the text will be truncated with an ellipsis in the middle and the last 5 characters will be visible.
+   * @default `false`
+   */
+  truncateText?: boolean;
+  /**
+   * When true, there will be a button to copy the providedtext.
+   * @default `false`
+   */
+  copyText?: boolean;
+  /**
+   * The visually hidden label for the copy button.
+   * @default `Copy`
+   */
+  copyLabel?: string;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
 }
 
-function Description({ text, prefix, suffix }: DescriptionProps) {
+function Description({ text, prefix, suffix, truncateText = false, copyText = false, copyLabel }: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -147,6 +164,7 @@ function Description({ text, prefix, suffix }: DescriptionProps) {
           justifyContent: 'flex-end',
           alignItems: 'center',
           gap: t.space.$1,
+          minWidth: '0',
         })}
       >
         {prefix ? (
@@ -159,13 +177,27 @@ function Description({ text, prefix, suffix }: DescriptionProps) {
             })}
           />
         ) : null}
-        <Span
-          localizationKey={text}
-          elementDescriptor={descriptors.lineItemsDescriptionText}
-          sx={t => ({
-            ...common.textVariants(t).body,
-          })}
-        />
+        {typeof text === 'string' && truncateText ? (
+          <TruncatedText text={text} />
+        ) : (
+          <Span
+            localizationKey={text}
+            elementDescriptor={descriptors.lineItemsDescriptionText}
+            sx={t => ({
+              ...common.textVariants(t).body,
+              minWidth: '0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            })}
+          />
+        )}
+        {typeof text === 'string' && copyText ? (
+          <CopyButton
+            text={text}
+            copyLabel={copyLabel}
+          />
+        ) : null}
       </Span>
       {suffix ? (
         <Span
@@ -174,10 +206,61 @@ function Description({ text, prefix, suffix }: DescriptionProps) {
           sx={t => ({
             color: t.colors.$colorTextSecondary,
             ...common.textVariants(t).caption,
+            justifySelf: 'flex-end',
           })}
         />
       ) : null}
     </Dd>
+  );
+}
+
+function TruncatedText({ text }: { text: string }) {
+  const { onCopy } = useClipboard(text);
+  return (
+    <Span
+      elementDescriptor={descriptors.lineItemsDescriptionText}
+      sx={t => ({
+        ...common.textVariants(t).body,
+        display: 'flex',
+        minWidth: '0',
+      })}
+      onCopy={async e => {
+        e.preventDefault();
+        await onCopy();
+      }}
+    >
+      {truncateWithEndVisible(text, 15)}
+    </Span>
+  );
+}
+
+function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
+  const { onCopy, hasCopied } = useClipboard(text);
+
+  return (
+    <Button
+      variant='unstyled'
+      onClick={onCopy}
+      sx={t => ({
+        color: 'inherit',
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        padding: 0,
+        borderRadius: t.radii.$sm,
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: t.colors.$neutralAlpha200,
+        },
+      })}
+      focusRing={false}
+      aria-label={hasCopied ? 'Copied' : copyLabel}
+    >
+      <Icon
+        size='sm'
+        icon={hasCopied ? Check : Copy}
+        aria-hidden
+      />
+    </Button>
   );
 }
 

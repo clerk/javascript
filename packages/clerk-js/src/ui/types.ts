@@ -111,6 +111,11 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
 };
 
+export type __experimental_PaymentSourcesCtx = {
+  componentName: 'PaymentSources';
+  subscriberType?: __experimental_CommerceSubscriberType;
+};
+
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;
   redirectUrlComplete?: string;
@@ -130,5 +135,4 @@ export type AvailableComponentCtx =
   | WaitlistCtx
   | __experimental_PricingTableCtx
   | __experimental_CheckoutCtx;
-
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

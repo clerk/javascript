@@ -2,7 +2,7 @@ import type { OrganizationCustomRoleKey } from 'organizationMembership';
 import type { SignInResource } from 'signIn';
 
 import type { SetActive, SignOut } from './clerk';
-import type { ActClaim } from './jwtv2';
+import type { ActClaim, JwtPayload } from './jwtv2';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -12,7 +12,13 @@ import type {
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
+/**
+ * @inline
+ */
 type CheckAuthorizationSignedOut = undefined;
+/**
+ * @inline
+ */
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
@@ -36,6 +42,10 @@ export type UseAuthReturn =
        * The ID for the current session.
        */
       sessionId: undefined;
+      /**
+       * The JWT claims for the current session.
+       */
+      sessionClaims: undefined;
       /**
        * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
        */
@@ -70,6 +80,7 @@ export type UseAuthReturn =
       isSignedIn: false;
       userId: null;
       sessionId: null;
+      sessionClaims: null;
       actor: null;
       orgId: null;
       orgRole: null;
@@ -83,6 +94,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActClaim | null;
       orgId: null;
       orgRole: null;
@@ -96,6 +108,7 @@ export type UseAuthReturn =
       isSignedIn: true;
       userId: string;
       sessionId: string;
+      sessionClaims: JwtPayload;
       actor: ActClaim | null;
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
@@ -220,7 +233,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The [`User`](https://clerk.com/docs/references/javascript/user) object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
        */
       user: undefined;
     }

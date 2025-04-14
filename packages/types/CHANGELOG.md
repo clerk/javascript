@@ -1,5 +1,49 @@
 # Change Log
 
+## 4.54.0
+
+### Minor Changes
+
+- Add `pla` claim to `VersionedJwtPayload`. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Nest existing commerce settings under `billing`. ([#5612](https://github.com/clerk/javascript/pull/5612)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename the `sendCaptchaToken` to `__internal_sendCaptchaToken`. ([#5581](https://github.com/clerk/javascript/pull/5581)) by [@anagstef](https://github.com/anagstef)
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
+## 4.53.0
+
+### Minor Changes
+
+- Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
+
+  - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
+
+## 4.52.0
+
+### Minor Changes
+
+- Adding the new `o` claim that contains all organization related info for JWT v2 schema ([#5549](https://github.com/clerk/javascript/pull/5549)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add Payment Sources to `<OrgProfile />`, hook up all org-related payment source and checkout methods to the org-specific endpoints ([#5554](https://github.com/clerk/javascript/pull/5554)) by [@aeliox](https://github.com/aeliox)
+
+- Add copy and truncation options to `<LineItems.Description />` component. ([#5560](https://github.com/clerk/javascript/pull/5560)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Optionally handle the `intent` parameter on SSO redirects to reload specific resources. ([#5553](https://github.com/clerk/javascript/pull/5553)) by [@dstaley](https://github.com/dstaley)
+
+## 4.51.1
+
+### Patch Changes
+
+- Expose the 'external_account.phone_number' property. This represents the associated phone number, if exists, with the specific external account ([#5557](https://github.com/clerk/javascript/pull/5557)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.51.0
 
 ### Minor Changes

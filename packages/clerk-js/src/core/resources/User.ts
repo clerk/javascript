@@ -243,7 +243,7 @@ export class User extends BaseResource implements UserResource {
 
   delete = (): Promise<void> => {
     return this._baseDelete({ path: '/me' }).then(res => {
-      eventBus.dispatch(events.UserSignOut, null);
+      eventBus.emit(events.UserSignOut, null);
       return res;
     });
   };

@@ -84,7 +84,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
-  disabledCommerceFeature,
+  disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -381,6 +381,15 @@ export class Clerk implements ClerkInterface {
 
     this.#options = this.#initOptions(options);
 
+    /**
+     * Listen to `Session.getToken` resolving to emit the updated session
+     * with the new token to the state listeners.
+     */
+    eventBus.on(events.SessionTokenResolved, () => {
+      this.#setAccessors(this.session);
+      this.#emit();
+    });
+
     assertNoLegacyProp(this.#options);
 
     if (this.#options.sdkMetadata) {
@@ -431,9 +440,9 @@ export class Clerk implements ClerkInterface {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out.
-      eventBus.dispatch(events.UserSignOut, null);
+      eventBus.emit(events.UserSignOut, null);
       // Clean up cookies
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
 
       this.#setTransitiveState();
 
@@ -946,7 +955,7 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledCommerceFeature(this, this.environment)) {
+    if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
           code: 'cannot_render_commerce_disabled',
@@ -1033,7 +1042,7 @@ export class Clerk implements ClerkInterface {
       }
 
       if (session?.lastActiveToken) {
-        eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+        eventBus.emit(events.TokenUpdate, { token: session.lastActiveToken });
       }
 
       /**
@@ -1053,7 +1062,7 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
-        eventBus.dispatch(events.TokenUpdate, { token: null });
+        eventBus.emit(events.TokenUpdate, { token: null });
       }
 
       //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
@@ -1120,7 +1129,7 @@ export class Clerk implements ClerkInterface {
     // has expired, it needs to trigger a sign-out
     const token = await session.getToken();
     if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
+      eventBus.emit(events.TokenUpdate, { token: null });
     }
 
     // Only triggers navigation for internal routing, in order to not affect custom flows
@@ -1528,16 +1537,15 @@ export class Clerk implements ClerkInterface {
     // directs the opening page to navigate to the /sso-callback route), we need to reload the signIn and signUp resources
     // to ensure that we have the latest state. This operation can fail when we try reloading a resource that doesn't
     // exist (such as when reloading a signIn resource during a signUp attempt), but this can be safely ignored.
-    if (!window.opener) {
+    if (!window.opener && params.reloadResource) {
       try {
-        await signIn.reload();
+        if (params.reloadResource === 'signIn') {
+          await signIn.reload();
+        } else if (params.reloadResource === 'signUp') {
+          await signUp.reload();
+        }
       } catch {
-        // This can be safely ignored
-      }
-      try {
-        await signUp.reload();
-      } catch {
-        // This can be safely ignored
+        // This catch intentionally left blank.
       }
     }
 
@@ -1766,7 +1774,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
       if (opts.broadcast) {
-        eventBus.dispatch(events.UserSignOut, null);
+        eventBus.emit(events.UserSignOut, null);
       }
       return this.setActive({ session: null });
     } catch (err) {
@@ -1851,6 +1859,7 @@ export class Clerk implements ClerkInterface {
     unsafeMetadata,
     strategy,
     legalAccepted,
+    secondFactorUrl,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Web3');
@@ -1860,6 +1869,9 @@ export class Clerk implements ClerkInterface {
     if (!this.client || !this.environment) {
       return;
     }
+
+    const { displayConfig } = this.environment;
+
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
@@ -1869,8 +1881,23 @@ export class Clerk implements ClerkInterface {
           ? generateSignatureWithCoinbaseWallet
           : generateSignatureWithOKXWallet;
 
-    const navigate = (to: string) =>
+    const makeNavigate = (to: string) => () =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    const navigateToFactorTwo = makeNavigate(
+      secondFactorUrl || buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+    );
+
+    const navigateToContinueSignUp = makeNavigate(
+      signUpContinueUrl ||
+        buildURL(
+          {
+            base: displayConfig.signUpUrl,
+            hashPath: '/continue',
+          },
+          { stringify: true },
+        ),
+    );
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
@@ -1894,18 +1921,27 @@ export class Clerk implements ClerkInterface {
           signInOrSignUp.status === 'missing_requirements' &&
           signInOrSignUp.verifications.web3Wallet.status === 'verified'
         ) {
-          await navigate(signUpContinueUrl);
+          await navigateToContinueSignUp();
         }
       } else {
         throw err;
       }
     }
 
-    if (signInOrSignUp.createdSessionId) {
-      await this.setActive({
-        session: signInOrSignUp.createdSessionId,
-        redirectUrl,
-      });
+    switch (signInOrSignUp.status) {
+      case 'needs_second_factor':
+        await navigateToFactorTwo();
+        break;
+      case 'complete':
+        if (signInOrSignUp.createdSessionId) {
+          await this.setActive({
+            session: signInOrSignUp.createdSessionId,
+            redirectUrl,
+          });
+        }
+        break;
+      default:
+        return;
     }
   };
 
@@ -1957,7 +1993,7 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
-      eventBus.dispatch(events.TokenUpdate, { token: this.session?.lastActiveToken });
+      eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
     this.#emit();

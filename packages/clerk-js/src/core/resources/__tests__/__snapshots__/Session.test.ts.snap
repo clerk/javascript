@@ -34,6 +34,13 @@ exports[`Session getToken() dispatches token:update event on getToken with activ
 ]
 `;
 
+exports[`Session getToken() dispatches token:update event on getToken with active organization 2`] = `
+[
+  "session:tokenResolved",
+  null,
+]
+`;
+
 exports[`Session getToken() dispatches token:update event on getToken without active organization 1`] = `
 [
   "token:update",
@@ -65,5 +72,12 @@ exports[`Session getToken() dispatches token:update event on getToken without ac
       "pathRoot": "/client/sessions/session_1/tokens",
     },
   },
+]
+`;
+
+exports[`Session getToken() dispatches token:update event on getToken without active organization 2`] = `
+[
+  "session:tokenResolved",
+  null,
 ]
 `;

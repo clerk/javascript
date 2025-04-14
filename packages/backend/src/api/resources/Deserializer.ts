@@ -1,16 +1,19 @@
 import {
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
   Cookies,
   DeletedObject,
   Email,
   EmailAddress,
   Invitation,
+  JwtTemplate,
   OauthAccessToken,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
   PhoneNumber,
+  ProxyCheck,
   RedirectUrl,
   Session,
   SignInToken,
@@ -72,6 +75,8 @@ function jsonToObject(item: any): any {
       return AccountlessApplication.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
+    case ObjectType.BlocklistIdentifier:
+      return BlocklistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
     case ObjectType.Cookies:
@@ -82,6 +87,8 @@ function jsonToObject(item: any): any {
       return Email.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.JwtTemplate:
+      return JwtTemplate.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.Organization:
@@ -92,6 +99,8 @@ function jsonToObject(item: any): any {
       return OrganizationMembership.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
+    case ObjectType.ProxyCheck:
+      return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
     case ObjectType.SignInToken:

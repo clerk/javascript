@@ -35,7 +35,7 @@ export type AuthenticateRequestOptions = {
    */
   afterSignUpUrl?: string;
   /**
-   * Used to activate a specific [organization](https://clerk.com/docs/organizations/overview) or [personal account](https://clerk.com/docs/organizations/organization-workspaces#organization-workspaces-in-the-clerk-dashboard:~:text=Personal%20account) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
+   * Used to activate a specific [organization](https://clerk.com/docs/organizations/overview) or [personal account](https://clerk.com/docs/organizations/organization-workspaces) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
    *
    * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
    */
@@ -61,8 +61,8 @@ export type OrganizationSyncOptions = {
    *
    * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * @warning
-   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
+   * > [!WARNING]
+   * > If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]

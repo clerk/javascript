@@ -21,6 +21,7 @@ export interface ExternalAccountResource extends ClerkResource {
   lastName: string;
   imageUrl: string;
   username?: string;
+  phoneNumber?: string;
   publicMetadata: Record<string, unknown>;
   label?: string;
   verification: VerificationResource | null;

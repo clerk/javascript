@@ -1,4 +1,6 @@
 import type {
+  AllowlistIdentifierType,
+  BlocklistIdentifierType,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -13,6 +15,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
   ApiKey: 'api_key',
+  BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
   Email: 'email',
@@ -22,6 +25,7 @@ export const ObjectType = {
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
   MachineToken: 'machine_token',
+  JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   OauthApplicationToken: 'oauth_application_token', // TODO: This has the oauth_access_token url as well
   Organization: 'organization',
@@ -29,6 +33,7 @@ export const ObjectType = {
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
+  ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
   Session: 'session',
@@ -74,9 +79,20 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
+  identifier_type: AllowlistIdentifierType;
+  instance_id?: string;
+  invitation_id?: string;
   created_at: number;
   updated_at: number;
-  invitation_id?: string;
+}
+
+export interface BlocklistIdentifierJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BlocklistIdentifier;
+  identifier: string;
+  identifier_type: BlocklistIdentifierType;
+  instance_id?: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -123,9 +139,36 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   last_name: string;
   image_url?: string;
   username: string | null;
+  phone_number: string | null;
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
   verification: VerificationJSON | null;
+}
+
+export interface JwksJSON {
+  keys?: JwksKeyJSON[];
+}
+
+export interface JwksKeyJSON {
+  use: string;
+  kty: string;
+  kid: string;
+  alg: string;
+  n: string;
+  e: string;
+}
+
+export interface JwtTemplateJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.JwtTemplate;
+  id: string;
+  name: string;
+  claims: object;
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -209,13 +252,16 @@ export interface OrganizationDomainVerificationJSON {
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   role: OrganizationMembershipRole;
+  role_name: string;
   organization_id: string;
   public_organization_data?: PublicOrganizationDataJSON | null;
   status?: OrganizationInvitationStatus;
   public_metadata: OrganizationInvitationPublicMetadata;
   private_metadata: OrganizationInvitationPrivateMetadata;
+  url: string | null;
   created_at: number;
   updated_at: number;
+  expires_at: number;
 }
 
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
@@ -256,6 +302,17 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   linked_to: IdentificationLinkJSON[];
   backup_codes: string[];
 }
+
+export type ProxyCheckJSON = {
+  object: typeof ObjectType.ProxyCheck;
+  id: string;
+  domain_id: string;
+  last_run_at: number | null;
+  proxy_url: string;
+  successful: boolean;
+  created_at: number;
+  updated_at: number;
+};
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
   object: typeof ObjectType.RedirectUrl;
@@ -518,4 +575,8 @@ export interface OauthApplicationTokenJSON {
   claims: Record<string, string> | null;
   created_at: number;
   expires_at: number;
+}
+
+export interface WebhooksSvixJSON {
+  svix_url: string;
 }

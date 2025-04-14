@@ -16,8 +16,6 @@ import {
 } from './internal';
 
 export class __experimental_CommerceCheckout extends BaseResource implements __experimental_CommerceCheckoutResource {
-  pathRoot = '/me/commerce/checkouts';
-
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
@@ -29,9 +27,10 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   subscription?: __experimental_CommerceSubscription;
   totals!: __experimental_CommerceTotals;
 
-  constructor(data: __experimental_CommerceCheckoutJSON) {
+  constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();
     this.fromJSON(data);
+    this.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
   }
 
   protected fromJSON(data: __experimental_CommerceCheckoutJSON | null): this {
@@ -55,10 +54,13 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     return this;
   }
 
-  confirm = (params?: __experimental_ConfirmCheckoutParams): Promise<this> => {
+  confirm = (params: __experimental_ConfirmCheckoutParams): Promise<this> => {
+    const { orgId, ...rest } = params;
     return this._basePatch({
-      path: this.path('confirm'),
-      body: params as any,
+      path: orgId
+        ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
+        : `/me/commerce/checkouts/${this.id}/confirm`,
+      body: rest as any,
     });
   };
 }

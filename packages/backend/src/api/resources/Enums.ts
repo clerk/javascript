@@ -36,3 +36,7 @@ export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_fact
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+
+export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
+
+export type BlocklistIdentifierType = AllowlistIdentifierType;

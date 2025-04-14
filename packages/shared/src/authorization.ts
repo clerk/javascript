@@ -2,6 +2,7 @@ import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   PendingSessionOptions,
@@ -20,11 +21,18 @@ type AuthorizationOptions = {
   orgRole: string | null | undefined;
   orgPermissions: string[] | null | undefined;
   factorVerificationAge: [number, number] | null;
+  features: string | null | undefined;
+  plans: string | null | undefined;
 };
 
 type CheckOrgAuthorization = (
   params: { role?: OrganizationCustomRoleKey; permission?: OrganizationCustomPermissionKey },
-  { orgId, orgRole, orgPermissions }: AuthorizationOptions,
+  options: Pick<AuthorizationOptions, 'orgId' | 'orgRole' | 'orgPermissions'>,
+) => boolean | null;
+
+type CheckBillingAuthorization = (
+  params: { feature?: string; plan?: string },
+  options: Pick<AuthorizationOptions, 'plans' | 'features'>,
 ) => boolean | null;
 
 type CheckReverificationAuthorization = (
@@ -72,6 +80,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   if (!params.role && !params.permission) {
     return null;
   }
+
   if (!orgId || !orgRole || !orgPermissions) {
     return null;
   }
@@ -79,10 +88,49 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   if (params.permission) {
     return orgPermissions.includes(params.permission);
   }
+
   if (params.role) {
     return orgRole === params.role;
   }
   return null;
+};
+
+const checkForFeatureOrPlan = (claim: string, featureOrPlan: string) => {
+  const { org: orgFeatures, user: userFeatures } = splitByScope(claim);
+  const [scope, _id] = featureOrPlan.split(':');
+  const id = _id || scope;
+
+  if (scope === 'org') {
+    return orgFeatures.includes(id);
+  } else if (scope === 'user') {
+    return userFeatures.includes(id);
+  } else {
+    // Since org scoped features will not exist if there is not an active org, merging is safe.
+    return [...orgFeatures, ...userFeatures].includes(id);
+  }
+};
+
+const checkBillingAuthorization: CheckBillingAuthorization = (params, options) => {
+  const { features, plans } = options;
+
+  if (params.feature && features) {
+    return checkForFeatureOrPlan(features, params.feature);
+  }
+
+  if (params.plan && plans) {
+    return checkForFeatureOrPlan(plans, params.plan);
+  }
+  return null;
+};
+
+const splitByScope = (fea: string | null | undefined) => {
+  const features = fea ? fea.split(',').map(f => f.trim()) : [];
+
+  // TODO: make this more efficient
+  return {
+    org: features.filter(f => f.split(':')[0].includes('o')).map(f => f.split(':')[1]),
+    user: features.filter(f => f.split(':')[0].includes('u')).map(f => f.split(':')[1]),
+  };
 };
 
 const validateReverificationConfig = (config: ReverificationConfig | undefined | null) => {
@@ -154,14 +202,15 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       return false;
     }
 
+    const billingAuthorization = checkBillingAuthorization(params, options);
     const orgAuthorization = checkOrgAuthorization(params, options);
     const reverificationAuthorization = checkReverificationAuthorization(params, options);
 
-    if ([orgAuthorization, reverificationAuthorization].some(a => a === null)) {
-      return [orgAuthorization, reverificationAuthorization].some(a => a === true);
+    if ([billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === null)) {
+      return [billingAuthorization || orgAuthorization, reverificationAuthorization].some(a => a === true);
     }
 
-    return [orgAuthorization, reverificationAuthorization].every(a => a === true);
+    return [billingAuthorization || orgAuthorization, reverificationAuthorization].every(a => a === true);
   };
 };
 
@@ -170,6 +219,7 @@ type AuthStateOptions = {
     userId?: string | null;
     sessionId?: string | null;
     sessionStatus?: SessionStatusClaim | null;
+    sessionClaims?: JwtPayload | null;
     actor?: ActClaim | null;
     orgId?: string | null;
     orgRole?: OrganizationCustomRoleKey | null;
@@ -188,7 +238,19 @@ type AuthStateOptions = {
  * @internal
  */
 const resolveAuthState = ({
-  authObject: { sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, signOut, getToken, has },
+  authObject: {
+    sessionId,
+    sessionStatus,
+    userId,
+    actor,
+    orgId,
+    orgRole,
+    orgSlug,
+    signOut,
+    getToken,
+    has,
+    sessionClaims,
+  },
   options: { treatPendingAsSignedOut = true },
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
@@ -196,6 +258,7 @@ const resolveAuthState = ({
       isLoaded: false,
       isSignedIn: undefined,
       sessionId,
+      sessionClaims: undefined,
       userId,
       actor: undefined,
       orgId: undefined,
@@ -213,6 +276,7 @@ const resolveAuthState = ({
       isSignedIn: false,
       sessionId,
       userId,
+      sessionClaims: null,
       actor: null,
       orgId: null,
       orgRole: null,
@@ -229,6 +293,7 @@ const resolveAuthState = ({
       isSignedIn: false,
       sessionId: null,
       userId: null,
+      sessionClaims: null,
       actor: null,
       orgId: null,
       orgRole: null,
@@ -239,11 +304,12 @@ const resolveAuthState = ({
     } as const;
   }
 
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
+  if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId,
@@ -255,11 +321,12 @@ const resolveAuthState = ({
     } as const;
   }
 
-  if (!!sessionId && !!userId && !orgId) {
+  if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
       isLoaded: true,
       isSignedIn: true,
       sessionId,
+      sessionClaims,
       userId,
       actor: actor || null,
       orgId: null,
@@ -272,4 +339,4 @@ const resolveAuthState = ({
   }
 };
 
-export { createCheckAuthorization, validateReverificationConfig, resolveAuthState };
+export { createCheckAuthorization, validateReverificationConfig, resolveAuthState, splitByScope };

@@ -42,6 +42,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'lineItemsDescriptionSuffix',
   'lineItemsDescriptionPrefix',
   'lineItemsDescriptionText',
+  'lineItemsCopyButton',
 
   'actionCard',
 
@@ -328,6 +329,13 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectButtonIcon',
   'selectOptionsContainer',
   'selectOption',
+
+  'paymentSourceRow',
+  'paymentSourceRowIcon',
+  'paymentSourceRowText',
+  'paymentSourceRowType',
+  'paymentSourceRowValue',
+  'paymentSourceRowBadge',
 
   'menuButton',
   'menuButtonEllipsis',

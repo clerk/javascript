@@ -1,5 +1,45 @@
 # @clerk/testing
 
+## 1.4.39
+
+### Patch Changes
+
+- Updated dependencies [[`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`950ffed`](https://github.com/clerk/javascript/commit/950ffedd5ce93678274c721400fc7464bb1e2f99), [`d3e6c32`](https://github.com/clerk/javascript/commit/d3e6c32864487bb9c4dec361866ec2cd427b7cd0), [`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`a0cc247`](https://github.com/clerk/javascript/commit/a0cc24764cc2229abae97f7c9183b413609febc7), [`85ed003`](https://github.com/clerk/javascript/commit/85ed003e65802ac02d69d7b671848938c9816c45), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`e60e3aa`](https://github.com/clerk/javascript/commit/e60e3aa41630b987b6a481643caf67d70584f2e1), [`65712dc`](https://github.com/clerk/javascript/commit/65712dccb3f3f2bc6028e53406e3f7f31622e961), [`9ee0531`](https://github.com/clerk/javascript/commit/9ee0531c81d1bb260ec0f87130d8394d7825b6d4), [`78d22d4`](https://github.com/clerk/javascript/commit/78d22d443446ac1c0d30b1b93aaf5cddde75a9a3), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/backend@1.28.0
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+
+## 1.4.38
+
+### Patch Changes
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/backend@1.27.3
+  - @clerk/shared@3.6.0
+  - @clerk/types@4.53.0
+
+## 1.4.37
+
+### Patch Changes
+
+- Update `setupClerk` to handle the explict setting of secret keys via `setupClerk({ secretKey: 'sk_test_***' })` ([#5561](https://github.com/clerk/javascript/pull/5561)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update `setupClerk` to enable skipping of the automatic loading of dot env files via `setupClerk({ dotenv: false })` ([#5561](https://github.com/clerk/javascript/pull/5561)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`1b34bcb`](https://github.com/clerk/javascript/commit/1b34bcb17e1a7f22644c0ea073857c528a8f81b7), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+  - @clerk/backend@1.27.2
+
+## 1.4.36
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/backend@1.27.1
+  - @clerk/types@4.51.1
+  - @clerk/shared@3.4.1
+
 ## 1.4.35
 
 ### Patch Changes

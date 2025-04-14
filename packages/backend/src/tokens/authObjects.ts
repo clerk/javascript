@@ -1,13 +1,11 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
-  ActClaim,
   CheckAuthorizationFromSessionClaims,
   JwtPayload,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
-  SessionStatusClaim,
+  SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
@@ -28,29 +26,8 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-type SignedInAuthObjectProperties = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  sessionStatus: SessionStatusClaim | null;
-  actor: ActClaim | undefined;
+export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
   entity: 'user';
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
-  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
-};
-
-/**
- * @internal
- */
-export type SignedInAuthObject = SignedInAuthObjectProperties & {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -127,32 +104,6 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
   };
 };
 
-const generateSignedInAuthObjectProperties = (claims: JwtPayload): SignedInAuthObjectProperties => {
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = claims.fva ?? null;
-
-  // sts can be undefined for instances that have not opt-in
-  const sessionStatus = claims.sts ?? null;
-
-  // TODO(jwt-v2): replace this when the new claim for org permissions is added, this will not break
-  // anything since the JWT v2 is not yet available
-  const orgPermissions = claims.org_permissions;
-
-  return {
-    entity: 'user',
-    sessionClaims: claims,
-    sessionId: claims.sid,
-    sessionStatus,
-    actor: claims.act,
-    userId: claims.sub,
-    orgId: claims.org_id,
-    orgRole: claims.org_role,
-    orgSlug: claims.org_slug,
-    orgPermissions,
-    factorVerificationAge,
-  };
-};
-
 /**
  * @internal
  */
@@ -162,14 +113,13 @@ export function signedInAuthObject(
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
   const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
-    generateSignedInAuthObjectProperties(sessionClaims);
+    __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
-
   return {
     entity: 'user',
     actor,
@@ -183,7 +133,15 @@ export function signedInAuthObject(
     orgPermissions,
     factorVerificationAge,
     getToken,
-    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, factorVerificationAge }),
+    has: createCheckAuthorization({
+      orgId,
+      orgRole,
+      orgPermissions,
+      userId,
+      factorVerificationAge,
+      features: (sessionClaims.fea as string) || '',
+      plans: (sessionClaims.pla as string) || '',
+    }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }

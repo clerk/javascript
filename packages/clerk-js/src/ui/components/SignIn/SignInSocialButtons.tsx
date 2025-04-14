@@ -54,6 +54,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
             strategy,
+            secondFactorUrl: 'factor-two',
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
       }}

@@ -115,6 +115,8 @@ export class Session extends BaseResource implements SessionResource {
       orgId: activeMembership?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
+      features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
+      plans: (this.lastActiveToken?.jwt?.claims.pla as string) || '',
     })(params);
   };
 
@@ -351,7 +353,7 @@ export class Session extends BaseResource implements SessionResource {
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
-        eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
+        eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
@@ -366,7 +368,13 @@ export class Session extends BaseResource implements SessionResource {
 
     return tokenResolver.then(token => {
       if (shouldDispatchTokenUpdate) {
-        eventBus.dispatch(events.TokenUpdate, { token });
+        eventBus.emit(events.TokenUpdate, { token });
+
+        if (token.jwt) {
+          this.lastActiveToken = token;
+          // Emits the updated session with the new token to the state listeners
+          eventBus.emit(events.SessionTokenResolved, null);
+        }
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
