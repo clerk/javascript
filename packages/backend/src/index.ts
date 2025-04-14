@@ -89,6 +89,7 @@ export type {
   DeletedObjectJSON,
   PaginatedResponseJSON,
   TestingTokenJSON,
+  WebhooksSvixJSON,
 } from './api/resources/JSON';
 
 /**
