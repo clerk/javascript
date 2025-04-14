@@ -177,7 +177,7 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
                   const content = this.helpers.getCommentParts(possibleUnionHeadings.content);
                   const unionHeadings = JSON.parse(content);
 
-                  md.push(heading(3, unionHeadings[i]));
+                  md.push(heading(3, `${unionHeadings[i]} {{ combineTables: true, toc: false }}`));
                 }
               }
 
