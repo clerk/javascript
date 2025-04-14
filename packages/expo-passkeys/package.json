@@ -35,7 +35,7 @@
     "@clerk/types": "workspace:^"
   },
   "devDependencies": {
-    "expo": "~52.0.42"
+    "expo": "~52.0.44"
   },
   "peerDependencies": {
     "expo": "^50 || ^51 || ^52",
