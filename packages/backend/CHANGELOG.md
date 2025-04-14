@@ -1,5 +1,127 @@
 # Change Log
 
+## 1.28.0
+
+### Minor Changes
+
+- Add support for feature or plan based authorization. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Adds the ability to grab an instance's JWKS to the Backend API client. ([#5588](https://github.com/clerk/javascript/pull/5588)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.jwks.getJWKS();
+  ```
+
+- Adds the Blocklist Identifier endpoints to the Backend API client. ([#5617](https://github.com/clerk/javascript/pull/5617)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.blocklistIdentifiers.getBlocklistIdentifierList();
+    await clerkClient.blocklistIdentifiers.createBlocklistIdentifier({ identifier });
+    await clerkClient.blocklistIdentifiers.deleteBlocklistIdentifier('blocklistIdentifierId');
+  ```
+
+  Updates the ability paginate Allowlist Identifier reponses and access `identifierType` and `instanceId` from the response.
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    const res = await clerkClient.blocklistIdentifiers.getAllowlistIdentifierList({ limit, offset });
+  ```
+
+  Corrects the type of the Allowlist Identifier `DeletedObject`
+
+- Adds webhooks endpoints to the Backend API client. ([#5619](https://github.com/clerk/javascript/pull/5619)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.webhooks.createSvixApp();
+    await clerkClient.webhooks.generateSvixAuthURL();
+    await clerkClient.webhooks.deleteSvixApp();
+  ```
+
+- Adds the ability to perform CRUD operations on JWT Templates to the Backend API client. ([#5598](https://github.com/clerk/javascript/pull/5598)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.jwtTemplates.list({...});
+    await clerkClient.jwtTemplates.get('templateId');
+    await clerkClient.jwtTemplates.create({...});
+    await clerkClient.jwtTemplates.update({...});
+    await clerkClient.jwtTemplates.delete('templateId');
+  ```
+
+- Adds the ability to create an active session to the Backend API client. ([#5592](https://github.com/clerk/javascript/pull/5592)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.sessions.createSession({
+      userId: 'user_xxxxxx',
+    });
+  ```
+
+### Patch Changes
+
+- Add support for phpass_md5 and ldap_ssha hashers ([#5583](https://github.com/clerk/javascript/pull/5583)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Adds the ability to verify proxy checks to the Backend API client. ([#5589](https://github.com/clerk/javascript/pull/5589)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.proxyChecks.verify({
+      domainId: 'dmn_xxxxxx',
+      proxyUrl: 'https://[your-domain].com'
+    });
+  ```
+
+- Adds the following User-centric functionality to the Backend API client. ([#5593](https://github.com/clerk/javascript/pull/5593)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.users.getOrganizationInvitationList({
+      userId: 'user_xxxxxx',
+      status: 'pending',
+    });
+    await clerkClient.users.deleteUserPasskey({
+      userId: 'user_xxxxxx',
+      passkeyIdentificationId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserWeb3Wallet({
+      userId: 'user_xxxxxx',
+      web3WalletIdentificationId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserExternalAccount({
+      userId: 'user_xxxxxx',
+      externalAccountId: 'xxxxxxx',
+    });
+    await clerkClient.users.deleteUserBackupCodes('user_xxxxxx');
+    await clerkClient.users.deleteUserTOTP('user_xxxxxx');
+  ```
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+
 ## 1.27.3
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.54.0
+
+### Minor Changes
+
+- Add `pla` claim to `VersionedJwtPayload`. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Nest existing commerce settings under `billing`. ([#5612](https://github.com/clerk/javascript/pull/5612)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename the `sendCaptchaToken` to `__internal_sendCaptchaToken`. ([#5581](https://github.com/clerk/javascript/pull/5581)) by [@anagstef](https://github.com/anagstef)
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.53.0
 
 ### Minor Changes

@@ -1,5 +1,49 @@
 # Change Log
 
+## 5.61.0
+
+### Minor Changes
+
+- Add support for feature or plan based authorization ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Plan
+
+  - `Clerk.session.checkAuthorization({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `Clerk.session.checkAuthorization({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `Clerk.session.checkAuthorization({ feature: "org:my-feature" })`
+  - `Clerk.session.checkAuthorization({ feature: "user:my-feature" })`
+  - `Clerk.session.checkAuthorization({ plan: "user:my-plan" })`
+  - `Clerk.session.checkAuthorization({ plan: "org:my-plan" })`
+
+### Patch Changes
+
+- Nest existing commerce settings under `billing`. ([#5612](https://github.com/clerk/javascript/pull/5612)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename the `sendCaptchaToken` to `__internal_sendCaptchaToken`. ([#5581](https://github.com/clerk/javascript/pull/5581)) by [@anagstef](https://github.com/anagstef)
+
+- Ensure Organization slugs contain at least one alphanumeric character ([#5586](https://github.com/clerk/javascript/pull/5586)) by [@jacekradko](https://github.com/jacekradko)
+
+- Ensure Stripe dependencies aren't bundled for non-RHC environments ([#5594](https://github.com/clerk/javascript/pull/5594)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix issue where truncated text was wraping within line items. ([#5616](https://github.com/clerk/javascript/pull/5616)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fully strip @stripe/stripe-js from non-RHC builds ([#5597](https://github.com/clerk/javascript/pull/5597)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add `PaymentSourceRow` for displaying payment sources ([#5570](https://github.com/clerk/javascript/pull/5570)) by [@aeliox](https://github.com/aeliox)
+
+- Bug fix: Invalidate cached checkout on checkout drawer unmount ([#5602](https://github.com/clerk/javascript/pull/5602)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+  - @clerk/localizations@3.13.10
+
 ## 5.60.0
 
 ### Minor Changes
