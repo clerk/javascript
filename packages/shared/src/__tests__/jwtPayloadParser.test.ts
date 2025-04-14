@@ -183,6 +183,61 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       ['org:memberships:read', 'org:memberships:manage'].sort(),
     );
   });
+
+  test('org permissions are constructed correctly case 2', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:billing,o:email,o:fraud,o:instance,o:staging_plans',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'manage,read',
+        fpm: '3,3,3,3,1',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      [
+        'org:billing:manage',
+        'org:billing:read',
+        'org:email:manage',
+        'org:email:read',
+        'org:fraud:manage',
+        'org:fraud:read',
+        'org:instance:manage',
+        'org:instance:read',
+        'org:staging_plans:manage',
+      ].sort(),
+    );
+  });
+
+  test('org permissions are constructed correctly case 3', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:repositories,o:projects',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'read,create,update,delete,revoke',
+        fpm: '7,21',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      [
+        'org:repositories:read',
+        'org:repositories:create',
+        'org:repositories:update',
+        'org:projects:read',
+        'org:projects:update',
+        'org:projects:revoke',
+      ].sort(),
+    );
+  });
 });
 
 describe('splitByScope ', () => {
