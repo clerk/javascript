@@ -162,6 +162,7 @@ export type ElementsConfig = {
   lineItemsDescriptionText: WithOptions;
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
+  lineItemsCopyButton: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -452,6 +453,13 @@ export type ElementsConfig = {
   selectButtonIcon: WithOptions<SelectId>;
   selectOptionsContainer: WithOptions<SelectId>;
   selectOption: WithOptions<SelectId>;
+
+  paymentSourceRow: WithOptions;
+  paymentSourceRowIcon: WithOptions;
+  paymentSourceRowText: WithOptions;
+  paymentSourceRowType: WithOptions;
+  paymentSourceRowValue: WithOptions;
+  paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
 
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;

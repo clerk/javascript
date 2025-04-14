@@ -14,7 +14,11 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
+import type {
+  __experimental_CommerceNamespace,
+  __experimental_CommerceSubscriberType,
+  __experimental_CommerceSubscriptionPlanPeriod,
+} from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -720,6 +724,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The underlying resource to optionally reload before processing an OAuth callback.
+     */
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -760,11 +768,11 @@ export type ClerkOptions = PendingSessionOptions &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -777,7 +785,7 @@ export type ClerkOptions = PendingSessionOptions &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1524,13 +1532,13 @@ export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
 };
 
 export type __experimental_PaymentSourcesProps = {
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export interface HandleEmailLinkVerificationParams {
@@ -1598,10 +1606,16 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * @inline
+ * @interface
  */
 export interface CreateOrganizationParams {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug?: string;
 }
 

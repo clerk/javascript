@@ -69,6 +69,12 @@ const common = ({ mode, disableRHC = false }) => {
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
     },
+    /**
+     * Remove the Stripe dependencies from the bundle, if RHC is disabled.
+     * Necessary to prevent the Stripe dependencies from being bundled into
+     * SDKs such as Browser Extensions.
+     */
+    externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
       splitChunks: {
         cacheGroups: {
@@ -442,11 +448,27 @@ const prodConfig = ({ mode, env, analysis }) => {
     },
   );
 
+  /** @type { () => (import('@rspack/core').Configuration) } */
+  const commonForNoRHC = () => ({
+    plugins: [
+      new rspack.IgnorePlugin({
+        resourceRegExp: /^@stripe\/stripe-js$/,
+      }),
+      new rspack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
+    optimization: {
+      splitChunks: false,
+    },
+  });
+
   const clerkEsmNoRHC = merge(
     entryForVariant(variants.clerkNoRHC),
     common({ mode, disableRHC: true }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForNoRHC(),
     {
       experiments: {
         outputModule: true,
@@ -454,17 +476,6 @@ const prodConfig = ({ mode, env, analysis }) => {
       output: {
         filename: '[name].mjs',
         libraryTarget: 'module',
-      },
-      plugins: [
-        // Include the lazy chunks in the bundle as well
-        // so that the final bundle can be imported and bundled again
-        // by a different bundler, eg the webpack instance used by react-scripts
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
       },
     },
   );
@@ -474,21 +485,11 @@ const prodConfig = ({ mode, env, analysis }) => {
     common({ mode, disableRHC: true }),
     commonForProd(),
     commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForNoRHC(),
     {
       output: {
         filename: '[name].js',
         libraryTarget: 'commonjs',
-      },
-      plugins: [
-        // Include the lazy chunks in the bundle as well
-        // so that the final bundle can be imported and bundled again
-        // by a different bundler, eg the webpack instance used by react-scripts
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
       },
     },
   );

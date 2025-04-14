@@ -93,7 +93,7 @@ export const SignUpVerificationMachine = setup({
         void run(async () =>
           clerk.client.signUp
             .reload()
-            .then(resource => {
+            .then((resource: SignUpResource) => {
               const signInStatus = resource.status;
               const verificationStatus = resource.verifications.emailAddress.status;
 
@@ -124,9 +124,9 @@ export const SignUpVerificationMachine = setup({
 
               stop();
             })
-            .catch(error => {
+            .catch((error: Error) => {
               stop();
-              new ClerkElementsRuntimeError(error);
+              new ClerkElementsRuntimeError(error.message);
             }),
         );
 

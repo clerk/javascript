@@ -16,5 +16,6 @@ export const usePricingTableContext = () => {
   return {
     ...ctx,
     componentName,
+    subscriberType: ctx.subscriberType || 'user',
   };
 };

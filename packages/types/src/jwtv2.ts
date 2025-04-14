@@ -39,13 +39,6 @@ declare global {
 
 type JWTPayloadBase = {
   /**
-   * @experimental
-   *
-   * The version of the JWT payload.
-   */
-  ver: number | undefined;
-
-  /**
    * Encoded token supporting the `getRawString` method.
    */
   __raw: string;
@@ -98,21 +91,6 @@ type JWTPayloadBase = {
   fva?: [fistFactorAge: number, secondFactorAge: number];
 
   /**
-   * Active organization ID.
-   */
-  org_id?: string;
-
-  /**
-   * Active organization slug.
-   */
-  org_slug?: string;
-
-  /**
-   * Active organization role.
-   */
-  org_role?: OrganizationCustomRoleKey;
-
-  /**
    * Session status
    */
   sts?: SessionStatusClaim;
@@ -125,18 +103,28 @@ type JWTPayloadBase = {
 
 export type VersionedJwtPayload =
   | {
-      /**
-       * @experimental
-       *
-       * The version of the JWT payload.
-       */
-      ver?: never;
+      v?: undefined;
 
       /**
        *
        * Active organization permissions.
        */
       org_permissions?: OrganizationCustomPermissionKey[];
+
+      /**
+       * Active organization ID.
+       */
+      org_id?: string;
+
+      /**
+       * Active organization slug.
+       */
+      org_slug?: string;
+
+      /**
+       * Active organization role.
+       */
+      org_role?: OrganizationCustomRoleKey;
     }
   | {
       /**
@@ -144,10 +132,54 @@ export type VersionedJwtPayload =
        *
        * The version of the JWT payload.
        */
-      ver: 2;
+      v: 2;
+
+      /**
+       * Features for session.
+       */
+      fea?: string;
+
+      /**
+       * Plans for session.
+       */
+      pla?: string;
+
+      /**
+       * @experimental - This structure is subject to change.
+       *
+       * Active organization information.
+       */
+      o?: {
+        /**
+         * Active organization ID.
+         */
+        id: string;
+
+        /**
+         * Active organization slug.
+         */
+        slg?: string;
+
+        /**
+         * Active organization role.
+         */
+        rol?: OrganizationCustomRoleKey;
+
+        /**
+         * Active organization permissions.
+         */
+        per?: string;
+
+        /**
+         * Feature mapping.
+         */
+        fpm?: string;
+      };
 
       org_permissions?: never;
-      // TODO: include the version 2 claims here
+      org_id?: never;
+      org_slug?: never;
+      org_role?: never;
     };
 
 export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtPayload;

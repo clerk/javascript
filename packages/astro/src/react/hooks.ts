@@ -1,4 +1,5 @@
 import { resolveAuthState } from '@clerk/shared/authorization';
+import { deriveState } from '@clerk/shared/deriveState';
 import type {
   CheckAuthorizationWithCustomPermissions,
   Clerk,
@@ -83,7 +84,7 @@ type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
  * }
  */
 export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
-  const authContext = useStore($authStore);
+  const authContext = useAuthStore();
   const clerkContext = useStore($clerkStore);
 
   const getToken: GetToken = useCallback(createGetToken(), []);
@@ -139,14 +140,18 @@ export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
   return payload;
 };
 
+function useStore<T extends Store, SV extends StoreValue<T>>(store: T, getServerSnapshot?: () => SV): SV {
+  const get = store.get.bind(store);
+  return useSyncExternalStore<SV>(store.listen, get, getServerSnapshot || get);
+}
+
 /**
  * This implementation of `useStore` is an alternative solution to the hook exported by nanostores
  * Reference: https://github.com/nanostores/react/blob/main/index.js
  */
-function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
-  const get = store.get.bind(store);
-
-  return useSyncExternalStore<SV>(store.listen, get, () => {
+function useAuthStore() {
+  const get = $authStore.get.bind($authStore);
+  return useStore($authStore, () => {
     // Per react docs
     /**
      * optional getServerSnapshot:
@@ -160,7 +165,17 @@ function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
      * When this runs on the server we want to grab the content from the async-local-storage.
      */
     if (typeof window === 'undefined') {
-      return authAsyncStorage.getStore();
+      return deriveState(
+        false,
+        {
+          user: null,
+          session: null,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          client: null!,
+          organization: null,
+        },
+        authAsyncStorage.getStore() as any,
+      );
     }
 
     /**

@@ -1,4 +1,5 @@
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { Alert, Spinner } from '../../customizables';
 import { useCheckout } from '../../hooks';
@@ -6,13 +7,17 @@ import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, orgId, onSubscriptionComplete } = props;
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
 
-  const { checkout, updateCheckout, isLoading } = useCheckout({
+  const { checkout, isLoading, invalidate, updateCheckout } = useCheckout({
     planId,
     planPeriod,
-    orgId,
+    subscriberType,
   });
+
+  useEffect(() => {
+    return invalidate;
+  }, []);
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
     updateCheckout(newCheckout);

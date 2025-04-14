@@ -1,19 +1,29 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
 export const useCheckout = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, orgId } = props;
+  const { planId, planPeriod, subscriberType = 'user' } = props;
   const { __experimental_commerce } = useClerk();
+  const { organization } = useOrganization();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
 
-  const { data: initialCheckout, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
-    planId,
-    planPeriod,
-    orgId,
-  });
+  const {
+    data: initialCheckout,
+    isLoading,
+    invalidate,
+  } = useFetch(
+    __experimental_commerce?.__experimental_billing.startCheckout,
+    {
+      planId,
+      planPeriod,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    'commerce-checkout',
+  );
 
   useEffect(() => {
     if (initialCheckout && !currentCheckout) {
@@ -29,5 +39,6 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     checkout: currentCheckout || initialCheckout,
     updateCheckout,
     isLoading,
+    invalidate,
   };
 };
