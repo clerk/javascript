@@ -21,3 +21,5 @@ Updates the ability paginate Allowlist Identifier reponses and access `identifie
   const clerkClient = createClerkClient(...);
   const res = await clerkClient.blocklistIdentifiers.getAllowlistIdentifierList({ limit, offset });
 ```
+
+Corrects the type of the Allowlist Identifier `DeletedObject`
