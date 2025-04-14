@@ -22,7 +22,7 @@ export const ObjectType = {
   Invitation: 'invitation',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
-  OauthApplication: 'oauth_application',
+  OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
@@ -195,8 +195,8 @@ export interface OauthAccessTokenJSON {
   token_secret?: string;
 }
 
-export interface OauthApplicationJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.OauthApplication;
+export interface OAuthApplicationJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OAuthApplication;
   id: string;
   instance_id: string;
   name: string;

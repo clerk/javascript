@@ -22,7 +22,7 @@ export * from './Invitation';
 export * from './JSON';
 export * from './JwtTemplate';
 export * from './OauthAccessToken';
-export * from './OauthApplication';
+export * from './OAuthApplication';
 export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';

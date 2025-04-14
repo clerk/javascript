@@ -3,7 +3,7 @@ import type { ClerkPaginationRequest } from '@clerk/types';
 import { joinPaths } from '../../util/path';
 import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
-import type { OauthApplication } from '../resources/OauthApplication';
+import type { OAuthApplication } from '../resources/OAuthApplication';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/oauth_applications';
@@ -38,7 +38,7 @@ type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
 
 export class OAuthApplicationsApi extends AbstractAPI {
   public async list(params: ClerkPaginationRequest = {}) {
-    return this.request<PaginatedResourceResponse<OauthApplication[]>>({
+    return this.request<PaginatedResourceResponse<OAuthApplication[]>>({
       method: 'GET',
       path: basePath,
       queryParams: params,
@@ -48,14 +48,14 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async get(oauthApplicationId: string) {
     this.requireId(oauthApplicationId);
 
-    return this.request<OauthApplication>({
+    return this.request<OAuthApplication>({
       method: 'GET',
       path: joinPaths(basePath, oauthApplicationId),
     });
   }
 
   public async create(params: CreateOAuthApplicationParams) {
-    return this.request<OauthApplication>({
+    return this.request<OAuthApplication>({
       method: 'POST',
       path: basePath,
       bodyParams: params,
@@ -67,7 +67,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
 
     this.requireId(oauthApplicationId);
 
-    return this.request<OauthApplication>({
+    return this.request<OAuthApplication>({
       method: 'PATCH',
       path: joinPaths(basePath, oauthApplicationId),
       bodyParams,
@@ -86,7 +86,7 @@ export class OAuthApplicationsApi extends AbstractAPI {
   public async rotateSecret(oauthApplicationId: string) {
     this.requireId(oauthApplicationId);
 
-    return this.request<OauthApplication>({
+    return this.request<OAuthApplication>({
       method: 'POST',
       path: joinPaths(basePath, oauthApplicationId, 'rotate_secret'),
     });

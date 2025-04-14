@@ -1,6 +1,6 @@
-import type { OauthApplicationJSON } from './JSON';
+import type { OAuthApplicationJSON } from './JSON';
 
-export class OauthApplication {
+export class OAuthApplication {
   constructor(
     readonly id: string,
     readonly instanceId: string,
@@ -19,8 +19,8 @@ export class OauthApplication {
     readonly clientSecret?: string,
   ) {}
 
-  static fromJSON(data: OauthApplicationJSON) {
-    return new OauthApplication(
+  static fromJSON(data: OAuthApplicationJSON) {
+    return new OAuthApplication(
       data.id,
       data.instance_id,
       data.name,
