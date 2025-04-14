@@ -1,7 +1,5 @@
-import {
-  __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties,
-  parseFeatures,
-} from '../jwtPayloadParser';
+import { splitByScope } from '../authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties } from '../jwtPayloadParser';
 
 const baseClaims = {
   exp: 1234567890,
@@ -187,37 +185,37 @@ describe('JWTPayloadToAuthObjectProperties', () => {
   });
 });
 
-describe('parseFeatures ', () => {
+describe('splitByScope ', () => {
   test('returns empty array when no features are present', () => {
-    const { orgFeatures } = parseFeatures('');
-    expect(orgFeatures).toEqual([]);
+    const { org } = splitByScope('');
+    expect(org).toEqual([]);
   });
 
   test('only org features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:impersonation,o:payments');
-    expect(orgFeatures).toEqual(['impersonation', 'payments']);
+    const { org, user } = splitByScope('o:impersonation,o:payments');
+    expect(org).toEqual(['impersonation', 'payments']);
 
-    expect(userFeatures).toEqual([]);
+    expect(user).toEqual([]);
   });
 
   test('only user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('u:impersonation,u:payments');
-    expect(orgFeatures).toEqual([]);
+    const { org, user } = splitByScope('u:impersonation,u:payments');
+    expect(org).toEqual([]);
 
-    expect(userFeatures).toEqual(['impersonation', 'payments']);
+    expect(user).toEqual(['impersonation', 'payments']);
   });
 
   test('both org and user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:payments,u:impersonation');
-    expect(orgFeatures).toEqual(['payments']);
+    const { org, user } = splitByScope('o:payments,u:impersonation');
+    expect(org).toEqual(['payments']);
 
-    expect(userFeatures).toEqual(['impersonation']);
+    expect(user).toEqual(['impersonation']);
   });
 
   test('features have multiple scopes', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('ou:payments,u:impersonation');
-    expect(orgFeatures).toEqual(['payments']);
+    const { org, user } = splitByScope('ou:payments,u:impersonation');
+    expect(org).toEqual(['payments']);
 
-    expect(userFeatures).toEqual(['payments', 'impersonation']);
+    expect(user).toEqual(['payments', 'impersonation']);
   });
 });

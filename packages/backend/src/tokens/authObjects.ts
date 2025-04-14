@@ -97,7 +97,15 @@ export function signedInAuthObject(
     orgPermissions,
     factorVerificationAge,
     getToken,
-    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, factorVerificationAge }),
+    has: createCheckAuthorization({
+      orgId,
+      orgRole,
+      orgPermissions,
+      userId,
+      factorVerificationAge,
+      features: (sessionClaims.fea as string) || '',
+      plans: (sessionClaims.pla as string) || '',
+    }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
