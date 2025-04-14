@@ -3,7 +3,9 @@ export * from './AllowlistIdentifier';
 export * from './BlocklistIdentifier';
 export * from './Client';
 export * from './Cookies';
+export * from './CnameTarget';
 export * from './DeletedObject';
+export * from './Domain';
 export * from './Email';
 export * from './EmailAddress';
 

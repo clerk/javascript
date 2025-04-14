@@ -35,6 +35,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     clients: new ClientAPI(request),
+    domains: new DomainAPI(request),
     emailAddresses: new EmailAddressAPI(request),
     invitations: new InvitationAPI(request),
     jwks: new JwksAPI(request),
@@ -43,12 +44,11 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     phoneNumbers: new PhoneNumberAPI(request),
     proxyChecks: new ProxyCheckAPI(request),
     redirectUrls: new RedirectUrlAPI(request),
+    samlConnections: new SamlConnectionAPI(request),
     sessions: new SessionAPI(request),
     signInTokens: new SignInTokenAPI(request),
-    users: new UserAPI(request),
-    domains: new DomainAPI(request),
-    samlConnections: new SamlConnectionAPI(request),
     testingTokens: new TestingTokenAPI(request),
+    users: new UserAPI(request),
     webhooks: new WebhookAPI(request),
   };
 }
