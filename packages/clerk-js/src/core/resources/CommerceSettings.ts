@@ -29,8 +29,9 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
       return this;
     }
 
-    this.billing.stripePublishableKey = data.billing.stripe_publishable_key || '';
-    this.billing.enabled = data.billing.enabled || false;
+    // TODO(@commerce): Remove `?.` once we launch.
+    this.billing.stripePublishableKey = data?.billing?.stripe_publishable_key || '';
+    this.billing.enabled = data?.billing?.enabled || false;
 
     return this;
   }
