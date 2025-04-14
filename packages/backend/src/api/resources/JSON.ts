@@ -20,6 +20,7 @@ export const ObjectType = {
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
+  JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -138,6 +139,19 @@ export interface JwksKeyJSON {
   alg: string;
   n: string;
   e: string;
+}
+
+export interface JwtTemplateJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.JwtTemplate;
+  id: string;
+  name: string;
+  claims: object;
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
