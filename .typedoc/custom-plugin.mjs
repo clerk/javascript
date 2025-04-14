@@ -14,6 +14,7 @@ const FILES_WITHOUT_HEADINGS = [
   'paginated-hook-config.mdx',
   'use-organization-list-return.mdx',
   'use-organization-list-params.mdx',
+  'create-organization-params.mdx',
 ];
 
 /**
@@ -28,6 +29,13 @@ const LINK_REPLACEMENTS = [
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
   ['user-resource', '/docs/references/javascript/user'],
   ['session-status-claim', '/docs/references/javascript/types/session-status'],
+  ['user-organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
+  ['organization-membership-resource', '/docs/references/javascript/types/organization-membership'],
+  ['organization-suggestion-resource', '/docs/references/javascript/types/organization-suggestion'],
+  ['organization-resource', '/docs/references/javascript/organization'],
+  ['organization-domain-resource', '/docs/references/javascript/types/organization-domain'],
+  ['organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
+  ['organization-membership-request-resource', '/docs/references/javascript/types/organization-membership-request'],
 ];
 
 /**
@@ -69,8 +77,8 @@ function getUnlinkedTypesReplacements() {
       replace: '[Clerk](/docs/references/javascript/clerk)',
     },
     {
-      pattern: /`OrganizationCustomRoleKey`/g,
-      replace: '[OrganizationCustomRoleKey](/docs/references/javascript/types/organization-custom-role-key)',
+      pattern: /\(CreateOrganizationParams\)/g,
+      replace: '([CreateOrganizationParams](#create-organization-params))',
     },
   ];
 }

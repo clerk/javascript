@@ -6,6 +6,7 @@ import {
   Email,
   EmailAddress,
   Invitation,
+  JwtTemplate,
   OauthAccessToken,
   OauthApplication,
   Organization,
@@ -83,6 +84,8 @@ function jsonToObject(item: any): any {
       return Email.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.JwtTemplate:
+      return JwtTemplate.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.OauthApplication:

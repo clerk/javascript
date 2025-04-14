@@ -229,7 +229,7 @@ function TruncatedText({ text }: { text: string }) {
         await onCopy();
       }}
     >
-      {truncateWithEndVisible(text)}
+      {truncateWithEndVisible(text, 15)}
     </Span>
   );
 }

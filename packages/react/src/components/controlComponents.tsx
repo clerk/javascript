@@ -1,5 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
+  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -61,21 +62,43 @@ export type ProtectProps = React.PropsWithChildren<
         condition?: never;
         role: OrganizationCustomRoleKey;
         permission?: never;
+        feature?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
+        feature?: never;
+        plan?: never;
         permission: OrganizationCustomPermissionKey;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
         role?: never;
         permission?: never;
+        feature?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission?: never;
+        feature: Autocomplete<`user:${string}` | `org:${string}`>;
+        plan?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        feature?: never;
+        plan: Autocomplete<`user:${string}` | `org:${string}`>;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        feature?: never;
+        plan?: never;
       }
   ) & {
     fallback?: React.ReactNode;
@@ -127,7 +150,12 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (
+    restAuthorizedParams.role ||
+    restAuthorizedParams.permission ||
+    restAuthorizedParams.feature ||
+    restAuthorizedParams.plan
+  ) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }
@@ -170,7 +198,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 /**
  * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-user-profile) instead, will be removed in the next major version.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -183,7 +211,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-organization-profile) instead, will be removed in the next major version.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -196,7 +224,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-create-organization) instead, will be removed in the next major version.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {

@@ -20,6 +20,7 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
 export * from './JSON';
+export * from './JwtTemplate';
 export * from './OauthAccessToken';
 export * from './OauthApplication';
 export * from './Organization';

@@ -39,6 +39,10 @@ declare global {
   }
 }
 
+/**
+ * The `OrganizationMembership` object is the model around an organization membership entity and describes the relationship between users and organizations.
+ * @interface
+ */
 export interface OrganizationMembershipResource extends ClerkResource {
   id: string;
   organization: OrganizationResource;
@@ -50,6 +54,9 @@ export interface OrganizationMembershipResource extends ClerkResource {
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
+  /**
+   * @internal
+   */
   __internal_toSnapshot: () => OrganizationMembershipJSONSnapshot;
 }
 

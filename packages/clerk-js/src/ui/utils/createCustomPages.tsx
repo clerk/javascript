@@ -1,6 +1,6 @@
 import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
-import { isValidUrl } from '../../utils';
+import { disabledBillingFeature, isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
 import { CreditCard, Organization, TickShield, User, Users } from '../icons';
@@ -91,7 +91,7 @@ const createCustomPages = (
     commerce:
       clerk.sdkMetadata?.environment === 'test'
         ? false
-        : clerk.__internal_getOption('experimental')?.commerce && environment?.__experimental_commerceSettings.enabled,
+        : clerk.__internal_getOption('experimental')?.commerce && !disabledBillingFeature(clerk, environment),
   });
 
   if (isDevelopmentSDK(clerk)) {
