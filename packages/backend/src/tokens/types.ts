@@ -1,4 +1,4 @@
-import type { ApiClient, APIKey, MachineToken, OAuthApplicationToken } from '../api';
+import type { ApiClient, APIKey, MachineToken, OauthApplicationToken } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -120,4 +120,4 @@ type Pattern = string;
 
 export type Entity = 'machine' | 'user' | 'any';
 
-export type MachineAuthType = MachineToken | APIKey | OAuthApplicationToken;
+export type MachineAuthType = MachineToken | APIKey | OauthApplicationToken;

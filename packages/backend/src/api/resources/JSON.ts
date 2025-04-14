@@ -12,6 +12,7 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
+  ApiKey: 'api_key',
   Client: 'client',
   Cookies: 'cookies',
   Email: 'email',
@@ -20,7 +21,9 @@ export const ObjectType = {
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
+  MachineToken: 'machine_token',
   OauthAccessToken: 'oauth_access_token',
+  OauthApplicationToken: 'oauth_application_token', // TODO: This has the oauth_access_token url as well
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
@@ -507,7 +510,7 @@ export interface APIKeyJSON {
   expires_at: number | null;
 }
 
-export interface OAuthApplicationTokenJSON {
+export interface OauthApplicationTokenJSON {
   id: string;
   type: string; // right now it's just oauth:access_token
   name: string;
