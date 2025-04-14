@@ -6,7 +6,7 @@ export const prerender = true;
 ---
 
 <Layout title="Protected">
-    <Protect role="admin">
+    <Protect role="org:admin">
         <h1>I'm an admin</h1>
         <h1 slot="fallback">Not an admin</h1>
     </Protect>
