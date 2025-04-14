@@ -56,7 +56,7 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && __experimental_commerceSettings.enabled && (
+        {experimental?.commerce && __experimental_commerceSettings.billing.enabled && (
           <Route path={isBillingPageRoot ? undefined : 'billing'}>
             <Switch>
               <Route index>
