@@ -13,6 +13,7 @@ import {
 } from '../../elements';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
+import { InvoicesList } from './InvoicesList';
 
 export const BillingPage = withCardStateProvider(() => {
   const card = useCardState();
@@ -56,7 +57,31 @@ export const BillingPage = withCardStateProvider(() => {
                 <__experimental_PricingTable />
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <InvoicesList
+                invoices={{
+                  data: [
+                    {
+                      id: 'INV-2025643782',
+                      date: '2025-04-14T15:21:49-0400',
+                      status: 'Paid',
+                      total: '$100.00',
+                    },
+                    {
+                      id: 'INV-2024848383',
+                      date: '2025-04-14T15:21:49-0400',
+                      status: 'Failed',
+                      total: '$100.00',
+                    },
+                  ],
+                  isLoading: false,
+                  isValidating: false,
+                  hasMore: false,
+                  loadMore: () => {},
+                }}
+                pageSize={10}
+              />
+            </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
                 <__experimental_PaymentSources />
