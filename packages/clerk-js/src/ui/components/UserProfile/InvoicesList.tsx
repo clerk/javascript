@@ -69,13 +69,13 @@ const InvoicesListRow = (props: { id: string; date: string; status: InvoiceStatu
  * -----------------------------------------------------------------------------------------------*/
 
 type DataTableProps = {
-  headers: LocalizationKey[];
+  headers: (LocalizationKey | string)[];
   rows: React.ReactNode[];
   isLoading?: boolean;
   page: number;
   onPageChange: (page: number) => void;
   itemCount: number;
-  emptyStateLocalizationKey: LocalizationKey;
+  emptyStateLocalizationKey: LocalizationKey | string;
   pageCount: number;
   itemsPerPage: number;
 };
