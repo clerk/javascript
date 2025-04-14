@@ -186,9 +186,13 @@ function SignUpStartInternal(): JSX.Element {
 
         // TODO: This is a hack to reset the sign in attempt so that the oauth error
         // does not persist on full page reloads.
-        // We will revise this strategy as part of the Clerk DX epic.
-        // @ts-ignore We want to skip triggering the captcha on this sign up attempt
-        void (await signUp.create({ __internal_skipCaptcha: true }));
+        // We are going to revise this in the near future.
+        try {
+          // @ts-ignore We want to skip triggering the captcha on this sign up attempt
+          void (await signUp.create({ __internal_skipCaptcha: true }));
+        } catch {
+          // Mute the 400 error from FAPI
+        }
       }
     }
 

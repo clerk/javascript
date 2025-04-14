@@ -85,6 +85,10 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
     let params: Record<string, unknown> = _params;
+
+    // This is only used in SignUpStart in order to skip the captcha
+    // challenge when we fire the create request to clear the error.
+    // It's a temporary solution until we have a better way to handle this.
     const shouldSkipCaptcha = params?.__internal_skipCaptcha;
     if (params?.__internal_skipCaptcha) {
       delete params?.__internal_skipCaptcha;
