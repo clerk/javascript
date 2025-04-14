@@ -31,7 +31,7 @@ type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
  * </If>
  *
  * @unionReturnHeadings
- * ["During initialization", "When signed out", "When signed in (no active organization)", "When signed in (with active organization)"]
+ * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
  * @param [initialAuthStateOrOptions] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
  *

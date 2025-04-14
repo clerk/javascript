@@ -9,7 +9,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/custom-flows/overview#sign-in-flow).
  *
  * @unionReturnHeadings
- * ["During initialization", "Once loaded"]
+ * ["Initialization", "Loaded"]
  *
  * @example
  * ### Check the current state of a sign-in
