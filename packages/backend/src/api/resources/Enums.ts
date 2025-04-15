@@ -54,3 +54,5 @@ export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorToken
 export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
 
 export type BlocklistIdentifierType = AllowlistIdentifierType;
+
+export type WaitlistEntryStatus = 'pending' | 'invited' | 'completed' | 'rejected';

@@ -2,6 +2,7 @@ import {
   AccountlessApplicationAPI,
   ActorTokenAPI,
   AllowlistIdentifierAPI,
+  BetaFeaturesAPI,
   BlocklistIdentifierAPI,
   ClientAPI,
   DomainAPI,
@@ -20,6 +21,7 @@ import {
   SignInTokenAPI,
   TestingTokenAPI,
   UserAPI,
+  WaitlistEntryAPI,
   WebhookAPI,
 } from './endpoints';
 import { buildRequest } from './request';
@@ -37,6 +39,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     ),
     actorTokens: new ActorTokenAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
+    betaFeatures: new BetaFeaturesAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     clients: new ClientAPI(request),
     domains: new DomainAPI(request),
@@ -55,6 +58,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     signInTokens: new SignInTokenAPI(request),
     testingTokens: new TestingTokenAPI(request),
     users: new UserAPI(request),
+    waitlistEntries: new WaitlistEntryAPI(request),
     webhooks: new WebhookAPI(request),
   };
 }
