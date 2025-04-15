@@ -72,6 +72,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
               publishableKey,
               frontendApiUrl,
               secretKey,
+              // @ts-expect-error apiUrl is not a typed option for clerkSetup, but it is accepted at runtime.
               apiUrl,
               dotenv: false,
             });

@@ -30,13 +30,6 @@ export type ClerkSetupOptions = {
   secretKey?: string;
 
   /*
-   * The backend API URL
-   * If not provided, the library will look for the key in the following environment variables:
-   * - CLERK_API_URL
-   */
-  apiUrl?: string;
-
-  /*
    * Automatic loading of environment variables from .env files.
    * Default: true
    */
