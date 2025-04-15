@@ -172,7 +172,7 @@ export function SubscriptionDetailDrawer({
               {subscription.status === 'upcoming' ? (
                 <>
                   <Heading
-                    elementDescriptor={descriptors.drawerConfirmationTitle}
+                    elementDescriptor={descriptors.drawerFooterTitle}
                     as='h2'
                     textVariant='h3'
                   >
@@ -180,7 +180,7 @@ export function SubscriptionDetailDrawer({
                     Subscription starts {formatDate(new Date(subscription.periodStart), 'short')}
                   </Heading>
                   <Text
-                    elementDescriptor={descriptors.drawerConfirmationDescription}
+                    elementDescriptor={descriptors.drawerFooterDescription}
                     colorScheme='secondary'
                   >
                     {/* TODO(@COMMERCE): needs localization */}
