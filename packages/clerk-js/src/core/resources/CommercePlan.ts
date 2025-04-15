@@ -1,6 +1,5 @@
 import type { __experimental_CommercePlanJSON, __experimental_CommercePlanResource } from '@clerk/types';
 
-import type { __experimental_CommerceSubscription } from './internal';
 import { __experimental_CommerceFeature, BaseResource } from './internal';
 
 export class __experimental_CommercePlan extends BaseResource implements __experimental_CommercePlanResource {
@@ -14,7 +13,6 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
   currency!: string;
   description!: string;
   isDefault!: boolean;
-  isImplicitlyActive!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
   payerType!: string[];
@@ -22,7 +20,6 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
   slug!: string;
   avatarUrl!: string;
   features!: __experimental_CommerceFeature[];
-  activeOrUpcomingSubscription: __experimental_CommerceSubscription | undefined;
 
   constructor(data: __experimental_CommercePlanJSON) {
     super();
@@ -44,7 +41,6 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
     this.currency = data.currency;
     this.description = data.description;
     this.isDefault = data.is_default;
-    this.isImplicitlyActive = false;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
     this.payerType = data.payer_type;

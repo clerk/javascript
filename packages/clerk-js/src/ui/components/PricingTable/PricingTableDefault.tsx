@@ -5,6 +5,7 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
+import { usePlansContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -102,9 +103,11 @@ function Card(props: CardProps) {
   const isDefaultLayout = pricingTableProps.layout === 'default';
   const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
   const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
-  const { id, slug, activeOrUpcomingSubscription, isDefault, features } = plan;
+  const { id, slug, isDefault, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
+
+  const activeOrUpcomingSubscription = usePlansContext().activeOrUpcomingSubscription(plan);
 
   return (
     <Box
@@ -206,7 +209,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const { plan, isCompact, planPeriod, setPlanPeriod } = props;
-  const { name, avatarUrl, isImplicitlyActive, activeOrUpcomingSubscription, annualMonthlyAmount } = plan;
+  const { name, avatarUrl, annualMonthlyAmount } = plan;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const pricingTableCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -220,7 +223,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
 
-  const showBadge = !!activeOrUpcomingSubscription || isImplicitlyActive;
+  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActive } = usePlansContext();
+  const subscription = activeOrUpcomingSubscription(plan);
+  const isImplicitlyActive = isDefaultPlanImplicitlyActive && plan.isDefault;
+
+  const showBadge = !!subscription || isImplicitlyActive;
 
   return (
     <Box
@@ -263,7 +270,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                   flexBasis: avatarUrl ? '100%' : undefined,
                 }}
               >
-                {isImplicitlyActive || activeOrUpcomingSubscription?.status === 'active' ? (
+                {isImplicitlyActive || subscription?.status === 'active' ? (
                   <Badge
                     elementDescriptor={descriptors.pricingTableCardBadge}
                     localizationKey={localizationKeys('badge__currentPlan')}
@@ -273,7 +280,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                   <Badge
                     elementDescriptor={descriptors.pricingTableCardBadge}
                     localizationKey={localizationKeys('badge__startsAt', {
-                      date: activeOrUpcomingSubscription?.periodStart,
+                      date: subscription?.periodStart,
                     })}
                     colorScheme={'primary'}
                   />

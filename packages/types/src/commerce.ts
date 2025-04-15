@@ -53,7 +53,6 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   currency: string;
   description: string;
   isDefault: boolean;
-  isImplicitlyActive: boolean;
   isRecurring: boolean;
   hasBaseFee: boolean;
   payerType: string[];
@@ -61,7 +60,6 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   slug: string;
   avatarUrl: string;
   features: __experimental_CommerceFeatureResource[];
-  activeOrUpcomingSubscription: __experimental_CommerceSubscriptionResource | undefined;
 }
 
 export interface __experimental_CommerceFeatureResource extends ClerkResource {

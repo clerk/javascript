@@ -10,6 +10,7 @@ import type {
 import { useState } from 'react';
 import * as React from 'react';
 
+import { usePlansContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -27,7 +28,6 @@ import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
 import { InformationCircle } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
 import { formatDate, handleError } from '../../utils';
-
 type DrawerRootProps = React.ComponentProps<typeof Drawer.Root>;
 
 type SubscriptionDetailDrawerProps = {
@@ -283,7 +283,7 @@ interface HeaderProps {
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, planPeriod, closeSlot } = props;
-  const { name, avatarUrl, activeOrUpcomingSubscription, isImplicitlyActive, annualMonthlyAmount } = plan;
+  const { name, avatarUrl, annualMonthlyAmount } = plan;
   const getPlanFee = React.useMemo(() => {
     if (annualMonthlyAmount <= 0) {
       return plan.amountFormatted;
@@ -291,7 +291,11 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
 
-  const showBadge = !!activeOrUpcomingSubscription || isImplicitlyActive;
+  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActive } = usePlansContext();
+  const subscription = activeOrUpcomingSubscription(plan);
+  const isImplicitlyActive = isDefaultPlanImplicitlyActive && plan.isDefault;
+
+  const showBadge = !!subscription || isImplicitlyActive;
 
   return (
     <Box
@@ -334,7 +338,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                   flexBasis: closeSlot && avatarUrl ? '100%' : undefined,
                 }}
               >
-                {isImplicitlyActive || activeOrUpcomingSubscription?.status === 'active' ? (
+                {isImplicitlyActive || subscription?.status === 'active' ? (
                   <Badge
                     elementDescriptor={descriptors.pricingTableCardBadge}
                     localizationKey={localizationKeys('badge__currentPlan')}
@@ -344,7 +348,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                   <Badge
                     elementDescriptor={descriptors.pricingTableCardBadge}
                     localizationKey={localizationKeys('badge__startsAt', {
-                      date: activeOrUpcomingSubscription?.periodStart,
+                      date: subscription?.periodStart,
                     })}
                     colorScheme={'secondary'}
                   />
