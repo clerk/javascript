@@ -21,6 +21,7 @@ import {
 import { Pagination } from '../../elements';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
+import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 /* -------------------------------------------------------------------------------------------------
  * InvoicesList
@@ -80,7 +81,7 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
           truncate
           sx={t => ({ marginTop: t.space.$0x5, textTransform: 'uppercase' })}
         >
-          {id}
+          {truncateWithEndVisible(id)}
         </Text>
       </Td>
       <Td
