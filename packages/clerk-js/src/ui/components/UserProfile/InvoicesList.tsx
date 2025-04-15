@@ -49,16 +49,24 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
   return (
     <DataTableRow>
       <Td>
-        <Text>{new Date(paymentDueOn).toLocaleDateString()}</Text>
+        <Text variant='subtitle'>{new Date(paymentDueOn).toLocaleDateString()}</Text>
         <Text
           colorScheme='secondary'
+          truncate
           sx={t => ({ marginTop: t.space.$0x5, textTransform: 'uppercase' })}
         >
           {id}
         </Text>
       </Td>
       <Td>
-        <Badge colorScheme={badgeColorSchemeMap[status]}>{status}</Badge>
+        <Badge
+          colorScheme={badgeColorSchemeMap[status]}
+          sx={{
+            textTransform: 'capitalize',
+          }}
+        >
+          {status}
+        </Badge>
       </Td>
       <Td>
         <Text colorScheme='secondary'>
@@ -108,7 +116,7 @@ const DataTable = (props: DataTableProps) => {
       sx={{ width: '100%' }}
     >
       <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1 })}>
-        <Table>
+        <Table sx={{ tableLayout: 'fixed' }}>
           <Thead>
             <Tr>
               {headers.map((h, index) => (
