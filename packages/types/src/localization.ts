@@ -433,11 +433,11 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         /**
-         * @deprecated UserProfile now only uses `actionLabel__connectionFailed`.
+         * @deprecated Use `actionLabel__connectionFailed` instead.
          */
         actionLabel__reauthorize: LocalizationValue;
         /**
-         * @deprecated UserProfile now uses `subtitle__disconnected`.
+         * @deprecated Use `subtitle__disconnected` instead.
          */
         subtitle__reauthorize: LocalizationValue;
         subtitle__disconnected: LocalizationValue;
@@ -510,7 +510,7 @@ type _LocalizationResource = {
       formHint: LocalizationValue;
       emailCode: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -520,7 +520,7 @@ type _LocalizationResource = {
       };
       emailLink: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;

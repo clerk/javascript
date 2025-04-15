@@ -114,7 +114,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   social: OAuthProviders;
 
   /**
-   * @deprecated Use `enterprise_sso` instead
+   * @deprecated Use `enterprise_sso` instead.
    */
   saml: SamlSettings;
   enterprise_sso: EnterpriseSSOSettings;
@@ -131,7 +131,7 @@ export interface UserSettingsResource extends ClerkResource {
   social: OAuthProviders;
 
   /**
-   * @deprecated Use `enterprise_sso` instead
+   * @deprecated Use `enterprise_sso` instead.
    */
   saml: SamlSettings;
   enterpriseSSO: EnterpriseSSOSettings;

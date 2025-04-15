@@ -13,6 +13,8 @@ type UseSession = (options?: PendingSessionOptions) => UseSessionReturn;
  *
  * @function
  *
+ * @param [options] - An object containing options for the `useSession()` hook.
+ *
  * @example
  * ### Access the `Session` object
  *
