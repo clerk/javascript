@@ -591,7 +591,7 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowserNoRHC]: merge(
       entryForVariant(variants.clerkBrowserNoRHC),
-      common({ mode, disableRHC: true, variants: variant.clerkBrowserNoRHC }),
+      common({ mode, disableRHC: true, variant: variant.clerkBrowserNoRHC }),
       commonForDev(),
     ),
     [variants.clerkHeadless]: merge(
