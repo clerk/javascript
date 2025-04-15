@@ -6,8 +6,6 @@ import type { ClerkResource } from './resource';
 export interface __experimental_CommerceSettingsJSON extends ClerkResourceJSON {
   billing: {
     enabled: boolean;
-    has_paid_org_plans: boolean;
-    has_paid_user_plans: boolean;
     stripe_publishable_key: string;
     has_paid_user_plans: boolean;
     has_paid_org_plans: boolean;
@@ -17,8 +15,6 @@ export interface __experimental_CommerceSettingsJSON extends ClerkResourceJSON {
 export interface __experimental_CommerceSettingsResource extends ClerkResource {
   billing: {
     enabled: boolean;
-    hasPaidOrgPlans: boolean;
-    hasPaidUserPlans: boolean;
     stripePublishableKey: string;
     hasPaidUserPlans: boolean;
     hasPaidOrgPlans: boolean;
