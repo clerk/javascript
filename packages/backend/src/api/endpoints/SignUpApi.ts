@@ -16,7 +16,7 @@ export class SignUpAPI extends AbstractAPI {
 
     return this.request<SignUpAttempt>({
       method: 'GET',
-      path: basePath,
+      path: joinPaths(basePath, signUpAttemptId),
     });
   }
 

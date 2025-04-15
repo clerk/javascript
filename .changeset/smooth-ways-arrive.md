@@ -2,7 +2,7 @@
 '@clerk/backend': minor
 ---
 
-Adds the ability to retrieve and update Sign Up Attemps to the Backend API client.
+Adds the ability to retrieve and update Sign Up Attempts to the Backend API client.
 
 
 ```ts
