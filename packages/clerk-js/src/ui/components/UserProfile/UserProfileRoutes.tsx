@@ -5,12 +5,17 @@ import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { InvoicesContextProvider, useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
-import { InvoicePage } from './InvoicePage';
 import { SecurityPage } from './SecurityPage';
 
 const BillingPage = lazy(() =>
   import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
     default: module.BillingPage,
+  })),
+);
+
+const InvoicePage = lazy(() =>
+  import(/* webpackChunkName: "up-invoice-page"*/ './InvoicePage').then(module => ({
+    default: module.InvoicePage,
   })),
 );
 
@@ -66,9 +71,11 @@ export const UserProfileRoutes = () => {
                 </Suspense>
               </Route>
               <Route path='invoice/:invoiceId'>
-                <InvoicesContextProvider>
-                  <InvoicePage />
-                </InvoicesContextProvider>
+                <Suspense fallback={''}>
+                  <InvoicesContextProvider>
+                    <InvoicePage />
+                  </InvoicesContextProvider>
+                </Suspense>
               </Route>
             </Switch>
           </Route>
