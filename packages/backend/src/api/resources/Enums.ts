@@ -37,6 +37,13 @@ export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
+export const ActorTokenStatus = {
+  Pending: 'pending',
+  Accepted: 'accepted',
+  Revoked: 'revoked',
+} as const;
+export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorTokenStatus];
+
 export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
 
 export type BlocklistIdentifierType = AllowlistIdentifierType;

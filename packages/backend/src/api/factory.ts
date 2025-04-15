@@ -1,5 +1,6 @@
 import {
   AccountlessApplicationAPI,
+  ActorTokenAPI,
   AllowlistIdentifierAPI,
   BlocklistIdentifierAPI,
   ClientAPI,
@@ -32,6 +33,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     __experimental_accountlessApplications: new AccountlessApplicationAPI(
       buildRequest({ ...options, requireSecretKey: false }),
     ),
+    actorTokens: new ActorTokenAPI(request),
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     blocklistIdentifiers: new BlocklistIdentifierAPI(request),
     clients: new ClientAPI(request),
