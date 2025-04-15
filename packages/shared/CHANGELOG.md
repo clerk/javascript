@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.7.0
+
+### Minor Changes
+
+- Replace `parseFeatures` with `splitByScope`. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+- Update `createCheckAuthorization` to support authorization based on features and plans. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Bug fix: Reverse permissions array on `parsePermissions` to match bitmask correctly. ([#5620](https://github.com/clerk/javascript/pull/5620)) by [@panteliselef](https://github.com/panteliselef)
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+
 ## 3.6.0
 
 ### Minor Changes

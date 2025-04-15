@@ -54,11 +54,15 @@ export type { VerifyTokenOptions } from './tokens/verify';
  * JSON types
  */
 export type {
+  ActorTokenJSON,
   AccountlessApplicationJSON,
   ClerkResourceJSON,
   TokenJSON,
   AllowlistIdentifierJSON,
+  BlocklistIdentifierJSON,
   ClientJSON,
+  CnameTargetJSON,
+  DomainJSON,
   EmailJSON,
   EmailAddressJSON,
   ExternalAccountJSON,
@@ -67,7 +71,9 @@ export type {
   InstanceRestrictionsJSON,
   InstanceSettingsJSON,
   InvitationJSON,
+  JwtTemplateJSON,
   OauthAccessTokenJSON,
+  OAuthApplicationJSON,
   OrganizationJSON,
   OrganizationDomainJSON,
   OrganizationDomainVerificationJSON,
@@ -91,22 +97,29 @@ export type {
   DeletedObjectJSON,
   PaginatedResponseJSON,
   TestingTokenJSON,
+  WebhooksSvixJSON,
 } from './api/resources/JSON';
 
 /**
  * Resources
  */
 export type {
+  ActorToken,
   AccountlessApplication,
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
+  CnameTarget,
+  Domain,
   EmailAddress,
   ExternalAccount,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
   Invitation,
+  JwtTemplate,
   OauthAccessToken,
+  OAuthApplication,
   Organization,
   OrganizationDomain,
   OrganizationDomainVerification,

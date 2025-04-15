@@ -16,7 +16,7 @@ export type AfterMultiSessionSingleSignOutUrl = {
 };
 
 /**
- * @deprecated This is deprecated and will be removed in a future release.
+ * @deprecated This will be removed in a future release.
  */
 export type LegacyRedirectProps = {
   /**
@@ -101,14 +101,16 @@ export type SignUpForceRedirectUrl = {
 
 export type SignUpFallbackRedirectUrl = {
   /**
-   * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * @default '/'
    */
   signUpFallbackRedirectUrl?: string | null;
 };
 
 export type SignInFallbackRedirectUrl = {
   /**
-   * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * @default '/'
    */
   signInFallbackRedirectUrl?: string | null;
 };

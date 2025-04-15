@@ -1,7 +1,5 @@
-import {
-  __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties,
-  parseFeatures,
-} from '../jwtPayloadParser';
+import { splitByScope } from '../authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties as JWTPayloadToAuthObjectProperties } from '../jwtPayloadParser';
 
 const baseClaims = {
   exp: 1234567890,
@@ -40,7 +38,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       o: {
         id: 'org_xxxxxxx',
         rol: 'admin',
-        slg: '/test',
+        slg: 'org_test',
         per: 'read,manage',
         fpm: '3',
       },
@@ -50,32 +48,8 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       ...baseClaims,
       org_id: 'org_xxxxxxx',
       org_role: 'org:admin',
-      org_slug: '/test',
-      org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
-    });
-    expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
-  });
-
-  test('produced auth object is the same for v1 and v2', () => {
-    const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
-      ...baseClaims,
-      v: 2,
-      fea: 'o:impersonation',
-      o: {
-        id: 'org_xxxxxxx',
-        rol: 'admin',
-        slg: '/test',
-        per: 'read,manage',
-        fpm: '3',
-      },
-    });
-
-    const { sessionClaims: v1Claims, ...signedInAuthObjectV1 } = JWTPayloadToAuthObjectProperties({
-      ...baseClaims,
-      org_id: 'org_xxxxxxx',
-      org_role: 'org:admin',
-      org_slug: '/test',
-      org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
+      org_slug: 'org_test',
+      org_permissions: ['org:impersonation:manage', 'org:impersonation:read'],
     });
     expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
   });
@@ -88,9 +62,9 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       o: {
         id: 'org_xxxxxxx',
         rol: 'admin',
-        slg: '/test',
+        slg: 'org_test',
         per: 'read,manage',
-        fpm: '2,3',
+        fpm: '1,3',
       },
     });
 
@@ -109,7 +83,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,manage',
-        fpm: '2,3',
+        fpm: '1,3',
       },
     });
 
@@ -128,7 +102,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
         rol: 'admin',
         slg: 'org_slug',
         per: 'read,manage',
-        fpm: '2,3,2',
+        fpm: '1,3,1',
       },
     });
 
@@ -185,39 +159,139 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       ['org:memberships:read', 'org:memberships:manage'].sort(),
     );
   });
+
+  test('org permissions are constructed correctly case 2', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:billing,o:email,o:fraud,o:instance,o:staging_plans',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'manage,read',
+        fpm: '3,3,3,3,1',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      [
+        'org:billing:manage',
+        'org:billing:read',
+        'org:email:manage',
+        'org:email:read',
+        'org:fraud:manage',
+        'org:fraud:read',
+        'org:instance:manage',
+        'org:instance:read',
+        'org:staging_plans:manage',
+      ].sort(),
+    );
+  });
+
+  test('org permissions are constructed correctly case 3', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:repositories,o:projects',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'read,create,update,delete,revoke',
+        fpm: '7,21',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      [
+        'org:repositories:read',
+        'org:repositories:create',
+        'org:repositories:update',
+        'org:projects:read',
+        'org:projects:update',
+        'org:projects:revoke',
+      ].sort(),
+    );
+  });
+
+  test('org permissions are constructed correctly case 4', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:repositories,o:projects,o:webhooks,o:impersonation',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'read,manage',
+        fpm: '1,2,3',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      ['org:repositories:read', 'org:projects:manage', 'org:webhooks:read', 'org:webhooks:manage'].sort(),
+    );
+  });
+
+  test('org permissions are constructed correctly case 5', () => {
+    const { sessionClaims: v2Claims, ...signedInAuthObject } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      fea: 'o:repositories,uo:projects,u:goldprofileborder',
+      o: {
+        id: 'org_id',
+        rol: 'admin',
+        slg: 'org_slug',
+        per: 'read,create,update,delete,revoke',
+        fpm: '7,21',
+      },
+    });
+
+    expect(signedInAuthObject.orgPermissions?.sort()).toEqual(
+      [
+        'org:repositories:read',
+        'org:repositories:create',
+        'org:repositories:update',
+        'org:projects:read',
+        'org:projects:update',
+        'org:projects:revoke',
+      ].sort(),
+    );
+  });
 });
 
-describe('parseFeatures ', () => {
+describe('splitByScope ', () => {
   test('returns empty array when no features are present', () => {
-    const { orgFeatures } = parseFeatures('');
-    expect(orgFeatures).toEqual([]);
+    const { org } = splitByScope('');
+    expect(org).toEqual([]);
   });
 
   test('only org features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:impersonation,o:payments');
-    expect(orgFeatures).toEqual(['impersonation', 'payments']);
+    const { org, user } = splitByScope('o:impersonation,o:payments');
+    expect(org).toEqual(['impersonation', 'payments']);
 
-    expect(userFeatures).toEqual([]);
+    expect(user).toEqual([]);
   });
 
   test('only user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('u:impersonation,u:payments');
-    expect(orgFeatures).toEqual([]);
+    const { org, user } = splitByScope('u:impersonation,u:payments');
+    expect(org).toEqual([]);
 
-    expect(userFeatures).toEqual(['impersonation', 'payments']);
+    expect(user).toEqual(['impersonation', 'payments']);
   });
 
   test('both org and user features included', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('o:payments,u:impersonation');
-    expect(orgFeatures).toEqual(['payments']);
+    const { org, user } = splitByScope('o:payments,u:impersonation');
+    expect(org).toEqual(['payments']);
 
-    expect(userFeatures).toEqual(['impersonation']);
+    expect(user).toEqual(['impersonation']);
   });
 
   test('features have multiple scopes', () => {
-    const { orgFeatures, userFeatures } = parseFeatures('ou:payments,u:impersonation');
-    expect(orgFeatures).toEqual(['payments']);
+    const { org, user } = splitByScope('ou:payments,u:impersonation');
+    expect(org).toEqual(['payments']);
 
-    expect(userFeatures).toEqual(['payments', 'impersonation']);
+    expect(user).toEqual(['payments', 'impersonation']);
   });
 });

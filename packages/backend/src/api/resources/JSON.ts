@@ -1,4 +1,7 @@
 import type {
+  ActorTokenStatus,
+  AllowlistIdentifierType,
+  BlocklistIdentifierType,
   DomainsEnrollmentModes,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
@@ -12,9 +15,12 @@ import type {
 
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
+  ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  Domain: 'domain',
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
@@ -24,7 +30,9 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
@@ -74,12 +82,35 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
   api_keys_url: string;
 }
 
+export interface ActorTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ActorToken;
+  id: string;
+  status: ActorTokenStatus;
+  user_id: string;
+  actor: Record<string, unknown> | null;
+  token?: string | null;
+  url?: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
+  identifier_type: AllowlistIdentifierType;
+  instance_id?: string;
+  invitation_id?: string;
   created_at: number;
   updated_at: number;
-  invitation_id?: string;
+}
+
+export interface BlocklistIdentifierJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BlocklistIdentifier;
+  identifier: string;
+  identifier_type: BlocklistIdentifierType;
+  instance_id?: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -91,6 +122,30 @@ export interface ClientJSON extends ClerkResourceJSON {
   last_active_session_id: string | null;
   created_at: number;
   updated_at: number;
+}
+
+export interface CnameTargetJSON {
+  host: string;
+  value: string;
+  /**
+   * Denotes whether this CNAME target is required to be set in order for the domain to be considered deployed.
+   */
+  required: boolean;
+}
+
+export interface DomainJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Domain;
+  id: string;
+  name: string;
+  is_satellite: boolean;
+  frontend_api_url: string;
+  /**
+   * null for satellite domains
+   */
+  accounts_portal_url?: string | null;
+  proxy_url?: string;
+  development_origin: string;
+  cname_targets: CnameTargetJSON[];
 }
 
 export interface EmailJSON extends ClerkResourceJSON {
@@ -143,6 +198,19 @@ export interface JwksKeyJSON {
   alg: string;
   n: string;
   e: string;
+}
+
+export interface JwtTemplateJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.JwtTemplate;
+  id: string;
+  name: string;
+  claims: object;
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -221,6 +289,25 @@ export interface OauthAccessTokenJSON {
   scopes?: string[];
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
+}
+
+export interface OAuthApplicationJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OAuthApplication;
+  id: string;
+  instance_id: string;
+  name: string;
+  client_id: string;
+  public: boolean;
+  scopes: string;
+  redirect_uris: Array<string>;
+  authorize_url: string;
+  token_fetch_url: string;
+  user_info_url: string;
+  discovery_url: string;
+  token_introspection_url: string;
+  created_at: number;
+  updated_at: number;
+  client_secret?: string;
 }
 
 export interface OrganizationJSON extends ClerkResourceJSON {
@@ -552,4 +639,8 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
+}
+
+export interface WebhooksSvixJSON {
+  svix_url: string;
 }

@@ -1,15 +1,20 @@
 import {
+  ActorToken,
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
   Cookies,
   DeletedObject,
+  Domain,
   Email,
   EmailAddress,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
   Invitation,
+  JwtTemplate,
   OauthAccessToken,
+  OAuthApplication,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
@@ -74,12 +79,18 @@ function jsonToObject(item: any): any {
   switch (item.object) {
     case ObjectType.AccountlessApplication:
       return AccountlessApplication.fromJSON(item);
+    case ObjectType.ActorToken:
+      return ActorToken.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
+    case ObjectType.BlocklistIdentifier:
+      return BlocklistIdentifier.fromJSON(item);
     case ObjectType.Client:
       return Client.fromJSON(item);
     case ObjectType.Cookies:
       return Cookies.fromJSON(item);
+    case ObjectType.Domain:
+      return Domain.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:
@@ -92,8 +103,12 @@ function jsonToObject(item: any): any {
       return InstanceSettings.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
+    case ObjectType.JwtTemplate:
+      return JwtTemplate.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
+    case ObjectType.OAuthApplication:
+      return OAuthApplication.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
     case ObjectType.OrganizationInvitation:

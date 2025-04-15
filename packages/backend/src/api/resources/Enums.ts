@@ -43,3 +43,14 @@ export const DomainsEnrollmentModes = {
   AutomaticSuggestion: 'automatic_suggestion',
 } as const;
 export type DomainsEnrollmentModes = (typeof DomainsEnrollmentModes)[keyof typeof DomainsEnrollmentModes];
+
+export const ActorTokenStatus = {
+  Pending: 'pending',
+  Accepted: 'accepted',
+  Revoked: 'revoked',
+} as const;
+export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorTokenStatus];
+
+export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
+
+export type BlocklistIdentifierType = AllowlistIdentifierType;
