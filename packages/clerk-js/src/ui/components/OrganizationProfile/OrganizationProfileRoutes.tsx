@@ -4,13 +4,18 @@ import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { InvoicesContextProvider, useEnvironment, useOptions, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
-import { InvoicePage } from '../Invoices';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
     default: module.OrganizationBillingPage,
+  })),
+);
+
+const InvoicePage = lazy(() =>
+  import(/* webpackChunkName: "up-invoice-page"*/ '../Invoices/InvoicePage').then(module => ({
+    default: module.InvoicePage,
   })),
 );
 
