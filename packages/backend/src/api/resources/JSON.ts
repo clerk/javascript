@@ -1,4 +1,6 @@
 import type {
+  AllowlistIdentifierType,
+  BlocklistIdentifierType,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -12,6 +14,7 @@ import type {
 export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   AllowlistIdentifier: 'allowlist_identifier',
+  BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
   Email: 'email',
@@ -20,6 +23,7 @@ export const ObjectType = {
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
+  JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -72,9 +76,20 @@ export interface AccountlessApplicationJSON extends ClerkResourceJSON {
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
+  identifier_type: AllowlistIdentifierType;
+  instance_id?: string;
+  invitation_id?: string;
   created_at: number;
   updated_at: number;
-  invitation_id?: string;
+}
+
+export interface BlocklistIdentifierJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BlocklistIdentifier;
+  identifier: string;
+  identifier_type: BlocklistIdentifierType;
+  instance_id?: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -138,6 +153,19 @@ export interface JwksKeyJSON {
   alg: string;
   n: string;
   e: string;
+}
+
+export interface JwtTemplateJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.JwtTemplate;
+  id: string;
+  name: string;
+  claims: object;
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -509,4 +537,8 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
+}
+
+export interface WebhooksSvixJSON {
+  svix_url: string;
 }

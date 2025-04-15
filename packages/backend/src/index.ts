@@ -58,12 +58,14 @@ export type {
   ClerkResourceJSON,
   TokenJSON,
   AllowlistIdentifierJSON,
+  BlocklistIdentifierJSON,
   ClientJSON,
   EmailJSON,
   EmailAddressJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
   InvitationJSON,
+  JwtTemplateJSON,
   OauthAccessTokenJSON,
   OrganizationJSON,
   OrganizationDomainJSON,
@@ -87,6 +89,7 @@ export type {
   DeletedObjectJSON,
   PaginatedResponseJSON,
   TestingTokenJSON,
+  WebhooksSvixJSON,
 } from './api/resources/JSON';
 
 /**
@@ -95,10 +98,12 @@ export type {
 export type {
   AccountlessApplication,
   AllowlistIdentifier,
+  BlocklistIdentifier,
   Client,
   EmailAddress,
   ExternalAccount,
   Invitation,
+  JwtTemplate,
   OauthAccessToken,
   Organization,
   OrganizationDomain,

@@ -1,5 +1,6 @@
 export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
+export * from './BlocklistIdentifier';
 export * from './Client';
 export * from './Cookies';
 export * from './DeletedObject';
@@ -20,6 +21,7 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Invitation';
 export * from './JSON';
+export * from './JwtTemplate';
 export * from './OauthAccessToken';
 export * from './Organization';
 export * from './OrganizationInvitation';

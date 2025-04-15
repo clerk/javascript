@@ -454,6 +454,13 @@ export type ElementsConfig = {
   selectOptionsContainer: WithOptions<SelectId>;
   selectOption: WithOptions<SelectId>;
 
+  paymentSourceRow: WithOptions;
+  paymentSourceRowIcon: WithOptions;
+  paymentSourceRowText: WithOptions;
+  paymentSourceRowType: WithOptions;
+  paymentSourceRowValue: WithOptions;
+  paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
+
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
