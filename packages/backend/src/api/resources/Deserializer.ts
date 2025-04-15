@@ -31,6 +31,7 @@ import {
 import { AccountlessApplication } from './AccountlessApplication';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
+import { WaitlistEntry } from './WaitlistEntry';
 
 type ResourceResponse<T> = {
   data: T;
@@ -135,6 +136,8 @@ function jsonToObject(item: any): any {
       return getCount(item);
     case ObjectType.User:
       return User.fromJSON(item);
+    case ObjectType.WaitlistEntry:
+      return WaitlistEntry.fromJSON(item);
     default:
       return item;
   }

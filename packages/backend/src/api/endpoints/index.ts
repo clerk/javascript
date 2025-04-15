@@ -20,4 +20,5 @@ export * from './SessionApi';
 export * from './SignInTokenApi';
 export * from './TestingTokenApi';
 export * from './UserApi';
+export * from './WaitlistEntryApi';
 export * from './WebhookApi';

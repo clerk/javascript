@@ -20,6 +20,7 @@ import {
   SignInTokenAPI,
   TestingTokenAPI,
   UserAPI,
+  WaitlistEntryAPI,
   WebhookAPI,
 } from './endpoints';
 import { buildRequest } from './request';
@@ -55,6 +56,7 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     signInTokens: new SignInTokenAPI(request),
     testingTokens: new TestingTokenAPI(request),
     users: new UserAPI(request),
+    waitlistEntries: new WaitlistEntryAPI(request),
     webhooks: new WebhookAPI(request),
   };
 }
