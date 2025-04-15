@@ -11,7 +11,7 @@ import type {
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient, OauthApplicationToken } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-import type { MachineAuthType } from './types';
+import type { MachineAuthType, TokenEntity } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -62,10 +62,9 @@ export type SignedOutAuthObject = {
  * @internal
  */
 export type AuthenticatedMachineObject = {
-  isMachine: true;
   userId: string | null;
   claims: Record<string, string> | null;
-  entity: 'machine';
+  entity: Exclude<TokenEntity, 'user'>;
   machineId: string | null;
   has: CheckAuthorizationFromSessionClaims;
   getToken: () => string;
@@ -76,10 +75,9 @@ export type AuthenticatedMachineObject = {
  * @internal
  */
 export type UnauthenticatedMachineObject = {
-  isMachine: false;
   userId: null;
   claims: null;
-  entity: 'machine';
+  entity: Exclude<TokenEntity, 'user'>;
   machineId: null;
   has: CheckAuthorizationFromSessionClaims;
   getToken: ServerGetToken;
@@ -172,14 +170,14 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
  * @internal
  */
 export function authenticatedMachineObject(
+  entity: Exclude<TokenEntity, 'user'>,
   machineToken: string,
   verificationResult: MachineAuthType,
   debugData?: AuthObjectDebugData,
 ): AuthenticatedMachineObject {
   return {
-    isMachine: true,
     claims: verificationResult.claims,
-    entity: 'machine',
+    entity,
     machineId: verificationResult.id,
     userId: !(verificationResult instanceof OauthApplicationToken) ? verificationResult.createdBy : null,
     getToken: () => machineToken,
@@ -191,10 +189,12 @@ export function authenticatedMachineObject(
 /**
  * @internal
  */
-export function unauthenticatedMachineObject(debugData?: AuthObjectDebugData): UnauthenticatedMachineObject {
+export function unauthenticatedMachineObject(
+  entity: Exclude<TokenEntity, 'user'>,
+  debugData?: AuthObjectDebugData,
+): UnauthenticatedMachineObject {
   return {
-    isMachine: false,
-    entity: 'machine',
+    entity,
     claims: null,
     machineId: null,
     userId: null,

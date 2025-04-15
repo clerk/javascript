@@ -47,7 +47,7 @@ export type AuthenticateRequestOptions = {
   /**
    * TODO: Add docs
    */
-  entity?: Entity;
+  entity?: TokenEntity | 'any';
 } & VerifyTokenOptions;
 
 /**
@@ -118,6 +118,6 @@ export type OrganizationSyncOptions = {
  */
 type Pattern = string;
 
-export type Entity = 'machine' | 'user' | 'any';
+export type TokenEntity = 'user' | 'oauth_token' | 'api_key' | 'machine_token';
 
 export type MachineAuthType = MachineToken | APIKey | OauthApplicationToken;

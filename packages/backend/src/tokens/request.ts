@@ -11,27 +11,13 @@ import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
-import type {
-  HandshakeState,
-  MachineAuthenticatedState,
-  MachineUnauthenticatedState,
-  RequestState,
-  SignedInState,
-  SignedOutState,
-} from './authStatus';
-import {
-  AuthErrorReason,
-  handshake,
-  machineAuthenticated,
-  machineUnauthenticated,
-  signedIn,
-  signedOut,
-} from './authStatus';
+import type { HandshakeState, SignedInState, SignedOutState } from './authStatus';
+import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
-import { isMachineToken } from './machine';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
+import { getMachineTokenType, isMachineToken } from './machine';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions, TokenEntity } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -105,22 +91,6 @@ function isRequestEligibleForRefresh(
   );
 }
 
-// Overloads
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions & { entity: 'machine' },
-): Promise<MachineAuthenticatedState | MachineUnauthenticatedState>;
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions & { entity: 'user' },
-): Promise<RequestState>;
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions & { entity: 'any' },
-): Promise<RequestState | MachineAuthenticatedState | MachineUnauthenticatedState>;
-export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
-
-// Implementation
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
@@ -208,12 +178,23 @@ export async function authenticateRequest(request: Request, options: Authenticat
     }
 
     if (sessionToken === '') {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+      return signedOut({
+        entity: 'user',
+        authenticateContext,
+        reason: AuthErrorReason.SessionTokenMissing,
+        headers,
+      });
     }
 
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
-      return signedIn(authenticateContext, data, headers, sessionToken);
+      return signedIn({
+        entity: 'user',
+        authenticateContext,
+        sessionClaims: data,
+        headers,
+        token: sessionToken,
+      });
     }
 
     if (
@@ -240,7 +221,13 @@ ${error.getFullMessage()}`,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(authenticateContext, retryResult, headers, sessionToken);
+        return signedIn({
+          entity: 'user',
+          authenticateContext,
+          sessionClaims: retryResult,
+          headers,
+          token: sessionToken,
+        });
       }
 
       throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
@@ -403,13 +390,23 @@ ${error.getFullMessage()}`,
       if (isRedirectLoop) {
         const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
         console.log(msg);
-        return signedOut(authenticateContext, reason, message);
+        return signedOut({
+          entity: 'user',
+          authenticateContext,
+          reason,
+          message,
+        });
       }
 
       return handshake(authenticateContext, reason, message, handshakeHeaders);
     }
 
-    return signedOut(authenticateContext, reason, message);
+    return signedOut({
+      entity: 'user',
+      authenticateContext,
+      reason,
+      message,
+    });
   }
 
   /**
@@ -483,8 +480,14 @@ ${error.getFullMessage()}`,
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      return signedIn({
+        entity: 'user',
+        authenticateContext,
+        sessionClaims: data,
+        headers: new Headers(),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        token: sessionTokenInHeader!,
+      });
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -616,7 +619,11 @@ ${error.getFullMessage()}`,
     }
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '');
+      return signedOut({
+        entity: 'user',
+        authenticateContext,
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
+      });
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
@@ -645,13 +652,15 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      const signedInRequestState = signedIn(
+
+      const signedInRequestState = signedIn({
+        entity: 'user',
         authenticateContext,
-        data,
-        undefined,
+        sessionClaims: data,
+        headers: new Headers(),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        authenticateContext.sessionTokenInCookie!,
-      );
+        token: authenticateContext.sessionTokenInCookie!,
+      });
 
       // Org sync if necessary
       const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
@@ -667,7 +676,12 @@ ${error.getFullMessage()}`,
       return handleError(err, 'cookie');
     }
 
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+    // Unreachable
+    return signedOut({
+      entity: 'user',
+      authenticateContext,
+      reason: AuthErrorReason.UnexpectedError,
+    });
   }
 
   async function handleError(
@@ -675,7 +689,11 @@ ${error.getFullMessage()}`,
     tokenCarrier: TokenCarrier,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
-      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+      return signedOut({
+        entity: 'user',
+        authenticateContext,
+        reason: AuthErrorReason.UnexpectedError,
+      });
     }
 
     let refreshError: string | null;
@@ -683,7 +701,13 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
-        return signedIn(authenticateContext, data.jwtPayload, data.headers, data.sessionToken);
+        return signedIn({
+          entity: 'user',
+          authenticateContext,
+          sessionClaims: data.jwtPayload,
+          headers: data.headers,
+          token: data.sessionToken,
+        });
       }
 
       // If there's any error, simply fallback to the handshake flow including the reason as a query parameter.
@@ -719,15 +743,29 @@ ${error.getFullMessage()}`,
       );
     }
 
-    return signedOut(authenticateContext, err.reason, err.getFullMessage());
+    return signedOut({
+      entity: 'user',
+      authenticateContext,
+      reason: err.reason,
+      message: err.getFullMessage(),
+    });
   }
 
-  function handleMachineError(err: unknown): MachineUnauthenticatedState {
+  function handleMachineError(entity: Exclude<TokenEntity, 'user'>, err: unknown): SignedOutState {
     if (!(err instanceof MachineTokenVerificationError)) {
-      return machineUnauthenticated(AuthErrorReason.UnexpectedError);
+      return signedOut({
+        entity,
+        authenticateContext,
+        reason: AuthErrorReason.UnexpectedError,
+      });
     }
 
-    return machineUnauthenticated(err.code, err.getFullMessage());
+    return signedOut({
+      entity,
+      authenticateContext,
+      reason: err.code,
+      message: err.getFullMessage(),
+    });
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {
@@ -737,12 +775,22 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
-    const { data, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
-    if (errors) {
-      return handleMachineError(errors[0]);
+    const tokenType = getMachineTokenType(sessionTokenInHeader);
+    if (options.entity !== 'any' && options.entity !== tokenType) {
+      return handleError(new Error(`Expected ${options.entity} token but received ${tokenType} token`), 'header');
     }
 
-    return machineAuthenticated(undefined, sessionTokenInHeader, data);
+    const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+    if (errors) {
+      return handleMachineError(entity, errors[0]);
+    }
+
+    return signedIn({
+      entity,
+      authenticateContext,
+      machineData: data,
+      token: sessionTokenInHeader,
+    });
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
@@ -753,12 +801,22 @@ ${error.getFullMessage()}`,
     }
 
     if (isMachineToken(sessionTokenInHeader)) {
-      const { data, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
-      if (errors) {
-        return handleMachineError(errors[0]);
+      const tokenType = getMachineTokenType(sessionTokenInHeader);
+      if (options.entity !== 'any' && options.entity !== tokenType) {
+        return handleError(new Error(`Expected ${options.entity} token but received ${tokenType} token`), 'header');
       }
 
-      return machineAuthenticated(undefined, sessionTokenInHeader, data);
+      const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+      if (errors) {
+        return handleMachineError(entity, errors[0]);
+      }
+
+      return signedIn({
+        entity,
+        authenticateContext,
+        machineData: data,
+        token: sessionTokenInHeader,
+      });
     }
 
     // Handle as a regular session token
@@ -766,22 +824,36 @@ ${error.getFullMessage()}`,
     if (errors) {
       return handleError(errors[0], 'header');
     }
-    return signedIn(authenticateContext, data, undefined, sessionTokenInHeader);
+
+    return signedIn({
+      entity: 'user',
+      authenticateContext,
+      sessionClaims: data,
+      token: sessionTokenInHeader,
+    });
   }
 
   if (authenticateContext.sessionTokenInHeader) {
     if (options.entity === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
-    } else if (options.entity === 'machine') {
-      return authenticateMachineRequestWithTokenInHeader();
     }
-    return authenticateRequestWithTokenInHeader();
+
+    if (options.entity === 'user') {
+      return authenticateRequestWithTokenInHeader();
+    }
+
+    return authenticateMachineRequestWithTokenInHeader();
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (options.entity === 'machine') {
-    return machineUnauthenticated('No token in header');
+  if (options.entity === 'oauth_token' || options.entity === 'api_key' || options.entity === 'machine_token') {
+    return signedOut({
+      entity: options.entity,
+      authenticateContext,
+      reason: 'no token in header',
+    });
   }
+
   return authenticateRequestWithTokenInCookie();
 }
 

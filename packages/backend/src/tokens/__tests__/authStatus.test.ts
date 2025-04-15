@@ -1,10 +1,17 @@
+import type { JwtPayload } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
+import type { AuthenticateContext } from '../../tokens/authenticateContext';
 import { handshake, signedIn, signedOut } from '../authStatus';
 
 describe('signed-in', () => {
   it('does not include debug headers', () => {
-    const authObject = signedIn({} as any, {} as any, undefined, 'token');
+    const authObject = signedIn({
+      entity: 'user',
+      authenticateContext: {} as AuthenticateContext,
+      sessionClaims: {} as JwtPayload,
+      token: 'token',
+    });
 
     expect(authObject.headers.get('x-clerk-auth-status')).toBeNull();
     expect(authObject.headers.get('x-clerk-auth-reason')).toBeNull();
@@ -12,7 +19,12 @@ describe('signed-in', () => {
   });
 
   it('authObject returned by toAuth() returns the token passed', async () => {
-    const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
+    const signedInAuthObject = signedIn({
+      entity: 'user',
+      authenticateContext: {} as AuthenticateContext,
+      sessionClaims: { sid: 'sid' } as JwtPayload,
+      token: 'token',
+    }).toAuth();
     const token = await signedInAuthObject.getToken();
 
     expect(token).toBe('token');
@@ -22,7 +34,13 @@ describe('signed-in', () => {
 describe('signed-out', () => {
   it('includes debug headers', () => {
     const headers = new Headers({ 'custom-header': 'value' });
-    const authObject = signedOut({} as any, 'auth-reason', 'auth-message', headers);
+    const authObject = signedOut({
+      entity: 'user',
+      authenticateContext: {} as AuthenticateContext,
+      reason: 'auth-reason',
+      message: 'auth-message',
+      headers,
+    });
 
     expect(authObject.headers.get('custom-header')).toBe('value');
     expect(authObject.headers.get('x-clerk-auth-status')).toBe('signed-out');
@@ -32,7 +50,13 @@ describe('signed-out', () => {
 
   it('handles debug headers containing invalid unicode characters without throwing', () => {
     const headers = new Headers({ 'custom-header': 'value' });
-    const authObject = signedOut({} as any, 'auth-reason+RR�56', 'auth-message+RR�56', headers);
+    const authObject = signedOut({
+      entity: 'user',
+      authenticateContext: {} as AuthenticateContext,
+      reason: 'auth-reason+RR�56',
+      message: 'auth-message+RR�56',
+      headers,
+    });
 
     expect(authObject.headers.get('custom-header')).toBe('value');
     expect(authObject.headers.get('x-clerk-auth-status')).toBe('signed-out');

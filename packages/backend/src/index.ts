@@ -143,8 +143,3 @@ export type {
  * Auth objects
  */
 export type { AuthObject } from './tokens/authObjects';
-
-/**
- * Request state helpers
- */
-export { isMachineRequest, isUserRequest } from './tokens/authStatus';
