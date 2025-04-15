@@ -3,8 +3,23 @@ import React from 'react';
 
 import { useInvoicesContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Badge,
+  Col,
+  descriptors,
+  Flex,
+  Link,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '../../customizables';
 import { Pagination } from '../../elements';
+import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 
 /* -------------------------------------------------------------------------------------------------
@@ -41,15 +56,25 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
     status,
     totals: { grandTotal },
   } = invoice;
+  const { navigate } = useRouter();
   const badgeColorSchemeMap: Record<__experimental_CommerceInvoiceStatus, 'success' | 'warning' | 'danger'> = {
     paid: 'success',
     unpaid: 'warning',
     past_due: 'danger',
   };
+  const handleClick = () => {
+    void navigate(`/user-profile#/billing/invoice/${id}`);
+  };
   return (
-    <DataTableRow>
-      <Td>
-        <Text variant='subtitle'>{new Date(paymentDueOn).toLocaleDateString()}</Text>
+    <DataTableRow onClick={handleClick}>
+      <Td
+        sx={{
+          cursor: 'pointer',
+        }}
+      >
+        <Text variant='subtitle'>
+          <Link onClick={handleClick}>{new Date(paymentDueOn).toLocaleDateString()}</Link>
+        </Text>
         <Text
           colorScheme='secondary'
           truncate
@@ -58,7 +83,11 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
           {id}
         </Text>
       </Td>
-      <Td>
+      <Td
+        sx={{
+          cursor: 'pointer',
+        }}
+      >
         <Badge
           colorScheme={badgeColorSchemeMap[status]}
           sx={{
@@ -68,7 +97,11 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
           {status}
         </Badge>
       </Td>
-      <Td>
+      <Td
+        sx={{
+          cursor: 'pointer',
+        }}
+      >
         <Text colorScheme='secondary'>
           {grandTotal.currencySymbol}
           {grandTotal.amountFormatted}

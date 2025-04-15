@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
+import { InvoicesContextProvider, useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { AccountPage } from './AccountPage';
 import { InvoicePage } from './InvoicePage';
@@ -65,8 +65,10 @@ export const UserProfileRoutes = () => {
                   <BillingPage />
                 </Suspense>
               </Route>
-              <Route path='invoice'>
-                <InvoicePage />
+              <Route path='invoice/:invoiceId'>
+                <InvoicesContextProvider>
+                  <InvoicePage />
+                </InvoicesContextProvider>
               </Route>
             </Switch>
           </Route>

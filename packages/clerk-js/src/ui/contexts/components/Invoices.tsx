@@ -26,6 +26,10 @@ export const InvoicesContextProvider = ({
   );
   const { data: invoices, total_count: totalCount } = data || { data: [], totalCount: 0 };
 
+  const getInvoiceById = (invoiceId: string) => {
+    return invoices.find(invoice => invoice.id === invoiceId);
+  };
+
   return (
     <InvoicesContext.Provider
       value={{
@@ -35,6 +39,7 @@ export const InvoicesContextProvider = ({
         totalCount: totalCount || 0,
         isLoading: isLoading || false,
         revalidate,
+        getInvoiceById,
       }}
     >
       {children}

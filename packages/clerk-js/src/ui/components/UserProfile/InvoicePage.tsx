@@ -1,10 +1,27 @@
-import { Badge, Box, Dd, Dl, Dt, Heading, Text, useLocalizations } from '../../customizables';
+import { useInvoicesContext } from '../../contexts';
+import { Badge, Box, Dd, descriptors, Dl, Dt, Heading, Spinner, Text } from '../../customizables';
 import { Header, LineItems } from '../../elements';
+import { useRouter } from '../../router';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
+import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const InvoicePage = () => {
-  const { t } = useLocalizations();
+  const { params } = useRouter();
+  const { getInvoiceById, isLoading } = useInvoicesContext();
+  const invoice = params.invoiceId ? getInvoiceById(params.invoiceId) : null;
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Spinner
+          colorScheme='primary'
+          sx={{ margin: 'auto', display: 'block' }}
+          elementDescriptor={descriptors.spinner}
+        />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -26,111 +43,128 @@ export const InvoicePage = () => {
           paddingBlockStart: t.space.$4,
         })}
       >
-        <Box
-          sx={t => ({
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-            borderRadius: t.radii.$lg,
-            overflow: 'hidden',
-          })}
-        >
+        {!invoice ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Text>Invoice not found</Text>
+          </Box>
+        ) : (
           <Box
-            as='header'
             sx={t => ({
-              padding: t.space.$4,
-              background: common.mergedColorsBackground(
-                colors.setAlpha(t.colors.$colorBackground, 1),
-                t.colors.$neutralAlpha50,
-              ),
-              borderBlockEndWidth: t.borderWidths.$normal,
-              borderBlockEndStyle: t.borderStyles.$solid,
-              borderBlockEndColor: t.colors.$neutralAlpha100,
+              borderWidth: t.borderWidths.$normal,
+              borderStyle: t.borderStyles.$solid,
+              borderColor: t.colors.$neutralAlpha100,
+              borderRadius: t.radii.$lg,
+              overflow: 'hidden',
             })}
           >
             <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Heading textVariant='h2'>INV-2025643782</Heading>
-              <Badge colorScheme='warning'>Failed</Badge>
-            </Box>
-            <Dl
+              as='header'
               sx={t => ({
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBlockStart: t.space.$3,
+                padding: t.space.$4,
+                background: common.mergedColorsBackground(
+                  colors.setAlpha(t.colors.$colorBackground, 1),
+                  t.colors.$neutralAlpha50,
+                ),
+                borderBlockEndWidth: t.borderWidths.$normal,
+                borderBlockEndStyle: t.borderStyles.$solid,
+                borderBlockEndColor: t.colors.$neutralAlpha100,
               })}
             >
-              <Box>
-                <Dt>
-                  <Text
-                    colorScheme='secondary'
-                    variant='body'
-                  >
-                    Created on
-                  </Text>
-                </Dt>
-                <Dd>
-                  <Text variant='subtitle'>{new Date('2025-04-14T15:21:49-0400').toLocaleDateString()}</Text>
-                </Dd>
-              </Box>
               <Box
                 sx={{
-                  textAlign: 'right',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
-                <Dt>
-                  <Text
-                    colorScheme='secondary'
-                    variant='body'
-                  >
-                    Due on
-                  </Text>
-                </Dt>
-                <Dd>
-                  <Text variant='subtitle'>{new Date('2025-04-14T15:21:49-0400').toLocaleDateString()}</Text>
-                </Dd>
+                <Heading textVariant='h2'>{truncateWithEndVisible(invoice.id)}</Heading>
+                <Badge
+                  colorScheme={
+                    invoice.status === 'paid' ? 'success' : invoice.status === 'unpaid' ? 'warning' : 'danger'
+                  }
+                  sx={{ textTransform: 'capitalize' }}
+                >
+                  {invoice.status}
+                </Badge>
               </Box>
-            </Dl>
-          </Box>
-          <Box
-            sx={t => ({
-              padding: t.space.$4,
-            })}
-          >
-            <LineItems.Root>
-              <LineItems.Group>
-                <LineItems.Title title='Platnum plan' />
-                <LineItems.Description
-                  text='$400.00'
-                  suffix='per month'
-                />
-              </LineItems.Group>
-              <LineItems.Group
-                variant='secondary'
-                borderTop
+              <Dl
+                sx={t => ({
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBlockStart: t.space.$3,
+                })}
               >
-                <LineItems.Title title='Subtotal' />
-                <LineItems.Description text='$400.00' />
-              </LineItems.Group>
-              <LineItems.Group variant='secondary'>
-                <LineItems.Title title='Tax' />
-                <LineItems.Description text='$5.00' />
-              </LineItems.Group>
-              <LineItems.Group borderTop>
-                <LineItems.Title title='Total due' />
-                <LineItems.Description
-                  text='$405.00'
-                  prefix='USD'
-                />
-              </LineItems.Group>
-            </LineItems.Root>
+                <Box>
+                  <Dt>
+                    <Text
+                      colorScheme='secondary'
+                      variant='body'
+                    >
+                      Created on
+                    </Text>
+                  </Dt>
+                  <Dd>
+                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                  </Dd>
+                </Box>
+                <Box
+                  sx={{
+                    textAlign: 'right',
+                  }}
+                >
+                  <Dt>
+                    <Text
+                      colorScheme='secondary'
+                      variant='body'
+                    >
+                      Due on
+                    </Text>
+                  </Dt>
+                  <Dd>
+                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                  </Dd>
+                </Box>
+              </Dl>
+            </Box>
+            <Box
+              sx={t => ({
+                padding: t.space.$4,
+              })}
+            >
+              <LineItems.Root>
+                <LineItems.Group>
+                  <LineItems.Title title='Plan' />
+                  <LineItems.Description
+                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    suffix='per month'
+                  />
+                </LineItems.Group>
+                <LineItems.Group
+                  variant='secondary'
+                  borderTop
+                >
+                  <LineItems.Title title='Subtotal' />
+                  <LineItems.Description
+                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                  />
+                </LineItems.Group>
+                <LineItems.Group variant='secondary'>
+                  <LineItems.Title title='Tax' />
+                  <LineItems.Description
+                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                  />
+                </LineItems.Group>
+                <LineItems.Group borderTop>
+                  <LineItems.Title title='Total due' />
+                  <LineItems.Description
+                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    prefix='USD'
+                  />
+                </LineItems.Group>
+              </LineItems.Root>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </>
   );

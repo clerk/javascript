@@ -124,6 +124,7 @@ export type __experimental_InvoicesCtx = {
   totalCount: number;
   isLoading: boolean;
   revalidate: () => void;
+  getInvoiceById: (invoiceId: string) => __experimental_CommerceInvoiceResource | undefined;
 };
 
 export type SessionTasksCtx = {
