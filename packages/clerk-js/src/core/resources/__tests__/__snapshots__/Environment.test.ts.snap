@@ -12,6 +12,8 @@ exports[`Environment __internal_toSnapshot() 1`] = `
   "commerce_settings": {
     "billing": {
       "enabled": false,
+      "has_paid_org_plans": false,
+      "has_paid_user_plans": false,
       "stripe_publishable_key": "",
     },
   },

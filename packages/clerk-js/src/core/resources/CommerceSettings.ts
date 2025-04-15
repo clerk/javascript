@@ -13,6 +13,8 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
   billing = {
     stripePublishableKey: '',
     enabled: false,
+    hasPaidOrgPlans: false,
+    hasPaidUserPlans: false,
   };
 
   public constructor(
@@ -32,6 +34,8 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
     // TODO(@commerce): Remove `?.` once we launch.
     this.billing.stripePublishableKey = data?.billing?.stripe_publishable_key || '';
     this.billing.enabled = data?.billing?.enabled || false;
+    this.billing.hasPaidOrgPlans = data?.billing?.has_paid_org_plans || false;
+    this.billing.hasPaidUserPlans = data?.billing?.has_paid_user_plans || false;
 
     return this;
   }
@@ -41,6 +45,8 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
       billing: {
         stripe_publishable_key: this.billing.stripePublishableKey,
         enabled: this.billing.enabled,
+        has_paid_org_plans: this.billing.hasPaidOrgPlans,
+        has_paid_user_plans: this.billing.hasPaidUserPlans,
       },
     } as unknown as __experimental_CommerceSettingsJSONSnapshot;
   }
