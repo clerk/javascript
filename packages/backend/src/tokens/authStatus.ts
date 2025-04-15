@@ -136,6 +136,11 @@ export function signedIn(params: SignedInParams): SignedInState {
   const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
     const targetEntity = options?.entity || 'user';
 
+    // TODO: Handle this gracefully
+    if (targetEntity !== params.entity) {
+      throw new Error(`Cannot convert ${params.entity} token to ${targetEntity} token.`);
+    }
+
     if (targetEntity === 'user') {
       const { sessionClaims } = params as { sessionClaims: JwtPayload };
       return signedInAuthObject(authenticateContext, token, sessionClaims);
