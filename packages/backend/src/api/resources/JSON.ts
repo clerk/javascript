@@ -289,6 +289,7 @@ export interface OauthAccessTokenJSON {
   scopes?: string[];
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
+  expires_at?: number;
 }
 
 export interface OAuthApplicationJSON extends ClerkResourceJSON {
