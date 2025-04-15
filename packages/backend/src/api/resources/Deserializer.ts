@@ -8,6 +8,9 @@ import {
   Domain,
   Email,
   EmailAddress,
+  Instance,
+  InstanceRestrictions,
+  InstanceSettings,
   Invitation,
   JwtTemplate,
   OauthAccessToken,
@@ -15,6 +18,7 @@ import {
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
+  OrganizationSettings,
   PhoneNumber,
   ProxyCheck,
   RedirectUrl,
@@ -91,6 +95,12 @@ function jsonToObject(item: any): any {
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
+    case ObjectType.Instance:
+      return Instance.fromJSON(item);
+    case ObjectType.InstanceRestrictions:
+      return InstanceRestrictions.fromJSON(item);
+    case ObjectType.InstanceSettings:
+      return InstanceSettings.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
     case ObjectType.JwtTemplate:
@@ -105,6 +115,8 @@ function jsonToObject(item: any): any {
       return OrganizationInvitation.fromJSON(item);
     case ObjectType.OrganizationMembership:
       return OrganizationMembership.fromJSON(item);
+    case ObjectType.OrganizationSettings:
+      return OrganizationSettings.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
     case ObjectType.ProxyCheck:

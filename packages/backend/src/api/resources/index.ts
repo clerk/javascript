@@ -22,6 +22,9 @@ export type {
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
+export * from './Instance';
+export * from './InstanceRestrictions';
+export * from './InstanceSettings';
 export * from './Invitation';
 export * from './JSON';
 export * from './JwtTemplate';
@@ -30,6 +33,7 @@ export * from './OAuthApplication';
 export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
+export * from './OrganizationSettings';
 export * from './PhoneNumber';
 export * from './ProxyCheck';
 export * from './RedirectUrl';

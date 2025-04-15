@@ -2,6 +2,7 @@ import type {
   ActorTokenStatus,
   AllowlistIdentifierType,
   BlocklistIdentifierType,
+  DomainsEnrollmentModes,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -25,6 +26,9 @@ export const ObjectType = {
   ExternalAccount: 'external_account',
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
+  Instance: 'instance',
+  InstanceRestrictions: 'instance_restrictions',
+  InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
@@ -33,6 +37,7 @@ export const ObjectType = {
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
+  OrganizationSettings: 'organization_settings',
   PhoneNumber: 'phone_number',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
@@ -222,6 +227,44 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;
+}
+
+export interface OrganizationSettingsJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OrganizationSettings;
+  enabled: boolean;
+  max_allowed_memberships: number;
+  max_allowed_roles: number;
+  max_allowed_permissions: number;
+  creator_role: string;
+  admin_delete_enabled: boolean;
+  domains_enabled: boolean;
+  domains_enrollment_modes: Array<DomainsEnrollmentModes>;
+  domains_default_role: string;
+}
+
+export interface InstanceJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Instance;
+  id: string;
+  environment_type: string;
+  allowed_origins: Array<string> | null;
+}
+
+export interface InstanceRestrictionsJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.InstanceRestrictions;
+  allowlist: boolean;
+  blocklist: boolean;
+  block_email_subaddresses: boolean;
+  block_disposable_email_domains: boolean;
+  ignore_dots_for_gmail_addresses: boolean;
+}
+
+export interface InstanceSettingsJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.InstanceSettings;
+  id: string;
+  restricted_to_allowlist: boolean;
+  from_email_address: string;
+  progressive_sign_up: boolean;
+  enhanced_email_deliverability: boolean;
 }
 
 export interface InvitationJSON extends ClerkResourceJSON {
