@@ -4,18 +4,13 @@ import { CustomPageContentContainer } from '../../common/CustomPageContentContai
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { InvoicesContextProvider, useEnvironment, useOptions, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { InvoicePage } from '../Invoices/InvoicePage';
 import { AccountPage } from './AccountPage';
 import { SecurityPage } from './SecurityPage';
 
 const BillingPage = lazy(() =>
   import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
     default: module.BillingPage,
-  })),
-);
-
-const InvoicePage = lazy(() =>
-  import(/* webpackChunkName: "up-invoice-page"*/ '../Invoices/InvoicePage').then(module => ({
-    default: module.InvoicePage,
   })),
 );
 
