@@ -49,7 +49,7 @@ describe('JWTPayloadToAuthObjectProperties', () => {
       org_id: 'org_xxxxxxx',
       org_role: 'org:admin',
       org_slug: 'org_test',
-      org_permissions: ['org:impersonation:manage', 'org:impersonation:read'],
+      org_permissions: ['org:impersonation:read', 'org:impersonation:manage'],
     });
     expect(signedInAuthObjectV1).toEqual(signedInAuthObjectV2);
   });
