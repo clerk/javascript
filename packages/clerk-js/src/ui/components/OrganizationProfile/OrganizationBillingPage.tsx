@@ -64,7 +64,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <InvoicesContextProvider>
+              <InvoicesContextProvider subscriberType='org'>
                 <InvoicesList />
               </InvoicesContextProvider>
             </TabPanel>

@@ -75,7 +75,7 @@ export const OrganizationProfileRoutes = () => {
               </Route>
               <Route path='invoice/:invoiceId'>
                 <Suspense fallback={''}>
-                  <InvoicesContextProvider>
+                  <InvoicesContextProvider subscriberType='org'>
                     <InvoicePage />
                   </InvoicesContextProvider>
                 </Suspense>
