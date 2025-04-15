@@ -2,8 +2,9 @@ import { lazy, Suspense } from 'react';
 
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { useEnvironment, useOptions, useOrganizationProfileContext } from '../../contexts';
+import { InvoicesContextProvider, useEnvironment, useOptions, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { InvoicePage } from '../Invoices';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
@@ -65,6 +66,13 @@ export const OrganizationProfileRoutes = () => {
               <Route index>
                 <Suspense fallback={''}>
                   <OrganizationBillingPage />
+                </Suspense>
+              </Route>
+              <Route path='invoice/:invoiceId'>
+                <Suspense fallback={''}>
+                  <InvoicesContextProvider>
+                    <InvoicePage />
+                  </InvoicesContextProvider>
                 </Suspense>
               </Route>
             </Switch>
