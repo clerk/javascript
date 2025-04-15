@@ -108,7 +108,8 @@ export type VerifyJwtOptions = {
    */
   authorizedParties?: string[];
   /**
-   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token. Defaults to 5000 ms (5 seconds).
+   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token.
+   * @default 5000
    */
   clockSkewInMs?: number;
   /**

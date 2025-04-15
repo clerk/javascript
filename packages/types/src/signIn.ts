@@ -80,7 +80,7 @@ export interface SignInResource extends ClerkResource {
    */
   status: SignInStatus | null;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
@@ -262,7 +262,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   id: string;
   status: SignInStatus;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supported_identifiers: SignInIdentifier[];
   identifier: string;

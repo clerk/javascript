@@ -29,7 +29,7 @@ const LINK_REPLACEMENTS = [
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
   ['user-resource', '/docs/references/javascript/user'],
   ['session-status-claim', '/docs/references/javascript/types/session-status'],
-  ['user-organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
+  ['user-organization-invitation-resource', '/docs/references/javascript/types/user-organization-invitation'],
   ['organization-membership-resource', '/docs/references/javascript/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/references/javascript/types/organization-suggestion'],
   ['organization-resource', '/docs/references/javascript/organization'],
@@ -62,7 +62,7 @@ function getRelativeLinkReplacements() {
   });
 }
 
-function getUnlinkedTypesReplacements() {
+function getCatchAllReplacements() {
   return [
     {
       pattern: /\(setActiveParams\)/g,
@@ -79,6 +79,20 @@ function getUnlinkedTypesReplacements() {
     {
       pattern: /\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
+    },
+    {
+      /**
+       * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
+       */
+      pattern: /\*\*Deprecated\*\*/g,
+      replace: '**Deprecated.**',
+    },
+    {
+      /**
+       * By default, `@default` is output with "**Default** `value`". We want to capture the value and place it inside "Defaults to `value`."
+       */
+      pattern: /\*\*Default\*\* `([^`]+)`/g,
+      replace: 'Defaults to `$1`.',
     },
   ];
 }
@@ -97,9 +111,9 @@ export function load(app) {
       }
     }
 
-    const unlinkedTypesReplacements = getUnlinkedTypesReplacements();
+    const catchAllReplacements = getCatchAllReplacements();
 
-    for (const { pattern, replace } of unlinkedTypesReplacements) {
+    for (const { pattern, replace } of catchAllReplacements) {
       if (output.contents) {
         output.contents = output.contents.replace(pattern, replace);
       }
