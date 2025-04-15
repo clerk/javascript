@@ -278,6 +278,8 @@ Environment {
   "__experimental_commerceSettings": __experimental_CommerceSettings {
     "billing": {
       "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
       "stripePublishableKey": "",
     },
     "pathRoot": "",
@@ -507,6 +509,8 @@ Environment {
   "__experimental_commerceSettings": __experimental_CommerceSettings {
     "billing": {
       "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
       "stripePublishableKey": "",
     },
     "pathRoot": "",
