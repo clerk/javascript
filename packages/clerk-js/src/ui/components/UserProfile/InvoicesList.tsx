@@ -63,7 +63,7 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
     past_due: 'danger',
   };
   const handleClick = () => {
-    void navigate(`/user-profile#/billing/invoice/${id}`);
+    void navigate(`invoice/${id}`);
   };
   return (
     <DataTableRow onClick={handleClick}>
