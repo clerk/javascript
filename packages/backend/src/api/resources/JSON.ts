@@ -567,7 +567,7 @@ export interface APIKeyJSON {
   expires_at: number | null;
 }
 
-export interface OAuthApplicationTokenJSON {
+export interface OauthApplicationTokenJSON {
   id: string;
   type: string; // right now it's just oauth:access_token
   name: string;
