@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/localizations': patch
 ---
 
 Fix German account deletion confirmation
