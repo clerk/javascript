@@ -12,6 +12,8 @@ describe('public exports', () => {
     expect(Object.keys(publicExports).sort()).toMatchInlineSnapshot(`
       [
         "createClerkClient",
+        "isMachineRequest",
+        "isUserRequest",
         "verifyToken",
       ]
     `);
@@ -22,6 +24,8 @@ describe('subpath /errors exports', () => {
   it('should not include a breaking change', () => {
     expect(Object.keys(errorExports).sort()).toMatchInlineSnapshot(`
       [
+        "MachineTokenVerificationError",
+        "MachineTokenVerificationErrorCode",
         "SignJWTError",
         "TokenVerificationError",
         "TokenVerificationErrorAction",
