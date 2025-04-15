@@ -1,4 +1,8 @@
-import { __experimental_PaymentSourcesContext, __experimental_PricingTableContext } from '../../contexts';
+import {
+  __experimental_PaymentSourcesContext,
+  __experimental_PricingTableContext,
+  InvoicesContextProvider,
+} from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -58,29 +62,9 @@ export const BillingPage = withCardStateProvider(() => {
               </__experimental_PricingTableContext.Provider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <InvoicesList
-                invoices={{
-                  data: [
-                    {
-                      id: 'INV-2025643782',
-                      date: '2025-04-14T15:21:49-0400',
-                      status: 'Paid',
-                      total: '$100.00',
-                    },
-                    {
-                      id: 'INV-2024848383',
-                      date: '2025-04-14T15:21:49-0400',
-                      status: 'Failed',
-                      total: '$100.00',
-                    },
-                  ],
-                  isLoading: false,
-                  isValidating: false,
-                  hasMore: false,
-                  loadMore: () => {},
-                }}
-                pageSize={10}
-              />
+              <InvoicesContextProvider>
+                <InvoicesList />
+              </InvoicesContextProvider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>

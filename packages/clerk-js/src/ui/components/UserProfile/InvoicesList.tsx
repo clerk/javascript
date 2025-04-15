@@ -1,5 +1,7 @@
+import type { __experimental_CommerceInvoiceResource, __experimental_CommerceInvoiceStatus } from '@clerk/types';
 import React from 'react';
 
+import { useInvoicesContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Badge, Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Pagination } from '../../elements';
@@ -9,44 +11,45 @@ import type { PropsOfComponent } from '../../styledSystem';
  * InvoicesList
  * -----------------------------------------------------------------------------------------------*/
 
-type InvoicesListProps = {
-  invoices: any;
-  pageSize: number;
-};
+export const InvoicesList = () => {
+  const { invoices, isLoading, totalCount } = useInvoicesContext();
 
-export const InvoicesList = ({ invoices, pageSize }: InvoicesListProps) => {
   return (
     <DataTable
-      page={invoices?.page || 1}
-      onPageChange={n => invoices?.fetchPage?.(n)}
-      itemCount={invoices?.count || 0}
-      pageCount={invoices?.pageCount || 0}
-      itemsPerPage={pageSize}
-      isLoading={invoices?.isLoading && !invoices?.data.length}
+      page={1}
+      onPageChange={_ => {}}
+      itemCount={totalCount}
+      pageCount={1}
+      itemsPerPage={10}
+      isLoading={isLoading}
       emptyStateLocalizationKey='No invoices to display'
       headers={['Date/Invoice', 'Status', 'Total']}
-      rows={(invoices?.data || []).map(i => (
+      rows={invoices.map(i => (
         <InvoicesListRow
           key={i.id}
-          {...i}
+          invoice={i}
         />
       ))}
     />
   );
 };
 
-type InvoiceStatus = 'Paid' | 'Failed';
-
-const InvoicesListRow = (props: { id: string; date: string; status: InvoiceStatus; total: number }) => {
-  const { date, id, status, total } = props;
-  const badgeColorSchemeMap: Record<InvoiceStatus, 'success' | 'warning'> = {
-    Paid: 'success',
-    Failed: 'warning',
+const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceResource }) => {
+  const {
+    paymentDueOn,
+    id,
+    status,
+    totals: { grandTotal },
+  } = invoice;
+  const badgeColorSchemeMap: Record<__experimental_CommerceInvoiceStatus, 'success' | 'warning' | 'danger'> = {
+    paid: 'success',
+    unpaid: 'warning',
+    past_due: 'danger',
   };
   return (
     <DataTableRow>
       <Td>
-        <Text>{new Date(date).toLocaleDateString()}</Text>
+        <Text>{new Date(paymentDueOn).toLocaleDateString()}</Text>
         <Text
           colorScheme='secondary'
           sx={t => ({ marginTop: t.space.$0x5, textTransform: 'uppercase' })}
@@ -58,7 +61,10 @@ const InvoicesListRow = (props: { id: string; date: string; status: InvoiceStatu
         <Badge colorScheme={badgeColorSchemeMap[status]}>{status}</Badge>
       </Td>
       <Td>
-        <Text colorScheme='secondary'>{total}</Text>
+        <Text colorScheme='secondary'>
+          {grandTotal.currencySymbol}
+          {grandTotal.amountFormatted}
+        </Text>
       </Td>
     </DataTableRow>
   );
@@ -153,7 +159,7 @@ const DataTable = (props: DataTableProps) => {
   );
 };
 
-const DataTableEmptyRow = (props: { localizationKey: LocalizationKey }) => {
+const DataTableEmptyRow = (props: { localizationKey: LocalizationKey | string }) => {
   return (
     <Tr>
       <Td colSpan={4}>
