@@ -25,7 +25,7 @@ export type StartOAuthFlowReturnType = {
 };
 
 /**
- * @deprecated Use `useSSO` instead
+ * @deprecated Use `useSSO()` instead.
  */
 export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { strategy } = useOAuthParams || {};

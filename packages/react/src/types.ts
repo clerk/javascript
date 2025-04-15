@@ -55,7 +55,8 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    */
   initialState?: InitialState;
   /**
-   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error. Defaults to `false`.
+   * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
+   * @default false
    * @internal
    */
   __internal_bypassMissingPublishableKey?: boolean;
