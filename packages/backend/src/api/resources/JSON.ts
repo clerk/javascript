@@ -28,6 +28,7 @@ export const ObjectType = {
   Invitation: 'invitation',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
@@ -245,6 +246,25 @@ export interface OauthAccessTokenJSON {
   scopes?: string[];
   // Only set in OAuth 1.0 tokens
   token_secret?: string;
+}
+
+export interface OAuthApplicationJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.OAuthApplication;
+  id: string;
+  instance_id: string;
+  name: string;
+  client_id: string;
+  public: boolean;
+  scopes: string;
+  redirect_uris: Array<string>;
+  authorize_url: string;
+  token_fetch_url: string;
+  user_info_url: string;
+  discovery_url: string;
+  token_introspection_url: string;
+  created_at: number;
+  updated_at: number;
+  client_secret?: string;
 }
 
 export interface OrganizationJSON extends ClerkResourceJSON {
