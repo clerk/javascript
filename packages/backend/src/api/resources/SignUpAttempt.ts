@@ -1,7 +1,7 @@
 import type { SignUpStatus } from '@clerk/types';
 
 import type { SignUpVerificationNextAction } from './Enums';
-import type { SignUpAttemptJSON, SignUpVerificationJSON, SignUpVerificationsJSON } from './JSON';
+import type { SignUpJSON, SignUpVerificationJSON, SignUpVerificationsJSON } from './JSON';
 
 export class SignUpAttemptVerification {
   constructor(
@@ -58,7 +58,7 @@ export class SignUpAttempt {
     readonly unsafeMetadata?: Record<string, unknown> | null,
   ) {}
 
-  static fromJSON(data: SignUpAttemptJSON): SignUpAttempt {
+  static fromJSON(data: SignUpJSON): SignUpAttempt {
     return new SignUpAttempt(
       data.id,
       data.status,

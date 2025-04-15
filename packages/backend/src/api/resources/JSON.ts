@@ -466,7 +466,7 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface SignUpAttemptJSON extends ClerkResourceJSON {
+export interface SignUpJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignUpAttempt;
   id: string;
   status: SignUpStatus;

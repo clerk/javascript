@@ -88,7 +88,7 @@ export type {
   SessionJSON,
   SignInJSON,
   SignInTokenJSON,
-  SignUpAttemptJSON,
+  SignUpJSON,
   SignUpVerificationJSON,
   SignUpVerificationsJSON,
   SMSMessageJSON,
