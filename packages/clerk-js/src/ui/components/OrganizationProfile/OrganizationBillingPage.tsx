@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
   __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
@@ -15,12 +17,20 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useTabState } from '../../hooks/useTabState';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
 
+const orgTabMap = {
+  0: 'plans',
+  1: 'invoices',
+  2: 'payment-sources',
+} as const;
+
 export const OrganizationBillingPage = withCardStateProvider(() => {
   const card = useCardState();
+  const { selectedTab, handleTabChange } = useTabState(orgTabMap);
 
   return (
     <Col
@@ -41,7 +51,10 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
 
         <Card.Alert>{card.error}</Card.Alert>
 
-        <Tabs>
+        <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
+        >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab
               localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')}

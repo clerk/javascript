@@ -170,6 +170,7 @@ export type ElementsConfig = {
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
+  headerBackLink: WithOptions;
 
   backRow: WithOptions;
   backLink: WithOptions;

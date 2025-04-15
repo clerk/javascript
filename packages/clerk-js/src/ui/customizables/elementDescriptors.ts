@@ -52,6 +52,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
+  'headerBackLink',
 
   'main',
 

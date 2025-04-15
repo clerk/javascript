@@ -7,7 +7,7 @@ import { colors } from '../../utils';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 export const InvoicePage = () => {
-  const { params } = useRouter();
+  const { params, navigate } = useRouter();
   const { getInvoiceById, isLoading } = useInvoicesContext();
   const invoice = params.invoiceId ? getInvoiceById(params.invoiceId) : null;
 
@@ -26,10 +26,12 @@ export const InvoicePage = () => {
   return (
     <>
       <Header.Root>
-        <Header.Title
-          localizationKey='Invoice'
-          textVariant='h2'
-        />
+        <Header.BackLink onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=invoices') })}>
+          <Header.Title
+            localizationKey='Invoices'
+            textVariant='h2'
+          />
+        </Header.BackLink>
       </Header.Root>
       <Box
         elementDescriptor={descriptors.invoiceRoot}
