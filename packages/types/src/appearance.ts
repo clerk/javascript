@@ -461,6 +461,17 @@ export type ElementsConfig = {
   paymentSourceRowValue: WithOptions;
   paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
 
+  invoiceRoot: WithOptions;
+  invoiceCard: WithOptions;
+  invoiceHeader: WithOptions;
+  invoiceTitle: WithOptions;
+  invoiceBadge: WithOptions;
+  invoiceDetails: WithOptions;
+  invoiceDetailsItem: WithOptions;
+  invoiceDetailsItemTitle: WithOptions;
+  invoiceDetailsItemValue: WithOptions;
+  invoiceContent: WithOptions;
+
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;

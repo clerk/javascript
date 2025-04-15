@@ -337,6 +337,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'paymentSourceRowValue',
   'paymentSourceRowBadge',
 
+  'invoiceRoot',
+  'invoiceCard',
+  'invoiceHeader',
+  'invoiceTitle',
+  'invoiceBadge',
+  'invoiceDetails',
+  'invoiceDetailsItem',
+  'invoiceDetailsItemTitle',
+  'invoiceDetailsItemValue',
+  'invoiceContent',
+
   'menuButton',
   'menuButtonEllipsis',
   'menuList',

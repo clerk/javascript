@@ -32,6 +32,7 @@ export const InvoicePage = () => {
         />
       </Header.Root>
       <Box
+        elementDescriptor={descriptors.invoiceRoot}
         sx={t => ({
           display: 'flex',
           flexDirection: 'column',
@@ -49,6 +50,7 @@ export const InvoicePage = () => {
           </Box>
         ) : (
           <Box
+            elementDescriptor={descriptors.invoiceCard}
             sx={t => ({
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
@@ -58,6 +60,7 @@ export const InvoicePage = () => {
             })}
           >
             <Box
+              elementDescriptor={descriptors.invoiceHeader}
               as='header'
               sx={t => ({
                 padding: t.space.$4,
@@ -77,8 +80,14 @@ export const InvoicePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <Heading textVariant='h2'>{truncateWithEndVisible(invoice.id)}</Heading>
+                <Heading
+                  textVariant='h2'
+                  elementDescriptor={descriptors.invoiceTitle}
+                >
+                  {truncateWithEndVisible(invoice.id)}
+                </Heading>
                 <Badge
+                  elementDescriptor={descriptors.invoiceBadge}
                   colorScheme={
                     invoice.status === 'paid' ? 'success' : invoice.status === 'unpaid' ? 'warning' : 'danger'
                   }
@@ -88,14 +97,15 @@ export const InvoicePage = () => {
                 </Badge>
               </Box>
               <Dl
+                elementDescriptor={descriptors.invoiceDetails}
                 sx={t => ({
                   display: 'flex',
                   justifyContent: 'space-between',
                   marginBlockStart: t.space.$3,
                 })}
               >
-                <Box>
-                  <Dt>
+                <Box elementDescriptor={descriptors.invoiceDetailsItem}>
+                  <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
                       colorScheme='secondary'
                       variant='body'
@@ -103,16 +113,17 @@ export const InvoicePage = () => {
                       Created on
                     </Text>
                   </Dt>
-                  <Dd>
+                  <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
                     <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
                   </Dd>
                 </Box>
                 <Box
+                  elementDescriptor={descriptors.invoiceDetailsItem}
                   sx={{
                     textAlign: 'right',
                   }}
                 >
-                  <Dt>
+                  <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
                       colorScheme='secondary'
                       variant='body'
@@ -120,13 +131,14 @@ export const InvoicePage = () => {
                       Due on
                     </Text>
                   </Dt>
-                  <Dd>
+                  <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
                     <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
                   </Dd>
                 </Box>
               </Dl>
             </Box>
             <Box
+              elementDescriptor={descriptors.invoiceContent}
               sx={t => ({
                 padding: t.space.$4,
               })}
