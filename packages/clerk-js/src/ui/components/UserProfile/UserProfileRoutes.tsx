@@ -62,24 +62,26 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && __experimental_commerceSettings.billing.enabled && (
-          <Route path={isBillingPageRoot ? undefined : 'billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <BillingPage />
-                </Suspense>
-              </Route>
-              <Route path='invoice/:invoiceId'>
-                <Suspense fallback={''}>
-                  <InvoicesContextProvider>
-                    <InvoicePage />
-                  </InvoicesContextProvider>
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
-        )}
+        {experimental?.commerce &&
+          __experimental_commerceSettings.billing.enabled &&
+          __experimental_commerceSettings.billing.hasPaidUserPlans && (
+            <Route path={isBillingPageRoot ? undefined : 'billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <BillingPage />
+                  </Suspense>
+                </Route>
+                <Route path='invoice/:invoiceId'>
+                  <Suspense fallback={''}>
+                    <InvoicesContextProvider>
+                      <InvoicePage />
+                    </InvoicesContextProvider>
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          )}
       </Route>
     </Switch>
   );

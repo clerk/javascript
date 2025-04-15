@@ -261,7 +261,7 @@ export interface UserJSON extends ClerkResourceJSON {
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
   /**
-   * @deprecated use `enterprise_accounts` instead
+   * @deprecated Use `enterprise_accounts` instead.
    */
   saml_accounts: SamlAccountJSON[];
 

@@ -65,24 +65,26 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && __experimental_commerceSettings.billing.enabled && (
-          <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationBillingPage />
-                </Suspense>
-              </Route>
-              <Route path='invoice/:invoiceId'>
-                <Suspense fallback={''}>
-                  <InvoicesContextProvider subscriberType='org'>
-                    <InvoicePage />
-                  </InvoicesContextProvider>
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
-        )}
+        {experimental?.commerce &&
+          __experimental_commerceSettings.billing.enabled &&
+          __experimental_commerceSettings.billing.hasPaidOrgPlans && (
+            <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationBillingPage />
+                  </Suspense>
+                </Route>
+                <Route path='invoice/:invoiceId'>
+                  <Suspense fallback={''}>
+                    <InvoicesContextProvider subscriberType='org'>
+                      <InvoicePage />
+                    </InvoicesContextProvider>
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          )}
       </Route>
     </Switch>
   );

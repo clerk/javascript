@@ -64,6 +64,63 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         return output;
       },
       /**
+       * This condenses the output if only a "simple" return type + `@returns` is given.
+       * @param {import('typedoc').SignatureReflection} model
+       * @param {{ headingLevel: number }} options
+       */
+      signatureReturns: (model, options) => {
+        const defaultOutput = superPartials.signatureReturns(model, options);
+        const hasReturnsTag = model.comment?.getTag('@returns');
+
+        /**
+         * @type {any}
+         */
+        const type = model.type;
+        /**
+         * @type {import('typedoc').DeclarationReflection}
+         */
+        const typeDeclaration = type?.declaration;
+
+        /**
+         * Early return for non "simple" cases
+         */
+        if (!typeDeclaration?.signatures) {
+          if (model.type && this.helpers.hasUsefulTypeDetails(model.type)) {
+            return defaultOutput;
+          }
+        }
+        if (!hasReturnsTag) {
+          return defaultOutput;
+        }
+
+        /**
+         * Now the default output would be in this format:
+         *
+         * `Type`
+         *
+         * Contents of `@returns` tag
+         *
+         * It should be condensed to:
+         *
+         * `Type` — Contents of `@returns` tag
+         */
+
+        const o = defaultOutput.split('\n\n');
+
+        /**
+         * At this stage the output can be:
+         * - ['## Returns', '`Type`', 'Contents of `@returns` tag']
+         * - ['## Returns', '`Type`', '']
+         *
+         * We want to condense the first case by combining the second and third item with ` — `
+         */
+        if (o.length === 3 && o[2] !== '') {
+          return `${o[0]}\n\n${o[1]} — ${o[2]}`;
+        }
+
+        return defaultOutput;
+      },
+      /**
        * This hides the "Type parameters" section from the output
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number }} options
