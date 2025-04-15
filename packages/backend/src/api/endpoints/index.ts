@@ -2,6 +2,7 @@ export * from './ActorTokenApi';
 export * from './AccountlessApplicationsAPI';
 export * from './AbstractApi';
 export * from './AllowlistIdentifierApi';
+export * from './BetaFeaturesApi';
 export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
