@@ -1,5 +1,7 @@
 import type {
   ActorTokenStatus,
+  AllowlistIdentifierType,
+  BlocklistIdentifierType,
   InvitationStatus,
   OrganizationDomainVerificationStatus,
   OrganizationDomainVerificationStrategy,
@@ -14,20 +16,24 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  Domain: 'domain',
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
   FacebookAccount: 'facebook_account',
   GoogleAccount: 'google_account',
   Invitation: 'invitation',
+  JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
+  ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
   Session: 'session',
@@ -85,9 +91,20 @@ export interface ActorTokenJSON extends ClerkResourceJSON {
 export interface AllowlistIdentifierJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AllowlistIdentifier;
   identifier: string;
+  identifier_type: AllowlistIdentifierType;
+  instance_id?: string;
+  invitation_id?: string;
   created_at: number;
   updated_at: number;
-  invitation_id?: string;
+}
+
+export interface BlocklistIdentifierJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BlocklistIdentifier;
+  identifier: string;
+  identifier_type: BlocklistIdentifierType;
+  instance_id?: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -99,6 +116,30 @@ export interface ClientJSON extends ClerkResourceJSON {
   last_active_session_id: string | null;
   created_at: number;
   updated_at: number;
+}
+
+export interface CnameTargetJSON {
+  host: string;
+  value: string;
+  /**
+   * Denotes whether this CNAME target is required to be set in order for the domain to be considered deployed.
+   */
+  required: boolean;
+}
+
+export interface DomainJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Domain;
+  id: string;
+  name: string;
+  is_satellite: boolean;
+  frontend_api_url: string;
+  /**
+   * null for satellite domains
+   */
+  accounts_portal_url?: string | null;
+  proxy_url?: string;
+  development_origin: string;
+  cname_targets: CnameTargetJSON[];
 }
 
 export interface EmailJSON extends ClerkResourceJSON {
@@ -138,6 +179,32 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
   verification: VerificationJSON | null;
+}
+
+export interface JwksJSON {
+  keys?: JwksKeyJSON[];
+}
+
+export interface JwksKeyJSON {
+  use: string;
+  kty: string;
+  kid: string;
+  alg: string;
+  n: string;
+  e: string;
+}
+
+export interface JwtTemplateJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.JwtTemplate;
+  id: string;
+  name: string;
+  claims: object;
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -221,13 +288,16 @@ export interface OrganizationDomainVerificationJSON {
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
   role: OrganizationMembershipRole;
+  role_name: string;
   organization_id: string;
   public_organization_data?: PublicOrganizationDataJSON | null;
   status?: OrganizationInvitationStatus;
   public_metadata: OrganizationInvitationPublicMetadata;
   private_metadata: OrganizationInvitationPrivateMetadata;
+  url: string | null;
   created_at: number;
   updated_at: number;
+  expires_at: number;
 }
 
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
@@ -268,6 +338,17 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   linked_to: IdentificationLinkJSON[];
   backup_codes: string[];
 }
+
+export type ProxyCheckJSON = {
+  object: typeof ObjectType.ProxyCheck;
+  id: string;
+  domain_id: string;
+  last_run_at: number | null;
+  proxy_url: string;
+  successful: boolean;
+  created_at: number;
+  updated_at: number;
+};
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
   object: typeof ObjectType.RedirectUrl;
@@ -495,4 +576,8 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
+}
+
+export interface WebhooksSvixJSON {
+  svix_url: string;
 }

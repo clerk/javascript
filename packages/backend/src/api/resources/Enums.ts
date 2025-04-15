@@ -43,3 +43,7 @@ export const ActorTokenStatus = {
   Revoked: 'revoked',
 } as const;
 export type ActorTokenStatus = (typeof ActorTokenStatus)[keyof typeof ActorTokenStatus];
+
+export type AllowlistIdentifierType = 'email_address' | 'phone_number' | 'web3_wallet';
+
+export type BlocklistIdentifierType = AllowlistIdentifierType;
