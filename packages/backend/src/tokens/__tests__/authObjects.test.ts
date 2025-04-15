@@ -117,8 +117,8 @@ describe('signedInAuthObject', () => {
 
       const authObject = signedInAuthObject(mockAuthenticateContext, 'token', partialJwtPayload as JwtPayload);
 
-      expect(authObject.has({ permission: 'org:reservations:read' })).toBe(true);
-      expect(authObject.has({ permission: 'org:reservations:manage' })).toBe(false);
+      expect(authObject.has({ permission: 'org:reservations:read' })).toBe(false);
+      expect(authObject.has({ permission: 'org:reservations:manage' })).toBe(true);
 
       expect(authObject.has({ permission: 'org:support-chat:read' })).toBe(true);
       expect(authObject.has({ permission: 'org:support-chat:manage' })).toBe(true);
