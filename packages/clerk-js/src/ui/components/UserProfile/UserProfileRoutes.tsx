@@ -14,7 +14,7 @@ const BillingPage = lazy(() =>
 );
 
 const InvoicePage = lazy(() =>
-  import(/* webpackChunkName: "up-invoice-page"*/ './InvoicePage').then(module => ({
+  import(/* webpackChunkName: "up-invoice-page"*/ '../Invoices/InvoicePage').then(module => ({
     default: module.InvoicePage,
   })),
 );

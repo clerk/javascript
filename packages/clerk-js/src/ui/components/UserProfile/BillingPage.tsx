@@ -15,9 +15,9 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
-import { InvoicesList } from './InvoicesList';
 
 export const BillingPage = withCardStateProvider(() => {
   const card = useCardState();
