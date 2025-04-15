@@ -73,8 +73,8 @@ export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCr
 
 export type ButtonProps<Tag> = {
   /**
-   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
-   * Use the default slot with the 'asChild' prop instead.
+   * @deprecated The `'as'` prop will be removed in a future version.
+   * Use the default slot with the `'asChild'` prop instead.
    * @example
    * <SignInButton asChild>
    *   <button>Sign in</button>

@@ -16,7 +16,7 @@ export type AfterMultiSessionSingleSignOutUrl = {
 };
 
 /**
- * @deprecated This is deprecated and will be removed in a future release.
+ * @deprecated This will be removed in a future release.
  */
 export type LegacyRedirectProps = {
   /**

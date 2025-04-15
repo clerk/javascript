@@ -90,7 +90,7 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   kid: string;
   /**
-   * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
+   * @deprecated This cache TTL will be removed in the next major version. Specifying a cache TTL is a no-op.
    */
   jwksCacheTtlInMs?: number;
   /**

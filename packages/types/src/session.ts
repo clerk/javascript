@@ -29,6 +29,7 @@ import type { UserResource } from './user';
 import type { Autocomplete } from './utils';
 
 /**
+ * Options to configure the `useSession` hook.
  * @inline
  */
 export type PendingSessionOptions = {
