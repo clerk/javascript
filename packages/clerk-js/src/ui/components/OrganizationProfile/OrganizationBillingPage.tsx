@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
   __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
