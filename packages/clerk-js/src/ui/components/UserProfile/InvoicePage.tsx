@@ -1,7 +1,7 @@
-import { Badge, Box, Button, Dd, Dl, Dt, Heading, Text, useLocalizations } from '../../customizables';
+import { Badge, Box, Dd, Dl, Dt, Heading, Text, useLocalizations } from '../../customizables';
 import { Header, LineItems } from '../../elements';
 import { common } from '../../styledSystem';
-import { colors, getRelativeToNowDateKey } from '../../utils';
+import { colors } from '../../utils';
 
 export const InvoicePage = () => {
   const { t } = useLocalizations();
@@ -130,34 +130,6 @@ export const InvoicePage = () => {
               </LineItems.Group>
             </LineItems.Root>
           </Box>
-        </Box>
-
-        <Box
-          sx={t => ({
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$neutralAlpha100,
-            borderRadius: t.radii.$lg,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            overflow: 'hidden',
-            padding: t.space.$4,
-          })}
-        >
-          <Box>
-            <Text variant='subtitle'>Next Billing Attempt</Text>
-            <Text
-              variant='body'
-              colorScheme='secondary'
-              sx={t => ({
-                marginBlockStart: t.space.$0x5,
-              })}
-            >
-              {t(getRelativeToNowDateKey(new Date('2025-04-16')))} &bull; {new Date('2025-04-16').toLocaleDateString()}
-            </Text>
-          </Box>
-          <Button>Pay now</Button>
         </Box>
       </Box>
     </>
