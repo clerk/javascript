@@ -26,8 +26,16 @@ export const AuthStatus = {
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 type ToAuthOptions = {
-  entity?: TokenEntity;
+  entity?: TokenEntity | 'any';
 };
+
+type ToAuthReturn<T extends ToAuthOptions | undefined, UserAuth, MachineAuth> = T extends { entity: infer E }
+  ? E extends 'any'
+    ? UserAuth | MachineAuth
+    : E extends 'user' | undefined
+      ? UserAuth
+      : MachineAuth
+  : UserAuth;
 
 export type SignedInState = {
   status: typeof AuthStatus.SignedIn;
@@ -45,11 +53,7 @@ export type SignedInState = {
   entity: TokenEntity;
   toAuth: <T extends ToAuthOptions | undefined>(
     options?: T,
-  ) => T extends { entity: infer E }
-    ? E extends 'user' | undefined
-      ? SignedInAuthObject
-      : AuthenticatedMachineObject
-    : SignedInAuthObject;
+  ) => ToAuthReturn<T, SignedInAuthObject, AuthenticatedMachineObject>;
   headers: Headers;
   token: string;
 };
@@ -70,11 +74,7 @@ export type SignedOutState = {
   entity: TokenEntity;
   toAuth: <T extends ToAuthOptions | undefined>(
     options?: T,
-  ) => T extends { entity: infer E }
-    ? E extends 'user' | undefined
-      ? SignedOutAuthObject
-      : UnauthenticatedMachineObject
-    : SignedOutAuthObject;
+  ) => ToAuthReturn<T, SignedOutAuthObject, UnauthenticatedMachineObject>;
   headers: Headers;
   token: null;
 };
@@ -136,6 +136,17 @@ export function signedIn(params: SignedInParams): SignedInState {
   const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
     const targetEntity = options?.entity || 'user';
 
+    // If targetEntity is 'any', return the current auth object without conversion
+    if (targetEntity === 'any') {
+      if (params.entity === 'user') {
+        const { sessionClaims } = params;
+        return signedInAuthObject(authenticateContext, token, sessionClaims);
+      }
+      const { machineData } = params;
+      return authenticatedMachineObject(params.entity, token, machineData, authenticateContext);
+    }
+
+    // For specific entity types, validate they match
     // TODO: Handle this gracefully
     if (targetEntity !== params.entity) {
       throw new Error(`Cannot convert ${params.entity} token to ${targetEntity} token.`);
@@ -182,6 +193,19 @@ export function signedOut(params: SignedOutParams): SignedOutState {
   // matches the conditional type pattern.
   const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
     const targetEntity = options?.entity || 'user';
+
+    // If targetEntity is 'any', return based on current entity type
+    if (targetEntity === 'any') {
+      if (entity === 'user') {
+        return signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message });
+      }
+      return unauthenticatedMachineObject(entity, { reason, message, headers });
+    }
+
+    // For specific entity types, validate they match
+    if (targetEntity !== entity) {
+      throw new Error(`Cannot convert ${entity} token to ${targetEntity} token.`);
+    }
 
     if (targetEntity === 'user') {
       return signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message });

@@ -12,8 +12,6 @@ describe('public exports', () => {
     expect(Object.keys(publicExports).sort()).toMatchInlineSnapshot(`
       [
         "createClerkClient",
-        "isMachineRequest",
-        "isUserRequest",
         "verifyToken",
       ]
     `);
