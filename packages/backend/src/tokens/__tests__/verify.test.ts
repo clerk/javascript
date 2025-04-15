@@ -64,7 +64,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies M2M token', async () => {
-    const token = 'm2m_test_token';
+    const token = 'm2m_test_secret';
     const options = {
       apiUrl: 'https://api.clerk.test',
       secretKey: 'm2m_valid_secret',
@@ -80,9 +80,9 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         'https://api.clerk.test/v1/m2m_tokens/verify',
         validateHeaders(() => {
           return HttpResponse.json({
-            id: 'test_id',
-            name: 'test_token',
-            subject: 'test_subject',
+            id: 'm2m_test_id',
+            name: 'm2m_test_name',
+            subject: 'm2m_test_subject',
             claims: {},
             secondsUntilExpiration: 3600,
             createdBy: null,
@@ -96,6 +96,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     const result = await verifyMachineAuthToken(token, options);
     expect(result.data).toBeDefined();
-    expect(result.data?.id).toBe('test_id');
+    expect(result.data?.id).toBe('m2m_test_id');
   });
 });
