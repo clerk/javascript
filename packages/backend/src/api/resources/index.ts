@@ -2,8 +2,10 @@ export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
 export * from './BlocklistIdentifier';
 export * from './Client';
+export * from './CnameTarget';
 export * from './Cookies';
 export * from './DeletedObject';
+export * from './Domain';
 export * from './Email';
 export * from './EmailAddress';
 

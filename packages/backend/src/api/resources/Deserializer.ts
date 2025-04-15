@@ -4,6 +4,7 @@ import {
   Client,
   Cookies,
   DeletedObject,
+  Domain,
   Email,
   EmailAddress,
   Invitation,
@@ -80,6 +81,8 @@ function jsonToObject(item: any): any {
       return Client.fromJSON(item);
     case ObjectType.Cookies:
       return Cookies.fromJSON(item);
+    case ObjectType.Domain:
+      return Domain.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:

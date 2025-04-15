@@ -17,6 +17,7 @@ export const ObjectType = {
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  Domain: 'domain',
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
@@ -101,6 +102,30 @@ export interface ClientJSON extends ClerkResourceJSON {
   last_active_session_id: string | null;
   created_at: number;
   updated_at: number;
+}
+
+export interface CnameTargetJSON {
+  host: string;
+  value: string;
+  /**
+   * Denotes whether this CNAME target is required to be set in order for the domain to be considered deployed.
+   */
+  required: boolean;
+}
+
+export interface DomainJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Domain;
+  id: string;
+  name: string;
+  is_satellite: boolean;
+  frontend_api_url: string;
+  /**
+   * null for satellite domains
+   */
+  accounts_portal_url?: string | null;
+  proxy_url?: string;
+  development_origin: string;
+  cname_targets: CnameTargetJSON[];
 }
 
 export interface EmailJSON extends ClerkResourceJSON {
