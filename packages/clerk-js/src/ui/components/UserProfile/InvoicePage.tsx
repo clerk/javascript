@@ -27,7 +27,7 @@ export const InvoicePage = () => {
     <>
       <Header.Root>
         <Header.Title
-          localizationKey='Invoices'
+          localizationKey='Invoice'
           textVariant='h2'
         />
       </Header.Root>
