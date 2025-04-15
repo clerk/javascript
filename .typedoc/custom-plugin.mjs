@@ -82,10 +82,17 @@ function getCatchAllReplacements() {
     },
     {
       /**
-       * By default the markdown plugin outputs `@deprecated` with `**Deprecated**`. We want to add a full stop to it.
+       * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
        */
       pattern: /\*\*Deprecated\*\*/g,
       replace: '**Deprecated.**',
+    },
+    {
+      /**
+       * By default, `@default` is output with "**Default** `value`". We want to capture the value and place it inside "Defaults to `value`."
+       */
+      pattern: /\*\*Default\*\* `([^`]+)`/g,
+      replace: 'Defaults to `$1`.',
     },
   ];
 }

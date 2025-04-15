@@ -102,11 +102,13 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   secretKey?: string;
   /**
-   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint. Defaults to `'https://api.clerk.com'`.
+   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint.
+   * @default 'https://api.clerk.com'
    */
   apiUrl?: string;
   /**
-   * The version passed to the Clerk API. Defaults to `'v1'`.
+   * The version passed to the Clerk API.
+   * @default 'v1'
    */
   apiVersion?: string;
 };

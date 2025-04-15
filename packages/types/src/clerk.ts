@@ -839,7 +839,8 @@ export type ClerkOptions = PendingSessionOptions &
     experimental?: Autocomplete<
       {
         /**
-         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         * Persist the Clerk client to match the user's device with a client.
+         * @default true
          */
         persistClient: boolean;
         /**
