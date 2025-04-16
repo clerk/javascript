@@ -50,7 +50,7 @@ export type AuthenticateRequestOptions = {
   /**
    * TODO: Add docs
    */
-  entity?: TokenEntity | 'any';
+  accept?: TokenEntity | 'any';
 } & VerifyTokenOptions;
 
 /**

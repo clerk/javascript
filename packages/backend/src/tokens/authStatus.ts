@@ -26,10 +26,10 @@ export const AuthStatus = {
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 type ToAuthOptions = {
-  entity?: TokenEntity | 'any';
+  accept?: TokenEntity | 'any';
 };
 
-type ToAuthReturn<T extends ToAuthOptions | undefined, UserAuth, MachineAuth> = T extends { entity: infer E }
+type ToAuthReturn<T extends ToAuthOptions | undefined, UserAuth, MachineAuth> = T extends { accept: infer E }
   ? E extends 'any'
     ? UserAuth | MachineAuth
     : E extends 'user' | undefined
@@ -134,7 +134,7 @@ export function signedIn(params: SignedInParams): SignedInState {
   // We need to assert type because TS can't infer that our runtime logic
   // matches the conditional type pattern.
   const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
-    const targetEntity = options?.entity || 'user';
+    const targetEntity = options?.accept || 'user';
 
     // If targetEntity is 'any', return the current auth object without conversion
     if (targetEntity === 'any') {
@@ -147,9 +147,13 @@ export function signedIn(params: SignedInParams): SignedInState {
     }
 
     // For specific entity types, validate they match
-    // TODO: Handle this gracefully
     if (targetEntity !== params.entity) {
-      throw new Error(`Cannot convert ${params.entity} token to ${targetEntity} token.`);
+      return signedOutAuthObject({
+        ...authenticateContext,
+        status: AuthStatus.SignedOut,
+        reason: AuthErrorReason.UnexpectedError,
+        message: `Cannot convert ${params.entity} token to ${targetEntity} token.`,
+      });
     }
 
     if (targetEntity === 'user') {
@@ -192,7 +196,7 @@ export function signedOut(params: SignedOutParams): SignedOutState {
   // We need to assert type because TS can't infer that our runtime logic
   // matches the conditional type pattern.
   const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
-    const targetEntity = options?.entity || 'user';
+    const targetEntity = options?.accept || 'user';
 
     // If targetEntity is 'any', return based on current entity type
     if (targetEntity === 'any') {
@@ -204,7 +208,12 @@ export function signedOut(params: SignedOutParams): SignedOutState {
 
     // For specific entity types, validate they match
     if (targetEntity !== entity) {
-      throw new Error(`Cannot convert ${entity} token to ${targetEntity} token.`);
+      return signedOutAuthObject({
+        ...authenticateContext,
+        status: AuthStatus.SignedOut,
+        reason: AuthErrorReason.UnexpectedError,
+        message: `Cannot convert ${entity} token to ${targetEntity} token.`,
+      });
     }
 
     if (targetEntity === 'user') {
