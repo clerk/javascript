@@ -11,7 +11,7 @@ type NonEmptyArray<T> = [T, ...T[]];
 
 // standard names https://www.rfc-editor.org/rfc/rfc7515.html#section-4.1
 /**
- * @deprecated use `JwtHeader` instead
+ * @deprecated Use `JwtHeader` instead.
  */
 export interface JWTHeader {
   alg: string | Algorithm;
@@ -27,7 +27,7 @@ export interface JWTHeader {
 }
 
 /**
- * @deprecated use `JwtPayload` instead
+ * @deprecated Use `JwtPayload` instead.
  */
 export interface JWTClaims extends ClerkJWTClaims {
   /**
@@ -38,7 +38,7 @@ export interface JWTClaims extends ClerkJWTClaims {
 
 /**
  * Clerk-issued JWT payload
- * @deprecated use `JwtPayload` instead
+ * @deprecated Use `JwtPayload` instead.
  */
 export interface ClerkJWTClaims {
   /**
@@ -105,7 +105,7 @@ export interface ClerkJWTClaims {
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
  * @inline
- * @deprecated use `ActClaim` instead
+ * @deprecated Use `ActClaim` instead.
  */
 export interface ActJWTClaim {
   sub: string;

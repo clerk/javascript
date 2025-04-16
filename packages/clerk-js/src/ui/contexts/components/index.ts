@@ -13,3 +13,4 @@ export * from './Waitlist';
 export * from './PricingTable';
 export * from './Checkout';
 export * from './PaymentSources';
+export * from './Plans';

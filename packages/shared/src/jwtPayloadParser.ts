@@ -5,17 +5,9 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-const parseFeatures = (fea: string | undefined) => {
-  const features = fea ? fea.split(',').map(f => f.trim()) : [];
+import { splitByScope } from './authorization';
 
-  // TODO: make this more efficient
-  return {
-    orgFeatures: features.filter(f => f.includes('o')).map(f => f.split(':')[1]),
-    userFeatures: features.filter(f => f.includes('u')).map(f => f.split(':')[1]),
-  };
-};
-
-const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
+export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
   if (!per || !fpm) {
     return { permissions: [], featurePermissionMap: [] };
   }
@@ -31,7 +23,8 @@ const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
         .toString(2)
         .padStart(permissions.length, '0')
         .split('')
-        .map(bit => Number.parseInt(bit, 10)),
+        .map(bit => Number.parseInt(bit, 10))
+        .reverse(),
     )
     .filter(Boolean);
 
@@ -101,13 +94,13 @@ const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): Sh
         if (claims.o?.rol) {
           orgRole = `org:${claims.o?.rol}`;
         }
-        const { orgFeatures } = parseFeatures(claims.fea);
+        const { org } = splitByScope(claims.fea);
         const { permissions, featurePermissionMap } = parsePermissions({
           per: claims.o?.per,
           fpm: claims.o?.fpm,
         });
         orgPermissions = buildOrgPermissions({
-          features: orgFeatures,
+          features: org,
           featurePermissionMap: featurePermissionMap,
           permissions: permissions,
         });

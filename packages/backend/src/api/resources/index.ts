@@ -1,8 +1,12 @@
+export * from './ActorToken';
 export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
+export * from './BlocklistIdentifier';
 export * from './Client';
+export * from './CnameTarget';
 export * from './Cookies';
 export * from './DeletedObject';
+export * from './Domain';
 export * from './Email';
 export * from './EmailAddress';
 
@@ -18,13 +22,20 @@ export type {
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
+export * from './Instance';
+export * from './InstanceRestrictions';
+export * from './InstanceSettings';
 export * from './Invitation';
 export * from './JSON';
+export * from './JwtTemplate';
 export * from './OauthAccessToken';
+export * from './OAuthApplication';
 export * from './Organization';
 export * from './OrganizationInvitation';
 export * from './OrganizationMembership';
+export * from './OrganizationSettings';
 export * from './PhoneNumber';
+export * from './ProxyCheck';
 export * from './RedirectUrl';
 export * from './Session';
 export * from './SignInTokens';
@@ -34,6 +45,7 @@ export * from './User';
 export * from './Verification';
 export * from './SamlConnection';
 export * from './TestingToken';
+export * from './WaitlistEntry';
 
 export type {
   EmailWebhookEvent,

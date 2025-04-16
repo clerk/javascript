@@ -10,7 +10,7 @@ export class Organization {
   constructor(
     readonly id: string,
     readonly name: string,
-    readonly slug: string | null,
+    readonly slug: string,
     readonly imageUrl: string,
     readonly hasImage: boolean,
     readonly createdAt: number,

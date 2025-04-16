@@ -25,6 +25,10 @@ type RefreshTokenParams = {
   format?: 'token' | 'cookie';
 };
 
+type CreateSessionParams = {
+  userId: string;
+};
+
 export class SessionAPI extends AbstractAPI {
   public async getSessionList(params: SessionListParams = {}) {
     return this.request<PaginatedResourceResponse<Session[]>>({
@@ -39,6 +43,14 @@ export class SessionAPI extends AbstractAPI {
     return this.request<Session>({
       method: 'GET',
       path: joinPaths(basePath, sessionId),
+    });
+  }
+
+  public async createSession(params: CreateSessionParams) {
+    return this.request<Session>({
+      method: 'POST',
+      path: basePath,
+      bodyParams: params,
     });
   }
 

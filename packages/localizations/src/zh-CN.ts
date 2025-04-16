@@ -18,7 +18,7 @@ export const zhCN: LocalizationResource = {
     billedAnnually: undefined,
     free: undefined,
     getStarted: undefined,
-    manageMembership: undefined,
+    manageSubscription: undefined,
     month: undefined,
     switchPlan: undefined,
   },

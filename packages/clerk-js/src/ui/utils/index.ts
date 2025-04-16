@@ -27,3 +27,4 @@ export * from './usernameUtils';
 export * from './web3CallbackErrorHandler';
 export * from './originPrefersPopup';
 export * from './normalizeColorString';
+export * from './formatDate';

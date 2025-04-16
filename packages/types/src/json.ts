@@ -260,7 +260,7 @@ export interface UserJSON extends ClerkResourceJSON {
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
   /**
-   * @deprecated use `enterprise_accounts` instead
+   * @deprecated Use `enterprise_accounts` instead.
    */
   saml_accounts: SamlAccountJSON[];
 
@@ -603,6 +603,7 @@ export interface __experimental_CommercePlanJSON extends ClerkResourceJSON {
   currency_symbol: string;
   currency: string;
   description: string;
+  is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   payer_type: string[];
@@ -656,6 +657,9 @@ export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJS
   plan: __experimental_CommercePlanJSON;
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;
   status: __experimental_CommerceSubscriptionStatus;
+  period_start: number;
+  period_end: number;
+  canceled_at: number | null;
 }
 
 export interface __experimental_CommerceMoneyJSON {

@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.2.29
+
+### Patch Changes
+
+- Externalize all Stripe-related modules ([#5597](https://github.com/clerk/javascript/pull/5597)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`f0e5598`](https://github.com/clerk/javascript/commit/f0e559855db4971d33bdc081737218811b758664), [`5ed0434`](https://github.com/clerk/javascript/commit/5ed04340f670d15d3b29602396c35f1d3d7cfb5c), [`b1b8541`](https://github.com/clerk/javascript/commit/b1b85412e5e906c7e92cf1524350c469678a284e), [`ba6d2ee`](https://github.com/clerk/javascript/commit/ba6d2eed77ebb42ed6cca5911fcdc739fc4db18c), [`6ec374c`](https://github.com/clerk/javascript/commit/6ec374c8722c93ef2e213329b678bc4e3ee551bd), [`ae2d1a9`](https://github.com/clerk/javascript/commit/ae2d1a9a1c28961a422c9ceab6b2356f5be78e3d), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/clerk-js@5.61.0
+  - @clerk/shared@3.7.0
+  - @clerk/clerk-react@5.28.0
+
+## 2.2.28
+
+### Patch Changes
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/clerk-js@5.60.0
+  - @clerk/shared@3.6.0
+  - @clerk/clerk-react@5.27.0
+
 ## 2.2.27
 
 ### Patch Changes

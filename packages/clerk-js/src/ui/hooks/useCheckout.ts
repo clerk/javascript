@@ -10,11 +10,20 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
   const { organization } = useOrganization();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
 
-  const { data: initialCheckout, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
-    planId,
-    planPeriod,
-    ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-  });
+  const {
+    data: initialCheckout,
+    isLoading,
+    invalidate,
+  } = useFetch(
+    __experimental_commerce?.__experimental_billing.startCheckout,
+    {
+      planId,
+      planPeriod,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    'commerce-checkout',
+  );
 
   useEffect(() => {
     if (initialCheckout && !currentCheckout) {
@@ -30,5 +39,6 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     checkout: currentCheckout || initialCheckout,
     updateCheckout,
     isLoading,
+    invalidate,
   };
 };

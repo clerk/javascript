@@ -6,12 +6,19 @@ export const enUS: LocalizationResource = {
     billedAnnually: 'Billed annually',
     free: 'Free',
     getStarted: 'Get started',
-    manageMembership: 'Manage membership',
+    manage: 'Manage',
+    manageSubscription: 'Manage subscription',
+    cancelSubscription: 'Cancel subscription',
+    keepSubscription: 'Keep subscription',
+    reSubscribe: 'Re-subscribe',
     month: 'Month',
     switchPlan: 'Switch to this plan',
   },
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
+  badge__upcomingPlan: 'Upcoming Plan',
+  badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
+  badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__default: 'Default',
   badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
@@ -560,7 +567,7 @@ export const enUS: LocalizationResource = {
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid:
-      'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
+      'Sign up unsuccessful due to failed security validations. Please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
@@ -667,6 +674,7 @@ export const enUS: LocalizationResource = {
         headerTitle__invoices: 'Invoices',
         headerTitle__paymentSources: 'Payment Sources',
         headerTitle__plans: 'Plans',
+        headerTitle__subscriptions: 'Subscriptions',
       },
       title: 'Billing & Payments',
       paymentSourcesSection: {

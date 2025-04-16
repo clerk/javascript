@@ -73,18 +73,22 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = checkout?.externalClientSecret ?? initializedPaymentSource?.externalClientSecret;
 
+  const stripePublishableKey = __experimental_commerceSettings.billing.stripePublishableKey;
+
   useEffect(() => {
-    if (!stripePromiseRef.current && externalGatewayId && __experimental_commerceSettings.stripePublishableKey) {
-      if (!__BUILD_DISABLE_RHC__) {
-        stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-          stripeAccount: externalGatewayId,
-        });
-        void stripePromiseRef.current.then(stripeInstance => {
-          setStripe(stripeInstance);
-        });
-      } else {
+    if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
+      if (__BUILD_DISABLE_RHC__) {
         clerkUnsupportedEnvironmentWarning('Stripe');
+        return;
       }
+
+      stripePromiseRef.current = loadStripe(stripePublishableKey, {
+        stripeAccount: externalGatewayId,
+      });
+
+      void stripePromiseRef.current.then(stripeInstance => {
+        setStripe(stripeInstance);
+      });
     }
   }, [externalGatewayId, __experimental_commerceSettings]);
 

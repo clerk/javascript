@@ -72,6 +72,7 @@ import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
 /**
  * The `SignIn` object holds the state of the current sign-in and provides helper methods to navigate and complete the sign-in process. It is used to manage the sign-in lifecycle, including the first and second factor verification, and the creation of a new session.
+ * @interface
  */
 export interface SignInResource extends ClerkResource {
   /**
@@ -79,7 +80,7 @@ export interface SignInResource extends ClerkResource {
    */
   status: SignInStatus | null;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
@@ -261,7 +262,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   id: string;
   status: SignInStatus;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supported_identifiers: SignInIdentifier[];
   identifier: string;

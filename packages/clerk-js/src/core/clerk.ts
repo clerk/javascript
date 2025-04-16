@@ -84,7 +84,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
-  disabledCommerceFeature,
+  disabledBillingFeature,
   disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithCoinbaseWallet,
@@ -380,6 +380,15 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    /**
+     * Listen to `Session.getToken` resolving to emit the updated session
+     * with the new token to the state listeners.
+     */
+    eventBus.on(events.SessionTokenResolved, () => {
+      this.#setAccessors(this.session);
+      this.#emit();
+    });
 
     assertNoLegacyProp(this.#options);
 
@@ -946,7 +955,7 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledCommerceFeature(this, this.environment)) {
+    if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
           code: 'cannot_render_commerce_disabled',

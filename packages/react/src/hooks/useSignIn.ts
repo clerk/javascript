@@ -6,12 +6,15 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/custom-flows/overview#sign-in-flow).
+ * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/custom-flows/overview#sign-in-flow).
+ *
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  *
  * @example
  * ### Check the current state of a sign-in
  *
- * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
+ * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
  *
  * <Tabs items='React,Next.js'>
  * <Tab>

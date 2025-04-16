@@ -56,17 +56,19 @@ export const UserProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {experimental?.commerce && __experimental_commerceSettings.enabled && (
-          <Route path={isBillingPageRoot ? undefined : 'billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <BillingPage />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
-        )}
+        {experimental?.commerce &&
+          __experimental_commerceSettings.billing.enabled &&
+          __experimental_commerceSettings.billing.hasPaidUserPlans && (
+            <Route path={isBillingPageRoot ? undefined : 'billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <BillingPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          )}
       </Route>
     </Switch>
   );

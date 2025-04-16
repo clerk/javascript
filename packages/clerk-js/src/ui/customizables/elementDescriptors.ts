@@ -108,6 +108,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'drawerTitle',
   'drawerBody',
   'drawerFooter',
+  'drawerFooterTitle',
+  'drawerFooterDescription',
   'drawerClose',
   'drawerConfirmationBackdrop',
   'drawerConfirmationRoot',
@@ -329,6 +331,13 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectButtonIcon',
   'selectOptionsContainer',
   'selectOption',
+
+  'paymentSourceRow',
+  'paymentSourceRowIcon',
+  'paymentSourceRowText',
+  'paymentSourceRowType',
+  'paymentSourceRowValue',
+  'paymentSourceRowBadge',
 
   'menuButton',
   'menuButtonEllipsis',
