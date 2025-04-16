@@ -28,6 +28,7 @@ export const ObjectType = {
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   OauthApplicationToken: 'oauth_application_token', // TODO: This has the oauth_access_token url as well
+  // TODO: Add clerk_idp_oauth_access_token
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
   OrganizationInvitation: 'organization_invitation',

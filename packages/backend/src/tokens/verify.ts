@@ -230,7 +230,6 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
     return verifyAPIKey(token, options);
   }
 
-  // TODO: Remove this later once API keys have prefix.
-  return verifyAPIKey(token, options);
-  // throw new Error('Unknown machine token type');
+  // TODO: Gracefully handle unknown machine token type
+  throw new Error('Unknown machine token type');
 }
