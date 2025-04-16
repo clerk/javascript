@@ -17,7 +17,7 @@ import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
 import { getInitialValuesFromQueryParams } from '../utils';
 
-export type SignInContextType = SignInCtx & {
+export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQueryString;
   signUpUrl: string;
@@ -72,6 +72,9 @@ export const useSignInContext = (): SignInContextType => {
     queryParams,
     mode,
   );
+
+  delete ctx.fallbackRedirectUrl;
+  delete ctx.forceRedirectUrl;
 
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
   const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());

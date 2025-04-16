@@ -14,7 +14,7 @@ type DisambiguatedRedirectOptions<T extends RedirectOptions, F extends Flow> = {
 } & PrefixedRedirectOptions<F>;
 
 /**
- * Ensures redirect props have the appropriate prefix depending on the flow they were originally provided to. Used when passing props from sign up -> sign in, or vice versa
+ * Ensures redirect props have the appropriate prefix depending on the flow they were originally provided to. Used when passing props from sign up -> sign in, or vice versa, when rendering modals.
  */
 export function disambiguateRedirectOptions<T extends RedirectOptions, F extends Flow>(
   props: T | null,
