@@ -94,7 +94,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   test('sign up modal', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     // The SignUpModal will only redirect to its provided forceRedirectUrl if the user is signing up; it will not
-    // redirect if the sign up is transfered to a sign in.
+    // redirect if the sign up is transferred to a sign in.
     await u.services.users.deleteIfExists({ email: fakeUser.email });
 
     await u.page.goToRelative('/buttons');
@@ -112,6 +112,46 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.enterTestOtpCode();
 
     await u.page.waitForAppUrl('/protected');
+  });
+
+  test('sign in modal to sign up modal to transfer respects original forceRedirectUrl', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    try {
+      await u.services.users.createBapiUser(fakeUser);
+    } catch {
+      // User already exists, so we don't need to create it
+    }
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    // Call clerk.openSignIn with custom redirect URLs
+    await u.page.evaluate(() => {
+      window.Clerk.openSignIn({
+        forceRedirectUrl: '/?from=signin',
+        signUpForceRedirectUrl: '/?from=signup',
+      });
+    });
+
+    await u.po.signIn.waitForModal();
+
+    // Click the Sign Up button to switch to sign up mode
+    await u.page.getByRole('dialog').getByRole('link', { name: 'Sign up' }).click();
+
+    // Use OAuth provider
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+    await u.page.getByText('Sign in to oauth-provider').waitFor();
+
+    // Sign in with existing account
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.enterTestOtpCode();
+
+    // Should redirect to the sign in redirect URL since we already had an account
+    await u.page.waitForAppUrl('/?from=signin');
+    await u.po.expect.toBeSignedIn();
   });
 
   test.describe('authenticateWithPopup', () => {
