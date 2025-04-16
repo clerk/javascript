@@ -297,7 +297,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
         const items = headings.map(i => `'${i}'`).join(', ');
         const tabs = md.map(i => `<Tab>${i}</Tab>`).join('\n');
 
-        return `<Tabs items={[${items}]}>
+        return `This function returns a discriminated union type. There are multiple variants of this type available which you can select by clicking on one of the tabs.
+
+<Tabs items={[${items}]}>
 ${tabs}
 </Tabs>`;
       },
