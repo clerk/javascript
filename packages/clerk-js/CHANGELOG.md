@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.61.1
+
+### Patch Changes
+
+- Fix: add default param to plans call ([#5637](https://github.com/clerk/javascript/pull/5637)) by [@aeliox](https://github.com/aeliox)
+
+- Fix an issue where `fallbackRedirectUrl` and `forceRedirectUrl` were being improperly passed from sign up to sign in and vice versa. These props will now only apply to the specific flow they were passed to initially. ([#5645](https://github.com/clerk/javascript/pull/5645)) by [@brkalow](https://github.com/brkalow)
+
+- Improve JSDoc comments ([#5630](https://github.com/clerk/javascript/pull/5630)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix: add missing context to PricingTable ([#5638](https://github.com/clerk/javascript/pull/5638)) by [@aeliox](https://github.com/aeliox)
+
+- Add invoices data fetching and invoice UI to org and user profile. ([#5627](https://github.com/clerk/javascript/pull/5627)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Chore: tidy up checkout complete state for upcoming subscriptions ([#5644](https://github.com/clerk/javascript/pull/5644)) by [@aeliox](https://github.com/aeliox)
+
+- Hide Billing tabs from UP and OP when no paid plans exist for an instance. ([#5628](https://github.com/clerk/javascript/pull/5628)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updates `PricingTable` and `SubscriptionDetailDrawer` to handle `upcoming` and "expiring" subscriptions. ([#5601](https://github.com/clerk/javascript/pull/5601)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`b7b940c`](https://github.com/clerk/javascript/commit/b7b940cd9ae3a62dc91feb0a62d28f10658329ce), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+  - @clerk/shared@3.7.1
+  - @clerk/localizations@3.13.11
+
 ## 5.61.0
 
 ### Minor Changes
