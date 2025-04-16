@@ -70,7 +70,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
      * When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive and generates a unique nonce value to be used for script elements.
      * This helps prevent XSS attacks while allowing trusted scripts to execute.
      */
-    strict: boolean;
+    strict?: boolean;
     /**
      * Custom CSP directives to merge with Clerk's default directives
      */
@@ -211,7 +211,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       }
       if (options.contentSecurityPolicy) {
         const { header, nonce } = createCSPHeader(
-          options.contentSecurityPolicy.strict,
+          options.contentSecurityPolicy.strict ?? false,
           (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
           options.contentSecurityPolicy.directives,
         );
