@@ -52,6 +52,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
+  'headerBackLink',
 
   'main',
 
@@ -338,6 +339,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'paymentSourceRowType',
   'paymentSourceRowValue',
   'paymentSourceRowBadge',
+
+  'invoiceRoot',
+  'invoiceCard',
+  'invoiceHeader',
+  'invoiceTitle',
+  'invoiceBadge',
+  'invoiceDetails',
+  'invoiceDetailsItem',
+  'invoiceDetailsItemTitle',
+  'invoiceDetailsItemValue',
+  'invoiceContent',
 
   'menuButton',
   'menuButtonEllipsis',

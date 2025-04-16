@@ -170,6 +170,7 @@ export type ElementsConfig = {
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
+  headerBackLink: WithOptions;
 
   backRow: WithOptions;
   backLink: WithOptions;
@@ -462,6 +463,17 @@ export type ElementsConfig = {
   paymentSourceRowType: WithOptions;
   paymentSourceRowValue: WithOptions;
   paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
+
+  invoiceRoot: WithOptions;
+  invoiceCard: WithOptions;
+  invoiceHeader: WithOptions;
+  invoiceTitle: WithOptions;
+  invoiceBadge: WithOptions;
+  invoiceDetails: WithOptions;
+  invoiceDetailsItem: WithOptions;
+  invoiceDetailsItemTitle: WithOptions;
+  invoiceDetailsItemValue: WithOptions;
+  invoiceContent: WithOptions;
 
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;

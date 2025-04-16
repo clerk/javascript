@@ -1,6 +1,7 @@
 import type {
   __experimental_CommerceInvoiceJSON,
   __experimental_CommerceInvoiceResource,
+  __experimental_CommerceInvoiceStatus,
   __experimental_CommerceTotals,
 } from '@clerk/types';
 
@@ -13,7 +14,7 @@ export class __experimental_CommerceInvoice extends BaseResource implements __ex
   planId!: string;
   paymentDueOn!: number;
   paidOn!: number;
-  status!: string;
+  status!: __experimental_CommerceInvoiceStatus;
   totals!: __experimental_CommerceTotals;
 
   constructor(data: __experimental_CommerceInvoiceJSON) {
