@@ -234,7 +234,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** @deprecated Please use getUserOauthAccessToken without the `oauth_` provider prefix . */
+  /** @deprecated Use `getUserOauthAccessToken` without the `oauth_` provider prefix . */
   public async getUserOauthAccessToken(
     userId: string,
     provider: `oauth_${OAuthProvider}`,

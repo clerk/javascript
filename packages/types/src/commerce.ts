@@ -27,7 +27,7 @@ export interface __experimental_CommerceBillingNamespace {
 }
 
 export type __experimental_CommerceSubscriberType = 'org' | 'user';
-export type __experimental_CommerceSubscriptionStatus = 'active' | 'canceled';
+export type __experimental_CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming';
 export type __experimental_CommerceSubscriptionPlanPeriod = 'month' | 'annual';
 
 export interface __experimental_CommerceProductResource extends ClerkResource {
@@ -52,6 +52,7 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   currencySymbol: string;
   currency: string;
   description: string;
+  isDefault: boolean;
   isRecurring: boolean;
   hasBaseFee: boolean;
   payerType: string[];
@@ -59,7 +60,6 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   slug: string;
   avatarUrl: string;
   features: __experimental_CommerceFeatureResource[];
-  subscriptionIdForCurrentSubscriber: string | undefined;
 }
 
 export interface __experimental_CommerceFeatureResource extends ClerkResource {
@@ -122,6 +122,9 @@ export interface __experimental_CommerceSubscriptionResource extends ClerkResour
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   status: __experimental_CommerceSubscriptionStatus;
+  periodStart: number;
+  periodEnd: number;
+  canceledAt: number | null;
   cancel: (params: __experimental_CancelSubscriptionParams) => Promise<DeletedObjectResource>;
 }
 

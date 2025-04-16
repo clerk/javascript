@@ -1,17 +1,24 @@
 import {
+  ActorToken,
   AllowlistIdentifier,
   BlocklistIdentifier,
   Client,
   Cookies,
   DeletedObject,
+  Domain,
   Email,
   EmailAddress,
+  Instance,
+  InstanceRestrictions,
+  InstanceSettings,
   Invitation,
   JwtTemplate,
   OauthAccessToken,
+  OAuthApplication,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
+  OrganizationSettings,
   PhoneNumber,
   ProxyCheck,
   RedirectUrl,
@@ -24,6 +31,7 @@ import {
 import { AccountlessApplication } from './AccountlessApplication';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
+import { WaitlistEntry } from './WaitlistEntry';
 
 type ResourceResponse<T> = {
   data: T;
@@ -73,6 +81,8 @@ function jsonToObject(item: any): any {
   switch (item.object) {
     case ObjectType.AccountlessApplication:
       return AccountlessApplication.fromJSON(item);
+    case ObjectType.ActorToken:
+      return ActorToken.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
     case ObjectType.BlocklistIdentifier:
@@ -81,22 +91,34 @@ function jsonToObject(item: any): any {
       return Client.fromJSON(item);
     case ObjectType.Cookies:
       return Cookies.fromJSON(item);
+    case ObjectType.Domain:
+      return Domain.fromJSON(item);
     case ObjectType.EmailAddress:
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
+    case ObjectType.Instance:
+      return Instance.fromJSON(item);
+    case ObjectType.InstanceRestrictions:
+      return InstanceRestrictions.fromJSON(item);
+    case ObjectType.InstanceSettings:
+      return InstanceSettings.fromJSON(item);
     case ObjectType.Invitation:
       return Invitation.fromJSON(item);
     case ObjectType.JwtTemplate:
       return JwtTemplate.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
+    case ObjectType.OAuthApplication:
+      return OAuthApplication.fromJSON(item);
     case ObjectType.Organization:
       return Organization.fromJSON(item);
     case ObjectType.OrganizationInvitation:
       return OrganizationInvitation.fromJSON(item);
     case ObjectType.OrganizationMembership:
       return OrganizationMembership.fromJSON(item);
+    case ObjectType.OrganizationSettings:
+      return OrganizationSettings.fromJSON(item);
     case ObjectType.PhoneNumber:
       return PhoneNumber.fromJSON(item);
     case ObjectType.ProxyCheck:
@@ -115,6 +137,8 @@ function jsonToObject(item: any): any {
       return getCount(item);
     case ObjectType.User:
       return User.fromJSON(item);
+    case ObjectType.WaitlistEntry:
+      return WaitlistEntry.fromJSON(item);
     default:
       return item;
   }

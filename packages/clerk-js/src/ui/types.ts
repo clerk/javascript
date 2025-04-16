@@ -1,6 +1,8 @@
 import type {
   __experimental_CheckoutProps,
+  __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
+  __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
@@ -114,6 +116,19 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
   subscriberType?: __experimental_CommerceSubscriberType;
+};
+
+export type __experimental_PlansCtx = {
+  componentName: 'Plans';
+  subscriberType: __experimental_CommerceSubscriberType;
+  plans: __experimental_CommercePlanResource[];
+  subscriptions: __experimental_CommerceSubscriptionResource[];
+  isLoading: boolean;
+  revalidate: () => void;
+  activeOrUpcomingSubscription: (
+    plan: __experimental_CommercePlanResource,
+  ) => __experimental_CommerceSubscriptionResource | undefined;
+  isDefaultPlanImplicitlyActive: boolean;
 };
 
 export type SessionTasksCtx = {
