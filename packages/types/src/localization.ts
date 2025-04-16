@@ -88,6 +88,9 @@ type _LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
+  badge__upcomingPlan: LocalizationValue;
+  badge__startsAt: LocalizationValue;
+  badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
@@ -103,7 +106,11 @@ type _LocalizationResource = {
     month: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
-    manageMembership: LocalizationValue;
+    manage: LocalizationValue;
+    manageSubscription: LocalizationValue;
+    cancelSubscription: LocalizationValue;
+    keepSubscription: LocalizationValue;
+    reSubscribe: LocalizationValue;
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
@@ -659,6 +666,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
         headerTitle__paymentSources: LocalizationValue;
       };
