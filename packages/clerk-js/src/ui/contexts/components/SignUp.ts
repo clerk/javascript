@@ -65,8 +65,8 @@ export const useSignUpContext = (): SignUpContextType => {
     options,
     {
       ...ctx,
-      signUpFallbackRedirectUrl: ctx.fallbackRedirectUrl,
-      signUpForceRedirectUrl: ctx.forceRedirectUrl,
+      signUpFallbackRedirectUrl: ctx.signUpFallbackRedirectUrl || ctx.fallbackRedirectUrl,
+      signUpForceRedirectUrl: ctx.signUpForceRedirectUrl || ctx.forceRedirectUrl,
     },
     queryParams,
     mode,

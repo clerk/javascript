@@ -66,8 +66,8 @@ export const useSignInContext = (): SignInContextType => {
     options,
     {
       ...ctx,
-      signInFallbackRedirectUrl: ctx.fallbackRedirectUrl,
-      signInForceRedirectUrl: ctx.forceRedirectUrl,
+      signInFallbackRedirectUrl: ctx.signInFallbackRedirectUrl || ctx.fallbackRedirectUrl,
+      signInForceRedirectUrl: ctx.signInForceRedirectUrl || ctx.forceRedirectUrl,
     },
     queryParams,
     mode,
