@@ -11,7 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
-import { createCSPHeader, type CSPDirective, type CSPMode } from './content-security-policy';
+import { createCSPHeader, type CSPDirective } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -67,9 +67,10 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
    */
   contentSecurityPolicy?: {
     /**
-     * The CSP mode to use - either 'standard' or 'strict-dynamic'
+     * When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive and generates a unique nonce value to be used for script elements.
+     * This helps prevent XSS attacks while allowing trusted scripts to execute.
      */
-    mode: CSPMode;
+    strict: boolean;
     /**
      * Custom CSP directives to merge with Clerk's default directives
      */
@@ -210,7 +211,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       }
       if (options.contentSecurityPolicy) {
         const { header, nonce } = createCSPHeader(
-          options.contentSecurityPolicy.mode,
+          options.contentSecurityPolicy.strict,
           (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
           options.contentSecurityPolicy.directives,
         );
