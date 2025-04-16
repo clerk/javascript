@@ -21,7 +21,7 @@ export type OAuthProvider =
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
