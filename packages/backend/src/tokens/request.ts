@@ -96,7 +96,7 @@ export async function authenticateRequest(request: Request, options: Authenticat
   assertValidSecretKey(authenticateContext.secretKey);
 
   // Default entity is user for backwards compatibility.
-  options.accept ??= 'user';
+  options.acceptsToken ??= 'user';
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -776,8 +776,8 @@ ${error.getFullMessage()}`,
     }
 
     const tokenType = getMachineTokenType(sessionTokenInHeader);
-    if (options.accept !== 'any' && options.accept !== tokenType) {
-      return handleError(new Error(`Expected ${options.accept} token but received ${tokenType} token`), 'header');
+    if (options.acceptsToken !== 'any' && options.acceptsToken !== tokenType) {
+      return handleError(new Error(`Expected ${options.acceptsToken} token but received ${tokenType} token`), 'header');
     }
 
     const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
@@ -802,8 +802,11 @@ ${error.getFullMessage()}`,
 
     if (isMachineToken(sessionTokenInHeader)) {
       const tokenType = getMachineTokenType(sessionTokenInHeader);
-      if (options.accept !== 'any' && options.accept !== tokenType) {
-        return handleError(new Error(`Expected ${options.accept} token but received ${tokenType} token`), 'header');
+      if (options.acceptsToken !== 'any' && options.acceptsToken !== tokenType) {
+        return handleError(
+          new Error(`Expected ${options.acceptsToken} token but received ${tokenType} token`),
+          'header',
+        );
       }
 
       const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
@@ -834,11 +837,11 @@ ${error.getFullMessage()}`,
   }
 
   if (authenticateContext.sessionTokenInHeader) {
-    if (options.accept === 'any') {
+    if (options.acceptsToken === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
     }
 
-    if (options.accept === 'user') {
+    if (options.acceptsToken === 'user') {
       return authenticateRequestWithTokenInHeader();
     }
 
@@ -846,9 +849,13 @@ ${error.getFullMessage()}`,
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (options.accept === 'oauth_token' || options.accept === 'api_key' || options.accept === 'machine_token') {
+  if (
+    options.acceptsToken === 'oauth_token' ||
+    options.acceptsToken === 'api_key' ||
+    options.acceptsToken === 'machine_token'
+  ) {
     return signedOut({
-      entity: options.accept,
+      entity: options.acceptsToken,
       authenticateContext,
       reason: 'no token in header',
     });

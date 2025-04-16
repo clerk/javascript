@@ -50,7 +50,7 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  entity: TokenEntity;
+  tokenType: TokenEntity;
   toAuth: <T extends ToAuthOptions | undefined>(
     options?: T,
   ) => ToAuthReturn<T, SignedInAuthObject, AuthenticatedMachineObject>;
@@ -71,7 +71,7 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  entity: TokenEntity;
+  tokenType: TokenEntity;
   toAuth: <T extends ToAuthOptions | undefined>(
     options?: T,
   ) => ToAuthReturn<T, SignedOutAuthObject, UnauthenticatedMachineObject>;
@@ -79,8 +79,8 @@ export type SignedOutState = {
   token: null;
 };
 
-export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'entity'> & {
-  entity: 'user';
+export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
+  tokenType: 'user';
   status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
@@ -178,7 +178,7 @@ export function signedIn(params: SignedInParams): SignedInState {
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    entity,
+    tokenType: entity,
     toAuth,
     headers,
     token,
@@ -236,7 +236,7 @@ export function signedOut(params: SignedOutParams): SignedOutState {
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
-    entity,
+    tokenType: entity,
     headers,
     toAuth,
     token: null,
@@ -262,7 +262,7 @@ export function handshake(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
-    entity: 'user',
+    tokenType: 'user',
     headers,
     toAuth: () => null,
     token: null,
