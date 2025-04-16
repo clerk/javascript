@@ -8,7 +8,10 @@ import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../
 import type { ClerkRequest } from './clerkRequest';
 import type { AuthenticateRequestOptions } from './types';
 
-interface AuthenticateContext extends AuthenticateRequestOptions {
+// TODO: Figure out if this is going to be a problem
+type AuthenticateRequestOptionsWithoutAccept = Omit<AuthenticateRequestOptions, 'accept'>;
+
+interface AuthenticateContext extends AuthenticateRequestOptionsWithoutAccept {
   // header-based values
   sessionTokenInHeader: string | undefined;
   origin: string | undefined;

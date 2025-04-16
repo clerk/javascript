@@ -6,11 +6,13 @@ export class MachineToken {
     readonly name: string,
     readonly subject: string,
     readonly claims: Record<string, string> | null,
-    readonly secondsUntilExpiration: number,
+    readonly revoked: boolean,
+    readonly expired: boolean,
+    readonly expiration: number | null,
     readonly createdBy: string | null,
+    readonly creationReason: string | null,
     readonly createdAt: number,
-    readonly expiresAt: number | null,
-    readonly creationReason?: string | null,
+    readonly updatedAt: number,
   ) {}
 
   static fromJSON(data: MachineTokenJSON) {
@@ -19,11 +21,13 @@ export class MachineToken {
       data.subject,
       data.name,
       data.claims,
-      data.seconds_until_expiration,
+      data.revoked,
+      data.expired,
+      data.expiration,
       data.created_by,
-      data.created_at,
-      data.expires_at,
       data.creation_reason,
+      data.created_at,
+      data.updated_at,
     );
   }
 }

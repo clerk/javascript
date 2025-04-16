@@ -673,7 +673,7 @@ export interface APIKeyJSON extends ClerkResourceJSON {
   expires_at: number | null;
 }
 
-export interface OauthApplicationTokenJSON extends ClerkResourceJSON {
+export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.IdpOAuthAccessToken;
   type: string;
   name: string;

@@ -9,6 +9,7 @@ import {
   Domain,
   Email,
   EmailAddress,
+  IdPOAuthAccessToken,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
@@ -17,7 +18,6 @@ import {
   MachineToken,
   OauthAccessToken,
   OAuthApplication,
-  OauthApplicationToken,
   Organization,
   OrganizationInvitation,
   OrganizationMembership,
@@ -103,7 +103,7 @@ function jsonToObject(item: any): any {
     case ObjectType.Email:
       return Email.fromJSON(item);
     case ObjectType.IdpOAuthAccessToken:
-      return OauthApplicationToken.fromJSON(item);
+      return IdPOAuthAccessToken.fromJSON(item);
     case ObjectType.Instance:
       return Instance.fromJSON(item);
     case ObjectType.InstanceRestrictions:

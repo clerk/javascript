@@ -9,7 +9,7 @@ import type {
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
-import { createBackendApiClient, OauthApplicationToken } from '../api';
+import { createBackendApiClient, IdPOAuthAccessToken } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineAuthType, TokenEntity } from './types';
 
@@ -179,7 +179,7 @@ export function authenticatedMachineObject(
     claims: verificationResult.claims,
     entity,
     machineId: verificationResult.id,
-    userId: !(verificationResult instanceof OauthApplicationToken) ? verificationResult.createdBy : null,
+    userId: !(verificationResult instanceof IdPOAuthAccessToken) ? verificationResult.createdBy : null,
     getToken: () => machineToken,
     has: () => false,
     debug: createDebug(debugData),

@@ -1,6 +1,6 @@
-import type { OauthApplicationTokenJSON } from './JSON';
+import type { IdPOAuthAccessTokenJSON } from './JSON';
 
-export class OauthApplicationToken {
+export class IdPOAuthAccessToken {
   constructor(
     readonly id: string,
     readonly type: string,
@@ -11,8 +11,8 @@ export class OauthApplicationToken {
     readonly expiresAt: number,
   ) {}
 
-  static fromJSON(data: OauthApplicationTokenJSON) {
-    return new OauthApplicationToken(
+  static fromJSON(data: IdPOAuthAccessTokenJSON) {
+    return new IdPOAuthAccessToken(
       data.id,
       data.type,
       data.name,

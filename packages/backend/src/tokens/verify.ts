@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { JwtPayload } from '@clerk/types';
 
-import type { APIKey, MachineToken, OauthApplicationToken } from '../api';
+import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import {
   MachineTokenVerificationError,
@@ -128,10 +128,10 @@ async function verifyMachineToken(
 async function verifyOAuthToken(
   secret: string,
   options: VerifyTokenOptions,
-): Promise<MachineTokenReturnType<OauthApplicationToken, MachineTokenVerificationError>> {
+): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.oAuthApplicationTokens.verifySecret(secret);
+    const verifiedToken = await client.idPOAuthAccessToken.verifySecret(secret);
     return { data: verifiedToken, entity: 'oauth_token', errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {

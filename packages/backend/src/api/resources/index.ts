@@ -23,6 +23,7 @@ export type {
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
+export * from './IdPOAuthAccessToken';
 export * from './Instance';
 export * from './InstanceRestrictions';
 export * from './InstanceSettings';
@@ -31,7 +32,6 @@ export * from './JSON';
 export * from './MachineToken';
 export * from './JwtTemplate';
 export * from './OauthAccessToken';
-export * from './OauthApplicationToken';
 export * from './OAuthApplication';
 export * from './Organization';
 export * from './OrganizationInvitation';
