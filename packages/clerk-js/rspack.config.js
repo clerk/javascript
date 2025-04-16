@@ -130,6 +130,8 @@ const common = ({ mode, disableRHC = false }) => {
         },
       },
     },
+    // Disable Rspack's warnings since we use bundlewatch
+    ignoreWarnings: [/entrypoint size limit/, /asset size limit/, /Rspack performance recommendations/],
   };
 };
 
