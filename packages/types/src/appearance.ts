@@ -467,12 +467,18 @@ export type ElementsConfig = {
   invoiceRoot: WithOptions;
   invoiceCard: WithOptions;
   invoiceHeader: WithOptions;
+  invoiceHeaderContent: WithOptions;
   invoiceTitle: WithOptions;
+  invoiceTitleContainer: WithOptions;
+  invoiceId: WithOptions;
+  invoiceIdContainer: WithOptions;
   invoiceBadge: WithOptions;
   invoiceDetails: WithOptions;
   invoiceDetailsItem: WithOptions;
   invoiceDetailsItemTitle: WithOptions;
+  invoiceDetailsItemTitleText: WithOptions;
   invoiceDetailsItemValue: WithOptions;
+  invoiceDetailsItemValueText: WithOptions;
   invoiceContent: WithOptions;
 
   menuButton: WithOptions<MenuId>;

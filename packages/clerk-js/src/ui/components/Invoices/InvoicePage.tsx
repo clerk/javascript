@@ -78,13 +78,14 @@ export const InvoicePage = () => {
               })}
             >
               <Box
+                elementDescriptor={descriptors.invoiceHeaderContent}
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'start',
                 }}
               >
-                <Span>
+                <Span elementDescriptor={descriptors.invoiceTitleContainer}>
                   <Heading
                     textVariant='h2'
                     elementDescriptor={descriptors.invoiceTitle}
@@ -92,17 +93,22 @@ export const InvoicePage = () => {
                     Invoice ID
                   </Heading>
                   <Span
+                    elementDescriptor={descriptors.invoiceIdContainer}
                     sx={t => ({
                       display: 'flex',
                       alignItems: 'center',
-                      gap: t.space.$0x5,
+                      gap: t.space.$0x25,
                       color: t.colors.$colorTextSecondary,
                     })}
                   >
-                    <CopyButton text={invoice.id} />
+                    <CopyButton
+                      copyLabel='Copy invoice ID'
+                      text={invoice.id}
+                    />
                     <Text
                       colorScheme='secondary'
                       variant='subtitle'
+                      elementDescriptor={descriptors.invoiceId}
                     >
                       {truncateWithEndVisible(invoice.id)}
                     </Text>
@@ -130,6 +136,7 @@ export const InvoicePage = () => {
                 <Box elementDescriptor={descriptors.invoiceDetailsItem}>
                   <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
@@ -137,7 +144,12 @@ export const InvoicePage = () => {
                     </Text>
                   </Dt>
                   <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
-                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                    <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      variant='subtitle'
+                    >
+                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                    </Text>
                   </Dd>
                 </Box>
                 <Box
@@ -148,6 +160,7 @@ export const InvoicePage = () => {
                 >
                   <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
@@ -155,7 +168,12 @@ export const InvoicePage = () => {
                     </Text>
                   </Dt>
                   <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
-                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                    <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      variant='subtitle'
+                    >
+                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                    </Text>
                   </Dd>
                 </Box>
               </Dl>
