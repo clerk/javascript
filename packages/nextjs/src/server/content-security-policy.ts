@@ -40,14 +40,6 @@ export type CSPDirective =
   | 'style-src-elem';
 
 /**
- * The mode to use for generating the CSP header
- *
- * - `standard`: Standard CSP mode
- * - `strict-dynamic`: Strict-dynamic mode, also generates a nonce
- */
-export type CSPMode = 'standard' | 'strict-dynamic';
-
-/**
  * Partial record of directives and their values
  */
 type CSPValues = Partial<Record<CSPDirective, string[]>>;
@@ -240,14 +232,14 @@ export function generateNonce(): string {
 
 /**
  * Creates a merged CSP state with all necessary directives
- * @param mode - The CSP mode to use
+ * @param strict - When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive
  * @param host - The host to include in CSP
  * @param customDirectives - Optional custom directives to merge with
  * @param nonce - Optional nonce for strict-dynamic mode
  * @returns Merged CSPDirectiveSet
  */
 function createMergedCSP(
-  mode: CSPMode,
+  strict: boolean,
   host: string,
   customDirectives?: Record<string, string[]>,
   nonce?: string,
@@ -257,7 +249,7 @@ function createMergedCSP(
   mergedCSP['connect-src'].add(host);
 
   // Handle strict-dynamic mode specific changes
-  if (mode === 'strict-dynamic') {
+  if (strict) {
     mergedCSP['script-src'].delete('http:');
     mergedCSP['script-src'].delete('https:');
     mergedCSP['script-src'].add("'strict-dynamic'");
@@ -290,16 +282,16 @@ function createMergedCSP(
 
 /**
  * Creates a Content Security Policy (CSP) header with the specified mode and host
- * @param mode - The CSP mode to use ('standard' or 'strict-dynamic')
+ * @param strict - When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive
  * @param host - The host to include in the CSP (parsed from publishableKey)
  * @param customDirectives - Optional custom directives to merge with
  * @returns Object containing the formatted CSP header and nonce (if in strict-dynamic mode)
  */
-export function createCSPHeader(mode: CSPMode, host: string, customDirectives?: CSPValues): CSPHeaderResult {
-  const nonce = mode === 'strict-dynamic' ? generateNonce() : undefined;
+export function createCSPHeader(strict: boolean, host: string, customDirectives?: CSPValues): CSPHeaderResult {
+  const nonce = strict ? generateNonce() : undefined;
 
   return {
-    header: formatCSPHeader(createMergedCSP(mode, host, customDirectives, nonce)),
+    header: formatCSPHeader(createMergedCSP(strict, host, customDirectives, nonce)),
     nonce,
   };
 }
