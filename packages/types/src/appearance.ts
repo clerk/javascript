@@ -227,6 +227,8 @@ export type ElementsConfig = {
   drawerTitle: WithOptions;
   drawerBody: WithOptions;
   drawerFooter: WithOptions;
+  drawerFooterTitle: WithOptions;
+  drawerFooterDescription: WithOptions;
   drawerClose: WithOptions;
   drawerConfirmationBackdrop: WithOptions;
   drawerConfirmationRoot: WithOptions;

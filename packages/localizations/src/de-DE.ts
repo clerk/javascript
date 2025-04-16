@@ -18,7 +18,7 @@ export const deDE: LocalizationResource = {
     billedAnnually: 'Jährlich abgerechnet',
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
-    manageMembership: 'Mitgliedschaft verwalten',
+    manageSubscription: 'Mitgliedschaft verwalten',
     month: 'Monat',
     switchPlan: 'Zu diesem Plan wechseln',
   },

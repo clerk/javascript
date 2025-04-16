@@ -8,9 +8,8 @@ import type {
 import { useState } from 'react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { usePricingTableContext } from '../../contexts';
+import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
-import { usePlans } from '../../hooks';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
@@ -20,7 +19,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   const { mode = 'mounted', subscriberType } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
-  const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
+  const { plans, revalidate, activeOrUpcomingSubscription } = usePlansContext();
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
   const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
@@ -31,9 +30,11 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
     if (!clerk.isSignedIn) {
       void clerk.redirectToSignIn();
     }
-    const activeSubscription = subscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
-    if (activeSubscription) {
-      setDetailSubscription(activeSubscription);
+
+    const subscription = activeOrUpcomingSubscription(plan);
+
+    if (subscription && !subscription.canceledAt) {
+      setDetailSubscription(subscription);
       setShowSubscriptionDetailDrawer(true);
     } else {
       clerk.__internal_openCheckout({

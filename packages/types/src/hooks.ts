@@ -43,7 +43,7 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
-       * The JWT claims for the current session.
+       * The current user's [session claims](https://clerk.com/docs/backend-requests/resources/session-tokens).
        */
       sessionClaims: undefined;
       /**

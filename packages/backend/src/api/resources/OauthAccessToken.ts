@@ -9,6 +9,7 @@ export class OauthAccessToken {
     readonly label: string,
     readonly scopes?: string[],
     readonly tokenSecret?: string,
+    readonly expiresAt?: number,
   ) {}
 
   static fromJSON(data: OauthAccessTokenJSON) {
@@ -20,6 +21,7 @@ export class OauthAccessToken {
       data.label || '',
       data.scopes,
       data.token_secret,
+      data.expires_at,
     );
   }
 }

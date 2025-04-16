@@ -67,7 +67,7 @@ export const OrganizationProfileRoutes = () => {
               <Switch>
                 <Route index>
                   <Suspense fallback={''}>
-                    <OrganizationBillingPage />
+                    <OrganizationBillingPage providerProps={{ subscriberType: 'org' }} />
                   </Suspense>
                 </Route>
                 <Route path='invoice/:invoiceId'>
