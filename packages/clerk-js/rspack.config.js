@@ -173,7 +173,7 @@ const typescriptLoaderProd = (
             ...(useCoreJs
               ? {
                   mode: 'usage',
-                  coreJs: '3.41.0',
+                  coreJs: require('core-js/package.json').version,
                 }
               : {}),
           },
