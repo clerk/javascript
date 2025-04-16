@@ -1,6 +1,7 @@
 import {
   __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
+  InvoicesContextProvider,
   usePlansContext,
   withPlans,
 } from '../../contexts';
@@ -16,13 +17,22 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useTabState } from '../../hooks/useTabState';
+import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
+
+const tabMap = {
+  0: 'plans',
+  1: 'invoices',
+  2: 'payment-sources',
+} as const;
 
 export const BillingPage = withPlans(
   withCardStateProvider(() => {
     const card = useCardState();
     const { subscriptions } = usePlansContext();
+    const { selectedTab, handleTabChange } = useTabState(tabMap);
 
     return (
       <Col
@@ -43,7 +53,10 @@ export const BillingPage = withPlans(
 
           <Card.Alert>{card.error}</Card.Alert>
 
-          <Tabs>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+          >
             <TabsList sx={t => ({ gap: t.space.$6 })}>
               <Tab
                 localizationKey={
@@ -67,7 +80,11 @@ export const BillingPage = withPlans(
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
               </TabPanel>
-              <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
+              <TabPanel sx={{ width: '100%' }}>
+                <InvoicesContextProvider>
+                  <InvoicesList />
+                </InvoicesContextProvider>
+              </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
                   <__experimental_PaymentSources />
