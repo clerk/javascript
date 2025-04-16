@@ -1,5 +1,112 @@
 # Change Log
 
+## 1.29.0
+
+### Minor Changes
+
+- Adds the following functionality for Instances to the Backend API client. ([#5600](https://github.com/clerk/javascript/pull/5600)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.instance.get();
+    await clerkClient.instance.update({...});
+    await clerkClient.instance.updateRestrictions({...});
+    await clerkClient.instance.updateOrganizationSettings({...});
+  ```
+
+- Adds the ability to perform CRUD operations on OAuth Applications to the Backend API client. ([#5599](https://github.com/clerk/javascript/pull/5599)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.oauthApplications.list({...});
+    await clerkClient.oauthApplications.get('templateId');
+    await clerkClient.oauthApplications.create({...});
+    await clerkClient.oauthApplications.update({...});
+    await clerkClient.oauthApplications.delete('templateId');
+    await clerkClient.oauthApplications.rotateSecret('templateId');
+  ```
+
+- Adds domain endpoints to the Backend API client. ([#5621](https://github.com/clerk/javascript/pull/5621)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+    await clerkClient.domains.list();
+    await clerkClient.domains.add({...});
+    await clerkClient.domains.update({...});
+    await clerkClient.domains.delete('satelliteDomainId');
+  ```
+
+- Adds the ability to retrieve and update Sign Up Attempts to the Backend API client. ([#5625](https://github.com/clerk/javascript/pull/5625)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.signUps.get('signUpAttemptId');
+    await clerkClient.signUps.update({...});
+  ```
+
+- Adds the ability to change production domains [beta] to the Backend API client. ([#5633](https://github.com/clerk/javascript/pull/5633)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.betaFeatures.changeDomain({
+      homeUrl: 'https://www.example.com',
+      isSecondary: false,
+    });
+  ```
+
+### Patch Changes
+
+- Append expired status to invitation types ([#5646](https://github.com/clerk/javascript/pull/5646)) by [@tmilewski](https://github.com/tmilewski)
+
+- Improve JSDoc comments ([#5630](https://github.com/clerk/javascript/pull/5630)) by [@LekoArts](https://github.com/LekoArts)
+
+- Include `expiresAt` in OAuth access token resource ([#5631](https://github.com/clerk/javascript/pull/5631)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Update typing of Organization.slug ([#5636](https://github.com/clerk/javascript/pull/5636)) by [@tmilewski](https://github.com/tmilewski)
+
+- Adds the ability to list and create waitlist entries to the Backend API client. ([#5591](https://github.com/clerk/javascript/pull/5591)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    await clerkClient.waitlistEntries.list({...});
+    await clerkClient.waitlistEntries.create({
+      emailAddress: 'you@yourdomain.com',
+      notify: true
+    });
+  ```
+
+- Adds the ability to create and revoke actor tokens to the Backend API client. ([#5585](https://github.com/clerk/javascript/pull/5585)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```ts
+    import { createClerkClient } from '@clerk/backend';
+
+    const clerkClient = createClerkClient(...);
+
+    const { id } = await clerkClient.actorTokens.create({...});
+    await clerkClient.actorTokens.revoke(id);
+  ```
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+  - @clerk/shared@3.7.1
+
 ## 1.28.0
 
 ### Minor Changes
