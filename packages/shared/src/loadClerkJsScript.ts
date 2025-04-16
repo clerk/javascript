@@ -61,11 +61,13 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
       });
     });
 
-    const loaded = await Promise.race([
-      attemptExisting,
-      // @ts-ignore
-      window.__clerk_script_promise,
-    ])
+    const promisesToRace = [attemptExisting];
+
+    if (typeof window?.__clerk_script_promise?.then === 'function') {
+      promisesToRace.push(window?.__clerk_script_promise);
+    }
+
+    const loaded = await Promise.race(promisesToRace)
       .then(() => true)
       .catch(msg => {
         if (msg) {
