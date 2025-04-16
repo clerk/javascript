@@ -12,6 +12,7 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
   currencySymbol!: string;
   currency!: string;
   description!: string;
+  isDefault!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
   payerType!: string[];
@@ -19,7 +20,6 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
   slug!: string;
   avatarUrl!: string;
   features!: __experimental_CommerceFeature[];
-  subscriptionIdForCurrentSubscriber: string | undefined;
 
   constructor(data: __experimental_CommercePlanJSON) {
     super();
@@ -40,6 +40,7 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
     this.currencySymbol = data.currency_symbol;
     this.currency = data.currency;
     this.description = data.description;
+    this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
     this.payerType = data.payer_type;

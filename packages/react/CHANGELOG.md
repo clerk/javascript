@@ -1,5 +1,55 @@
 # Change Log
 
+## 5.28.0
+
+### Minor Changes
+
+- Add support for feature or plan based authorization ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## `useAuth()`
+
+  ### Plan
+
+  - `useAuth().has({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `useAuth().has({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `useAuth().has({ feature: "org:my-feature" })`
+  - `useAuth().has({ feature: "user:my-feature" })`
+  - `useAuth().has({ plan: "user:my-plan" })`
+  - `useAuth().has({ plan: "org:my-plan" })`
+
+  ## `<Protect />`
+
+  ### Plan
+
+  - `<Protect plan="my-plan" />`
+
+  ### Feature
+
+  - `<Protect feature="my-feature" />`
+
+  ### Scoped per user or per org
+
+  - `<Protect feature="org:my-feature" />`
+  - `<Protect feature="user:my-feature" />`
+  - `<Protect plan="org:my-plan" />`
+  - `<Protect plan="user:my-plan" />`
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+
 ## 5.27.0
 
 ### Minor Changes

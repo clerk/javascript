@@ -88,6 +88,9 @@ type _LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
+  badge__upcomingPlan: LocalizationValue;
+  badge__startsAt: LocalizationValue;
+  badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
@@ -103,7 +106,11 @@ type _LocalizationResource = {
     month: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
-    manageMembership: LocalizationValue;
+    manage: LocalizationValue;
+    manageSubscription: LocalizationValue;
+    cancelSubscription: LocalizationValue;
+    keepSubscription: LocalizationValue;
+    reSubscribe: LocalizationValue;
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
@@ -433,11 +440,11 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         /**
-         * @deprecated UserProfile now only uses `actionLabel__connectionFailed`.
+         * @deprecated Use `actionLabel__connectionFailed` instead.
          */
         actionLabel__reauthorize: LocalizationValue;
         /**
-         * @deprecated UserProfile now uses `subtitle__disconnected`.
+         * @deprecated Use `subtitle__disconnected` instead.
          */
         subtitle__reauthorize: LocalizationValue;
         subtitle__disconnected: LocalizationValue;
@@ -510,7 +517,7 @@ type _LocalizationResource = {
       formHint: LocalizationValue;
       emailCode: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -520,7 +527,7 @@ type _LocalizationResource = {
       };
       emailLink: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -659,6 +666,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
         headerTitle__paymentSources: LocalizationValue;
       };
