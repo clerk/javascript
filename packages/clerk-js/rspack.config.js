@@ -157,8 +157,10 @@ const svgLoader = () => {
   };
 };
 
-/** @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderProd = ({ targets, useCoreJs = false }) => {
+/** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
+const typescriptLoaderProd = (
+  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
+) => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
@@ -246,9 +248,11 @@ const typescriptLoaderDev = () => {
 
 /**
  * Used for production builds that have dynamicly loaded chunks.
- * @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
+ * @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
  * */
-const commonForProdChunked = ({ targets, useCoreJs = false }) => {
+const commonForProdChunked = (
+  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
+) => {
   return {
     module: {
       rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
@@ -258,9 +262,11 @@ const commonForProdChunked = ({ targets, useCoreJs = false }) => {
 
 /**
  * Used for production builds that combine all files into one single file (such as for Chrome Extensions).
- * @type { (opts: { targets: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
+ * @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').Configuration) }
  * */
-const commonForProdBundled = ({ targets, useCoreJs = false }) => {
+const commonForProdBundled = (
+  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
+) => {
   return {
     module: {
       rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
@@ -361,7 +367,7 @@ const prodConfig = ({ mode, env, analysis }) => {
       : {},
     common({ mode, variant: variants.clerkBrowser }),
     commonForProd(),
-    commonForProdChunked({ targets: packageJSON.browserslist }),
+    commonForProdChunked(),
   );
 
   const clerkLegacyBrowser = merge(
@@ -375,7 +381,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkHeadless),
     common({ mode, variant: variants.clerkHeadless }),
     commonForProd(),
-    commonForProdChunked({ targets: packageJSON.browserslist }),
+    commonForProdChunked(),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
     // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
     // chunking in our browser bundles.
@@ -394,7 +400,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkHeadlessBrowser),
     common({ mode, variant: variants.clerkHeadlessBrowser }),
     commonForProd(),
-    commonForProdChunked({ targets: packageJSON.browserslist }),
+    commonForProdChunked(),
     // externalsForHeadless(),
   );
 
@@ -402,7 +408,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
     commonForProd(),
-    commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForProdBundled(),
     {
       experiments: {
         outputModule: true,
@@ -429,7 +435,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
     commonForProd(),
-    commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForProdBundled(),
     {
       output: {
         filename: '[name].js',
@@ -468,7 +474,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkNoRHC),
     common({ mode, disableRHC: true, variant: variants.clerkNoRHC }),
     commonForProd(),
-    commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForProdBundled(),
     commonForNoRHC(),
     {
       experiments: {
@@ -485,7 +491,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkNoRHC),
     common({ mode, disableRHC: true, variant: variants.clerkNoRHC }),
     commonForProd(),
-    commonForProdBundled({ targets: packageJSON.browserslist }),
+    commonForProdBundled(),
     commonForNoRHC(),
     {
       output: {
