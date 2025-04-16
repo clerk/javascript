@@ -162,7 +162,7 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
   externalGatewayId: string;
-  invoice?: __experimental_CommerceInvoiceResource;
+  invoice_id: string;
   paymentSource?: __experimental_CommercePaymentSourceResource;
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;

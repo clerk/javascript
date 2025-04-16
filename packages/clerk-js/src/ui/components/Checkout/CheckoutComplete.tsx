@@ -107,11 +107,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
-              text={
-                checkout.invoice
-                  ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-                  : '–'
-              }
+              text={`${checkout.totals.grandTotal.currencySymbol}${checkout.totals.grandTotal.amountFormatted}`}
             />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
@@ -137,7 +133,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='tertiary'>
             <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__invoiceId')} />
             <LineItems.Description
-              text={checkout.invoice ? checkout.invoice.id : '–'}
+              text={checkout.invoice_id || '–'}
               truncateText
               copyText
               copyLabel='Copy invoice ID'

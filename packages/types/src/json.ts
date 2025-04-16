@@ -682,7 +682,7 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice?: __experimental_CommerceInvoiceJSON;
+  invoice_id: string;
   payment_source?: __experimental_CommercePaymentSourceJSON;
   plan: __experimental_CommercePlanJSON;
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;
