@@ -59,6 +59,7 @@ type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 90
 type FontWeightScale = {
   normal?: FontWeightNamedValue | FontWeightNumericValue;
   medium?: FontWeightNamedValue | FontWeightNumericValue;
+  semibold?: FontWeightNamedValue | FontWeightNumericValue;
   bold?: FontWeightNamedValue | FontWeightNumericValue;
 };
 
