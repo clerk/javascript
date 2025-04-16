@@ -109,17 +109,15 @@ const CheckoutFormElements = ({
   const { data: paymentSources } = data || { data: [] };
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    return checkout
-      .confirm({
+    try {
+      const newCheckout = await checkout.confirm({
         paymentSourceId,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      })
-      .then(newCheckout => {
-        onCheckoutComplete(newCheckout);
-      })
-      .catch(error => {
-        throw error;
       });
+      onCheckoutComplete(newCheckout);
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
   };
 
   const onPaymentSourceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -130,17 +128,13 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    try {
-      await confirmCheckout({ paymentSourceId });
-    } catch (error) {
-      handleError(error, [], setSubmitError);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await confirmCheckout({ paymentSourceId });
+    setIsSubmitting(false);
   };
 
   const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
     await confirmCheckout({ paymentSourceId: paymentSource.id });
+    setIsSubmitting(false);
   };
 
   return (
