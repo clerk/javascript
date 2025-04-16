@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Add invoices and invoice UI
+Add invoices data fetching and invoice UI to org and user profile.
