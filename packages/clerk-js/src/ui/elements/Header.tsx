@@ -78,12 +78,18 @@ const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element 
           display: 'inline-flex',
           alignItems: 'center',
           gap: t.space.$2,
+          '&:hover': {
+            textDecoration: 'none',
+          },
         },
         sx,
       ]}
       {...rest}
     >
-      <Icon icon={ArrowLeftIcon} />
+      <Icon
+        icon={ArrowLeftIcon}
+        sx={t => ({ color: t.colors.$colorText })}
+      />
       {children}
     </Link>
   );
