@@ -11,7 +11,11 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
   SignInProps,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -51,7 +55,8 @@ type ComponentMode = 'modal' | 'mounted';
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
   mode?: ComponentMode;
-};
+} & SignInFallbackRedirectUrl &
+  SignInForceRedirectUrl;
 
 export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
@@ -68,7 +73,8 @@ export type SignUpCtx = SignUpProps & {
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
   ssoCallbackUrl?: string;
-};
+} & SignUpFallbackRedirectUrl &
+  SignUpForceRedirectUrl;
 
 export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
