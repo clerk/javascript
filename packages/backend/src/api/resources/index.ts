@@ -17,8 +17,9 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpStatus,
 } from './Enums';
+
+export type { SignUpStatus } from '@clerk/types';
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
@@ -39,6 +40,7 @@ export * from './ProxyCheck';
 export * from './RedirectUrl';
 export * from './Session';
 export * from './SignInTokens';
+export * from './SignUpAttempt';
 export * from './SMSMessage';
 export * from './Token';
 export * from './User';
