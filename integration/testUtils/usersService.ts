@@ -56,7 +56,7 @@ export type UserService = {
   /**
    * Creates a BAPI user if it doesn't exist, otherwise returns the existing user.
    */
-  ensureBapiUserExists: (fakeUser: FakeUser) => Promise<User>;
+  getOrCreateUser: (fakeUser: FakeUser) => Promise<User>;
   deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
@@ -106,7 +106,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         skipPasswordRequirement: fakeUser.password === undefined,
       });
     },
-    ensureBapiUserExists: async fakeUser => {
+    getOrCreateUser: async fakeUser => {
       const existingUser = await self.getUser({ email: fakeUser.email });
       if (existingUser) {
         return existingUser;

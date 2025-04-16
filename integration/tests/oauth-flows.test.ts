@@ -119,7 +119,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     // The user already exists on the OAuth provider instance, but we want to make sure that the user is created on the
     // app instance as well so that their sign up is transferred to a sign in.
-    await u.services.users.ensureBapiUserExists(fakeUser);
+    await u.services.users.getOrCreateUser(fakeUser);
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
