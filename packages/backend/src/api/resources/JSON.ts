@@ -35,8 +35,7 @@ export const ObjectType = {
   MachineToken: 'machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
-  OauthApplicationToken: 'oauth_application_token', // TODO: This has the oauth_access_token url as well
-  // TODO: Add clerk_idp_oauth_access_token
+  IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
   OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -647,20 +646,22 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface MachineTokenJSON {
-  id: string;
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
   name: string;
   subject: string;
   claims: Record<string, string> | null;
-  creation_reason?: string | null;
+  revoked: boolean;
+  expired: boolean;
+  expiration: number | null;
   created_by: string | null;
-  seconds_until_expiration: number;
+  creation_reason: string | null;
   created_at: number;
-  expires_at: number | null;
+  updated_at: number;
 }
 
-export interface APIKeyJSON {
-  id: string;
+export interface APIKeyJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ApiKey;
   type: string;
   name: string;
   subject: string;
@@ -672,9 +673,9 @@ export interface APIKeyJSON {
   expires_at: number | null;
 }
 
-export interface OauthApplicationTokenJSON {
-  id: string;
-  type: string; // right now it's just oauth:access_token
+export interface OauthApplicationTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.IdpOAuthAccessToken;
+  type: string;
   name: string;
   subject: string;
   claims: Record<string, string> | null;
