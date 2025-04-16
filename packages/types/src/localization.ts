@@ -114,6 +114,18 @@ type _LocalizationResource = {
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
+    checkout: {
+      title__paymentSuccessful: LocalizationValue;
+      title__subscriptionSuccessful: LocalizationValue;
+      description__paymentSuccessful: LocalizationValue;
+      description__subscriptionSuccessful: LocalizationValue;
+      lineItems: {
+        title__totalPaid: LocalizationValue;
+        title__paymentMethod: LocalizationValue;
+        title__invoiceId: LocalizationValue;
+        title__subscriptionBegins: LocalizationValue;
+      };
+    };
   };
   signUp: {
     start: {
