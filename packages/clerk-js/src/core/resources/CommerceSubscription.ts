@@ -18,7 +18,9 @@ export class __experimental_CommerceSubscription
   plan!: __experimental_CommercePlan;
   planPeriod!: __experimental_CommerceSubscriptionPlanPeriod;
   status!: __experimental_CommerceSubscriptionStatus;
-
+  periodStart!: number;
+  periodEnd!: number;
+  canceledAt!: number | null;
   constructor(data: __experimental_CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
@@ -34,7 +36,9 @@ export class __experimental_CommerceSubscription
     this.plan = new __experimental_CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
-
+    this.periodStart = data.period_start;
+    this.periodEnd = data.period_end;
+    this.canceledAt = data.canceled_at;
     return this;
   }
 

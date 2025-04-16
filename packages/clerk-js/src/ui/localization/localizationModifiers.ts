@@ -19,6 +19,18 @@ const weekday = (val: Date | string | number, locale?: string, weekday?: 'long' 
   }
 };
 
+const shortDate = (val: Date | string | number, locale?: string) => {
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US', {
+      month: 'short',
+      day: 'numeric',
+    }).format(normalizeDate(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
 const numeric = (val: Date | number | string, locale?: string) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US').format(normalizeDate(val));
@@ -38,4 +50,5 @@ export const MODIFIERS = {
   weekday,
   numeric,
   link,
+  shortDate,
 } as const;

@@ -24,7 +24,7 @@ export interface ClientResource extends ClerkResource {
   __internal_sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   __internal_toSnapshot: () => ClientJSONSnapshot;
   /**
-   * @deprecated Use `signedInSessions` instead
+   * @deprecated Use `signedInSessions` instead.
    */
   activeSessions: ActiveSessionResource[];
 }

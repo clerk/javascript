@@ -23,7 +23,8 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
         .toString(2)
         .padStart(permissions.length, '0')
         .split('')
-        .map(bit => Number.parseInt(bit, 10)),
+        .map(bit => Number.parseInt(bit, 10))
+        .reverse(),
     )
     .filter(Boolean);
 

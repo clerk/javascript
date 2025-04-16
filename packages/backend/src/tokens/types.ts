@@ -11,7 +11,8 @@ export type AuthenticateRequestOptions = {
    */
   domain?: string;
   /**
-   * Whether the instance is a satellite domain in a multi-domain setup. Defaults to `false`.
+   * Whether the instance is a satellite domain in a multi-domain setup.
+   * @default false
    */
   isSatellite?: boolean;
   /**
@@ -27,11 +28,13 @@ export type AuthenticateRequestOptions = {
    */
   signUpUrl?: string;
   /**
-   * Full URL or path to navigate to after successful sign in. Defaults to `/`.
+   * Full URL or path to navigate to after successful sign in.
+   * @default '/'
    */
   afterSignInUrl?: string;
   /**
-   * Full URL or path to navigate to after successful sign up. Defaults to `/`.
+   * Full URL or path to navigate to after successful sign up.
+   * @default '/'
    */
   afterSignUpUrl?: string;
   /**

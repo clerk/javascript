@@ -281,8 +281,8 @@ importers:
         specifier: 4.6.2
         version: 4.6.2(typedoc@0.28.2(typescript@5.8.3))
       typedoc-plugin-replace-text:
-        specifier: 4.1.0
-        version: 4.1.0(typedoc@0.28.2(typescript@5.8.3))
+        specifier: 4.2.0
+        version: 4.2.0(typedoc@0.28.2(typescript@5.8.3))
       typescript:
         specifier: catalog:repo
         version: 5.8.3
@@ -355,8 +355,8 @@ importers:
         version: 0.11.3
     devDependencies:
       astro:
-        specifier: ^5.5.5
-        version: 5.5.5(@types/node@22.14.0)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.39.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
+        specifier: ^5.6.1
+        version: 5.6.2(@types/node@22.14.0)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.39.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
 
   packages/backend:
     dependencies:
@@ -421,7 +421,7 @@ importers:
         version: 0.10.7
       type-fest:
         specifier: ^4.8.3
-        version: 4.38.0
+        version: 4.39.1
 
   packages/clerk-js:
     dependencies:
@@ -581,11 +581,11 @@ importers:
         specifier: ^8.2.2
         version: 8.2.2
       next:
-        specifier: 14.2.26
-        version: 14.2.26(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 14.2.28
+        version: 14.2.28(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       type-fest:
-        specifier: ^4.38.0
-        version: 4.38.0
+        specifier: ^4.39.1
+        version: 4.39.1
 
   packages/expo:
     dependencies:
@@ -3556,28 +3556,13 @@ packages:
     resolution: {integrity: sha512-z6okREyK8in0486a22Oro0k+YsuyEjDXJt46FpgeOgXqKJ9ElM8QPll0iuLBkpbH33ENiNbIPLd1cuClRQnhiw==}
     engines: {node: '>=18.0.0'}
 
-  '@next/env@14.2.26':
-    resolution: {integrity: sha512-vO//GJ/YBco+H7xdQhzJxF7ub3SUwft76jwaeOyVVQFHCi5DCnkP16WHB+JBylo4vOKPoZBlR94Z8xBxNBdNJA==}
-
   '@next/env@14.2.28':
     resolution: {integrity: sha512-PAmWhJfJQlP+kxZwCjrVd9QnR5x0R3u0mTXTiZDgSd4h5LdXmjxCCWbN9kq6hkZBOax8Rm3xDW5HagWyJuT37g==}
-
-  '@next/swc-darwin-arm64@14.2.26':
-    resolution: {integrity: sha512-zDJY8gsKEseGAxG+C2hTMT0w9Nk9N1Sk1qV7vXYz9MEiyRoF5ogQX2+vplyUMIfygnjn9/A04I6yrUTRTuRiyQ==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [darwin]
 
   '@next/swc-darwin-arm64@14.2.28':
     resolution: {integrity: sha512-kzGChl9setxYWpk3H6fTZXXPFFjg7urptLq5o5ZgYezCrqlemKttwMT5iFyx/p1e/JeglTwDFRtb923gTJ3R1w==}
     engines: {node: '>= 10'}
     cpu: [arm64]
-    os: [darwin]
-
-  '@next/swc-darwin-x64@14.2.26':
-    resolution: {integrity: sha512-U0adH5ryLfmTDkahLwG9sUQG2L0a9rYux8crQeC92rPhi3jGQEY47nByQHrVrt3prZigadwj/2HZ1LUUimuSbg==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
     os: [darwin]
 
   '@next/swc-darwin-x64@14.2.28':
@@ -3586,20 +3571,8 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@14.2.26':
-    resolution: {integrity: sha512-SINMl1I7UhfHGM7SoRiw0AbwnLEMUnJ/3XXVmhyptzriHbWvPPbbm0OEVG24uUKhuS1t0nvN/DBvm5kz6ZIqpg==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-
   '@next/swc-linux-arm64-gnu@14.2.28':
     resolution: {integrity: sha512-9ARHLEQXhAilNJ7rgQX8xs9aH3yJSj888ssSjJLeldiZKR4D7N08MfMqljk77fAwZsWwsrp8ohHsMvurvv9liQ==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@next/swc-linux-arm64-musl@14.2.26':
-    resolution: {integrity: sha512-s6JaezoyJK2DxrwHWxLWtJKlqKqTdi/zaYigDXUJ/gmx/72CrzdVZfMvUc6VqnZ7YEvRijvYo+0o4Z9DencduA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -3610,20 +3583,8 @@ packages:
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@14.2.26':
-    resolution: {integrity: sha512-FEXeUQi8/pLr/XI0hKbe0tgbLmHFRhgXOUiPScz2hk0hSmbGiU8aUqVslj/6C6KA38RzXnWoJXo4FMo6aBxjzg==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-
   '@next/swc-linux-x64-gnu@14.2.28':
     resolution: {integrity: sha512-nsiSnz2wO6GwMAX2o0iucONlVL7dNgKUqt/mDTATGO2NY59EO/ZKnKEr80BJFhuA5UC1KZOMblJHWZoqIJddpA==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-
-  '@next/swc-linux-x64-musl@14.2.26':
-    resolution: {integrity: sha512-BUsomaO4d2DuXhXhgQCVt2jjX4B4/Thts8nDoIruEJkhE5ifeQFtvW5c9JkdOtYvE5p2G0hcwQ0UbRaQmQwaVg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -3634,34 +3595,16 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-win32-arm64-msvc@14.2.26':
-    resolution: {integrity: sha512-5auwsMVzT7wbB2CZXQxDctpWbdEnEW/e66DyXO1DcgHxIyhP06awu+rHKshZE+lPLIGiwtjo7bsyeuubewwxMw==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [win32]
-
   '@next/swc-win32-arm64-msvc@14.2.28':
     resolution: {integrity: sha512-l61WZ3nevt4BAnGksUVFKy2uJP5DPz2E0Ma/Oklvo3sGj9sw3q7vBWONFRgz+ICiHpW5mV+mBrkB3XEubMrKaA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-ia32-msvc@14.2.26':
-    resolution: {integrity: sha512-GQWg/Vbz9zUGi9X80lOeGsz1rMH/MtFO/XqigDznhhhTfDlDoynCM6982mPCbSlxJ/aveZcKtTlwfAjwhyxDpg==}
-    engines: {node: '>= 10'}
-    cpu: [ia32]
-    os: [win32]
-
   '@next/swc-win32-ia32-msvc@14.2.28':
     resolution: {integrity: sha512-+Kcp1T3jHZnJ9v9VTJ/yf1t/xmtFAc/Sge4v7mVc1z+NYfYzisi8kJ9AsY8itbgq+WgEwMtOpiLLJsUy2qnXZw==}
     engines: {node: '>= 10'}
     cpu: [ia32]
-    os: [win32]
-
-  '@next/swc-win32-x64-msvc@14.2.26':
-    resolution: {integrity: sha512-2rdB3T1/Gp7bv1eQTTm9d1Y1sv9UuJ2LAwOE0Pe2prHKe32UNscj7YS13fRB37d0GAiGNR+Y7ZcW8YjDI8Ns0w==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
     os: [win32]
 
   '@next/swc-win32-x64-msvc@14.2.28':
@@ -6033,8 +5976,8 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
 
-  astro@5.5.5:
-    resolution: {integrity: sha512-fdnnK5dhWNIQT/cXzvaGs9il4T5noi4jafobdntbuNOrRxI1JnOxDfrtBadUo6cknCRCFhYrXh4VndCqj1a4Sg==}
+  astro@5.6.2:
+    resolution: {integrity: sha512-Ds4x3Au2s+YfBKLXY2HCHird+73ff4wTds+cuAGqaHmY4GR+Gc+sCAP54Mq6blkpuFqXwqjPUAcmxvAwovJPGQ==}
     engines: {node: ^18.17.1 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -10708,24 +10651,6 @@ packages:
   nested-error-stacks@2.1.1:
     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
 
-  next@14.2.26:
-    resolution: {integrity: sha512-b81XSLihMwCfwiUVRRja3LphLo4uBBMZEzBBWMaISbKTwOmq3wPknIETy/8000tr7Gq4WmbuFYPS7jOYIf+ZJw==}
-    engines: {node: '>=18.17.0'}
-    hasBin: true
-    peerDependencies:
-      '@opentelemetry/api': ^1.1.0
-      '@playwright/test': ^1.41.2
-      react: ^18.2.0
-      react-dom: ^18.2.0
-      sass: ^1.3.0
-    peerDependenciesMeta:
-      '@opentelemetry/api':
-        optional: true
-      '@playwright/test':
-        optional: true
-      sass:
-        optional: true
-
   next@14.2.28:
     resolution: {integrity: sha512-QLEIP/kYXynIxtcKB6vNjtWLVs3Y4Sb+EClTC/CSVzdLD1gIuItccpu/n1lhmduffI32iPGEK2cLLxxt28qgYA==}
     engines: {node: '>=18.17.0'}
@@ -13497,8 +13422,8 @@ packages:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
 
-  type-fest@4.38.0:
-    resolution: {integrity: sha512-2dBz5D5ycHIoliLYLi0Q2V7KRaDlH0uWIvmk7TYlAg5slqwiPv1ezJdZm1QEM0xgk29oYWMCbIG7E6gHpvChlg==}
+  type-fest@4.39.1:
+    resolution: {integrity: sha512-uW9qzd66uyHYxwyVBYiwS4Oi0qZyUqwjU+Oevr6ZogYiXt99EOYtwvzMSLw1c3lYo2HzJsep/NB23iEVEgjG/w==}
     engines: {node: '>=16'}
 
   type-is@1.6.18:
@@ -13531,10 +13456,10 @@ packages:
     peerDependencies:
       typedoc: 0.28.x
 
-  typedoc-plugin-replace-text@4.1.0:
-    resolution: {integrity: sha512-t/vOiGzhcK+8oVQRt6kJ19RKFN5zwQlDiXyx2eWywG7xHt0lSUcfttroGwNLIBnNEd2rLAwe5YVPhSjVoYHBag==}
+  typedoc-plugin-replace-text@4.2.0:
+    resolution: {integrity: sha512-vmhpFKg75l0CfHO7n3bdf/wwSWH6hQQxaZTqZ5HDe5Xd40tkk6jkVkP6SWhDhntSIflREQqwneflGJG3bCqPEA==}
     peerDependencies:
-      typedoc: 0.26.x || 0.27.x
+      typedoc: 0.26.x || 0.27.x || 0.28.x
 
   typedoc@0.28.2:
     resolution: {integrity: sha512-9Giuv+eppFKnJ0oi+vxqLM817b/IrIsEMYgy3jj6zdvppAfDqV3d6DXL2vXUg2TnlL62V48th25Zf/tcQKAJdg==}
@@ -14613,8 +14538,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod-to-json-schema@3.24.3:
-    resolution: {integrity: sha512-HIAfWdYIt1sssHfYZFCXp4rU1w2r8hVVXYIlmoa0r0gABLs5di3RCqPU5DDROogVz1pAdYBaz7HK5n9pSUNs3A==}
+  zod-to-json-schema@3.24.5:
+    resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
     peerDependencies:
       zod: ^3.24.1
 
@@ -14686,7 +14611,7 @@ snapshots:
     dependencies:
       '@ai-sdk/provider': 1.0.7
       '@ai-sdk/provider-utils': 2.1.6(zod@3.24.2)
-      zod-to-json-schema: 3.24.3(zod@3.24.2)
+      zod-to-json-schema: 3.24.5(zod@3.24.2)
     optionalDependencies:
       zod: 3.24.2
 
@@ -17383,7 +17308,7 @@ snapshots:
       p-retry: 4.6.2
       uuid: 10.0.0
       zod: 3.24.2
-      zod-to-json-schema: 3.24.3(zod@3.24.2)
+      zod-to-json-schema: 3.24.5(zod@3.24.2)
     transitivePeerDependencies:
       - openai
 
@@ -17544,7 +17469,7 @@ snapshots:
       pkce-challenge: 4.1.0
       raw-body: 3.0.0
       zod: 3.24.2
-      zod-to-json-schema: 3.24.3(zod@3.24.2)
+      zod-to-json-schema: 3.24.5(zod@3.24.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -17591,59 +17516,30 @@ snapshots:
 
   '@netlify/serverless-functions-api@1.36.0': {}
 
-  '@next/env@14.2.26': {}
-
   '@next/env@14.2.28': {}
 
-  '@next/swc-darwin-arm64@14.2.26':
-    optional: true
-
   '@next/swc-darwin-arm64@14.2.28':
-    optional: true
-
-  '@next/swc-darwin-x64@14.2.26':
     optional: true
 
   '@next/swc-darwin-x64@14.2.28':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@14.2.26':
-    optional: true
-
   '@next/swc-linux-arm64-gnu@14.2.28':
-    optional: true
-
-  '@next/swc-linux-arm64-musl@14.2.26':
     optional: true
 
   '@next/swc-linux-arm64-musl@14.2.28':
     optional: true
 
-  '@next/swc-linux-x64-gnu@14.2.26':
-    optional: true
-
   '@next/swc-linux-x64-gnu@14.2.28':
-    optional: true
-
-  '@next/swc-linux-x64-musl@14.2.26':
     optional: true
 
   '@next/swc-linux-x64-musl@14.2.28':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@14.2.26':
-    optional: true
-
   '@next/swc-win32-arm64-msvc@14.2.28':
     optional: true
 
-  '@next/swc-win32-ia32-msvc@14.2.26':
-    optional: true
-
   '@next/swc-win32-ia32-msvc@14.2.28':
-    optional: true
-
-  '@next/swc-win32-x64-msvc@14.2.26':
     optional: true
 
   '@next/swc-win32-x64-msvc@14.2.28':
@@ -18562,7 +18458,7 @@ snapshots:
       cookie: 0.4.2
       set-cookie-parser: 2.6.0
       source-map: 0.7.4
-      type-fest: 4.38.0
+      type-fest: 4.39.1
     optionalDependencies:
       typescript: 5.8.3
 
@@ -21078,7 +20974,7 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astro@5.5.5(@types/node@22.14.0)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.39.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1):
+  astro@5.6.2(@types/node@22.14.0)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.27.0)(rollup@4.39.0)(terser@5.37.0)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1):
     dependencies:
       '@astrojs/compiler': 2.11.0
       '@astrojs/internal-helpers': 0.6.1
@@ -21135,7 +21031,7 @@ snapshots:
       yargs-parser: 21.1.1
       yocto-spinner: 0.2.1
       zod: 3.24.2
-      zod-to-json-schema: 3.24.3(zod@3.24.2)
+      zod-to-json-schema: 3.24.5(zod@3.24.2)
       zod-to-ts: 1.2.0(typescript@5.8.3)(zod@3.24.2)
     optionalDependencies:
       sharp: 0.33.5
@@ -21466,7 +21362,7 @@ snapshots:
       chalk: 5.4.1
       cli-boxes: 3.0.0
       string-width: 7.2.0
-      type-fest: 4.38.0
+      type-fest: 4.39.1
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
 
@@ -22717,7 +22613,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.38.0
+      type-fest: 4.39.1
 
   dotenv-expand@11.0.7:
     dependencies:
@@ -24888,7 +24784,7 @@ snapshots:
       slice-ansi: 7.1.0
       stack-utils: 2.0.6
       string-width: 7.2.0
-      type-fest: 4.38.0
+      type-fest: 4.39.1
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
       ws: 8.18.1
@@ -27020,7 +26916,7 @@ snapshots:
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
       strict-event-emitter: 0.5.1
-      type-fest: 4.38.0
+      type-fest: 4.39.1
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.8.3
@@ -27075,33 +26971,6 @@ snapshots:
   nested-error-stacks@2.0.1: {}
 
   nested-error-stacks@2.1.1: {}
-
-  next@14.2.26(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@next/env': 14.2.26
-      '@swc/helpers': 0.5.5
-      busboy: 1.6.0
-      caniuse-lite: 1.0.30001705
-      graceful-fs: 4.2.11
-      postcss: 8.4.31
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.1(@babel/core@7.26.9)(babel-plugin-macros@3.1.0)(react@18.3.1)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 14.2.26
-      '@next/swc-darwin-x64': 14.2.26
-      '@next/swc-linux-arm64-gnu': 14.2.26
-      '@next/swc-linux-arm64-musl': 14.2.26
-      '@next/swc-linux-x64-gnu': 14.2.26
-      '@next/swc-linux-x64-musl': 14.2.26
-      '@next/swc-win32-arm64-msvc': 14.2.26
-      '@next/swc-win32-ia32-msvc': 14.2.26
-      '@next/swc-win32-x64-msvc': 14.2.26
-      '@opentelemetry/api': 1.9.0
-      '@playwright/test': 1.44.1
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
 
   next@14.2.28(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(@playwright/test@1.44.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -27830,7 +27699,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.26.2
       index-to-position: 0.1.2
-      type-fest: 4.38.0
+      type-fest: 4.39.1
 
   parse-latin@7.0.0:
     dependencies:
@@ -28608,7 +28477,7 @@ snapshots:
       '@types/normalize-package-data': 2.4.4
       normalize-package-data: 6.0.2
       parse-json: 8.1.0
-      type-fest: 4.38.0
+      type-fest: 4.39.1
       unicorn-magic: 0.1.0
 
   read-yaml-file@1.1.0:
@@ -29390,7 +29259,7 @@ snapshots:
     dependencies:
       map-obj: 4.3.0
       snake-case: 3.0.4
-      type-fest: 4.38.0
+      type-fest: 4.39.1
 
   socket.io-adapter@2.5.5:
     dependencies:
@@ -30290,7 +30159,7 @@ snapshots:
 
   type-fest@3.13.1: {}
 
-  type-fest@4.38.0: {}
+  type-fest@4.39.1: {}
 
   type-is@1.6.18:
     dependencies:
@@ -30340,7 +30209,7 @@ snapshots:
     dependencies:
       typedoc: 0.28.2(typescript@5.8.3)
 
-  typedoc-plugin-replace-text@4.1.0(typedoc@0.28.2(typescript@5.8.3)):
+  typedoc-plugin-replace-text@4.2.0(typedoc@0.28.2(typescript@5.8.3)):
     dependencies:
       typedoc: 0.28.2(typescript@5.8.3)
 
@@ -31635,7 +31504,7 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod-to-json-schema@3.24.3(zod@3.24.2):
+  zod-to-json-schema@3.24.5(zod@3.24.2):
     dependencies:
       zod: 3.24.2
 

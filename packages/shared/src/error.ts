@@ -215,7 +215,7 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
 }
 
 /**
- * @deprecated Please use `EmailLinkErrorCodeStatus` instead.
+ * @deprecated Use `EmailLinkErrorCodeStatus` instead.
  *
  * @hidden
  */
