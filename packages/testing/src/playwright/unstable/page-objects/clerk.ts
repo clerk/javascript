@@ -1,4 +1,4 @@
-import { EnhancedPage } from './app';
+import type { EnhancedPage } from './app';
 
 export const createClerkPageObject = ({ page }: { page: EnhancedPage }) => {
   return {

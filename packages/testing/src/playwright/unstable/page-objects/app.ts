@@ -1,5 +1,6 @@
-import { setupClerkTestingToken } from '../../setupClerkTestingToken';
 import type { Page } from '@playwright/test';
+
+import { setupClerkTestingToken } from '../../setupClerkTestingToken';
 
 export type EnhancedPage = ReturnType<typeof createAppPageObject>;
 export const createAppPageObject = (

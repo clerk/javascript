@@ -1,5 +1,5 @@
-import { common } from './common';
 import type { EnhancedPage } from './app';
+import { common } from './common';
 
 type WaitlistFormInputs = {
   email: string;

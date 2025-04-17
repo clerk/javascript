@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+
 import type { EnhancedPage } from './app';
 
 export const createUserButtonPageObject = (testArgs: { page: EnhancedPage }) => {

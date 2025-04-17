@@ -1,18 +1,18 @@
-import { createAppPageObject } from './app';
 import type { Page } from '@playwright/test';
 
+import { createAppPageObject } from './app';
+import { createClerkPageObject } from './clerk';
+import { createExpectPageObject } from './expect';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
+import { createTestingTokenPageObject } from './testingToken';
 import { createUserButtonPageObject } from './userButton';
 import { createUserProfileComponentPageObject } from './userProfile';
 import { createUserVerificationComponentPageObject } from './userVerification';
 import { createWaitlistComponentPageObject } from './waitlist';
-import { createExpectPageObject } from './expect';
-import { createClerkPageObject } from './clerk';
-import { createTestingTokenPageObject } from './testingToken';
 
 export const createPageObjects = (
   page: Page,

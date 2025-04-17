@@ -1,6 +1,7 @@
-import { expect } from '@playwright/test';
-import type { EnhancedPage } from './app';
 import type { Response } from '@playwright/test';
+import { expect } from '@playwright/test';
+
+import type { EnhancedPage } from './app';
 
 export const createExpectPageObject = ({ page }: { page: EnhancedPage }) => {
   return {
