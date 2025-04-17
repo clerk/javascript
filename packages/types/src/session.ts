@@ -33,7 +33,7 @@ import type { Autocomplete } from './utils';
  */
 export type PendingSessionOptions = {
   /**
-   * Determines if pending sessions are considered as signed-out state.
+   * A boolean that indicates whether pending sessions are considered as signed out or not.
    * @default true
    */
   treatPendingAsSignedOut?: boolean;
