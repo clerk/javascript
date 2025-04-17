@@ -11,6 +11,7 @@ import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
+import pluginJsDoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -419,21 +420,14 @@ export default tseslint.config([
       'turbo/no-undeclared-env-vars': 'off',
     },
   },
-  ...pluginYml.configs['flat/recommended'],
   {
-    name: 'repo/.github',
-    // rules: {
-    // 'regex/invalid': [
-    //   'error',
-    //   [
-    //     {
-    //       regex: '^(?!.*\\$TURBO_ARGS( |$)).*turbo \\S+',
-    //       message: 'Invalid turbo CI command. Must contain `$TURBO_ARGS`',
-    //     },
-    //   ],
-    // ],
-    // },
+    name: 'repo/jsdoc',
+    ...pluginJsDoc.configs['flat/recommended-typescript'],
+    files: ['packages/shared/src/**/*.{ts,tsx}'],
+    plugins: {
+      jsdoc: pluginJsDoc,
+    },
   },
-
+  ...pluginYml.configs['flat/recommended'],
   configPrettier,
 ]);
