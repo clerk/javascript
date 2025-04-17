@@ -1,7 +1,10 @@
+import { usePlansContext } from '../../contexts';
 import { Badge, Box, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
 
 export function BillingSubscriptionsList() {
+  const { subscriptions } = usePlansContext();
+
   return (
     <Table tableHeadVisuallyHidden>
       <Thead>
@@ -12,20 +15,8 @@ export function BillingSubscriptionsList() {
         </Tr>
       </Thead>
       <Tbody>
-        {[
-          {
-            name: 'Platinum',
-            currentPlan: true,
-            price: '$128.89',
-            startDate: 'Jun 3',
-          },
-          {
-            name: 'Bronze',
-            price: '$18.89',
-            startDate: 'Jun 3',
-          },
-        ].map(row => (
-          <Tr key={row.name}>
+        {subscriptions.map(subscription => (
+          <Tr key={subscription.plan.name}>
             <Td>
               <Box
                 sx={t => ({
@@ -33,20 +24,23 @@ export function BillingSubscriptionsList() {
                   columnGap: t.space.$2,
                 })}
               >
-                <Text variant='subtitle'>{row.name}</Text>
+                <Text variant='subtitle'>{subscription.plan.name}</Text>
                 <Badge
-                  colorScheme={row.currentPlan ? 'secondary' : 'primary'}
+                  colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                   localizationKey={
-                    row.currentPlan
+                    subscription.status === 'active'
                       ? localizationKeys('badge__currentPlan')
-                      : localizationKeys('badge__startsAt', { date: row.startDate })
+                      : localizationKeys('badge__startsAt', { date: subscription.periodStart })
                   }
                 />
               </Box>
             </Td>
             <Td>
               <Text variant='subtitle'>
-                {row.price}
+                {subscription.plan.currencySymbol}
+                {subscription.planPeriod === 'annual'
+                  ? subscription.plan.annualMonthlyAmountFormatted
+                  : subscription.plan.amountFormatted}
                 <Span
                   sx={t => ({
                     color: t.colors.$colorTextSecondary,
