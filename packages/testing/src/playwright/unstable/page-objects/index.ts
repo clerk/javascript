@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 import { createAppPageObject } from './app';
 import { createClerkPageObject } from './clerk';
 import { createExpectPageObject } from './expect';
+import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createSessionTaskComponentPageObject } from './sessionTask';
@@ -30,6 +31,7 @@ export const createPageObjects = ({
     page: app,
     clerk: createClerkPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
+    impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),

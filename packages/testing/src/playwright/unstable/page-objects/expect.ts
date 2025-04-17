@@ -26,6 +26,11 @@ export const createExpectPageObject = ({ page }: { page: EnhancedPage }) => {
         return !!window.Clerk?.user;
       });
     },
+    toBeSignedInAsActor: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.session?.actor;
+      });
+    },
     toHaveResolvedTask: async () => {
       return page.waitForFunction(() => {
         return !window.Clerk?.session?.currentTask;

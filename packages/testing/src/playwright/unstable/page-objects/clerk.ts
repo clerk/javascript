@@ -7,6 +7,11 @@ export const createClerkPageObject = ({ page }: { page: EnhancedPage }) => {
         return !!window.Clerk?.loaded;
       });
     },
+    getClientSideActor: () => {
+      return page.evaluate(() => {
+        return window.Clerk?.session?.actor;
+      });
+    },
     getClientSideUser: () => {
       return page.evaluate(() => {
         return window.Clerk?.user;
