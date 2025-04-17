@@ -24,7 +24,7 @@ declare global {
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
   /**
-   * Define the URL that `@clerk/clerk-js` should be hot-loaded from
+   * The URL that `@clerk/clerk-js` should be hot-loaded from.
    */
   clerkJSUrl?: string;
   /**
@@ -32,7 +32,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSVariant?: 'headless' | '';
   /**
-   * Define the npm version for `@clerk/clerk-js`
+   * The npm version for `@clerk/clerk-js`.
    */
   clerkJSVersion?: string;
   /**
