@@ -27,13 +27,15 @@ export function handleNetlifyCacheInDevInstance({
   locationHeader,
   requestStateHeaders,
   publishableKey,
+  netlifyEnv,
 }: {
   locationHeader: string;
   requestStateHeaders: Headers;
   publishableKey: string;
+  netlifyEnv?: string;
 }) {
   // Pre-defined build variable on Netlify
-  const isOnNetlify = getEnvVariable('NETLIFY');
+  const isOnNetlify = Boolean(netlifyEnv || getEnvVariable('NETLIFY'));
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
