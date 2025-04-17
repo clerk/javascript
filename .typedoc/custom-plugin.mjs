@@ -81,6 +81,10 @@ function getCatchAllReplacements() {
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
+      pattern: /\| `SignInResource` \|/,
+      replace: '| [SignInResource](/docs/references/javascript/sign-in) |',
+    },
+    {
       /**
        * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
        */

@@ -180,7 +180,7 @@ export type UseSessionReturn =
        */
       isSignedIn: undefined;
       /**
-       * Holds the current active session for the user.
+       * The current active session for the user.
        */
       session: undefined;
     }
@@ -233,7 +233,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The `User` object for the current user.
        */
       user: undefined;
     }

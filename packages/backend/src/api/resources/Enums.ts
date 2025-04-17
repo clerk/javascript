@@ -21,7 +21,7 @@ export type OAuthProvider =
 
 export type OAuthStrategy = `oauth_${OAuthProvider}`;
 
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 
 export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 
@@ -33,7 +33,7 @@ export type OrganizationMembershipRole = OrganizationCustomRoleKey;
 
 export type SignInStatus = 'needs_identifier' | 'needs_factor_one' | 'needs_factor_two' | 'complete';
 
-export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';
+export type SignUpVerificationNextAction = 'needs_prepare' | 'needs_attempt' | '';
 
 export type InvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
 

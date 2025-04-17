@@ -342,7 +342,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                   <Badge
                     elementDescriptor={descriptors.pricingTableCardBadge}
                     localizationKey={localizationKeys('badge__currentPlan')}
-                    colorScheme={'primary'}
+                    colorScheme={'secondary'}
                   />
                 ) : (
                   <Badge
@@ -350,7 +350,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                     localizationKey={localizationKeys('badge__startsAt', {
                       date: subscription?.periodStart,
                     })}
-                    colorScheme={'secondary'}
+                    colorScheme={'primary'}
                   />
                 )}
               </Span>

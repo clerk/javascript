@@ -17,15 +17,16 @@ import { invalidStateError } from '../errors/messages';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
-type Nullish<T> = T | undefined | null;
-type InitialAuthState = Record<string, any>;
 /**
  * @inline
  */
-type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
+type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
+ *
+ * > [!NOTE]
+ * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/references/backend/types/auth-object).
  *
  * <If sdk="nextjs">
  * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
@@ -34,7 +35,7 @@ type UseAuthOptions = Nullish<InitialAuthState | PendingSessionOptions>;
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [initialAuthStateOrOptions] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
+ * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
  *
  * @function
  *

@@ -1,5 +1,6 @@
 import type {
   __experimental_CheckoutProps,
+  __experimental_CommerceInvoiceResource,
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionResource,
@@ -10,7 +11,11 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
   SignInProps,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -50,7 +55,8 @@ type ComponentMode = 'modal' | 'mounted';
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
   mode?: ComponentMode;
-};
+} & SignInFallbackRedirectUrl &
+  SignInForceRedirectUrl;
 
 export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
@@ -67,7 +73,8 @@ export type SignUpCtx = SignUpProps & {
   mode?: ComponentMode;
   emailLinkRedirectUrl?: string;
   ssoCallbackUrl?: string;
-};
+} & SignUpFallbackRedirectUrl &
+  SignUpForceRedirectUrl;
 
 export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
@@ -116,6 +123,16 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
   subscriberType?: __experimental_CommerceSubscriberType;
+};
+
+export type __experimental_InvoicesCtx = {
+  componentName: 'Invoices';
+  subscriberType: __experimental_CommerceSubscriberType;
+  invoices: __experimental_CommerceInvoiceResource[];
+  totalCount: number;
+  isLoading: boolean;
+  revalidate: () => void;
+  getInvoiceById: (invoiceId: string) => __experimental_CommerceInvoiceResource | undefined;
 };
 
 export type __experimental_PlansCtx = {

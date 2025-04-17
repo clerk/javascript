@@ -13,6 +13,18 @@ export const enUS: LocalizationResource = {
     reSubscribe: 'Re-subscribe',
     month: 'Month',
     switchPlan: 'Switch to this plan',
+    checkout: {
+      title__paymentSuccessful: 'Payment was successful!',
+      title__subscriptionSuccessful: 'Success!',
+      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__subscriptionSuccessful: 'Your new subscription is all set.',
+      lineItems: {
+        title__totalPaid: 'Total paid',
+        title__paymentMethod: 'Payment method',
+        title__invoiceId: 'Invoice ID',
+        title__subscriptionBegins: 'Subscription begins',
+      },
+    },
   },
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
