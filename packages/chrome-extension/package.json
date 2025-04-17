@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.2.28",
+  "version": "2.2.30",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",

@@ -23,11 +23,14 @@ export interface __experimental_CommerceBillingNamespace {
   getSubscriptions: (
     params: __experimental_GetSubscriptionsParams,
   ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
+  getInvoices: (
+    params: __experimental_GetInvoicesParams,
+  ) => Promise<ClerkPaginatedResponse<__experimental_CommerceInvoiceResource>>;
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
 
 export type __experimental_CommerceSubscriberType = 'org' | 'user';
-export type __experimental_CommerceSubscriptionStatus = 'active' | 'canceled';
+export type __experimental_CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming';
 export type __experimental_CommerceSubscriptionPlanPeriod = 'month' | 'annual';
 
 export interface __experimental_CommerceProductResource extends ClerkResource {
@@ -52,6 +55,7 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   currencySymbol: string;
   currency: string;
   description: string;
+  isDefault: boolean;
   isRecurring: boolean;
   hasBaseFee: boolean;
   payerType: string[];
@@ -59,7 +63,6 @@ export interface __experimental_CommercePlanResource extends ClerkResource {
   slug: string;
   avatarUrl: string;
   features: __experimental_CommerceFeatureResource[];
-  subscriptionIdForCurrentSubscriber: string | undefined;
 }
 
 export interface __experimental_CommerceFeatureResource extends ClerkResource {
@@ -103,6 +106,10 @@ export interface __experimental_CommerceInitializedPaymentSourceResource extends
   externalGatewayId: string;
 }
 
+export type __experimental_GetInvoicesParams = WithOptionalOrgType<ClerkPaginationParams>;
+
+export type __experimental_CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due';
+
 export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
   planId: string;
@@ -110,7 +117,7 @@ export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   totals: __experimental_CommerceTotals;
   paymentDueOn: number;
   paidOn: number;
-  status: string;
+  status: __experimental_CommerceInvoiceStatus;
 }
 
 export type __experimental_GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
@@ -122,6 +129,9 @@ export interface __experimental_CommerceSubscriptionResource extends ClerkResour
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   status: __experimental_CommerceSubscriptionStatus;
+  periodStart: number;
+  periodEnd: number;
+  canceledAt: number | null;
   cancel: (params: __experimental_CancelSubscriptionParams) => Promise<DeletedObjectResource>;
 }
 
@@ -152,7 +162,7 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
   externalGatewayId: string;
-  invoice?: __experimental_CommerceInvoiceResource;
+  invoice_id: string;
   paymentSource?: __experimental_CommercePaymentSourceResource;
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;

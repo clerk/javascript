@@ -54,7 +54,7 @@ type BuildRequestOptions = {
   userAgent?: string;
   /**
    * Allow requests without specifying a secret key. In most cases this should be set to `false`.
-   * Defaults to `true`.
+   * @default true
    */
   requireSecretKey?: boolean;
 };

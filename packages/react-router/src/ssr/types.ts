@@ -54,18 +54,15 @@ export type RootAuthLoaderOptions = {
    */
   secretKey?: string;
   /**
-   * @deprecated This option will be removed in the next major version.
-   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
   loadUser?: boolean;
   /**
-   * @deprecated This option will be removed in the next major version.
-   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
   loadSession?: boolean;
   /**
-   * @deprecated This option will be removed in the next major version.
-   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
   loadOrganization?: boolean;
   signInUrl?: string;

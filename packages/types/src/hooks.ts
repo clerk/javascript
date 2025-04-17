@@ -25,9 +25,6 @@ type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorization
  * @inline
  */
 export type UseAuthReturn =
-  /**
-   * During initialization
-   */
   | {
       /**
        * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
@@ -46,7 +43,7 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
-       * The JWT claims for the current session.
+       * The current user's [session claims](https://clerk.com/docs/backend-requests/resources/session-tokens).
        */
       sessionClaims: undefined;
       /**
@@ -78,9 +75,6 @@ export type UseAuthReturn =
        */
       getToken: GetToken;
     }
-  /**
-   * When signed out
-   */
   | {
       isLoaded: true;
       isSignedIn: false;
@@ -95,9 +89,6 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
-  /**
-   * When signed in (no active organization)
-   */
   | {
       isLoaded: true;
       isSignedIn: true;
@@ -112,9 +103,6 @@ export type UseAuthReturn =
       signOut: SignOut;
       getToken: GetToken;
     }
-  /**
-   * When signed in (with active organization)
-   */
   | {
       isLoaded: true;
       isSignedIn: true;
@@ -192,7 +180,7 @@ export type UseSessionReturn =
        */
       isSignedIn: undefined;
       /**
-       * Holds the current active session for the user.
+       * The current active session for the user.
        */
       session: undefined;
     }
@@ -245,7 +233,7 @@ export type UseUserReturn =
        */
       isSignedIn: undefined;
       /**
-       * The `User` object for the current user. If the user isn't signed in, `user` will be `null`.
+       * The `User` object for the current user.
        */
       user: undefined;
     }

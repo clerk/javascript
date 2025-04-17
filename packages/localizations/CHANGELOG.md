@@ -1,5 +1,25 @@
 # Change Log
 
+## 3.13.11
+
+### Patch Changes
+
+- Chore: tidy up checkout complete state for upcoming subscriptions ([#5644](https://github.com/clerk/javascript/pull/5644)) by [@aeliox](https://github.com/aeliox)
+
+- Fix German account deletion confirmation ([#5624](https://github.com/clerk/javascript/pull/5624)) by [@hansemannn](https://github.com/hansemannn)
+
+- Updates `PricingTable` and `SubscriptionDetailDrawer` to handle `upcoming` and "expiring" subscriptions. ([#5601](https://github.com/clerk/javascript/pull/5601)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+
+## 3.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+
 ## 3.13.9
 
 ### Patch Changes

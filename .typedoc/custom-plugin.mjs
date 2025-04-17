@@ -14,6 +14,7 @@ const FILES_WITHOUT_HEADINGS = [
   'paginated-hook-config.mdx',
   'use-organization-list-return.mdx',
   'use-organization-list-params.mdx',
+  'create-organization-params.mdx',
 ];
 
 /**
@@ -28,6 +29,13 @@ const LINK_REPLACEMENTS = [
   ['sign-up-resource', '/docs/references/javascript/sign-up'],
   ['user-resource', '/docs/references/javascript/user'],
   ['session-status-claim', '/docs/references/javascript/types/session-status'],
+  ['user-organization-invitation-resource', '/docs/references/javascript/types/user-organization-invitation'],
+  ['organization-membership-resource', '/docs/references/javascript/types/organization-membership'],
+  ['organization-suggestion-resource', '/docs/references/javascript/types/organization-suggestion'],
+  ['organization-resource', '/docs/references/javascript/organization'],
+  ['organization-domain-resource', '/docs/references/javascript/types/organization-domain'],
+  ['organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
+  ['organization-membership-request-resource', '/docs/references/javascript/types/organization-membership-request'],
 ];
 
 /**
@@ -54,7 +62,7 @@ function getRelativeLinkReplacements() {
   });
 }
 
-function getUnlinkedTypesReplacements() {
+function getCatchAllReplacements() {
   return [
     {
       pattern: /\(setActiveParams\)/g,
@@ -69,8 +77,26 @@ function getUnlinkedTypesReplacements() {
       replace: '[Clerk](/docs/references/javascript/clerk)',
     },
     {
-      pattern: /`OrganizationCustomRoleKey`/g,
-      replace: '[OrganizationCustomRoleKey](/docs/references/javascript/types/organization-custom-role-key)',
+      pattern: /\(CreateOrganizationParams\)/g,
+      replace: '([CreateOrganizationParams](#create-organization-params))',
+    },
+    {
+      pattern: /\| `SignInResource` \|/,
+      replace: '| [SignInResource](/docs/references/javascript/sign-in) |',
+    },
+    {
+      /**
+       * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
+       */
+      pattern: /\*\*Deprecated\*\*/g,
+      replace: '**Deprecated.**',
+    },
+    {
+      /**
+       * By default, `@default` is output with "**Default** `value`". We want to capture the value and place it inside "Defaults to `value`."
+       */
+      pattern: /\*\*Default\*\* `([^`]+)`/g,
+      replace: 'Defaults to `$1`.',
     },
   ];
 }
@@ -89,9 +115,9 @@ export function load(app) {
       }
     }
 
-    const unlinkedTypesReplacements = getUnlinkedTypesReplacements();
+    const catchAllReplacements = getCatchAllReplacements();
 
-    for (const { pattern, replace } of unlinkedTypesReplacements) {
+    for (const { pattern, replace } of catchAllReplacements) {
       if (output.contents) {
         output.contents = output.contents.replace(pattern, replace);
       }
