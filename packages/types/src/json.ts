@@ -3,6 +3,7 @@
  */
 
 import type {
+  __experimental_CommerceInvoiceStatus,
   __experimental_CommercePaymentSourceStatus,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionStatus,
@@ -646,7 +647,7 @@ export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
   payment_due_on: number;
   payment_source_id: string;
   plan_id: string;
-  status: string;
+  status: __experimental_CommerceInvoiceStatus;
   totals: __experimental_CommerceTotalsJSON;
 }
 
@@ -681,7 +682,7 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice?: __experimental_CommerceInvoiceJSON;
+  invoice_id: string;
   payment_source?: __experimental_CommercePaymentSourceJSON;
   plan: __experimental_CommercePlanJSON;
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;

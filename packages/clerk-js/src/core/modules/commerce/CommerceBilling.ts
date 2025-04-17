@@ -1,11 +1,14 @@
 import type {
   __experimental_CommerceBillingNamespace,
   __experimental_CommerceCheckoutJSON,
+  __experimental_CommerceInvoiceJSON,
+  __experimental_CommerceInvoiceResource,
   __experimental_CommercePlanResource,
   __experimental_CommerceProductJSON,
   __experimental_CommerceSubscriptionJSON,
   __experimental_CommerceSubscriptionResource,
   __experimental_CreateCheckoutParams,
+  __experimental_GetInvoicesParams,
   __experimental_GetPlansParams,
   __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
@@ -14,6 +17,7 @@ import type {
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   __experimental_CommerceCheckout,
+  __experimental_CommerceInvoice,
   __experimental_CommercePlan,
   __experimental_CommerceSubscription,
   BaseResource,
@@ -47,6 +51,26 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
       return {
         total_count,
         data: subscriptions.map(subscription => new __experimental_CommerceSubscription(subscription)),
+      };
+    });
+  };
+
+  getInvoices = async (
+    params: __experimental_GetInvoicesParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceInvoiceResource>> => {
+    const { orgId, ...rest } = params;
+
+    return await BaseResource._fetch({
+      path: orgId ? `/organizations/${orgId}/invoices` : `/me/commerce/invoices`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
+    }).then(res => {
+      const { data: invoices, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceInvoiceJSON>;
+
+      return {
+        total_count,
+        data: invoices.map(invoice => new __experimental_CommerceInvoice(invoice)),
       };
     });
   };

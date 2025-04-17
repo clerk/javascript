@@ -27,6 +27,7 @@ import {
   RedirectUrl,
   Session,
   SignInToken,
+  SignUpAttempt,
   SMSMessage,
   Token,
   User,
@@ -136,6 +137,8 @@ function jsonToObject(item: any): any {
       return RedirectUrl.fromJSON(item);
     case ObjectType.SignInToken:
       return SignInToken.fromJSON(item);
+    case ObjectType.SignUpAttempt:
+      return SignUpAttempt.fromJSON(item);
     case ObjectType.Session:
       return Session.fromJSON(item);
     case ObjectType.SmsMessage:

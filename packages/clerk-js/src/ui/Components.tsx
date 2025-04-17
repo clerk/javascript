@@ -18,6 +18,7 @@ import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
+import { disambiguateRedirectOptions } from '../utils/disambiguateRedirectOptions';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
@@ -396,7 +397,7 @@ const Components = (props: ComponentsProps) => {
       componentName={'SignInModal'}
     >
       <SignInModal {...signInModal} />
-      <SignUpModal {...signInModal} />
+      <SignUpModal {...disambiguateRedirectOptions(signInModal, 'signin')} />
       <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>
   );
@@ -412,7 +413,7 @@ const Components = (props: ComponentsProps) => {
       startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
       componentName={'SignUpModal'}
     >
-      <SignInModal {...signUpModal} />
+      <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
       <SignUpModal {...signUpModal} />
       <WaitlistModal {...waitlistModal} />
     </LazyModalRenderer>

@@ -1,3 +1,5 @@
+import type { SignUpStatus } from '@clerk/types';
+
 import type {
   ActorTokenStatus,
   AllowlistIdentifierType,
@@ -10,7 +12,7 @@ import type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpStatus,
+  SignUpVerificationNextAction,
   WaitlistEntryStatus,
 } from './Enums';
 
@@ -470,18 +472,45 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 
 export interface SignUpJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignUpAttempt;
+  id: string;
   status: SignUpStatus;
+  required_fields: string[];
+  optional_fields: string[];
+  missing_fields: string[];
+  unverified_fields: string[];
+  verifications: SignUpVerificationsJSON;
   username: string | null;
   email_address: string | null;
   phone_number: string | null;
   web3_wallet: string | null;
-  web3_wallet_verification: VerificationJSON | null;
-  external_account: any;
-  has_password: boolean;
-  name_full: string | null;
+  password_enabled: boolean;
+  first_name: string | null;
+  last_name: string | null;
+  public_metadata?: Record<string, unknown> | null;
+  unsafe_metadata?: Record<string, unknown> | null;
+  custom_action: boolean;
+  external_id: string | null;
   created_session_id: string | null;
   created_user_id: string | null;
   abandon_at: number | null;
+  legal_accepted_at: number | null;
+
+  /**
+   * @deprecated Please use `verifications.external_account` instead
+   */
+  external_account: object | null;
+}
+
+export interface SignUpVerificationsJSON {
+  email_address: SignUpVerificationJSON;
+  phone_number: SignUpVerificationJSON;
+  web3_wallet: SignUpVerificationJSON;
+  external_account: VerificationJSON;
+}
+
+export interface SignUpVerificationJSON {
+  next_action: SignUpVerificationNextAction;
+  supported_strategies: string[];
 }
 
 export interface SMSMessageJSON extends ClerkResourceJSON {

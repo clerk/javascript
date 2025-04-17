@@ -3,6 +3,7 @@ import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { Check } from '../../icons';
+import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
@@ -77,18 +78,22 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               elementDescriptor={descriptors.checkoutSuccessTitle}
               as='h2'
               textVariant='h2'
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Payment was successful!
-            </Heading>
+              localizationKey={
+                checkout.subscription?.status === 'active'
+                  ? localizationKeys('__experimental_commerce.checkout.title__paymentSuccessful')
+                  : localizationKeys('__experimental_commerce.checkout.title__subscriptionSuccessful')
+              }
+            />
             <Text
               elementDescriptor={descriptors.checkoutSuccessDescription}
               colorScheme='secondary'
               sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
-            >
-              {/* TODO(@COMMERCE): needs localization */}
-              Minim adipisicing enim fugiat enim est ad nisi exercitation nisi exercitation quis culpa.
-            </Text>
+              localizationKey={
+                checkout.subscription?.status === 'active'
+                  ? localizationKeys('__experimental_commerce.checkout.description__paymentSuccessful')
+                  : localizationKeys('__experimental_commerce.checkout.description__subscriptionSuccessful')
+              }
+            />
           </Span>
         </Span>
       </Drawer.Body>
@@ -100,32 +105,35 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
       >
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
-            {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title title='Total paid' />
+            <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
-              text={
-                checkout.invoice
-                  ? `${checkout.invoice.totals.grandTotal.currencySymbol}${checkout.invoice.totals.grandTotal.amountFormatted}`
-                  : '–'
-              }
+              text={`${checkout.totals.grandTotal.currencySymbol}${checkout.totals.grandTotal.amountFormatted}`}
             />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
-            {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title title='Payment method' />
+            <LineItems.Title
+              title={
+                checkout.subscription?.status === 'active'
+                  ? localizationKeys('__experimental_commerce.checkout.lineItems.title__paymentMethod')
+                  : localizationKeys('__experimental_commerce.checkout.lineItems.title__subscriptionBegins')
+              }
+            />
             <LineItems.Description
               text={
-                checkout.paymentSource
-                  ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
-                  : '–'
+                checkout.subscription?.status === 'active'
+                  ? checkout.paymentSource
+                    ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
+                    : '–'
+                  : checkout.subscription?.periodStart
+                    ? formatDate(new Date(checkout.subscription.periodStart))
+                    : '–'
               }
             />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
-            {/* TODO(@COMMERCE): needs localization */}
-            <LineItems.Title title='Invoice ID' />
+            <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__invoiceId')} />
             <LineItems.Description
-              text={checkout.invoice ? checkout.invoice.id : '–'}
+              text={checkout.invoice_id || '–'}
               truncateText
               copyText
               copyLabel='Copy invoice ID'
