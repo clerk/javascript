@@ -1,6 +1,7 @@
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
-import { AuthStatus } from '@clerk/backend/internal';
+import { AuthStatus, constants } from '@clerk/backend/internal';
+import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 
 import { errorThrower } from '../utils';
 import { patchRequest } from './utils';
@@ -32,8 +33,13 @@ export async function authenticateRequest(
     afterSignUpUrl,
   });
 
-  const hasLocationHeader = requestState.headers.get('location');
-  if (hasLocationHeader) {
+  const locationHeader = requestState.headers.get(constants.Headers.Location);
+  if (locationHeader) {
+    handleNetlifyCacheInDevInstance({
+      locationHeader,
+      requestStateHeaders: requestState.headers,
+      publishableKey: requestState.publishableKey,
+    });
     // triggering a handshake redirect
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw new Response(null, { status: 307, headers: requestState.headers });

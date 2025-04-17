@@ -36,3 +36,4 @@ export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
 export { getEnvVariable } from './getEnvVariable';
 export * from './pathMatcher';
+export * from './netlifyCacheHandler';
