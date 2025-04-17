@@ -469,7 +469,8 @@ export type ElementsConfig = {
   invoiceHeader: WithOptions;
   invoiceHeaderContent: WithOptions;
   invoiceTitle: WithOptions;
-  invoiceTitleContainer: WithOptions;
+  invoiceHeaderTitleBadgeContainer: WithOptions;
+  invoiceTitleIdContainer: WithOptions;
   invoiceId: WithOptions;
   invoiceIdContainer: WithOptions;
   invoiceBadge: WithOptions;
@@ -479,6 +480,7 @@ export type ElementsConfig = {
   invoiceDetailsItemTitleText: WithOptions;
   invoiceDetailsItemValue: WithOptions;
   invoiceDetailsItemValueText: WithOptions;
+  invoiceCopyButton: WithOptions;
   invoiceContent: WithOptions;
 
   menuButton: WithOptions<MenuId>;

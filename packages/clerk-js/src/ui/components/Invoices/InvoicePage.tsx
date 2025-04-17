@@ -78,14 +78,14 @@ export const InvoicePage = () => {
               })}
             >
               <Box
-                elementDescriptor={descriptors.invoiceHeaderContent}
+                elementDescriptor={descriptors.invoiceHeaderTitleBadgeContainer}
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'start',
                 }}
               >
-                <Span elementDescriptor={descriptors.invoiceTitleContainer}>
+                <Span elementDescriptor={descriptors.invoiceTitleIdContainer}>
                   <Heading
                     textVariant='h2'
                     elementDescriptor={descriptors.invoiceTitle}
@@ -106,9 +106,9 @@ export const InvoicePage = () => {
                       text={invoice.id}
                     />
                     <Text
+                      elementDescriptor={descriptors.invoiceId}
                       colorScheme='secondary'
                       variant='subtitle'
-                      elementDescriptor={descriptors.invoiceId}
                     >
                       {truncateWithEndVisible(invoice.id)}
                     </Text>
@@ -228,6 +228,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
 
   return (
     <Button
+      elementDescriptor={descriptors.invoiceCopyButton}
       variant='unstyled'
       onClick={onCopy}
       sx={t => ({
