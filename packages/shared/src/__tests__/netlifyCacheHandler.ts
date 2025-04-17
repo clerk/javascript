@@ -5,14 +5,14 @@ const mockPublishableKey = 'pk_test_YW55LW9mZabcZS1wYWdlX3BhZ2VfcG9pbnRlci1pZF90
 
 describe('handleNetlifyCacheInDevInstance', () => {
   beforeEach(() => {
-    delete process.env.NETLIFY;
+    delete process.env.URL;
   });
 
   it('should add cache bust parameter when on Netlify and in development', () => {
-    process.env.NETLIFY = 'true';
+    process.env.URL = 'https://example.netlify.app';
 
     const requestStateHeaders = new Headers({
-      Location: 'https://example.com',
+      Location: 'https://example.netlify.app',
     });
     const locationHeader = requestStateHeaders.get('Location') || '';
 
@@ -30,7 +30,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
     process.env.NETLIFY = 'true';
 
     const requestStateHeaders = new Headers({
-      Location: 'https://example.com/redirect?__clerk_handshake=',
+      Location: 'https://example.netlify.app/redirect?__clerk_handshake=',
     });
     const locationHeader = requestStateHeaders.get('Location') || '';
 
@@ -45,7 +45,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
 
   it('should not modify the Location header if not on Netlify', () => {
     const requestStateHeaders = new Headers({
-      Location: 'https://example.com',
+      Location: 'https://example.netlify.app',
     });
     const locationHeader = requestStateHeaders.get('Location') || '';
 
@@ -55,6 +55,6 @@ describe('handleNetlifyCacheInDevInstance', () => {
       publishableKey: mockPublishableKey,
     });
 
-    expect(requestStateHeaders.get('Location')).toBe('https://example.com');
+    expect(requestStateHeaders.get('Location')).toBe('https://example.netlify.app');
   });
 });
