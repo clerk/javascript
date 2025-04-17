@@ -359,9 +359,6 @@ ${error.getFullMessage()}`,
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
       const handshakeHeaders = headers ?? buildRedirectToHandshake({ handshakeReason: reason });
 
-      // Add Netlify-Vary header to handle caching properly
-      handshakeHeaders.set('Netlify-Vary', 'cookie=__client|__session');
-
       // Chrome aggressively caches inactive tabs. If we don't set the header here,
       // all 307 redirects will be cached and the handshake will end up in an infinite loop.
       if (handshakeHeaders.get(constants.Headers.Location)) {
