@@ -3,9 +3,11 @@ import { isDevelopmentFromPublishableKey } from './keys';
 
 /**
  * Cache busting parameter for Netlify to prevent cached responses
- * during handshale flows with Clerk development instances.
+ * during handshake flows with Clerk development instances.
  *
  * Note: This query parameter will be removed in the "@clerk/clerk-js" package.
+ *
+ * @internal
  */
 export const CLERK_NETLIFY_CACHE_BUST_PARAM = '__clerk_netlify_cache_bust';
 
@@ -16,7 +18,10 @@ export const CLERK_NETLIFY_CACHE_BUST_PARAM = '__clerk_netlify_cache_bust';
  *
  * The issue happens only on Clerk development instances running on Netlify. This is
  * a workaround until we find a better solution.
- * see https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1
+ *
+ * See {@link https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1}
+ *
+ * @internal
  */
 export function handleNetlifyCacheInDevInstance({
   locationHeader,
