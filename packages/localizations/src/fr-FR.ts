@@ -16,20 +16,40 @@ export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   __experimental_commerce: {
     billedAnnually: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
     free: undefined,
     getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    reSubscribe: undefined,
     switchPlan: undefined,
   },
   backButton: 'Retour',
   badge__currentPlan: undefined,
   badge__default: 'Défaut',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
   badge__requiresAction: 'Nécessite une action',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Cet appareil',
   badge__unverified: 'Non vérifié',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
   createOrganization: {
@@ -181,6 +201,7 @@ export const frFR: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gérer votre organisation.',
       general: 'Général',
       members: 'Membres',
@@ -531,7 +552,8 @@ export const frFR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "J'accepte la Politique de confidentialité.",
         label__onlyTermsOfService: "J'accepte les Conditions d'utilisation.",
-        label__termsOfServiceAndPrivacyPolicy: `J'accepte les {{ termsOfServiceLink || link("Conditions d'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.`,
+        label__termsOfServiceAndPrivacyPolicy:
+          'J\'accepte les {{ termsOfServiceLink || link("Conditions d\'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.',
       },
       continue: {
         subtitle: 'Lisez et acceptez les conditions pour continuer.',
@@ -669,10 +691,31 @@ export const frFR: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       start: {
         headerTitle__invoices: undefined,
         headerTitle__paymentSources: undefined,
         headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__cancel: undefined,
+        actionLabel__default: undefined,
       },
       title: undefined,
     },

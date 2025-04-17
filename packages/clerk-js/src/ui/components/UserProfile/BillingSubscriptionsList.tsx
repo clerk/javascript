@@ -68,7 +68,9 @@ export function BillingSubscriptionsList() {
               <ThreeDotsMenu
                 actions={[
                   {
-                    label: localizationKeys('__experimental_commerce.month'),
+                    label: localizationKeys(
+                      'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__default',
+                    ),
                     onClick: () => {},
                   },
                   {

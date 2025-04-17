@@ -5,7 +5,7 @@ import {
   usePlansContext,
   withPlans,
 } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -76,8 +76,15 @@ export const BillingPage = withPlans(
               />
             </TabsList>
             <TabPanels>
-              <TabPanel sx={t => ({ width: '100%', flexDirection: 'column', rowGap: t.space.$4 })}>
+              <TabPanel sx={t => ({ width: '100%', flexDirection: 'column' })}>
                 <BillingSubscriptionsList />
+                <Hr sx={t => ({ marginBlock: t.space.$6 })} />
+                <Heading
+                  textVariant='h3'
+                  as='h2'
+                  localizationKey='Available Plans'
+                  sx={t => ({ marginBlockEnd: t.space.$4, fontWeight: t.fontWeights.$medium })}
+                />
                 <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
