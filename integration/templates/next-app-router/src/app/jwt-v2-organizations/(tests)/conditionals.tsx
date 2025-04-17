@@ -17,7 +17,7 @@ export function Conditionals({
   hasAdminRole: boolean;
   hasManagerRole: boolean;
   hasImpersonationReaderRole: boolean;
-  role: string | null;
+  role: string | null | undefined;
   hasImpersonationFeature: boolean;
   hasMagicLinksFeature: boolean;
 }) {
