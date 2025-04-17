@@ -35,16 +35,10 @@ export async function authenticateRequest(
 
   const locationHeader = requestState.headers.get(constants.Headers.Location);
   if (locationHeader) {
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    console.log('is on netlify process.env.NETLIFY', process.env.NETLIFY);
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    console.log('is on netlify import.meta.env.NETLIFY', import.meta.env.NETLIFY);
     handleNetlifyCacheInDevInstance({
       locationHeader,
       requestStateHeaders: requestState.headers,
       publishableKey: requestState.publishableKey,
-      // eslint-disable-next-line turbo/no-undeclared-env-vars
-      netlifyEnv: import.meta.env.NETLIFY,
     });
     // triggering a handshake redirect
     // eslint-disable-next-line @typescript-eslint/only-throw-error

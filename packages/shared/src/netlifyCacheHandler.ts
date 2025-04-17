@@ -1,4 +1,3 @@
-import { getEnvVariable } from './getEnvVariable';
 import { isDevelopmentFromPublishableKey } from './keys';
 
 /**
@@ -27,15 +26,13 @@ export function handleNetlifyCacheInDevInstance({
   locationHeader,
   requestStateHeaders,
   publishableKey,
-  netlifyEnv,
 }: {
   locationHeader: string;
   requestStateHeaders: Headers;
   publishableKey: string;
-  netlifyEnv?: string;
 }) {
-  // Pre-defined build variable on Netlify
-  const isOnNetlify = Boolean(netlifyEnv || getEnvVariable('NETLIFY'));
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  const isOnNetlify = process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
