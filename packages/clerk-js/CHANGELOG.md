@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.61.2
+
+### Patch Changes
+
+- Ensure margin is reset on definition list components to prevent browser default styling leaking in. ([#5653](https://github.com/clerk/javascript/pull/5653)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor InvoicePage title and invoice ID UI. ([#5655](https://github.com/clerk/javascript/pull/5655)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Chore: improve checkout error handling ([#5654](https://github.com/clerk/javascript/pull/5654)) by [@aeliox](https://github.com/aeliox)
+
+- Chore: display correct total for checkout complete page ([#5650](https://github.com/clerk/javascript/pull/5650)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ea84f6b`](https://github.com/clerk/javascript/commit/ea84f6b8b3b9faed09f0d1cc198d023700cde83e), [`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/localizations@3.13.12
+  - @clerk/types@4.54.2
+  - @clerk/shared@3.7.2
+
 ## 5.61.1
 
 ### Patch Changes
