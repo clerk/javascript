@@ -14,15 +14,20 @@ import { createUserProfileComponentPageObject } from './userProfile';
 import { createUserVerificationComponentPageObject } from './userVerification';
 import { createWaitlistComponentPageObject } from './waitlist';
 
-export const createPageObjects = (
-  page: Page,
-  { useTestingToken, serverUrl }: { useTestingToken?: boolean; serverUrl: string },
-) => {
-  const app = createAppPageObject({ page, useTestingToken }, { serverUrl });
+export const createPageObjects = ({
+  page,
+  useTestingToken = true,
+  baseURL,
+}: {
+  page: Page;
+  useTestingToken?: boolean;
+  baseURL?: string;
+}) => {
+  const app = createAppPageObject({ page, useTestingToken }, { baseURL });
   const testArgs = { page: app };
 
   return {
-    app,
+    page: app,
     clerk: createClerkPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),

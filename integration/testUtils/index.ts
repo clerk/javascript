@@ -46,7 +46,7 @@ export const createTestUtils = <
     return { services } as any;
   }
 
-  const pageObjects = createPageObjects(params.page, { useTestingToken, serverUrl: app.serverUrl });
+  const pageObjects = createPageObjects({ page: params.page, useTestingToken, baseURL: app.serverUrl });
 
   const browserHelpers = {
     runInNewTab: async (
@@ -54,7 +54,7 @@ export const createTestUtils = <
     ) => {
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
       });
       await cb(u as any, context);
       return u;
@@ -68,7 +68,7 @@ export const createTestUtils = <
       const context = await browser.newContext();
       const u = createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, app),
+        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
       });
       await cb(u as any, context);
       return u;
@@ -76,7 +76,7 @@ export const createTestUtils = <
   };
 
   return {
-    page: pageObjects.app,
+    page: pageObjects.page,
     services,
     po: pageObjects,
     tabs: browserHelpers,
