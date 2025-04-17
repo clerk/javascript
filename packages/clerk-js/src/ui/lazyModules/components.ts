@@ -20,6 +20,8 @@ const componentImportPaths = {
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
+  SubscriptionDetailDrawer: () =>
+    import(/* webpackChunkName: "subscriptionDetailDrawer" */ '../components/PricingTable/SubscriptionDetailDrawer'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -99,6 +101,10 @@ export const Checkout = lazy(() =>
   componentImportPaths.Checkout().then(module => ({ default: module.__experimental_Checkout })),
 );
 
+export const SubscriptionDetailDrawer = lazy(() =>
+  componentImportPaths.SubscriptionDetailDrawer().then(module => ({ default: module.SubscriptionDetailDrawer })),
+);
+
 export const SessionTasks = lazy(() =>
   componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
 );
@@ -129,6 +135,7 @@ export const ClerkComponents = {
   BlankCaptchaModal,
   PricingTable,
   Checkout,
+  SubscriptionDetailDrawer,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

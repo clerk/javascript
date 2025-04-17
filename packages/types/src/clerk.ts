@@ -8,6 +8,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -18,6 +19,7 @@ import type {
   __experimental_CommerceNamespace,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -194,7 +196,17 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk SubscriptionDetailDrawer component in a drawer.
+   * @param props Optional subscription detail drawer configuration parameters.
+   */
+  __internal_openSubscriptionDetailDrawer: (props?: __experimental_SubscriptionDetailDrawerProps) => void;
+
+  /**
+   * Closes the Clerk SubscriptionDetailDrawer drawer.
+   */
+  __internal_closeSubscriptionDetailDrawer: () => void;
+
+  /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -1535,6 +1547,15 @@ export type __experimental_CheckoutProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
+  portalId?: string;
+};
+
+export type __experimental_SubscriptionDetailDrawerProps = {
+  appearance?: SubscriptionDetailTheme;
+  subscription?: __experimental_CommerceSubscriptionResource;
+  subscriberType?: __experimental_CommerceSubscriberType;
+  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  onSubscriptionCancel?: () => void;
   portalId?: string;
 };
 

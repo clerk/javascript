@@ -798,6 +798,7 @@ export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
+export type SubscriptionDetailTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**

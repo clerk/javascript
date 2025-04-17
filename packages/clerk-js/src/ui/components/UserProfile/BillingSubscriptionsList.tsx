@@ -1,10 +1,13 @@
+import { useClerk } from '@clerk/shared/react';
+
+import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext } from '../../contexts';
 import { Badge, Box, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
 
 export function BillingSubscriptionsList() {
-  const { subscriptions } = usePlansContext();
-
+  const { subscriptions, revalidate } = usePlansContext();
+  const clerk = useClerk();
   return (
     <Table tableHeadVisuallyHidden>
       <Thead>
@@ -65,7 +68,13 @@ export function BillingSubscriptionsList() {
                     label: localizationKeys(
                       'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__default',
                     ),
-                    onClick: () => {},
+                    onClick: () => {
+                      clerk.__internal_openSubscriptionDetailDrawer({
+                        subscription,
+                        onSubscriptionCancel: () => revalidate(),
+                        portalId: PROFILE_CARD_SCROLLBOX_ID,
+                      });
+                    },
                   },
                   {
                     label: localizationKeys(

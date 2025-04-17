@@ -5,6 +5,7 @@ import type {
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
+  __experimental_SubscriptionDetailDrawerProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -48,7 +49,8 @@ export type AvailableComponentProps =
   | WaitlistProps
   | __experimental_PricingTableProps
   | __experimental_CheckoutProps
-  | __internal_UserVerificationProps;
+  | __internal_UserVerificationProps
+  | __experimental_SubscriptionDetailDrawerProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -120,6 +122,10 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
 };
 
+export type __experimental_SubscriptionDetailDrawerCtx = __experimental_SubscriptionDetailDrawerProps & {
+  componentName: 'SubscriptionDetailDrawer';
+};
+
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
   subscriberType?: __experimental_CommerceSubscriberType;
@@ -166,5 +172,6 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | __experimental_PricingTableCtx
-  | __experimental_CheckoutCtx;
+  | __experimental_CheckoutCtx
+  | __experimental_SubscriptionDetailDrawerCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

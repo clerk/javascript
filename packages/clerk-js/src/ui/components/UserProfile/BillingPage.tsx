@@ -76,7 +76,7 @@ export const BillingPage = withPlans(
               />
             </TabsList>
             <TabPanels>
-              <TabPanel sx={t => ({ width: '100%', flexDirection: 'column' })}>
+              <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
                 <BillingSubscriptionsList />
                 <Hr sx={t => ({ marginBlock: t.space.$6 })} />
                 <Heading
