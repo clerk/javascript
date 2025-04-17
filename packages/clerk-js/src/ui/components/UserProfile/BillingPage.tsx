@@ -21,6 +21,7 @@ import { useTabState } from '../../hooks/useTabState';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
+import { BillingSubscriptionsList } from './BillingSubscriptionsList';
 
 const tabMap = {
   0: 'plans',
@@ -75,7 +76,8 @@ export const BillingPage = withPlans(
               />
             </TabsList>
             <TabPanels>
-              <TabPanel sx={{ width: '100%' }}>
+              <TabPanel sx={t => ({ width: '100%', flexDirection: 'column', rowGap: t.space.$4 })}>
+                <BillingSubscriptionsList />
                 <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
