@@ -63,7 +63,7 @@ export const esMX: LocalizationResource = {
     'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
-  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Ingresa tu correo electrónico',
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
     'Ingrese o pegue una o más direcciones de correo electrónico, separadas por espacios o comas',
@@ -73,7 +73,7 @@ export const esMX: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
   formFieldInputPlaceholder__organizationSlug: undefined,
-  formFieldInputPlaceholder__password: undefined,
+  formFieldInputPlaceholder__password: 'Ingresa tu contraseña',
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automaticas para este dominio',
