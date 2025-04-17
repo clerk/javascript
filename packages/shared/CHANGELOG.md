@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.7.2
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5643](https://github.com/clerk/javascript/pull/5643)) by [@alexisintech](https://github.com/alexisintech)
+
+- Updated dependencies [[`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/types@4.54.2
+
 ## 3.7.1
 
 ### Patch Changes
