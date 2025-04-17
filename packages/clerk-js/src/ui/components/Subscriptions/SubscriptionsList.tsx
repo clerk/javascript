@@ -4,7 +4,7 @@ import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext } from '../../contexts';
 import { Badge, Box, Button, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 
-export function BillingSubscriptionsList() {
+export function SubscriptionsList() {
   const { subscriptions, revalidate } = usePlansContext();
   const clerk = useClerk();
   return (

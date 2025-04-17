@@ -21,7 +21,7 @@ const componentImportPaths = {
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   SubscriptionDetailDrawer: () =>
-    import(/* webpackChunkName: "subscriptionDetailDrawer" */ '../components/PricingTable/SubscriptionDetailDrawer'),
+    import(/* webpackChunkName: "subscriptionDetailDrawer" */ '../components/Subscriptions/SubscriptionDetailDrawer'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
