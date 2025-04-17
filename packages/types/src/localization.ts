@@ -700,7 +700,6 @@ type _LocalizationResource = {
       };
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;
-        actionLabel__cancel: LocalizationValue;
       };
     };
   };

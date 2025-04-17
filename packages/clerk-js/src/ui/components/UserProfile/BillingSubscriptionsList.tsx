@@ -2,8 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 
 import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext } from '../../contexts';
-import { Badge, Box, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { ThreeDotsMenu } from '../../elements';
+import { Badge, Box, Button, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 
 export function BillingSubscriptionsList() {
   const { subscriptions, revalidate } = usePlansContext();
@@ -62,28 +61,21 @@ export function BillingSubscriptionsList() {
                 textAlign: 'right',
               })}
             >
-              <ThreeDotsMenu
-                actions={[
-                  {
-                    label: localizationKeys(
-                      'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__default',
-                    ),
-                    onClick: () => {
-                      clerk.__internal_openSubscriptionDetailDrawer({
-                        subscription,
-                        onSubscriptionCancel: () => revalidate(),
-                        portalId: PROFILE_CARD_SCROLLBOX_ID,
-                      });
-                    },
-                  },
-                  {
-                    label: localizationKeys(
-                      'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__cancel',
-                    ),
-                    onClick: () => {},
-                    isDestructive: true,
-                  },
-                ]}
+              <Button
+                size='xs'
+                colorScheme='secondary'
+                variant='bordered'
+                textVariant='buttonSmall'
+                onClick={() =>
+                  clerk.__internal_openSubscriptionDetailDrawer({
+                    subscription,
+                    onSubscriptionCancel: () => revalidate(),
+                    portalId: PROFILE_CARD_SCROLLBOX_ID,
+                  })
+                }
+                localizationKey={localizationKeys(
+                  'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__default',
+                )}
               />
             </Td>
           </Tr>

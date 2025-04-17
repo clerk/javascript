@@ -706,8 +706,7 @@ export const enUS: LocalizationResource = {
         headerTitle__subscriptions: 'Subscriptions',
       },
       subscriptionsSection: {
-        actionLabel__cancel: 'Cancel subscription',
-        actionLabel__default: 'Learn more',
+        actionLabel__default: 'Manage',
       },
       title: 'Billing & Payments',
     },

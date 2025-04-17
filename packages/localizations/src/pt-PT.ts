@@ -707,7 +707,6 @@ export const ptPT: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsSection: {
-        actionLabel__cancel: undefined,
         actionLabel__default: undefined,
       },
       title: undefined,
