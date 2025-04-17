@@ -32,6 +32,7 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
+  // Pre-defined build variable on Netlify
   const isOnNetlify = getEnvVariable('NETLIFY');
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
