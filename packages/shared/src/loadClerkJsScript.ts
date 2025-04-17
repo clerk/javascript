@@ -32,7 +32,6 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
-  existingScriptTimeout?: number;
 };
 
 /**
@@ -51,48 +50,16 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
 const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
-  const existingScriptTimeout = opts?.existingScriptTimeout ?? 2_000;
-  let timeoutId: ReturnType<typeof setTimeout>;
-
-  function clTimeout() {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  }
-
   if (existingScript) {
-    const attemptExisting = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       existingScript.addEventListener('load', () => {
         resolve(existingScript);
-        clTimeout();
       });
 
       existingScript.addEventListener('error', () => {
         reject(FAILED_TO_LOAD_ERROR);
-        clTimeout();
       });
-
-      /**
-       * Avoid waiting indefinitely, cancel the attempt for the existing script and continue with "loadScript" below.
-       */
-      timeoutId = setTimeout(() => {
-        // We don't add a cause because we want to retry loading manually
-        reject();
-      }, existingScriptTimeout);
     });
-
-    const loaded = await attemptExisting
-      .then(() => true)
-      .catch(msg => {
-        if (msg) {
-          throw msg;
-        }
-        return false;
-      });
-
-    if (loaded) {
-      return existingScript;
-    }
   }
 
   if (!opts?.publishableKey) {
