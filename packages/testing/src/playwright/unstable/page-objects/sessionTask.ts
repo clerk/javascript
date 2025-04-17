@@ -1,15 +1,14 @@
 import { expect } from '@playwright/test';
 
-import { common } from './commonPageObject';
-import type { FakeOrganization } from './organizationsService';
-import type { TestArgs } from './signInPageObject';
+import type { EnhancedPage } from './app';
+import { common } from './common';
 
-export const createSessionTaskComponentPageObject = (testArgs: TestArgs) => {
+export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
 
   const self = {
     ...common(testArgs),
-    resolveForceOrganizationSelectionTask: async (fakeOrganization: FakeOrganization) => {
+    resolveForceOrganizationSelectionTask: async (fakeOrganization: { name: string; slug: string }) => {
       const createOrganizationButton = page.getByRole('button', { name: /create organization/i });
 
       await expect(createOrganizationButton).toBeVisible();

@@ -36,6 +36,16 @@
         "default": "./dist/playwright/index.js"
       }
     },
+    "./playwright/unstable": {
+      "import": {
+        "types": "./dist/types/playwright/unstable/index.d.ts",
+        "default": "./dist/playwright/unstable/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/playwright/unstable/index.d.ts",
+        "default": "./dist/playwright/unstable/index.js"
+      }
+    },
     "./cypress": {
       "import": {
         "types": "./dist/types/cypress/index.d.ts",

@@ -1,5 +1,5 @@
-import { common } from './commonPageObject';
-import type { TestArgs } from './signInPageObject';
+import type { EnhancedPage } from './app';
+import { common } from './common';
 
 type SignUpFormInputs = {
   email?: string;
@@ -11,7 +11,7 @@ type SignUpFormInputs = {
   legalAccepted?: boolean;
 };
 
-export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
+export const createSignUpComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
 
   const self = {
@@ -37,11 +37,11 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
     },
     signUp: async (opts: SignUpFormInputs) => {
       if (opts.firstName) {
-        await self.getFirstNameInput().fill(opts.lastName);
+        await self.getFirstNameInput().fill(opts.firstName);
       }
 
       if (opts.lastName) {
-        await self.getLastNameInput().fill(opts.firstName);
+        await self.getLastNameInput().fill(opts.lastName);
       }
 
       if (opts.email) {

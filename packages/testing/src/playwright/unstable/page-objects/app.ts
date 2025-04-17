@@ -1,19 +1,25 @@
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import type { Page } from '@playwright/test';
 
-import type { Application } from '../models/application';
+import { setupClerkTestingToken } from '../../setupClerkTestingToken';
 
-export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: Application) => {
+export type EnhancedPage = ReturnType<typeof createAppPageObject>;
+export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: { baseURL?: string }) => {
   const { page, useTestingToken = true } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
     goToAppHome: async () => {
+      if (!app.baseURL) {
+        throw new Error(
+          'Attempted to call method requiring baseURL, but baseURL was not provided to createPageObjects.',
+        );
+      }
+
       try {
         if (useTestingToken) {
           await setupClerkTestingToken({ page });
         }
 
-        await page.goto(app.serverUrl);
+        await page.goto(app.baseURL);
       } catch {
         // do not fail the test if interstitial is returned (401)
       }
@@ -22,13 +28,18 @@ export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: bo
       path: string,
       opts: { waitUntil?: any; searchParams?: URLSearchParams; timeout?: number } = {},
     ) => {
+      if (!app.baseURL) {
+        throw new Error(
+          'Attempted to call method requiring baseURL, but baseURL was not provided to createPageObjects.',
+        );
+      }
       let url: URL;
 
       try {
         // When testing applications using real domains we want to manually navigate to the domain first
         // and not follow serverUrl (localhost) by default, as this is usually proxied
         if (page.url().includes('about:blank')) {
-          url = new URL(path, app.serverUrl);
+          url = new URL(path, app.baseURL);
         } else {
           url = new URL(path, page.url());
         }
@@ -37,7 +48,7 @@ export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: bo
         // as the test is using a localhost app directly
         // This handles the case where the page is at about:blank
         // and instead it uses the serverUrl
-        url = new URL(path, app.serverUrl);
+        url = new URL(path, app.baseURL);
       }
 
       if (opts.searchParams) {
@@ -64,7 +75,12 @@ export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: bo
       return page.waitForSelector('.cl-rootBox', { state: 'attached' });
     },
     waitForAppUrl: async (relativePath: string) => {
-      return page.waitForURL(new URL(relativePath, app.serverUrl).toString());
+      if (!app.baseURL) {
+        throw new Error(
+          'Attempted to call method requiring baseURL, but baseURL was not provided to createPageObjects.',
+        );
+      }
+      return page.waitForURL(new URL(relativePath, app.baseURL).toString());
     },
     /**
      * Get the cookies for the URL the page is currently at.

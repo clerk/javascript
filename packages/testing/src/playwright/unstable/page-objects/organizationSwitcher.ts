@@ -1,9 +1,9 @@
 import { expect } from '@playwright/test';
 
-import { common } from './commonPageObject';
-import type { TestArgs } from './signInPageObject';
+import type { EnhancedPage } from './app';
+import { common } from './common';
 
-export const createOrganizationSwitcherComponentPageObject = (testArgs: TestArgs) => {
+export const createOrganizationSwitcherComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
 
   const self = {

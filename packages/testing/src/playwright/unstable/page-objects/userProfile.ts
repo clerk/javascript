@@ -1,14 +1,9 @@
-import type { Browser, BrowserContext } from '@playwright/test';
-
-import type { createAppPageObject } from './appPageObject';
-import { common } from './commonPageObject';
-
-export type EnchancedPage = ReturnType<typeof createAppPageObject>;
-export type TestArgs = { page: EnchancedPage; context: BrowserContext; browser: Browser };
+import type { EnhancedPage } from './app';
+import { common } from './common';
 
 export type Sections = 'profile' | 'emailAddresses' | 'username' | 'phoneNumbers' | 'danger';
 
-export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
+export const createUserProfileComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
   const self = {
     ...common(testArgs),

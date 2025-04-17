@@ -1,6 +1,6 @@
-import type { TestArgs } from './signInPageObject';
+import type { EnhancedPage } from './app';
 
-export const common = ({ page }: TestArgs) => {
+export const common = ({ page }: { page: EnhancedPage }) => {
   const self = {
     continue: () => {
       return page.getByRole('button', { name: 'Continue', exact: true }).click();
