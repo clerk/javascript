@@ -1,11 +1,11 @@
-import { common } from './commonPageObject';
-import type { TestArgs } from './signInPageObject';
+import { common } from './common';
+import type { EnhancedPage } from './app';
 
 type WaitlistFormInputs = {
   email: string;
 };
 
-export const createWaitlistComponentPageObject = (testArgs: TestArgs) => {
+export const createWaitlistComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
 
   const self = {

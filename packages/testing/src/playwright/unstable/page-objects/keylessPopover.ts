@@ -1,11 +1,6 @@
-import type { Browser, BrowserContext } from '@playwright/test';
+import { EnhancedPage } from './app';
 
-import type { createAppPageObject } from './appPageObject';
-
-export type EnchancedPage = ReturnType<typeof createAppPageObject>;
-export type TestArgs = { page: EnchancedPage; context: BrowserContext; browser: Browser };
-
-export const createKeylessPopoverPageObject = (testArgs: TestArgs) => {
+export const createKeylessPopoverPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
   // TODO: Is this the ID we really want ?
   const elementId = '#--clerk-keyless-prompt-button';

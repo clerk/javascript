@@ -1,9 +1,11 @@
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
+import { setupClerkTestingToken } from '../../setupClerkTestingToken';
 import type { Page } from '@playwright/test';
 
-import type { Application } from '../models/application';
-
-export const createAppPageObject = (testArgs: { page: Page; useTestingToken?: boolean }, app: Application) => {
+export type EnhancedPage = ReturnType<typeof createAppPageObject>;
+export const createAppPageObject = (
+  testArgs: { page: Page; useTestingToken?: boolean },
+  app: { serverUrl: string },
+) => {
   const { page, useTestingToken = true } = testArgs;
   const appPage = Object.create(page) as Page;
   const helpers = {
