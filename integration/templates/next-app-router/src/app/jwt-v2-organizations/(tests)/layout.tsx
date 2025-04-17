@@ -1,5 +1,4 @@
 import { ClientJWT } from '../client-jwt';
-import { RoleSelector } from '../role-selector';
 import { ServerJWT } from '../server-jwt';
 
 export default function Layout({ children }: React.PropsWithChildren) {
@@ -15,7 +14,6 @@ export default function Layout({ children }: React.PropsWithChildren) {
           flex: '0 0 300px',
         }}
       >
-        <RoleSelector />
         <ServerJWT />
         <ClientJWT />
       </aside>
