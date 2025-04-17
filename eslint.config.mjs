@@ -427,6 +427,14 @@ export default tseslint.config([
     plugins: {
       jsdoc: pluginJsDoc,
     },
+    rules: {
+      ...pluginJsDoc.configs['flat/recommended-typescript'].rules,
+      'jsdoc/check-tag-names': ['warn', { definedTags: ['inline', 'unionReturnHeadings'], typed: false }],
+      'jsdoc/require-hyphen-before-param-description': 'warn',
+      'jsdoc/require-description': 'warn',
+      'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
+      'jsdoc/require-param-description': 'warn',
+    },
   },
   ...pluginYml.configs['flat/recommended'],
   configPrettier,
