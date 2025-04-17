@@ -25,13 +25,11 @@ import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-type SubscriptionDetailDrawerProps = __experimental_SubscriptionDetailDrawerProps;
-
 export function SubscriptionDetailDrawer({
   subscription,
   subscriberType,
   onSubscriptionCancel,
-}: SubscriptionDetailDrawerProps) {
+}: __experimental_SubscriptionDetailDrawerProps) {
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

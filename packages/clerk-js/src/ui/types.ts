@@ -122,10 +122,6 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
 };
 
-export type __experimental_SubscriptionDetailDrawerCtx = __experimental_SubscriptionDetailDrawerProps & {
-  componentName: 'SubscriptionDetailDrawer';
-};
-
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
   subscriberType?: __experimental_CommerceSubscriberType;
@@ -172,6 +168,5 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | __experimental_PricingTableCtx
-  | __experimental_CheckoutCtx
-  | __experimental_SubscriptionDetailDrawerCtx;
+  | __experimental_CheckoutCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
