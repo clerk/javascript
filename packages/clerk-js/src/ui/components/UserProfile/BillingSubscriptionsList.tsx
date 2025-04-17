@@ -19,7 +19,7 @@ export function BillingSubscriptionsList() {
       </Thead>
       <Tbody>
         {subscriptions.map(subscription => (
-          <Tr key={subscription.plan.name}>
+          <Tr key={subscription.plan.id}>
             <Td>
               <Box
                 sx={t => ({
