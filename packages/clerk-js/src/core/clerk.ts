@@ -309,12 +309,6 @@ export class Clerk implements ClerkInterface {
   }
 
   get __experimental_commerce(): __experimental_CommerceNamespace {
-    if (!this.#options.experimental?.commerce) {
-      throw new Error(
-        'Clerk: commerce functionality is currently in an experimental state. To enable, pass `experimental.commerce = true`.',
-      );
-    }
-
     if (!Clerk._commerce) {
       Clerk._commerce = new __experimental_Commerce();
     }
