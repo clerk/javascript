@@ -50,7 +50,27 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  if (isomorphicClerk.loaded) {
+  if (isomorphicClerk.status !== 'loading') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkFailed = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkFailed');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'error') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkDegraded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
   return children;

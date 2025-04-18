@@ -15,6 +15,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "types/clerk-pagination-params.mdx",
   "types/clerk-pagination-request.mdx",
   "types/clerk-resource.mdx",
+  "types/clerk-status.mdx",
   "types/clerk.mdx",
   "types/create-organization-params.mdx",
   "types/element-object-key.mdx",
