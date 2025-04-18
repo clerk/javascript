@@ -63,7 +63,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
 
   // List of token types case
-  function authenticateRequest<T extends TokenType[]>(
+  function authenticateRequest<T extends readonly TokenType[]>(
     request: Request,
     options: RunTimeOptions & { acceptsToken: [...T] },
   ): Promise<RequestState<T[number]>>;

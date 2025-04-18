@@ -102,6 +102,7 @@ export const AuthErrorReason = {
   SessionTokenIatInTheFuture: 'session-token-iat-in-the-future',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   ActiveOrganizationMismatch: 'active-organization-mismatch',
+  TokenTypeMismatch: 'token-type-mismatch',
   UnexpectedError: 'unexpected-error',
 } as const;
 
@@ -132,12 +133,12 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
 
   const toAuth = () => {
     if (params.tokenType === 'session_token') {
-      // @ts-expect-error: TODO
-      return signedInAuthObject(authenticateContext, token, params.sessionClaims);
+      const { sessionClaims } = params as { sessionClaims: JwtPayload };
+      return signedInAuthObject(authenticateContext, token, sessionClaims);
     }
 
-    // @ts-expect-error: TODO
-    return authenticatedMachineObject(params.tokenType, token, params.machineData, authenticateContext);
+    const { machineData } = params as { machineData: MachineAuthType };
+    return authenticatedMachineObject(params.tokenType, token, machineData, authenticateContext);
   };
 
   return {

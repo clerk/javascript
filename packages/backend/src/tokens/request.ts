@@ -91,6 +91,27 @@ function isRequestEligibleForRefresh(
   );
 }
 
+function maybeHandleTokenTypeMismatch(
+  parsedTokenType: Exclude<TokenType, 'session_token'>,
+  acceptsToken: TokenType | TokenType[] | 'any',
+  authenticateContext: AuthenticateContext,
+): SignedOutState<Exclude<TokenType, 'session_token'>> | null {
+  if (acceptsToken === 'any') {
+    return null;
+  }
+  const mismatch = Array.isArray(acceptsToken)
+    ? !acceptsToken.includes(parsedTokenType)
+    : acceptsToken !== parsedTokenType;
+  if (mismatch) {
+    return signedOut({
+      tokenType: parsedTokenType,
+      authenticateContext,
+      reason: AuthErrorReason.TokenTypeMismatch,
+    });
+  }
+  return null;
+}
+
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
 export async function authenticateRequest<T extends TokenType>(
   request: Request,
@@ -100,7 +121,7 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: 'any' },
 ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
-export async function authenticateRequest<T extends TokenType[]>(
+export async function authenticateRequest<T extends readonly TokenType[]>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: [...T] },
 ): Promise<RequestState<T[number]>>;
@@ -787,21 +808,20 @@ ${error.getFullMessage()}`,
 
   async function authenticateMachineRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
-
     if (!sessionTokenInHeader) {
       return handleError(new Error('No token in header'), 'header');
     }
 
     const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
-    if (acceptsToken !== 'any' && acceptsToken !== parsedTokenType) {
-      return handleError(new Error(`Expected ${acceptsToken} token but received ${parsedTokenType} token`), 'header');
+    const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+    if (mismatchState) {
+      return mismatchState;
     }
 
     const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(tokenType, errors[0]);
     }
-
     return signedIn({
       tokenType,
       authenticateContext,
@@ -812,15 +832,14 @@ ${error.getFullMessage()}`,
 
   async function authenticateAnyRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
-
     if (!sessionTokenInHeader) {
       return handleError(new Error('No token in header'), 'header');
     }
-
     if (isMachineToken(sessionTokenInHeader)) {
       const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
-      if (acceptsToken !== 'any' && acceptsToken !== parsedTokenType) {
-        return handleError(new Error(`Expected ${acceptsToken} token but received ${parsedTokenType} token`), 'header');
+      const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+      if (mismatchState) {
+        return mismatchState;
       }
 
       const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
