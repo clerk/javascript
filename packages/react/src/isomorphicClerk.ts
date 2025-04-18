@@ -745,7 +745,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps) => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openSubscriptionDetails(props);
     } else {
       this.preopenSubscriptionDetails = props;
@@ -753,7 +753,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   __internal_closeSubscriptionDetails = () => {
-    if (this.clerkjs && this.#loaded) {
+    if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_closeSubscriptionDetails();
     } else {
       this.preopenSubscriptionDetails = null;
