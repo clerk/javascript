@@ -196,15 +196,15 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk SubscriptionDetailDrawer component in a drawer.
-   * @param props Optional subscription detail drawer configuration parameters.
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
    */
-  __internal_openSubscriptionDetailDrawer: (props?: __experimental_SubscriptionDetailDrawerProps) => void;
+  __internal_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
 
   /**
-   * Closes the Clerk SubscriptionDetailDrawer drawer.
+   * Closes the Clerk SubscriptionDetails drawer.
    */
-  __internal_closeSubscriptionDetailDrawer: () => void;
+  __internal_closeSubscriptionDetails: () => void;
 
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
@@ -1550,7 +1550,7 @@ export type __experimental_CheckoutProps = {
   portalId?: string;
 };
 
-export type __experimental_SubscriptionDetailDrawerProps = {
+export type __experimental_SubscriptionDetailsProps = {
   appearance?: SubscriptionDetailTheme;
   subscription?: __experimental_CommerceSubscriptionResource;
   subscriberType?: __experimental_CommerceSubscriberType;

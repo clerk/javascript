@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
-  __experimental_SubscriptionDetailDrawerProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -34,7 +34,7 @@ import {
   preloadComponent,
   SignInModal,
   SignUpModal,
-  SubscriptionDetailDrawer,
+  SubscriptionDetails,
   UserProfileModal,
   UserVerificationModal,
   WaitlistModal,
@@ -109,16 +109,16 @@ export type ComponentControls = {
       notify?: boolean;
     },
   ) => void;
-  openDrawer: <T extends 'checkout' | 'subscriptionDetail'>(
+  openDrawer: <T extends 'checkout' | 'subscriptionDetails'>(
     drawer: T,
     props: T extends 'checkout'
       ? __experimental_CheckoutProps
-      : T extends 'subscriptionDetail'
-        ? __experimental_SubscriptionDetailDrawerProps
+      : T extends 'subscriptionDetails'
+        ? __experimental_SubscriptionDetailsProps
         : never,
   ) => void;
   closeDrawer: (
-    drawer: 'checkout' | 'subscriptionDetail',
+    drawer: 'checkout' | 'subscriptionDetails',
     options?: {
       notify?: boolean;
     },
@@ -159,9 +159,9 @@ interface ComponentsState {
     open: false;
     props: null | __experimental_CheckoutProps;
   };
-  subscriptionDetailDrawer: {
+  subscriptionDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailDrawerProps;
+    props: null | __experimental_SubscriptionDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
@@ -248,7 +248,7 @@ const Components = (props: ComponentsProps) => {
       open: false,
       props: null,
     },
-    subscriptionDetailDrawer: {
+    subscriptionDetailsDrawer: {
       open: false,
       props: null,
     },
@@ -267,7 +267,7 @@ const Components = (props: ComponentsProps) => {
     waitlistModal,
     blankCaptchaModal,
     checkoutDrawer,
-    subscriptionDetailDrawer,
+    subscriptionDetailsDrawer,
     nodes,
   } = state;
 
@@ -563,21 +563,21 @@ const Components = (props: ComponentsProps) => {
     </LazyDrawerRenderer>
   );
 
-  const mountedSubscriptionDetailDrawer = subscriptionDetailDrawer.props && (
+  const mountedSubscriptionDetailDrawer = subscriptionDetailsDrawer.props && (
     <LazyDrawerRenderer
       globalAppearance={state.appearance}
-      appearanceKey={'subscriptionDetail' as any}
+      appearanceKey={'subscriptionDetails' as any}
       componentAppearance={{}}
-      flowName={'subscriptionDetail'}
-      open={subscriptionDetailDrawer.open}
-      onOpenChange={() => componentsControls.closeDrawer('subscriptionDetail')}
-      componentName={'SubscriptionDetailDrawer'}
-      portalId={subscriptionDetailDrawer.props.portalId}
+      flowName={'subscriptionDetails'}
+      open={subscriptionDetailsDrawer.open}
+      onOpenChange={() => componentsControls.closeDrawer('subscriptionDetails')}
+      componentName={'SubscriptionDetails'}
+      portalId={subscriptionDetailsDrawer.props.portalId}
     >
-      <SubscriptionDetailDrawer
-        {...subscriptionDetailDrawer.props}
-        subscriberType={subscriptionDetailDrawer.props.subscriberType || 'user'}
-        onSubscriptionCancel={subscriptionDetailDrawer.props.onSubscriptionCancel || (() => {})}
+      <SubscriptionDetails
+        {...subscriptionDetailsDrawer.props}
+        subscriberType={subscriptionDetailsDrawer.props.subscriberType || 'user'}
+        onSubscriptionCancel={subscriptionDetailsDrawer.props.onSubscriptionCancel || (() => {})}
       />
     </LazyDrawerRenderer>
   );

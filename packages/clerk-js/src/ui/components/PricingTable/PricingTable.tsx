@@ -28,7 +28,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
     const subscription = activeOrUpcomingSubscription(plan);
 
     if (subscription && !subscription.canceledAt) {
-      clerk.__internal_openSubscriptionDetailDrawer({
+      clerk.__internal_openSubscriptionDetails({
         subscription,
         subscriberType,
         onSubscriptionCancel: onSubscriptionChange,

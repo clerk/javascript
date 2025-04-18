@@ -5,7 +5,7 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailDrawerProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -112,7 +112,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __experimental_CheckoutProps = null;
-  private preopenSubscriptionDetailDrawer?: null | __experimental_SubscriptionDetailDrawerProps = null;
+  private preopenSubscriptionDetails?: null | __experimental_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -485,8 +485,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openCheckout(this.preopenCheckout);
     }
 
-    if (this.preopenSubscriptionDetailDrawer !== null) {
-      clerkjs.__internal_openSubscriptionDetailDrawer(this.preopenSubscriptionDetailDrawer);
+    if (this.preopenSubscriptionDetails !== null) {
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
     }
 
     if (this.preopenSignUp !== null) {
@@ -683,19 +683,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openSubscriptionDetailDrawer = (props?: __experimental_SubscriptionDetailDrawerProps) => {
+  __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps) => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__internal_openSubscriptionDetailDrawer(props);
+      this.clerkjs.__internal_openSubscriptionDetails(props);
     } else {
-      this.preopenSubscriptionDetailDrawer = props;
+      this.preopenSubscriptionDetails = props;
     }
   };
 
-  __internal_closeSubscriptionDetailDrawer = () => {
+  __internal_closeSubscriptionDetails = () => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__internal_closeSubscriptionDetailDrawer();
+      this.clerkjs.__internal_closeSubscriptionDetails();
     } else {
-      this.preopenSubscriptionDetailDrawer = null;
+      this.preopenSubscriptionDetails = null;
     }
   };
 

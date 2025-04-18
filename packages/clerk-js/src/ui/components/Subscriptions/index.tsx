@@ -1,2 +1,2 @@
-export * from './SubscriptionDetailDrawer';
+export * from './SubscriptionDetails';
 export * from './SubscriptionsList';

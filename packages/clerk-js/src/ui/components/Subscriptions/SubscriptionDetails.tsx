@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type {
   __experimental_CommerceSubscriptionResource,
-  __experimental_SubscriptionDetailDrawerProps,
+  __experimental_SubscriptionDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
@@ -25,11 +25,11 @@ import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export function SubscriptionDetailDrawer({
+export function SubscriptionDetails({
   subscription,
   subscriberType,
   onSubscriptionCancel,
-}: __experimental_SubscriptionDetailDrawerProps) {
+}: __experimental_SubscriptionDetailsProps) {
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -67,7 +67,7 @@ export function SubscriptionsList() {
                 variant='bordered'
                 textVariant='buttonSmall'
                 onClick={() =>
-                  clerk.__internal_openSubscriptionDetailDrawer({
+                  clerk.__internal_openSubscriptionDetails({
                     subscription,
                     onSubscriptionCancel: () => revalidate(),
                     portalId: PROFILE_CARD_SCROLLBOX_ID,

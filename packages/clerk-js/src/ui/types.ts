@@ -5,7 +5,7 @@ import type {
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailDrawerProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -50,7 +50,7 @@ export type AvailableComponentProps =
   | __experimental_PricingTableProps
   | __experimental_CheckoutProps
   | __internal_UserVerificationProps
-  | __experimental_SubscriptionDetailDrawerProps;
+  | __experimental_SubscriptionDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
