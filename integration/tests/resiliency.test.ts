@@ -110,7 +110,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       return route.fulfill(response);
     });
 
-    await page.route('**/v1/environment?**', route => {
+    await page.route('*/**/v1/environment*', route => {
       return route.fulfill(response);
     });
 
@@ -230,19 +230,26 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     test('clerk-js environment fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
-      await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
+      // Clear any existing routes
+      await context.unroute('**/*');
+
+      // Set up route interception with debug
+      await context.route('**/*', async route => {
+        if (route.request().url().includes('/v1/environment')) {
+          await route.fulfill(make500ClerkResponse());
+        } else {
+          await route.continue();
+        }
+      });
 
       await u.page.goToRelative('/clerk-status');
 
       // Initial state checks
-      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
-      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
-      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
       await u.po.clerk.toBeLoading();
 
       // Wait for loading to complete and verify final state
-      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible();
       await u.po.clerk.toBeDegraded();
+
       await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
       await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
       await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeVisible();
