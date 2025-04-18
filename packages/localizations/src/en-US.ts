@@ -24,6 +24,10 @@ export const enUS: LocalizationResource = {
         title__invoiceId: 'Invoice ID',
         title__subscriptionBegins: 'Subscription begins',
       },
+      emailForm: {
+        title: 'Add an email address',
+        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+      },
     },
   },
   backButton: 'Back',
