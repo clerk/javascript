@@ -7,7 +7,7 @@ import type {
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { AppearanceProvider } from '../../customizables';
 import { PricingTableDefault } from './PricingTableDefault';
@@ -42,7 +42,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         planPeriod,
         subscriberType,
         onSubscriptionComplete: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+        portalId:
+          mode === 'modal'
+            ? subscriberType === 'user'
+              ? USER_PROFILE_CARD_SCROLLBOX_ID
+              : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
+            : undefined,
       });
     }
   };
@@ -84,7 +89,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           setPlanPeriod={setPlanPeriod}
           strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
           portalProps={{
-            id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+            id:
+              mode === 'modal'
+                ? subscriberType === 'user'
+                  ? USER_PROFILE_CARD_SCROLLBOX_ID
+                  : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
+                : undefined,
           }}
           onSubscriptionCancel={onSubscriptionChange}
         />
