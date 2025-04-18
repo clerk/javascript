@@ -48,7 +48,11 @@ export type SignedInState<T extends TokenType = 'session_token'> = {
   signUpUrl: string;
   afterSignInUrl: string;
   afterSignUpUrl: string;
+  /**
+   * @deprecated Use `isAuthenticated` instead.
+   */
   isSignedIn: true;
+  isAuthenticated: true;
   headers: Headers;
   token: string;
   tokenType: T;
@@ -74,7 +78,11 @@ export type SignedOutState<T extends TokenType = 'session_token'> = {
   signUpUrl: string;
   afterSignInUrl: string;
   afterSignUpUrl: string;
+  /**
+   * @deprecated Use `isAuthenticated` instead.
+   */
   isSignedIn: false;
+  isAuthenticated: false;
   headers: Headers;
   token: null;
   tokenType: T;
@@ -154,6 +162,7 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
+    isAuthenticated: true,
     tokenType: params.tokenType,
     toAuth,
     headers,
@@ -197,6 +206,7 @@ export function signedOut<T extends TokenType>(params: SignedOutParams & { token
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
+    isAuthenticated: false,
     tokenType,
     headers,
     toAuth,
@@ -223,6 +233,7 @@ export function handshake(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
+    isAuthenticated: false,
     tokenType: 'session_token',
     headers,
     toAuth: () => null,
