@@ -14,6 +14,7 @@
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
     "format": "prettier --write .",
     "format:check": "prettier --cache --check .",
+    "generate:api-client": "(cd packages/backend-api-client && speakeasy run)",
     "preinstall": "npx only-allow pnpm",
     "lint": "node ./scripts/lint.mjs",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
