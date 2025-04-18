@@ -17,6 +17,7 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -548,6 +549,18 @@ export class Clerk implements ClerkInterface {
   public __internal_closeCheckout = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
+  };
+
+  public __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'SubscriptionDetails' })
+      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
+  };
+
+  public __internal_closeSubscriptionDetails = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
