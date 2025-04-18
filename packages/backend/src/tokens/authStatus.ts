@@ -36,7 +36,7 @@ type SignedInObjectMap = {
   oauth_token: AuthenticatedOAuthTokenObject;
 };
 
-export type SignedInState<T extends TokenType = TokenType> = {
+export type SignedInState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
@@ -62,7 +62,7 @@ type SignedOutObjectMap = {
   oauth_token: UnauthenticatedOAuthTokenObject;
 };
 
-export type SignedOutState<T extends TokenType = TokenType> = {
+export type SignedOutState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedOut;
   message: string;
   reason: AuthReason;
@@ -109,7 +109,7 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState<T extends TokenType = TokenType> =
+export type RequestState<T extends TokenType = 'session_token'> =
   | SignedInState<T>
   | SignedOutState<T>
   | (T extends 'session_token' ? HandshakeState : never);

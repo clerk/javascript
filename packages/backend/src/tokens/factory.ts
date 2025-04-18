@@ -48,21 +48,21 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const apiClient = params.apiClient;
 
   // No options case
-  function authenticateRequest(request: Request): Promise<RequestState<'session_token'>>;
+  function authenticateRequest(request: Request): Promise<RequestState>;
 
-  // With token type case
+  // Single token type case
   function authenticateRequest<T extends TokenType>(
     request: Request,
     options: RunTimeOptions & { acceptsToken: T },
   ): Promise<RequestState<T>>;
 
-  // Any case
+  // Any token type case
   function authenticateRequest(
     request: Request,
     options: RunTimeOptions & { acceptsToken: 'any' },
-  ): Promise<RequestState>;
+  ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
 
-  // List case
+  // List of token types case
   function authenticateRequest<T extends TokenType[]>(
     request: Request,
     options: RunTimeOptions & { acceptsToken: [...T] },

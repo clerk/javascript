@@ -91,10 +91,7 @@ function isRequestEligibleForRefresh(
   );
 }
 
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions,
-): Promise<RequestState<'session_token'>>;
+export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
 export async function authenticateRequest<T extends TokenType>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: T },
@@ -102,7 +99,7 @@ export async function authenticateRequest<T extends TokenType>(
 export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: 'any' },
-): Promise<RequestState>;
+): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
 export async function authenticateRequest<T extends TokenType[]>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: [...T] },
@@ -880,7 +877,7 @@ ${error.getFullMessage()}`,
 /**
  * @internal
  */
-export const debugRequestState = (params: SignedInState | SignedOutState | HandshakeState) => {
+export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
