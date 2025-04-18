@@ -48,9 +48,10 @@ export type AuthenticateRequestOptions = {
    */
   apiClient?: ApiClient;
   /**
-   * TODO: Add docs
+   * The type of token to accept.
+   * @default 'session_token'
    */
-  acceptsToken?: TokenEntity | 'any';
+  acceptsToken?: TokenType | TokenType[] | 'any';
 } & VerifyTokenOptions;
 
 /**
@@ -121,6 +122,6 @@ export type OrganizationSyncOptions = {
  */
 type Pattern = string;
 
-export type TokenEntity = 'user' | 'oauth_token' | 'api_key' | 'machine_token';
+export type TokenType = 'session_token' | 'oauth_token' | 'api_key' | 'machine_token';
 
 export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;

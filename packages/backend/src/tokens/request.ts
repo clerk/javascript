@@ -11,13 +11,13 @@ import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
-import type { HandshakeState, SignedInState, SignedOutState } from './authStatus';
+import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import { getMachineTokenType, isMachineToken } from './machine';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions, TokenEntity } from './types';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions, TokenType } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -91,12 +91,29 @@ function isRequestEligibleForRefresh(
   );
 }
 
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions,
+): Promise<RequestState<'session_token'>>;
+export async function authenticateRequest<T extends TokenType>(
+  request: Request,
+  options: AuthenticateRequestOptions & { acceptsToken: T },
+): Promise<RequestState<T>>;
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions & { acceptsToken: 'any' },
+): Promise<RequestState>;
+export async function authenticateRequest<T extends TokenType[]>(
+  request: Request,
+  options: AuthenticateRequestOptions & { acceptsToken: [...T] },
+): Promise<RequestState<T[number]>>;
+
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
-  // Default entity is user for backwards compatibility.
-  options.acceptsToken ??= 'user';
+  // Default tokenType is session_token for backwards compatibility.
+  const acceptsToken = options.acceptsToken ?? 'session_token';
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -179,7 +196,7 @@ export async function authenticateRequest(request: Request, options: Authenticat
 
     if (sessionToken === '') {
       return signedOut({
-        entity: 'user',
+        tokenType: 'session_token',
         authenticateContext,
         reason: AuthErrorReason.SessionTokenMissing,
         headers,
@@ -189,7 +206,7 @@ export async function authenticateRequest(request: Request, options: Authenticat
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
       return signedIn({
-        entity: 'user',
+        tokenType: 'session_token',
         authenticateContext,
         sessionClaims: data,
         headers,
@@ -222,7 +239,7 @@ ${error.getFullMessage()}`,
       });
       if (retryResult) {
         return signedIn({
-          entity: 'user',
+          tokenType: 'session_token',
           authenticateContext,
           sessionClaims: retryResult,
           headers,
@@ -391,7 +408,7 @@ ${error.getFullMessage()}`,
         const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
         console.log(msg);
         return signedOut({
-          entity: 'user',
+          tokenType: 'session_token',
           authenticateContext,
           reason,
           message,
@@ -402,7 +419,7 @@ ${error.getFullMessage()}`,
     }
 
     return signedOut({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext,
       reason,
       message,
@@ -481,7 +498,7 @@ ${error.getFullMessage()}`,
       }
       // use `await` to force this try/catch handle the signedIn invocation
       return signedIn({
-        entity: 'user',
+        tokenType: 'session_token',
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -620,7 +637,7 @@ ${error.getFullMessage()}`,
 
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut({
-        entity: 'user',
+        tokenType: 'api_key',
         authenticateContext,
         reason: AuthErrorReason.SessionTokenAndUATMissing,
       });
@@ -654,7 +671,7 @@ ${error.getFullMessage()}`,
       }
 
       const signedInRequestState = signedIn({
-        entity: 'user',
+        tokenType: 'session_token',
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -678,7 +695,7 @@ ${error.getFullMessage()}`,
 
     // Unreachable
     return signedOut({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext,
       reason: AuthErrorReason.UnexpectedError,
     });
@@ -690,7 +707,7 @@ ${error.getFullMessage()}`,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
       return signedOut({
-        entity: 'user',
+        tokenType: 'session_token',
         authenticateContext,
         reason: AuthErrorReason.UnexpectedError,
       });
@@ -702,7 +719,7 @@ ${error.getFullMessage()}`,
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
         return signedIn({
-          entity: 'user',
+          tokenType: 'session_token',
           authenticateContext,
           sessionClaims: data.jwtPayload,
           headers: data.headers,
@@ -744,24 +761,27 @@ ${error.getFullMessage()}`,
     }
 
     return signedOut({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext,
       reason: err.reason,
       message: err.getFullMessage(),
     });
   }
 
-  function handleMachineError(entity: Exclude<TokenEntity, 'user'>, err: unknown): SignedOutState {
+  function handleMachineError(
+    tokenType: Exclude<TokenType, 'session_token'>,
+    err: unknown,
+  ): SignedOutState<Exclude<TokenType, 'session_token'>> {
     if (!(err instanceof MachineTokenVerificationError)) {
       return signedOut({
-        entity,
+        tokenType,
         authenticateContext,
         reason: AuthErrorReason.UnexpectedError,
       });
     }
 
     return signedOut({
-      entity,
+      tokenType,
       authenticateContext,
       reason: err.code,
       message: err.getFullMessage(),
@@ -775,18 +795,18 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
-    const tokenType = getMachineTokenType(sessionTokenInHeader);
-    if (options.acceptsToken !== 'any' && options.acceptsToken !== tokenType) {
-      return handleError(new Error(`Expected ${options.acceptsToken} token but received ${tokenType} token`), 'header');
+    const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
+    if (acceptsToken !== 'any' && acceptsToken !== parsedTokenType) {
+      return handleError(new Error(`Expected ${acceptsToken} token but received ${parsedTokenType} token`), 'header');
     }
 
-    const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+    const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
     if (errors) {
-      return handleMachineError(entity, errors[0]);
+      return handleMachineError(tokenType, errors[0]);
     }
 
     return signedIn({
-      entity,
+      tokenType,
       authenticateContext,
       machineData: data,
       token: sessionTokenInHeader,
@@ -801,21 +821,18 @@ ${error.getFullMessage()}`,
     }
 
     if (isMachineToken(sessionTokenInHeader)) {
-      const tokenType = getMachineTokenType(sessionTokenInHeader);
-      if (options.acceptsToken !== 'any' && options.acceptsToken !== tokenType) {
-        return handleError(
-          new Error(`Expected ${options.acceptsToken} token but received ${tokenType} token`),
-          'header',
-        );
+      const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
+      if (acceptsToken !== 'any' && acceptsToken !== parsedTokenType) {
+        return handleError(new Error(`Expected ${acceptsToken} token but received ${parsedTokenType} token`), 'header');
       }
 
-      const { data, entity, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+      const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
       if (errors) {
-        return handleMachineError(entity, errors[0]);
+        return handleMachineError(tokenType, errors[0]);
       }
 
       return signedIn({
-        entity,
+        tokenType,
         authenticateContext,
         machineData: data,
         token: sessionTokenInHeader,
@@ -829,7 +846,7 @@ ${error.getFullMessage()}`,
     }
 
     return signedIn({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext,
       sessionClaims: data,
       token: sessionTokenInHeader,
@@ -837,11 +854,11 @@ ${error.getFullMessage()}`,
   }
 
   if (authenticateContext.sessionTokenInHeader) {
-    if (options.acceptsToken === 'any') {
+    if (acceptsToken === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
     }
 
-    if (options.acceptsToken === 'user') {
+    if (acceptsToken === 'session_token') {
       return authenticateRequestWithTokenInHeader();
     }
 
@@ -849,13 +866,9 @@ ${error.getFullMessage()}`,
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (
-    options.acceptsToken === 'oauth_token' ||
-    options.acceptsToken === 'api_key' ||
-    options.acceptsToken === 'machine_token'
-  ) {
+  if (acceptsToken === 'oauth_token' || acceptsToken === 'api_key' || acceptsToken === 'machine_token') {
     return signedOut({
-      entity: options.acceptsToken,
+      tokenType: acceptsToken,
       authenticateContext,
       reason: 'no token in header',
     });

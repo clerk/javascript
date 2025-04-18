@@ -2,7 +2,7 @@ import type { ApiClient } from '../api';
 import type { RequestState } from '../tokens/authStatus';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, TokenType } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
 type BuildTimeOptions = Partial<
@@ -47,6 +47,28 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
+  // No options case
+  function authenticateRequest(request: Request): Promise<RequestState<'session_token'>>;
+
+  // With token type case
+  function authenticateRequest<T extends TokenType>(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: T },
+  ): Promise<RequestState<T>>;
+
+  // Any case
+  function authenticateRequest(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: 'any' },
+  ): Promise<RequestState>;
+
+  // List case
+  function authenticateRequest<T extends TokenType[]>(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: [...T] },
+  ): Promise<RequestState<T[number]>>;
+
+  // Implementation
   function authenticateRequest(request: Request, options: RunTimeOptions = {}): Promise<RequestState> {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);

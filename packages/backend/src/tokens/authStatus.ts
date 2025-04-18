@@ -4,10 +4,14 @@ import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type {
-  AuthenticatedMachineObject,
+  AuthenticatedAPIKeyObject,
+  AuthenticatedMachineTokenObject,
+  AuthenticatedOAuthTokenObject,
   SignedInAuthObject,
   SignedOutAuthObject,
-  UnauthenticatedMachineObject,
+  UnauthenticatedAPIKeyObject,
+  UnauthenticatedMachineTokenObject,
+  UnauthenticatedOAuthTokenObject,
 } from './authObjects';
 import {
   authenticatedMachineObject,
@@ -15,7 +19,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { MachineAuthType, TokenEntity } from './types';
+import type { MachineAuthType, TokenType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -25,19 +29,14 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-type ToAuthOptions = {
-  accept?: TokenEntity | 'any';
+type SignedInObjectMap = {
+  session_token: SignedInAuthObject;
+  api_key: AuthenticatedAPIKeyObject;
+  machine_token: AuthenticatedMachineTokenObject;
+  oauth_token: AuthenticatedOAuthTokenObject;
 };
 
-type ToAuthReturn<T extends ToAuthOptions | undefined, UserAuth, MachineAuth> = T extends { accept: infer E }
-  ? E extends 'any'
-    ? UserAuth | MachineAuth
-    : E extends 'user' | undefined
-      ? UserAuth
-      : MachineAuth
-  : UserAuth;
-
-export type SignedInState = {
+export type SignedInState<T extends TokenType = TokenType> = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
@@ -50,15 +49,20 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  tokenType: TokenEntity;
-  toAuth: <T extends ToAuthOptions | undefined>(
-    options?: T,
-  ) => ToAuthReturn<T, SignedInAuthObject, AuthenticatedMachineObject>;
   headers: Headers;
   token: string;
+  tokenType: T;
+  toAuth: () => SignedInObjectMap[T];
 };
 
-export type SignedOutState = {
+type SignedOutObjectMap = {
+  session_token: SignedOutAuthObject;
+  api_key: UnauthenticatedAPIKeyObject;
+  machine_token: UnauthenticatedMachineTokenObject;
+  oauth_token: UnauthenticatedOAuthTokenObject;
+};
+
+export type SignedOutState<T extends TokenType = TokenType> = {
   status: typeof AuthStatus.SignedOut;
   message: string;
   reason: AuthReason;
@@ -71,16 +75,14 @@ export type SignedOutState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: false;
-  tokenType: TokenEntity;
-  toAuth: <T extends ToAuthOptions | undefined>(
-    options?: T,
-  ) => ToAuthReturn<T, SignedOutAuthObject, UnauthenticatedMachineObject>;
   headers: Headers;
   token: null;
+  tokenType: T;
+  toAuth: () => SignedOutObjectMap[T];
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
-  tokenType: 'user';
+  tokenType: 'session_token';
   status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
@@ -107,63 +109,36 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
-export type RequestState = SignedInState | SignedOutState | HandshakeState;
+export type RequestState<T extends TokenType = TokenType> =
+  | SignedInState<T>
+  | SignedOutState<T>
+  | (T extends 'session_token' ? HandshakeState : never);
 
 type BaseSignedInParams = {
   authenticateContext: AuthenticateContext;
   headers?: Headers;
   token: string;
-  entity?: TokenEntity;
+  tokenType: TokenType;
 };
 
-type SignedInParams = BaseSignedInParams &
-  (
-    | {
-        entity: 'user';
-        sessionClaims: JwtPayload;
-      }
-    | {
-        entity: Exclude<TokenEntity, 'user'>;
-        machineData: MachineAuthType;
-      }
-  );
+type SignedInParams =
+  | (BaseSignedInParams & { tokenType: 'session_token'; sessionClaims: JwtPayload })
+  | (BaseSignedInParams & { tokenType: 'api_key'; machineData: MachineAuthType })
+  | (BaseSignedInParams & { tokenType: 'machine_token'; machineData: MachineAuthType })
+  | (BaseSignedInParams & { tokenType: 'oauth_token'; machineData: MachineAuthType });
 
-export function signedIn(params: SignedInParams): SignedInState {
-  const { authenticateContext, headers = new Headers(), token, entity = 'user' } = params;
+export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): SignedInState<T> {
+  const { authenticateContext, headers = new Headers(), token } = params;
 
-  // We need to assert type because TS can't infer that our runtime logic
-  // matches the conditional type pattern.
-  const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
-    const targetEntity = options?.accept || 'user';
-
-    // If targetEntity is 'any', return the current auth object without conversion
-    if (targetEntity === 'any') {
-      if (params.entity === 'user') {
-        const { sessionClaims } = params;
-        return signedInAuthObject(authenticateContext, token, sessionClaims);
-      }
-      const { machineData } = params;
-      return authenticatedMachineObject(params.entity, token, machineData, authenticateContext);
+  const toAuth = () => {
+    if (params.tokenType === 'session_token') {
+      // @ts-expect-error: TODO
+      return signedInAuthObject(authenticateContext, token, params.sessionClaims);
     }
 
-    // For specific entity types, validate they match
-    if (targetEntity !== params.entity) {
-      return signedOutAuthObject({
-        ...authenticateContext,
-        status: AuthStatus.SignedOut,
-        reason: AuthErrorReason.UnexpectedError,
-        message: `Cannot convert ${params.entity} token to ${targetEntity} token.`,
-      });
-    }
-
-    if (targetEntity === 'user') {
-      const { sessionClaims } = params as { sessionClaims: JwtPayload };
-      return signedInAuthObject(authenticateContext, token, sessionClaims);
-    }
-
-    const { machineData } = params as { machineData: MachineAuthType };
-    return authenticatedMachineObject(targetEntity, token, machineData, authenticateContext);
-  }) as SignedInState['toAuth'];
+    // @ts-expect-error: TODO
+    return authenticatedMachineObject(params.tokenType, token, params.machineData, authenticateContext);
+  };
 
   return {
     status: AuthStatus.SignedIn,
@@ -178,50 +153,35 @@ export function signedIn(params: SignedInParams): SignedInState {
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    tokenType: entity,
+    tokenType: params.tokenType,
     toAuth,
     headers,
     token,
-  };
+  } as SignedInState<T>;
 }
 
-type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
+type BaseSignedOutParams = Omit<BaseSignedInParams, 'token'> & {
   reason: AuthReason;
   message?: string;
 };
 
-export function signedOut(params: SignedOutParams): SignedOutState {
-  const { authenticateContext, headers = new Headers(), entity = 'user', reason, message = '' } = params;
+// Create a union type for all valid signedOut parameter shapes
+type SignedOutParams =
+  | (BaseSignedOutParams & { tokenType: 'session_token' })
+  | (BaseSignedOutParams & { tokenType: 'api_key' })
+  | (BaseSignedOutParams & { tokenType: 'machine_token' })
+  | (BaseSignedOutParams & { tokenType: 'oauth_token' });
 
-  // We need to assert type because TS can't infer that our runtime logic
-  // matches the conditional type pattern.
-  const toAuth = (<T extends ToAuthOptions | undefined>(options?: T) => {
-    const targetEntity = options?.accept || 'user';
+export function signedOut<T extends TokenType>(params: SignedOutParams & { tokenType: T }): SignedOutState<T> {
+  const { authenticateContext, headers = new Headers(), reason, message = '', tokenType } = params;
 
-    // If targetEntity is 'any', return based on current entity type
-    if (targetEntity === 'any') {
-      if (entity === 'user') {
-        return signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message });
-      }
-      return unauthenticatedMachineObject(entity, { reason, message, headers });
-    }
-
-    // For specific entity types, validate they match
-    if (targetEntity !== entity) {
-      return signedOutAuthObject({
-        ...authenticateContext,
-        status: AuthStatus.SignedOut,
-        reason: AuthErrorReason.UnexpectedError,
-        message: `Cannot convert ${entity} token to ${targetEntity} token.`,
-      });
-    }
-
-    if (targetEntity === 'user') {
+  const toAuth = () => {
+    if (tokenType === 'session_token') {
       return signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message });
     }
 
-    return unauthenticatedMachineObject(targetEntity, { reason, message, headers });
-  }) as SignedOutState['toAuth'];
+    return unauthenticatedMachineObject(tokenType, { reason, message, headers });
+  };
 
   return withDebugHeaders({
     status: AuthStatus.SignedOut,
@@ -236,11 +196,11 @@ export function signedOut(params: SignedOutParams): SignedOutState {
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
-    tokenType: entity,
+    tokenType,
     headers,
     toAuth,
     token: null,
-  });
+  }) as SignedOutState<T>;
 }
 
 export function handshake(
@@ -262,14 +222,16 @@ export function handshake(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: false,
-    tokenType: 'user',
+    tokenType: 'session_token',
     headers,
     toAuth: () => null,
     token: null,
   });
 }
 
-const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+const withDebugHeaders = <T extends { headers: Headers; message?: string; reason?: AuthReason; status?: AuthStatus }>(
+  requestState: T,
+): T => {
   const headers = new Headers(requestState.headers || {});
 
   if (requestState.message) {

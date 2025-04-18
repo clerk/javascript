@@ -1,4 +1,4 @@
-import type { TokenEntity } from '../tokens/types';
+import type { TokenType } from '../tokens/types';
 
 export const M2M_TOKEN_PREFIX = 'm2m_';
 export const OAUTH_TOKEN_PREFIX = 'oauth_';
@@ -10,7 +10,7 @@ export function isMachineToken(token: string): boolean {
   return MACHINE_TOKEN_PREFIXES.some(prefix => token.startsWith(prefix));
 }
 
-export function getMachineTokenType(token: string): Exclude<TokenEntity, 'user'> {
+export function getMachineTokenType(token: string): Exclude<TokenType, 'session_token'> {
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
     return 'machine_token';
   }

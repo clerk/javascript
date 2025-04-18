@@ -13,7 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import type { TokenEntity } from '../tokens/types';
+import type { TokenType } from '../tokens/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
@@ -65,12 +65,12 @@ export async function verifyToken(
 }
 
 function handleUnexpectedMachineError(
-  entity: Exclude<TokenEntity, 'user'>,
+  tokenType: Exclude<TokenType, 'session_token'>,
   err: any,
 ): MachineTokenReturnType<any, MachineTokenVerificationError> {
   return {
     data: undefined,
-    entity,
+    tokenType,
     errors: [
       new MachineTokenVerificationError({
         message: 'Unexpected error',
@@ -88,7 +88,7 @@ async function verifyMachineToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.machineTokens.verifySecret(secret);
-    return { data: verifiedToken, entity: 'machine_token', errors: undefined };
+    return { data: verifiedToken, tokenType: 'machine_token', errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {
       let code: MachineTokenVerificationErrorCode;
@@ -110,7 +110,7 @@ async function verifyMachineToken(
 
       return {
         data: undefined,
-        entity: 'machine_token',
+        tokenType: 'machine_token',
         errors: [
           new MachineTokenVerificationError({
             message,
@@ -132,7 +132,7 @@ async function verifyOAuthToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verifySecret(secret);
-    return { data: verifiedToken, entity: 'oauth_token', errors: undefined };
+    return { data: verifiedToken, tokenType: 'oauth_token', errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {
       let code: MachineTokenVerificationErrorCode;
@@ -154,7 +154,7 @@ async function verifyOAuthToken(
 
       return {
         data: undefined,
-        entity: 'oauth_token',
+        tokenType: 'oauth_token',
         errors: [
           new MachineTokenVerificationError({
             message,
@@ -176,7 +176,7 @@ async function verifyAPIKey(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.apiKeys.verifySecret(secret);
-    return { data: verifiedToken, entity: 'api_key', errors: undefined };
+    return { data: verifiedToken, tokenType: 'api_key', errors: undefined };
   } catch (err: any) {
     if (isClerkAPIResponseError(err)) {
       let code: MachineTokenVerificationErrorCode;
@@ -198,7 +198,7 @@ async function verifyAPIKey(
 
       return {
         data: undefined,
-        entity: 'api_key',
+        tokenType: 'api_key',
         errors: [
           new MachineTokenVerificationError({
             message,
