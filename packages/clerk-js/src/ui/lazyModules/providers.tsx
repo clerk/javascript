@@ -147,31 +147,29 @@ type LazyDrawerRendererProps = React.PropsWithChildren<
 
 export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
   return (
-    <Suspense fallback={''}>
-      <VirtualRouter startPath=''>
-        <AppearanceProvider
-          globalAppearance={props.globalAppearance}
-          appearanceKey={props.appearanceKey}
-          appearance={props.componentAppearance}
-        >
-          <FlowMetadataProvider flow={props.flowName || ('' as any)}>
-            <InternalThemeProvider>
-              <DrawerRoot
-                open={props.open}
-                onOpenChange={props.onOpenChange}
-                strategy={props.portalId ? 'absolute' : 'fixed'}
-                portalProps={{
-                  id: props.portalId ? props.portalId : undefined,
-                }}
-              >
-                <DrawerOverlay />
-                {props.children}
-              </DrawerRoot>
-            </InternalThemeProvider>
-          </FlowMetadataProvider>
-        </AppearanceProvider>
-      </VirtualRouter>
-    </Suspense>
+    <VirtualRouter startPath=''>
+      <AppearanceProvider
+        globalAppearance={props.globalAppearance}
+        appearanceKey={props.appearanceKey}
+        appearance={props.componentAppearance}
+      >
+        <FlowMetadataProvider flow={props.flowName || ('' as any)}>
+          <InternalThemeProvider>
+            <DrawerRoot
+              open={props.open}
+              onOpenChange={props.onOpenChange}
+              strategy={props.portalId ? 'absolute' : 'fixed'}
+              portalProps={{
+                id: props.portalId ? props.portalId : undefined,
+              }}
+            >
+              <DrawerOverlay />
+              <Suspense fallback={''}>{props.children}</Suspense>
+            </DrawerRoot>
+          </InternalThemeProvider>
+        </FlowMetadataProvider>
+      </AppearanceProvider>
+    </VirtualRouter>
   );
 };
 
