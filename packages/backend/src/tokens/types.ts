@@ -124,4 +124,6 @@ type Pattern = string;
 
 export type TokenType = 'session_token' | 'oauth_token' | 'api_key' | 'machine_token';
 
+export type NonSessionTokenType = Exclude<TokenType, 'session_token'>;
+
 export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;

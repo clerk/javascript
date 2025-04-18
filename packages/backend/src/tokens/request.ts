@@ -17,7 +17,7 @@ import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import { getMachineTokenType, isMachineToken } from './machine';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions, TokenType } from './types';
+import type { AuthenticateRequestOptions, NonSessionTokenType, OrganizationSyncOptions, TokenType } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -92,10 +92,10 @@ function isRequestEligibleForRefresh(
 }
 
 function maybeHandleTokenTypeMismatch(
-  parsedTokenType: Exclude<TokenType, 'session_token'>,
+  parsedTokenType: NonSessionTokenType,
   acceptsToken: TokenType | TokenType[] | 'any',
   authenticateContext: AuthenticateContext,
-): SignedOutState<Exclude<TokenType, 'session_token'>> | null {
+): SignedOutState<NonSessionTokenType> | null {
   if (acceptsToken === 'any') {
     return null;
   }
@@ -786,10 +786,7 @@ ${error.getFullMessage()}`,
     });
   }
 
-  function handleMachineError(
-    tokenType: Exclude<TokenType, 'session_token'>,
-    err: unknown,
-  ): SignedOutState<Exclude<TokenType, 'session_token'>> {
+  function handleMachineError(tokenType: NonSessionTokenType, err: unknown): SignedOutState<NonSessionTokenType> {
     if (!(err instanceof MachineTokenVerificationError)) {
       return signedOut({
         tokenType,

@@ -13,7 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import type { TokenType } from '../tokens/types';
+import type { NonSessionTokenType } from '../tokens/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
@@ -65,7 +65,7 @@ export async function verifyToken(
 }
 
 function handleUnexpectedMachineError(
-  tokenType: Exclude<TokenType, 'session_token'>,
+  tokenType: NonSessionTokenType,
   err: any,
 ): MachineTokenReturnType<any, MachineTokenVerificationError> {
   return {
