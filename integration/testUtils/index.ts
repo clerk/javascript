@@ -6,6 +6,7 @@ import { expect } from '@playwright/test';
 import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
+import { createImpersonationPageObject } from './impersonationPageObjects';
 import { createInvitationService } from './invitationsService';
 import { createKeylessPopoverPageObject } from './keylessPopoverPageObject';
 import { createOrganizationsService } from './organizationsService';
@@ -53,6 +54,11 @@ const createExpectPageObject = ({ page }: TestArgs) => {
         return !!window.Clerk?.user;
       });
     },
+    toBeSignedInAsActor: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.session?.actor;
+      });
+    },
     toHaveResolvedTask: async () => {
       return page.waitForFunction(() => {
         return !window.Clerk?.session?.currentTask;
@@ -66,6 +72,11 @@ const createClerkUtils = ({ page }: TestArgs) => {
     toBeLoaded: async () => {
       return page.waitForFunction(() => {
         return !!window.Clerk?.loaded;
+      });
+    },
+    getClientSideActor: () => {
+      return page.evaluate(() => {
+        return window.Clerk?.session?.actor;
       });
     },
     toBeLoading: async () => {
@@ -130,6 +141,7 @@ export const createTestUtils = <
   const pageObjects = {
     clerk: createClerkUtils(testArgs),
     expect: createExpectPageObject(testArgs),
+    impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),
