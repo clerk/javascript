@@ -91,11 +91,8 @@ const createCustomPages = (
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
     commerce:
-      clerk.sdkMetadata?.environment === 'test'
-        ? false
-        : clerk.__internal_getOption('experimental')?.commerce &&
-          !disabledBillingFeature(clerk, environment) &&
-          (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
+      !disabledBillingFeature(clerk, environment) &&
+      (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
   });
 
   if (isDevelopmentSDK(clerk)) {
