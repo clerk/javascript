@@ -5,7 +5,7 @@ import {
   usePlansContext,
   withPlans,
 } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -21,6 +21,7 @@ import { useTabState } from '../../hooks/useTabState';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
+import { SubscriptionsList } from '../Subscriptions';
 
 const orgTabMap = {
   0: 'plans',
@@ -75,7 +76,19 @@ export const OrganizationBillingPage = withPlans(
               />
             </TabsList>
             <TabPanels>
-              <TabPanel sx={{ width: '100%' }}>
+              <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
+                {subscriptions.length > 0 && (
+                  <>
+                    <SubscriptionsList />
+                    <Hr sx={t => ({ marginBlock: t.space.$6 })} />
+                    <Heading
+                      textVariant='h3'
+                      as='h2'
+                      localizationKey='Available Plans'
+                      sx={t => ({ marginBlockEnd: t.space.$4, fontWeight: t.fontWeights.$medium })}
+                    />
+                  </>
+                )}
                 <__experimental_PricingTableContext.Provider
                   value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
                 >

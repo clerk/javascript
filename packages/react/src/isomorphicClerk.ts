@@ -6,6 +6,7 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PricingTableProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -113,6 +114,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __experimental_CheckoutProps = null;
+  private preopenSubscriptionDetails?: null | __experimental_SubscriptionDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -538,6 +540,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openCheckout(this.preopenCheckout);
     }
 
+    if (this.preopenSubscriptionDetails !== null) {
+      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
+    }
+
     if (this.preopenSignUp !== null) {
       clerkjs.openSignUp(this.preopenSignUp);
     }
@@ -735,6 +741,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_closeCheckout();
     } else {
       this.preopenCheckout = null;
+    }
+  };
+
+  __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openSubscriptionDetails(props);
+    } else {
+      this.preopenSubscriptionDetails = props;
+    }
+  };
+
+  __internal_closeSubscriptionDetails = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closeSubscriptionDetails();
+    } else {
+      this.preopenSubscriptionDetails = null;
     }
   };
 

@@ -702,6 +702,9 @@ type _LocalizationResource = {
           successMessage: LocalizationValue;
         };
       };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
+      };
     };
   };
   userButton: {
