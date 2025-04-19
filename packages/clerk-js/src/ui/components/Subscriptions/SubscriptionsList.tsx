@@ -1,11 +1,11 @@
 import { useClerk } from '@clerk/shared/react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext } from '../../contexts';
 import { Badge, Box, Button, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 
 export function SubscriptionsList() {
-  const { subscriptions, revalidate } = usePlansContext();
+  const { subscriptions, subscriberType, revalidate } = usePlansContext();
   const clerk = useClerk();
   return (
     <Table tableHeadVisuallyHidden>
@@ -70,7 +70,10 @@ export function SubscriptionsList() {
                   clerk.__internal_openSubscriptionDetails({
                     subscription,
                     onSubscriptionCancel: () => revalidate(),
-                    portalId: PROFILE_CARD_SCROLLBOX_ID,
+                    portalId:
+                      subscriberType === 'user'
+                        ? USER_PROFILE_CARD_SCROLLBOX_ID
+                        : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID,
                   })
                 }
                 localizationKey={localizationKeys(

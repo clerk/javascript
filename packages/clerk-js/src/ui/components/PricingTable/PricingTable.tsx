@@ -6,7 +6,7 @@ import type {
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
@@ -32,7 +32,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         subscription,
         subscriberType,
         onSubscriptionCancel: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+        portalId:
+          mode === 'modal'
+            ? subscriberType === 'user'
+              ? USER_PROFILE_CARD_SCROLLBOX_ID
+              : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
+            : undefined,
       });
     } else {
       clerk.__internal_openCheckout({
@@ -40,7 +45,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         planPeriod,
         subscriberType,
         onSubscriptionComplete: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
+        portalId:
+          mode === 'modal'
+            ? subscriberType === 'user'
+              ? USER_PROFILE_CARD_SCROLLBOX_ID
+              : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
+            : undefined,
       });
     }
   };
