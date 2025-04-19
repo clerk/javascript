@@ -1,6 +1,7 @@
 import type { UserProfileModalProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
+import { USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { UserProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
@@ -34,7 +35,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
     <ProfileCard.Root>
       <UserProfileNavbar contentRef={contentRef}>
         <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('userProfile.navbar.title')} />
-        <ProfileCard.Content contentRef={contentRef}>
+        <ProfileCard.Content
+          contentRef={contentRef}
+          scrollBoxId={USER_PROFILE_CARD_SCROLLBOX_ID}
+        >
           <UserProfileRoutes />
         </ProfileCard.Content>
       </UserProfileNavbar>

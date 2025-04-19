@@ -1,12 +1,19 @@
-import { useClerk } from '@clerk/shared/react';
+import type { __experimental_CommerceSubscriptionResource } from '@clerk/types';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext } from '../../contexts';
 import { Badge, Box, Button, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 
 export function SubscriptionsList() {
-  const { subscriptions, revalidate } = usePlansContext();
-  const clerk = useClerk();
+  const { subscriptions, handleSelectPlan, buttonPropsForPlan } = usePlansContext();
+
+  const handleSelectSubscription = (subscription: __experimental_CommerceSubscriptionResource) => {
+    handleSelectPlan({
+      mode: 'modal', // always modal for now
+      plan: subscription.plan,
+      planPeriod: subscription.planPeriod,
+    });
+  };
+
   return (
     <Table tableHeadVisuallyHidden>
       <Thead>
@@ -63,19 +70,9 @@ export function SubscriptionsList() {
             >
               <Button
                 size='xs'
-                colorScheme='secondary'
-                variant='bordered'
                 textVariant='buttonSmall'
-                onClick={() =>
-                  clerk.__internal_openSubscriptionDetails({
-                    subscription,
-                    onSubscriptionCancel: () => revalidate(),
-                    portalId: PROFILE_CARD_SCROLLBOX_ID,
-                  })
-                }
-                localizationKey={localizationKeys(
-                  'userProfile.__experimental_billingPage.subscriptionsSection.actionLabel__default',
-                )}
+                onClick={() => handleSelectSubscription(subscription)}
+                {...buttonPropsForPlan({ plan: subscription.plan })}
               />
             </Td>
           </Tr>
