@@ -1,5 +1,4 @@
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
-import { useEffect } from 'react';
 
 import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
@@ -18,13 +17,8 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     subscriberType,
   });
 
-  useEffect(() => {
-    return () => {
-      invalidate();
-    };
-  }, []);
-
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
+    invalidate(); // invalidate the initial checkout on complete
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
   };
