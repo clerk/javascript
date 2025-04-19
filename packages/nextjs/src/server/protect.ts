@@ -90,6 +90,11 @@ export function createProtect(opts: {
       return notFound();
     };
 
+    if (authObject.entity !== 'user') {
+      // TODO: Figure out what to do with session status
+      throw new Error('Cannot protect machine auth object');
+    }
+
     /**
      * Redirects the user back to the tasks URL if their session status is pending
      */

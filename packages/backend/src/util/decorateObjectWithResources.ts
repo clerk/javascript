@@ -1,6 +1,6 @@
 import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import type { AuthObject } from '../tokens/authObjects';
+import type { AuthObject, SignedInAuthObject, SignedOutAuthObject } from '../tokens/authObjects';
 
 type DecorateAuthWithResourcesOptions = {
   loadSession?: boolean;
@@ -23,7 +23,7 @@ export const decorateObjectWithResources = async <T extends object>(
   opts: CreateBackendApiOptions & DecorateAuthWithResourcesOptions,
 ): Promise<WithResources<T>> => {
   const { loadSession, loadUser, loadOrganization } = opts || {};
-  const { userId, sessionId, orgId } = authObj;
+  const { userId, sessionId, orgId } = authObj as SignedInAuthObject | SignedOutAuthObject;
 
   const { sessions, users, organizations } = createBackendApiClient({ ...opts });
 

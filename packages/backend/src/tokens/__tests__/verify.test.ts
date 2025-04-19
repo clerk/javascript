@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
 import { server, validateHeaders } from '../../mock-server';
-import { verifyToken } from '../verify';
+import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 describe('tokens.verify(token, options)', () => {
   beforeEach(() => {
@@ -51,5 +51,51 @@ describe('tokens.verify(token, options)', () => {
     });
 
     expect(data).toEqual(mockJwtPayload);
+  });
+});
+
+describe('tokens.verifyMachineAuthToken(token, options)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('verifies M2M token', async () => {
+    const token = 'm2m_test_secret';
+    const options = {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'm2m_valid_secret',
+      headers: {
+        Authorization: 'Bearer m2m_valid_secret',
+        'Clerk-API-Version': 'v1',
+        'User-Agent': '@clerk/backend@0.0.0-test',
+      },
+    };
+
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/m2m_tokens/verify',
+        validateHeaders(() => {
+          return HttpResponse.json({
+            id: 'm2m_test_id',
+            name: 'm2m_test_name',
+            subject: 'm2m_test_subject',
+            claims: {},
+            secondsUntilExpiration: 3600,
+            createdBy: null,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 3600,
+            creationReason: null,
+          });
+        }),
+      ),
+    );
+
+    const result = await verifyMachineAuthToken(token, options);
+    expect(result.data).toBeDefined();
+    expect(result.data?.id).toBe('m2m_test_id');
   });
 });

@@ -20,6 +20,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
@@ -33,8 +34,10 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  MachineToken: 'machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
   OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -670,6 +673,43 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
+}
+
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
+  name: string;
+  subject: string;
+  claims: Record<string, string> | null;
+  revoked: boolean;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface APIKeyJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ApiKey;
+  type: string;
+  name: string;
+  subject: string;
+  claims: Record<string, string> | null;
+  created_by: string | null;
+  creation_reason: string | null;
+  seconds_until_expiration: number | null;
+  created_at: number;
+  expires_at: number | null;
+}
+
+export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.IdpOAuthAccessToken;
+  type: string;
+  name: string;
+  subject: string;
+  claims: Record<string, string> | null;
+  created_at: number;
+  expires_at: number;
 }
 
 export interface WebhooksSvixJSON {

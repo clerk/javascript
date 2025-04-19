@@ -22,6 +22,8 @@ describe('subpath /errors exports', () => {
   it('should not include a breaking change', () => {
     expect(Object.keys(errorExports).sort()).toMatchInlineSnapshot(`
       [
+        "MachineTokenVerificationError",
+        "MachineTokenVerificationErrorCode",
         "SignJWTError",
         "TokenVerificationError",
         "TokenVerificationErrorAction",

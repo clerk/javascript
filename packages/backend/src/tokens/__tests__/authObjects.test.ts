@@ -1,8 +1,24 @@
 import type { JwtPayload } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
+import { IdPOAuthAccessToken, MachineToken } from '../../api';
+import { ObjectType } from '../../api/resources/JSON';
 import type { AuthenticateContext } from '../authenticateContext';
-import { makeAuthObjectSerializable, signedInAuthObject, signedOutAuthObject } from '../authObjects';
+import type {
+  AuthenticatedAPIKeyObject,
+  AuthenticatedMachineTokenObject,
+  AuthenticatedOAuthTokenObject,
+  UnauthenticatedAPIKeyObject,
+  UnauthenticatedMachineTokenObject,
+  UnauthenticatedOAuthTokenObject,
+} from '../authObjects';
+import {
+  authenticatedMachineObject,
+  makeAuthObjectSerializable,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from '../authObjects';
 
 describe('makeAuthObjectSerializable', () => {
   it('removes non-serializable props', () => {
@@ -10,7 +26,7 @@ describe('makeAuthObjectSerializable', () => {
     const serializableAuthObject = makeAuthObjectSerializable(authObject);
 
     for (const key in serializableAuthObject) {
-      expect(typeof serializableAuthObject[key]).not.toBe('function');
+      expect(typeof serializableAuthObject[key as keyof typeof serializableAuthObject]).not.toBe('function');
     }
   });
 });
@@ -172,5 +188,161 @@ describe('signedInAuthObject', () => {
       expect(authObject.has({ plan: 'pro' })).toBe(true); // because the user has it.
       expect(authObject.has({ plan: 'business' })).toBe(true); // because the org has it.
     });
+  });
+});
+
+describe('authenticatedMachineObject', () => {
+  it('returns correct AuthenticatedAPIKeyObject', async () => {
+    const debugData = { foo: 'bar' };
+    const verificationResult = {
+      object: ObjectType.ApiKey,
+      id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
+      type: 'api_key',
+      name: 'my-api-key',
+      subject: 'user_xyz987uvw654rst321qpo000nml',
+      claims: { foo: 'bar' },
+      createdBy: null,
+      creationReason: 'For testing purposes',
+      secondsUntilExpiration: 3600,
+      createdAt: 1744928754551,
+      expiresAt: null,
+    };
+    const token = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
+
+    const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
+    const apiKeyObject = authObject as AuthenticatedAPIKeyObject;
+
+    expect(apiKeyObject.tokenType).toBe('api_key');
+    expect(await authObject.getToken()).toBe(token);
+    expect(apiKeyObject.name).toBe('my-api-key');
+    expect(apiKeyObject.subject).toBe('user_xyz987uvw654rst321qpo000nml');
+    expect(apiKeyObject.claims).toEqual({ foo: 'bar' });
+    expect(apiKeyObject.createdAt).toBe(1744928754551);
+    expect(apiKeyObject.type).toBe('api_key');
+    expect(apiKeyObject.createdBy).toBeNull();
+    expect(apiKeyObject.creationReason).toBe('For testing purposes');
+    expect(apiKeyObject.secondsUntilExpiration).toBe(3600);
+    expect(apiKeyObject.expiresAt).toBeNull();
+    expect(apiKeyObject.has({})).toBe(false);
+    expect(apiKeyObject.debug()).toMatchObject({ foo: 'bar' });
+  });
+
+  it.skip('returns correct AuthenticatedOAuthTokenObject', async () => {
+    const debugData = { foo: 'baz' };
+    const oauthJson = {
+      object: ObjectType.IdpOAuthAccessToken,
+      id: 'id2',
+      type: 'oauth_type',
+      name: 'oauth_name',
+      subject: 'subject2',
+      claims: { x: 'y' },
+      created_at: 2000,
+      expires_at: 3000,
+    };
+    const oauthToken = IdPOAuthAccessToken.fromJSON(oauthJson);
+    const obj = authenticatedMachineObject('oauth_token', 'oauth_token_string', oauthToken, debugData);
+    const oauthObj = obj as AuthenticatedOAuthTokenObject;
+    expect(oauthObj.tokenType).toBe('oauth_token');
+    expect(await oauthObj.getToken()).toBe('oauth_token_string');
+    expect(oauthObj.name).toBe(oauthToken.name);
+    expect(oauthObj.subject).toBe(oauthToken.subject);
+    expect(oauthObj.claims).toEqual(oauthToken.claims);
+    expect(oauthObj.createdAt).toBe(oauthToken.createdAt);
+    expect(oauthObj.type).toBe(oauthToken.type);
+    expect(oauthObj.expiresAt).toBe(oauthToken.expiresAt);
+    expect(oauthObj.has({})).toBe(false);
+    expect(oauthObj.debug()).toMatchObject({ foo: 'baz' });
+  });
+
+  it.skip('returns correct AuthenticatedMachineTokenObject', async () => {
+    const debugData = { foo: 'qux' };
+    const machineJson = {
+      object: ObjectType.MachineToken,
+      id: 'id3',
+      name: 'machine_name',
+      subject: 'subject3',
+      claims: { c: 'd' },
+      revoked: false,
+      expired: false,
+      expiration: 4000,
+      created_by: 'creator3',
+      creation_reason: 'reason3',
+      created_at: 3000,
+      updated_at: 4500,
+    };
+    const machineToken = MachineToken.fromJSON(machineJson);
+    const obj = authenticatedMachineObject('machine_token', 'machine_token_string', machineToken, debugData);
+    const machineObj = obj as AuthenticatedMachineTokenObject;
+    expect(machineObj.tokenType).toBe('machine_token');
+    expect(await machineObj.getToken()).toBe('machine_token_string');
+    expect(machineObj.name).toBe(machineToken.name);
+    expect(machineObj.subject).toBe(machineToken.subject);
+    expect(machineObj.claims).toEqual(machineToken.claims);
+    expect(machineObj.createdAt).toBe(machineToken.createdAt);
+    expect(machineObj.revoked).toBe(machineToken.revoked);
+    expect(machineObj.expired).toBe(machineToken.expired);
+    expect(machineObj.expiration).toBe(machineToken.expiration);
+    expect(machineObj.createdBy).toBe(machineToken.createdBy);
+    expect(machineObj.creationReason).toBe(machineToken.creationReason);
+    expect(machineObj.updatedAt).toBe(machineToken.updatedAt);
+    expect(machineObj.has({})).toBe(false);
+    expect(machineObj.debug()).toMatchObject({ foo: 'qux' });
+  });
+});
+
+describe.skip('unauthenticatedMachineObject', () => {
+  it('returns correct UnauthenticatedAPIKeyObject', async () => {
+    const debugData = { foo: 'bar' };
+    const obj = unauthenticatedMachineObject('api_key', debugData);
+    const unauthApiObj = obj as UnauthenticatedAPIKeyObject;
+    expect(unauthApiObj.tokenType).toBe('api_key');
+    expect(await unauthApiObj.getToken()).toBeNull();
+    expect(unauthApiObj.name).toBeNull();
+    expect(unauthApiObj.subject).toBeNull();
+    expect(unauthApiObj.claims).toBeNull();
+    expect(unauthApiObj.createdAt).toBeNull();
+    expect(unauthApiObj.type).toBeNull();
+    expect(unauthApiObj.createdBy).toBeNull();
+    expect(unauthApiObj.creationReason).toBeNull();
+    expect(unauthApiObj.secondsUntilExpiration).toBeNull();
+    expect(unauthApiObj.expiresAt).toBeNull();
+    expect(unauthApiObj.has({})).toBe(false);
+    expect(unauthApiObj.debug()).toMatchObject({ foo: 'bar' });
+  });
+
+  it('returns correct UnauthenticatedOAuthTokenObject', async () => {
+    const debugData = { foo: 'baz' };
+    const obj = unauthenticatedMachineObject('oauth_token', debugData);
+    const unauthOAuthObj = obj as UnauthenticatedOAuthTokenObject;
+    expect(unauthOAuthObj.tokenType).toBe('oauth_token');
+    expect(await unauthOAuthObj.getToken()).toBeNull();
+    expect(unauthOAuthObj.name).toBeNull();
+    expect(unauthOAuthObj.subject).toBeNull();
+    expect(unauthOAuthObj.claims).toBeNull();
+    expect(unauthOAuthObj.createdAt).toBeNull();
+    expect(unauthOAuthObj.type).toBeNull();
+    expect(unauthOAuthObj.expiresAt).toBeNull();
+    expect(unauthOAuthObj.has({})).toBe(false);
+    expect(unauthOAuthObj.debug()).toMatchObject({ foo: 'baz' });
+  });
+
+  it('returns correct UnauthenticatedMachineTokenObject', async () => {
+    const debugData = { foo: 'quux' };
+    const obj = unauthenticatedMachineObject('machine_token', debugData);
+    const unauthMachineObj = obj as UnauthenticatedMachineTokenObject;
+    expect(unauthMachineObj.tokenType).toBe('machine_token');
+    expect(await unauthMachineObj.getToken()).toBeNull();
+    expect(unauthMachineObj.name).toBeNull();
+    expect(unauthMachineObj.subject).toBeNull();
+    expect(unauthMachineObj.claims).toBeNull();
+    expect(unauthMachineObj.createdAt).toBeNull();
+    expect(unauthMachineObj.revoked).toBeNull();
+    expect(unauthMachineObj.expired).toBeNull();
+    expect(unauthMachineObj.expiration).toBeNull();
+    expect(unauthMachineObj.createdBy).toBeNull();
+    expect(unauthMachineObj.creationReason).toBeNull();
+    expect(unauthMachineObj.updatedAt).toBeNull();
+    expect(unauthMachineObj.has({})).toBe(false);
+    expect(unauthMachineObj.debug()).toMatchObject({ foo: 'quux' });
   });
 });

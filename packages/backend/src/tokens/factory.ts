@@ -1,7 +1,8 @@
 import type { ApiClient } from '../api';
+import type { RequestState } from '../tokens/authStatus';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, TokenType, UniqueTokenArray } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
 type BuildTimeOptions = Partial<
@@ -46,7 +47,29 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
-  const authenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
+  // No options case
+  function authenticateRequest(request: Request): Promise<RequestState>;
+
+  // Single token type case
+  function authenticateRequest<T extends TokenType>(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: T },
+  ): Promise<RequestState<T>>;
+
+  // Any token type case
+  function authenticateRequest(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: 'any' },
+  ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
+
+  // List of token types case
+  function authenticateRequest<T extends UniqueTokenArray>(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: T },
+  ): Promise<RequestState<T[number]>>;
+
+  // Implementation
+  function authenticateRequest(request: Request, options: RunTimeOptions = {}): Promise<RequestState> {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal(request, {
@@ -58,7 +81,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       apiClient,
     });
-  };
+  }
 
   return {
     authenticateRequest,
