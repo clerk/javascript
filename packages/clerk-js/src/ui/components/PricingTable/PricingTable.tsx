@@ -6,17 +6,16 @@ import type {
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
-  const { plans, revalidate, activeOrUpcomingSubscription } = usePlansContext();
+  const { plans, handleSelectPlan } = usePlansContext();
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
 
@@ -25,38 +24,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
       void clerk.redirectToSignIn();
     }
 
-    const subscription = activeOrUpcomingSubscription(plan);
-
-    if (subscription && !subscription.canceledAt) {
-      clerk.__internal_openSubscriptionDetails({
-        subscription,
-        subscriberType,
-        onSubscriptionCancel: onSubscriptionChange,
-        portalId:
-          mode === 'modal'
-            ? subscriberType === 'user'
-              ? USER_PROFILE_CARD_SCROLLBOX_ID
-              : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-            : undefined,
-      });
-    } else {
-      clerk.__internal_openCheckout({
-        planId: plan.id,
-        planPeriod,
-        subscriberType,
-        onSubscriptionComplete: onSubscriptionChange,
-        portalId:
-          mode === 'modal'
-            ? subscriberType === 'user'
-              ? USER_PROFILE_CARD_SCROLLBOX_ID
-              : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-            : undefined,
-      });
-    }
-  };
-
-  const onSubscriptionChange = () => {
-    void revalidate();
+    handleSelectPlan({ mode, plan, planPeriod });
   };
 
   return (
