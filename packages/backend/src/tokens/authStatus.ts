@@ -4,14 +4,10 @@ import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type {
-  AuthenticatedAPIKeyObject,
-  AuthenticatedMachineTokenObject,
-  AuthenticatedOAuthTokenObject,
+  BaseAuthenticatedMachineObject,
+  BaseUnauthenticatedMachineObject,
   SignedInAuthObject,
   SignedOutAuthObject,
-  UnauthenticatedAPIKeyObject,
-  UnauthenticatedMachineTokenObject,
-  UnauthenticatedOAuthTokenObject,
 } from './authObjects';
 import {
   authenticatedMachineObject,
@@ -19,7 +15,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { MachineAuthType, TokenType } from './types';
+import type { MachineAuthType, NonSessionTokenType, TokenType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -28,13 +24,6 @@ export const AuthStatus = {
 } as const;
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
-
-type SignedInObjectMap = {
-  session_token: SignedInAuthObject;
-  api_key: AuthenticatedAPIKeyObject;
-  machine_token: AuthenticatedMachineTokenObject;
-  oauth_token: AuthenticatedOAuthTokenObject;
-};
 
 export type SignedInState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedIn;
@@ -56,14 +45,9 @@ export type SignedInState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: string;
   tokenType: T;
-  toAuth: () => SignedInObjectMap[T];
-};
-
-type SignedOutObjectMap = {
-  session_token: SignedOutAuthObject;
-  api_key: UnauthenticatedAPIKeyObject;
-  machine_token: UnauthenticatedMachineTokenObject;
-  oauth_token: UnauthenticatedOAuthTokenObject;
+  toAuth: () => T extends 'session_token'
+    ? SignedInAuthObject
+    : BaseAuthenticatedMachineObject<Exclude<T, 'session_token'>>;
 };
 
 export type SignedOutState<T extends TokenType = 'session_token'> = {
@@ -86,7 +70,9 @@ export type SignedOutState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: null;
   tokenType: T;
-  toAuth: () => SignedOutObjectMap[T];
+  toAuth: () => T extends 'session_token'
+    ? SignedOutAuthObject
+    : BaseUnauthenticatedMachineObject<Exclude<T, 'session_token'>>;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
@@ -132,9 +118,7 @@ type BaseSignedInParams = {
 
 type SignedInParams =
   | (BaseSignedInParams & { tokenType: 'session_token'; sessionClaims: JwtPayload })
-  | (BaseSignedInParams & { tokenType: 'api_key'; machineData: MachineAuthType })
-  | (BaseSignedInParams & { tokenType: 'machine_token'; machineData: MachineAuthType })
-  | (BaseSignedInParams & { tokenType: 'oauth_token'; machineData: MachineAuthType });
+  | (BaseSignedInParams & { tokenType: NonSessionTokenType; machineData: MachineAuthType });
 
 export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): SignedInState<T> {
   const { authenticateContext, headers = new Headers(), token } = params;
@@ -170,17 +154,10 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
   } as SignedInState<T>;
 }
 
-type BaseSignedOutParams = Omit<BaseSignedInParams, 'token'> & {
+type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
   reason: AuthReason;
   message?: string;
 };
-
-// Create a union type for all valid signedOut parameter shapes
-type SignedOutParams =
-  | (BaseSignedOutParams & { tokenType: 'session_token' })
-  | (BaseSignedOutParams & { tokenType: 'api_key' })
-  | (BaseSignedOutParams & { tokenType: 'machine_token' })
-  | (BaseSignedOutParams & { tokenType: 'oauth_token' });
 
 export function signedOut<T extends TokenType>(params: SignedOutParams & { tokenType: T }): SignedOutState<T> {
   const { authenticateContext, headers = new Headers(), reason, message = '', tokenType } = params;
@@ -208,8 +185,8 @@ export function signedOut<T extends TokenType>(params: SignedOutParams & { token
     isSignedIn: false,
     isAuthenticated: false,
     tokenType,
-    headers,
     toAuth,
+    headers,
     token: null,
   }) as SignedOutState<T>;
 }
@@ -235,8 +212,8 @@ export function handshake(
     isSignedIn: false,
     isAuthenticated: false,
     tokenType: 'session_token',
-    headers,
     toAuth: () => null,
+    headers,
     token: null,
   });
 }

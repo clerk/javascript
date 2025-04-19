@@ -3,14 +3,13 @@ import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/j
 import type {
   CheckAuthorizationFromSessionClaims,
   JwtPayload,
-  Override,
   ServerGetToken,
   ServerGetTokenOptions,
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
-import { APIKey, createBackendApiClient, IdPOAuthAccessToken, MachineToken } from '../api';
+import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineAuthType, NonSessionTokenType } from './types';
 
@@ -59,87 +58,43 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
-type BaseMachineAuthObject<T extends NonSessionTokenType> = {
+export type BaseAuthenticatedMachineObject<T extends NonSessionTokenType> = {
   tokenType: T;
+  id: string;
   name: string;
   subject: string;
   claims: Record<string, string> | null;
-  createdAt: number;
   getToken: () => Promise<string>;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
 };
 
-export type AuthenticatedAPIKeyObject = BaseMachineAuthObject<'api_key'> &
-  Pick<APIKey, 'type' | 'createdBy' | 'creationReason' | 'secondsUntilExpiration' | 'expiresAt'>;
-
-export type AuthenticatedOAuthTokenObject = BaseMachineAuthObject<'oauth_token'> &
-  Pick<IdPOAuthAccessToken, 'type' | 'expiresAt'>;
-
-export type AuthenticatedMachineTokenObject = BaseMachineAuthObject<'machine_token'> &
-  Pick<MachineToken, 'revoked' | 'expired' | 'expiration' | 'createdBy' | 'creationReason' | 'updatedAt'>;
-
 /**
  * @internal
  */
 export type AuthenticatedMachineObject =
-  | AuthenticatedAPIKeyObject
-  | AuthenticatedOAuthTokenObject
-  | AuthenticatedMachineTokenObject;
+  | BaseAuthenticatedMachineObject<'api_key'>
+  | BaseAuthenticatedMachineObject<'oauth_token'>
+  | BaseAuthenticatedMachineObject<'machine_token'>;
 
-export type UnauthenticatedAPIKeyObject = Override<
-  AuthenticatedAPIKeyObject,
-  {
-    getToken: () => Promise<null>;
-    name: null;
-    subject: null;
-    claims: null;
-    createdAt: null;
-    type: null;
-    createdBy: null;
-    creationReason: null;
-    secondsUntilExpiration: null;
-    expiresAt: null;
-  }
->;
-
-export type UnauthenticatedOAuthTokenObject = Override<
-  AuthenticatedOAuthTokenObject,
-  {
-    getToken: () => Promise<null>;
-    name: null;
-    subject: null;
-    claims: null;
-    createdAt: null;
-    type: null;
-    expiresAt: null;
-  }
->;
-
-export type UnauthenticatedMachineTokenObject = Override<
-  AuthenticatedMachineTokenObject,
-  {
-    getToken: () => Promise<null>;
-    name: null;
-    subject: null;
-    claims: null;
-    createdAt: null;
-    revoked: null;
-    expired: null;
-    expiration: null;
-    createdBy: null;
-    creationReason: null;
-    updatedAt: null;
-  }
->;
+export type BaseUnauthenticatedMachineObject<T extends NonSessionTokenType> = {
+  tokenType: T;
+  id: null;
+  name: null;
+  subject: null;
+  claims: null;
+  getToken: () => Promise<null>;
+  has: () => false;
+  debug: AuthObjectDebug;
+};
 
 /**
  * @internal
  */
 export type UnauthenticatedMachineObject =
-  | UnauthenticatedAPIKeyObject
-  | UnauthenticatedOAuthTokenObject
-  | UnauthenticatedMachineTokenObject;
+  | BaseUnauthenticatedMachineObject<'api_key'>
+  | BaseUnauthenticatedMachineObject<'oauth_token'>
+  | BaseUnauthenticatedMachineObject<'machine_token'>;
 
 /**
  * @internal
@@ -232,51 +187,16 @@ export function authenticatedMachineObject(
   verificationResult: MachineAuthType,
   debugData?: AuthObjectDebugData,
 ): AuthenticatedMachineObject {
-  const baseObject = {
+  return {
+    tokenType,
+    id: verificationResult.id,
     name: verificationResult.name,
     subject: verificationResult.subject,
     claims: verificationResult.claims,
-    createdAt: verificationResult.createdAt,
     getToken: () => Promise.resolve(machineToken),
     has: () => false,
     debug: createDebug(debugData),
   };
-
-  if (verificationResult instanceof APIKey) {
-    return {
-      ...baseObject,
-      tokenType: 'api_key',
-      type: verificationResult.type,
-      createdBy: verificationResult.createdBy,
-      creationReason: verificationResult.creationReason,
-      secondsUntilExpiration: verificationResult.secondsUntilExpiration,
-      expiresAt: verificationResult.expiresAt,
-    };
-  }
-
-  if (verificationResult instanceof IdPOAuthAccessToken) {
-    return {
-      ...baseObject,
-      tokenType: 'oauth_token',
-      type: verificationResult.type,
-      expiresAt: verificationResult.expiresAt,
-    };
-  }
-
-  if (verificationResult instanceof MachineToken) {
-    return {
-      ...baseObject,
-      tokenType: 'machine_token',
-      revoked: verificationResult.revoked,
-      expired: verificationResult.expired,
-      expiration: verificationResult.expiration,
-      createdBy: verificationResult.createdBy,
-      creationReason: verificationResult.creationReason,
-      updatedAt: verificationResult.updatedAt,
-    };
-  }
-
-  throw new Error(`Unsupported machine token type: ${tokenType}`);
 }
 
 /**
@@ -286,59 +206,16 @@ export function unauthenticatedMachineObject(
   tokenType: NonSessionTokenType,
   debugData?: AuthObjectDebugData,
 ): UnauthenticatedMachineObject {
-  const baseObject = {
+  return {
+    tokenType,
+    id: null,
+    name: null,
+    subject: null,
+    claims: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
   };
-
-  if (tokenType === 'api_key') {
-    return {
-      ...baseObject,
-      tokenType: 'api_key',
-      name: null,
-      subject: null,
-      claims: null,
-      createdAt: null,
-      type: null,
-      createdBy: null,
-      creationReason: null,
-      secondsUntilExpiration: null,
-      expiresAt: null,
-    };
-  }
-
-  if (tokenType === 'oauth_token') {
-    return {
-      ...baseObject,
-      tokenType: 'oauth_token',
-      name: null,
-      subject: null,
-      claims: null,
-      createdAt: null,
-      type: null,
-      expiresAt: null,
-    };
-  }
-
-  if (tokenType === 'machine_token') {
-    return {
-      ...baseObject,
-      tokenType: 'machine_token',
-      name: null,
-      subject: null,
-      claims: null,
-      createdAt: null,
-      revoked: null,
-      expired: null,
-      expiration: null,
-      createdBy: null,
-      creationReason: null,
-      updatedAt: null,
-    };
-  }
-
-  throw new Error(`Unsupported machine token type: ${tokenType}`);
 }
 
 /**
