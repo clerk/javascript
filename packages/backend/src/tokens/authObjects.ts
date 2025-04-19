@@ -12,7 +12,7 @@ import type {
 import type { CreateBackendApiOptions } from '../api';
 import { APIKey, createBackendApiClient, IdPOAuthAccessToken, MachineToken } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-import type { MachineAuthType } from './types';
+import type { MachineAuthType, NonSessionTokenType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -59,14 +59,8 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
-type MachineResourceMap = {
-  api_key: APIKey;
-  oauth_token: IdPOAuthAccessToken;
-  machine_token: MachineToken;
-};
-
-type BaseMachineAuthObject<E extends keyof MachineResourceMap> = {
-  tokenType: E;
+type BaseMachineAuthObject<T extends NonSessionTokenType> = {
+  tokenType: T;
   name: string;
   subject: string;
   claims: Record<string, string> | null;
@@ -233,7 +227,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
  * @internal
  */
 export function authenticatedMachineObject(
-  tokenType: keyof MachineResourceMap,
+  tokenType: NonSessionTokenType,
   machineToken: string,
   verificationResult: MachineAuthType,
   debugData?: AuthObjectDebugData,
@@ -289,7 +283,7 @@ export function authenticatedMachineObject(
  * @internal
  */
 export function unauthenticatedMachineObject(
-  tokenType: keyof MachineResourceMap,
+  tokenType: NonSessionTokenType,
   debugData?: AuthObjectDebugData,
 ): UnauthenticatedMachineObject {
   const baseObject = {

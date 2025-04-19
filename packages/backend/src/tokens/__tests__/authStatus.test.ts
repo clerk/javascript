@@ -7,7 +7,7 @@ import { handshake, signedIn, signedOut } from '../authStatus';
 describe('signed-in', () => {
   it('does not include debug headers', () => {
     const authObject = signedIn({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext: {} as AuthenticateContext,
       sessionClaims: {} as JwtPayload,
       token: 'token',
@@ -20,7 +20,7 @@ describe('signed-in', () => {
 
   it('authObject returned by toAuth() returns the token passed', async () => {
     const signedInAuthObject = signedIn({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext: {} as AuthenticateContext,
       sessionClaims: { sid: 'sid' } as JwtPayload,
       token: 'token',
@@ -35,7 +35,7 @@ describe('signed-out', () => {
   it('includes debug headers', () => {
     const headers = new Headers({ 'custom-header': 'value' });
     const authObject = signedOut({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext: {} as AuthenticateContext,
       reason: 'auth-reason',
       message: 'auth-message',
@@ -51,7 +51,7 @@ describe('signed-out', () => {
   it('handles debug headers containing invalid unicode characters without throwing', () => {
     const headers = new Headers({ 'custom-header': 'value' });
     const authObject = signedOut({
-      entity: 'user',
+      tokenType: 'session_token',
       authenticateContext: {} as AuthenticateContext,
       reason: 'auth-reason+RR�56',
       message: 'auth-message+RR�56',
