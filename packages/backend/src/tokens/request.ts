@@ -17,7 +17,13 @@ import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import { getMachineTokenType, isMachineToken } from './machine';
-import type { AuthenticateRequestOptions, NonSessionTokenType, OrganizationSyncOptions, TokenType } from './types';
+import type {
+  AuthenticateRequestOptions,
+  NonSessionTokenType,
+  OrganizationSyncOptions,
+  TokenType,
+  UniqueTokenArray,
+} from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -121,9 +127,9 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: 'any' },
 ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
-export async function authenticateRequest<T extends readonly TokenType[]>(
+export async function authenticateRequest<T extends UniqueTokenArray>(
   request: Request,
-  options: AuthenticateRequestOptions & { acceptsToken: [...T] },
+  options: AuthenticateRequestOptions & { acceptsToken: T },
 ): Promise<RequestState<T[number]>>;
 
 export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {

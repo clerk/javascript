@@ -58,8 +58,11 @@ export type SignedOutAuthObject = {
   debug: AuthObjectDebug;
 };
 
-export type BaseAuthenticatedMachineObject<T extends NonSessionTokenType> = {
-  tokenType: T;
+/**
+ * @internal
+ */
+export type AuthenticatedMachineObject = {
+  tokenType: NonSessionTokenType;
   id: string;
   name: string;
   subject: string;
@@ -72,13 +75,8 @@ export type BaseAuthenticatedMachineObject<T extends NonSessionTokenType> = {
 /**
  * @internal
  */
-export type AuthenticatedMachineObject =
-  | BaseAuthenticatedMachineObject<'api_key'>
-  | BaseAuthenticatedMachineObject<'oauth_token'>
-  | BaseAuthenticatedMachineObject<'machine_token'>;
-
-export type BaseUnauthenticatedMachineObject<T extends NonSessionTokenType> = {
-  tokenType: T;
+export type UnauthenticatedMachineObject = {
+  tokenType: NonSessionTokenType;
   id: null;
   name: null;
   subject: null;
@@ -88,17 +86,6 @@ export type BaseUnauthenticatedMachineObject<T extends NonSessionTokenType> = {
   debug: AuthObjectDebug;
 };
 
-/**
- * @internal
- */
-export type UnauthenticatedMachineObject =
-  | BaseUnauthenticatedMachineObject<'api_key'>
-  | BaseUnauthenticatedMachineObject<'oauth_token'>
-  | BaseUnauthenticatedMachineObject<'machine_token'>;
-
-/**
- * @internal
- */
 export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject

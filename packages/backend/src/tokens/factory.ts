@@ -2,7 +2,7 @@ import type { ApiClient } from '../api';
 import type { RequestState } from '../tokens/authStatus';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
-import type { AuthenticateRequestOptions, TokenType } from './types';
+import type { AuthenticateRequestOptions, TokenType, UniqueTokenArray } from './types';
 
 type RunTimeOptions = Omit<AuthenticateRequestOptions, 'apiUrl' | 'apiVersion'>;
 type BuildTimeOptions = Partial<
@@ -63,9 +63,9 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
 
   // List of token types case
-  function authenticateRequest<T extends readonly TokenType[]>(
+  function authenticateRequest<T extends UniqueTokenArray>(
     request: Request,
-    options: RunTimeOptions & { acceptsToken: [...T] },
+    options: RunTimeOptions & { acceptsToken: T },
   ): Promise<RequestState<T[number]>>;
 
   // Implementation

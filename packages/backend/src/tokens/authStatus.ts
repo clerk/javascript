@@ -4,10 +4,10 @@ import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type {
-  BaseAuthenticatedMachineObject,
-  BaseUnauthenticatedMachineObject,
+  AuthenticatedMachineObject,
   SignedInAuthObject,
   SignedOutAuthObject,
+  UnauthenticatedMachineObject,
 } from './authObjects';
 import {
   authenticatedMachineObject,
@@ -24,6 +24,16 @@ export const AuthStatus = {
 } as const;
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
+
+export type AuthObjectForSignedIn<T extends TokenType> = T extends 'session_token'
+  ? () => SignedInAuthObject
+  : () => AuthenticatedMachineObject & {
+      tokenType: T;
+    };
+
+export type AuthObjectForSignedOut<T extends TokenType> = T extends 'session_token'
+  ? () => SignedOutAuthObject
+  : () => UnauthenticatedMachineObject & { tokenType: T };
 
 export type SignedInState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedIn;
@@ -45,9 +55,7 @@ export type SignedInState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: string;
   tokenType: T;
-  toAuth: () => T extends 'session_token'
-    ? SignedInAuthObject
-    : BaseAuthenticatedMachineObject<Exclude<T, 'session_token'>>;
+  toAuth: AuthObjectForSignedIn<T>;
 };
 
 export type SignedOutState<T extends TokenType = 'session_token'> = {
@@ -70,9 +78,7 @@ export type SignedOutState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: null;
   tokenType: T;
-  toAuth: () => T extends 'session_token'
-    ? SignedOutAuthObject
-    : BaseUnauthenticatedMachineObject<Exclude<T, 'session_token'>>;
+  toAuth: AuthObjectForSignedOut<T>;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
