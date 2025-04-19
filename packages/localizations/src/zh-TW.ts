@@ -213,8 +213,8 @@ export const zhTW: LocalizationResource = {
   formFieldLabel__signOutOfOtherSessions: '登出所有其他設備',
   formFieldLabel__username: '使用者名稱',
   impersonationFab: {
-    action__signOut: '退出登錄',
-    title: '以 {{identifier}} 登錄',
+    action__signOut: '退出登入',
+    title: '以 {{identifier}} 登入',
   },
   maintenanceMode: undefined,
   membershipRole__admin: '管理員',
@@ -531,7 +531,7 @@ export const zhTW: LocalizationResource = {
       blockButton__emailCode: '電子郵件驗證碼到 {{identifier}}',
       blockButton__emailLink: '電子郵件連結到 {{identifier}}',
       blockButton__passkey: undefined,
-      blockButton__password: '使用您的密碼登錄',
+      blockButton__password: '使用您的密碼登入',
       blockButton__phoneCode: '發送簡訊代碼到 {{identifier}}',
       blockButton__totp: '使用您的驗證應用程式',
       getHelp: {
@@ -575,7 +575,7 @@ export const zhTW: LocalizationResource = {
       formTitle: '驗證連結',
       loading: {
         subtitle: '即將為您重定向',
-        title: '正在登錄...',
+        title: '正在登入...',
       },
       resendButton: '重新發送連結',
       subtitle: '繼續使用 {{applicationName}}',
@@ -585,7 +585,7 @@ export const zhTW: LocalizationResource = {
       },
       verified: {
         subtitle: '即將為您重定向',
-        title: '成功登錄',
+        title: '成功登入',
       },
       verifiedSwitchTab: {
         subtitle: '返回原始標籤頁繼續',
@@ -603,13 +603,13 @@ export const zhTW: LocalizationResource = {
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: '重設密碼',
-      label__alternativeMethods: '或者，使用其他方式登錄。',
+      label__alternativeMethods: '或者，使用其他方式登入。',
       title: '忘記密碼？',
     },
     noAvailableMethods: {
-      message: '無法繼續登錄。沒有可用的身份驗證因素。',
+      message: '無法繼續登入。沒有可用的身份驗證因素。',
       subtitle: '出現錯誤',
-      title: '無法登錄',
+      title: '無法登入',
     },
     passkey: {
       subtitle: undefined,
@@ -662,7 +662,7 @@ export const zhTW: LocalizationResource = {
       },
       subtitle: '繼續使用 {{applicationName}}',
       subtitleCombined: undefined,
-      title: '登錄',
+      title: '登入',
       titleCombined: undefined,
     },
     totpMfa: {
@@ -679,7 +679,7 @@ export const zhTW: LocalizationResource = {
       title: undefined,
     },
     continue: {
-      actionLink: '登錄',
+      actionLink: '登入',
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
       title: '填寫缺少的欄位',
@@ -742,7 +742,7 @@ export const zhTW: LocalizationResource = {
       title: undefined,
     },
     start: {
-      actionLink: '登錄',
+      actionLink: '登入',
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: '已經有帳戶了？',
@@ -758,7 +758,7 @@ export const zhTW: LocalizationResource = {
       titleCombined: '創建您的帳戶',
     },
   },
-  socialButtonsBlockButton: '使用 {{provider|titleize}} 登錄',
+  socialButtonsBlockButton: '使用 {{provider|titleize}} 登入',
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     already_a_member_in_organization: undefined,
@@ -854,7 +854,7 @@ export const zhTW: LocalizationResource = {
   userButton: {
     action__addAccount: '添加帳戶',
     action__manageAccount: '管理帳戶',
-    action__signOut: '退出登錄',
+    action__signOut: '退出登入',
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
@@ -975,7 +975,7 @@ export const zhTW: LocalizationResource = {
       formHint: undefined,
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
-        messageLine2: '您將無法使用這個電子郵件地址登錄。',
+        messageLine2: '您將無法使用這個電子郵件地址登入。',
         successMessage: '電子郵件 {{emailAddress}} 已從您的帳戶中移除。',
         title: '移除電子郵件地址',
       },
@@ -996,7 +996,7 @@ export const zhTW: LocalizationResource = {
       backButton: '使用現有號碼',
       primaryButton__addPhoneNumber: '添加電話號碼',
       removeResource: {
-        messageLine1: '{{identifier}} 將不再在登錄時接收驗證代碼。',
+        messageLine1: '{{identifier}} 將不再在登入時接收驗證代碼。',
         messageLine2: '您的帳戶可能不再安全。您確定要繼續嗎？',
         successMessage: '已移除{{mfaPhoneCode}}的簡訊驗證碼兩步驗證',
         title: '移除兩步驗證',
@@ -1012,18 +1012,18 @@ export const zhTW: LocalizationResource = {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: '掃描二維碼',
         buttonUnableToScan__nonPrimary: '不能掃描二維碼？',
-        infoText__ableToScan: '在您的驗證器應用中設置一個新的登錄方法，並掃描下面的二維碼將其連結到您的帳戶。',
-        infoText__unableToScan: '在驗證器中設置一個新的登錄方法，並輸入下面提供的 Key。',
+        infoText__ableToScan: '在您的驗證器應用中設置一個新的登入方法，並掃描下面的二維碼將其連結到您的帳戶。',
+        infoText__unableToScan: '在驗證器中設置一個新的登入方法，並輸入下面提供的 Key。',
         inputLabel__unableToScan1: '確保啟用了基於時間或一次性密碼，然後完成連結您的帳戶。',
         inputLabel__unableToScan2: '或者，如果您的驗證器支持 TOTP URIs，您也可以複製完整的 URI。',
       },
       removeResource: {
-        messageLine1: '登錄時，將不再需要來自此驗證器的驗證碼。',
+        messageLine1: '登入時，將不再需要來自此驗證器的驗證碼。',
         messageLine2: '您的帳戶可能不再安全。您確定要繼續嗎？',
         successMessage: '已移除通過驗證器應用程式的兩步驗證。',
         title: '移除兩步驗證',
       },
-      successMessage: '現在已啟用兩步驗證。在登錄時，您需要輸入來自此驗證器的驗證碼作為額外步驟。',
+      successMessage: '現在已啟用兩步驗證。在登入時，您需要輸入來自此驗證器的驗證碼作為額外步驟。',
       title: '添加驗證器應用程式',
       verifySubtitle: '輸入您的驗證器生成的驗證碼',
       verifyTitle: '驗證代碼',
@@ -1058,7 +1058,7 @@ export const zhTW: LocalizationResource = {
       infoText: '一條包含驗證連結的簡訊將會發送到這個電話號碼。',
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
-        messageLine2: '您將無法使用這個電話號碼登錄。',
+        messageLine2: '您將無法使用這個電話號碼登入。',
         successMessage: '電話號碼 {{phoneNumber}} 已從您的帳戶中移除。',
         title: '移除電話號碼',
       },
@@ -1171,7 +1171,7 @@ export const zhTW: LocalizationResource = {
     web3WalletPage: {
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
-        messageLine2: '您將無法使用這個 web3 錢包登錄。',
+        messageLine2: '您將無法使用這個 web3 錢包登入。',
         successMessage: '{{web3Wallet}} 已從您的帳戶中移除。',
         title: '移除 web3 錢包',
       },
