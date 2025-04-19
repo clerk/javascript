@@ -165,7 +165,7 @@ export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
                 }}
               >
                 <DrawerOverlay />
-                {props.children}
+                <Suspense fallback={''}>{props.children}</Suspense>
               </DrawerRoot>
             </InternalThemeProvider>
           </FlowMetadataProvider>
