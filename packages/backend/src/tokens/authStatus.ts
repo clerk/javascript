@@ -25,17 +25,7 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-type ToAuthSignedIn<T extends TokenType> = T extends 'session_token'
-  ? () => SignedInAuthObject
-  : () => AuthenticatedMachineObject & {
-      tokenType: T;
-    };
-
-type ToAuthSignedOut<T extends TokenType> = T extends 'session_token'
-  ? () => SignedOutAuthObject
-  : () => UnauthenticatedMachineObject & { tokenType: T };
-
-export type SignedInState<T extends TokenType = 'session_token'> = {
+export type AuthenticatedState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
@@ -55,13 +45,13 @@ export type SignedInState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: string;
   tokenType: T;
-  toAuth: ToAuthSignedIn<T>;
+  toAuth: T extends 'session_token' ? () => SignedInAuthObject : () => AuthenticatedMachineObject & { tokenType: T };
 };
 
-export type SignedOutState<T extends TokenType = 'session_token'> = {
+export type UnauthenticatedState<T extends TokenType = 'session_token'> = {
   status: typeof AuthStatus.SignedOut;
-  message: string;
   reason: AuthReason;
+  message: string;
   proxyUrl?: string;
   publishableKey: string;
   isSatellite: boolean;
@@ -75,18 +65,28 @@ export type SignedOutState<T extends TokenType = 'session_token'> = {
    */
   isSignedIn: false;
   isAuthenticated: false;
+  tokenType: T;
   headers: Headers;
   token: null;
-  tokenType: T;
-  toAuth: ToAuthSignedOut<T>;
+  toAuth: T extends 'session_token' ? () => SignedOutAuthObject : () => UnauthenticatedMachineObject & { tokenType: T };
 };
 
-export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
+export type HandshakeState = Omit<UnauthenticatedState<'session_token'>, 'status' | 'toAuth' | 'tokenType'> & {
   tokenType: 'session_token';
   status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
 };
+
+/**
+ * @deprecated Use AuthenticatedState instead
+ */
+export type SignedInState = AuthenticatedState<'session_token'>;
+
+/**
+ * @deprecated Use UnauthenticatedState instead
+ */
+export type SignedOutState = UnauthenticatedState<'session_token'>;
 
 export const AuthErrorReason = {
   ClientUATWithoutSessionToken: 'client-uat-but-no-session-token',
@@ -111,8 +111,8 @@ export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorRea
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
 export type RequestState<T extends TokenType = 'session_token'> =
-  | SignedInState<T>
-  | SignedOutState<T>
+  | AuthenticatedState<T>
+  | UnauthenticatedState<T>
   | (T extends 'session_token' ? HandshakeState : never);
 
 type BaseSignedInParams = {
@@ -126,7 +126,7 @@ type SignedInParams =
   | (BaseSignedInParams & { tokenType: 'session_token'; sessionClaims: JwtPayload })
   | (BaseSignedInParams & { tokenType: NonSessionTokenType; machineData: MachineAuthType });
 
-export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): SignedInState<T> {
+export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): AuthenticatedState<T> {
   const { authenticateContext, headers = new Headers(), token } = params;
 
   const toAuth = () => {
@@ -157,7 +157,7 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
     toAuth,
     headers,
     token,
-  } as SignedInState<T>;
+  } as AuthenticatedState<T>;
 }
 
 type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
@@ -165,7 +165,7 @@ type SignedOutParams = Omit<BaseSignedInParams, 'token'> & {
   message?: string;
 };
 
-export function signedOut<T extends TokenType>(params: SignedOutParams & { tokenType: T }): SignedOutState<T> {
+export function signedOut<T extends TokenType>(params: SignedOutParams & { tokenType: T }): UnauthenticatedState<T> {
   const { authenticateContext, headers = new Headers(), reason, message = '', tokenType } = params;
 
   const toAuth = () => {
@@ -194,7 +194,7 @@ export function signedOut<T extends TokenType>(params: SignedOutParams & { token
     toAuth,
     headers,
     token: null,
-  }) as SignedOutState<T>;
+  }) as UnauthenticatedState<T>;
 }
 
 export function handshake(

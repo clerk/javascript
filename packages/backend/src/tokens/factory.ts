@@ -48,28 +48,25 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const apiClient = params.apiClient;
 
   // No options case
-  function authenticateRequest(request: Request): Promise<RequestState>;
-
+  function authenticateRequest(request: Request): Promise<RequestState<'session_token'>>;
   // Single token type case
   function authenticateRequest<T extends TokenType>(
     request: Request,
     options: RunTimeOptions & { acceptsToken: T },
   ): Promise<RequestState<T>>;
-
   // Any token type case
   function authenticateRequest(
     request: Request,
     options: RunTimeOptions & { acceptsToken: 'any' },
-  ): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
-
-  // List of token types case
+  ): Promise<RequestState<TokenType>>;
+  // List of unique token types case
   function authenticateRequest<T extends UniqueTokenArray>(
     request: Request,
     options: RunTimeOptions & { acceptsToken: T },
   ): Promise<RequestState<T[number]>>;
 
   // Implementation
-  function authenticateRequest(request: Request, options: RunTimeOptions = {}): Promise<RequestState> {
+  function authenticateRequest(request: Request, options: RunTimeOptions = {}): Promise<RequestState<TokenType>> {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal(request, {

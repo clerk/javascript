@@ -11,7 +11,7 @@ import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
-import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
+import type { HandshakeState, RequestState, SignedInState, SignedOutState, UnauthenticatedState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
@@ -101,7 +101,7 @@ function maybeHandleTokenTypeMismatch(
   parsedTokenType: NonSessionTokenType,
   acceptsToken: TokenType | TokenType[] | 'any',
   authenticateContext: AuthenticateContext,
-): SignedOutState<NonSessionTokenType> | null {
+): UnauthenticatedState<NonSessionTokenType> | null {
   if (acceptsToken === 'any') {
     return null;
   }
@@ -118,21 +118,31 @@ function maybeHandleTokenTypeMismatch(
   return null;
 }
 
-export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions): Promise<RequestState>;
+// No options case.
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions,
+): Promise<RequestState<'session_token'>>;
+// Single token type case.
 export async function authenticateRequest<T extends TokenType>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: T },
 ): Promise<RequestState<T>>;
+// Any token type case.
 export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: 'any' },
-): Promise<RequestState<'session_token' | 'api_key' | 'oauth_token' | 'machine_token'>>;
+): Promise<RequestState<TokenType>>;
+// List of unique token types case.
 export async function authenticateRequest<T extends UniqueTokenArray>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: T },
 ): Promise<RequestState<T[number]>>;
 
-export async function authenticateRequest(request: Request, options: AuthenticateRequestOptions) {
+export async function authenticateRequest(
+  request: Request,
+  options: AuthenticateRequestOptions,
+): Promise<RequestState<TokenType>> {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -792,7 +802,7 @@ ${error.getFullMessage()}`,
     });
   }
 
-  function handleMachineError(tokenType: NonSessionTokenType, err: unknown): SignedOutState<NonSessionTokenType> {
+  function handleMachineError(tokenType: NonSessionTokenType, err: unknown): UnauthenticatedState<NonSessionTokenType> {
     if (!(err instanceof MachineTokenVerificationError)) {
       return signedOut({
         tokenType,
