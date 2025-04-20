@@ -25,13 +25,13 @@ export const AuthStatus = {
 
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
-export type AuthObjectForSignedIn<T extends TokenType> = T extends 'session_token'
+type ToAuthSignedIn<T extends TokenType> = T extends 'session_token'
   ? () => SignedInAuthObject
   : () => AuthenticatedMachineObject & {
       tokenType: T;
     };
 
-export type AuthObjectForSignedOut<T extends TokenType> = T extends 'session_token'
+type ToAuthSignedOut<T extends TokenType> = T extends 'session_token'
   ? () => SignedOutAuthObject
   : () => UnauthenticatedMachineObject & { tokenType: T };
 
@@ -55,7 +55,7 @@ export type SignedInState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: string;
   tokenType: T;
-  toAuth: AuthObjectForSignedIn<T>;
+  toAuth: ToAuthSignedIn<T>;
 };
 
 export type SignedOutState<T extends TokenType = 'session_token'> = {
@@ -78,7 +78,7 @@ export type SignedOutState<T extends TokenType = 'session_token'> = {
   headers: Headers;
   token: null;
   tokenType: T;
-  toAuth: AuthObjectForSignedOut<T>;
+  toAuth: ToAuthSignedOut<T>;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth' | 'tokenType'> & {
