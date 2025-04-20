@@ -841,8 +841,8 @@ importers:
         specifier: ^2.1.4
         version: 2.1.4
       react-router:
-        specifier: 7.1.5
-        version: 7.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 7.5.0
+        version: 7.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   packages/remix:
     dependencies:
@@ -8291,6 +8291,7 @@ packages:
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
+    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -11920,8 +11921,8 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react-router@7.1.5:
-    resolution: {integrity: sha512-8BUF+hZEU4/z/JD201yK6S+UYhsf58bzYIDq2NS1iGpwxSXDu7F+DeGSkIXMFBuHZB21FSiCzEcUb18cQNdRkA==}
+  react-router@7.5.0:
+    resolution: {integrity: sha512-estOHrRlDMKdlQa6Mj32gIks4J+AxNsYoE0DbTTxiMy2mPzZuWSDU+N85/r1IlNR7kGfznF3VCUlvc5IUO+B9g==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -28433,7 +28434,7 @@ snapshots:
       '@remix-run/router': 1.9.0
       react: 18.3.1
 
-  react-router@7.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@types/cookie': 0.6.0
       cookie: 1.0.2
