@@ -8,9 +8,9 @@ import type { ComponentType, ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import type { LocalizationKey } from '../../customizables';
-import { localizationKeys } from '../../customizables';
 import { useFetch } from '../../hooks';
+import type { LocalizationKey } from '../../localization';
+import { localizationKeys } from '../../localization';
 import type { __experimental_PlansCtx } from '../../types';
 
 type PlansContextProviderProps = {
