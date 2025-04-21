@@ -2,7 +2,7 @@
 '@clerk/testing': minor
 ---
 
-Add [Playwright page objects](https://playwright.dev/docs/pom) for Clerk functionality. This functionality is directly extraced from the end-to-end integration test suite that Clerk uses to develop Clerk components. While the API is being refined for public consumption, it will be available under the `@clerk/testing/playwright/unstable` import, and is not subject to [SemVer](https://semver.org) compatibility guidelines.
+Add [Playwright page objects](https://playwright.dev/docs/pom) for Clerk functionality. This functionality is directly extracted from the end-to-end integration test suite that Clerk uses to develop Clerk components. While the API is being refined for public consumption, it will be available under the `@clerk/testing/playwright/unstable` import, and is not subject to [SemVer](https://semver.org) compatibility guidelines.
 
 ```ts
 import { test } from "@playwright/test";
