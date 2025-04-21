@@ -1,5 +1,29 @@
 # Change Log
 
+## 3.13.13
+
+### Patch Changes
+
+- Account for all possible cases from `not_allowed_access` error codes ([#5688](https://github.com/clerk/javascript/pull/5688)) by [@tmilewski](https://github.com/tmilewski)
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+- Updated dependencies [[`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/types@4.55.0
+
 ## 3.13.12
 
 ### Patch Changes
