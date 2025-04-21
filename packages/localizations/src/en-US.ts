@@ -8,6 +8,10 @@ export const enUS: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      emailForm: {
+        title: 'Add an email address',
+        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+      },
       lineItems: {
         title__invoiceId: 'Invoice ID',
         title__paymentMethod: 'Payment method',

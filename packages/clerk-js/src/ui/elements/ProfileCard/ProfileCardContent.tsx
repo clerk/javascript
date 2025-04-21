@@ -1,13 +1,15 @@
 import React from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { Col, descriptors } from '../../customizables';
 import { useRouter } from '../../router';
 import { common, mqu } from '../../styledSystem';
 
-type ProfileCardContentProps = React.PropsWithChildren<{ contentRef?: React.RefObject<HTMLDivElement> }>;
+type ProfileCardContentProps = React.PropsWithChildren<{
+  contentRef?: React.RefObject<HTMLDivElement>;
+  scrollBoxId?: string;
+}>;
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
-  const { contentRef, children } = props;
+  const { contentRef, children, scrollBoxId } = props;
   const router = useRouter();
   const scrollPosRef = React.useRef(0);
 
@@ -43,7 +45,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$cardContentShadow,
       })}
-      id={PROFILE_CARD_SCROLLBOX_ID}
+      id={scrollBoxId}
     >
       <Col
         elementDescriptor={descriptors.pageScrollBox}
