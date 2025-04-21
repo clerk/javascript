@@ -81,7 +81,6 @@ function jsonToObject(item: any): any {
     return DeletedObject.fromJSON(item);
   }
 
-  // TODO: Add machine token objects here
   switch (item.object) {
     case ObjectType.AccountlessApplication:
       return AccountlessApplication.fromJSON(item);

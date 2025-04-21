@@ -825,6 +825,15 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
+    if (!isMachineToken(sessionTokenInHeader)) {
+      return signedOut({
+        tokenType: acceptsToken as NonSessionTokenType,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
     const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {
