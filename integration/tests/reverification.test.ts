@@ -37,10 +37,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
     });
 
     test.afterAll(async () => {
-      await fakeOrganization.delete();
-      await fakeViewer.deleteIfExists();
-      await fakeAdmin.deleteIfExists();
-      await app.teardown();
+      try {
+        await fakeOrganization.delete();
+        await fakeViewer.deleteIfExists();
+        await fakeAdmin.deleteIfExists();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        await app.teardown();
+      }
     });
 
     test('reverification prompt on adding new email address', async ({ page, context }) => {
