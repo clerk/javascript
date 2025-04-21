@@ -31,7 +31,7 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
     const secure = getSecureAttribute(sameSite);
-    const partitioned = secure;
+    const partitioned = secure && sameSite === 'None';
 
     // If setting Partitioned to true, remove the existing session cookies.
     // This is to avoid conflicts with the same cookie name without Partitioned attribute.
