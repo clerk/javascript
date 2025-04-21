@@ -90,9 +90,8 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    if (authObject.entity !== 'user') {
-      // TODO: Figure out what to do with session status
-      throw new Error('Cannot protect machine auth object');
+    if (authObject.tokenType !== 'session_token') {
+      throw new Error('TODO: Handle machine auth object');
     }
 
     /**

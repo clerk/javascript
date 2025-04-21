@@ -110,8 +110,8 @@ export const auth: AuthFn = async () => {
         publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-        // TODO: Figure out what to do with session status
-        sessionStatus: authObject.entity === 'user' ? authObject.sessionStatus : null,
+        // TODO: Handle machine auth object
+        sessionStatus: authObject.tokenType === 'session_token' ? authObject.sessionStatus : null,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
     ] as const;

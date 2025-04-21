@@ -10,6 +10,13 @@ import {
   mockJwtPayload,
   mockMalformedJwt,
 } from '../../fixtures';
+import {
+  mockApiKey,
+  mockMachineAuthResponses,
+  mockMachineToken,
+  mockOauthToken,
+  tokenMap,
+} from '../../fixtures/machine';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -1210,198 +1217,59 @@ describe('tokens.authenticateRequest(options)', () => {
       vi.clearAllMocks();
     });
 
-    describe('API Key', () => {
-      const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
+    // Test each token type with parameterized tests
+    const tokenTypes = ['api_key', 'oauth_token', 'machine_token'] as const;
 
-      test('returns authenticated state with valid API key in header', async () => {
+    describe.each(tokenTypes)('%s Authentication', tokenType => {
+      const mockToken = tokenMap[tokenType];
+      const mockConfig = mockMachineAuthResponses[tokenType];
+
+      test('returns authenticated state with valid token in header', async () => {
         server.use(
-          http.post('https://api.clerk.test/v1/api_keys/verify', () => {
-            return HttpResponse.json({
-              object: 'api_key',
-              id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-              type: 'api_key',
-              name: 'my-api-key',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
+          http.post(mockConfig.endpoint, () => {
+            return HttpResponse.json(mockConfig.successResponse);
           }),
         );
 
-        const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
+        const request = mockRequest({ authorization: `Bearer ${mockToken}` });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: tokenType }));
 
         expect(requestState).toBeMachineAuthenticated();
       });
 
-      test('returns unauthenticated state with invalid API key', async () => {
+      test('returns unauthenticated state with invalid token', async () => {
         server.use(
-          http.post('https://api.clerk.test/v1/api_keys/verify', () => {
+          http.post(mockConfig.endpoint, () => {
             return HttpResponse.json({}, { status: 404 });
           }),
         );
 
-        const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
+        const request = mockRequest({ authorization: `Bearer ${mockToken}` });
+        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: tokenType }));
 
         expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'api_key',
+          tokenType,
           reason: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: 'API key not found (code=token-invalid, status=404)',
+          message: `${mockConfig.errorMessage} (code=token-invalid, status=404)`,
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'api_key',
-        });
-      });
-    });
-
-    describe('OAuth Token', () => {
-      const mockOAuthToken = 'oauth_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-      test('returns authenticated state with valid API key in header', async () => {
-        server.use(
-          http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
-            return HttpResponse.json({
-              object: 'oauth_token',
-              id: 'oauth_token_ey966f1b1xf93586b2debdcadb0b3bd1',
-              type: 'oauth_token',
-              name: 'my-oauth-token',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockOAuthToken}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
-
-        expect(requestState).toBeMachineAuthenticated();
-      });
-
-      test('returns unauthenticated state with invalid API key', async () => {
-        server.use(
-          http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
-            return HttpResponse.json({}, { status: 404 });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockOAuthToken}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
-
-        expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'oauth_token',
-          reason: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: 'OAuth token not found (code=token-invalid, status=404)',
-        });
-        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'oauth_token',
-        });
-      });
-    });
-
-    describe('M2M Token', () => {
-      const mockM2MToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-      test('returns authenticated state with valid M2M token in header', async () => {
-        server.use(
-          http.post('https://api.clerk.test/v1/m2m_tokens/verify', () => {
-            return HttpResponse.json({
-              object: 'machine_token',
-              id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
-              name: 'my-machine-token',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockM2MToken}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
-
-        expect(requestState).toBeMachineAuthenticated();
-      });
-
-      test('returns unauthenticated state with invalid M2M token', async () => {
-        server.use(
-          http.post('https://api.clerk.test/v1/m2m_tokens/verify', () => {
-            return HttpResponse.json({}, { status: 404 });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockM2MToken}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
-
-        expect(requestState).toBeMachineUnauthenticated({
-          tokenType: 'machine_token',
-          reason: MachineTokenVerificationErrorCode.TokenInvalid,
-          message: 'Machine token not found (code=token-invalid, status=404)',
-        });
-        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
-          tokenType: 'machine_token',
+          tokenType,
         });
       });
     });
 
     describe('Any Token Type Authentication', () => {
-      test('accepts API key when acceptsToken is "any"', async () => {
-        const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
+      test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
+        const mockToken = tokenMap[tokenType];
+        const mockConfig = mockMachineAuthResponses[tokenType];
 
         server.use(
-          http.post('https://api.clerk.test/v1/api_keys/verify', () => {
-            return HttpResponse.json({
-              object: 'api_key',
-              id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-              type: 'api_key',
-              name: 'my-api-key',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
+          http.post(mockConfig.endpoint, () => {
+            return HttpResponse.json(mockConfig.successResponse);
           }),
         );
 
-        const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
-
-        expect(requestState).toBeMachineAuthenticated();
-      });
-
-      test('accepts OAuth token when acceptsToken is "any"', async () => {
-        const mockOAuthToken = 'oauth_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-        server.use(
-          http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
-            return HttpResponse.json({
-              object: 'oauth_token',
-              id: 'oauth_token_ey966f1b1xf93586b2debdcadb0b3bd1',
-              type: 'oauth_token',
-              name: 'my-oauth-token',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockOAuthToken}` });
-        const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
-
-        expect(requestState).toBeMachineAuthenticated();
-      });
-
-      test('accepts M2M token when acceptsToken is "any"', async () => {
-        const mockM2MToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-        server.use(
-          http.post('https://api.clerk.test/v1/m2m_tokens/verify', () => {
-            return HttpResponse.json({
-              object: 'machine_token',
-              id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
-              name: 'my-machine-token',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
-          }),
-        );
-
-        const request = mockRequest({ authorization: `Bearer ${mockM2MToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockToken}` });
         const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: 'any' }));
 
         expect(requestState).toBeMachineAuthenticated();
@@ -1424,8 +1292,6 @@ describe('tokens.authenticateRequest(options)', () => {
 
     describe('Token Type Mismatch', () => {
       test('returns unauthenticated state when token type mismatches (API key provided, OAuth token expected)', async () => {
-        const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
-
         const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
 
@@ -1440,9 +1306,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type mismatches (OAuth token provided, M2M token expected)', async () => {
-        const mockOAuthToken = 'oauth_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-        const request = mockRequest({ authorization: `Bearer ${mockOAuthToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockOauthToken}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
 
         expect(result).toBeMachineUnauthenticated({
@@ -1455,10 +1319,8 @@ describe('tokens.authenticateRequest(options)', () => {
         });
       });
 
-      test.skip('returns unauthenticated state when token type mismatches (M2M token provided, API key expected)', async () => {
-        const mockM2MToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
-
-        const request = mockRequest({ authorization: `Bearer ${mockM2MToken}` });
+      test('returns unauthenticated state when token type mismatches (M2M token provided, API key expected)', async () => {
+        const request = mockRequest({ authorization: `Bearer ${mockMachineToken}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
 
         expect(result).toBeMachineUnauthenticated({
@@ -1487,19 +1349,10 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     describe('Array of Accepted Token Types', () => {
-      test('accepts API key when it is in the acceptsToken array', async () => {
-        const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
-
+      test('accepts token when it is in the acceptsToken array', async () => {
         server.use(
-          http.post('https://api.clerk.test/v1/api_keys/verify', () => {
-            return HttpResponse.json({
-              object: 'api_key',
-              id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-              type: 'api_key',
-              name: 'my-api-key',
-              subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-              claims: { foo: 'bar' },
-            });
+          http.post(mockMachineAuthResponses.api_key.endpoint, () => {
+            return HttpResponse.json(mockMachineAuthResponses.api_key.successResponse);
           }),
         );
 
@@ -1513,8 +1366,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
-        const mockM2MToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
-        const request = mockRequest({ authorization: `Bearer ${mockM2MToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockMachineToken}` });
         const requestState = await authenticateRequest(
           request,
           mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),

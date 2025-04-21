@@ -825,6 +825,7 @@ ${error.getFullMessage()}`,
       return handleError(new Error('No token in header'), 'header');
     }
 
+    // Handle case where tokenType is any and the token is not a machine token
     if (!isMachineToken(sessionTokenInHeader)) {
       return signedOut({
         tokenType: acceptsToken as NonSessionTokenType,
@@ -857,6 +858,8 @@ ${error.getFullMessage()}`,
     if (!sessionTokenInHeader) {
       return handleError(new Error('No token in header'), 'header');
     }
+
+    // Handle as a machine token
     if (isMachineToken(sessionTokenInHeader)) {
       const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
       const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
@@ -908,7 +911,7 @@ ${error.getFullMessage()}`,
     return signedOut({
       tokenType: acceptsToken,
       authenticateContext,
-      reason: 'no token in header',
+      reason: 'No token in header',
     });
   }
 
