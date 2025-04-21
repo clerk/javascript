@@ -123,22 +123,23 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,
 ): Promise<RequestState<'session_token'>>;
-// Single token type case.
-export async function authenticateRequest<T extends TokenType>(
-  request: Request,
-  options: AuthenticateRequestOptions & { acceptsToken: T },
-): Promise<RequestState<T>>;
-// Any token type case.
+// With options but no acceptsToken case
 export async function authenticateRequest(
   request: Request,
-  options: AuthenticateRequestOptions & { acceptsToken: 'any' },
-): Promise<RequestState<TokenType>>;
+  options: Omit<AuthenticateRequestOptions, 'acceptsToken'>,
+): Promise<RequestState<'session_token'>>;
+// Single or any token type case.
+export async function authenticateRequest<T extends TokenType | 'any'>(
+  request: Request,
+  options: AuthenticateRequestOptions & { acceptsToken: T },
+): Promise<RequestState<T extends 'any' ? TokenType : T>>;
 // List of unique token types case.
 export async function authenticateRequest<T extends UniqueTokenArray>(
   request: Request,
   options: AuthenticateRequestOptions & { acceptsToken: T },
 ): Promise<RequestState<T[number]>>;
 
+// Implementation
 export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,

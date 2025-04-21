@@ -49,16 +49,16 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
 
   // No options case
   function authenticateRequest(request: Request): Promise<RequestState<'session_token'>>;
-  // Single token type case
-  function authenticateRequest<T extends TokenType>(
-    request: Request,
-    options: RunTimeOptions & { acceptsToken: T },
-  ): Promise<RequestState<T>>;
-  // Any token type case
+  // With options but no acceptsToken case
   function authenticateRequest(
     request: Request,
-    options: RunTimeOptions & { acceptsToken: 'any' },
-  ): Promise<RequestState<TokenType>>;
+    options: Omit<RunTimeOptions, 'acceptsToken'>,
+  ): Promise<RequestState<'session_token'>>;
+  // Single or any token type case
+  function authenticateRequest<T extends TokenType | 'any'>(
+    request: Request,
+    options: RunTimeOptions & { acceptsToken: T },
+  ): Promise<RequestState<T extends 'any' ? TokenType : T>>;
   // List of unique token types case
   function authenticateRequest<T extends UniqueTokenArray>(
     request: Request,

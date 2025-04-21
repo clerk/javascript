@@ -251,7 +251,6 @@ expect.extend({
       message: string;
     },
   ) {
-    console.log('received', received);
     const pass =
       received.status === AuthStatus.SignedOut &&
       received.tokenType === expected.tokenType &&
@@ -1224,7 +1223,7 @@ describe('tokens.authenticateRequest(options)', () => {
       const mockToken = tokenMap[tokenType];
       const mockConfig = mockMachineAuthResponses[tokenType];
 
-      test('returns authenticated state with valid token in header', async () => {
+      test('returns authenticated state with valid token', async () => {
         server.use(
           http.post(mockConfig.endpoint, () => {
             return HttpResponse.json(mockConfig.successResponse);
