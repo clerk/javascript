@@ -171,9 +171,15 @@ export const usePlansContext = () => {
               : undefined,
         });
       } else {
+        // if the plan doesn't support annual, use monthly
+        let _planPeriod = planPeriod;
+        if (planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
+          _planPeriod = 'month';
+        }
+
         clerk.__internal_openCheckout({
           planId: plan.id,
-          planPeriod,
+          planPeriod: _planPeriod,
           subscriberType: ctx.subscriberType,
           onSubscriptionComplete: () => {
             ctx.revalidate();
