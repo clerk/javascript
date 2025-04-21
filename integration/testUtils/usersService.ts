@@ -53,6 +53,10 @@ export type FakeOrganization = {
 export type UserService = {
   createFakeUser: (options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
+  /**
+   * Creates a BAPI user if it doesn't exist, otherwise returns the existing user.
+   */
+  getOrCreateUser: (fakeUser: FakeUser) => Promise<User>;
   deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
@@ -101,6 +105,13 @@ export const createUserService = (clerkClient: ClerkClient) => {
         username: fakeUser.username,
         skipPasswordRequirement: fakeUser.password === undefined,
       });
+    },
+    getOrCreateUser: async fakeUser => {
+      const existingUser = await self.getUser({ email: fakeUser.email });
+      if (existingUser) {
+        return existingUser;
+      }
+      return await self.createBapiUser(fakeUser);
     },
     deleteIfExists: async (opts: { id?: string; email?: string }) => {
       let id = opts.id;

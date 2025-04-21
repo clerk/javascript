@@ -1,10 +1,11 @@
 import {
   __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
+  InvoicesContextProvider,
   usePlansContext,
   withPlans,
 } from '../../contexts';
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -16,13 +17,23 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { useTabState } from '../../hooks/useTabState';
+import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
+import { SubscriptionsList } from '../Subscriptions';
+
+const tabMap = {
+  0: 'plans',
+  1: 'invoices',
+  2: 'payment-sources',
+} as const;
 
 export const BillingPage = withPlans(
   withCardStateProvider(() => {
     const card = useCardState();
     const { subscriptions } = usePlansContext();
+    const { selectedTab, handleTabChange } = useTabState(tabMap);
 
     return (
       <Col
@@ -43,7 +54,10 @@ export const BillingPage = withPlans(
 
           <Card.Alert>{card.error}</Card.Alert>
 
-          <Tabs>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+          >
             <TabsList sx={t => ({ gap: t.space.$6 })}>
               <Tab
                 localizationKey={
@@ -62,12 +76,28 @@ export const BillingPage = withPlans(
               />
             </TabsList>
             <TabPanels>
-              <TabPanel sx={{ width: '100%' }}>
+              <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
+                {subscriptions.length > 0 && (
+                  <>
+                    <SubscriptionsList />
+                    <Hr sx={t => ({ marginBlock: t.space.$6 })} />
+                    <Heading
+                      textVariant='h3'
+                      as='h2'
+                      localizationKey='Available Plans'
+                      sx={t => ({ marginBlockEnd: t.space.$4, fontWeight: t.fontWeights.$medium })}
+                    />
+                  </>
+                )}
                 <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
               </TabPanel>
-              <TabPanel sx={{ width: '100%' }}>Invoices</TabPanel>
+              <TabPanel sx={{ width: '100%' }}>
+                <InvoicesContextProvider>
+                  <InvoicesList />
+                </InvoicesContextProvider>
+              </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
                   <__experimental_PaymentSources />

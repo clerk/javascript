@@ -35,4 +35,4 @@ export interface OrganizationInvitationResource extends ClerkResource {
 /**
  * @inline
  */
-export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked';
+export type OrganizationInvitationStatus = 'pending' | 'accepted' | 'revoked' | 'expired';

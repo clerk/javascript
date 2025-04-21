@@ -170,6 +170,7 @@ export type ElementsConfig = {
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
+  headerBackLink: WithOptions;
 
   backRow: WithOptions;
   backLink: WithOptions;
@@ -462,6 +463,25 @@ export type ElementsConfig = {
   paymentSourceRowType: WithOptions;
   paymentSourceRowValue: WithOptions;
   paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
+
+  invoiceRoot: WithOptions;
+  invoiceCard: WithOptions;
+  invoiceHeader: WithOptions;
+  invoiceHeaderContent: WithOptions;
+  invoiceTitle: WithOptions;
+  invoiceHeaderTitleBadgeContainer: WithOptions;
+  invoiceTitleIdContainer: WithOptions;
+  invoiceId: WithOptions;
+  invoiceIdContainer: WithOptions;
+  invoiceBadge: WithOptions;
+  invoiceDetails: WithOptions;
+  invoiceDetailsItem: WithOptions;
+  invoiceDetailsItemTitle: WithOptions;
+  invoiceDetailsItemTitleText: WithOptions;
+  invoiceDetailsItemValue: WithOptions;
+  invoiceDetailsItemValueText: WithOptions;
+  invoiceCopyButton: WithOptions;
+  invoiceContent: WithOptions;
 
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
@@ -786,6 +806,7 @@ export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
+export type SubscriptionDetailTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**

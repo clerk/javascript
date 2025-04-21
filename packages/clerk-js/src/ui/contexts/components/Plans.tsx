@@ -13,7 +13,7 @@ type PlansContextProviderProps = {
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 
 export const PlansContextProvider = ({
-  subscriberType,
+  subscriberType = 'user',
   children,
 }: PlansContextProviderProps & {
   children: ReactNode;

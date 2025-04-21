@@ -3,6 +3,8 @@
 exports[`root public exports > should not change unexpectedly 1`] = `
 [
   "AuthenticateWithRedirectCallback",
+  "ClerkDegraded",
+  "ClerkFailed",
   "ClerkLoaded",
   "ClerkLoading",
   "ClerkProvider",

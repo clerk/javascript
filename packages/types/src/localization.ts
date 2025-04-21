@@ -5,7 +5,7 @@ export type LocalizationValue = string;
 
 /**
  * A type containing all the possible localization keys the prebuilt Clerk components support.
- * Users aiming to customise a few strings can also peak at the `data-localization-key` attribute by inspecting
+ * Users aiming to customize a few strings can also peak at the `data-localization-key` attribute by inspecting
  * the DOM and updating the corresponding key.
  * Users aiming to completely localize the components by providing a complete translation can use
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
@@ -114,6 +114,18 @@ type _LocalizationResource = {
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
+    checkout: {
+      title__paymentSuccessful: LocalizationValue;
+      title__subscriptionSuccessful: LocalizationValue;
+      description__paymentSuccessful: LocalizationValue;
+      description__subscriptionSuccessful: LocalizationValue;
+      lineItems: {
+        title__totalPaid: LocalizationValue;
+        title__paymentMethod: LocalizationValue;
+        title__invoiceId: LocalizationValue;
+        title__subscriptionBegins: LocalizationValue;
+      };
+    };
   };
   signUp: {
     start: {
@@ -685,6 +697,9 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
       };
     };
   };

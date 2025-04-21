@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.61.0",
+  "version": "5.61.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -52,7 +52,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
     "watch": "rspack build --config rspack.config.js --env production --watch"
   },
-  "browserslist": "last 2 years, Safari > 12, iOS > 12",
+  "browserslist": "last 2 years",
   "dependencies": {
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
@@ -70,7 +70,7 @@
     "@zxcvbn-ts/language-common": "3.0.4",
     "browser-tabs-lock": "1.2.15",
     "copy-to-clipboard": "3.3.3",
-    "core-js": "3.26.1",
+    "core-js": "3.41.0",
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
     "qrcode.react": "3.1.0",
@@ -94,5 +94,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "browserslistLegacy": "Chrome > 73, Firefox > 66, Safari > 12, iOS > 12, Edge > 18, Opera > 58"
 }

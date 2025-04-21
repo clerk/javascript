@@ -48,7 +48,7 @@ export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSe
     log('Fetching testing token from Clerk Backend API...');
 
     try {
-      const apiUrl = process.env.CLERK_API_URL;
+      const apiUrl = (rest as any)?.apiUrl || process.env.CLERK_API_URL;
       const clerkClient = createClerkClient({ secretKey, apiUrl });
       const tokenData = await clerkClient.testingTokens.createTestingToken();
       testingToken = tokenData.token;

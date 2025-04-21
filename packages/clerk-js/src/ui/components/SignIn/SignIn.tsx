@@ -5,7 +5,6 @@ import React from 'react';
 import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import type { SignUpContextType } from '../../contexts';
 import {
   SignInContext,
   SignUpContext,
@@ -17,6 +16,7 @@ import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { usePreloadTasks } from '../../hooks/usePreloadTasks';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import type { SignUpCtx } from '../../types';
 import {
   LazySignUpContinue,
   LazySignUpSSOCallback,
@@ -173,7 +173,7 @@ function SignInRoot() {
     signInUrl: signInContext.signInUrl,
     unsafeMetadata: signInContext.unsafeMetadata,
     ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
-  } as SignUpContextType;
+  } as SignUpCtx;
 
   /**
    * Preload Sign Up when in Combined Flow.

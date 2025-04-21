@@ -52,17 +52,17 @@ type UpdateOrganizationSettingsParams = {
   adminDeleteEnabled?: boolean | null | undefined;
   domainsEnabled?: boolean | null | undefined;
   /**
-   * Specify which enrollment modes to enable for your Organization Domains.
+   * Specifies which [enrollment modes](https://clerk.com/docs/organizations/verified-domains#enrollment-mode) to enable for your Organization Domains.
    *
    * @remarks Supported modes are 'automatic_invitation' & 'automatic_suggestion'.
    */
   domainsEnrollmentModes?: Array<string> | undefined;
   /**
-   * Specify what the default organization role is for an organization creator.
+   * Specifies what the default organization role is for an organization creator.
    */
   creatorRoleId?: string | null | undefined;
   /**
-   * Specify what the default organization role is for the organization domains.
+   * Specifies what the default organization role is for the organization domains.
    */
   domainsDefaultRoleId?: string | null | undefined;
 };
