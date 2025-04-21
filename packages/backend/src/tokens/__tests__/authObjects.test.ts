@@ -254,10 +254,10 @@ describe('authenticatedMachineObject', () => {
   });
 
   describe('Machine Token authentication', () => {
-    const token = 'oauth_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
     const verificationResult = {
       object: ObjectType.MachineToken,
-      id: 'machine_token_ey966f1b1xf93586b2debdcadb0b3bd1',
+      id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
       name: 'my-machine-token',
       subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
       claims: { foo: 'bar' },

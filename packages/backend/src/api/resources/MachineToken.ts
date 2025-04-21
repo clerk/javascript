@@ -18,8 +18,8 @@ export class MachineToken {
   static fromJSON(data: MachineTokenJSON) {
     return new MachineToken(
       data.id,
-      data.subject,
       data.name,
+      data.subject,
       data.claims,
       data.revoked,
       data.expired,

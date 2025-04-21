@@ -19,5 +19,9 @@ export function getMachineTokenType(token: string): NonSessionTokenType {
     return 'oauth_token';
   }
 
-  return 'api_key';
+  if (token.startsWith(API_KEY_PREFIX)) {
+    return 'api_key';
+  }
+
+  throw new Error('Unknown machine token type');
 }
