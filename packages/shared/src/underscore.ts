@@ -1,5 +1,6 @@
 /**
  * Convert words to a sentence.
+ *
  * @param items - An array of words to be joined.
  * @returns A string with the items joined by a comma and the last item joined by ", or".
  */
@@ -20,16 +21,24 @@ const IP_V4_ADDRESS_REGEX =
   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 /**
- * Checks if a string is a valid IPv4 address
- * @returns True if the string is a valid IPv4 address, false otherwise
+ * Checks if a string is a valid IPv4 address.
+ *
+ * @returns True if the string is a valid IPv4 address, false otherwise.
  */
 export function isIPV4Address(str: string | undefined | null): boolean {
   return IP_V4_ADDRESS_REGEX.test(str || '');
 }
 
 /**
- * Converts a string to title case
- * @returns The string in title case
+ * Converts the first character of a string to uppercase.
+ *
+ * @param str - The string to be converted.
+ * @returns The modified string with the rest of the string unchanged.
+ *
+ * @example
+ * ```ts
+ * titleize('hello world') // 'Hello world'
+ * ```
  */
 export function titleize(str: string | undefined | null): string {
   const s = str || '';
@@ -37,14 +46,14 @@ export function titleize(str: string | undefined | null): string {
 }
 
 /**
- *
+ * Converts a string from snake_case to camelCase.
  */
 export function snakeToCamel(str: string | undefined): string {
   return str ? str.replace(/([-_][a-z])/g, match => match.toUpperCase().replace(/-|_/, '')) : '';
 }
 
 /**
- *
+ * Converts a string from camelCase to snake_case.
  */
 export function camelToSnake(str: string | undefined): string {
   return str ? str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`) : '';
@@ -87,6 +96,7 @@ const createDeepObjectTransformer = (transform: any) => {
  * Transforms camelCased objects/ arrays to snake_cased.
  * This function recursively traverses all objects and arrays of the passed value
  * camelCased keys are removed.
+ *
  * @function
  */
 export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
@@ -95,12 +105,14 @@ export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
  * Transforms snake_cased objects/ arrays to camelCased.
  * This function recursively traverses all objects and arrays of the passed value
  * camelCased keys are removed.
+ *
  * @function
  */
 export const deepSnakeToCamel = createDeepObjectTransformer(snakeToCamel);
 
 /**
  * A function to determine if a value is truthy.
+ *
  * @returns True for `true`, true, positive numbers. False for `false`, false, 0, negative integers and anything else.
  */
 export function isTruthy(value: unknown): boolean {
@@ -140,7 +152,7 @@ export function isTruthy(value: unknown): boolean {
 }
 
 /**
- *
+ * Get all non-undefined values from an object.
  */
 export function getNonUndefinedValues<T extends object>(obj: T): Partial<T> {
   return Object.entries(obj).reduce((acc, [key, value]) => {
