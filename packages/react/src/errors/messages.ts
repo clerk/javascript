@@ -42,9 +42,6 @@ export const incompatibleRoutingWithPathProvidedError = (componentName: string) 
 
 export const userButtonIgnoredComponent = `<UserButton /> can only accept <UserButton.UserProfilePage />, <UserButton.UserProfileLink /> and <UserButton.MenuItems /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.`;
 
-export const mustBeContainedInClientComponentError = (componentName: string) =>
-  `The <${componentName}/> component must be used in a client component.`;
-
 export const customMenuItemsIgnoredComponent =
   '<UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.';
 
