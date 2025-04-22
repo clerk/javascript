@@ -150,7 +150,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies provided OAuth token', async () => {
-    const token = 'oauth_token_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
@@ -158,7 +158,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         validateHeaders(() => {
           return HttpResponse.json({
             object: ObjectType.IdpOAuthAccessToken,
-            id: 'oauth_token_2VTWUzvGC5UhdJCNx6xG1D98edc',
+            id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
             type: 'oauth:access_token',
             name: 'GitHub OAuth',
             subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
@@ -180,7 +180,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as IdPOAuthAccessToken;
-    expect(data.id).toBe('oauth_token_2VTWUzvGC5UhdJCNx6xG1D98edc');
+    expect(data.id).toBe('oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.claims).toEqual({ scope: 'read write' });
@@ -276,7 +276,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   describe('handles API errors for OAuth tokens', () => {
     it('handles invalid token', async () => {
-      const token = 'oauth_invalid_token';
+      const token = 'oauth_access_invalid_token';
 
       server.use(
         http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
@@ -297,7 +297,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     it('handles unexpected error', async () => {
-      const token = 'oauth_token_8XOIucKvqHVr5tYP123456789abcdefghij';
+      const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
 
       server.use(
         http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
