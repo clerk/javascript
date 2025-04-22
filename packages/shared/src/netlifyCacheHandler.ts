@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { isDevelopmentFromPublishableKey } from './keys';
 
 /**
@@ -31,7 +32,6 @@ export function handleNetlifyCacheInDevInstance({
   requestStateHeaders: Headers;
   publishableKey: string;
 }) {
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const isOnNetlify =
     process.env.NETLIFY || process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
