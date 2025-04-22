@@ -148,12 +148,12 @@ export const useFetch = <K, T>(
           }, waitTime);
         }
       })
-      .catch(() => {
+      .catch((e: Error) => {
         setCache({
           data: getCache()?.data ?? null,
           isLoading: false,
           isValidating: false,
-          error: true,
+          error: e,
           cachedAt: Date.now(),
         });
       });

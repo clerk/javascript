@@ -107,7 +107,7 @@ function Card(props: CardProps) {
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
 
-  const activeOrUpcomingSubscription = usePlansContext().activeOrUpcomingSubscription(plan);
+  const { buttonPropsForPlan } = usePlansContext();
 
   return (
     <Box
@@ -174,15 +174,7 @@ function Card(props: CardProps) {
             <Button
               block
               textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              variant={isCompact || !!activeOrUpcomingSubscription ? 'bordered' : 'solid'}
-              colorScheme={isCompact || !!activeOrUpcomingSubscription ? 'secondary' : 'primary'}
-              localizationKey={
-                activeOrUpcomingSubscription
-                  ? activeOrUpcomingSubscription.canceledAt
-                    ? localizationKeys('__experimental_commerce.reSubscribe')
-                    : localizationKeys('__experimental_commerce.manageSubscription')
-                  : localizationKeys('__experimental_commerce.getStarted')
-              }
+              {...buttonPropsForPlan({ plan, isCompact })}
               onClick={() => {
                 onSelect(plan);
               }}

@@ -12,8 +12,8 @@ import type {
 /**
  * Derives authentication state based on the current rendering context (SSR or client-side).
  */
-export const deriveState = (clerkLoaded: boolean, state: Resources, initialState: InitialState | undefined) => {
-  if (!clerkLoaded && initialState) {
+export const deriveState = (clerkOperational: boolean, state: Resources, initialState: InitialState | undefined) => {
+  if (!clerkOperational && initialState) {
     return deriveFromSsrInitialState(initialState);
   }
   return deriveFromClientSideState(state);

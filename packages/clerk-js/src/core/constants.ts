@@ -43,11 +43,11 @@ export const SIGN_UP_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'use
 
 export const DEBOUNCE_MS = 350;
 
-export const SIGN_UP_MODES: Record<string, SignUpModes> = {
+export const SIGN_UP_MODES = {
   PUBLIC: 'public',
   RESTRICTED: 'restricted',
   WAITLIST: 'waitlist',
-};
+} satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
 export const SUPPORTED_FAPI_VERSION = '2025-04-10';

@@ -15,7 +15,8 @@ type FlowMetadata = {
     | 'oneTap'
     | 'blankCaptcha'
     | 'waitlist'
-    | 'checkout';
+    | 'checkout'
+    | 'subscriptionDetails';
   part?:
     | 'start'
     | 'emailCode'

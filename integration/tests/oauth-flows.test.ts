@@ -117,11 +117,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   test('sign in modal to sign up modal to transfer respects original forceRedirectUrl', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    try {
-      await u.services.users.createBapiUser(fakeUser);
-    } catch {
-      // User already exists, so we don't need to create it
-    }
+    // The user already exists on the OAuth provider instance, but we want to make sure that the user is created on the
+    // app instance as well so that their sign up is transferred to a sign in.
+    await u.services.users.getOrCreateUser(fakeUser);
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();

@@ -59,8 +59,8 @@ importers:
         specifier: 0.17.4
         version: 0.17.4
       '@changesets/cli':
-        specifier: ^2.28.1
-        version: 2.28.1
+        specifier: ^2.29.2
+        version: 2.29.2
       '@changesets/get-github-info':
         specifier: ^0.6.0
         version: 0.6.0
@@ -146,8 +146,8 @@ importers:
         specifier: ^7.0.6
         version: 7.0.6
       dotenv:
-        specifier: ^16.4.7
-        version: 16.4.7
+        specifier: ^16.5.0
+        version: 16.5.0
       eslint:
         specifier: 9.23.0
         version: 9.23.0(jiti@2.4.2)
@@ -156,7 +156,7 @@ importers:
         version: 10.1.1(eslint@9.23.0(jiti@2.4.2))
       eslint-config-turbo:
         specifier: 2.4.4
-        version: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.4.4)
+        version: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.5.0)
       eslint-import-resolver-typescript:
         specifier: 3.10.0
         version: 3.10.0(eslint-plugin-import@2.31.0)(eslint@9.23.0(jiti@2.4.2))
@@ -183,7 +183,7 @@ importers:
         version: 12.1.1(eslint@9.23.0(jiti@2.4.2))
       eslint-plugin-turbo:
         specifier: 2.4.4
-        version: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.4.4)
+        version: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.5.0)
       eslint-plugin-unused-imports:
         specifier: 4.1.4
         version: 4.1.4(@typescript-eslint/eslint-plugin@8.28.0(@typescript-eslint/parser@8.28.0(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.23.0(jiti@2.4.2))
@@ -269,11 +269,11 @@ importers:
         specifier: catalog:repo
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
       turbo:
-        specifier: ^2.4.4
-        version: 2.4.4
+        specifier: ^2.5.0
+        version: 2.5.0
       turbo-ignore:
-        specifier: ^2.4.4
-        version: 2.4.4
+        specifier: ^2.5.0
+        version: 2.5.0
       typedoc:
         specifier: 0.28.2
         version: 0.28.2(typescript@5.8.3)
@@ -474,8 +474,8 @@ importers:
         specifier: 3.3.3
         version: 3.3.3
       core-js:
-        specifier: 3.26.1
-        version: 3.26.1
+        specifier: 3.41.0
+        version: 3.41.0
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -527,7 +527,7 @@ importers:
         version: 9.0.1
       dotenv:
         specifier: ^16.4.5
-        version: 16.4.7
+        version: 16.5.0
       globby:
         specifier: ^14.0.2
         version: 14.1.0
@@ -1960,8 +1960,8 @@ packages:
   '@cfworker/json-schema@4.1.1':
     resolution: {integrity: sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==}
 
-  '@changesets/apply-release-plan@7.0.10':
-    resolution: {integrity: sha512-wNyeIJ3yDsVspYvHnEz1xQDq18D9ifed3lI+wxRQRK4pArUcuHgCTrHv0QRnnwjhVCQACxZ+CBih3wgOct6UXw==}
+  '@changesets/apply-release-plan@7.0.12':
+    resolution: {integrity: sha512-EaET7As5CeuhTzvXTQCRZeBUcisoYPDDcXvgTE/2jmmypKp0RC7LxKj/yzqeh/1qFTZI7oDGFcL1PHRuQuketQ==}
 
   '@changesets/assemble-release-plan@6.0.6':
     resolution: {integrity: sha512-Frkj8hWJ1FRZiY3kzVCKzS0N5mMwWKwmv9vpam7vt8rZjLL1JMthdh6pSDVSPumHPshTTkKZ0VtNbE0cJHZZUg==}
@@ -1969,8 +1969,8 @@ packages:
   '@changesets/changelog-git@0.2.1':
     resolution: {integrity: sha512-x/xEleCFLH28c3bQeQIyeZf8lFXyDFVn1SgcBiR2Tw/r4IAWlk1fzxCEZ6NxQAjF2Nwtczoen3OA2qR+UawQ8Q==}
 
-  '@changesets/cli@2.28.1':
-    resolution: {integrity: sha512-PiIyGRmSc6JddQJe/W1hRPjiN4VrMvb2VfQ6Uydy2punBioQrsxppyG5WafinKcW1mT0jOe/wU4k9Zy5ff21AA==}
+  '@changesets/cli@2.29.2':
+    resolution: {integrity: sha512-vwDemKjGYMOc0l6WUUTGqyAWH3AmueeyoJa1KmFRtCYiCoY5K3B68ErYpDB6H48T4lLI4czum4IEjh6ildxUeg==}
     hasBin: true
 
   '@changesets/config@3.1.1':
@@ -1985,14 +1985,14 @@ packages:
   '@changesets/get-github-info@0.6.0':
     resolution: {integrity: sha512-v/TSnFVXI8vzX9/w3DU2Ol+UlTZcu3m0kXTjTT4KlAdwSvwutcByYwyYn9hwerPWfPkT2JfpoX0KgvCEi8Q/SA==}
 
-  '@changesets/get-release-plan@4.0.8':
-    resolution: {integrity: sha512-MM4mq2+DQU1ZT7nqxnpveDMTkMBLnwNX44cX7NSxlXmr7f8hO6/S2MXNiXG54uf/0nYnefv0cfy4Czf/ZL/EKQ==}
+  '@changesets/get-release-plan@4.0.10':
+    resolution: {integrity: sha512-CCJ/f3edYaA3MqoEnWvGGuZm0uMEMzNJ97z9hdUR34AOvajSwySwsIzC/bBu3+kuGDsB+cny4FljG8UBWAa7jg==}
 
   '@changesets/get-version-range-type@0.4.0':
     resolution: {integrity: sha512-hwawtob9DryoGTpixy1D3ZXbGgJu1Rhr+ySH2PvTLHvkZuQ7sRT4oQwMh0hbqZH1weAooedEjRsbrWcGLCeyVQ==}
 
-  '@changesets/git@3.0.2':
-    resolution: {integrity: sha512-r1/Kju9Y8OxRRdvna+nxpQIsMsRQn9dhhAZt94FLDeu0Hij2hnOozW8iqnHBgvu+KdnJppCveQwK4odwfw/aWQ==}
+  '@changesets/git@3.0.4':
+    resolution: {integrity: sha512-BXANzRFkX+XcC1q/d27NKvlJ1yf7PSAgi8JG6dt8EfbHFHi4neau7mufcSca5zRhwOL8j9s6EqsxmT+s+/E6Sw==}
 
   '@changesets/logger@0.1.1':
     resolution: {integrity: sha512-OQtR36ZlnuTxKqoW4Sv6x5YIhOmClRd5pWsjZsddYxpWs517R0HkyiefQPIytCVh4ZcC5x9XaG8KTdd5iRQUfg==}
@@ -2003,8 +2003,8 @@ packages:
   '@changesets/pre@2.0.2':
     resolution: {integrity: sha512-HaL/gEyFVvkf9KFg6484wR9s0qjAXlZ8qWPDkTyKF6+zqjBe/I2mygg3MbpZ++hdi0ToqNUF8cjj7fBy0dg8Ug==}
 
-  '@changesets/read@0.6.3':
-    resolution: {integrity: sha512-9H4p/OuJ3jXEUTjaVGdQEhBdqoT2cO5Ts95JTFsQyawmKzpL8FnIeJSyhTDPW1MBRDnwZlHFEM9SpPwJDY5wIg==}
+  '@changesets/read@0.6.5':
+    resolution: {integrity: sha512-UPzNGhsSjHD3Veb0xO/MwvasGe8eMyNrR/sT9gR8Q3DhOQZirgKhhXv/8hVsI0QpPjR004Z9iFxoJU6in3uGMg==}
 
   '@changesets/should-skip-package@0.1.2':
     resolution: {integrity: sha512-qAK/WrqWLNCP22UDdBTMPH5f41elVDlsNyat180A33dWxuUDyNpg6fPi/FyTZwRriVjg0L8gnjJn2F9XAoF0qw==}
@@ -6833,11 +6833,11 @@ packages:
   core-js-compat@3.39.0:
     resolution: {integrity: sha512-VgEUx3VwlExr5no0tXlBt+silBvhTryPwCXRI2Id1PN8WTKu7MreethvddqOubrYxkFdv/RnYrqlv1sFNAUelw==}
 
-  core-js@3.26.1:
-    resolution: {integrity: sha512-21491RRQVzUn0GGM9Z1Jrpr6PNPxPi+Za8OM9q4tksTSnlbXXGKK1nXNg/QvwFYettXvSX6zWKCtHHfjN4puyA==}
-
   core-js@3.37.1:
     resolution: {integrity: sha512-Xn6qmxrQZyB0FFY8E3bgRXei3lWDJHhvI+u0q9TKIYM49G8pAr0FgnnrFRAmsbptZL1yxRADVXn+x5AGsbBfyw==}
+
+  core-js@3.41.0:
+    resolution: {integrity: sha512-SJ4/EHwS36QMJd6h/Rg+GyR4A5xE0FSI3eZ+iBVpfqf1x0eTSg1smWLHrA+2jQThZSh97fmSgFSU8B61nxosxA==}
 
   core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
@@ -7418,6 +7418,10 @@ packages:
 
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+    engines: {node: '>=12'}
+
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
 
   dset@3.1.4:
@@ -8291,6 +8295,7 @@ packages:
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
+    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -13335,45 +13340,45 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  turbo-darwin-64@2.4.4:
-    resolution: {integrity: sha512-5kPvRkLAfmWI0MH96D+/THnDMGXlFNmjeqNRj5grLKiry+M9pKj3pRuScddAXPdlxjO5Ptz06UNaOQrrYGTx1g==}
+  turbo-darwin-64@2.5.0:
+    resolution: {integrity: sha512-fP1hhI9zY8hv0idym3hAaXdPi80TLovmGmgZFocVAykFtOxF+GlfIgM/l4iLAV9ObIO4SUXPVWHeBZQQ+Hpjag==}
     cpu: [x64]
     os: [darwin]
 
-  turbo-darwin-arm64@2.4.4:
-    resolution: {integrity: sha512-/gtHPqbGQXDFhrmy+Q/MFW2HUTUlThJ97WLLSe4bxkDrKHecDYhAjbZ4rN3MM93RV9STQb3Tqy4pZBtsd4DfCw==}
+  turbo-darwin-arm64@2.5.0:
+    resolution: {integrity: sha512-p9sYq7kXH7qeJwIQE86cOWv/xNqvow846l6c/qWc26Ib1ci5W7V0sI5thsrP3eH+VA0d+SHalTKg5SQXgNQBWA==}
     cpu: [arm64]
     os: [darwin]
 
-  turbo-ignore@2.4.4:
-    resolution: {integrity: sha512-F9Vmg48TJaf8bOiAyfDPQHuEYBEWzVSO4N5EjgPFAl3ccCrX7bfbGPStFvclFJsAKb6nTcy9UVvrkYEFocm5hA==}
+  turbo-ignore@2.5.0:
+    resolution: {integrity: sha512-AjNz9ntAMVHsrXMwlOfZgt3cQ2Fmei3+8+KJ2iUOOZgswebnl4xhNQ8bmBwMQ4Qe3mok/ZA0bFC9f5uXAGffSQ==}
     hasBin: true
 
-  turbo-linux-64@2.4.4:
-    resolution: {integrity: sha512-SR0gri4k0bda56hw5u9VgDXLKb1Q+jrw4lM7WAhnNdXvVoep4d6LmnzgMHQQR12Wxl3KyWPbkz9d1whL6NTm2Q==}
+  turbo-linux-64@2.5.0:
+    resolution: {integrity: sha512-1iEln2GWiF3iPPPS1HQJT6ZCFXynJPd89gs9SkggH2EJsj3eRUSVMmMC8y6d7bBbhBFsiGGazwFIYrI12zs6uQ==}
     cpu: [x64]
     os: [linux]
 
-  turbo-linux-arm64@2.4.4:
-    resolution: {integrity: sha512-COXXwzRd3vslQIfJhXUklgEqlwq35uFUZ7hnN+AUyXx7hUOLIiD5NblL+ETrHnhY4TzWszrbwUMfe2BYWtaPQg==}
+  turbo-linux-arm64@2.5.0:
+    resolution: {integrity: sha512-bKBcbvuQHmsX116KcxHJuAcppiiBOfivOObh2O5aXNER6mce7YDDQJy00xQQNp1DhEfcSV2uOsvb3O3nN2cbcA==}
     cpu: [arm64]
     os: [linux]
 
   turbo-stream@2.4.0:
     resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
-  turbo-windows-64@2.4.4:
-    resolution: {integrity: sha512-PV9rYNouGz4Ff3fd6sIfQy5L7HT9a4fcZoEv8PKRavU9O75G7PoDtm8scpHU10QnK0QQNLbE9qNxOAeRvF0fJg==}
+  turbo-windows-64@2.5.0:
+    resolution: {integrity: sha512-9BCo8oQ7BO7J0K913Czbc3tw8QwLqn2nTe4E47k6aVYkM12ASTScweXPTuaPFP5iYXAT6z5Dsniw704Ixa5eGg==}
     cpu: [x64]
     os: [win32]
 
-  turbo-windows-arm64@2.4.4:
-    resolution: {integrity: sha512-403sqp9t5sx6YGEC32IfZTVWkRAixOQomGYB8kEc6ZD+//LirSxzeCHCnM8EmSXw7l57U1G+Fb0kxgTcKPU/Lg==}
+  turbo-windows-arm64@2.5.0:
+    resolution: {integrity: sha512-OUHCV+ueXa3UzfZ4co/ueIHgeq9B2K48pZwIxKSm5VaLVuv8M13MhM7unukW09g++dpdrrE1w4IOVgxKZ0/exg==}
     cpu: [arm64]
     os: [win32]
 
-  turbo@2.4.4:
-    resolution: {integrity: sha512-N9FDOVaY3yz0YCOhYIgOGYad7+m2ptvinXygw27WPLQvcZDl3+0Sa77KGVlLSiuPDChOUEnTKE9VJwLSi9BPGQ==}
+  turbo@2.5.0:
+    resolution: {integrity: sha512-PvSRruOsitjy6qdqwIIyolv99+fEn57gP6gn4zhsHTEcCYgXPhv6BAxzAjleS8XKpo+Y582vTTA9nuqYDmbRuA==}
     hasBin: true
 
   tweetnacl@0.14.5:
@@ -15668,11 +15673,11 @@ snapshots:
 
   '@cfworker/json-schema@4.1.1': {}
 
-  '@changesets/apply-release-plan@7.0.10':
+  '@changesets/apply-release-plan@7.0.12':
     dependencies:
       '@changesets/config': 3.1.1
       '@changesets/get-version-range-type': 0.4.0
-      '@changesets/git': 3.0.2
+      '@changesets/git': 3.0.4
       '@changesets/should-skip-package': 0.1.2
       '@changesets/types': 6.1.0
       '@manypkg/get-packages': 1.1.3
@@ -15697,19 +15702,19 @@ snapshots:
     dependencies:
       '@changesets/types': 6.1.0
 
-  '@changesets/cli@2.28.1':
+  '@changesets/cli@2.29.2':
     dependencies:
-      '@changesets/apply-release-plan': 7.0.10
+      '@changesets/apply-release-plan': 7.0.12
       '@changesets/assemble-release-plan': 6.0.6
       '@changesets/changelog-git': 0.2.1
       '@changesets/config': 3.1.1
       '@changesets/errors': 0.2.0
       '@changesets/get-dependents-graph': 2.1.3
-      '@changesets/get-release-plan': 4.0.8
-      '@changesets/git': 3.0.2
+      '@changesets/get-release-plan': 4.0.10
+      '@changesets/git': 3.0.4
       '@changesets/logger': 0.1.1
       '@changesets/pre': 2.0.2
-      '@changesets/read': 0.6.3
+      '@changesets/read': 0.6.5
       '@changesets/should-skip-package': 0.1.2
       '@changesets/types': 6.1.0
       '@changesets/write': 0.4.0
@@ -15756,18 +15761,18 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@changesets/get-release-plan@4.0.8':
+  '@changesets/get-release-plan@4.0.10':
     dependencies:
       '@changesets/assemble-release-plan': 6.0.6
       '@changesets/config': 3.1.1
       '@changesets/pre': 2.0.2
-      '@changesets/read': 0.6.3
+      '@changesets/read': 0.6.5
       '@changesets/types': 6.1.0
       '@manypkg/get-packages': 1.1.3
 
   '@changesets/get-version-range-type@0.4.0': {}
 
-  '@changesets/git@3.0.2':
+  '@changesets/git@3.0.4':
     dependencies:
       '@changesets/errors': 0.2.0
       '@manypkg/get-packages': 1.1.3
@@ -15791,9 +15796,9 @@ snapshots:
       '@manypkg/get-packages': 1.1.3
       fs-extra: 7.0.1
 
-  '@changesets/read@0.6.3':
+  '@changesets/read@0.6.5':
     dependencies:
-      '@changesets/git': 3.0.2
+      '@changesets/git': 3.0.4
       '@changesets/logger': 0.1.1
       '@changesets/parse': 0.4.1
       '@changesets/types': 6.1.0
@@ -17700,7 +17705,7 @@ snapshots:
       citty: 0.1.6
       consola: 3.4.2
       destr: 2.0.5
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       git-url-parse: 16.0.1
       is-docker: 3.0.0
       ofetch: 1.4.1
@@ -21469,7 +21474,7 @@ snapshots:
       chokidar: 4.0.3
       confbox: 0.2.2
       defu: 6.1.4
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       exsolve: 1.0.4
       giget: 2.0.0
       jiti: 2.4.2
@@ -22006,9 +22011,9 @@ snapshots:
     dependencies:
       browserslist: 4.24.4
 
-  core-js@3.26.1: {}
-
   core-js@3.37.1: {}
+
+  core-js@3.41.0: {}
 
   core-util-is@1.0.2: {}
 
@@ -22617,13 +22622,15 @@ snapshots:
 
   dotenv-expand@11.0.7:
     dependencies:
-      dotenv: 16.4.7
+      dotenv: 16.5.0
 
   dotenv@10.0.0: {}
 
   dotenv@16.0.3: {}
 
   dotenv@16.4.7: {}
+
+  dotenv@16.5.0: {}
 
   dset@3.1.4: {}
 
@@ -23042,11 +23049,11 @@ snapshots:
     dependencies:
       eslint: 9.23.0(jiti@2.4.2)
 
-  eslint-config-turbo@2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.4.4):
+  eslint-config-turbo@2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.5.0):
     dependencies:
       eslint: 9.23.0(jiti@2.4.2)
-      eslint-plugin-turbo: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.4.4)
-      turbo: 2.4.4
+      eslint-plugin-turbo: 2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.5.0)
+      turbo: 2.5.0
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
@@ -23176,11 +23183,11 @@ snapshots:
     dependencies:
       eslint: 9.23.0(jiti@2.4.2)
 
-  eslint-plugin-turbo@2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.4.4):
+  eslint-plugin-turbo@2.4.4(eslint@9.23.0(jiti@2.4.2))(turbo@2.5.0):
     dependencies:
       dotenv: 16.0.3
       eslint: 9.23.0(jiti@2.4.2)
-      turbo: 2.4.4
+      turbo: 2.5.0
 
   eslint-plugin-unused-imports@4.1.4(@typescript-eslint/eslint-plugin@8.28.0(@typescript-eslint/parser@8.28.0(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.23.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.23.0(jiti@2.4.2)):
     dependencies:
@@ -30098,38 +30105,38 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  turbo-darwin-64@2.4.4:
+  turbo-darwin-64@2.5.0:
     optional: true
 
-  turbo-darwin-arm64@2.4.4:
+  turbo-darwin-arm64@2.5.0:
     optional: true
 
-  turbo-ignore@2.4.4:
+  turbo-ignore@2.5.0:
     dependencies:
       json5: 2.2.3
 
-  turbo-linux-64@2.4.4:
+  turbo-linux-64@2.5.0:
     optional: true
 
-  turbo-linux-arm64@2.4.4:
+  turbo-linux-arm64@2.5.0:
     optional: true
 
   turbo-stream@2.4.0: {}
 
-  turbo-windows-64@2.4.4:
+  turbo-windows-64@2.5.0:
     optional: true
 
-  turbo-windows-arm64@2.4.4:
+  turbo-windows-arm64@2.5.0:
     optional: true
 
-  turbo@2.4.4:
+  turbo@2.5.0:
     optionalDependencies:
-      turbo-darwin-64: 2.4.4
-      turbo-darwin-arm64: 2.4.4
-      turbo-linux-64: 2.4.4
-      turbo-linux-arm64: 2.4.4
-      turbo-windows-64: 2.4.4
-      turbo-windows-arm64: 2.4.4
+      turbo-darwin-64: 2.5.0
+      turbo-darwin-arm64: 2.5.0
+      turbo-linux-64: 2.5.0
+      turbo-linux-arm64: 2.5.0
+      turbo-windows-64: 2.5.0
+      turbo-windows-arm64: 2.5.0
 
   tweetnacl@0.14.5: {}
 
