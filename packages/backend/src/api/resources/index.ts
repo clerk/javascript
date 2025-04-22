@@ -1,6 +1,7 @@
 export * from './ActorToken';
 export * from './AccountlessApplication';
 export * from './AllowlistIdentifier';
+export * from './APIKey';
 export * from './BlocklistIdentifier';
 export * from './Client';
 export * from './CnameTarget';
@@ -23,11 +24,13 @@ export type { SignUpStatus } from '@clerk/types';
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';
+export * from './IdPOAuthAccessToken';
 export * from './Instance';
 export * from './InstanceRestrictions';
 export * from './InstanceSettings';
 export * from './Invitation';
 export * from './JSON';
+export * from './MachineToken';
 export * from './JwtTemplate';
 export * from './OauthAccessToken';
 export * from './OAuthApplication';
