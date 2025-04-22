@@ -1,6 +1,8 @@
 import { useInvoicesContext } from '../../contexts';
-import { Badge, Box, Dd, descriptors, Dl, Dt, Heading, Spinner, Text } from '../../customizables';
+import { Badge, Box, Button, Dd, descriptors, Dl, Dt, Heading, Icon, Span, Spinner, Text } from '../../customizables';
 import { Header, LineItems } from '../../elements';
+import { useClipboard } from '../../hooks';
+import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
@@ -76,18 +78,43 @@ export const InvoicePage = () => {
               })}
             >
               <Box
+                elementDescriptor={descriptors.invoiceHeaderTitleBadgeContainer}
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
+                  alignItems: 'start',
                 }}
               >
-                <Heading
-                  textVariant='h2'
-                  elementDescriptor={descriptors.invoiceTitle}
-                >
-                  {truncateWithEndVisible(invoice.id)}
-                </Heading>
+                <Span elementDescriptor={descriptors.invoiceTitleIdContainer}>
+                  <Heading
+                    textVariant='h2'
+                    elementDescriptor={descriptors.invoiceTitle}
+                  >
+                    Invoice ID
+                  </Heading>
+                  <Span
+                    elementDescriptor={descriptors.invoiceIdContainer}
+                    sx={t => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: t.space.$0x25,
+                      color: t.colors.$colorTextSecondary,
+                    })}
+                  >
+                    <CopyButton
+                      copyLabel='Copy invoice ID'
+                      text={invoice.id}
+                    />
+                    <Text
+                      elementDescriptor={descriptors.invoiceId}
+                      colorScheme='secondary'
+                      variant='subtitle'
+                    >
+                      {truncateWithEndVisible(invoice.id)}
+                    </Text>
+                  </Span>
+                </Span>
+
                 <Badge
                   elementDescriptor={descriptors.invoiceBadge}
                   colorScheme={
@@ -109,6 +136,7 @@ export const InvoicePage = () => {
                 <Box elementDescriptor={descriptors.invoiceDetailsItem}>
                   <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
@@ -116,7 +144,12 @@ export const InvoicePage = () => {
                     </Text>
                   </Dt>
                   <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
-                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                    <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      variant='subtitle'
+                    >
+                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                    </Text>
                   </Dd>
                 </Box>
                 <Box
@@ -127,6 +160,7 @@ export const InvoicePage = () => {
                 >
                   <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
                     <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
@@ -134,7 +168,12 @@ export const InvoicePage = () => {
                     </Text>
                   </Dt>
                   <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
-                    <Text variant='subtitle'>{new Date(invoice.paymentDueOn).toLocaleDateString()}</Text>
+                    <Text
+                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      variant='subtitle'
+                    >
+                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                    </Text>
                   </Dd>
                 </Box>
               </Dl>
@@ -183,3 +222,34 @@ export const InvoicePage = () => {
     </>
   );
 };
+
+function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
+  const { onCopy, hasCopied } = useClipboard(text);
+
+  return (
+    <Button
+      elementDescriptor={descriptors.invoiceCopyButton}
+      variant='unstyled'
+      onClick={onCopy}
+      sx={t => ({
+        color: 'inherit',
+        width: t.sizes.$4,
+        height: t.sizes.$4,
+        padding: 0,
+        borderRadius: t.radii.$sm,
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: t.colors.$neutralAlpha200,
+        },
+      })}
+      focusRing={false}
+      aria-label={hasCopied ? 'Copied' : copyLabel}
+    >
+      <Icon
+        size='sm'
+        icon={hasCopied ? Check : Copy}
+        aria-hidden
+      />
+    </Button>
+  );
+}

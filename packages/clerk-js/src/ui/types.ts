@@ -5,6 +5,7 @@ import type {
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
+  __experimental_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -48,7 +49,8 @@ export type AvailableComponentProps =
   | WaitlistProps
   | __experimental_PricingTableProps
   | __experimental_CheckoutProps
-  | __internal_UserVerificationProps;
+  | __internal_UserVerificationProps
+  | __experimental_SubscriptionDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -142,10 +144,6 @@ export type __experimental_PlansCtx = {
   subscriptions: __experimental_CommerceSubscriptionResource[];
   isLoading: boolean;
   revalidate: () => void;
-  activeOrUpcomingSubscription: (
-    plan: __experimental_CommercePlanResource,
-  ) => __experimental_CommerceSubscriptionResource | undefined;
-  isDefaultPlanImplicitlyActive: boolean;
 };
 
 export type SessionTasksCtx = {
