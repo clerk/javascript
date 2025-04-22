@@ -125,6 +125,10 @@ type _LocalizationResource = {
         title__invoiceId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
+      emailForm: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
   };
   signUp: {
@@ -697,6 +701,9 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
       };
     };
   };

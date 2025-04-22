@@ -161,6 +161,7 @@ const PaymentSourceMenu = ({
       label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
+      isDisabled: paymentSource.isDefault,
     },
   ];
 
@@ -176,6 +177,7 @@ const PaymentSourceMenu = ({
             handleError(error, [], card.setError);
           });
       },
+      isDisabled: false,
     });
   }
 

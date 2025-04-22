@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
+import { common } from '../styledSystem/common';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
@@ -61,7 +62,18 @@ const { applyVariants, filterProps } = createVariants(theme => {
         display: 'block',
       },
     },
-    variants: {},
+    variants: {
+      tableHeadVisuallyHidden: {
+        true: {
+          thead: {
+            ...common.visuallyHidden(),
+          },
+          'tr:first-of-type td': {
+            borderTop: 'none',
+          },
+        },
+      },
+    },
   };
 });
 
