@@ -25,7 +25,7 @@ export function SubscriptionsList() {
       </Thead>
       <Tbody>
         {subscriptions.map(subscription => (
-          <Tr key={subscription.plan.id}>
+          <Tr key={subscription.id}>
             <Td>
               <Box
                 sx={t => ({
@@ -72,7 +72,7 @@ export function SubscriptionsList() {
                 size='xs'
                 textVariant='buttonSmall'
                 onClick={() => handleSelectSubscription(subscription)}
-                {...buttonPropsForPlan({ plan: subscription.plan })}
+                {...buttonPropsForPlan({ subscription })}
               />
             </Td>
           </Tr>
