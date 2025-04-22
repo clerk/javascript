@@ -23,7 +23,7 @@ export const organizationProfileLinkRenderedError =
   '<OrganizationProfile.Link /> component needs to be a direct child of `<OrganizationProfile />` or `<OrganizationSwitcher />`.';
 
 export const customPagesIgnoredComponent = (componentName: string) =>
-  `<${componentName} /> can only accept <${componentName}.Page /> and <${componentName}.Link /> as its children. Any other provided component will be ignored.`;
+  `<${componentName} /> can only accept <${componentName}.Page /> and <${componentName}.Link /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.`;
 
 export const customPageWrongProps = (componentName: string) =>
   `Missing props. <${componentName}.Page /> component requires the following props: url, label, labelIcon, alongside with children to be rendered inside the page.`;
@@ -40,10 +40,13 @@ export const noPathProvidedError = (componentName: string) =>
 export const incompatibleRoutingWithPathProvidedError = (componentName: string) =>
   `The \`path\` prop will only be respected when the Clerk component uses path-based routing. To resolve this error, pass \`routing='path'\` to the <${componentName}/> component, or drop the \`path\` prop to switch to hash-based routing. For more details please refer to our docs: https://clerk.com/docs`;
 
-export const userButtonIgnoredComponent = `<UserButton /> can only accept <UserButton.UserProfilePage />, <UserButton.UserProfileLink /> and <UserButton.MenuItems /> as its children. Any other provided component will be ignored.`;
+export const userButtonIgnoredComponent = `<UserButton /> can only accept <UserButton.UserProfilePage />, <UserButton.UserProfileLink /> and <UserButton.MenuItems /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.`;
+
+export const mustBeContainedInClientComponentError = (componentName: string) =>
+  `The <${componentName}/> component must be used in a client component.`;
 
 export const customMenuItemsIgnoredComponent =
-  '<UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored.';
+  '<UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored. Additionally, please ensure that the component is rendered in a client component.';
 
 export const userButtonMenuItemsRenderedError =
   '<UserButton.MenuItems /> component needs to be a direct child of `<UserButton />`.';
