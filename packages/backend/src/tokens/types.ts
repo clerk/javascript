@@ -1,6 +1,6 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 
-import type { ApiClient } from '../api';
+import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -49,6 +49,11 @@ export type AuthenticateRequestOptions = {
    * @internal
    */
   apiClient?: ApiClient;
+  /**
+   * The type of token to accept.
+   * @default 'session_token'
+   */
+  acceptsToken?: TokenType | TokenType[] | 'any';
 } & VerifyTokenOptions;
 
 /**
@@ -131,3 +136,30 @@ export type OrganizationSyncTargetMatchers = {
 export type OrganizationSyncTarget =
   | { type: 'personalAccount' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
+export type TokenType = 'session_token' | 'oauth_token' | 'api_key' | 'machine_token';
+
+export type NonSessionTokenType = Exclude<TokenType, 'session_token'>;
+
+export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
+
+/**
+ * A type that ensures an array contains only unique token types from the allowed TokenType values.
+ */
+export type UniqueTokenArray<
+  ExcludedTokens = never,
+  MaxLength extends 4 | 3 | 2 | 1 | 0 = 4, // Updated to support 4 tokens
+> = MaxLength extends 0
+  ? []
+  : Exclude<TokenType, ExcludedTokens> extends infer T
+    ? T extends any
+      ?
+          | [
+              T,
+              ...UniqueTokenArray<
+                ExcludedTokens | T,
+                MaxLength extends 4 ? 3 : MaxLength extends 3 ? 2 : MaxLength extends 2 ? 1 : 0
+              >,
+            ]
+          | []
+      : never
+    : never;

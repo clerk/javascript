@@ -11,6 +11,7 @@ import type {
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
+import type { MachineAuthType, NonSessionTokenType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -26,6 +27,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  tokenType: 'session_token';
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -39,6 +41,7 @@ export type SignedOutAuthObject = {
   sessionId: null;
   sessionStatus: null;
   actor: null;
+  tokenType: 'session_token';
   userId: null;
   orgId: null;
   orgRole: null;
@@ -58,7 +61,36 @@ export type SignedOutAuthObject = {
 /**
  * @internal
  */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthenticatedMachineObject = {
+  tokenType: NonSessionTokenType;
+  id: string;
+  name: string;
+  subject: string;
+  claims: Record<string, string> | null;
+  getToken: () => Promise<string>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+};
+
+/**
+ * @internal
+ */
+export type UnauthenticatedMachineObject = {
+  tokenType: NonSessionTokenType;
+  id: null;
+  name: null;
+  subject: null;
+  claims: null;
+  getToken: () => Promise<null>;
+  has: () => false;
+  debug: AuthObjectDebug;
+};
+
+export type AuthObject =
+  | SignedInAuthObject
+  | SignedOutAuthObject
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -86,6 +118,7 @@ export function signedInAuthObject(
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
   return {
+    tokenType: 'session_token',
     actor,
     sessionClaims,
     sessionId,
@@ -115,6 +148,7 @@ export function signedInAuthObject(
  */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
+    tokenType: 'session_token',
     sessionClaims: null,
     sessionId: null,
     sessionStatus: null,
@@ -125,6 +159,46 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgSlug: null,
     orgPermissions: null,
     factorVerificationAge: null,
+    getToken: () => Promise.resolve(null),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+/**
+ * @internal
+ */
+export function authenticatedMachineObject(
+  tokenType: NonSessionTokenType,
+  machineToken: string,
+  verificationResult: MachineAuthType,
+  debugData?: AuthObjectDebugData,
+): AuthenticatedMachineObject {
+  return {
+    tokenType,
+    id: verificationResult.id,
+    name: verificationResult.name,
+    subject: verificationResult.subject,
+    claims: verificationResult.claims,
+    getToken: () => Promise.resolve(machineToken),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+}
+
+/**
+ * @internal
+ */
+export function unauthenticatedMachineObject(
+  tokenType: NonSessionTokenType,
+  debugData?: AuthObjectDebugData,
+): UnauthenticatedMachineObject {
+  return {
+    tokenType,
+    id: null,
+    name: null,
+    subject: null,
+    claims: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),

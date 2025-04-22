@@ -90,6 +90,10 @@ export function createProtect(opts: {
       return notFound();
     };
 
+    if (authObject.tokenType !== 'session_token') {
+      throw new Error('TODO: Handle machine auth object');
+    }
+
     /**
      * Redirects the user back to the tasks URL if their session status is pending
      */
