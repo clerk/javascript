@@ -125,6 +125,10 @@ type _LocalizationResource = {
         title__invoiceId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
+      emailForm: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
   };
   signUp: {

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-react-start",
-  "version": "0.13.7",
+  "version": "0.13.8",
   "description": "Clerk SDK for TanStack React Start",
   "keywords": [
     "clerk",
@@ -62,7 +62,9 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile esm-only",
     "lint:publint": "publint",
-    "publish:local": "pnpm yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
