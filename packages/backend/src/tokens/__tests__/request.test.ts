@@ -1296,7 +1296,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
         expect(result).toBeMachineUnauthenticated({
           tokenType: 'api_key',
-          reason: 'token-type-mismatch',
+          reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
@@ -1310,7 +1310,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
         expect(result).toBeMachineUnauthenticated({
           tokenType: 'oauth_token',
-          reason: 'token-type-mismatch',
+          reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
@@ -1324,7 +1324,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
         expect(result).toBeMachineUnauthenticated({
           tokenType: 'machine_token',
-          reason: 'token-type-mismatch',
+          reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
@@ -1338,7 +1338,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
         expect(result).toBeMachineUnauthenticated({
           tokenType: 'machine_token',
-          reason: 'token-type-mismatch',
+          reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(result.toAuth()).toBeMachineUnauthenticatedToAuth({
@@ -1373,7 +1373,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
         expect(requestState).toBeMachineUnauthenticated({
           tokenType: 'machine_token',
-          reason: 'token-type-mismatch',
+          reason: AuthErrorReason.TokenTypeMismatch,
           message: '',
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
