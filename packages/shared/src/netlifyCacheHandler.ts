@@ -18,7 +18,7 @@ export const CLERK_NETLIFY_CACHE_BUST_PARAM = '__clerk_netlify_cache_bust';
  * The issue happens only on Clerk development instances running on Netlify. This is
  * a workaround until we find a better solution.
  *
- * See {@link https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1}
+ * See https://answers.netlify.com/t/cache-handling-recommendation-for-authentication-handshake-redirects/143969/1
  *
  * @internal
  */
