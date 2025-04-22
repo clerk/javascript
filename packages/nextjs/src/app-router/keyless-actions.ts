@@ -8,6 +8,14 @@ import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
 
+const cookieValue = {
+  // domain: 'localhost',
+  // sameSite: 'lax',
+  secure: false,
+  httpOnly: true,
+  // maxAge: 1000 * 60 * 60 * 24 * 30,
+};
+
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   const cookieStore = await cookies();
@@ -21,10 +29,10 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
     return;
   }
 
+  // const expires = new Date().setDate(new Date().getDate() + 30);
   // Set the new keys in the cookie.
   cookieStore.set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-    secure: true,
-    httpOnly: true,
+    ...cookieValue,
   });
 
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
@@ -65,8 +73,7 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
 
   void (await cookies()).set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-    secure: false,
-    httpOnly: false,
+    ...cookieValue,
   });
 
   return {
