@@ -1,7 +1,7 @@
 /**
- * Converts an array of strings to a comma-separated sentence
- * @param items {Array<string>}
- * @returns {string} Returns a string with the items joined by a comma and the last item joined by ", or"
+ * Convert words to a sentence.
+ * @param items - An array of words to be joined.
+ * @returns A string with the items joined by a comma and the last item joined by ", or".
  */
 export const toSentence = (items: string[]): string => {
   // TODO: Once Safari supports it, use Intl.ListFormat
@@ -19,19 +19,33 @@ export const toSentence = (items: string[]): string => {
 const IP_V4_ADDRESS_REGEX =
   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
+/**
+ * Checks if a string is a valid IPv4 address
+ * @returns True if the string is a valid IPv4 address, false otherwise
+ */
 export function isIPV4Address(str: string | undefined | null): boolean {
   return IP_V4_ADDRESS_REGEX.test(str || '');
 }
 
+/**
+ * Converts a string to title case
+ * @returns The string in title case
+ */
 export function titleize(str: string | undefined | null): string {
   const s = str || '';
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/**
+ *
+ */
 export function snakeToCamel(str: string | undefined): string {
   return str ? str.replace(/([-_][a-z])/g, match => match.toUpperCase().replace(/-|_/, '')) : '';
 }
 
+/**
+ *
+ */
 export function camelToSnake(str: string | undefined): string {
   return str ? str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`) : '';
 }
@@ -86,8 +100,8 @@ export const deepCamelToSnake = createDeepObjectTransformer(camelToSnake);
 export const deepSnakeToCamel = createDeepObjectTransformer(snakeToCamel);
 
 /**
- * Returns true for `true`, true, positive numbers.
- * Returns false for `false`, false, 0, negative integers and anything else.
+ * A function to determine if a value is truthy.
+ * @returns True for `true`, true, positive numbers. False for `false`, false, 0, negative integers and anything else.
  */
 export function isTruthy(value: unknown): boolean {
   // Return if Boolean
@@ -125,6 +139,9 @@ export function isTruthy(value: unknown): boolean {
   return false;
 }
 
+/**
+ *
+ */
 export function getNonUndefinedValues<T extends object>(obj: T): Partial<T> {
   return Object.entries(obj).reduce((acc, [key, value]) => {
     if (value !== undefined) {
