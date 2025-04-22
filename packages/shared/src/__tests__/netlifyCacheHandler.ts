@@ -6,9 +6,11 @@ const mockPublishableKey = 'pk_test_YW55LW9mZabcZS1wYWdlX3BhZ2VfcG9pbnRlci1pZF90
 describe('handleNetlifyCacheInDevInstance', () => {
   beforeEach(() => {
     delete process.env.URL;
+    delete process.env.NETLIFY;
   });
 
   it('should add cache bust parameter when on Netlify and in development', () => {
+    process.env.NETLIFY = 'true';
     process.env.URL = 'https://example.netlify.app';
 
     const requestStateHeaders = new Headers({
@@ -27,6 +29,7 @@ describe('handleNetlifyCacheInDevInstance', () => {
   });
 
   it('should not modify the Location header if it has the handshake param', () => {
+    process.env.URL = 'https://example.netlify.app';
     process.env.NETLIFY = 'true';
 
     const requestStateHeaders = new Headers({
