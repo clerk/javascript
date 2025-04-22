@@ -33,6 +33,26 @@ describe('signedInAuthObject', () => {
   });
 
   describe('JWT v1', () => {
+    it('has() for user scope', () => {
+      const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
+
+      const partialJwtPayload = {
+        ___raw: 'raw',
+        act: { sub: 'actor' },
+        sid: 'sessionId',
+        sub: 'userId',
+      } as Partial<JwtPayload>;
+
+      const authObject = signedInAuthObject(mockAuthenticateContext, 'token', partialJwtPayload as JwtPayload);
+
+      expect(authObject.has({ role: 'org:admin' })).toBe(false);
+      expect(authObject.has({ role: 'admin' })).toBe(false);
+      expect(authObject.has({ permission: 'org:f1:read' })).toBe(false);
+      expect(authObject.has({ permission: 'f1:read' })).toBe(false);
+      expect(authObject.has({ feature: 'org:reservations' })).toBe(false);
+      expect(authObject.has({ feature: 'org:impersonation' })).toBe(false);
+    });
+
     it('has() for orgs', () => {
       const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
 
@@ -50,7 +70,9 @@ describe('signedInAuthObject', () => {
       const authObject = signedInAuthObject(mockAuthenticateContext, 'token', partialJwtPayload as JwtPayload);
 
       expect(authObject.has({ role: 'org:admin' })).toBe(true);
+      expect(authObject.has({ role: 'admin' })).toBe(true);
       expect(authObject.has({ permission: 'org:f1:read' })).toBe(true);
+      expect(authObject.has({ permission: 'f1:read' })).toBe(true);
       expect(authObject.has({ permission: 'org:f1' })).toBe(false);
       expect(authObject.has({ permission: 'org:f2:manage' })).toBe(true);
       expect(authObject.has({ permission: 'org:f2' })).toBe(false);
@@ -84,7 +106,9 @@ describe('signedInAuthObject', () => {
       const authObject = signedInAuthObject(mockAuthenticateContext, 'token', partialJwtPayload as JwtPayload);
 
       expect(authObject.has({ role: 'org:admin' })).toBe(true);
+      expect(authObject.has({ role: 'admin' })).toBe(true);
       expect(authObject.has({ permission: 'org:reservations:read' })).toBe(true);
+      expect(authObject.has({ permission: 'reservations:read' })).toBe(true);
       expect(authObject.has({ permission: 'org:reservations' })).toBe(false);
       expect(authObject.has({ permission: 'org:reservations:manage' })).toBe(true);
       expect(authObject.has({ permission: 'org:reservations' })).toBe(false);
