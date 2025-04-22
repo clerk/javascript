@@ -32,7 +32,8 @@ export function handleNetlifyCacheInDevInstance({
   publishableKey: string;
 }) {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
-  const isOnNetlify = process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
+  const isOnNetlify =
+    process.env.NETLIFY || process.env.URL?.endsWith('netlify.app') || Boolean(process.env.NETLIFY_FUNCTIONS_TOKEN);
   const isDevelopmentInstance = isDevelopmentFromPublishableKey(publishableKey);
   if (isOnNetlify && isDevelopmentInstance) {
     const hasHandshakeQueryParam = locationHeader.includes('__clerk_handshake');
