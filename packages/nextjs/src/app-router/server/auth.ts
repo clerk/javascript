@@ -1,5 +1,13 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type {
+  AuthenticatedMachineObject,
+  RedirectFun,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  TokenType,
+  UnauthenticatedMachineObject,
+} from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -15,7 +23,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type Auth = AuthObject & {
+type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -37,8 +45,29 @@ type Auth = AuthObject & {
   redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
 };
 
+// Machine token auth objects
+type MachineAuth<T extends Exclude<TokenType, 'session_token'>> = (
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject
+) & { tokenType: T };
+
+type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
+
 export interface AuthFn {
-  (): Promise<Auth>;
+  // No options case - defaults to session token
+  (): Promise<SessionAuth>;
+
+  // With options but no acceptsToken case - defaults to session token
+  (options: Omit<AuthOptions, 'acceptsToken'>): Promise<SessionAuth>;
+
+  (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
+
+  <T extends TokenType>(
+    options: AuthOptions & { acceptsToken: T },
+  ): Promise<T extends 'session_token' ? SessionAuth : MachineAuth<Exclude<T, 'session_token'>>>;
+
+  // Array case - if includes session_token, return SessionAuth, else MachineAuth
+  // (options: AuthOptions & { acceptsToken: TokenType[] }): Promise<SessionAuth | MachineAuth<Exclude<TokenType, 'session_token'>>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
@@ -68,7 +97,7 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = async () => {
+export const auth: AuthFn = (async () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -132,7 +161,7 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
-};
+}) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

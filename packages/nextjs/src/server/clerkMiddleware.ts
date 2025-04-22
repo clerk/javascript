@@ -56,7 +56,7 @@ type ClerkMiddlewareHandler = (
  * The `clerkMiddleware()` function accepts an optional object. The following options are available.
  * @interface
  */
-export interface ClerkMiddlewareOptions extends AuthenticateRequestOptions {
+export interface ClerkMiddlewareOptions extends Omit<AuthenticateRequestOptions, 'acceptsToken'> {
   /**
    * If true, additional debug information will be logged to the console.
    */
@@ -66,7 +66,12 @@ export interface ClerkMiddlewareOptions extends AuthenticateRequestOptions {
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
   contentSecurityPolicy?: ContentSecurityPolicyOptions;
-}
+  /**
+   * The type of token to accept.
+   * @default 'session_token'
+   */
+  acceptsTokenType?: AuthenticateRequestOptions['acceptsToken'];
+};
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
@@ -130,6 +135,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         secretKey,
         signInUrl,
         signUpUrl,
+        acceptsToken: resolvedParams.acceptsTokenType || 'session_token',
         ...resolvedParams,
       };
 
@@ -328,6 +334,7 @@ export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
+  // @ts-expect-error: Fix types as it only gets the array of token types
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),

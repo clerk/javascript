@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type { RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
+import type { RedirectFun, SignedInAuthObject, TokenType } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationFromSessionClaims,
@@ -13,6 +13,10 @@ import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
 
 type AuthProtectOptions = {
+  /**
+   * The token type to check.
+   */
+  token?: TokenType;
   /**
    * The URL to redirect the user to if they are not authorized.
    */
@@ -71,8 +75,14 @@ export function createProtect(opts: {
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
     const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
     const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
+    const requestedToken = (args[0]?.token || args[1]?.token) as TokenType | undefined;
 
     const handleUnauthenticated = () => {
+      // For machine tokens, always return notFound instead of redirecting
+      if (authObject.tokenType !== 'session_token') {
+        return notFound();
+      }
+
       if (unauthenticatedUrl) {
         return redirect(unauthenticatedUrl);
       }
@@ -90,8 +100,20 @@ export function createProtect(opts: {
       return notFound();
     };
 
+    // Check if the token type matches the requested token
+    if (requestedToken && authObject.tokenType !== requestedToken) {
+      console.log('requestedToken', requestedToken);
+      console.log('authObject.tokenType', authObject.tokenType);
+      return handleUnauthorized();
+    }
+
     if (authObject.tokenType !== 'session_token') {
-      throw new Error('TODO: Handle machine auth object');
+      // For machine tokens, we only check if they're authenticated
+      // They don't have session status or organization permissions
+      if (!authObject.id) {
+        return handleUnauthenticated();
+      }
+      return authObject;
     }
 
     /**
