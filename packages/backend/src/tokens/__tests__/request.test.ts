@@ -1361,5 +1361,27 @@ describe('tokens.authenticateRequest(options)', () => {
         });
       });
     });
+
+    describe('Token Location Validation', () => {
+      test.each(tokenTypes)('returns unauthenticated state when %s is in cookie instead of header', async tokenType => {
+        const mockToken = tokenMap[tokenType];
+
+        const requestState = await authenticateRequest(
+          mockRequestWithCookies(
+            {},
+            {
+              __session: mockToken,
+            },
+          ),
+          mockOptions({ acceptsToken: tokenType }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType,
+          reason: 'No token in header',
+          message: '',
+        });
+      });
+    });
   });
 });
