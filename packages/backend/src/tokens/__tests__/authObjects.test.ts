@@ -221,10 +221,10 @@ describe('authenticatedMachineObject', () => {
   });
 
   describe('OAuth Access Token authentication', () => {
-    const token = 'oauth_token_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
     const verificationResult = {
       object: ObjectType.IdpOAuthAccessToken,
-      id: 'oauth_token_2VTWUzvGC5UhdJCNx6xG1D98edc',
+      id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
       type: 'oauth:access_token',
       name: 'GitHub OAuth',
       subject: 'user_2vYVtestTESTtestTESTtestTESTtest',

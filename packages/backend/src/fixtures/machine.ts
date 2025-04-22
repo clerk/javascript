@@ -1,5 +1,5 @@
 export const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
-export const mockOauthToken = 'oauth_8XOIucKvqHVr5tYP123456789abcdefghij';
+export const mockOauthToken = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
 export const mockMachineToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
 
 export const mockMachineAuthResponses = {
@@ -18,8 +18,8 @@ export const mockMachineAuthResponses = {
   oauth_token: {
     endpoint: 'https://api.clerk.test/v1/oauth_applications/access_tokens/verify',
     successResponse: {
-      object: 'oauth_token',
-      id: 'oauth_token_ey966f1b1xf93586b2debdcadb0b3bd1',
+      object: 'clerk_idp_oauth_access_token',
+      id: 'oauth_access_ey966f1b1xf93586b2debdcadb0b3bd1',
       type: 'oauth_token',
       name: 'my-oauth-token',
       subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
