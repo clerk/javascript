@@ -679,8 +679,10 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.MachineToken;
   name: string;
   subject: string;
+  scopes: string[];
   claims: Record<string, string> | null;
   revoked: boolean;
+  revocation_reason: string | null;
   expired: boolean;
   expiration: number | null;
   created_by: string | null;
@@ -694,12 +696,17 @@ export interface APIKeyJSON extends ClerkResourceJSON {
   type: string;
   name: string;
   subject: string;
+  scopes: string[];
   claims: Record<string, string> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
   created_by: string | null;
   creation_reason: string | null;
   seconds_until_expiration: number | null;
   created_at: number;
-  expires_at: number | null;
+  updated_at: number;
 }
 
 export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
@@ -707,9 +714,14 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   type: string;
   name: string;
   subject: string;
+  scopes: string[];
   claims: Record<string, string> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
   created_at: number;
-  expires_at: number;
+  updated_at: number;
 }
 
 export interface WebhooksSvixJSON {

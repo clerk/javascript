@@ -6,12 +6,17 @@ export class APIKey {
     readonly type: string,
     readonly name: string,
     readonly subject: string,
+    readonly scopes: string[],
     readonly claims: Record<string, string> | null,
+    readonly revoked: boolean,
+    readonly revocationReason: string | null,
+    readonly expired: boolean,
+    readonly expiration: number | null,
     readonly createdBy: string | null,
     readonly creationReason: string | null,
     readonly secondsUntilExpiration: number | null,
     readonly createdAt: number,
-    readonly expiresAt: number | null,
+    readonly updatedAt: number,
   ) {}
 
   static fromJSON(data: APIKeyJSON) {
@@ -20,12 +25,17 @@ export class APIKey {
       data.type,
       data.name,
       data.subject,
+      data.scopes,
       data.claims,
+      data.revoked,
+      data.revocation_reason,
+      data.expired,
+      data.expiration,
       data.created_by,
       data.creation_reason,
       data.seconds_until_expiration,
       data.created_at,
-      data.expires_at,
+      data.updated_at,
     );
   }
 }
