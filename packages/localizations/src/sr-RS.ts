@@ -636,6 +636,7 @@ export const srRS: LocalizationResource = {
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
+    session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',

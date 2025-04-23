@@ -1,5 +1,20 @@
 # @clerk/testing
 
+## 1.5.0
+
+### Minor Changes
+
+- Switching over our interception of FAPI calls from page.route to context.route as routes set up with page.route() take precedence over browser context routes when request matches both handlers. ([#5673](https://github.com/clerk/javascript/pull/5673)) by [@jacekradko](https://github.com/jacekradko)
+
+  This allows for users to override calls to FAPI more consistently
+
+### Patch Changes
+
+- Updated dependencies [[`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/types@4.55.0
+  - @clerk/backend@1.29.2
+  - @clerk/shared@3.7.3
+
 ## 1.4.41
 
 ### Patch Changes

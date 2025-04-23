@@ -637,6 +637,7 @@ export const mnMN: LocalizationResource = {
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
+    session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',

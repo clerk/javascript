@@ -641,6 +641,7 @@ export const frFR: LocalizationResource = {
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",

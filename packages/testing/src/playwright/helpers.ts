@@ -88,7 +88,12 @@ type PlaywrightClerkSignInParams = {
 };
 
 const signIn = async ({ page, signInParams, setupClerkTestingTokenOptions }: PlaywrightClerkSignInParams) => {
-  await setupClerkTestingToken({ page, options: setupClerkTestingTokenOptions });
+  const context = page.context();
+  if (!context) {
+    throw new Error('Page context is not available. Make sure the page is properly initialized.');
+  }
+
+  await setupClerkTestingToken({ context, options: setupClerkTestingTokenOptions });
   await loaded({ page });
 
   await page.evaluate(signInHelper, { signInParams });

@@ -42,7 +42,7 @@ export function PricingTableMatrix({
   const pricingTableMatrixId = React.useId();
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
-  const { activeOrUpcomingSubscription } = usePlansContext();
+  const { buttonPropsForPlan } = usePlansContext();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -159,8 +159,6 @@ export function PricingTableMatrix({
                     : planPeriod === 'annual'
                       ? plan.annualMonthlyAmountFormatted
                       : plan.amountFormatted;
-
-                const subscription = activeOrUpcomingSubscription(plan);
 
                 return (
                   <Box
@@ -323,20 +321,13 @@ export function PricingTableMatrix({
                       >
                         <Button
                           block
-                          variant='bordered'
-                          colorScheme={highlight ? 'primary' : 'secondary'}
                           textVariant='buttonSmall'
                           size='xs'
                           onClick={() => {
                             onSelect(plan);
                           }}
-                          localizationKey={
-                            subscription?.status === 'active'
-                              ? subscription?.canceledAt
-                                ? localizationKeys('__experimental_commerce.reSubscribe')
-                                : localizationKeys('__experimental_commerce.manageSubscription')
-                              : localizationKeys('__experimental_commerce.getStarted')
-                          }
+                          {...buttonPropsForPlan({ plan })}
+                          colorScheme={highlight ? 'primary' : 'secondary'}
                         />
                       </Box>
                     ) : null}
