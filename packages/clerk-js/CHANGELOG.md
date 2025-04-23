@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.62.1
+
+### Patch Changes
+
+- Minor UI fixes for Billing pages in `<UserProfile/>` and `<OrganizationProfile/>`. ([#5690](https://github.com/clerk/javascript/pull/5690)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/localizations@3.13.14
+  - @clerk/types@4.55.1
+  - @clerk/shared@3.7.4
+
 ## 5.62.0
 
 ### Minor Changes
