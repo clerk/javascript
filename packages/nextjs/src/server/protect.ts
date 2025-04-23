@@ -102,8 +102,6 @@ export function createProtect(opts: {
 
     // Check if the token type matches the requested token
     if (requestedToken && authObject.tokenType !== requestedToken) {
-      console.log('requestedToken', requestedToken);
-      console.log('authObject.tokenType', authObject.tokenType);
       return handleUnauthorized();
     }
 

@@ -135,7 +135,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         secretKey,
         signInUrl,
         signUpUrl,
-        acceptsToken: resolvedParams.acceptsTokenType || 'session_token',
         ...resolvedParams,
       };
 
@@ -334,10 +333,11 @@ export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
 ): Parameters<AuthenticateRequest>[1] => {
-  // @ts-expect-error: Fix types as it only gets the array of token types
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
+    // @ts-expect-error: Fix types as it only gets the array of token types
+    acceptsToken: 'any',
   };
 };
 
