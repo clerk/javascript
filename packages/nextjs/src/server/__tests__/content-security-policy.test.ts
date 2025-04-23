@@ -103,12 +103,16 @@ describe('CSP Header Utils', () => {
       const result = createContentSecurityPolicyHeaders(testHost, { reportTo: 'https://example.com/reports' });
 
       expect(result.headers).toHaveLength(2);
-      const [cspHeader, reportHeader] = result.headers;
-      expect(cspHeader[0]).toBe('content-security-policy');
-      expect(reportHeader[0]).toBe('reporting-endpoints');
 
+      const cspHeader = result.headers.find(([name]) => name === 'content-security-policy');
+      const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
+
+      expect(cspHeader).toBeDefined();
+      if (!cspHeader) throw new Error('CSP header not found');
       expect(cspHeader[1]).toContain('report-to csp-endpoint');
 
+      expect(reportHeader).toBeDefined();
+      if (!reportHeader) throw new Error('Report header not found');
       expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
     });
 
