@@ -186,7 +186,7 @@ describe('CSP Header Utils', () => {
       const result = createContentSecurityPolicyHeaders(testHost, {
         directives: {
           'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
-          'object-src': ['none'],
+          'frame-src': ['none'],
         },
       });
 
@@ -200,12 +200,12 @@ describe('CSP Header Utils', () => {
       expect(scriptSrcValues).toContain("'unsafe-eval'");
       expect(scriptSrcValues).toContain('custom-domain.com');
 
-      const objectSrcDirective = directives.find(d => d.startsWith('object-src'));
-      expect(objectSrcDirective).toBeDefined();
-      if (!objectSrcDirective) throw new Error('object-src directive not found');
-      const objectSrcValues = objectSrcDirective.replace('object-src ', '').split(' ');
-      expect(objectSrcValues).toContain("'none'");
-      expect(objectSrcValues).toHaveLength(1);
+      const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
+      expect(frameSrcDirective).toBeDefined();
+      if (!frameSrcDirective) throw new Error('frame-src directive not found');
+      const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
+      expect(frameSrcValues).toContain("'none'");
+      expect(frameSrcValues).toHaveLength(1);
     });
 
     it('should merge clerk subdomain with existing CSP values', () => {
@@ -231,6 +231,145 @@ describe('CSP Header Utils', () => {
       expect(directives).toContainEqual(
         `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://frames.example.com`,
       );
+    });
+
+    it('should preserve all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {});
+
+      const directives = result.headers[0][1].split('; ');
+
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+      );
+      expect(directives).toContainEqual("default-src 'self'");
+      expect(directives).toContainEqual("form-action 'self'");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
+      expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+      expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+      expect(directives).toContainEqual("worker-src 'self' blob:");
+
+      const scriptSrc = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrc).toBeDefined();
+      expect(scriptSrc).toContain("'self'");
+      expect(scriptSrc).toContain('https:');
+      expect(scriptSrc).toContain('http:');
+      expect(scriptSrc).toContain("'unsafe-inline'");
+      if (process.env.NODE_ENV !== 'production') {
+        expect(scriptSrc).toContain("'unsafe-eval'");
+      }
+    });
+
+    it('should include script-src with development-specific values when NODE_ENV is not production', () => {
+      vi.stubEnv('NODE_ENV', 'development');
+
+      const result = createContentSecurityPolicyHeaders(testHost, {});
+      const directives = result.headers[0][1].split('; ');
+
+      const scriptSrc = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrc).toBeDefined();
+      expect(scriptSrc).toContain("'unsafe-eval'");
+      expect(scriptSrc).toContain("'self'");
+      expect(scriptSrc).toContain('https:');
+      expect(scriptSrc).toContain('http:');
+      expect(scriptSrc).toContain("'unsafe-inline'");
+
+      vi.stubEnv('NODE_ENV', 'production');
+    });
+
+    it('should properly convert host to clerk subdomain in CSP directives', () => {
+      const host = 'clerk.example.com';
+      const result = createContentSecurityPolicyHeaders(host, {});
+
+      const directives = result.headers[0][1].split('; ');
+
+      expect(directives).toContainEqual(
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com`,
+      );
+      expect(directives).toContainEqual(`img-src 'self' https://img.clerk.com`);
+      expect(directives).toContainEqual(
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com`,
+      );
+
+      expect(directives).toContainEqual(`default-src 'self'`);
+      expect(directives).toContainEqual(`form-action 'self'`);
+      expect(directives).toContainEqual(`style-src 'self' 'unsafe-inline'`);
+      expect(directives).toContainEqual(`worker-src 'self' blob:`);
+    });
+
+    it('should merge and deduplicate values for existing directives while preserving special keywords', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ["'self'", 'new-value', 'another-value', "'unsafe-inline'", "'unsafe-eval'"],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+
+      const values = new Set(scriptSrcDirective.replace('script-src ', '').split(' '));
+      expect(values).toContain("'self'");
+      expect(values).toContain("'unsafe-inline'");
+      expect(values).toContain('new-value');
+      expect(values).toContain('another-value');
+    });
+
+    it('should correctly add new directives from custom directives object and preserve special keyword quoting', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'frame-src': ['self', 'value1', 'value2', 'unsafe-inline'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      const frameSrcDirective = directives.find(d => d.startsWith('frame-src'));
+      expect(frameSrcDirective).toBeDefined();
+      if (!frameSrcDirective) throw new Error('frame-src directive not found');
+
+      const frameSrcValues = frameSrcDirective.replace('frame-src ', '').split(' ');
+      expect(frameSrcValues).toContain("'self'");
+      expect(frameSrcValues).toContain('value1');
+      expect(frameSrcValues).toContain('value2');
+      expect(frameSrcValues).toContain("'unsafe-inline'");
+    });
+
+    it('should produce a complete CSP header with all expected directives and special keywords quoted', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ['new-value', 'unsafe-inline'],
+          'frame-src': ['self', 'value1', 'value2'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+      );
+      expect(directives).toContainEqual("default-src 'self'");
+      expect(directives).toContainEqual("form-action 'self'");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com value1 value2",
+      );
+      expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+      expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+      expect(directives).toContainEqual("worker-src 'self' blob:");
+
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+
+      const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
+      expect(scriptSrcValues).toContain("'self'");
+      expect(scriptSrcValues).toContain("'unsafe-inline'");
+      expect(scriptSrcValues).toContain('https:');
+      expect(scriptSrcValues).toContain('http:');
+      expect(scriptSrcValues).toContain('new-value');
+
+      expect(result.headers[0][1]).toMatch(/^[^;]+(; [^;]+)*$/);
     });
   });
 });
