@@ -16,7 +16,7 @@ type AuthProtectOptions = {
   /**
    * The token type to check.
    */
-  token?: TokenType;
+  token?: TokenType | TokenType[];
   /**
    * The URL to redirect the user to if they are not authorized.
    */
@@ -75,7 +75,7 @@ export function createProtect(opts: {
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
     const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
     const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
-    const requestedToken = (args[0]?.token || args[1]?.token) as TokenType | undefined;
+    const requestedToken = (args[0]?.token || args[1]?.token) as TokenType | TokenType[] | undefined;
 
     const handleUnauthenticated = () => {
       // For machine tokens, always return notFound instead of redirecting
@@ -100,9 +100,15 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    // Check if the token type matches the requested token
-    if (requestedToken && authObject.tokenType !== requestedToken) {
-      return handleUnauthorized();
+    // Check if the token type matches the requested token or array of requested tokens
+    if (requestedToken) {
+      if (Array.isArray(requestedToken) && !requestedToken.includes(authObject.tokenType)) {
+        return handleUnauthorized();
+      }
+      if (authObject.tokenType !== requestedToken) {
+        return handleUnauthorized();
+      }
+      return authObject;
     }
 
     if (authObject.tokenType !== 'session_token') {

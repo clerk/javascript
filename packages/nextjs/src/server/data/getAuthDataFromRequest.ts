@@ -1,4 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
+import type { TokenType } from '@clerk/backend/internal';
 import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
@@ -8,14 +9,17 @@ import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
 import type { RequestLike } from '../types';
 import { assertTokenSignature, decryptClerkRequestData } from '../utils';
 
+type GetAuthDataFromRequestOptions = {
+  secretKey?: string;
+  logger?: LoggerNoCommit;
+  tokenType?: TokenType | TokenType[];
+};
+
 /**
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
-export function getAuthDataFromRequest(
-  req: RequestLike,
-  opts: { secretKey?: string; logger?: LoggerNoCommit } = {},
-): AuthObject {
+export function getAuthDataFromRequest(req: RequestLike, opts: GetAuthDataFromRequestOptions = {}): AuthObject {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
