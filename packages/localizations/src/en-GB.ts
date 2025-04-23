@@ -644,6 +644,7 @@ export const enGB: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: "You're already signed in.",
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',

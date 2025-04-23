@@ -642,6 +642,7 @@ export const hrHR: LocalizationResource = {
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
+    session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',

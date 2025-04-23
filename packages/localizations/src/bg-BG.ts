@@ -632,6 +632,7 @@ export const bgBG: LocalizationResource = {
       requireUppercase: 'главна буква',
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
+    session_exists: 'Вече сте влезнали.',
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     web3_missing_identifier: undefined,
     zxcvbn: {

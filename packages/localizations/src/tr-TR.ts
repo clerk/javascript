@@ -638,6 +638,7 @@ export const trTR: LocalizationResource = {
       sentencePrefix: 'Şifreniz;',
     },
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
+    session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     zxcvbn: {
       couldBeStronger:

@@ -638,6 +638,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    session_exists: 'Sunteți deja conectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
