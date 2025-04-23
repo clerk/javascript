@@ -955,6 +955,7 @@ type UnstableErrors = WithParamName<{
     requireUppercase: LocalizationValue;
     requireSpecialCharacter: LocalizationValue;
   };
+  session_exists: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;

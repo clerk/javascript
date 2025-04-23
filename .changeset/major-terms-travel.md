@@ -1,5 +1,6 @@
 ---
 '@clerk/localizations': patch
+'@clerk/types': patch
 ---
 
-Simplify and localize single-sessing mode error message
+Make the `session_exists` error message more user-friendly and localize
