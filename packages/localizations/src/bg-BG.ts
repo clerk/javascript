@@ -612,7 +612,8 @@ export const bgBG: LocalizationResource = {
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
-    not_allowed_access: 'Нямате необходимите разрешения за достъп.',
+    not_allowed_access:
+      'Имейл адресът или телефонният номер не са разрешени за регистрация. Това може да се дължи на използването на „+“, „=“, „#“ или „.“ във вашия имейл адрес, като използвате домейн, свързан с временна имейл услуга, или сте изрично блокирани. Ако смятате, че това е грешка, моля, свържете се с поддръжката.',
     organization_domain_blocked: 'Доменът на организацията е блокиран.',
     organization_domain_common: 'Доменът на организацията е твърде общ.',
     organization_domain_exists_for_enterprise_connection: undefined,

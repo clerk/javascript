@@ -619,7 +619,8 @@ export const esMX: LocalizationResource = {
     form_username_invalid_character: 'Carácter inválido.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
-    not_allowed_access: 'No tienes permiso para acceder a este recurso.',
+    not_allowed_access:
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

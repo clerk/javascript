@@ -616,7 +616,8 @@ export const esES: LocalizationResource = {
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'El nombre de usuario debe tener entre 3 y 20 caracteres.',
     identification_deletion_failed: 'No puedes eliminar tu última identificación.',
-    not_allowed_access: 'Acceso no permitido.',
+    not_allowed_access:
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: 'Este es un dominio bloqueado, por favor usa otro.',
     organization_domain_common: 'Este es un dominio común, por favor usa otro.',
     organization_domain_exists_for_enterprise_connection: undefined,

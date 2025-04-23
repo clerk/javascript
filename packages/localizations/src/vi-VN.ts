@@ -613,7 +613,8 @@ export const viVN: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Bạn không thể xóa thông tin nhận dạng cuối cùng của bạn.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Địa chỉ email hoặc số điện thoại bạn đang sử dụng cho đăng ký không được phép. Điều này có thể do việc sử dụng '+', '=', '#' hoặc '.' trong địa chỉ email của bạn, sử dụng một miền được kết nối với dịch vụ email tạm thời hoặc một loại loại trừ rõ ràng.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

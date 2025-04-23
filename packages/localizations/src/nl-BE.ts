@@ -614,7 +614,8 @@ export const nlBE: LocalizationResource = {
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
-    not_allowed_access: 'Toegang niet toegestaan.',
+    not_allowed_access:
+      "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
     organization_domain_blocked: 'Het domein van de organisatie is geblokkeerd.',
     organization_domain_common: 'Het domein van de organisatie is te algemeen.',
     organization_domain_exists_for_enterprise_connection: undefined,

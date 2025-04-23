@@ -623,7 +623,7 @@ export const plPL: LocalizationResource = {
     form_username_invalid_length: 'Nazwa użytkownika musi zawierać od {{min_length}} do {{max_length}} znaków.',
     identification_deletion_failed: 'Nie można usunąć ostatniego identyfikatora.',
     not_allowed_access:
-      'Nie masz uprawnień dostępu do tej strony. Jeśli uważasz, że jest to błąd, skontaktuj się z pomocą.',
+      "Adres e-mail lub numer telefonu nie jest dozwolony do rejestracji. Może to być spowodowane użyciem '+', '=', '#' lub '.' w adresie e-mail, użyciem domeny skojarzonej z usługą poczty e-mail tymczasowej lub jawnego wykluczenia.",
     organization_domain_blocked: 'To jest zablokowana domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_common: 'To jest popularna domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_exists_for_enterprise_connection:

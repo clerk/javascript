@@ -615,7 +615,8 @@ export const nbNO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

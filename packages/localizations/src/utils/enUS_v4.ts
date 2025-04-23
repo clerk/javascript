@@ -726,7 +726,6 @@ export const enUS_v4: any = {
     form_param_nil: '',
     form_code_incorrect: '',
     form_password_incorrect: '',
-    not_allowed_access: '',
     form_identifier_exists: '',
     form_password_validation_failed: 'Incorrect Password',
     form_password_not_strong_enough: 'Your password is not strong enough.',

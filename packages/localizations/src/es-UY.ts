@@ -579,7 +579,7 @@ export const esUY: LocalizationResource = {
     form_username_invalid_length: 'Tu nombre de usuario debe tener entre {{min_length}} y {{max_length}} caracteres.',
     identification_deletion_failed: 'No podés eliminar tu última identificación.',
     not_allowed_access:
-      'No tenés permiso para acceder a esta página. Por favor, contactá al soporte si creés que esto es un error.',
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: 'Este es un dominio de proveedor de correo bloqueado. Por favor, usá otro.',
     organization_domain_common: 'Este es un dominio de proveedor de correo común. Por favor, usá otro.',
     organization_domain_exists_for_enterprise_connection: 'Este dominio ya se utiliza para el SSO de tu organización.',

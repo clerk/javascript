@@ -612,7 +612,8 @@ export const skSK: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Adresa e-mailu alebo telefónneho čísla nie je povolená pre registráciu. Toto môže byť spôsobené použitím '+', '=', '#' alebo '.' v adresári e-mailu, použitím domény, ktorá je pripojená k dočasnej e-mailovej službe, alebo explicitnému vylúčeniu.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
