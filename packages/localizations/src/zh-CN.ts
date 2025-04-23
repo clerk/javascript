@@ -621,6 +621,7 @@ export const zhCN: LocalizationResource = {
       sentencePrefix: '您的密码必须包含',
     },
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
+    session_exists: '您已登录。',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',

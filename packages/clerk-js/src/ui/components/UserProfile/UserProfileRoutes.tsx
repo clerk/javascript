@@ -66,6 +66,7 @@ export const UserProfileRoutes = () => {
                   </Suspense>
                 </Route>
                 <Route path='invoice/:invoiceId'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
                     <InvoicesContextProvider>
                       <InvoicePage />

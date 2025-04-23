@@ -637,6 +637,7 @@ export const fiFI: LocalizationResource = {
       sentencePrefix: 'Salasanan on sisällettävä',
     },
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
+    session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',

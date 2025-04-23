@@ -651,6 +651,7 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     zxcvbn: {

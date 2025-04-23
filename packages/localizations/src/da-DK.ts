@@ -634,6 +634,7 @@ export const daDK: LocalizationResource = {
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
+    session_exists: 'Du er allerede logget ind.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',

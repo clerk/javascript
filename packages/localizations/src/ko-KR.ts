@@ -629,7 +629,8 @@ export const koKR: LocalizationResource = {
       requireUppercase: '대문자',
       sentencePrefix: '당신의 비밀번호는 반드시 포함해야합니다',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: '이 전화번호는 이미 사용중입니다. 다른 번호를 시도해 주세요.',
+    session_exists: '이미 로그인 중입니다.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '비밀번호는 작동하지만 더 강력할 수 있습니다. 문자를 더 추가해 보세요.',

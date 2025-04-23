@@ -102,9 +102,9 @@ const createClerkUtils = ({ page }: TestArgs) => {
   };
 };
 
-const createTestingTokenUtils = ({ page }: TestArgs) => {
+const createTestingTokenUtils = ({ context }: TestArgs) => {
   return {
-    setup: async () => setupClerkTestingToken({ page }),
+    setup: async () => setupClerkTestingToken({ context }),
   };
 };
 

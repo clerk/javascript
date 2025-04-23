@@ -2,6 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { OrganizationProfileContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
@@ -38,7 +39,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
     >
       <OrganizationProfileNavbar contentRef={contentRef}>
         <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('organizationProfile.navbar.title')} />
-        <ProfileCard.Content contentRef={contentRef}>
+        <ProfileCard.Content
+          contentRef={contentRef}
+          scrollBoxId={ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID}
+        >
           <OrganizationProfileRoutes />
         </ProfileCard.Content>
       </OrganizationProfileNavbar>
