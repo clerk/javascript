@@ -375,5 +375,28 @@ describe('CSP Header Utils', () => {
 
       expect(result.headers[0][1]).toMatch(/^[^;]+(; [^;]+)*$/);
     });
+
+    it('should properly accumulate multiple custom directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'base-uri': ['value1', 'value2'],
+          'manifest-src': ['value3', 'value4'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+
+      const baseUriDirective = directives.find(d => d.startsWith('base-uri'));
+      expect(baseUriDirective).toBeDefined();
+      if (!baseUriDirective) throw new Error('base-uri directive not found');
+      expect(baseUriDirective).toContain('value1');
+      expect(baseUriDirective).toContain('value2');
+
+      const manifestSrcDirective = directives.find(d => d.startsWith('manifest-src'));
+      expect(manifestSrcDirective).toBeDefined();
+      if (!manifestSrcDirective) throw new Error('manifest-src directive not found');
+      expect(manifestSrcDirective).toContain('value3');
+      expect(manifestSrcDirective).toContain('value4');
+    });
   });
 });

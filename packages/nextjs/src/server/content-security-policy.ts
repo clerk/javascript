@@ -287,13 +287,19 @@ function buildContentSecurityPolicyDirectives(
   }
 
   if (customDirectives) {
+    const customDirectivesMap = new Map<string, Set<string>>();
     Object.entries(customDirectives).forEach(([key, values]) => {
       const valuesArray = Array.isArray(values) ? values : [values];
       if (ContentSecurityPolicyDirectiveManager.DEFAULT_DIRECTIVES[key as ContentSecurityPolicyDirective]) {
         handleExistingDirective(directives, key as ContentSecurityPolicyDirective, valuesArray);
       } else {
-        handleCustomDirective(new Map(), key, valuesArray);
+        handleCustomDirective(customDirectivesMap, key, valuesArray);
       }
+    });
+
+    // Merge all custom directives into the final directives object
+    customDirectivesMap.forEach((values, key) => {
+      directives[key as ContentSecurityPolicyDirective] = values;
     });
   }
 
