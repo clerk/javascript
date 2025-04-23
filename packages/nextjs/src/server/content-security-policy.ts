@@ -316,16 +316,13 @@ export function createContentSecurityPolicyHeaders(
 
   if (options.reportTo) {
     cspHeader += '; report-to csp-endpoint';
+    headers.push([constants.Headers.ReportingEndpoints, `csp-endpoint="${options.reportTo}"`]);
   }
 
   if (options.reportOnly) {
     headers.push([constants.Headers.ContentSecurityPolicyReportOnly, cspHeader]);
   } else {
     headers.push([constants.Headers.ContentSecurityPolicy, cspHeader]);
-  }
-
-  if (options.reportTo) {
-    headers.push([constants.Headers.ReportingEndpoints, `csp-endpoint="${options.reportTo}"`]);
   }
 
   if (nonce) {
