@@ -610,7 +610,7 @@ export const ruRU: LocalizationResource = {
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Аккаунт не найден.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Адрес электронной почты должен быть действительным.',
     form_param_format_invalid__phone_number: 'Номер телефона должен быть в действующем международном формате.',

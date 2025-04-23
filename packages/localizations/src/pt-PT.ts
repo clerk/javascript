@@ -596,7 +596,7 @@ export const ptPT: LocalizationResource = {
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
-    form_identifier_not_found: 'Identificador não encontrado.',
+    form_identifier_not_found: 'Nenhuma conta encontrada.',
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',

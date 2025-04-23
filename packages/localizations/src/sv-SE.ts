@@ -602,7 +602,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
-    form_identifier_not_found: 'Identifieraren hittades inte.',
+    form_identifier_not_found: 'Kontot hittades inte.',
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',

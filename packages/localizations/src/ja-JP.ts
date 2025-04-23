@@ -598,7 +598,7 @@ export const jaJP: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: '識別子が見つかりません。',
+    form_identifier_not_found: 'アカウントが見つかりません。',
     form_param_format_invalid: 'パラメータ形式が無効です。',
     form_param_format_invalid__email_address: 'メールアドレスは有効なメールアドレスである必要があります。',
     form_param_format_invalid__phone_number: '電話番号は有効な国際形式である必要があります',

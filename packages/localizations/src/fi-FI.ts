@@ -600,7 +600,7 @@ export const fiFI: LocalizationResource = {
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Ei tiliä löytynyt.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',

@@ -596,7 +596,7 @@ export const thTH: LocalizationResource = {
     form_identifier_exists__email_address: 'ที่อยู่อีเมลนี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_exists__phone_number: 'หมายเลขโทรศัพท์นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_exists__username: 'ชื่อผู้ใช้นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
-    form_identifier_not_found: 'ไม่พบบัญชีที่มีตัวระบุนี้ โปรดตรวจสอบและลองอีกครั้ง',
+    form_identifier_not_found: 'ไม่พบบัญชี',
     form_param_format_invalid: 'ค่าที่ป้อนอยู่ในรูปแบบที่ไม่ถูกต้อง โปรดตรวจสอบและแก้ไข',
     form_param_format_invalid__email_address: 'ที่อยู่อีเมลต้องเป็นที่อยู่อีเมลที่ถูกต้อง',
     form_param_format_invalid__phone_number: 'หมายเลขโทรศัพท์ต้องอยู่ในรูปแบบสากลที่ถูกต้อง',

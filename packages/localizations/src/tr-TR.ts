@@ -599,7 +599,7 @@ export const trTR: LocalizationResource = {
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
-    form_identifier_not_found: 'Tanımlayıcı bulunamadı.',
+    form_identifier_not_found: 'Hesap bulunamadı',
     form_param_format_invalid: 'Parametre formatı geçersiz.',
     form_param_format_invalid__email_address: 'E-posta adresi geçerli olmalıdır.',
     form_param_format_invalid__phone_number: 'Telefon numarası geçerli olmalıdır.',

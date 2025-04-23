@@ -602,7 +602,7 @@ export const esMX: LocalizationResource = {
     form_identifier_exists__email_address: 'La dirección de correo ya existe.',
     form_identifier_exists__phone_number: 'El número de teléfono ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
-    form_identifier_not_found: 'No se encontró, puede estar mal escrito.',
+    form_identifier_not_found: 'No se encontró ninguna cuenta.',
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'La dirección de correo debe ser válida.',
     form_param_format_invalid__phone_number: 'El número de teléfono debe ser en un formato válido internacional.',

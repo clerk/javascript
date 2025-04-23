@@ -596,7 +596,7 @@ export const bgBG: LocalizationResource = {
     form_identifier_exists__email_address: 'Този имейл адрес вече е регистриран.',
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',
-    form_identifier_not_found: 'Не можем да намерим този идентификатор.',
+    form_identifier_not_found: 'Акаунтът не е пронаден.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Имейл адресът не е във валиден формат.',
     form_param_format_invalid__phone_number: 'Телефонният номер не е във валиден формат.',

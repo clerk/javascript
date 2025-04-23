@@ -597,7 +597,7 @@ export const srRS: LocalizationResource = {
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
-    form_identifier_not_found: 'Identifikator nije pronađen.',
+    form_identifier_not_found: 'Račun nije pronađen.',
     form_param_format_invalid: 'Format parametra je nevažeći.',
     form_param_format_invalid__email_address: 'E-mail adresa mora biti važeća e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u važećem međunarodnom formatu',
