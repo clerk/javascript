@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.3.0
+
+### Minor Changes
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`d8f67be`](https://github.com/clerk/javascript/commit/d8f67be58a9c29f6cd30438149a72cd581e2e18e), [`f0f1ed7`](https://github.com/clerk/javascript/commit/f0f1ed7ef3666bfc1cbf945326e94a51e83c4646), [`25c3502`](https://github.com/clerk/javascript/commit/25c35023ee995acbf8f5c8989619ebc176a366d6)]:
+  - @clerk/clerk-js@5.62.1
+  - @clerk/clerk-react@5.30.0
+  - @clerk/shared@3.7.4
+
 ## 2.2.32
 
 ### Patch Changes

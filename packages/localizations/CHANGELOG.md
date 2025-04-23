@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.13.14
+
+### Patch Changes
+
+- Make the `session_exists` error message more user-friendly and localize ([#5699](https://github.com/clerk/javascript/pull/5699)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+
 ## 3.13.13
 
 ### Patch Changes

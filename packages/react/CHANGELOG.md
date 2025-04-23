@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.30.0
+
+### Minor Changes
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add details to `<UserButton.*>` error messages indicating that the components must be used within client components. ([#5695](https://github.com/clerk/javascript/pull/5695)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+  - @clerk/shared@3.7.4
+
 ## 5.29.0
 
 ### Minor Changes
