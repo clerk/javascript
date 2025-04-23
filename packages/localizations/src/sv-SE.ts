@@ -639,6 +639,7 @@ export const svSE: LocalizationResource = {
       sentencePrefix: 'Lösenordet måste innehålla',
     },
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
+    session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',

@@ -646,6 +646,7 @@ export const idID: LocalizationResource = {
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
+    session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',

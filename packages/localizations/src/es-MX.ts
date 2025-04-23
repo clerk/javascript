@@ -640,6 +640,7 @@ export const esMX: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, trata con otro.',
+    session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero puede ser más segura. Prueba añadiendo más caracteres.',

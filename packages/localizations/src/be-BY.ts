@@ -641,6 +641,7 @@ export const beBY: LocalizationResource = {
       sentencePrefix: 'Ваш пароль павінен утрымліваць',
     },
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
+    session_exists: 'Вы ўжо ўвайшлі.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль падыходзіць, але мог бы быць надзейнейшым. Паспрабуйце дадаць больш сімвалаў.',

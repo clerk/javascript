@@ -646,6 +646,7 @@ export const plPL: LocalizationResource = {
       sentencePrefix: 'Twoje hasło musi zawierać',
     },
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
+    session_exists: 'Jesteś już zalogowany.',
     web3_missing_identifier: 'Nie można znaleźć rozszerzenia Web3 Wallet. Zainstaluj je, aby kontynuować.',
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
