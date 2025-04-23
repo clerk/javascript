@@ -87,6 +87,16 @@ describe('CSP Header Utils', () => {
 
       const directives = headerValue.split('; ');
       expect(directives).toContainEqual("default-src 'self'");
+      expect(directives).toContainEqual(
+        "connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com",
+      );
+      expect(directives).toContainEqual("form-action 'self'");
+      expect(directives).toContainEqual(
+        "frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com",
+      );
+      expect(directives).toContainEqual("img-src 'self' https://img.clerk.com");
+      expect(directives).toContainEqual("style-src 'self' 'unsafe-inline'");
+      expect(directives).toContainEqual("worker-src 'self' blob:");
     });
 
     it('should handle report-to functionality', () => {
@@ -136,6 +146,10 @@ describe('CSP Header Utils', () => {
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
       expect(scriptSrcDirective).toContain("'unsafe-eval'");
+      expect(scriptSrcDirective).toContain("'self'");
+      expect(scriptSrcDirective).toContain('https:');
+      expect(scriptSrcDirective).toContain('http:');
+      expect(scriptSrcDirective).toContain("'unsafe-inline'");
       vi.stubEnv('NODE_ENV', 'production');
     });
 
@@ -149,7 +163,6 @@ describe('CSP Header Utils', () => {
       });
 
       expect(result.headers).toHaveLength(3);
-
       const cspHeader = result.headers.find(([name]) => name === 'content-security-policy');
       const nonceHeader = result.headers.find(([name]) => name === 'x-nonce');
       const reportHeader = result.headers.find(([name]) => name === 'reporting-endpoints');
@@ -167,6 +180,57 @@ describe('CSP Header Utils', () => {
       expect(reportHeader).toBeDefined();
       if (!reportHeader) throw new Error('Report header not found');
       expect(reportHeader[1]).toBe('csp-endpoint="https://example.com/reports"');
+    });
+
+    it('should handle special keywords in directives', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
+          'object-src': ['none'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
+      expect(scriptSrcDirective).toBeDefined();
+      if (!scriptSrcDirective) throw new Error('script-src directive not found');
+      const scriptSrcValues = scriptSrcDirective.replace('script-src ', '').split(' ');
+      expect(scriptSrcValues).toContain("'self'");
+      expect(scriptSrcValues).toContain("'unsafe-inline'");
+      expect(scriptSrcValues).toContain("'unsafe-eval'");
+      expect(scriptSrcValues).toContain('custom-domain.com');
+
+      const objectSrcDirective = directives.find(d => d.startsWith('object-src'));
+      expect(objectSrcDirective).toBeDefined();
+      if (!objectSrcDirective) throw new Error('object-src directive not found');
+      const objectSrcValues = objectSrcDirective.replace('object-src ', '').split(' ');
+      expect(objectSrcValues).toContain("'none'");
+      expect(objectSrcValues).toHaveLength(1);
+    });
+
+    it('should merge clerk subdomain with existing CSP values', () => {
+      const result = createContentSecurityPolicyHeaders(testHost, {
+        directives: {
+          'connect-src': ['self', 'https://api.example.com'],
+          'img-src': ['self', 'https://images.example.com'],
+          'frame-src': ['self', 'https://frames.example.com'],
+        },
+      });
+
+      const directives = result.headers[0][1].split('; ');
+      expect(directives).toContainEqual(
+        `connect-src 'self' https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com clerk.example.com https://api.example.com`,
+      );
+
+      const imgSrcDirective = directives.find(d => d.startsWith('img-src')) || '';
+      expect(imgSrcDirective).toBeDefined();
+      expect(imgSrcDirective).toContain("'self'");
+      expect(imgSrcDirective).toContain('https://img.clerk.com');
+      expect(imgSrcDirective).toContain('https://images.example.com');
+
+      expect(directives).toContainEqual(
+        `frame-src 'self' https://challenges.cloudflare.com https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://frames.example.com`,
+      );
     });
   });
 });
