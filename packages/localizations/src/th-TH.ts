@@ -635,6 +635,7 @@ export const thTH: LocalizationResource = {
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
     phone_number_exists: 'หมายเลขโทรศัพท์นี้ถูกใช้แล้ว โปรดลองหมายเลขอื่น',
+    session_exists: 'คุณเข้าสู่ระบบอยู่แล้ว',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้งานได้ แต่ควรจะแข็งแกร่งกว่านี้ ลองเพิ่มอักขระเพิ่มเติม',

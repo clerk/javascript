@@ -632,7 +632,8 @@ export const ukUA: LocalizationResource = {
       requireUppercase: 'букву у верхньому регістрі',
       sentencePrefix: 'Ваш пароль повинен містити',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
+    session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',

@@ -636,6 +636,7 @@ export const jaJP: LocalizationResource = {
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
     phone_number_exists: 'この電話番号は既に使用されています。別の電話番号を試してください。',
+    session_exists: 'すでにサインインしています。',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',

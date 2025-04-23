@@ -637,6 +637,7 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: "You're already signed in.",
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
