@@ -90,7 +90,7 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   kid: string;
   /**
-   * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
+   * @deprecated This cache TTL will be removed in the next major version. Specifying a cache TTL is a no-op.
    */
   jwksCacheTtlInMs?: number;
   /**
@@ -102,11 +102,13 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   secretKey?: string;
   /**
-   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint. Defaults to `'https://api.clerk.com'`.
+   * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api) endpoint.
+   * @default 'https://api.clerk.com'
    */
   apiUrl?: string;
   /**
-   * The version passed to the Clerk API. Defaults to `'v1'`.
+   * The version passed to the Clerk API.
+   * @default 'v1'
    */
   apiVersion?: string;
 };

@@ -82,7 +82,7 @@ export interface UserResource extends ClerkResource {
   enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
   /**
-   * @deprecated use `enterpriseAccounts` instead
+   * @deprecated Use `enterpriseAccounts` instead.
    */
   samlAccounts: SamlAccountResource[];
 

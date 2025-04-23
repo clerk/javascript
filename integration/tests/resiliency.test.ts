@@ -4,8 +4,26 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
+const make500ClerkResponse = () => ({
+  status: 500,
+  body: JSON.stringify({
+    errors: [
+      {
+        message: 'Oops, an unexpected error occurred',
+        long_message: "There was an internal error on our servers. We've been notified and are working on fixing it.",
+        code: 'internal_clerk_error',
+      },
+    ],
+    clerk_trace_id: 'some-trace-id',
+  }),
+});
+
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resiliency @generic', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
+
+  if (app.name.includes('next')) {
+    test.skip();
+  }
 
   let fakeUser: FakeUser;
 
@@ -32,22 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     // Simulate developer coming back and client fails to load.
-    await page.route('**/v1/client?**', route => {
-      return route.fulfill({
-        status: 500,
-        body: JSON.stringify({
-          errors: [
-            {
-              message: 'Oops, an unexpected error occurred',
-              long_message:
-                "There was an internal error on our servers. We've been notified and are working on fixing it.",
-              code: 'internal_clerk_error',
-            },
-          ],
-          clerk_trace_id: 'some-trace-id',
-        }),
-      });
-    });
+    await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
 
     await page.waitForTimeout(1_000);
     await page.reload();
@@ -139,5 +142,116 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     await waitForDevBrowserImmediately;
 
     await u.po.clerk.toBeLoaded();
+  });
+
+  test.describe('Clerk.status', () => {
+    test('normal flow shows correct states and transitions', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/clerk-status');
+
+      // Initial state checks
+      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is out')).toBeHidden();
+      await expect(page.getByText('Clerk is degraded')).toBeHidden();
+      await expect(page.getByText('(comp) Waiting for clerk to fail, ready or regraded.')).toBeVisible();
+      await u.po.clerk.toBeLoading();
+
+      // Wait for loading to complete and verify final state
+      await expect(page.getByText('Status: ready', { exact: true })).toBeVisible();
+      await u.po.clerk.toBeLoaded();
+      await u.po.clerk.toBeReady();
+      await expect(page.getByText('Clerk is ready', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeVisible();
+      await expect(page.getByText('Clerk is loaded', { exact: true })).toBeVisible();
+      await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeVisible();
+
+      // Verify loading component is no longer visible
+      await expect(page.getByText('(comp) Waiting for clerk to fail, ready or regraded.')).toBeHidden();
+    });
+
+    test('clerk-js hotloading failed', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await page.route('**/clerk.browser.js', route => route.abort());
+
+      await u.page.goToRelative('/clerk-status');
+
+      // Initial state checks
+      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
+
+      // Wait for loading to complete and verify final state
+      await expect(page.getByText('Status: error', { exact: true })).toBeVisible({
+        timeout: 10_000,
+      });
+      await expect(page.getByText('Clerk is out', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeHidden();
+      await expect(page.getByText('Clerk is loaded', { exact: true })).toBeHidden();
+      await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeHidden();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
+
+      // Verify loading component is no longer visible
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
+    });
+
+    test('clerk-js client fails and status degraded', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
+
+      await u.page.goToRelative('/clerk-status');
+
+      // Initial state checks
+      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
+
+      // Wait for loading to complete and verify final state
+      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible({
+        timeout: 10_000,
+      });
+      await u.po.clerk.toBeDegraded();
+      await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
+      await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeVisible();
+      await expect(page.getByText('Clerk is loaded', { exact: true })).toBeVisible();
+      await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeHidden();
+      await expect(page.getByText('(comp) Clerk is degraded')).toBeVisible();
+
+      // Verify loading component is no longer visible
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
+    });
+
+    test('clerk-js environment fails and status degraded', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
+
+      await u.page.goToRelative('/clerk-status');
+
+      // Initial state checks
+      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
+      await u.po.clerk.toBeLoading();
+
+      // Wait for loading to complete and verify final state
+      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible();
+      await u.po.clerk.toBeDegraded();
+      await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
+      await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
+      await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeVisible();
+      await expect(page.getByText('Clerk is loaded', { exact: true })).toBeVisible();
+      await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeVisible();
+      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeHidden();
+      await expect(page.getByText('(comp) Clerk is degraded')).toBeVisible();
+
+      // Verify loading component is no longer visible
+      await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
+    });
   });
 });

@@ -60,7 +60,7 @@ export class FraudProtection {
       try {
         const captchaParams: any = await this.managedChallenge(clerk);
         if (captchaParams?.captchaError !== 'modal_component_not_ready') {
-          await this.client.getOrCreateInstance().sendCaptchaToken(captchaParams);
+          await this.client.getOrCreateInstance().__internal_sendCaptchaToken(captchaParams);
           this.captchaRetryCount = 0; // Reset the retry count on success
         }
       } catch (err) {

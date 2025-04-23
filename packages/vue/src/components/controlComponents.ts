@@ -63,7 +63,7 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
 });
 
 /**
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -75,7 +75,7 @@ export const RedirectToUserProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -87,7 +87,7 @@ export const RedirectToOrganizationProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = defineComponent(() => {
   useClerkLoaded(clerk => {

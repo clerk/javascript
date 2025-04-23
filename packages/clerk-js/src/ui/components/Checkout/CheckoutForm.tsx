@@ -9,13 +9,13 @@ import type {
 import { useMemo, useState } from 'react';
 
 import { __experimental_PaymentSourcesContext, useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, Form, Icon, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
-import { ArrowUpDown, CreditCard } from '../../icons';
+import { ArrowUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from '../PaymentSources';
+import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
@@ -109,17 +109,15 @@ const CheckoutFormElements = ({
   const { data: paymentSources } = data || { data: [] };
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    return checkout
-      .confirm({
+    try {
+      const newCheckout = await checkout.confirm({
         paymentSourceId,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      })
-      .then(newCheckout => {
-        onCheckoutComplete(newCheckout);
-      })
-      .catch(error => {
-        throw error;
       });
+      onCheckoutComplete(newCheckout);
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
   };
 
   const onPaymentSourceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -130,17 +128,13 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    try {
-      await confirmCheckout({ paymentSourceId });
-    } catch (error) {
-      handleError(error, [], setSubmitError);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await confirmCheckout({ paymentSourceId });
+    setIsSubmitting(false);
   };
 
   const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
     await confirmCheckout({ paymentSourceId: paymentSource.id });
+    setIsSubmitting(false);
   };
 
   return (
@@ -170,6 +164,7 @@ const CheckoutFormElements = ({
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
+                  checkout={checkout}
                   paymentSources={paymentSources}
                   totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
                   onPaymentSourceSubmit={onPaymentSourceSubmit}
@@ -208,11 +203,13 @@ const CheckoutFormElements = ({
 };
 
 const PaymentSourceMethods = ({
+  checkout,
   totalDueNow,
   paymentSources,
   onPaymentSourceSubmit,
   isSubmitting,
 }: {
+  checkout: __experimental_CommerceCheckoutResource;
   totalDueNow: __experimental_CommerceMoney;
   paymentSources: __experimental_CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
@@ -220,7 +217,7 @@ const PaymentSourceMethods = ({
 }) => {
   const [selectedPaymentSource, setSelectedPaymentSource] = useState<
     __experimental_CommercePaymentSourceResource | undefined
-  >(paymentSources.length > 0 ? paymentSources[0] : undefined);
+  >(checkout.paymentSource || paymentSources.find(p => p.isDefault));
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
@@ -241,7 +238,7 @@ const PaymentSourceMethods = ({
       })}
     >
       <Select
-        elementId='role'
+        elementId='paymentSource'
         options={options}
         value={selectedPaymentSource?.id || null}
         onChange={option => {
@@ -263,20 +260,7 @@ const PaymentSourceMethods = ({
             backgroundColor: t.colors.$colorBackground,
           })}
         >
-          {selectedPaymentSource && (
-            <Flex
-              gap={3}
-              align='center'
-            >
-              <Icon icon={CreditCard} />
-              <Text
-                as='span'
-                colorScheme='body'
-              >
-                {capitalize(selectedPaymentSource.cardType)} ⋯ {selectedPaymentSource.last4}
-              </Text>
-            </Flex>
-          )}
+          {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
         </SelectButton>
         <SelectOptionList
           sx={t => ({
