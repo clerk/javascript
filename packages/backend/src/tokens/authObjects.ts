@@ -66,6 +66,7 @@ export type AuthenticatedMachineObject = {
   id: string;
   name: string;
   subject: string;
+  scopes: string[];
   claims: Record<string, string> | null;
   getToken: () => Promise<string>;
   has: CheckAuthorizationFromSessionClaims;
@@ -80,6 +81,7 @@ export type UnauthenticatedMachineObject = {
   id: null;
   name: null;
   subject: null;
+  scopes: null;
   claims: null;
   getToken: () => Promise<null>;
   has: () => false;
@@ -179,6 +181,7 @@ export function authenticatedMachineObject(
     id: verificationResult.id,
     name: verificationResult.name,
     subject: verificationResult.subject,
+    scopes: verificationResult.scopes,
     claims: verificationResult.claims,
     getToken: () => Promise.resolve(machineToken),
     has: () => false,
@@ -198,6 +201,7 @@ export function unauthenticatedMachineObject(
     id: null,
     name: null,
     subject: null,
+    scopes: null,
     claims: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
