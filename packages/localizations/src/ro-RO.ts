@@ -16,20 +16,40 @@ export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   __experimental_commerce: {
     billedAnnually: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
     free: undefined,
     getStarted: undefined,
-    manageMembership: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
     month: undefined,
+    reSubscribe: undefined,
     switchPlan: undefined,
   },
   backButton: 'Înapoi',
   badge__currentPlan: undefined,
   badge__default: 'Implicit',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
   badge__primary: 'Principală',
   badge__requiresAction: 'Necesită acțiune',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Acest dispozitiv',
   badge__unverified: 'Nedeclarat',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispozitiv de utilizator',
   badge__you: 'Tu',
   createOrganization: {
@@ -181,6 +201,7 @@ export const roRO: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
@@ -617,6 +638,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    session_exists: 'Sunteți deja conectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
@@ -668,10 +690,30 @@ export const roRO: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       start: {
         headerTitle__invoices: undefined,
         headerTitle__paymentSources: undefined,
         headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
       },
       title: undefined,
     },

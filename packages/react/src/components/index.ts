@@ -9,11 +9,14 @@ export {
   OrganizationList,
   GoogleOneTap,
   Waitlist,
+  __experimental_PricingTable,
 } from './uiComponents';
 
 export {
   ClerkLoaded,
   ClerkLoading,
+  ClerkDegraded,
+  ClerkFailed,
   SignedOut,
   SignedIn,
   Protect,

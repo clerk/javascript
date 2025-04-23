@@ -2,52 +2,29 @@ import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { usePricingTableContext } from '../../contexts';
-import { AppearanceProvider } from '../../customizables';
-import { usePlans } from '../../hooks';
+import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
-import { SubscriptionDetailDrawer } from './SubscriptionDetailDrawer';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
   const isCompact = mode === 'modal';
 
-  const { plans, subscriptions, revalidate } = usePlans({ subscriberType });
+  const { plans, handleSelectPlan } = usePlansContext();
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
-  const [detailSubscription, setDetailSubscription] = useState<__experimental_CommerceSubscriptionResource>();
-
-  const [showSubscriptionDetailDrawer, setShowSubscriptionDetailDrawer] = useState(false);
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
     if (!clerk.isSignedIn) {
       void clerk.redirectToSignIn();
     }
-    const activeSubscription = subscriptions.find(sub => sub.id === plan.subscriptionIdForCurrentSubscriber);
-    if (activeSubscription) {
-      setDetailSubscription(activeSubscription);
-      setShowSubscriptionDetailDrawer(true);
-    } else {
-      clerk.__internal_openCheckout({
-        planId: plan.id,
-        planPeriod,
-        subscriberType,
-        onSubscriptionComplete: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-      });
-    }
-  };
 
-  const onSubscriptionChange = () => {
-    void revalidate();
+    handleSelectPlan({ mode, plan, planPeriod });
   };
 
   return (
@@ -70,24 +47,6 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-
-      <AppearanceProvider
-        appearanceKey='checkout'
-        appearance={props.checkoutProps?.appearance}
-      >
-        <SubscriptionDetailDrawer
-          isOpen={showSubscriptionDetailDrawer}
-          setIsOpen={setShowSubscriptionDetailDrawer}
-          subscription={detailSubscription}
-          subscriberType={subscriberType}
-          setPlanPeriod={setPlanPeriod}
-          strategy={mode === 'mounted' ? 'fixed' : 'absolute'}
-          portalProps={{
-            id: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-          }}
-          onSubscriptionCancel={onSubscriptionChange}
-        />
-      </AppearanceProvider>
     </>
   );
 };

@@ -50,7 +50,27 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>) => 
   useAssertWrappedByClerkProvider('ClerkLoading');
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  if (isomorphicClerk.loaded) {
+  if (isomorphicClerk.status !== 'loading') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkFailed = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkFailed');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'error') {
+    return null;
+  }
+  return children;
+};
+
+export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) => {
+  useAssertWrappedByClerkProvider('ClerkDegraded');
+
+  const isomorphicClerk = useIsomorphicClerkContext();
+  if (isomorphicClerk.status !== 'degraded') {
     return null;
   }
   return children;
@@ -198,7 +218,7 @@ export const RedirectToSignUp = withClerk(({ clerk, ...props }: WithClerkProp<Re
 
 /**
  * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -211,7 +231,7 @@ export const RedirectToUserProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
   React.useEffect(() => {
@@ -224,7 +244,7 @@ export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
 
 /**
  * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
   React.useEffect(() => {

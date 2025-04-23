@@ -1,5 +1,139 @@
 # Change Log
 
+## 5.62.0
+
+### Minor Changes
+
+- Introduce `Clerk.status` for tracking the state of the clerk singleton. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  Possible values for `Clerk.status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+
+  The computed value of `Clerk.loaded` is:
+
+  - `true` when `Clerk.status` is either `"ready"` or `"degraded"`.
+  - `false` when `Clerk.status` is `"loading"` or `"error"`.
+
+- Introduce `clerk.legacy.browser.js` for legacy browser support. ([#5495](https://github.com/clerk/javascript/pull/5495)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix duplicate checkout calls when clicking Get Started buttons ([#5664](https://github.com/clerk/javascript/pull/5664)) by [@aeliox](https://github.com/aeliox)
+
+- Remove the experimental commerce flag ([#5666](https://github.com/clerk/javascript/pull/5666)) by [@aeliox](https://github.com/aeliox)
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Rollback change to lazy-loading suspense wrapper ([#5670](https://github.com/clerk/javascript/pull/5670)) by [@aeliox](https://github.com/aeliox)
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+- Updated dependencies [[`68dc2b6`](https://github.com/clerk/javascript/commit/68dc2b622d52aa13b31b8e6b7facff131532dfd7), [`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/localizations@3.13.13
+  - @clerk/types@4.55.0
+  - @clerk/shared@3.7.3
+
+## 5.61.2
+
+### Patch Changes
+
+- Ensure margin is reset on definition list components to prevent browser default styling leaking in. ([#5653](https://github.com/clerk/javascript/pull/5653)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactor InvoicePage title and invoice ID UI. ([#5655](https://github.com/clerk/javascript/pull/5655)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Chore: improve checkout error handling ([#5654](https://github.com/clerk/javascript/pull/5654)) by [@aeliox](https://github.com/aeliox)
+
+- Chore: display correct total for checkout complete page ([#5650](https://github.com/clerk/javascript/pull/5650)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ea84f6b`](https://github.com/clerk/javascript/commit/ea84f6b8b3b9faed09f0d1cc198d023700cde83e), [`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/localizations@3.13.12
+  - @clerk/types@4.54.2
+  - @clerk/shared@3.7.2
+
+## 5.61.1
+
+### Patch Changes
+
+- Fix: add default param to plans call ([#5637](https://github.com/clerk/javascript/pull/5637)) by [@aeliox](https://github.com/aeliox)
+
+- Fix an issue where `fallbackRedirectUrl` and `forceRedirectUrl` were being improperly passed from sign up to sign in and vice versa. These props will now only apply to the specific flow they were passed to initially. ([#5645](https://github.com/clerk/javascript/pull/5645)) by [@brkalow](https://github.com/brkalow)
+
+- Improve JSDoc comments ([#5630](https://github.com/clerk/javascript/pull/5630)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix: add missing context to PricingTable ([#5638](https://github.com/clerk/javascript/pull/5638)) by [@aeliox](https://github.com/aeliox)
+
+- Add invoices data fetching and invoice UI to org and user profile. ([#5627](https://github.com/clerk/javascript/pull/5627)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Chore: tidy up checkout complete state for upcoming subscriptions ([#5644](https://github.com/clerk/javascript/pull/5644)) by [@aeliox](https://github.com/aeliox)
+
+- Hide Billing tabs from UP and OP when no paid plans exist for an instance. ([#5628](https://github.com/clerk/javascript/pull/5628)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updates `PricingTable` and `SubscriptionDetailDrawer` to handle `upcoming` and "expiring" subscriptions. ([#5601](https://github.com/clerk/javascript/pull/5601)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`b7b940c`](https://github.com/clerk/javascript/commit/b7b940cd9ae3a62dc91feb0a62d28f10658329ce), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+  - @clerk/shared@3.7.1
+  - @clerk/localizations@3.13.11
+
+## 5.61.0
+
+### Minor Changes
+
+- Add support for feature or plan based authorization ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Plan
+
+  - `Clerk.session.checkAuthorization({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `Clerk.session.checkAuthorization({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `Clerk.session.checkAuthorization({ feature: "org:my-feature" })`
+  - `Clerk.session.checkAuthorization({ feature: "user:my-feature" })`
+  - `Clerk.session.checkAuthorization({ plan: "user:my-plan" })`
+  - `Clerk.session.checkAuthorization({ plan: "org:my-plan" })`
+
+### Patch Changes
+
+- Nest existing commerce settings under `billing`. ([#5612](https://github.com/clerk/javascript/pull/5612)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename the `sendCaptchaToken` to `__internal_sendCaptchaToken`. ([#5581](https://github.com/clerk/javascript/pull/5581)) by [@anagstef](https://github.com/anagstef)
+
+- Ensure Organization slugs contain at least one alphanumeric character ([#5586](https://github.com/clerk/javascript/pull/5586)) by [@jacekradko](https://github.com/jacekradko)
+
+- Ensure Stripe dependencies aren't bundled for non-RHC environments ([#5594](https://github.com/clerk/javascript/pull/5594)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix issue where truncated text was wraping within line items. ([#5616](https://github.com/clerk/javascript/pull/5616)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fully strip @stripe/stripe-js from non-RHC builds ([#5597](https://github.com/clerk/javascript/pull/5597)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add `PaymentSourceRow` for displaying payment sources ([#5570](https://github.com/clerk/javascript/pull/5570)) by [@aeliox](https://github.com/aeliox)
+
+- Bug fix: Invalidate cached checkout on checkout drawer unmount ([#5602](https://github.com/clerk/javascript/pull/5602)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+  - @clerk/localizations@3.13.10
+
 ## 5.60.0
 
 ### Minor Changes

@@ -1,5 +1,84 @@
 # Change Log
 
+## 4.55.0
+
+### Minor Changes
+
+- Introduce `Clerk.status` for tracking the state of the clerk singleton. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  Possible values for `Clerk.status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+
+  The computed value of `Clerk.loaded` is:
+
+  - `true` when `Clerk.status` is either `"ready"` or `"degraded"`.
+  - `false` when `Clerk.status` is `"loading"` or `"error"`.
+
+### Patch Changes
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+## 4.54.2
+
+### Patch Changes
+
+- Refactor InvoicePage title and invoice ID UI. ([#5655](https://github.com/clerk/javascript/pull/5655)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve JSDoc comments ([#5643](https://github.com/clerk/javascript/pull/5643)) by [@alexisintech](https://github.com/alexisintech)
+
+- Chore: improve checkout error handling ([#5654](https://github.com/clerk/javascript/pull/5654)) by [@aeliox](https://github.com/aeliox)
+
+- Chore: display correct total for checkout complete page ([#5650](https://github.com/clerk/javascript/pull/5650)) by [@aeliox](https://github.com/aeliox)
+
+## 4.54.1
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5641](https://github.com/clerk/javascript/pull/5641)) by [@LekoArts](https://github.com/LekoArts)
+
+- Append expired status to invitation types ([#5646](https://github.com/clerk/javascript/pull/5646)) by [@tmilewski](https://github.com/tmilewski)
+
+- Improve JSDoc comments ([#5630](https://github.com/clerk/javascript/pull/5630)) by [@LekoArts](https://github.com/LekoArts)
+
+- Chore: tidy up checkout complete state for upcoming subscriptions ([#5644](https://github.com/clerk/javascript/pull/5644)) by [@aeliox](https://github.com/aeliox)
+
+- Hide Billing tabs from UP and OP when no paid plans exist for an instance. ([#5628](https://github.com/clerk/javascript/pull/5628)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updates `PricingTable` and `SubscriptionDetailDrawer` to handle `upcoming` and "expiring" subscriptions. ([#5601](https://github.com/clerk/javascript/pull/5601)) by [@aeliox](https://github.com/aeliox)
+
+## 4.54.0
+
+### Minor Changes
+
+- Add `pla` claim to `VersionedJwtPayload`. ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Nest existing commerce settings under `billing`. ([#5612](https://github.com/clerk/javascript/pull/5612)) by [@panteliselef](https://github.com/panteliselef)
+
+- Rename the `sendCaptchaToken` to `__internal_sendCaptchaToken`. ([#5581](https://github.com/clerk/javascript/pull/5581)) by [@anagstef](https://github.com/anagstef)
+
+- Improve JSDoc comments ([#5578](https://github.com/clerk/javascript/pull/5578)) by [@LekoArts](https://github.com/LekoArts)
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.53.0
 
 ### Minor Changes

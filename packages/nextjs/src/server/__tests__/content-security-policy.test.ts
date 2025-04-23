@@ -21,7 +21,7 @@ describe('CSP Header Utils', () => {
     const testHost = 'clerk.example.com';
 
     it('should create a standard CSP header with default directives', () => {
-      const result = createCSPHeader('standard', testHost);
+      const result = createCSPHeader(false, testHost);
 
       const directives = result.header.split('; ');
 
@@ -55,7 +55,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('should create a strict-dynamic CSP header with nonce', () => {
-      const result = createCSPHeader('strict-dynamic', testHost);
+      const result = createCSPHeader(true, testHost);
 
       // Extract the script-src directive and verify it contains the required values
       const directives = result.header.split('; ');
@@ -78,7 +78,7 @@ describe('CSP Header Utils', () => {
         'img-src': ['self', 'https://example.com'],
         'custom-directive': ['value'],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       expect(result.header).toContain("default-src 'none'");
       // Check for the presence of all required values in the img-src directive
@@ -92,7 +92,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('should handle development environment specific directives', () => {
-      const result = createCSPHeader('standard', testHost);
+      const result = createCSPHeader(false, testHost);
       const directives = result.header.split('; ');
       const scriptSrcDirective = directives.find(d => d.startsWith('script-src'));
       expect(scriptSrcDirective).toBeDefined();
@@ -107,7 +107,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('preserves all original CLERK_CSP_VALUES directives with special keywords quoted', () => {
-      const result = createCSPHeader('standard', testHost);
+      const result = createCSPHeader(false, testHost);
 
       // Split the result into individual directives for precise testing
       const directives = result.header.split('; ');
@@ -141,7 +141,7 @@ describe('CSP Header Utils', () => {
     it('includes script-src with development-specific values when NODE_ENV is not production', () => {
       vi.stubEnv('NODE_ENV', 'development');
 
-      const result = createCSPHeader('standard', testHost);
+      const result = createCSPHeader(false, testHost);
       const directives = result.header.split('; ');
 
       const scriptSrc = directives.find((d: string) => d.startsWith('script-src'));
@@ -159,7 +159,7 @@ describe('CSP Header Utils', () => {
 
     it('properly converts host to clerk subdomain in CSP directives', () => {
       const host = 'clerk.example.com';
-      const result = createCSPHeader('standard', host);
+      const result = createCSPHeader(false, host);
 
       // Split the result into individual directives for precise testing
       const directives = result.header.split('; ');
@@ -184,7 +184,7 @@ describe('CSP Header Utils', () => {
       const customDirectives = {
         'script-src': ["'self'", 'new-value', 'another-value', "'unsafe-inline'", "'unsafe-eval'"],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       // The script-src directive should contain both the default values and new values, with special keywords quoted
       const resultDirectives = result.header.split('; ');
@@ -203,7 +203,7 @@ describe('CSP Header Utils', () => {
       const customDirectives = {
         'object-src': ['self', 'value1', 'value2', 'unsafe-inline'],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       // The new directive should be added
       const directives = result.header.split('; ');
@@ -222,7 +222,7 @@ describe('CSP Header Utils', () => {
         'script-src': ['new-value', 'unsafe-inline'],
         'object-src': ['self', 'value1', 'value2'],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       // Split the result into individual directives for precise testing
       const directives = result.header.split('; ');
@@ -271,7 +271,7 @@ describe('CSP Header Utils', () => {
         'script-src': ['self', 'unsafe-inline', 'unsafe-eval', 'custom-domain.com'],
         'new-directive': ['none'],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       // Verify that special keywords are always quoted in output, regardless of input format
       const resultDirectives = result.header.split('; ');
@@ -304,7 +304,7 @@ describe('CSP Header Utils', () => {
         'img-src': ['self', 'https://images.example.com'],
         'frame-src': ['self', 'https://frames.example.com'],
       };
-      const result = createCSPHeader('standard', testHost, customDirectives);
+      const result = createCSPHeader(false, testHost, customDirectives);
 
       const directives = result.header.split('; ');
 
@@ -330,7 +330,7 @@ describe('CSP Header Utils', () => {
     });
 
     it('correctly implements strict-dynamic mode with nonce-based script-src', () => {
-      const result = createCSPHeader('strict-dynamic', testHost);
+      const result = createCSPHeader(true, testHost);
       const directives = result.header.split('; ');
 
       // Extract the script-src directive and check for specific values

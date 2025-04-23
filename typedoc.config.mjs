@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { OptionDefaults } from 'typedoc';
 
 const IGNORE_LIST = ['.DS_Store', 'dev-cli', 'expo-passkeys', 'testing', 'themes', 'upgrade'];
+const CUSTOM_TAGS = ['@unionReturnHeadings'];
 
 /**
  * Return an array of relative paths to all folders in the "packages" folder to be used for the "entryPoints" option.
@@ -86,6 +87,7 @@ const config = {
   theme: 'clerkTheme',
   router: 'clerk-router',
   readme: 'none',
+  notRenderedTags: [...OptionDefaults.notRenderedTags, ...CUSTOM_TAGS],
   packageOptions: {
     includeVersion: false,
     excludePrivate: true,
@@ -95,7 +97,7 @@ const config = {
     excludeInternal: true,
     excludeNotDocumented: true,
     gitRevision: 'main',
-    blockTags: [...OptionDefaults.blockTags],
+    blockTags: [...OptionDefaults.blockTags, ...CUSTOM_TAGS],
     modifierTags: [...OptionDefaults.modifierTags],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',

@@ -15,6 +15,7 @@ import {
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
+  PlansContextProvider,
   SignInContext,
   SignUpContext,
   UserButtonContext,
@@ -87,11 +88,13 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <__experimental_PricingTableContext.Provider
-          value={{ componentName, ...(props as __experimental_PricingTableProps) }}
-        >
-          {children}
-        </__experimental_PricingTableContext.Provider>
+        <PlansContextProvider>
+          <__experimental_PricingTableContext.Provider
+            value={{ componentName, ...(props as __experimental_PricingTableProps) }}
+          >
+            {children}
+          </__experimental_PricingTableContext.Provider>
+        </PlansContextProvider>
       );
     case 'Checkout':
       return (

@@ -16,20 +16,40 @@ export const deDE: LocalizationResource = {
   locale: 'de-DE',
   __experimental_commerce: {
     billedAnnually: 'Jährlich abgerechnet',
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
-    manageMembership: 'Mitgliedschaft verwalten',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'Mitgliedschaft verwalten',
     month: 'Monat',
+    reSubscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
   },
   backButton: 'Zurück',
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
   badge__requiresAction: 'Erfordert Handeln',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Dieses Gerät',
   badge__unverified: 'Unbestätigt',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
   createOrganization: {
@@ -63,7 +83,7 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account löschen',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -182,6 +202,7 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
       members: 'Mitglieder',
@@ -630,6 +651,7 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     zxcvbn: {
@@ -681,10 +703,30 @@ export const deDE: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       start: {
         headerTitle__invoices: 'Rechnungen',
         headerTitle__paymentSources: 'Zahlungsquellen',
         headerTitle__plans: 'Pläne',
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
       },
       title: 'Abrechnung & Zahlungen',
     },

@@ -5,7 +5,9 @@ import { appConfigs } from '../presets';
 import type { FakeOrganization, FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authorization @nextjs', ({ app }) => {
+testAgainstRunningApps({
+  withEnv: [appConfigs.envs.withCustomRoles, appConfigs.envs.withBillingStaging],
+})('authorization @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
@@ -40,6 +42,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
+    const jwtVersion = await page.evaluate(() => window.Clerk.session?.lastActiveToken?.jwt?.claims?.v);
+    expect(jwtVersion).toBe(app.env.id === 'withBillingStaging' ? 2 : undefined);
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();
