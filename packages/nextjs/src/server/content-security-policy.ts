@@ -3,7 +3,7 @@ import { constants } from '@clerk/backend/internal';
 /**
  * Valid CSP directives according to the CSP Level 3 specification
  */
-export type CSPDirective =
+export type ContentSecurityPolicyDirective =
   // Default resource directives
   | 'connect-src'
   | 'default-src'
@@ -44,18 +44,24 @@ export type CSPDirective =
 /**
  * Partial record of directives and their values
  */
-type CSPValues = Partial<Record<CSPDirective, string[]>>;
+type ContentSecurityPolicyValues = Partial<Record<ContentSecurityPolicyDirective, string[]>>;
 
 /**
  * Directives and their values
  */
-type CSPDirectiveSet = Record<CSPDirective, Set<string>>;
+type ContentSecurityPolicyDirectiveSet = Record<ContentSecurityPolicyDirective, Set<string>>;
 
-export interface CSPConfig {
+export interface ContentSecurityPolicyHeaders {
   /**
-   * The host to include in the CSP
+   * Array of formatted headers to be added to the response.
+   *
+   * Includes both standard and report-only headers when applicable.
+   * Includes nonce when strict mode is enabled.
    */
-  host: string;
+  headers: [string, string][];
+}
+
+export interface ContentSecurityPolicyOptions {
   /**
    * When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive
    */
@@ -63,7 +69,7 @@ export interface CSPConfig {
   /**
    * Custom CSP directives to merge with Clerk's default directives
    */
-  directives?: Partial<Record<CSPDirective, string[]>>;
+  directives?: Partial<Record<ContentSecurityPolicyDirective, string[]>>;
   /**
    * When set to true, the Content-Security-Policy-Report-Only header will be used instead of
    * Content-Security-Policy. This allows monitoring policy violations without blocking content.
@@ -76,20 +82,7 @@ export interface CSPConfig {
   reportTo?: string;
 }
 
-/**
- * Return type for createCSPHeader
- */
-export interface CSPHeaderResult {
-  /**
-   * Array of formatted headers to be added to the response.
-   *
-   * Includes both standard and report-only headers when applicable.
-   * Includes nonce when strict mode is enabled.
-   */
-  headers: [string, string][];
-}
-
-class CSPDirectiveManager {
+class ContentSecurityPolicyDirectiveManager {
   /** Set of special keywords that require quoting in CSP directives */
   private static readonly KEYWORDS = new Set([
     'none',
@@ -101,7 +94,7 @@ class CSPDirectiveManager {
   ]);
 
   /** Default CSP directives and their values */
-  static readonly DEFAULT_DIRECTIVES: CSPValues = {
+  static readonly DEFAULT_DIRECTIVES: ContentSecurityPolicyValues = {
     'connect-src': [
       'self',
       'https://clerk-telemetry.com',
@@ -134,14 +127,14 @@ class CSPDirectiveManager {
   };
 
   /**
-   * Creates a new CSPDirectiveSet with default values
-   * @returns A new CSPDirectiveSet with default values
+   * Creates a new ContentSecurityPolicyDirectiveSet with default values
+   * @returns A new ContentSecurityPolicyDirectiveSet with default values
    */
-  static createDefaultDirectives(): CSPDirectiveSet {
+  static createDefaultDirectives(): ContentSecurityPolicyDirectiveSet {
     return Object.entries(this.DEFAULT_DIRECTIVES).reduce((acc, [key, values]) => {
-      acc[key as CSPDirective] = new Set(values);
+      acc[key as ContentSecurityPolicyDirective] = new Set(values);
       return acc;
-    }, {} as CSPDirectiveSet);
+    }, {} as ContentSecurityPolicyDirectiveSet);
   }
 
   /**
@@ -187,7 +180,11 @@ class CSPDirectiveManager {
  * @param key - The directive key to handle
  * @param values - New values to merge
  */
-function handleExistingDirective(mergedCSP: CSPDirectiveSet, key: CSPDirective, values: string[]) {
+function handleExistingDirective(
+  mergedCSP: ContentSecurityPolicyDirectiveSet,
+  key: ContentSecurityPolicyDirective,
+  values: string[],
+) {
   // None overrides all other values
   if (values.includes("'none'") || values.includes('none')) {
     mergedCSP[key] = new Set(["'none'"]);
@@ -198,11 +195,11 @@ function handleExistingDirective(mergedCSP: CSPDirectiveSet, key: CSPDirective, 
   const deduplicatedSet = new Set<string>();
 
   mergedCSP[key].forEach(value => {
-    deduplicatedSet.add(CSPDirectiveManager.formatValue(value));
+    deduplicatedSet.add(ContentSecurityPolicyDirectiveManager.formatValue(value));
   });
 
   values.forEach(value => {
-    deduplicatedSet.add(CSPDirectiveManager.formatValue(value));
+    deduplicatedSet.add(ContentSecurityPolicyDirectiveManager.formatValue(value));
   });
 
   mergedCSP[key] = deduplicatedSet;
@@ -223,7 +220,7 @@ function handleCustomDirective(customDirectives: Map<string, Set<string>>, key: 
 
   const formattedValues = new Set<string>();
   values.forEach(value => {
-    const formattedValue = CSPDirectiveManager.formatValue(value);
+    const formattedValue = ContentSecurityPolicyDirectiveManager.formatValue(value);
     formattedValues.add(formattedValue);
   });
 
@@ -241,7 +238,7 @@ function formatCSPHeader(mergedCSP: Record<string, Set<string>>): string {
     .map(([key, values]) => {
       const valueObjs = Array.from(values).map(v => ({
         raw: v,
-        formatted: CSPDirectiveManager.formatValue(v),
+        formatted: ContentSecurityPolicyDirectiveManager.formatValue(v),
       }));
 
       return `${key} ${valueObjs.map(item => item.formatted).join(' ')}`;
@@ -267,13 +264,16 @@ export function generateNonce(): string {
 function buildContentSecurityPolicyDirectives(
   strict: boolean,
   host: string,
-  customDirectives?: Partial<Record<CSPDirective, string[]>>,
+  customDirectives?: Partial<Record<ContentSecurityPolicyDirective, string[]>>,
   nonce?: string,
 ): string {
-  const directives = Object.entries(CSPDirectiveManager.DEFAULT_DIRECTIVES).reduce((acc, [key, values]) => {
-    acc[key as CSPDirective] = new Set(values);
-    return acc;
-  }, {} as CSPDirectiveSet);
+  const directives = Object.entries(ContentSecurityPolicyDirectiveManager.DEFAULT_DIRECTIVES).reduce(
+    (acc, [key, values]) => {
+      acc[key as ContentSecurityPolicyDirective] = new Set(values);
+      return acc;
+    },
+    {} as ContentSecurityPolicyDirectiveSet,
+  );
 
   directives['connect-src'].add(host);
 
@@ -289,8 +289,8 @@ function buildContentSecurityPolicyDirectives(
   if (customDirectives) {
     Object.entries(customDirectives).forEach(([key, values]) => {
       const valuesArray = Array.isArray(values) ? values : [values];
-      if (CSPDirectiveManager.DEFAULT_DIRECTIVES[key as CSPDirective]) {
-        handleExistingDirective(directives, key as CSPDirective, valuesArray);
+      if (ContentSecurityPolicyDirectiveManager.DEFAULT_DIRECTIVES[key as ContentSecurityPolicyDirective]) {
+        handleExistingDirective(directives, key as ContentSecurityPolicyDirective, valuesArray);
       } else {
         handleCustomDirective(new Map(), key, valuesArray);
       }
@@ -300,27 +300,6 @@ function buildContentSecurityPolicyDirectives(
   return formatCSPHeader(directives);
 }
 
-export interface ContentSecurityPolicyOptions {
-  /**
-   * When set to true, enhances security by applying the `strict-dynamic` attribute to the `script-src` CSP directive
-   */
-  strict?: boolean;
-  /**
-   * Custom CSP directives to merge with Clerk's default directives
-   */
-  directives?: Partial<Record<CSPDirective, string[]>>;
-  /**
-   * When set to true, the Content-Security-Policy-Report-Only header will be used instead of
-   * Content-Security-Policy. This allows monitoring policy violations without blocking content.
-   */
-  reportOnly?: boolean;
-  /**
-   * Specifies a reporting endpoint for CSP violations. This value will be used in the
-   * 'report-to' directive of the Content-Security-Policy header.
-   */
-  reportTo?: string;
-}
-
 /**
  * Creates Content Security Policy (CSP) headers with the specified configuration
  * @returns Object containing the formatted CSP headers
@@ -328,7 +307,7 @@ export interface ContentSecurityPolicyOptions {
 export function createContentSecurityPolicyHeaders(
   host: string,
   options: ContentSecurityPolicyOptions,
-): CSPHeaderResult {
+): ContentSecurityPolicyHeaders {
   const headers: [string, string][] = [];
 
   const nonce = options.strict ? generateNonce() : undefined;
