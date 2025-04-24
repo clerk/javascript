@@ -635,6 +635,7 @@ export const ptPT: LocalizationResource = {
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
+    session_exists: 'Já está conectado.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',

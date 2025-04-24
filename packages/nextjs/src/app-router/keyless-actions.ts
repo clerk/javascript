@@ -8,6 +8,14 @@ import { detectClerkMiddleware } from '../server/headers-utils';
 import { getKeylessCookieName, getKeylessCookieValue } from '../server/keyless';
 import { canUseKeyless } from '../utils/feature-flags';
 
+type SetCookieOptions = Parameters<Awaited<ReturnType<typeof cookies>>['set']>[2];
+
+const keylessCookieConfig = {
+  secure: false,
+  httpOnly: false,
+  sameSite: 'lax',
+} satisfies SetCookieOptions;
+
 export async function syncKeylessConfigAction(args: AccountlessApplication & { returnUrl: string }): Promise<void> {
   const { claimUrl, publishableKey, secretKey, returnUrl } = args;
   const cookieStore = await cookies();
@@ -22,10 +30,11 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
   }
 
   // Set the new keys in the cookie.
-  cookieStore.set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-    secure: true,
-    httpOnly: true,
-  });
+  cookieStore.set(
+    await getKeylessCookieName(),
+    JSON.stringify({ claimUrl, publishableKey, secretKey }),
+    keylessCookieConfig,
+  );
 
   // We cannot import `NextRequest` due to a bundling issue with server actions in Next.js 13.
   // @ts-expect-error Request will work as well
@@ -63,11 +72,11 @@ export async function createOrReadKeylessAction(): Promise<null | Omit<Accountle
   });
 
   const { claimUrl, publishableKey, secretKey, apiKeysUrl } = result;
-
-  void (await cookies()).set(await getKeylessCookieName(), JSON.stringify({ claimUrl, publishableKey, secretKey }), {
-    secure: false,
-    httpOnly: false,
-  });
+  void (await cookies()).set(
+    await getKeylessCookieName(),
+    JSON.stringify({ claimUrl, publishableKey, secretKey }),
+    keylessCookieConfig,
+  );
 
   return {
     claimUrl,

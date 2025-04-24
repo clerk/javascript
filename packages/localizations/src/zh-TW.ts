@@ -628,7 +628,8 @@ export const zhTW: LocalizationResource = {
       requireUppercase: '一個大寫字母',
       sentencePrefix: '您的密碼必須包含',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: '這個電話號碼已被使用。請嘗試另一個。',
+    session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: '您的密碼可以用，但可以更強。試著添加更多字元。',

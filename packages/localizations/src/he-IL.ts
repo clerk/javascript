@@ -627,6 +627,7 @@ export const heIL: LocalizationResource = {
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
+    session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
