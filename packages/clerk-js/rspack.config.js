@@ -16,6 +16,7 @@ const variants = {
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
+  clerkCHIPS: 'clerk.chips',
 };
 
 const variantToSourceFile = {
@@ -25,6 +26,7 @@ const variantToSourceFile = {
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
+  [variants.clerkCHIPS]: './src/index.chips.ts',
 };
 
 /**
@@ -100,22 +102,24 @@ const common = ({ mode, variant, disableRHC = false }) => {
           signUp: {
             minChunks: 1,
             name: 'signup',
-            test: module => module.resource && module.resource.includes('/ui/components/SignUp'),
+            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
           },
           paymentSources: {
             minChunks: 1,
             name: 'paymentSources',
             test: module =>
-              module.resource &&
-              (module.resource.includes('/ui/components/PaymentSources') ||
-                // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
-                module.resource.includes('/node_modules/@stripe')),
+              !!(
+                module.resource &&
+                (module.resource.includes('/ui/components/PaymentSources') ||
+                  // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
+                  module.resource.includes('/node_modules/@stripe'))
+              ),
           },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => module.resource && !module.resource.includes('/ui/components'),
+            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -406,6 +410,13 @@ const prodConfig = ({ mode, env, analysis }) => {
     // externalsForHeadless(),
   );
 
+  const clerkCHIPS = merge(
+    entryForVariant(variants.clerkCHIPS),
+    common({ mode, variant: variants.clerkCHIPS }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
+
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -513,6 +524,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkLegacyBrowser,
     clerkHeadless,
     clerkHeadlessBrowser,
+    clerkCHIPS,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -613,6 +625,11 @@ const devConfig = ({ mode, env }) => {
       common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
       // externalsForHeadless(),
+    ),
+    [variants.clerkCHIPS]: merge(
+      entryForVariant(variants.clerkCHIPS),
+      common({ mode, variant: variants.clerkCHIPS }),
+      commonForDev(),
     ),
   };
 
