@@ -21,7 +21,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Alert, Avatar, Drawer, ReversibleContainer } from '../../elements';
+import { Alert, Avatar, Drawer, ReversibleContainer, useDrawerContext } from '../../elements';
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
@@ -34,6 +34,15 @@ export function SubscriptionDetails({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+
+  const { setIsOpen } = useDrawerContext();
+
+  const handleClose = () => {
+    if (setIsOpen) {
+      setIsOpen(false);
+    }
+  };
+
   if (!subscription) {
     return null;
   }
@@ -48,6 +57,7 @@ export function SubscriptionDetails({
       .then(() => {
         setIsSubmitting(false);
         onSubscriptionCancel?.();
+        handleClose();
       })
       .catch(error => {
         handleError(error, [], setCancelError);
