@@ -16,6 +16,7 @@ import { authAuthHeaderMissing } from '../../server/errors';
 import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
+import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from '../../server/types';
 import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
@@ -46,32 +47,24 @@ type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
 };
 
 // Machine token auth objects
-type MachineAuth<T extends Exclude<TokenType, 'session_token'>> = (
-  | AuthenticatedMachineObject
-  | UnauthenticatedMachineObject
-) & { acceptsToken: T };
+type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
+  tokenType: T;
+};
 
 type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
 
 export interface AuthFn {
-  // No options case - defaults to session token
-  (): Promise<SessionAuth>;
-
-  (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
+  <T extends TokenType[]>(
+    options: AuthOptions & { acceptsToken: T },
+  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth, MachineAuth<T[number]>>>;
 
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<T extends 'session_token' ? SessionAuth : MachineAuth<Exclude<T, 'session_token'>>>;
+  ): Promise<InferAuthObjectFromToken<T, SessionAuth, MachineAuth<T>>>;
 
-  <T extends TokenType[]>(
-    options: AuthOptions & { acceptsToken: T },
-  ): Promise<
-    T[number] extends 'session_token' | infer U
-      ? U extends TokenType
-        ? SessionAuth | MachineAuth<Exclude<U, 'session_token'>>
-        : SessionAuth
-      : MachineAuth<Exclude<T[number], 'session_token'>>
-  >;
+  (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
+
+  (): Promise<SessionAuth>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:

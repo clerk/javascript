@@ -8,10 +8,10 @@ import type {
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
 } from '@clerk/types';
-import type { InferAuthObjectFromTokenArray } from 'src/server/types';
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
+import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from './types';
 
 type AuthProtectOptions = {
   /**
@@ -42,14 +42,26 @@ export interface AuthProtect {
     options?: AuthProtectOptions,
   ): Promise<SignedInAuthObject>;
 
+  /**
+   * @example
+   * auth.protect({ token: 'session_token' });
+   */
   <T extends TokenType>(
     options?: AuthProtectOptions & { token: T },
-  ): Promise<T extends 'session_token' ? SignedInAuthObject : AuthenticatedMachineObject & { tokenType: T }>;
+  ): Promise<InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>>;
 
+  /**
+   * @example
+   * auth.protect({ token: ['session_token', 'machine_token'] });
+   */
   <T extends TokenType[]>(
     options?: AuthProtectOptions & { token: T },
   ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
 
+  /**
+   * @example
+   * auth.protect();
+   */
   (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 }
 

@@ -1,3 +1,4 @@
+import type { AuthObject } from '@clerk/backend';
 import type { TokenType } from '@clerk/backend/internal';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
@@ -13,10 +14,18 @@ export type NextMiddlewareRequestParam = Parameters<NextMiddleware>['0'];
 export type NextMiddlewareEvtParam = Parameters<NextMiddleware>['1'];
 export type NextMiddlewareReturn = ReturnType<NextMiddleware>;
 
-export type InferAuthObjectFromTokenArray<T extends TokenType[], TSession, TMachine> = T[number] extends
-  | 'session_token'
-  | infer U
-  ? U extends TokenType
-    ? TSession | (TMachine & { tokenType: Exclude<U, 'session_token'> })
-    : TSession
-  : TMachine & { tokenType: T[number] };
+export type InferAuthObjectFromTokenArray<
+  T extends readonly TokenType[],
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = 'session_token' extends T[number]
+  ? T[number] extends 'session_token'
+    ? SessionType
+    : SessionType | (MachineType & { tokenType: T[number] })
+  : MachineType & { tokenType: T[number] };
+
+export type InferAuthObjectFromToken<
+  T extends TokenType,
+  SessionType extends AuthObject,
+  MachineType extends AuthObject,
+> = T extends 'session_token' ? SessionType : MachineType & { tokenType: T };

@@ -5,7 +5,7 @@ import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import type { GetAuthDataFromRequestOptions, GetAuthDataRequestFn } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequest, GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
 import { getAuthDataFromRequest as getAuthDataFromRequestOriginal } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
@@ -53,7 +53,7 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      const getAuthDataFromRequest: GetAuthDataRequestFn = (
+      const getAuthDataFromRequest: GetAuthDataFromRequest = (
         req: RequestLike,
         opts: GetAuthDataFromRequestOptions = {},
       ) => {
@@ -86,7 +86,7 @@ export const createSyncGetAuth = ({
 
       assertAuthStatus(req, noAuthStatusMessage);
 
-      const getAuthDataFromRequest: GetAuthDataRequestFn = (
+      const getAuthDataFromRequest: GetAuthDataFromRequest = (
         req: RequestLike,
         opts: GetAuthDataFromRequestOptions = {},
       ) => {

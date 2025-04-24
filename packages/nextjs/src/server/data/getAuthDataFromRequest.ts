@@ -12,7 +12,7 @@ import { decodeJwt } from '@clerk/backend/jwt';
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
-import type { InferAuthObjectFromTokenArray, RequestLike } from '../types';
+import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray, RequestLike } from '../types';
 import { assertTokenSignature, decryptClerkRequestData } from '../utils';
 
 export type GetAuthDataFromRequestOptions = {
@@ -24,19 +24,35 @@ export type GetAuthDataFromRequestOptions = {
 type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
 type MachineAuthObject = AuthenticatedMachineObject | UnauthenticatedMachineObject;
 
-export interface GetAuthDataRequestFn {
-  <T extends TokenType>(
-    req: RequestLike,
-    opts: GetAuthDataFromRequestOptions & { acceptsToken: T },
-  ): T extends 'session_token' ? SessionAuthObject : MachineAuthObject;
-
+export interface GetAuthDataFromRequest {
+  /**
+   * @example
+   * getAuthDataFromRequest(request, { acceptsToken: ['session_token', 'api_key'] });
+   */
   <T extends TokenType[]>(
     req: RequestLike,
     opts: GetAuthDataFromRequestOptions & { acceptsToken: T },
   ): InferAuthObjectFromTokenArray<T, SessionAuthObject, MachineAuthObject>;
 
+  /**
+   * @example
+   * getAuthDataFromRequest(request, { acceptsToken: 'session_token' });
+   */
+  <T extends TokenType>(
+    req: RequestLike,
+    opts: GetAuthDataFromRequestOptions & { acceptsToken: T },
+  ): InferAuthObjectFromToken<T, SessionAuthObject, MachineAuthObject>;
+
+  /**
+   * @example
+   * getAuthDataFromRequest(request, { acceptsToken: 'any' });
+   */
   (req: RequestLike, opts: GetAuthDataFromRequestOptions & { acceptsToken: 'any' }): AuthObject;
 
+  /**
+   * @example
+   * getAuthDataFromRequest(request);
+   */
   (req: RequestLike, opts?: GetAuthDataFromRequestOptions): SessionAuthObject;
 }
 
@@ -44,7 +60,7 @@ export interface GetAuthDataRequestFn {
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
-export const getAuthDataFromRequest: GetAuthDataRequestFn = ((
+export const getAuthDataFromRequest: GetAuthDataFromRequest = ((
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions = {},
 ): AuthObject => {
@@ -89,4 +105,4 @@ export const getAuthDataFromRequest: GetAuthDataRequestFn = ((
   }
 
   return authObject;
-}) as GetAuthDataRequestFn;
+}) as GetAuthDataFromRequest;

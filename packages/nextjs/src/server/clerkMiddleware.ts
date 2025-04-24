@@ -336,7 +336,6 @@ export const createAuthenticateRequestOptions = (
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
-    // @ts-expect-error: Fix types as it only gets the array of token types
     acceptsToken: 'any',
   };
 };
