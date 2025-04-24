@@ -92,7 +92,7 @@ const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
     __experimental_commerce?.getPaymentSources,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
-    'commerce-user-payment-sources',
+    'commerce-payment-sources',
   );
   const { data: paymentSources } = data || { data: [] };
 
