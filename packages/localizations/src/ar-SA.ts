@@ -634,6 +634,7 @@ export const arSA: LocalizationResource = {
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
+    session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',

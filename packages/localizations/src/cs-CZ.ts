@@ -632,7 +632,8 @@ export const csCZ: LocalizationResource = {
       requireUppercase: 'velké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovat',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
+    session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
