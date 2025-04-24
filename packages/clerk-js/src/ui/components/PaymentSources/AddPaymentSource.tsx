@@ -142,6 +142,16 @@ const AddPaymentSourceForm = withCardStateProvider(
     const { subscriberType } = usePaymentSourcesContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
+    // Revalidates the next time the hooks gets mounted
+    const { revalidate } = useFetch(
+      undefined,
+      {
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      },
+      undefined,
+      'commerce-payment-sources',
+    );
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!stripe || !elements) {
@@ -166,6 +176,8 @@ const AddPaymentSourceForm = withCardStateProvider(
           paymentToken: setupIntent.payment_method as string,
           ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
         });
+
+        revalidate();
 
         void onSuccess(paymentSource);
       } catch (error) {
