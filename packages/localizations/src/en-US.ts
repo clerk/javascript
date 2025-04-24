@@ -9,8 +9,8 @@ export const enUS: LocalizationResource = {
       description__paymentSuccessful: 'Your new subscription is all set.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       emailForm: {
-        title: 'Add an email address',
         subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+        title: 'Add an email address',
       },
       lineItems: {
         title__invoiceId: 'Invoice ID',
@@ -613,6 +613,7 @@ export const enUS: LocalizationResource = {
       'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     identification_deletion_failed: 'You cannot delete your last identification.',
+    not_allowed_access: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organization’s SSO',

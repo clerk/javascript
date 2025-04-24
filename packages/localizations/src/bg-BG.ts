@@ -20,6 +20,10 @@ export const bgBG: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -633,8 +637,8 @@ export const bgBG: LocalizationResource = {
       requireUppercase: 'главна буква',
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
-    session_exists: 'Вече сте влезнали.',
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
+    session_exists: 'Вече сте влезнали.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',

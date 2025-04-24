@@ -20,6 +20,10 @@ export const huHU: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,

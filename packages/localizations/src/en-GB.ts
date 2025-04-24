@@ -20,6 +20,10 @@ export const enGB: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -620,6 +624,7 @@ export const enGB: LocalizationResource = {
       'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
     form_username_invalid_length: 'Your username must be between 3 and 20 characters long.',
     identification_deletion_failed: 'You cannot delete your last identification.',
+    not_allowed_access: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organisation’s SSO',
