@@ -597,7 +597,7 @@ export const arSA: LocalizationResource = {
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

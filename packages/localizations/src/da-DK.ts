@@ -597,7 +597,7 @@ export const daDK: LocalizationResource = {
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
-    form_identifier_not_found: 'Identifikatoren blev ikke fundet.',
+    form_identifier_not_found: 'Vi kunne ikke finde en konto med disse detaljer.',
     form_param_format_invalid: 'Formatet er ugyldigt.',
     form_param_format_invalid__email_address: 'E-mailadressen skal være en gyldig e-mailadresse.',
     form_param_format_invalid__phone_number: 'Telefonnummeret skal være i et gyldigt internationalt format.',

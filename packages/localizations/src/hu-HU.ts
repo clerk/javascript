@@ -598,7 +598,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nem találtunk fiókot ezekkel a részletekkel.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',

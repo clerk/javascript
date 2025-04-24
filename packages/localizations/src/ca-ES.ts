@@ -598,7 +598,7 @@ export const caES: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: "No s'ha trobat cap identificador coincident. Si us plau, comprova el valor introduït.",
+    form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',

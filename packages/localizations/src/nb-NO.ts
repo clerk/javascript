@@ -598,7 +598,7 @@ export const nbNO: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Vi klarte ikke finne en konto med disse detaljene.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_param_format_invalid__phone_number: 'Telefonnummeret må være i et gyldig internasjonalt format',

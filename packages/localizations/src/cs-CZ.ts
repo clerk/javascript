@@ -596,7 +596,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
-    form_identifier_not_found: 'Identifikátor nebyl nalezen.',
+    form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',

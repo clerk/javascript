@@ -32,6 +32,6 @@ test.describe('sign-in-or-up restricted mode @nextjs', () => {
     await expect(u.page.getByText(/continue to/i)).toBeHidden();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
     await u.po.signIn.continue();
-    await expect(u.page.getByText(/no account found with this identifier/i)).toBeVisible();
+    await expect(u.page.getByText(/We couldn't find an account with those details/i)).toBeVisible();
   });
 });

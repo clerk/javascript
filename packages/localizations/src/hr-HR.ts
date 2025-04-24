@@ -601,7 +601,7 @@ export const hrHR: LocalizationResource = {
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',
