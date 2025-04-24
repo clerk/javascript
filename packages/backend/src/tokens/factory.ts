@@ -1,6 +1,6 @@
 import type { ApiClient } from '../api';
 import { mergePreDefinedOptions } from '../util/mergePreDefinedOptions';
-import type { AuthenticateRequestFn } from './request';
+import type { AuthenticateRequest } from './request';
 import { authenticateRequest as authenticateRequestOriginal, debugRequestState } from './request';
 import type { AuthenticateRequestOptions } from './types';
 
@@ -47,7 +47,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
-  const authenticateRequest: AuthenticateRequestFn = ((request: Request, options: RunTimeOptions = {}) => {
+  const authenticateRequest: AuthenticateRequest = ((request: Request, options: RunTimeOptions = {}) => {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal(request, {
@@ -59,7 +59,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       apiClient,
     });
-  }) satisfies AuthenticateRequestFn;
+  }) satisfies AuthenticateRequest;
 
   return {
     authenticateRequest,

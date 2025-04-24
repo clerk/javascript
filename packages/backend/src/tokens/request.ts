@@ -112,24 +112,39 @@ function maybeHandleTokenTypeMismatch(
   return null;
 }
 
-export interface AuthenticateRequestFn {
-  // List of token types case.
+export interface AuthenticateRequest {
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: ['session_token', 'api_key'] });
+   */
   <T extends readonly TokenType[]>(
     request: Request,
     options: AuthenticateRequestOptions & { acceptsToken: T },
   ): Promise<RequestState<T[number]>>;
 
-  // Single or any token type case.
-  <T extends TokenType | 'any'>(
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: 'session_token' });
+   */
+  <T extends TokenType>(
     request: Request,
     options: AuthenticateRequestOptions & { acceptsToken: T },
-  ): Promise<RequestState<T extends 'any' ? TokenType : T>>;
+  ): Promise<RequestState<T>>;
 
-  // Default case with no options specified
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: 'any' });
+   */
+  (request: Request, options: AuthenticateRequestOptions & { acceptsToken: 'any' }): Promise<RequestState<TokenType>>;
+
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request);
+   */
   (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<'session_token'>>;
 }
 
-export const authenticateRequest: AuthenticateRequestFn = (async (
+export const authenticateRequest: AuthenticateRequest = (async (
   request: Request,
   options: AuthenticateRequestOptions,
 ): Promise<RequestState<TokenType>> => {
@@ -906,7 +921,7 @@ ${error.getFullMessage()}`,
   }
 
   return authenticateRequestWithTokenInCookie();
-}) as AuthenticateRequestFn;
+}) as AuthenticateRequest;
 
 /**
  * @internal
