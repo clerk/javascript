@@ -621,7 +621,7 @@ export const enGB: LocalizationResource = {
     form_username_invalid_length: 'Your username must be between 3 and 20 characters long.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
-      'You do not have permission to access this page. Please contact support if you believe this is an error.',
+      "The email address or phone number is not allowed to sign up. This could be due to using '+', '=', '#', or '.' in your email address, using a domain connected with a temporary email service, or being explicitly blocked. If you believe this is an error, please contact support.",
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organisation’s SSO',
@@ -644,6 +644,7 @@ export const enGB: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: "You're already signed in.",
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',

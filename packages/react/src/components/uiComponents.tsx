@@ -1,5 +1,6 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
+  __experimental_PricingTableProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -570,4 +571,32 @@ export const Waitlist = withClerk(
     );
   },
   { component: 'Waitlist', renderWhileLoading: true },
+);
+
+export const __experimental_PricingTable = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<__experimental_PricingTableProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.__experimental_mountPricingTable}
+            unmount={clerk.__experimental_unmountPricingTable}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: '__experimental_PricingTable', renderWhileLoading: true },
 );

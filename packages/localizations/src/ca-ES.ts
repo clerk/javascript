@@ -636,6 +636,7 @@ export const caES: LocalizationResource = {
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
+    session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',

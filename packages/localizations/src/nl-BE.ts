@@ -635,6 +635,7 @@ export const nlBE: LocalizationResource = {
       sentencePrefix: 'Wachtwoord moet minstens 1 speciaal teken bevatten.',
     },
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
+    session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',

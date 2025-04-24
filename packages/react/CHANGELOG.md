@@ -1,5 +1,71 @@
 # Change Log
 
+## 5.30.0
+
+### Minor Changes
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add details to `<UserButton.*>` error messages indicating that the components must be used within client components. ([#5695](https://github.com/clerk/javascript/pull/5695)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+  - @clerk/shared@3.7.4
+
+## 5.29.0
+
+### Minor Changes
+
+- Introduce `useClerk().status` alongside `<ClerkFailed />` and `<ClerkDegraded />`. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### `useClerk().status`
+
+  Possible values for `useClerk().status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+    The computed value of `useClerk().loaded` is:
+  - `true` when `useClerk().status` is either `"ready"` or `"degraded"`.
+  - `false` when `useClerk().status` is `"loading"` or `"error"`.
+
+  ### `<ClerkFailed />`
+
+  ```tsx
+  <ClerkLoaded>
+    <MyCustomSignInForm/>
+  </ClerkLoaded>
+  <ClerkFailed>
+    <ContactSupportBanner/>
+  </ClerkFailed>
+  ```
+
+  ### `<ClerkDegraded />`
+
+  ```tsx
+  <ClerkLoaded>
+    <MyCustomPasskeyRegistration />
+    <ClerkDegraded>We are experiencing issues, registering a passkey might fail.</ClerkDegraded>
+  </ClerkLoaded>
+  ```
+
+### Patch Changes
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+- Updated dependencies [[`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/types@4.55.0
+  - @clerk/shared@3.7.3
+
 ## 5.28.2
 
 ### Patch Changes
