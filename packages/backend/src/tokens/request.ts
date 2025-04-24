@@ -20,7 +20,6 @@ import type {
   AuthenticateRequestOptions,
   NonSessionTokenType,
   TokenType,
-  UniqueTokenArray,
 } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
@@ -96,32 +95,27 @@ function maybeHandleTokenTypeMismatch(
   return null;
 }
 
-// No options case.
-export async function authenticateRequest(
-  request: Request,
-  options: AuthenticateRequestOptions,
-): Promise<RequestState<'session_token'>>;
-// With options but no acceptsToken case
-export async function authenticateRequest(
-  request: Request,
-  options: Omit<AuthenticateRequestOptions, 'acceptsToken'>,
-): Promise<RequestState<'session_token'>>;
-// Single or any token type case.
-export async function authenticateRequest<T extends TokenType | 'any'>(
-  request: Request,
-  options: AuthenticateRequestOptions & { acceptsToken: T },
-): Promise<RequestState<T extends 'any' ? TokenType : T>>;
-// List of unique token types case.
-export async function authenticateRequest<T extends UniqueTokenArray>(
-  request: Request,
-  options: AuthenticateRequestOptions & { acceptsToken: T },
-): Promise<RequestState<T[number]>>;
+export interface AuthenticateRequestFn {
+  // List of token types case.
+  <T extends readonly TokenType[]>(
+    request: Request,
+    options: AuthenticateRequestOptions & { acceptsToken: T },
+  ): Promise<RequestState<T[number]>>;
 
-// Implementation
-export async function authenticateRequest(
+  // Single or any token type case.
+  <T extends TokenType | 'any'>(
+    request: Request,
+    options: AuthenticateRequestOptions & { acceptsToken: T },
+  ): Promise<RequestState<T extends 'any' ? TokenType : T>>;
+
+  // Default case with no options specified
+  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<'session_token'>>;
+}
+
+export const authenticateRequest: AuthenticateRequestFn = (async (
   request: Request,
   options: AuthenticateRequestOptions,
-): Promise<RequestState<TokenType>> {
+): Promise<RequestState<TokenType>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
@@ -740,7 +734,7 @@ export async function authenticateRequest(
   }
 
   return authenticateRequestWithTokenInCookie();
-}
+}) as AuthenticateRequestFn;
 
 /**
  * @internal
