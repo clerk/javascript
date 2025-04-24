@@ -596,7 +596,7 @@ export const skSK: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nie je možné nájsť účet s tými istými údajmi.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

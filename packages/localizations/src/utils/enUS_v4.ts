@@ -711,7 +711,7 @@ export const enUS_v4: any = {
   },
   unstable__errors: {
     identification_deletion_failed: 'You cannot delete your last identification.',
-    form_identifier_not_found: '',
+    form_identifier_not_found: "We couldn't find an account with those details.",
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_invalid:

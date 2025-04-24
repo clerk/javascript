@@ -596,7 +596,7 @@ export const viVN: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Không tìm thấy tài khoản với thông tin này.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Địa chỉ email phải là một địa chỉ email hợp lệ',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

@@ -605,7 +605,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
-    form_identifier_not_found: 'Die eingegebene Kennung wurde nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.',
+    form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',
