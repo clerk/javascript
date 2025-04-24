@@ -93,10 +93,6 @@ const CheckoutFormElements = ({
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
   const { subscriberType } = useCheckoutContext();
-  const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
-  const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
   const { data } = useFetch(
     __experimental_commerce?.getPaymentSources,
@@ -106,6 +102,12 @@ const CheckoutFormElements = ({
     undefined,
     'commerce-payment-sources',
   );
+
+  const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
+  const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState((data?.data.length || 0) === 0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+
   const { data: paymentSources } = data || { data: [] };
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
@@ -160,7 +162,7 @@ const CheckoutFormElements = ({
             onOpenChange={setOpenAccountFundsDropDown}
           >
             {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger text='Account Funds' />
+            <Disclosure.Trigger text='Payment Sources' />
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
@@ -181,8 +183,9 @@ const CheckoutFormElements = ({
         open={openAddNewSourceDropDown}
         onOpenChange={setOpenAddNewSourceDropDown}
       >
-        {/* TODO(@Commerce): needs localization */}
-        <Disclosure.Trigger text='Add a New Payment Source' />
+        <Disclosure.Trigger
+          text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
+        />
         <Disclosure.Content>
           <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources', subscriberType }}>
             <AddPaymentSource
