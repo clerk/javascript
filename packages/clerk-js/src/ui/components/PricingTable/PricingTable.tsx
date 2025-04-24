@@ -7,9 +7,9 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
-import { useFetch } from '../../hooks/useFetch';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
