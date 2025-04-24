@@ -639,6 +639,7 @@ export const elGR: LocalizationResource = {
       sentencePrefix: 'Ο κωδικός πρόσβασής σας πρέπει να περιέχει',
     },
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
+    session_exists: 'Έχετε ήδη συνδεθεί.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:

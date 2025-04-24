@@ -636,7 +636,8 @@ export const itIT: LocalizationResource = {
       requireUppercase: undefined,
       sentencePrefix: undefined,
     },
-    phone_number_exists: undefined,
+    phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
+    session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: undefined,

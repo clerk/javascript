@@ -633,6 +633,7 @@ export const skSK: LocalizationResource = {
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',

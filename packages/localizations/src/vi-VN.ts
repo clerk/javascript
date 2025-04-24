@@ -634,6 +634,7 @@ export const viVN: LocalizationResource = {
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
     phone_number_exists: 'Số điện thoại này đã được sử dụng. Vui lòng thử số khác.',
+    session_exists: 'Bạn đã đăng nhập rồi.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn đủ mạnh, nhưng có thể mạnh hơn. Hãy thêm nhiều ký tự hơn.',

@@ -50,6 +50,7 @@ const Headers = {
   CloudFrontForwardedProto: 'cloudfront-forwarded-proto',
   ContentType: 'content-type',
   ContentSecurityPolicy: 'content-security-policy',
+  ContentSecurityPolicyReportOnly: 'content-security-policy-report-only',
   EnableDebug: 'x-clerk-debug',
   ForwardedHost: 'x-forwarded-host',
   ForwardedPort: 'x-forwarded-port',
@@ -61,6 +62,7 @@ const Headers = {
   Referrer: 'referer',
   SecFetchDest: 'sec-fetch-dest',
   UserAgent: 'user-agent',
+  ReportingEndpoints: 'reporting-endpoints',
 } as const;
 
 const ContentTypes = {

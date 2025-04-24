@@ -125,6 +125,10 @@ type _LocalizationResource = {
         title__invoiceId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
+      emailForm: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
   };
   signUp: {
@@ -951,6 +955,7 @@ type UnstableErrors = WithParamName<{
     requireUppercase: LocalizationValue;
     requireSpecialCharacter: LocalizationValue;
   };
+  session_exists: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;
