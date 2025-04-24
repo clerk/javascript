@@ -599,7 +599,7 @@ export const itIT: LocalizationResource = {
     form_identifier_exists__email_address: 'Questa email è già registrata.',
     form_identifier_exists__phone_number: 'Questo numero di telefono è già registrato.',
     form_identifier_exists__username: 'Questo username è già in uso.',
-    form_identifier_not_found: 'Nessun account trovato.',
+    form_identifier_not_found: 'Non abbiamo trovato nessun account con queste informazioni.',
     form_param_format_invalid: 'Formato non valido.',
     form_param_format_invalid__email_address: "L'indirizzo email deve essere un indirizzo email valido.",
     form_param_format_invalid__phone_number: 'Il numero di telefono deve essere in un formato internazionale valido.',
