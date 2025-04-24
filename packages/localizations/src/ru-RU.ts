@@ -650,6 +650,7 @@ export const ruRU: LocalizationResource = {
       sentencePrefix: 'Ваш пароль должен содержать',
     },
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
+    session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',

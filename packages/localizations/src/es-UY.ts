@@ -602,6 +602,7 @@ export const esUY: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
+    session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero podría ser más fuerte. Intentá agregar más caracteres.',

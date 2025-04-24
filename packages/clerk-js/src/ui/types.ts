@@ -144,10 +144,6 @@ export type __experimental_PlansCtx = {
   subscriptions: __experimental_CommerceSubscriptionResource[];
   isLoading: boolean;
   revalidate: () => void;
-  activeOrUpcomingSubscription: (
-    plan: __experimental_CommercePlanResource,
-  ) => __experimental_CommerceSubscriptionResource | undefined;
-  isDefaultPlanImplicitlyActive: boolean;
 };
 
 export type SessionTasksCtx = {
