@@ -82,6 +82,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
             name: 'my-api-key',
             subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
             claims: { foo: 'bar' },
+            scopes: ['read:users', 'write:users'],
             createdBy: null,
             creationReason: 'For testing purposes',
             secondsUntilExpiration: null,
@@ -105,6 +106,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('api_key_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-api-key');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+    expect(data.scopes).toEqual(['read:users', 'write:users']);
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
@@ -121,6 +123,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
             name: 'my-machine-token',
             subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
             claims: { foo: 'bar' },
+            scopes: ['read:users', 'write:users'],
             revoked: false,
             expired: false,
             expiration: 1745185445567,
@@ -146,6 +149,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-machine-token');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+    expect(data.scopes).toEqual(['read:users', 'write:users']);
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
@@ -163,6 +167,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
             name: 'GitHub OAuth',
             subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
             claims: { scope: 'read write' },
+            scopes: ['read:users', 'write:users'],
             createdAt: 1744928754551,
             expiresAt: 1744928754551,
           });
@@ -183,6 +188,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+    expect(data.scopes).toEqual(['read:users', 'write:users']);
     expect(data.claims).toEqual({ scope: 'read write' });
   });
 
