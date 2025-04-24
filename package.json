@@ -94,6 +94,7 @@
     "eslint-import-resolver-typescript": "3.10.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
+    "eslint-plugin-jsdoc": "50.6.9",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-playwright": "2.2.0",
     "eslint-plugin-react": "7.37.5",
