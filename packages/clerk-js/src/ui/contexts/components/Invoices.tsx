@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_CommerceSubscriberType } from '@clerk/types';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
@@ -18,11 +18,12 @@ export const InvoicesContextProvider = ({
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
 
+  const { user } = useUser();
   const { data, isLoading, revalidate } = useFetch(
     __experimental_commerce?.__experimental_billing.getInvoices,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
-    'commerce-invoices',
+    `commerce-invoices-${user?.id}`,
   );
   const { data: invoices, total_count: totalCount } = data || { data: [], totalCount: 0 };
 

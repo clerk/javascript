@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_CommercePaymentSourceResource, __experimental_PaymentSourcesProps } from '@clerk/types';
 import { Fragment, useRef } from 'react';
 
@@ -88,11 +88,12 @@ const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
   const { organization } = useOrganization();
   const { subscriberType } = usePaymentSourcesContext();
 
+  const { user } = useUser();
   const { data, revalidate } = useFetch(
     __experimental_commerce?.getPaymentSources,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
-    'commerce-payment-sources',
+    `commerce-payment-sources-${user?.id}`,
   );
   const { data: paymentSources } = data || { data: [] };
 

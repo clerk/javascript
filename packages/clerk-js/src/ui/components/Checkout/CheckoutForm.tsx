@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
@@ -91,6 +91,7 @@ const CheckoutFormElements = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { __experimental_commerce } = useClerk();
+  const { user } = useUser();
   const { organization } = useOrganization();
   const { subscriberType } = useCheckoutContext();
 
@@ -100,7 +101,7 @@ const CheckoutFormElements = ({
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    'commerce-payment-sources',
+    `commerce-payment-sources-${user?.id}`,
   );
 
   const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);

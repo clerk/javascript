@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
@@ -23,12 +23,12 @@ const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscriberType) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-
+  const { user } = useUser();
   return useFetch(
-    __experimental_commerce?.__experimental_billing.getSubscriptions,
+    user ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
     { orgId: subscriberType === 'org' ? organization?.id : undefined },
     undefined,
-    'commerce-subscriptions',
+    `commerce-subscriptions-${user?.id}`,
   );
 };
 
