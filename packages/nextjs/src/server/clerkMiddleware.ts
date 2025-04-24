@@ -1,11 +1,19 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import type { AuthFn } from '../app-router/server/auth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
@@ -35,16 +43,12 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
-export type ClerkMiddlewareAuthObject = AuthObject & {
+export type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignIn: RedirectFun<Response>;
   redirectToSignUp: RedirectFun<Response>;
 };
 
-export interface ClerkMiddlewareAuth {
-  (): Promise<ClerkMiddlewareAuthObject>;
-
-  protect: AuthProtect;
-}
+export type ClerkMiddlewareAuth = AuthFn<Response>;
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,

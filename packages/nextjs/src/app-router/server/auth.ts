@@ -24,7 +24,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
+type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -33,7 +33,7 @@ type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
    * > [!NOTE]
    * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
-  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+  redirectToSignIn: RedirectFun<TRedirect>;
 
   /**
    * The `auth()` helper returns the `redirectToSignUp()` method, which you can use to redirect the user to the sign-up page.
@@ -43,7 +43,7 @@ type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
    * > [!NOTE]
    * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
-  redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
+  redirectToSignUp: RedirectFun<TRedirect>;
 };
 
 // Machine token auth objects
@@ -51,20 +51,20 @@ type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | Unauthenti
   tokenType: T;
 };
 
-type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
+export type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
 
-export interface AuthFn {
+export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth, MachineAuth<T[number]>>>;
+  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth<TRedirect>, MachineAuth<T[number]>>>;
 
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
-  ): Promise<InferAuthObjectFromToken<T, SessionAuth, MachineAuth<T>>>;
+  ): Promise<InferAuthObjectFromToken<T, SessionAuth<TRedirect>, MachineAuth<T>>>;
 
   (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
 
-  (): Promise<SessionAuth>;
+  (): Promise<SessionAuth<TRedirect>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
