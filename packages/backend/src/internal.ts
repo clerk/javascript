@@ -39,3 +39,5 @@ export { createClerkRequest } from './tokens/clerkRequest';
 export type { ClerkRequest } from './tokens/clerkRequest';
 
 export { reverificationError, reverificationErrorResponse } from '@clerk/shared/authorization-errors';
+
+export { verifyMachineAuthToken } from './tokens/verify';
