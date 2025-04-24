@@ -174,7 +174,6 @@ export const usePlansContext = () => {
           onSubscriptionCancel: () => {
             ctx.revalidate();
             onSubscriptionChange?.();
-            clerk.__internal_closeSubscriptionDetails();
           },
           portalId:
             mode === 'modal'
