@@ -49,7 +49,7 @@ type SessionAuth = (SignedInAuthObject | SignedOutAuthObject) & {
 type MachineAuth<T extends Exclude<TokenType, 'session_token'>> = (
   | AuthenticatedMachineObject
   | UnauthenticatedMachineObject
-) & { tokenType: T };
+) & { acceptsToken: T };
 
 type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
 
@@ -57,17 +57,21 @@ export interface AuthFn {
   // No options case - defaults to session token
   (): Promise<SessionAuth>;
 
-  // With options but no acceptsToken case - defaults to session token
-  (options: Omit<AuthOptions, 'acceptsToken'>): Promise<SessionAuth>;
-
   (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
 
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
   ): Promise<T extends 'session_token' ? SessionAuth : MachineAuth<Exclude<T, 'session_token'>>>;
 
-  // Array case - if includes session_token, return SessionAuth, else MachineAuth
-  // (options: AuthOptions & { acceptsToken: TokenType[] }): Promise<SessionAuth | MachineAuth<Exclude<TokenType, 'session_token'>>>;
+  <T extends TokenType[]>(
+    options: AuthOptions & { acceptsToken: T },
+  ): Promise<
+    T[number] extends 'session_token' | infer U
+      ? U extends TokenType
+        ? SessionAuth | MachineAuth<Exclude<U, 'session_token'>>
+        : SessionAuth
+      : MachineAuth<Exclude<T[number], 'session_token'>>
+  >;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
@@ -97,7 +101,7 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = (async () => {
+export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -118,6 +122,9 @@ export const auth: AuthFn = (async () => {
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    options: {
+      acceptsToken: options?.acceptsToken ?? 'session_token',
+    },
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -139,7 +146,6 @@ export const auth: AuthFn = (async () => {
         publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-        // TODO: Handle machine auth object
         sessionStatus: authObject.tokenType === 'session_token' ? authObject.sessionStatus : null,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),

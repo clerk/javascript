@@ -1,3 +1,4 @@
+import type { TokenType } from '@clerk/backend/internal';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
 import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
@@ -11,3 +12,11 @@ export type RequestLike = NextRequest | NextApiRequest | GsspRequest;
 export type NextMiddlewareRequestParam = Parameters<NextMiddleware>['0'];
 export type NextMiddlewareEvtParam = Parameters<NextMiddleware>['1'];
 export type NextMiddlewareReturn = ReturnType<NextMiddleware>;
+
+export type InferAuthObjectFromTokenArray<T extends TokenType[], TSession, TMachine> = T[number] extends
+  | 'session_token'
+  | infer U
+  ? U extends TokenType
+    ? TSession | (TMachine & { tokenType: Exclude<U, 'session_token'> })
+    : TSession
+  : TMachine & { tokenType: T[number] };

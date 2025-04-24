@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type { RedirectFun, SignedInAuthObject, TokenType } from '@clerk/backend/internal';
+import type { AuthenticatedMachineObject, RedirectFun, SignedInAuthObject, TokenType } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationFromSessionClaims,
@@ -8,6 +8,7 @@ import type {
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
 } from '@clerk/types';
+import type { InferAuthObjectFromTokenArray } from 'src/server/types';
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
@@ -40,6 +41,14 @@ export interface AuthProtect {
     params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
     options?: AuthProtectOptions,
   ): Promise<SignedInAuthObject>;
+
+  <T extends TokenType>(
+    options?: AuthProtectOptions & { token: T },
+  ): Promise<T extends 'session_token' ? SignedInAuthObject : AuthenticatedMachineObject & { tokenType: T }>;
+
+  <T extends TokenType[]>(
+    options?: AuthProtectOptions & { token: T },
+  ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
 
   (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
 }

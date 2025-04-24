@@ -1,14 +1,20 @@
 import type { AuthObject } from '@clerk/backend';
+import type { TokenType } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequestOptions, GetAuthDataRequestFn } from './data/getAuthDataFromRequest';
+import { getAuthDataFromRequest as getAuthDataFromRequestOriginal } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
+
+type GetAuthOptions = {
+  acceptsToken?: TokenType | TokenType[] | 'any';
+};
 
 /**
  * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
@@ -17,9 +23,11 @@ import { assertAuthStatus } from './utils';
 export const createAsyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
@@ -45,7 +53,14 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      return getAuthDataFromRequest(req, { ...opts, logger });
+      const getAuthDataFromRequest: GetAuthDataRequestFn = (
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions = {},
+      ) => {
+        return getAuthDataFromRequestOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      };
+
+      return getAuthDataFromRequest(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 
@@ -57,9 +72,11 @@ export const createAsyncGetAuth = ({
 export const createSyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
@@ -68,7 +85,15 @@ export const createSyncGetAuth = ({
       }
 
       assertAuthStatus(req, noAuthStatusMessage);
-      return getAuthDataFromRequest(req, { ...opts, logger });
+
+      const getAuthDataFromRequest: GetAuthDataRequestFn = (
+        req: RequestLike,
+        opts: GetAuthDataFromRequestOptions = {},
+      ) => {
+        return getAuthDataFromRequestOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      };
+
+      return getAuthDataFromRequest(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 
