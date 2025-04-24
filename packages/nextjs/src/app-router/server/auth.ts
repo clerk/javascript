@@ -54,16 +54,32 @@ type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | Unauthenti
 export type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
 
 export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: ['session_token', 'api_key'] })
+   */
   <T extends TokenType[]>(
     options: AuthOptions & { acceptsToken: T },
   ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth<TRedirect>, MachineAuth<T[number]>>>;
 
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'session_token' })
+   */
   <T extends TokenType>(
     options: AuthOptions & { acceptsToken: T },
   ): Promise<InferAuthObjectFromToken<T, SessionAuth<TRedirect>, MachineAuth<T>>>;
 
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'any' })
+   */
   (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
 
+  /**
+   * @example
+   * const authObject = await auth()
+   */
   (): Promise<SessionAuth<TRedirect>>;
 
   /**
