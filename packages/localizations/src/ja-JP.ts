@@ -20,6 +20,10 @@ export const jaJP: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -615,7 +619,8 @@ export const jaJP: LocalizationResource = {
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
-    not_allowed_access: 'アクセスが許可されていません。',
+    not_allowed_access:
+      "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

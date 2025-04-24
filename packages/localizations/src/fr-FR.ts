@@ -20,6 +20,10 @@ export const frFR: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -620,7 +624,8 @@ export const frFR: LocalizationResource = {
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
-    not_allowed_access: 'Accès non autorisé',
+    not_allowed_access:
+      "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
     organization_domain_blocked: "Ce domaine d'organisation est bloqué.",
     organization_domain_common: 'Ce domaine est trop courant pour une organisation.',
     organization_domain_exists_for_enterprise_connection: undefined,

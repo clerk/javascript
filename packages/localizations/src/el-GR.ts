@@ -20,6 +20,10 @@ export const elGR: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -618,7 +622,8 @@ export const elGR: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

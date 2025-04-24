@@ -20,6 +20,10 @@ export const itIT: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -616,7 +620,8 @@ export const itIT: LocalizationResource = {
     form_username_invalid_character: 'Il nome utente contiene caratteri non validi.',
     form_username_invalid_length: 'Il nome utente deve avere una lunghezza compresa tra 3 e 32 caratteri.',
     identification_deletion_failed: 'Non puoi eliminare la tua ultima identificazione.',
-    not_allowed_access: 'Non hai accesso a questa risorsa.',
+    not_allowed_access:
+      "L'indirizzo email o il numero di telefono non è autorizzato per la registrazione. Questo può essere dovuto all'uso di '+', '=', '#' o '.' nell'indirizzo email, l'uso di un dominio collegato a un servizio email temporaneo o l'esclusione esplicita. Se ritieni che si tratti di un errore, contattaci.",
     organization_domain_blocked: "Il dominio dell'organizzazione è stato bloccato.",
     organization_domain_common: 'Questo dominio è troppo comune per essere utilizzato.',
     organization_domain_exists_for_enterprise_connection: undefined,

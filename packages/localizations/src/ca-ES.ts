@@ -20,6 +20,10 @@ export const caES: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -615,7 +619,8 @@ export const caES: LocalizationResource = {
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
-    not_allowed_access: "No tens permís per accedir a aquesta pàgina. Si us plau, posa't en contacte amb el suport.",
+    not_allowed_access:
+      "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

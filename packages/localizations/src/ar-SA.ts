@@ -20,6 +20,10 @@ export const arSA: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -613,7 +617,8 @@ export const arSA: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

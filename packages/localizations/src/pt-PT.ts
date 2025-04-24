@@ -20,6 +20,10 @@ export const ptPT: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -614,7 +618,8 @@ export const ptPT: LocalizationResource = {
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

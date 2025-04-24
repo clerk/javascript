@@ -20,6 +20,10 @@ export const svSE: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -618,7 +622,8 @@ export const svSE: LocalizationResource = {
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
-    not_allowed_access: 'Åtkomst nekad.',
+    not_allowed_access:
+      "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
     organization_domain_blocked: 'Domänen är blockerad.',
     organization_domain_common: 'Domänen är vanlig.',
     organization_domain_exists_for_enterprise_connection: undefined,

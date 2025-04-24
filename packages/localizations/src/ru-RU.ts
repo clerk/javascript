@@ -20,6 +20,10 @@ export const ruRU: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -627,7 +631,8 @@ export const ruRU: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_exists_for_enterprise_connection: undefined,

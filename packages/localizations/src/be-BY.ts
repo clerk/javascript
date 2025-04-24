@@ -20,6 +20,10 @@ export const beBY: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -620,7 +624,8 @@ export const beBY: LocalizationResource = {
     form_username_invalid_character: 'Імя карыстальніка змяшчае недапушчальныя сімвалы.',
     form_username_invalid_length: 'Імя карыстальніка павінна быць ад 3 да 50 сімвалаў.',
     identification_deletion_failed: 'Вы не можаце выдаліць вашу апошнюю ідэнтыфікацыю.',
-    not_allowed_access: 'Вы не маеце правоў доступу.',
+    not_allowed_access:
+      "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",
     organization_domain_blocked: 'Дамен арганізацыі заблакаван.',
     organization_domain_common: 'Дамен арганізацыі звычайны і не можа быць выкарыстаны.',
     organization_domain_exists_for_enterprise_connection: undefined,
