@@ -1,50 +1,69 @@
-export const mockApiKey = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
-export const mockOauthToken = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
-export const mockMachineToken = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
+export const mockTokens = {
+  api_key: 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
+  oauth_token: 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij',
+  machine_token: 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij',
+} as const;
+
+export const mockVerificationResults = {
+  api_key: {
+    id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
+    type: 'api_key',
+    name: 'my-api-key',
+    subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
+    claims: { foo: 'bar' },
+    scopes: ['read:foo', 'write:bar'],
+    revoked: false,
+    revocationReason: null,
+    expired: false,
+    expiration: null,
+    createdBy: null,
+    creationReason: null,
+    secondsUntilExpiration: null,
+    createdAt: 1745354860746,
+    updatedAt: 1745354860746,
+  },
+  oauth_token: {
+    id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
+    clientId: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
+    type: 'oauth:access_token',
+    name: 'GitHub OAuth',
+    subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
+    scopes: ['read:foo', 'write:bar'],
+    revoked: false,
+    revocationReason: null,
+    expired: false,
+    expiration: null,
+    createdAt: 1744928754551,
+    updatedAt: 1744928754551,
+  },
+  machine_token: {
+    id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
+    name: 'my-machine-token',
+    subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
+    scopes: ['read:foo', 'write:bar'],
+    claims: { foo: 'bar' },
+    revoked: false,
+    revocationReason: null,
+    expired: false,
+    expiration: null,
+    createdBy: null,
+    creationReason: null,
+    createdAt: 1745185445567,
+    updatedAt: 1745185445567,
+  },
+};
 
 export const mockMachineAuthResponses = {
   api_key: {
     endpoint: 'https://api.clerk.test/v1/api_keys/verify',
-    successResponse: {
-      object: 'api_key',
-      id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-      type: 'api_key',
-      name: 'my-api-key',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      claims: { foo: 'bar' },
-      scopes: ['read:users', 'write:users'],
-    },
     errorMessage: 'API key not found',
   },
   oauth_token: {
     endpoint: 'https://api.clerk.test/v1/oauth_applications/access_tokens/verify',
-    successResponse: {
-      object: 'clerk_idp_oauth_access_token',
-      id: 'oauth_access_ey966f1b1xf93586b2debdcadb0b3bd1',
-      type: 'oauth_token',
-      name: 'my-oauth-token',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      claims: { foo: 'bar' },
-      scopes: ['read:users', 'write:users'],
-    },
     errorMessage: 'OAuth token not found',
   },
   machine_token: {
     endpoint: 'https://api.clerk.test/v1/m2m_tokens/verify',
-    successResponse: {
-      object: 'machine_token',
-      id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
-      name: 'my-machine-token',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      claims: { foo: 'bar' },
-      scopes: ['read:users', 'write:users'],
-    },
     errorMessage: 'Machine token not found',
   },
-};
-
-export const tokenMap = {
-  api_key: mockApiKey,
-  oauth_token: mockOauthToken,
-  machine_token: mockMachineToken,
-};
+} as const;
