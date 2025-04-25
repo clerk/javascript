@@ -29,6 +29,7 @@ import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { getSignUpAttributeFromIdentifier } from './utils';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -483,10 +484,12 @@ function SignInStartInternal(): JSX.Element {
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                   </Col>
+                  <CaptchaElement />
                   <Form.SubmitButton hasArrow />
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
+            {!standardFormAttributes.length && <CaptchaElement />}
             {userSettings.attributes.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (
