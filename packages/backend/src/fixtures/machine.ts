@@ -55,15 +55,15 @@ export const mockVerificationResults = {
 
 export const mockMachineAuthResponses = {
   api_key: {
-    endpoint: 'https://api.clerk.test/v1/api_keys/verify',
+    endpoint: 'https://api.clerk.test/api_keys/verify',
     errorMessage: 'API key not found',
   },
   oauth_token: {
-    endpoint: 'https://api.clerk.test/v1/oauth_applications/access_tokens/verify',
+    endpoint: 'https://api.clerk.test/oauth_applications/access_tokens/verify',
     errorMessage: 'OAuth token not found',
   },
   machine_token: {
-    endpoint: 'https://api.clerk.test/v1/m2m_tokens/verify',
+    endpoint: 'https://api.clerk.test/m2m_tokens/verify',
     errorMessage: 'Machine token not found',
   },
 } as const;
