@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
@@ -39,7 +39,8 @@ export const PlansContextProvider = ({
   children: ReactNode;
 }) => {
   const { __experimental_commerce } = useClerk();
-
+  const { organization } = useOrganization();
+  const { user } = useUser();
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
@@ -57,10 +58,21 @@ export const PlansContextProvider = ({
     'commerce-plans',
   );
 
+  // Revalidates the next time the hooks gets mounted
+  const { revalidate: revalidateInvoices } = useFetch(
+    undefined,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-invoices-${user?.id}`,
+  );
+
   const revalidate = () => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
+    revalidateInvoices();
   };
 
   return (
