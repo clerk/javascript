@@ -16,7 +16,7 @@ const variants = {
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
-  clerkCHIPS: 'clerk.chips',
+  clerkCHIPS: 'clerk.chips.browser',
 };
 
 const variantToSourceFile = {
