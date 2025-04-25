@@ -20,6 +20,10 @@ export const idID: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -601,7 +605,7 @@ export const idID: LocalizationResource = {
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',
@@ -623,7 +627,8 @@ export const idID: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
     organization_domain_blocked: 'Ini adalah domain penyedia email yang diblokir. Silakan gunakan yang lain.',
     organization_domain_common: 'Ini adalah domain penyedia email umum. Silakan gunakan yang lain.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -646,6 +651,7 @@ export const idID: LocalizationResource = {
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
+    session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',

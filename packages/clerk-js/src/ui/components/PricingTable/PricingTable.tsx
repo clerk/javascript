@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -7,13 +7,15 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted' } = usePricingTableContext();
+  const { mode = 'mounted', subscriberType } = usePricingTableContext();
   const isCompact = mode === 'modal';
+  const { organization } = useOrganization();
 
   const { plans, handleSelectPlan } = usePlansContext();
 
@@ -26,6 +28,18 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
     handleSelectPlan({ mode, plan, planPeriod });
   };
+
+  const { __experimental_commerce } = useClerk();
+
+  const { user } = useUser();
+  useFetch(
+    user ? __experimental_commerce?.getPaymentSources : undefined,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-payment-sources-${user?.id}`,
+  );
 
   return (
     <>

@@ -20,6 +20,10 @@ export const caES: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -594,7 +598,7 @@ export const caES: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: "No s'ha trobat cap identificador coincident. Si us plau, comprova el valor introduït.",
+    form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',
@@ -615,7 +619,8 @@ export const caES: LocalizationResource = {
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
-    not_allowed_access: "No tens permís per accedir a aquesta pàgina. Si us plau, posa't en contacte amb el suport.",
+    not_allowed_access:
+      "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -636,6 +641,7 @@ export const caES: LocalizationResource = {
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
+    session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',

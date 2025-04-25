@@ -20,6 +20,10 @@ export const plPL: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -623,7 +627,7 @@ export const plPL: LocalizationResource = {
     form_username_invalid_length: 'Nazwa użytkownika musi zawierać od {{min_length}} do {{max_length}} znaków.',
     identification_deletion_failed: 'Nie można usunąć ostatniego identyfikatora.',
     not_allowed_access:
-      'Nie masz uprawnień dostępu do tej strony. Jeśli uważasz, że jest to błąd, skontaktuj się z pomocą.',
+      "Adres e-mail lub numer telefonu nie jest dozwolony do rejestracji. Może to być spowodowane użyciem '+', '=', '#' lub '.' w adresie e-mail, użyciem domeny skojarzonej z usługą poczty e-mail tymczasowej lub jawnego wykluczenia.",
     organization_domain_blocked: 'To jest zablokowana domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_common: 'To jest popularna domena dostawcy poczty e-mail. Użyj innej domeny.',
     organization_domain_exists_for_enterprise_connection:
@@ -646,6 +650,7 @@ export const plPL: LocalizationResource = {
       sentencePrefix: 'Twoje hasło musi zawierać',
     },
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
+    session_exists: 'Jesteś już zalogowany.',
     web3_missing_identifier: 'Nie można znaleźć rozszerzenia Web3 Wallet. Zainstaluj je, aby kontynuować.',
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',

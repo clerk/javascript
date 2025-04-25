@@ -38,15 +38,16 @@ export const useCache = <K = any, V = any>(
   serializer = serialize,
 ): {
   getCache: () => State<V> | undefined;
-  setCache: (state: State<V>) => void;
+  setCache: (state: State<V> | ((params: State<V>) => State<V>)) => void;
   clearCache: () => void;
   subscribeCache: (callback: () => void) => () => void;
 } => {
   const serializedKey = serializer(key);
   const get = useCallback(() => requestCache.get(serializedKey), [serializedKey]);
   const set = useCallback(
-    (data: State) => {
-      requestCache.set(serializedKey, data);
+    (data: State | ((params: State) => State)) => {
+      // @ts-ignore
+      requestCache.set(serializedKey, typeof data === 'function' ? data(get()) : data);
       subscribers.forEach(callback => callback());
     },
     [serializedKey],
@@ -106,9 +107,12 @@ export const useFetch = <K, T>(
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
   const revalidate = useCallback(() => {
-    clearCache();
+    setCache(d => ({
+      ...d,
+      cachedAt: 0,
+    }));
     setRevalidationCounter(prev => prev + 1);
-  }, [clearCache]);
+  }, [setCache]);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;

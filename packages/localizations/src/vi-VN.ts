@@ -20,6 +20,10 @@ export const viVN: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -592,7 +596,7 @@ export const viVN: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Không tìm thấy tài khoản với thông tin này.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Địa chỉ email phải là một địa chỉ email hợp lệ',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -613,7 +617,8 @@ export const viVN: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Bạn không thể xóa thông tin nhận dạng cuối cùng của bạn.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Địa chỉ email hoặc số điện thoại bạn đang sử dụng cho đăng ký không được phép. Điều này có thể do việc sử dụng '+', '=', '#' hoặc '.' trong địa chỉ email của bạn, sử dụng một miền được kết nối với dịch vụ email tạm thời hoặc một loại loại trừ rõ ràng.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -634,6 +639,7 @@ export const viVN: LocalizationResource = {
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
     phone_number_exists: 'Số điện thoại này đã được sử dụng. Vui lòng thử số khác.',
+    session_exists: 'Bạn đã đăng nhập rồi.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn đủ mạnh, nhưng có thể mạnh hơn. Hãy thêm nhiều ký tự hơn.',

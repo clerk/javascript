@@ -20,6 +20,10 @@ export const roRO: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -596,7 +600,7 @@ export const roRO: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nu am putut găsi un cont cu aceste detalii.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Adresa de e-mail trebuie să fie o adresă de e-mail validă.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -617,7 +621,8 @@ export const roRO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Nu vă puteți șterge ultima identificare.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Adresa de e-mail sau numărul de telefon nu este permis pentru înregistrare. Acest lucru poate fi datorat utilizării '+', '=', '#' sau '.' în adresa dvs. de e-mail, utilizării unui domeniu asociat cu un serviciu de e-mail temporar sau unei excluziuni explicite.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -638,6 +643,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    session_exists: 'Sunteți deja conectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:

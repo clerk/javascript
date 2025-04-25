@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`110f8dd`](https://github.com/clerk/javascript/commit/110f8dd09bc4b45d192828c85fbb60d6a06ae22a), [`20e6257`](https://github.com/clerk/javascript/commit/20e62573429d8fae072bb22e7a6628f0aeeacbd1), [`eecb321`](https://github.com/clerk/javascript/commit/eecb3212e2fb726c3dd09c7809bdae7ec4f7e8ed), [`dab9acd`](https://github.com/clerk/javascript/commit/dab9acdd5674104e100c7f5a580d3859dff2de79), [`8145835`](https://github.com/clerk/javascript/commit/814583546e7a44acb502387cd7d94119c6611030), [`da17a96`](https://github.com/clerk/javascript/commit/da17a967a2bab067db1e20549256af70f8d26dea), [`85e448e`](https://github.com/clerk/javascript/commit/85e448e2a6f1905f0b44a43142b3274f9cf9fc03), [`3cdbea0`](https://github.com/clerk/javascript/commit/3cdbea094685be77a63961b0643da127b91a253f)]:
+  - @clerk/clerk-js@5.62.2
+  - @clerk/clerk-react@5.30.0
+
+## 2.3.0
+
+### Minor Changes
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`d8f67be`](https://github.com/clerk/javascript/commit/d8f67be58a9c29f6cd30438149a72cd581e2e18e), [`f0f1ed7`](https://github.com/clerk/javascript/commit/f0f1ed7ef3666bfc1cbf945326e94a51e83c4646), [`25c3502`](https://github.com/clerk/javascript/commit/25c35023ee995acbf8f5c8989619ebc176a366d6)]:
+  - @clerk/clerk-js@5.62.1
+  - @clerk/clerk-react@5.30.0
+  - @clerk/shared@3.7.4
+
+## 2.2.32
+
+### Patch Changes
+
+- Updated dependencies [[`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`3336161`](https://github.com/clerk/javascript/commit/3336161fb5d55a86a199b09d02de906d5f362611), [`f707756`](https://github.com/clerk/javascript/commit/f7077562703552af30de4fbc3230cc9df58ef827), [`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`62a1c54`](https://github.com/clerk/javascript/commit/62a1c5418af1235c15a3ac1956547039f8571af4), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae), [`6f4cf71`](https://github.com/clerk/javascript/commit/6f4cf715cde0bb0f573fa0aa07f97db49d0d47aa)]:
+  - @clerk/clerk-react@5.29.0
+  - @clerk/clerk-js@5.62.0
+  - @clerk/shared@3.7.3
+
 ## 2.2.31
 
 ### Patch Changes

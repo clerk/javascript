@@ -1,8 +1,9 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
 } from '@clerk/types';
 import type { ComponentType, ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
@@ -19,6 +20,18 @@ type PlansContextProviderProps = {
 
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 
+export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscriberType) => {
+  const { __experimental_commerce } = useClerk();
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  return useFetch(
+    user ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
+    { orgId: subscriberType === 'org' ? organization?.id : undefined },
+    undefined,
+    `commerce-subscriptions-${user?.id}`,
+  );
+};
+
 export const PlansContextProvider = ({
   subscriberType = 'user',
   children,
@@ -27,17 +40,12 @@ export const PlansContextProvider = ({
 }) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-
+  const { user } = useUser();
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
     revalidate: revalidateSubscriptions,
-  } = useFetch(
-    __experimental_commerce?.__experimental_billing.getSubscriptions,
-    { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    undefined,
-    'commerce-subscriptions',
-  );
+  } = useSubscriptions(subscriberType);
 
   const {
     data: plans,
@@ -50,10 +58,21 @@ export const PlansContextProvider = ({
     'commerce-plans',
   );
 
+  // Revalidates the next time the hooks gets mounted
+  const { revalidate: revalidateInvoices } = useFetch(
+    undefined,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-invoices-${user?.id}`,
+  );
+
   const revalidate = () => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
+    revalidateInvoices();
   };
 
   return (
@@ -133,12 +152,14 @@ export const usePlansContext = () => {
   const buttonPropsForPlan = useCallback(
     ({
       plan,
+      subscription: sub,
       isCompact = false,
     }: {
-      plan: __experimental_CommercePlanResource;
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
       isCompact?: boolean;
     }): { localizationKey: LocalizationKey; variant: 'bordered' | 'solid'; colorScheme: 'secondary' | 'primary' } => {
-      const subscription = activeOrUpcomingSubscription(plan);
+      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return {
         localizationKey: subscription
@@ -162,7 +183,10 @@ export const usePlansContext = () => {
         clerk.__internal_openSubscriptionDetails({
           subscription,
           subscriberType: ctx.subscriberType,
-          onSubscriptionCancel: onSubscriptionChange,
+          onSubscriptionCancel: () => {
+            ctx.revalidate();
+            onSubscriptionChange?.();
+          },
           portalId:
             mode === 'modal'
               ? ctx.subscriberType === 'user'

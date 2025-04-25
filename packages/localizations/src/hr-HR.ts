@@ -20,6 +20,10 @@ export const hrHR: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -597,7 +601,7 @@ export const hrHR: LocalizationResource = {
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',
@@ -619,7 +623,8 @@ export const hrHR: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
     organization_domain_blocked: 'Ovo je blokirana domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_common: 'Ovo je uobičajena domena pružatelja e-pošte. Molimo koristite drugu.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -642,6 +647,7 @@ export const hrHR: LocalizationResource = {
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
+    session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
