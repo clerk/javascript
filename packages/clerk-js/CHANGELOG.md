@@ -1,5 +1,91 @@
 # Change Log
 
+## 5.62.2
+
+### Patch Changes
+
+- Bug fix: Use the same cache key for payment sources across checkout and profiles. ([#5706](https://github.com/clerk/javascript/pull/5706)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid laggy ui when closing drawer after canceling subscription. ([#5711](https://github.com/clerk/javascript/pull/5711)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: on session switch, revalidate cached commerce resources. ([#5712](https://github.com/clerk/javascript/pull/5712)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revalidate payment sources from `<Checkout />` when a new payment source is added before the checkout is completed. ([#5709](https://github.com/clerk/javascript/pull/5709)) by [@panteliselef](https://github.com/panteliselef)
+
+- Invalidate invoices after successful checkout. ([#5717](https://github.com/clerk/javascript/pull/5717)) by [@panteliselef](https://github.com/panteliselef)
+
+- Incremental improvements for account funds in checkout. ([#5705](https://github.com/clerk/javascript/pull/5705)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Fixes CLS issues when rendering account funds
+  - Renames "accounts funds" to "payment sources" for consistency
+  - Auto opes the "Add a new payment source" drawer only if no payments sources exist
+
+- Update shortDate modifier to include year for future dates. ([#5707](https://github.com/clerk/javascript/pull/5707)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for 2 new OAuth error codes ([#5718](https://github.com/clerk/javascript/pull/5718)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f9c2dfa`](https://github.com/clerk/javascript/commit/f9c2dfa432ac0fe06aa3a8baa2cf14c450e9e42b), [`7cd1afa`](https://github.com/clerk/javascript/commit/7cd1afaa029e7ca3041d73f165af0f18079bbb44)]:
+  - @clerk/localizations@3.14.0
+
+## 5.62.1
+
+### Patch Changes
+
+- Minor UI fixes for Billing pages in `<UserProfile/>` and `<OrganizationProfile/>`. ([#5690](https://github.com/clerk/javascript/pull/5690)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/localizations@3.13.14
+  - @clerk/types@4.55.1
+  - @clerk/shared@3.7.4
+
+## 5.62.0
+
+### Minor Changes
+
+- Introduce `Clerk.status` for tracking the state of the clerk singleton. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  Possible values for `Clerk.status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+
+  The computed value of `Clerk.loaded` is:
+
+  - `true` when `Clerk.status` is either `"ready"` or `"degraded"`.
+  - `false` when `Clerk.status` is `"loading"` or `"error"`.
+
+- Introduce `clerk.legacy.browser.js` for legacy browser support. ([#5495](https://github.com/clerk/javascript/pull/5495)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix duplicate checkout calls when clicking Get Started buttons ([#5664](https://github.com/clerk/javascript/pull/5664)) by [@aeliox](https://github.com/aeliox)
+
+- Remove the experimental commerce flag ([#5666](https://github.com/clerk/javascript/pull/5666)) by [@aeliox](https://github.com/aeliox)
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Rollback change to lazy-loading suspense wrapper ([#5670](https://github.com/clerk/javascript/pull/5670)) by [@aeliox](https://github.com/aeliox)
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+- Updated dependencies [[`68dc2b6`](https://github.com/clerk/javascript/commit/68dc2b622d52aa13b31b8e6b7facff131532dfd7), [`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/localizations@3.13.13
+  - @clerk/types@4.55.0
+  - @clerk/shared@3.7.3
+
 ## 5.61.2
 
 ### Patch Changes

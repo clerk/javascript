@@ -2,7 +2,7 @@ import {
   __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
   InvoicesContextProvider,
-  usePlansContext,
+  useSubscriptions,
   withPlans,
 } from '../../contexts';
 import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
@@ -26,14 +26,19 @@ import { SubscriptionsList } from '../Subscriptions';
 const tabMap = {
   0: 'plans',
   1: 'invoices',
-  2: 'payment-sources',
+  2: 'payment-methods',
 } as const;
 
 export const BillingPage = withPlans(
   withCardStateProvider(() => {
     const card = useCardState();
-    const { subscriptions } = usePlansContext();
+    const { data: subscriptions } = useSubscriptions();
+
     const { selectedTab, handleTabChange } = useTabState(tabMap);
+
+    if (!Array.isArray(subscriptions?.data)) {
+      return null;
+    }
 
     return (
       <Col
@@ -61,7 +66,7 @@ export const BillingPage = withPlans(
             <TabsList sx={t => ({ gap: t.space.$6 })}>
               <Tab
                 localizationKey={
-                  subscriptions.length > 0
+                  subscriptions.data.length > 0
                     ? localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__subscriptions')
                     : localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')
                 }
@@ -71,13 +76,13 @@ export const BillingPage = withPlans(
               />
               <Tab
                 localizationKey={localizationKeys(
-                  'userProfile.__experimental_billingPage.start.headerTitle__paymentSources',
+                  'userProfile.__experimental_billingPage.start.headerTitle__paymentMethods',
                 )}
               />
             </TabsList>
             <TabPanels>
               <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-                {subscriptions.length > 0 && (
+                {subscriptions.data.length > 0 && (
                   <>
                     <SubscriptionsList />
                     <Hr sx={t => ({ marginBlock: t.space.$6 })} />

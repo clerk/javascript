@@ -20,6 +20,10 @@ export const ruRU: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -606,7 +610,7 @@ export const ruRU: LocalizationResource = {
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Мы не смогли найти учетную запись с этими данными.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Адрес электронной почты должен быть действительным.',
     form_param_format_invalid__phone_number: 'Номер телефона должен быть в действующем международном формате.',
@@ -627,7 +631,8 @@ export const ruRU: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
     organization_domain_blocked: 'Это заблокированный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_common: 'Это распространенный домен почтового провайдера. Пожалуйста, используйте другой.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -650,6 +655,7 @@ export const ruRU: LocalizationResource = {
       sentencePrefix: 'Ваш пароль должен содержать',
     },
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
+    session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
@@ -717,7 +723,7 @@ export const ruRU: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

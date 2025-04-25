@@ -20,6 +20,10 @@ export const isIS: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -597,7 +601,7 @@ export const isIS: LocalizationResource = {
     form_identifier_exists__email_address: 'Þetta netfang er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Við getum ekki fundið reikning með þessum upplýsingum.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Netfang verður að vera gilt netfang.',
     form_param_format_invalid__phone_number: 'Símanúmer verður að vera á giltu alþjóðlegu formi',
@@ -619,7 +623,8 @@ export const isIS: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Þú getur ekki eytt síðasta auðkenni þínu.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Netfang eða símanúmer þitt er ekki leyft til að skrá sig. Þetta gæti verið vegna þess að þú ert að nota '+', '=', '#' eða '.' í netfangi þínu, að nota domen sem tengist tímabundnum tölvupóstur, eða að þú ert búinn til að nota það. Ef þú reynir að skrá sig og færð villu, vinsamlegast hafið samband við stuðning.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -640,6 +645,7 @@ export const isIS: LocalizationResource = {
       sentencePrefix: 'Lykilorðið þitt verður að innihalda',
     },
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
+    session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
@@ -707,7 +713,7 @@ export const isIS: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

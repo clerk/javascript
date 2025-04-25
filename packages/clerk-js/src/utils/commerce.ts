@@ -19,6 +19,6 @@ export const commerceTotalsFromJSON = (data: __experimental_CommerceTotalsJSON):
     grandTotal: commerceMoneyFromJSON(data.grand_total),
     subtotal: commerceMoneyFromJSON(data.subtotal),
     taxTotal: commerceMoneyFromJSON(data.tax_total),
-    totalDueNow: data.total_due_now ? commerceMoneyFromJSON(data.total_due_now) : undefined,
+    totalDueNow: commerceMoneyFromJSON(data.total_due_now),
   };
 };

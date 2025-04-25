@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -6,8 +6,8 @@ import type {
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
@@ -15,8 +15,9 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', subscriberType } = usePricingTableContext();
   const isCompact = mode === 'modal';
+  const { organization } = useOrganization();
 
-  const { plans, revalidate, activeOrUpcomingSubscription } = usePlansContext();
+  const { plans, handleSelectPlan } = usePlansContext();
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
 
@@ -25,29 +26,20 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
       void clerk.redirectToSignIn();
     }
 
-    const subscription = activeOrUpcomingSubscription(plan);
-
-    if (subscription && !subscription.canceledAt) {
-      clerk.__internal_openSubscriptionDetails({
-        subscription,
-        subscriberType,
-        onSubscriptionCancel: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-      });
-    } else {
-      clerk.__internal_openCheckout({
-        planId: plan.id,
-        planPeriod,
-        subscriberType,
-        onSubscriptionComplete: onSubscriptionChange,
-        portalId: mode === 'modal' ? PROFILE_CARD_SCROLLBOX_ID : undefined,
-      });
-    }
+    handleSelectPlan({ mode, plan, planPeriod });
   };
 
-  const onSubscriptionChange = () => {
-    void revalidate();
-  };
+  const { __experimental_commerce } = useClerk();
+
+  const { user } = useUser();
+  useFetch(
+    user ? __experimental_commerce?.getPaymentSources : undefined,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-payment-sources-${user?.id}`,
+  );
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommercePaymentSourceResource,
@@ -31,6 +31,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { __experimental_commerce } = useClerk();
   const { __experimental_commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
+  const { user } = useUser();
   const { subscriberType } = usePaymentSourcesContext();
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
@@ -67,7 +68,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    'commerce-payment-source-initialize',
+    `commerce-payment-source-initialize-${user?.id}`,
   );
 
   const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
@@ -139,8 +140,19 @@ const AddPaymentSourceForm = withCardStateProvider(
     const elements = useElements();
     const { displayConfig } = useEnvironment();
     const { organization } = useOrganization();
+    const { user } = useUser();
     const { subscriberType } = usePaymentSourcesContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+
+    // Revalidates the next time the hooks gets mounted
+    const { revalidate } = useFetch(
+      undefined,
+      {
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      },
+      undefined,
+      `commerce-payment-sources-${user?.id}`,
+    );
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -166,6 +178,8 @@ const AddPaymentSourceForm = withCardStateProvider(
           paymentToken: setupIntent.payment_method as string,
           ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
         });
+
+        revalidate();
 
         void onSuccess(paymentSource);
       } catch (error) {

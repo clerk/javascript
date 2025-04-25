@@ -20,6 +20,10 @@ export const trTR: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -595,7 +599,7 @@ export const trTR: LocalizationResource = {
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
-    form_identifier_not_found: 'Tanımlayıcı bulunamadı.',
+    form_identifier_not_found: 'Bu bilgilere sahip bir hesap bulunamadı.',
     form_param_format_invalid: 'Parametre formatı geçersiz.',
     form_param_format_invalid__email_address: 'E-posta adresi geçerli olmalıdır.',
     form_param_format_invalid__phone_number: 'Telefon numarası geçerli olmalıdır.',
@@ -616,7 +620,8 @@ export const trTR: LocalizationResource = {
     form_username_invalid_character: 'Kullanıcı adı geçersiz karakterler içeriyor.',
     form_username_invalid_length: 'Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.',
     identification_deletion_failed: 'Son kimliğinizi silemezsiniz.',
-    not_allowed_access: 'Erişime izin verilmiyor.',
+    not_allowed_access:
+      "E-posta adresiniz veya telefon numaranız kayıt için izin verilmiyor. Bu, e-posta adresinizde '+', '=', '#' veya '.' kullanmanız, geçici e-posta hizmetiyle ilişkilendirilmiş bir alan adı kullanmanız veya açık bir engellemeyle ilgili olabilir.",
     organization_domain_blocked: 'Organizasyon alan adı engellendi.',
     organization_domain_common: 'Organizasyon alan adı çok yaygın.',
     organization_domain_exists_for_enterprise_connection: 'Kurumsal bağlantı için bu alan adı zaten mevcut.',
@@ -638,6 +643,7 @@ export const trTR: LocalizationResource = {
       sentencePrefix: 'Şifreniz;',
     },
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
+    session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     zxcvbn: {
       couldBeStronger:
@@ -706,7 +712,7 @@ export const trTR: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

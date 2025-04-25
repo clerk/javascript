@@ -20,6 +20,10 @@ export const nbNO: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -594,7 +598,7 @@ export const nbNO: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Vi klarte ikke finne en konto med disse detaljene.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_param_format_invalid__phone_number: 'Telefonnummeret må være i et gyldig internasjonalt format',
@@ -615,7 +619,8 @@ export const nbNO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -636,6 +641,7 @@ export const nbNO: LocalizationResource = {
       sentencePrefix: 'Passordet ditt må inneholde',
     },
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
+    session_exists: 'Du er allerede logget inn.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
@@ -703,7 +709,7 @@ export const nbNO: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

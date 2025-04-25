@@ -1,5 +1,46 @@
 # Change Log
 
+## 4.55.1
+
+### Patch Changes
+
+- Make the `session_exists` error message more user-friendly and localize ([#5699](https://github.com/clerk/javascript/pull/5699)) by [@tmilewski](https://github.com/tmilewski)
+
+## 4.55.0
+
+### Minor Changes
+
+- Introduce `Clerk.status` for tracking the state of the clerk singleton. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  Possible values for `Clerk.status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+
+  The computed value of `Clerk.loaded` is:
+
+  - `true` when `Clerk.status` is either `"ready"` or `"degraded"`.
+  - `false` when `Clerk.status` is `"loading"` or `"error"`.
+
+### Patch Changes
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
 ## 4.54.2
 
 ### Patch Changes

@@ -20,6 +20,10 @@ export const huHU: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -594,7 +598,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nem találtunk fiókot ezekkel a részletekkel.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',
@@ -616,7 +620,8 @@ export const huHU: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Nem törölheted ki az utolsó azonosítód.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -637,6 +642,7 @@ export const huHU: LocalizationResource = {
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
+    session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
@@ -705,7 +711,7 @@ export const huHU: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

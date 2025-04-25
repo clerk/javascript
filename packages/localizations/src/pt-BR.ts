@@ -20,6 +20,10 @@ export const ptBR: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -618,7 +622,8 @@ export const ptBR: LocalizationResource = {
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
-    not_allowed_access: 'Acesso não permitido.',
+    not_allowed_access:
+      "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
     organization_domain_blocked: 'Este é um provedor de domínio de e-mail bloqueado. Por favor, use um diferente.',
     organization_domain_common: 'Este é um provedor de domínio de e-mail comum. Por favor, use um diferente.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -641,6 +646,7 @@ export const ptBR: LocalizationResource = {
       sentencePrefix: 'Sua senha deve conter',
     },
     phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
+    session_exists: 'Você já está conectado.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
@@ -708,7 +714,7 @@ export const ptBR: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
