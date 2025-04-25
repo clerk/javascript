@@ -1,4 +1,4 @@
-import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, ClerkRequest, RequestState, TokenType } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
@@ -259,3 +259,18 @@ function decryptData(data: string, key: string) {
   const encoded = decryptedBytes.toString(Utf8);
   return JSON.parse(encoded);
 }
+
+/**
+ * Check if a token type is accepted given a requested token type.
+ */
+export const isTokenTypeAccepted = (
+  tokenType: TokenType,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+): boolean => {
+  if (acceptsToken === 'any') {
+    return true;
+  }
+
+  const tokenTypes = Array.isArray(acceptsToken) ? acceptsToken : [acceptsToken];
+  return tokenTypes.includes(tokenType);
+};

@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticatedMachineObject,
+  AuthenticateRequestOptions,
   RedirectFun,
   SignedInAuthObject,
   SignedOutAuthObject,
@@ -51,7 +52,7 @@ type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | Unauthenti
   tokenType: T;
 };
 
-export type AuthOptions = { acceptsToken?: TokenType | TokenType[] | 'any' };
+export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
   /**

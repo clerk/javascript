@@ -1,9 +1,10 @@
 import type { AuthObject } from '@clerk/backend';
-import type { SignedInAuthObject, SignedOutAuthObject, TokenType } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import {
   authenticatedMachineObject,
   AuthStatus,
   constants,
+  getMachineTokenType,
   isMachineToken,
   signedInAuthObject,
   signedOutAuthObject,
@@ -16,12 +17,12 @@ import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
 import type { RequestLike } from '../types';
-import { assertTokenSignature, decryptClerkRequestData } from '../utils';
+import { assertTokenSignature, decryptClerkRequestData, isTokenTypeAccepted } from '../utils';
 
 export type GetAuthDataFromRequestOptions = {
   secretKey?: string;
   logger?: LoggerNoCommit;
-  acceptsToken?: TokenType | TokenType[] | 'any';
+  acceptsToken?: AuthenticateRequestOptions['acceptsToken'];
 };
 
 type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
@@ -51,7 +52,11 @@ export const getAuthDataFromRequestSync = (
     authReason,
   };
 
-  opts.logger?.debug('auth options', options);
+  // Only accept session tokens in sync version
+  const acceptsToken = opts.acceptsToken ?? 'session_token';
+  if (acceptsToken !== 'session_token' && acceptsToken !== 'any') {
+    return signedOutAuthObject(options);
+  }
 
   if (!authStatus || authStatus !== AuthStatus.SignedIn) {
     return signedOutAuthObject(options);
@@ -69,45 +74,35 @@ export const getAuthDataFromRequestSync = (
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.
  */
-export const getAuthDataFromRequest = async (
+export const getAuthDataFromRequestAsync = async (
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
-
-  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
-
-  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
-  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
-
-  const options = {
-    secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
-    publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
-    apiUrl: API_URL,
-    apiVersion: API_VERSION,
-    authStatus,
-    authMessage,
-    authReason,
-  };
-
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
+  const acceptsToken = opts.acceptsToken ?? 'session_token';
 
-  // Handle machine tokens if bearer token exists and is a machine token
   if (bearerToken && isMachineToken(bearerToken)) {
-    const { data, errors, tokenType } = await verifyMachineAuthToken(bearerToken, options);
+    const tokenType = getMachineTokenType(bearerToken);
+
+    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
+      return unauthenticatedMachineObject(tokenType);
+    }
+
+    const options = {
+      secretKey: opts?.secretKey || SECRET_KEY,
+      publishableKey: PUBLISHABLE_KEY,
+      apiUrl: API_URL,
+      apiVersion: API_VERSION,
+    };
+
+    // TODO: Cache the result of verifyMachineAuthToken
+    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
     if (errors) {
-      return unauthenticatedMachineObject(tokenType, {
-        reason: authReason,
-        message: authMessage,
-        headers: new Headers(),
-      });
+      return unauthenticatedMachineObject(tokenType);
     }
 
     return authenticatedMachineObject(tokenType, bearerToken, data);
   }
 
-  // Fall back to sync version for session tokens
   return getAuthDataFromRequestSync(req, opts);
 };

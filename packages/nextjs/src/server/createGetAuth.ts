@@ -1,5 +1,4 @@
 import type { AuthObject } from '@clerk/backend';
-import type { TokenType } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
@@ -7,7 +6,7 @@ import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
 import {
-  getAuthDataFromRequest as getAuthDataFromRequestOriginal,
+  getAuthDataFromRequestAsync as getAuthDataFromRequestAsyncOriginal,
   getAuthDataFromRequestSync as getAuthDataFromRequestSyncOriginal,
 } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
@@ -15,8 +14,8 @@ import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
 
-type GetAuthOptions = {
-  acceptsToken?: TokenType | TokenType[] | 'any';
+export type GetAuthOptions = {
+  acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
 };
 
 /**
@@ -56,11 +55,11 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
-        return getAuthDataFromRequestOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      const getAuthDataFromRequestAsync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestAsyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
       };
 
-      return getAuthDataFromRequest(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      return getAuthDataFromRequestAsync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 

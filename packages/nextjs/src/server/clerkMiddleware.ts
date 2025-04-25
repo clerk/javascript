@@ -21,6 +21,7 @@ import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { AuthFn } from '../app-router/server/auth';
+import type { GetAuthOptions } from '../server/createGetAuth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
@@ -46,6 +47,7 @@ import {
   assertKey,
   decorateRequest,
   handleMultiDomainAndProxy,
+  isTokenTypeAccepted,
   redirectAdapter,
   setRequestHeadersOnNextResponse,
 } from './utils';
@@ -400,19 +402,14 @@ const createMiddlewareAuthHandler = (
       : {},
   );
 
-  const authHandler = async (
-    options = {
-      acceptsToken: 'session_token',
-    },
-  ) => {
-    const acceptsToken = options.acceptsToken;
+  const authHandler = async (options: GetAuthOptions) => {
+    const acceptsToken = options.acceptsToken || 'session_token';
 
     if (acceptsToken === 'any') {
       return authObjWithMethods;
     }
 
-    const tokenTypes = Array.isArray(acceptsToken) ? acceptsToken : [acceptsToken];
-    if (!tokenTypes.includes(authObject.tokenType)) {
+    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
       if (authObject.tokenType === 'session_token') {
         return {
           ...signedOutAuthObject(),
@@ -420,7 +417,6 @@ const createMiddlewareAuthHandler = (
           redirectToSignUp,
         };
       }
-
       return unauthenticatedMachineObject(authObject.tokenType);
     }
 

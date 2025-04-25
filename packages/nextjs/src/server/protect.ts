@@ -10,6 +10,7 @@ import type {
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
+import { isTokenTypeAccepted } from '../server/utils';
 import { isNextFetcher } from './nextFetcher';
 import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from './types';
 
@@ -121,10 +122,8 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    // Check if the token type matches the requested token
     if (requestedToken) {
-      const tokenTypes = Array.isArray(requestedToken) ? requestedToken : [requestedToken];
-      if (!tokenTypes.includes(authObject.tokenType)) {
+      if (!isTokenTypeAccepted(authObject.tokenType, requestedToken)) {
         return handleUnauthorized();
       }
       return authObject;
