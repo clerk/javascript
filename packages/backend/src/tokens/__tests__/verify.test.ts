@@ -189,7 +189,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:users', 'write:users']);
-    expect(data.claims).toEqual({ scope: 'read write' });
   });
 
   describe('handles API errors for API keys', () => {
