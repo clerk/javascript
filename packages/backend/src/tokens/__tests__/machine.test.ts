@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { API_KEY_PREFIX, getMachineTokenType, isMachineToken, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from '../machine';
+import {
+  API_KEY_PREFIX,
+  getMachineTokenType,
+  isMachineToken,
+  isTokenTypeAccepted,
+  M2M_TOKEN_PREFIX,
+  OAUTH_TOKEN_PREFIX,
+} from '../machine';
 
 describe('isMachineToken', () => {
   it('returns true for tokens with M2M prefix', () => {
@@ -51,5 +58,23 @@ describe('getMachineTokenType', () => {
 
   it('throws an error for empty tokens', () => {
     expect(() => getMachineTokenType('')).toThrow('Unknown machine token type');
+  });
+});
+
+describe('isTokenTypeAccepted', () => {
+  it('accepts any token type', () => {
+    expect(isTokenTypeAccepted('api_key', 'any')).toBe(true);
+    expect(isTokenTypeAccepted('machine_token', 'any')).toBe(true);
+    expect(isTokenTypeAccepted('oauth_token', 'any')).toBe(true);
+    expect(isTokenTypeAccepted('session_token', 'any')).toBe(true);
+  });
+
+  it('accepts a list of token types', () => {
+    expect(isTokenTypeAccepted('api_key', ['api_key', 'machine_token'])).toBe(true);
+    expect(isTokenTypeAccepted('session_token', ['api_key', 'machine_token'])).toBe(false);
+  });
+
+  it('rejects a mismatching token type', () => {
+    expect(isTokenTypeAccepted('api_key', 'machine_token')).toBe(false);
   });
 });

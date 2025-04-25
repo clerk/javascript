@@ -16,7 +16,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
-import { getMachineTokenType, isMachineToken } from './machine';
+import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
 import type { AuthenticateRequestOptions, MachineTokenType, OrganizationSyncOptions, TokenType } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
@@ -93,15 +93,10 @@ function isRequestEligibleForRefresh(
 
 function maybeHandleTokenTypeMismatch(
   parsedTokenType: MachineTokenType,
-  acceptsToken: TokenType | TokenType[] | 'any',
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   authenticateContext: AuthenticateContext,
 ): UnauthenticatedState<MachineTokenType> | null {
-  if (acceptsToken === 'any') {
-    return null;
-  }
-  const mismatch = Array.isArray(acceptsToken)
-    ? !acceptsToken.includes(parsedTokenType)
-    : acceptsToken !== parsedTokenType;
+  const mismatch = !isTokenTypeAccepted(parsedTokenType, acceptsToken);
   if (mismatch) {
     return signedOut({
       tokenType: parsedTokenType,
@@ -527,11 +522,11 @@ ${error.getFullMessage()}`,
   }
 
   async function authenticateRequestWithTokenInHeader() {
-    const { sessionTokenInHeader } = authenticateContext;
+    const { sessionOrMachineTokenInHeader } = authenticateContext;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      const { data, errors } = await verifyToken(sessionOrMachineTokenInHeader!, authenticateContext);
       if (errors) {
         throw errors[0];
       }
@@ -542,7 +537,7 @@ ${error.getFullMessage()}`,
         sessionClaims: data,
         headers: new Headers(),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        token: sessionTokenInHeader!,
+        token: sessionOrMachineTokenInHeader!,
       });
     } catch (err) {
       return handleError(err, 'header');
@@ -825,13 +820,14 @@ ${error.getFullMessage()}`,
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {
-    const { sessionTokenInHeader } = authenticateContext;
-    if (!sessionTokenInHeader) {
-      return handleError(new Error('No token in header'), 'header');
+    const { sessionOrMachineTokenInHeader } = authenticateContext;
+    // Use session token error handling if no token in header (default behavior)
+    if (!sessionOrMachineTokenInHeader) {
+      return handleError(new Error('Missing token in header'), 'header');
     }
 
     // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineToken(sessionTokenInHeader)) {
+    if (!isMachineToken(sessionOrMachineTokenInHeader)) {
       return signedOut({
         tokenType: acceptsToken as MachineTokenType,
         authenticateContext,
@@ -840,13 +836,16 @@ ${error.getFullMessage()}`,
       });
     }
 
-    const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
+    const parsedTokenType = getMachineTokenType(sessionOrMachineTokenInHeader);
     const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {
       return mismatchState;
     }
 
-    const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+    const { data, tokenType, errors } = await verifyMachineAuthToken(
+      sessionOrMachineTokenInHeader,
+      authenticateContext,
+    );
     if (errors) {
       return handleMachineError(tokenType, errors[0]);
     }
@@ -854,25 +853,29 @@ ${error.getFullMessage()}`,
       tokenType,
       authenticateContext,
       machineData: data,
-      token: sessionTokenInHeader,
+      token: sessionOrMachineTokenInHeader,
     });
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
-    const { sessionTokenInHeader } = authenticateContext;
-    if (!sessionTokenInHeader) {
-      return handleError(new Error('No token in header'), 'header');
+    const { sessionOrMachineTokenInHeader } = authenticateContext;
+    // Use session token error handling if no token in header (default behavior)
+    if (!sessionOrMachineTokenInHeader) {
+      return handleError(new Error('Missing token in header'), 'header');
     }
 
     // Handle as a machine token
-    if (isMachineToken(sessionTokenInHeader)) {
-      const parsedTokenType = getMachineTokenType(sessionTokenInHeader);
+    if (isMachineToken(sessionOrMachineTokenInHeader)) {
+      const parsedTokenType = getMachineTokenType(sessionOrMachineTokenInHeader);
       const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {
         return mismatchState;
       }
 
-      const { data, tokenType, errors } = await verifyMachineAuthToken(sessionTokenInHeader, authenticateContext);
+      const { data, tokenType, errors } = await verifyMachineAuthToken(
+        sessionOrMachineTokenInHeader,
+        authenticateContext,
+      );
       if (errors) {
         return handleMachineError(tokenType, errors[0]);
       }
@@ -881,12 +884,12 @@ ${error.getFullMessage()}`,
         tokenType,
         authenticateContext,
         machineData: data,
-        token: sessionTokenInHeader,
+        token: sessionOrMachineTokenInHeader,
       });
     }
 
     // Handle as a regular session token
-    const { data, errors } = await verifyToken(sessionTokenInHeader, authenticateContext);
+    const { data, errors } = await verifyToken(sessionOrMachineTokenInHeader, authenticateContext);
     if (errors) {
       return handleError(errors[0], 'header');
     }
@@ -895,11 +898,11 @@ ${error.getFullMessage()}`,
       tokenType: 'session_token',
       authenticateContext,
       sessionClaims: data,
-      token: sessionTokenInHeader,
+      token: sessionOrMachineTokenInHeader,
     });
   }
 
-  if (authenticateContext.sessionTokenInHeader) {
+  if (authenticateContext.sessionOrMachineTokenInHeader) {
     if (acceptsToken === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
     }
@@ -927,8 +930,8 @@ ${error.getFullMessage()}`,
  * @internal
  */
 export const debugRequestState = (params: RequestState) => {
-  const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
-  return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
+  const { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
+  return { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
 type OrganizationSyncTargetMatchers = {
