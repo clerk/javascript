@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants } from '@clerk/backend/internal';
+import { constants, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
@@ -66,7 +66,7 @@ export const createAsyncGetAuth = ({
 /**
  * Previous known as `createGetAuth`. We needed to create a sync and async variant in order to allow for improvements
  * that required dynamic imports (using `require` would not work).
- * It powers the synchronous top-level api `getAuh()`.
+ * It powers the synchronous top-level api `getAuth()`.
  */
 export const createSyncGetAuth = ({
   debugLoggerName,
@@ -78,7 +78,7 @@ export const createSyncGetAuth = ({
   options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
+    return (req: RequestLike, opts?: { secretKey?: string }): SignedInAuthObject | SignedOutAuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }

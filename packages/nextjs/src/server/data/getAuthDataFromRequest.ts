@@ -26,12 +26,10 @@ export type GetAuthDataFromRequestOptions = {
   acceptsToken?: AuthenticateRequestOptions['acceptsToken'];
 };
 
-type SessionAuthObject = SignedInAuthObject | SignedOutAuthObject;
-
 export const getAuthDataFromRequestSync = (
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions = {},
-): SessionAuthObject => {
+): SignedInAuthObject | SignedOutAuthObject => {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');

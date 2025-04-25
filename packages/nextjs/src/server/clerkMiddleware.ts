@@ -65,11 +65,13 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+type AuthenticateAnyRequestOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'>;
+
 /**
  * The `clerkMiddleware()` function accepts an optional object. The following options are available.
  * @interface
  */
-export interface ClerkMiddlewareOptions extends Omit<AuthenticateRequestOptions, 'acceptsToken'> {
+export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
   /**
    * If true, additional debug information will be logged to the console.
    */
@@ -84,7 +86,7 @@ export interface ClerkMiddlewareOptions extends Omit<AuthenticateRequestOptions,
    * @default 'session_token'
    */
   acceptsTokenType?: AuthenticateRequestOptions['acceptsToken'];
-};
+}
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
