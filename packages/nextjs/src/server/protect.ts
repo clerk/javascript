@@ -1,6 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import type { AuthenticatedMachineObject, RedirectFun, SignedInAuthObject, TokenType } from '@clerk/backend/internal';
-import { constants } from '@clerk/backend/internal';
+import { constants, isTokenTypeAccepted } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationFromSessionClaims,
   CheckAuthorizationParamsFromSessionClaims,
@@ -10,7 +10,6 @@ import type {
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
-import { isTokenTypeAccepted } from '../server/utils';
 import { isNextFetcher } from './nextFetcher';
 import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from './types';
 

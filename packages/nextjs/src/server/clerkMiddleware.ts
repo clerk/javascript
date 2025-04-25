@@ -12,6 +12,7 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
+  isTokenTypeAccepted,
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
@@ -47,7 +48,6 @@ import {
   assertKey,
   decorateRequest,
   handleMultiDomainAndProxy,
-  isTokenTypeAccepted,
   redirectAdapter,
   setRequestHeadersOnNextResponse,
 } from './utils';

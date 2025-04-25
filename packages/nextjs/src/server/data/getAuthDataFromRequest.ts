@@ -6,6 +6,7 @@ import {
   constants,
   getMachineTokenType,
   isMachineToken,
+  isTokenTypeAccepted,
   signedInAuthObject,
   signedOutAuthObject,
   unauthenticatedMachineObject,
@@ -17,7 +18,7 @@ import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
 import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
 import type { RequestLike } from '../types';
-import { assertTokenSignature, decryptClerkRequestData, isTokenTypeAccepted } from '../utils';
+import { assertTokenSignature, decryptClerkRequestData } from '../utils';
 
 export type GetAuthDataFromRequestOptions = {
   secretKey?: string;
