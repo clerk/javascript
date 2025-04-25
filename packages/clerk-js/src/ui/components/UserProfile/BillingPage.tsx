@@ -26,7 +26,7 @@ import { SubscriptionsList } from '../Subscriptions';
 const tabMap = {
   0: 'plans',
   1: 'invoices',
-  2: 'payment-sources',
+  2: 'payment-methods',
 } as const;
 
 export const BillingPage = withPlans(
@@ -76,7 +76,7 @@ export const BillingPage = withPlans(
               />
               <Tab
                 localizationKey={localizationKeys(
-                  'userProfile.__experimental_billingPage.start.headerTitle__paymentSources',
+                  'userProfile.__experimental_billingPage.start.headerTitle__paymentMethods',
                 )}
               />
             </TabsList>
