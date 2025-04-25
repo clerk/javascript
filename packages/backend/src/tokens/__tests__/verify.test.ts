@@ -2,8 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../../api';
-import { ObjectType } from '../../api';
 import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
+import { mockVerificationResults } from '../../fixtures/machine';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
@@ -73,22 +73,9 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     server.use(
       http.post(
-        'https://api.clerk.test/v1/api_keys/verify',
+        'https://api.clerk.test/api_keys/verify',
         validateHeaders(() => {
-          return HttpResponse.json({
-            object: ObjectType.ApiKey,
-            id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-            type: 'api_key',
-            name: 'my-api-key',
-            subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-            claims: { foo: 'bar' },
-            scopes: ['read:users', 'write:users'],
-            createdBy: null,
-            creationReason: 'For testing purposes',
-            secondsUntilExpiration: null,
-            createdAt: 1745185445567,
-            expiresAt: 1745185445567,
-          });
+          return HttpResponse.json(mockVerificationResults.api_key);
         }),
       ),
     );
@@ -106,7 +93,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('api_key_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-api-key');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
-    expect(data.scopes).toEqual(['read:users', 'write:users']);
+    expect(data.scopes).toEqual(['read:foo', 'write:bar']);
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
@@ -115,23 +102,9 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     server.use(
       http.post(
-        'https://api.clerk.test/v1/m2m_tokens/verify',
+        'https://api.clerk.test/m2m_tokens/verify',
         validateHeaders(() => {
-          return HttpResponse.json({
-            object: ObjectType.MachineToken,
-            id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
-            name: 'my-machine-token',
-            subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-            claims: { foo: 'bar' },
-            scopes: ['read:users', 'write:users'],
-            revoked: false,
-            expired: false,
-            expiration: 1745185445567,
-            createdBy: null,
-            creationReason: 'For testing purposes',
-            createdAt: 1745185445567,
-            updatedAt: 1745185445567,
-          });
+          return HttpResponse.json(mockVerificationResults.machine_token);
         }),
       ),
     );
@@ -149,7 +122,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-machine-token');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
-    expect(data.scopes).toEqual(['read:users', 'write:users']);
+    expect(data.scopes).toEqual(['read:foo', 'write:bar']);
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
@@ -158,19 +131,9 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     server.use(
       http.post(
-        'https://api.clerk.test/v1/oauth_applications/access_tokens/verify',
+        'https://api.clerk.test/oauth_applications/access_tokens/verify',
         validateHeaders(() => {
-          return HttpResponse.json({
-            object: ObjectType.IdpOAuthAccessToken,
-            id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
-            type: 'oauth:access_token',
-            name: 'GitHub OAuth',
-            subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-            claims: { scope: 'read write' },
-            scopes: ['read:users', 'write:users'],
-            createdAt: 1744928754551,
-            expiresAt: 1744928754551,
-          });
+          return HttpResponse.json(mockVerificationResults.oauth_token);
         }),
       ),
     );
@@ -188,7 +151,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
-    expect(data.scopes).toEqual(['read:users', 'write:users']);
+    expect(data.scopes).toEqual(['read:foo', 'write:bar']);
   });
 
   describe('handles API errors for API keys', () => {
@@ -196,7 +159,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'api_key_invalid_token';
 
       server.use(
-        http.post('https://api.clerk.test/v1/api_keys/verify', () => {
+        http.post('https://api.clerk.test/api_keys/verify', () => {
           return HttpResponse.json({}, { status: 404 });
         }),
       );
@@ -217,7 +180,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1';
 
       server.use(
-        http.post('https://api.clerk.test/v1/api_keys/verify', () => {
+        http.post('https://api.clerk.test/api_keys/verify', () => {
           return HttpResponse.json({}, { status: 500 });
         }),
       );
@@ -240,7 +203,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'm2m_invalid_token';
 
       server.use(
-        http.post('https://api.clerk.test/v1/m2m_tokens/verify', () => {
+        http.post('https://api.clerk.test/m2m_tokens/verify', () => {
           return HttpResponse.json({}, { status: 404 });
         }),
       );
@@ -261,7 +224,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1';
 
       server.use(
-        http.post('https://api.clerk.test/v1/m2m_tokens/verify', () => {
+        http.post('https://api.clerk.test/m2m_tokens/verify', () => {
           return HttpResponse.json({}, { status: 500 });
         }),
       );
@@ -284,7 +247,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'oauth_access_invalid_token';
 
       server.use(
-        http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
+        http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () => {
           return HttpResponse.json({}, { status: 404 });
         }),
       );
@@ -305,7 +268,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
 
       server.use(
-        http.post('https://api.clerk.test/v1/oauth_applications/access_tokens/verify', () => {
+        http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () => {
           return HttpResponse.json({}, { status: 500 });
         }),
       );
