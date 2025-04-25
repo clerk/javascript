@@ -15,7 +15,7 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { MachineAuthType, NonSessionTokenType, TokenType } from './types';
+import type { MachineAuthType, MachineTokenType, TokenType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
@@ -124,7 +124,7 @@ type BaseSignedInParams = {
 
 type SignedInParams =
   | (BaseSignedInParams & { tokenType: 'session_token'; sessionClaims: JwtPayload })
-  | (BaseSignedInParams & { tokenType: NonSessionTokenType; machineData: MachineAuthType });
+  | (BaseSignedInParams & { tokenType: MachineTokenType; machineData: MachineAuthType });
 
 export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): AuthenticatedState<T> {
   const { authenticateContext, headers = new Headers(), token } = params;

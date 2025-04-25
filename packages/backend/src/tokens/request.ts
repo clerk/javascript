@@ -16,11 +16,7 @@ import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
 import { getMachineTokenType, isMachineToken } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
-import type {
-  AuthenticateRequestOptions,
-  NonSessionTokenType,
-  TokenType,
-} from './types';
+import type { AuthenticateRequestOptions, MachineTokenType, TokenType } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -75,10 +71,10 @@ function isRequestEligibleForRefresh(
 }
 
 function maybeHandleTokenTypeMismatch(
-  parsedTokenType: NonSessionTokenType,
+  parsedTokenType: MachineTokenType,
   acceptsToken: TokenType | TokenType[] | 'any',
   authenticateContext: AuthenticateContext,
-): UnauthenticatedState<NonSessionTokenType> | null {
+): UnauthenticatedState<MachineTokenType> | null {
   if (acceptsToken === 'any') {
     return null;
   }
@@ -635,7 +631,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     });
   }
 
-  function handleMachineError(tokenType: NonSessionTokenType, err: unknown): UnauthenticatedState<NonSessionTokenType> {
+  function handleMachineError(tokenType: MachineTokenType, err: unknown): UnauthenticatedState<MachineTokenType> {
     if (!(err instanceof MachineTokenVerificationError)) {
       return signedOut({
         tokenType,
@@ -661,7 +657,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Handle case where tokenType is any and the token is not a machine token
     if (!isMachineToken(sessionTokenInHeader)) {
       return signedOut({
-        tokenType: acceptsToken as NonSessionTokenType,
+        tokenType: acceptsToken as MachineTokenType,
         authenticateContext,
         reason: AuthErrorReason.TokenTypeMismatch,
         message: '',

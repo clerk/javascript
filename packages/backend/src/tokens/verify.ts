@@ -13,7 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import type { NonSessionTokenType } from '../tokens/types';
+import type { MachineTokenType } from '../tokens/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
@@ -138,7 +138,7 @@ export async function verifyToken(
  * @param notFoundMessage - Custom message for 404 errors
  */
 function handleClerkAPIError(
-  tokenType: NonSessionTokenType,
+  tokenType: MachineTokenType,
   err: any,
   notFoundMessage: string,
 ): MachineTokenReturnType<any, MachineTokenVerificationError> {

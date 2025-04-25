@@ -1,4 +1,4 @@
-import type { NonSessionTokenType } from '../tokens/types';
+import type { MachineTokenType } from '../tokens/types';
 
 export type JwtReturnType<R, E extends Error> =
   | {
@@ -13,11 +13,11 @@ export type JwtReturnType<R, E extends Error> =
 export type MachineTokenReturnType<R, E extends Error> =
   | {
       data: R;
-      tokenType: NonSessionTokenType;
+      tokenType: MachineTokenType;
       errors?: undefined;
     }
   | {
       data?: undefined;
-      tokenType: NonSessionTokenType;
+      tokenType: MachineTokenType;
       errors: [E];
     };
