@@ -50,9 +50,25 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     emailAddresses: new EmailAddressAPI(request),
     instance: new InstanceAPI(request),
     invitations: new InvitationAPI(request),
-    machineTokens: new MachineTokensApi(request),
-    idPOAuthAccessToken: new IdPOAuthAccessTokenApi(request),
-    apiKeys: new APIKeysAPI(request),
+    // TODO: Remove this once we add a version to bapi-proxy
+    machineTokens: new MachineTokensApi(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
+    idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
+    apiKeys: new APIKeysAPI(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
     oauthApplications: new OAuthApplicationsApi(request),
