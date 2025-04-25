@@ -674,7 +674,7 @@ export interface __experimental_CommerceTotalsJSON {
   grand_total: __experimental_CommerceMoneyJSON;
   subtotal: __experimental_CommerceMoneyJSON;
   tax_total: __experimental_CommerceMoneyJSON;
-  total_due_now?: __experimental_CommerceMoneyJSON;
+  total_due_now: __experimental_CommerceMoneyJSON;
 }
 
 export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {

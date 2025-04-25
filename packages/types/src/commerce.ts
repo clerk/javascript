@@ -146,7 +146,7 @@ export interface __experimental_CommerceTotals {
   subtotal: __experimental_CommerceMoney;
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
-  totalDueNow?: __experimental_CommerceMoney;
+  totalDueNow: __experimental_CommerceMoney;
 }
 
 export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
