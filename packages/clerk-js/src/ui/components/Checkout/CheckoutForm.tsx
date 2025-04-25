@@ -201,7 +201,7 @@ const CheckoutFormElements = ({
                         amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
                       },
                     )
-                  : 'Finish checkout'
+                  : 'Subscribe'
               }
             />
           </__experimental_PaymentSourcesContext.Provider>
@@ -295,7 +295,7 @@ const PaymentSourceMethods = ({
             {totalDueNow.amountFormatted}
           </>
         ) : (
-          'Finish checkout'
+          'Subscribe'
         )}
       </Button>
     </Form>
