@@ -17,8 +17,8 @@ export const InvoicesContextProvider = ({
 }) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-
   const { user } = useUser();
+
   const { data, isLoading, revalidate } = useFetch(
     __experimental_commerce?.__experimental_billing.getInvoices,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
