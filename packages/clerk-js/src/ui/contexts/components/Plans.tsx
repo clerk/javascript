@@ -148,6 +148,21 @@ export const usePlansContext = () => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
+  const shouldDisplayPlanButton = useCallback(
+    ({
+      plan,
+      subscription: sub,
+    }: {
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
+    }) => {
+      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+
+      return !subscription || !subscription.canceledAt;
+    },
+    [activeOrUpcomingSubscription],
+  );
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
@@ -231,5 +246,6 @@ export const usePlansContext = () => {
     isDefaultPlanImplicitlyActive,
     handleSelectPlan,
     buttonPropsForPlan,
+    shouldDisplayPlanButton,
   };
 };
