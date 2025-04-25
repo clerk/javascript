@@ -5,8 +5,11 @@ import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import type { GetAuthDataFromRequest, GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
-import { getAuthDataFromRequest as getAuthDataFromRequestOriginal } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
+import {
+  getAuthDataFromRequest as getAuthDataFromRequestOriginal,
+  getAuthDataFromRequestSync as getAuthDataFromRequestSyncOriginal,
+} from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
@@ -53,10 +56,7 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      const getAuthDataFromRequest: GetAuthDataFromRequest = (
-        req: RequestLike,
-        opts: GetAuthDataFromRequestOptions = {},
-      ) => {
+      const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
         return getAuthDataFromRequestOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
       };
 
@@ -86,14 +86,11 @@ export const createSyncGetAuth = ({
 
       assertAuthStatus(req, noAuthStatusMessage);
 
-      const getAuthDataFromRequest: GetAuthDataFromRequest = (
-        req: RequestLike,
-        opts: GetAuthDataFromRequestOptions = {},
-      ) => {
-        return getAuthDataFromRequestOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      const getAuthDataFromRequestSync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestSyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
       };
 
-      return getAuthDataFromRequest(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      return getAuthDataFromRequestSync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 
