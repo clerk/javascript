@@ -148,6 +148,21 @@ export const usePlansContext = () => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
+  const shouldDisplayPlanButton = useCallback(
+    ({
+      plan,
+      subscription: sub,
+    }: {
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
+    }) => {
+      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+
+      return !subscription || !subscription.canceledAt;
+    },
+    [activeOrUpcomingSubscription],
+  );
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
@@ -166,7 +181,10 @@ export const usePlansContext = () => {
           ? subscription.canceledAt
             ? localizationKeys('__experimental_commerce.reSubscribe')
             : localizationKeys('__experimental_commerce.manageSubscription')
-          : localizationKeys('__experimental_commerce.getStarted'),
+          : // If there are no active or grace period subscriptions, show the get started button
+            ctx.subscriptions.length > 0
+            ? localizationKeys('__experimental_commerce.switchPlan')
+            : localizationKeys('__experimental_commerce.getStarted'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
@@ -228,5 +246,6 @@ export const usePlansContext = () => {
     isDefaultPlanImplicitlyActive,
     handleSelectPlan,
     buttonPropsForPlan,
+    shouldDisplayPlanButton,
   };
 };
