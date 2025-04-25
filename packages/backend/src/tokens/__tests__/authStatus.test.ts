@@ -1,6 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
+import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../../tokens/authenticateContext';
 import { handshake, signedIn, signedOut } from '../authStatus';
 
@@ -37,19 +38,8 @@ describe('signed-in', () => {
       const authObject = signedIn({
         tokenType: 'api_key',
         authenticateContext: {} as AuthenticateContext,
-        token: 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
-        machineData: {
-          id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-          type: 'api_key',
-          name: 'my-api-key',
-          subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-          claims: { foo: 'bar' },
-          createdBy: null,
-          creationReason: 'For testing purposes',
-          secondsUntilExpiration: null,
-          createdAt: 1745185445567,
-          expiresAt: 1745185445567,
-        },
+        token: mockTokens.api_key,
+        machineData: mockVerificationResults.api_key,
       });
 
       expect(authObject.headers.get('x-clerk-auth-status')).toBeNull();
@@ -61,19 +51,8 @@ describe('signed-in', () => {
       const authObject = signedIn({
         tokenType: 'api_key',
         authenticateContext: {} as AuthenticateContext,
-        token: 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
-        machineData: {
-          id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-          type: 'api_key',
-          name: 'my-api-key',
-          subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-          claims: { foo: 'bar' },
-          createdBy: null,
-          creationReason: 'For testing purposes',
-          secondsUntilExpiration: null,
-          createdAt: 1745185445567,
-          expiresAt: 1745185445567,
-        },
+        token: mockTokens.api_key,
+        machineData: mockVerificationResults.api_key,
       }).toAuth();
 
       const token = await authObject.getToken();

@@ -10,13 +10,7 @@ import {
   mockJwtPayload,
   mockMalformedJwt,
 } from '../../fixtures';
-import {
-  mockApiKey,
-  mockMachineAuthResponses,
-  mockMachineToken,
-  mockOauthToken,
-  tokenMap,
-} from '../../fixtures/machine';
+import { mockMachineAuthResponses, mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
@@ -1220,13 +1214,14 @@ describe('tokens.authenticateRequest(options)', () => {
     const tokenTypes = ['api_key', 'oauth_token', 'machine_token'] as const;
 
     describe.each(tokenTypes)('%s Authentication', tokenType => {
-      const mockToken = tokenMap[tokenType];
+      const mockToken = mockTokens[tokenType];
+      const mockVerification = mockVerificationResults[tokenType];
       const mockConfig = mockMachineAuthResponses[tokenType];
 
       test('returns authenticated state with valid token', async () => {
         server.use(
           http.post(mockConfig.endpoint, () => {
-            return HttpResponse.json(mockConfig.successResponse);
+            return HttpResponse.json(mockVerification);
           }),
         );
 
@@ -1259,12 +1254,13 @@ describe('tokens.authenticateRequest(options)', () => {
 
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
-        const mockToken = tokenMap[tokenType];
+        const mockToken = mockTokens[tokenType];
+        const mockVerification = mockVerificationResults[tokenType];
         const mockConfig = mockMachineAuthResponses[tokenType];
 
         server.use(
           http.post(mockConfig.endpoint, () => {
-            return HttpResponse.json(mockConfig.successResponse);
+            return HttpResponse.json(mockVerification);
           }),
         );
 
@@ -1291,7 +1287,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
     describe('Token Type Mismatch', () => {
       test('returns unauthenticated state when token type mismatches (API key provided, OAuth token expected)', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.api_key}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'oauth_token' }));
 
         expect(result).toBeMachineUnauthenticated({
@@ -1305,7 +1301,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type mismatches (OAuth token provided, M2M token expected)', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockOauthToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'machine_token' }));
 
         expect(result).toBeMachineUnauthenticated({
@@ -1319,7 +1315,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type mismatches (M2M token provided, API key expected)', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockMachineToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
         const result = await authenticateRequest(request, mockOptions({ acceptsToken: 'api_key' }));
 
         expect(result).toBeMachineUnauthenticated({
@@ -1351,11 +1347,11 @@ describe('tokens.authenticateRequest(options)', () => {
       test('accepts token when it is in the acceptsToken array', async () => {
         server.use(
           http.post(mockMachineAuthResponses.api_key.endpoint, () => {
-            return HttpResponse.json(mockMachineAuthResponses.api_key.successResponse);
+            return HttpResponse.json(mockVerificationResults.api_key);
           }),
         );
 
-        const request = mockRequest({ authorization: `Bearer ${mockApiKey}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.api_key}` });
         const requestState = await authenticateRequest(
           request,
           mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),
@@ -1365,7 +1361,7 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       test('returns unauthenticated state when token type is not in the acceptsToken array', async () => {
-        const request = mockRequest({ authorization: `Bearer ${mockMachineToken}` });
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.machine_token}` });
         const requestState = await authenticateRequest(
           request,
           mockOptions({ acceptsToken: ['api_key', 'oauth_token'] }),
@@ -1384,7 +1380,7 @@ describe('tokens.authenticateRequest(options)', () => {
 
     describe('Token Location Validation', () => {
       test.each(tokenTypes)('returns unauthenticated state when %s is in cookie instead of header', async tokenType => {
-        const mockToken = tokenMap[tokenType];
+        const mockToken = mockTokens[tokenType];
 
         const requestState = await authenticateRequest(
           mockRequestWithCookies(

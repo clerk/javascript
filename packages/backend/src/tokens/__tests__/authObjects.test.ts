@@ -1,7 +1,7 @@
 import type { JwtPayload } from '@clerk/types';
-import type { APIKey, IdPOAuthAccessToken, MachineToken } from 'src/api';
 import { describe, expect, it } from 'vitest';
 
+import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
 import {
   authenticatedMachineObject,
@@ -183,26 +183,11 @@ describe('signedInAuthObject', () => {
 });
 
 describe('authenticatedMachineObject', () => {
+  const debugData = { foo: 'bar' };
+
   describe('API Key authentication', () => {
-    const debugData = { foo: 'bar' };
-    const token = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
-    const verificationResult = {
-      id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
-      type: 'api_key',
-      name: 'my-api-key',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      claims: { foo: 'bar' },
-      scopes: ['read:foo', 'write:bar'],
-      revoked: false,
-      revocationReason: null,
-      expired: false,
-      expiration: null,
-      createdBy: null,
-      creationReason: null,
-      secondsUntilExpiration: null,
-      createdAt: 1745354860746,
-      updatedAt: 1745354860746,
-    } satisfies APIKey;
+    const token = mockTokens.api_key;
+    const verificationResult = mockVerificationResults.api_key;
 
     it('getToken returns the token passed in', async () => {
       const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
@@ -226,22 +211,8 @@ describe('authenticatedMachineObject', () => {
   });
 
   describe('OAuth Access Token authentication', () => {
-    const debugData = { foo: 'bar' };
-    const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
-    const verificationResult = {
-      id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
-      clientId: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
-      type: 'oauth:access_token',
-      name: 'GitHub OAuth',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      scopes: ['read:foo', 'write:bar'],
-      revoked: false,
-      revocationReason: null,
-      expired: false,
-      expiration: null,
-      createdAt: 1744928754551,
-      updatedAt: 1744928754551,
-    } satisfies IdPOAuthAccessToken;
+    const token = mockTokens.oauth_token;
+    const verificationResult = mockVerificationResults.oauth_token;
 
     it('getToken returns the token passed in', async () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
@@ -265,22 +236,8 @@ describe('authenticatedMachineObject', () => {
 
   describe('Machine Token authentication', () => {
     const debugData = { foo: 'bar' };
-    const token = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
-    const verificationResult = {
-      id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
-      name: 'my-machine-token',
-      subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
-      scopes: ['read:foo', 'write:bar'],
-      claims: { foo: 'bar' },
-      revoked: false,
-      revocationReason: null,
-      expired: false,
-      expiration: null,
-      createdBy: null,
-      creationReason: null,
-      createdAt: 1745185445567,
-      updatedAt: 1745185445567,
-    } satisfies MachineToken;
+    const token = mockTokens.machine_token;
+    const verificationResult = mockVerificationResults.machine_token;
 
     it('getToken returns the token passed in', async () => {
       const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
