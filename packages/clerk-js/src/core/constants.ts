@@ -36,6 +36,8 @@ export const ERROR_CODES = {
   INVITATION_ACCOUNT_NOT_EXISTS: 'invitation_account_not_exists',
   ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO: 'organization_membership_quota_exceeded_for_sso',
   CAPTCHA_INVALID: 'captcha_invalid',
+  FRAUD_DEVICE_BLOCKED: 'device_blocked',
+  FRAUD_ACTION_BLOCKED: 'action_blocked',
 } as const;
 
 export const SIGN_IN_INITIAL_VALUE_KEYS = ['email_address', 'phone_number', 'username'];
