@@ -53,6 +53,7 @@ describe('subpath /internal exports', () => {
         "signedOutAuthObject",
         "stripPrivateDataFromObject",
         "unauthenticatedMachineObject",
+        "verifyMachineAuthToken",
       ]
     `);
   });

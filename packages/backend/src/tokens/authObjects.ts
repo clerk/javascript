@@ -8,13 +8,15 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-import type { CreateBackendApiOptions } from '../api';
+import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
 import type { MachineAuthType, MachineTokenType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
+
+type Claims = Record<string, any>;
 
 /**
  * @internal
@@ -59,34 +61,49 @@ export type SignedOutAuthObject = {
 };
 
 /**
- * @internal
+ * Extended properties specific to each machine token type.
+ * While all machine token types share common properties (id, name, subject, etc),
+ * this type defines the additional properties that are unique to each token type.
+ *
+ * @example
+ * api_key & machine_token: adds `claims` property
+ * oauth_token: adds no additional properties (empty object)
+ *
+ * @template TAuthenticated - Whether the machine object is authenticated or not
  */
-export type AuthenticatedMachineObject = {
-  tokenType: MachineTokenType;
-  id: string;
-  name: string;
-  subject: string;
-  scopes: string[];
-  claims: Record<string, string> | null;
-  getToken: () => Promise<string>;
-  has: CheckAuthorizationFromSessionClaims;
-  debug: AuthObjectDebug;
+type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
+  api_key: { claims: TAuthenticated extends true ? Claims | null : null };
+  machine_token: { claims: TAuthenticated extends true ? Claims | null : null };
+  oauth_token: object;
 };
 
 /**
  * @internal
  */
-export type UnauthenticatedMachineObject = {
-  tokenType: MachineTokenType;
+export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
+  id: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  getToken: () => Promise<string>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+  tokenType: T;
+} & MachineObjectExtendedProperties<true>[T];
+
+/**
+ * @internal
+ */
+export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
   id: null;
   name: null;
   subject: null;
   scopes: null;
-  claims: null;
   getToken: () => Promise<null>;
-  has: () => false;
+  has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
-};
+  tokenType: T;
+} & MachineObjectExtendedProperties<false>[T];
 
 export type AuthObject =
   | SignedInAuthObject
@@ -170,43 +187,97 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
 /**
  * @internal
  */
-export function authenticatedMachineObject(
-  tokenType: MachineTokenType,
-  machineToken: string,
+export function authenticatedMachineObject<T extends MachineTokenType>(
+  tokenType: T,
+  token: string,
   verificationResult: MachineAuthType,
   debugData?: AuthObjectDebugData,
-): AuthenticatedMachineObject {
-  return {
-    tokenType,
+): AuthenticatedMachineObject<T> {
+  const baseObject = {
     id: verificationResult.id,
     name: verificationResult.name,
     subject: verificationResult.subject,
-    scopes: verificationResult.scopes,
-    claims: 'claims' in verificationResult ? verificationResult.claims : null,
-    getToken: () => Promise.resolve(machineToken),
+    getToken: () => Promise.resolve(token),
     has: () => false,
     debug: createDebug(debugData),
   };
+
+  // Type assertions are safe here since we know the verification result type matches the tokenType.
+  // We need these assertions because TS can't infer the specific type
+  // just from the tokenType discriminator.
+
+  switch (tokenType) {
+    case 'api_key': {
+      const result = verificationResult as APIKey;
+      return {
+        ...baseObject,
+        tokenType,
+        claims: result.claims,
+        scopes: result.scopes,
+      };
+    }
+    case 'machine_token': {
+      const result = verificationResult as MachineToken;
+      return {
+        ...baseObject,
+        tokenType,
+        claims: result.claims,
+        scopes: result.scopes,
+      };
+    }
+    case 'oauth_token': {
+      return {
+        ...baseObject,
+        tokenType,
+        scopes: verificationResult.scopes,
+      } as AuthenticatedMachineObject<T>;
+    }
+    default:
+      throw new Error(`Invalid token type: ${tokenType}`);
+  }
 }
 
 /**
  * @internal
  */
-export function unauthenticatedMachineObject(
-  tokenType: MachineTokenType,
+export function unauthenticatedMachineObject<T extends MachineTokenType>(
+  tokenType: T,
   debugData?: AuthObjectDebugData,
-): UnauthenticatedMachineObject {
-  return {
-    tokenType,
+): UnauthenticatedMachineObject<T> {
+  const baseObject = {
     id: null,
     name: null,
     subject: null,
     scopes: null,
-    claims: null,
-    getToken: () => Promise.resolve(null),
     has: () => false,
+    getToken: () => Promise.resolve(null),
     debug: createDebug(debugData),
   };
+
+  switch (tokenType) {
+    case 'api_key': {
+      return {
+        ...baseObject,
+        tokenType,
+        claims: null,
+      };
+    }
+    case 'machine_token': {
+      return {
+        ...baseObject,
+        tokenType,
+        claims: null,
+      };
+    }
+    case 'oauth_token': {
+      return {
+        ...baseObject,
+        tokenType,
+      } as UnauthenticatedMachineObject<T>;
+    }
+    default:
+      throw new Error(`Invalid token type: ${tokenType}`);
+  }
 }
 
 /**
