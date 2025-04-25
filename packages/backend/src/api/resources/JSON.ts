@@ -711,11 +711,11 @@ export interface APIKeyJSON extends ClerkResourceJSON {
 
 export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.IdpOAuthAccessToken;
+  client_id: string;
   type: string;
   name: string;
   subject: string;
   scopes: string[];
-  claims: Record<string, string> | null;
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;

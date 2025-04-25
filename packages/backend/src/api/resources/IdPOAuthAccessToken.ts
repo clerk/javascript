@@ -3,11 +3,11 @@ import type { IdPOAuthAccessTokenJSON } from './JSON';
 export class IdPOAuthAccessToken {
   constructor(
     readonly id: string,
+    readonly clientId: string,
     readonly type: string,
     readonly name: string,
     readonly subject: string,
     readonly scopes: string[],
-    readonly claims: Record<string, string> | null,
     readonly revoked: boolean,
     readonly revocationReason: string | null,
     readonly expired: boolean,
@@ -19,11 +19,11 @@ export class IdPOAuthAccessToken {
   static fromJSON(data: IdPOAuthAccessTokenJSON) {
     return new IdPOAuthAccessToken(
       data.id,
+      data.client_id,
       data.type,
       data.name,
       data.subject,
       data.scopes,
-      data.claims,
       data.revoked,
       data.revocation_reason,
       data.expired,

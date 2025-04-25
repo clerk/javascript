@@ -182,7 +182,7 @@ export function authenticatedMachineObject(
     name: verificationResult.name,
     subject: verificationResult.subject,
     scopes: verificationResult.scopes,
-    claims: verificationResult.claims,
+    claims: 'claims' in verificationResult ? verificationResult.claims : null,
     getToken: () => Promise.resolve(machineToken),
     has: () => false,
     debug: createDebug(debugData),
