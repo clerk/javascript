@@ -725,7 +725,7 @@ export const deDE: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: 'Rechnungen',
-        headerTitle__paymentSources: 'Zahlungsquellen',
+        headerTitle__paymentMethods: 'Zahlungsquellen',
         headerTitle__plans: 'Pläne',
         headerTitle__subscriptions: undefined,
       },

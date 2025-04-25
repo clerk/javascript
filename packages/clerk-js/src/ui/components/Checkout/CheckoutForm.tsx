@@ -163,7 +163,7 @@ const CheckoutFormElements = ({
             onOpenChange={setOpenAccountFundsDropDown}
           >
             {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger text='Payment Sources' />
+            <Disclosure.Trigger text='Payment Methods' />
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
