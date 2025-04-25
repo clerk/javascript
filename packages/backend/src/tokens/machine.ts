@@ -1,4 +1,4 @@
-import type { MachineTokenType } from '../tokens/types';
+import type { AuthenticateRequestOptions, MachineTokenType, TokenType } from '../tokens/types';
 
 export const M2M_TOKEN_PREFIX = 'm2m_';
 export const OAUTH_TOKEN_PREFIX = 'oauth_access_';
@@ -25,3 +25,18 @@ export function getMachineTokenType(token: string): MachineTokenType {
 
   throw new Error('Unknown machine token type');
 }
+
+/**
+ * Check if a token type is accepted given a requested token type or list of token types.
+ */
+export const isTokenTypeAccepted = (
+  tokenType: TokenType,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+): boolean => {
+  if (acceptsToken === 'any') {
+    return true;
+  }
+
+  const tokenTypes = Array.isArray(acceptsToken) ? acceptsToken : [acceptsToken];
+  return tokenTypes.includes(tokenType);
+};
