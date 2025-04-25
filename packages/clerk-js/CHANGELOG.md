@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.62.2
+
+### Patch Changes
+
+- Bug fix: Use the same cache key for payment sources across checkout and profiles. ([#5706](https://github.com/clerk/javascript/pull/5706)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid laggy ui when closing drawer after canceling subscription. ([#5711](https://github.com/clerk/javascript/pull/5711)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: on session switch, revalidate cached commerce resources. ([#5712](https://github.com/clerk/javascript/pull/5712)) by [@panteliselef](https://github.com/panteliselef)
+
+- Revalidate payment sources from `<Checkout />` when a new payment source is added before the checkout is completed. ([#5709](https://github.com/clerk/javascript/pull/5709)) by [@panteliselef](https://github.com/panteliselef)
+
+- Invalidate invoices after successful checkout. ([#5717](https://github.com/clerk/javascript/pull/5717)) by [@panteliselef](https://github.com/panteliselef)
+
+- Incremental improvements for account funds in checkout. ([#5705](https://github.com/clerk/javascript/pull/5705)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Fixes CLS issues when rendering account funds
+  - Renames "accounts funds" to "payment sources" for consistency
+  - Auto opes the "Add a new payment source" drawer only if no payments sources exist
+
+- Update shortDate modifier to include year for future dates. ([#5707](https://github.com/clerk/javascript/pull/5707)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for 2 new OAuth error codes ([#5718](https://github.com/clerk/javascript/pull/5718)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f9c2dfa`](https://github.com/clerk/javascript/commit/f9c2dfa432ac0fe06aa3a8baa2cf14c450e9e42b), [`7cd1afa`](https://github.com/clerk/javascript/commit/7cd1afaa029e7ca3041d73f165af0f18079bbb44)]:
+  - @clerk/localizations@3.14.0
+
 ## 5.62.1
 
 ### Patch Changes
