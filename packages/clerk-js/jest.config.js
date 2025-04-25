@@ -7,6 +7,7 @@ const config = {
   globals: {
     __PKG_NAME__: '@clerk/clerk-js',
     __PKG_VERSION__: 'test',
+    __BUILD_VARIANT_CHIPS__: false,
   },
 
   testEnvironment: '<rootDir>/jest.jsdom-with-timezone.ts',
