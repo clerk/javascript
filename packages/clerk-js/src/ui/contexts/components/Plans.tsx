@@ -166,7 +166,10 @@ export const usePlansContext = () => {
           ? subscription.canceledAt
             ? localizationKeys('__experimental_commerce.reSubscribe')
             : localizationKeys('__experimental_commerce.manageSubscription')
-          : localizationKeys('__experimental_commerce.getStarted'),
+          : // If there are no active or grace period subscriptions, show the get started button
+            ctx.subscriptions.length > 0
+            ? localizationKeys('__experimental_commerce.switchPlan')
+            : localizationKeys('__experimental_commerce.getStarted'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
