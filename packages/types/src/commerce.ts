@@ -114,7 +114,7 @@ export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
   planId: string;
   paymentSourceId: string;
-  totals: __experimental_CommerceTotals;
+  totals: __experimental_CommerceInvoiceTotals;
   paymentDueOn: number;
   paidOn: number;
   status: __experimental_CommerceInvoiceStatus;
@@ -142,12 +142,16 @@ export interface __experimental_CommerceMoney {
   currencySymbol: string;
 }
 
-export interface __experimental_CommerceTotals {
+export interface __experimental_CommerceCheckoutTotals {
   subtotal: __experimental_CommerceMoney;
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
   totalDueNow: __experimental_CommerceMoney;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface __experimental_CommerceInvoiceTotals
+  extends Omit<__experimental_CommerceCheckoutTotals, 'totalDueNow'> {}
 
 export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
   planId: string;
@@ -167,7 +171,7 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   status: string;
-  totals: __experimental_CommerceTotals;
+  totals: __experimental_CommerceCheckoutTotals;
   subscription?: __experimental_CommerceSubscriptionResource;
   confirm: (params: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
