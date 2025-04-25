@@ -1,5 +1,26 @@
 # Change Log
 
+## 3.14.0
+
+### Minor Changes
+
+- Remove `not_allowed_access` localizations from `en_*` localization files to rely on more-specific API-based error messages. ([#5701](https://github.com/clerk/javascript/pull/5701)) by [@tmilewski](https://github.com/tmilewski)
+
+  Update and translate additional non-english `not_allowed_access` error messages.
+
+### Patch Changes
+
+- Simplify `form_identifier_not_found` localization to "We couldn't find an account with those details." ([#5700](https://github.com/clerk/javascript/pull/5700)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.13.14
+
+### Patch Changes
+
+- Make the `session_exists` error message more user-friendly and localize ([#5699](https://github.com/clerk/javascript/pull/5699)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+
 ## 3.13.13
 
 ### Patch Changes

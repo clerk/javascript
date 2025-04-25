@@ -1,5 +1,23 @@
 # Change Log
 
+## 6.18.0
+
+### Minor Changes
+
+- Adding reportTo and reportOnly configuration options to the contentSecurityPolicy config for clerkMiddleware ([#5702](https://github.com/clerk/javascript/pull/5702)) by [@jacekradko](https://github.com/jacekradko)
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Resolved an issue with Keyless on Safari where users appeared to be signed out immediately after a successful sign-in. ([#5696](https://github.com/clerk/javascript/pull/5696)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ba19465`](https://github.com/clerk/javascript/commit/ba194654b15d326bf0ab1b2bf0cab608042d20ec), [`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e), [`f0f1ed7`](https://github.com/clerk/javascript/commit/f0f1ed7ef3666bfc1cbf945326e94a51e83c4646), [`25c3502`](https://github.com/clerk/javascript/commit/25c35023ee995acbf8f5c8989619ebc176a366d6)]:
+  - @clerk/backend@1.30.0
+  - @clerk/types@4.55.1
+  - @clerk/clerk-react@5.30.0
+  - @clerk/shared@3.7.4
+
 ## 6.17.0
 
 ### Minor Changes

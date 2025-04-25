@@ -100,9 +100,8 @@ interface CardProps {
 
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const isDefaultLayout = pricingTableProps.layout === 'default';
-  const ctaPosition = (isDefaultLayout && pricingTableProps.ctaPosition) || 'top';
-  const collapseFeatures = (isDefaultLayout && pricingTableProps.collapseFeatures) || false;
+  const ctaPosition = pricingTableProps.ctaPosition || 'top';
+  const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug, isDefault, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;

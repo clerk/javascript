@@ -20,6 +20,10 @@ export const esMX: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -598,7 +602,7 @@ export const esMX: LocalizationResource = {
     form_identifier_exists__email_address: 'La dirección de correo ya existe.',
     form_identifier_exists__phone_number: 'El número de teléfono ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
-    form_identifier_not_found: 'No se encontró, puede estar mal escrito.',
+    form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'La dirección de correo debe ser válida.',
     form_param_format_invalid__phone_number: 'El número de teléfono debe ser en un formato válido internacional.',
@@ -619,7 +623,8 @@ export const esMX: LocalizationResource = {
     form_username_invalid_character: 'Carácter inválido.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
-    not_allowed_access: 'No tienes permiso para acceder a este recurso.',
+    not_allowed_access:
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -640,6 +645,7 @@ export const esMX: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, trata con otro.',
+    session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero puede ser más segura. Prueba añadiendo más caracteres.',
@@ -707,7 +713,7 @@ export const esMX: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

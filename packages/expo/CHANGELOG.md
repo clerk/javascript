@@ -1,5 +1,27 @@
 # Change Log
 
+## 2.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`110f8dd`](https://github.com/clerk/javascript/commit/110f8dd09bc4b45d192828c85fbb60d6a06ae22a), [`20e6257`](https://github.com/clerk/javascript/commit/20e62573429d8fae072bb22e7a6628f0aeeacbd1), [`eecb321`](https://github.com/clerk/javascript/commit/eecb3212e2fb726c3dd09c7809bdae7ec4f7e8ed), [`dab9acd`](https://github.com/clerk/javascript/commit/dab9acdd5674104e100c7f5a580d3859dff2de79), [`8145835`](https://github.com/clerk/javascript/commit/814583546e7a44acb502387cd7d94119c6611030), [`da17a96`](https://github.com/clerk/javascript/commit/da17a967a2bab067db1e20549256af70f8d26dea), [`85e448e`](https://github.com/clerk/javascript/commit/85e448e2a6f1905f0b44a43142b3274f9cf9fc03), [`3cdbea0`](https://github.com/clerk/javascript/commit/3cdbea094685be77a63961b0643da127b91a253f)]:
+  - @clerk/clerk-js@5.62.2
+  - @clerk/clerk-react@5.30.0
+
+## 2.10.0
+
+### Minor Changes
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`d8f67be`](https://github.com/clerk/javascript/commit/d8f67be58a9c29f6cd30438149a72cd581e2e18e), [`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e), [`f0f1ed7`](https://github.com/clerk/javascript/commit/f0f1ed7ef3666bfc1cbf945326e94a51e83c4646), [`25c3502`](https://github.com/clerk/javascript/commit/25c35023ee995acbf8f5c8989619ebc176a366d6)]:
+  - @clerk/clerk-js@5.62.1
+  - @clerk/types@4.55.1
+  - @clerk/clerk-react@5.30.0
+  - @clerk/shared@3.7.4
+
 ## 2.9.15
 
 ### Patch Changes

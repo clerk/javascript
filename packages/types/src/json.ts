@@ -648,7 +648,7 @@ export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
   payment_source_id: string;
   plan_id: string;
   status: __experimental_CommerceInvoiceStatus;
-  totals: __experimental_CommerceTotalsJSON;
+  totals: __experimental_CommerceInvoiceTotalsJSON;
 }
 
 export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
@@ -670,12 +670,16 @@ export interface __experimental_CommerceMoneyJSON {
   currency_symbol: string;
 }
 
-export interface __experimental_CommerceTotalsJSON {
+export interface __experimental_CommerceCheckoutTotalsJSON {
   grand_total: __experimental_CommerceMoneyJSON;
   subtotal: __experimental_CommerceMoneyJSON;
   tax_total: __experimental_CommerceMoneyJSON;
-  total_due_now?: __experimental_CommerceMoneyJSON;
+  total_due_now: __experimental_CommerceMoneyJSON;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface __experimental_CommerceInvoiceTotalsJSON
+  extends Omit<__experimental_CommerceCheckoutTotalsJSON, 'total_due_now'> {}
 
 export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   object: 'commerce_checkout';
@@ -688,5 +692,5 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;
   status: string;
   subscription?: __experimental_CommerceSubscriptionJSON;
-  totals: __experimental_CommerceTotalsJSON;
+  totals: __experimental_CommerceCheckoutTotalsJSON;
 }

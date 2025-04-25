@@ -4,7 +4,7 @@ import { usePlansContext } from '../../contexts';
 import { Badge, Box, Button, localizationKeys, Span, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 
 export function SubscriptionsList() {
-  const { subscriptions, handleSelectPlan, buttonPropsForPlan } = usePlansContext();
+  const { subscriptions, handleSelectPlan, buttonPropsForPlan, shouldDisplayPlanButton } = usePlansContext();
 
   const handleSelectSubscription = (subscription: __experimental_CommerceSubscriptionResource) => {
     handleSelectPlan({
@@ -25,7 +25,7 @@ export function SubscriptionsList() {
       </Thead>
       <Tbody>
         {subscriptions.map(subscription => (
-          <Tr key={subscription.plan.id}>
+          <Tr key={subscription.id}>
             <Td>
               <Box
                 sx={t => ({
@@ -68,12 +68,14 @@ export function SubscriptionsList() {
                 textAlign: 'right',
               })}
             >
-              <Button
-                size='xs'
-                textVariant='buttonSmall'
-                onClick={() => handleSelectSubscription(subscription)}
-                {...buttonPropsForPlan({ plan: subscription.plan })}
-              />
+              {shouldDisplayPlanButton({ subscription }) && (
+                <Button
+                  size='xs'
+                  textVariant='buttonSmall'
+                  onClick={() => handleSelectSubscription(subscription)}
+                  {...buttonPropsForPlan({ subscription })}
+                />
+              )}
             </Td>
           </Tr>
         ))}

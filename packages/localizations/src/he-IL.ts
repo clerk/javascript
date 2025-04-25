@@ -20,6 +20,10 @@ export const heIL: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -585,7 +589,7 @@ export const heIL: LocalizationResource = {
     form_identifier_exists__email_address: 'כתובת המייל הזאת כבר תפוסה. אנא נסה אחרת.',
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'לא ניתן למצוא חשבון עם אלו הפרטים.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'כתובת האימייל חייבת להיות כתובת אימייל תקינה.',
     form_param_format_invalid__phone_number: 'מספר הטלפון חייב להיות בפורמט בינלאומי תקין.',
@@ -606,7 +610,8 @@ export const heIL: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'לא ניתן למחוק את הזיהוי האחרון שלך.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "האימייל או מספר הטלפון אינו מותר להרשמה. זה עשוי להיות בגלל השימוש ב-'+', '=', '#' או '.' בכתובת האימייל שלך, השימוש בתחום המחובר לשירות אימייל זמני או הפרסט בכתובת האימייל שלך. אם מחזרים שגיאה, נא ליצור קשר עם תמיכה.",
     organization_domain_blocked: 'הדומיין של ספק האימייל הזה חסום. אנא נסה אחד שונה.',
     organization_domain_common: 'הדומיין של ספק האימייל הזה נפוץ. אנא נסה אחד שונה.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -627,6 +632,7 @@ export const heIL: LocalizationResource = {
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
+    session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
@@ -694,7 +700,7 @@ export const heIL: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

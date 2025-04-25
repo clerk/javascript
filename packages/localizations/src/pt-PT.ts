@@ -20,6 +20,10 @@ export const ptPT: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -592,7 +596,7 @@ export const ptPT: LocalizationResource = {
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
-    form_identifier_not_found: 'Identificador não encontrado.',
+    form_identifier_not_found: 'Não foi possível encontrar uma conta com esses detalhes.',
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',
@@ -614,7 +618,8 @@ export const ptPT: LocalizationResource = {
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -635,6 +640,7 @@ export const ptPT: LocalizationResource = {
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
+    session_exists: 'Já está conectado.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
@@ -702,7 +708,7 @@ export const ptPT: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

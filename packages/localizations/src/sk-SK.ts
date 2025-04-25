@@ -20,6 +20,10 @@ export const skSK: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -592,7 +596,7 @@ export const skSK: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nie je možné nájsť účet s tými istými údajmi.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -612,7 +616,8 @@ export const skSK: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Adresa e-mailu alebo telefónneho čísla nie je povolená pre registráciu. Toto môže byť spôsobené použitím '+', '=', '#' alebo '.' v adresári e-mailu, použitím domény, ktorá je pripojená k dočasnej e-mailovej službe, alebo explicitnému vylúčeniu.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -633,6 +638,7 @@ export const skSK: LocalizationResource = {
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
@@ -700,7 +706,7 @@ export const skSK: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
