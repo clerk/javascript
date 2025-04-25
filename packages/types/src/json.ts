@@ -677,6 +677,7 @@ export interface __experimental_CommerceCheckoutTotalsJSON {
   total_due_now: __experimental_CommerceMoneyJSON;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface __experimental_CommerceInvoiceTotalsJSON
   extends Omit<__experimental_CommerceCheckoutTotalsJSON, 'total_due_now'> {}
 

@@ -149,6 +149,7 @@ export interface __experimental_CommerceCheckoutTotals {
   totalDueNow: __experimental_CommerceMoney;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface __experimental_CommerceInvoiceTotals
   extends Omit<__experimental_CommerceCheckoutTotals, 'totalDueNow'> {}
 
