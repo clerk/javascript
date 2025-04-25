@@ -27,7 +27,7 @@ import {
   type OrganizationSyncTarget,
   RefreshTokenErrorReason,
 } from '../request';
-import type { AuthenticateRequestOptions, NonSessionTokenType, OrganizationSyncOptions } from '../types';
+import type { AuthenticateRequestOptions, MachineTokenType, OrganizationSyncOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -246,7 +246,7 @@ expect.extend({
   toBeMachineUnauthenticated(
     received,
     expected: {
-      tokenType: NonSessionTokenType;
+      tokenType: MachineTokenType;
       reason: AuthReason;
       message: string;
     },
@@ -274,7 +274,7 @@ expect.extend({
   toBeMachineUnauthenticatedToAuth(
     received,
     expected: {
-      tokenType: NonSessionTokenType;
+      tokenType: MachineTokenType;
     },
   ) {
     const pass =
