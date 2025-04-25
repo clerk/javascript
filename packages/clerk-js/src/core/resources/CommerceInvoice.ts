@@ -2,7 +2,7 @@ import type {
   __experimental_CommerceInvoiceJSON,
   __experimental_CommerceInvoiceResource,
   __experimental_CommerceInvoiceStatus,
-  __experimental_CommerceTotals,
+  __experimental_CommerceInvoiceTotals,
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
@@ -15,7 +15,7 @@ export class __experimental_CommerceInvoice extends BaseResource implements __ex
   paymentDueOn!: number;
   paidOn!: number;
   status!: __experimental_CommerceInvoiceStatus;
-  totals!: __experimental_CommerceTotals;
+  totals!: __experimental_CommerceInvoiceTotals;
 
   constructor(data: __experimental_CommerceInvoiceJSON) {
     super();
