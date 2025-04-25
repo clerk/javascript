@@ -52,8 +52,7 @@ export const getAuthDataFromRequestSync = (
   };
 
   // Only accept session tokens in sync version
-  const acceptsToken = opts.acceptsToken ?? 'session_token';
-  if (acceptsToken !== 'session_token' && acceptsToken !== 'any') {
+  if (!isTokenTypeAccepted('session_token', opts.acceptsToken || 'session_token')) {
     return signedOutAuthObject(options);
   }
 
@@ -78,7 +77,7 @@ export const getAuthDataFromRequestAsync = async (
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
-  const acceptsToken = opts.acceptsToken ?? 'session_token';
+  const acceptsToken = opts.acceptsToken || 'session_token';
 
   if (bearerToken && isMachineToken(bearerToken)) {
     const tokenType = getMachineTokenType(bearerToken);
