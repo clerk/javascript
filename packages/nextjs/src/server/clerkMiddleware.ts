@@ -7,7 +7,14 @@ import type {
   SignedInAuthObject,
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
@@ -191,11 +198,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
-        redirectToSignIn,
-        redirectToSignUp,
-      });
-      const authHandler = () => Promise.resolve(authObjWithMethods);
+      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -377,6 +380,51 @@ const createMiddlewareProtect = (
 
     return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
   }) as unknown as Promise<AuthProtect>;
+};
+
+const createMiddlewareAuthHandler = (
+  authObject: AuthObject,
+  redirectToSignIn: RedirectFun<Response>,
+  redirectToSignUp: RedirectFun<Response>,
+): ClerkMiddlewareAuth => {
+  const authObjWithMethods = Object.assign(
+    authObject,
+    authObject.tokenType === 'session_token'
+      ? {
+          redirectToSignIn,
+          redirectToSignUp,
+        }
+      : {},
+  );
+
+  const authHandler = async (
+    options = {
+      acceptsToken: 'session_token',
+    },
+  ) => {
+    const acceptsToken = options.acceptsToken;
+
+    if (acceptsToken === 'any') {
+      return authObjWithMethods;
+    }
+
+    const tokenTypes = Array.isArray(acceptsToken) ? acceptsToken : [acceptsToken];
+    if (!tokenTypes.includes(authObject.tokenType)) {
+      if (authObject.tokenType === 'session_token') {
+        return {
+          ...signedOutAuthObject(),
+          redirectToSignIn,
+          redirectToSignUp,
+        };
+      }
+
+      return unauthenticatedMachineObject(authObject.tokenType);
+    }
+
+    return authObjWithMethods;
+  };
+
+  return authHandler as ClerkMiddlewareAuth;
 };
 
 // Handle errors thrown by protect() and redirectToSignIn() calls,

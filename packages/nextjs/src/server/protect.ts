@@ -121,12 +121,10 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    // Check if the token type matches the requested token or array of requested tokens
+    // Check if the token type matches the requested token
     if (requestedToken) {
-      if (Array.isArray(requestedToken) && !requestedToken.includes(authObject.tokenType)) {
-        return handleUnauthorized();
-      }
-      if (authObject.tokenType !== requestedToken) {
+      const tokenTypes = Array.isArray(requestedToken) ? requestedToken : [requestedToken];
+      if (!tokenTypes.includes(authObject.tokenType)) {
         return handleUnauthorized();
       }
       return authObject;
