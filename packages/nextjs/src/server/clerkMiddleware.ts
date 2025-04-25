@@ -402,8 +402,8 @@ const createMiddlewareAuthHandler = (
       : {},
   );
 
-  const authHandler = async (options: GetAuthOptions) => {
-    const acceptsToken = options.acceptsToken || 'session_token';
+  const authHandler = async (options?: GetAuthOptions) => {
+    const acceptsToken = options?.acceptsToken ?? 'session_token';
 
     if (acceptsToken === 'any') {
       return authObjWithMethods;
