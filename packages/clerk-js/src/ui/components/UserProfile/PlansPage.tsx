@@ -8,7 +8,15 @@ export const PlansPage = withPlans(() => {
 
   return (
     <>
-      <Header.Root sx={t => ({ marginBlockEnd: t.space.$4 })}>
+      <Header.Root
+        sx={t => ({
+          borderBottomWidth: t.borderWidths.$normal,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$neutralAlpha100,
+          marginBlockEnd: t.space.$4,
+          paddingBlockEnd: t.space.$4,
+        })}
+      >
         <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
           <Header.Title
             localizationKey='Available Plans'
