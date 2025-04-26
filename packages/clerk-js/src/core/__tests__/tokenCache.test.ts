@@ -1,10 +1,11 @@
 import type { TokenResource } from '@clerk/types';
+import { describe, it, beforeAll, afterAll, expect, vi } from 'vitest';
 
 import { Token } from '../resources/internal';
 import { SessionTokenCache } from '../tokenCache';
 
 // This is required since abstract TS methods are undefined in Jest
-jest.mock('../resources/Base', () => {
+vi.mock('../resources/Base', () => {
   class BaseResource {}
 
   return {
@@ -17,11 +18,11 @@ const jwt =
 
 describe('MemoryTokenCache', () => {
   beforeAll(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('clear()', () => {
@@ -87,7 +88,7 @@ describe('MemoryTokenCache', () => {
     expect(isResolved).toBe(false);
 
     // Wait tokenResolver to resolve
-    jest.advanceTimersByTime(100);
+    vi.advanceTimersByTime(100);
     await tokenResolver;
 
     // Cache is not empty, retrieve the resolved tokenResolver
@@ -98,7 +99,7 @@ describe('MemoryTokenCache', () => {
     });
 
     // Advance the timer to force the JWT expiration
-    jest.advanceTimersByTime(60 * 1000);
+    vi.advanceTimersByTime(60 * 1000);
 
     // Cache is empty, tokenResolver has been removed due to JWT expiration
     expect(cache.get(key)).toBeUndefined();
@@ -125,11 +126,11 @@ describe('MemoryTokenCache', () => {
       expect(cache.get(key)).toMatchObject(key);
 
       // 44s since token created
-      jest.advanceTimersByTime(45 * 1000);
+      vi.advanceTimersByTime(45 * 1000);
       expect(cache.get(key)).toMatchObject(key);
 
       // 46s since token created
-      jest.advanceTimersByTime(1 * 1000);
+      vi.advanceTimersByTime(1 * 1000);
       expect(cache.get(key)).toBeUndefined();
     });
 
@@ -150,15 +151,15 @@ describe('MemoryTokenCache', () => {
       expect(cache.get(key)).toMatchObject(key);
 
       // 45s since token created
-      jest.advanceTimersByTime(45 * 1000);
+      vi.advanceTimersByTime(45 * 1000);
       expect(cache.get(key, 0)).toMatchObject(key);
 
       // 54s since token created
-      jest.advanceTimersByTime(9 * 1000);
+      vi.advanceTimersByTime(9 * 1000);
       expect(cache.get(key, 0)).toMatchObject(key);
 
       // 55s since token created
-      jest.advanceTimersByTime(1 * 1000);
+      vi.advanceTimersByTime(1 * 1000);
       expect(cache.get(key, 0)).toBeUndefined();
     });
   });

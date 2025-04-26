@@ -1,4 +1,5 @@
 import { camelToSnake } from '@clerk/shared/underscore';
+import { describe, it } from 'vitest';
 
 import { getQueryParams, stringifyQueryParams } from '../querystring';
 

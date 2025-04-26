@@ -1,16 +1,17 @@
 import { renderHook } from '@testing-library/react';
+import { describe, expect, test, vi } from 'vitest';
 
 import { useSupportEmail } from '../useSupportEmail';
 
-const mockUseOptions = jest.fn();
-const mockUseEnvironment = jest.fn();
+const mockUseOptions = vi.fn();
+const mockUseEnvironment = vi.fn();
 
-jest.mock('@clerk/shared/react', () => ({
+vi.mock('@clerk/shared/react', () => ({
   useClerk: () => ({
     publishableKey: 'pk_live_Y2xlcmsuY2xlcmsuY29tJA',
   }),
 }));
-jest.mock('../../contexts', () => {
+vi.mock('../../contexts', () => {
   return {
     useEnvironment: () => mockUseEnvironment(),
     useOptions: () => mockUseOptions(),

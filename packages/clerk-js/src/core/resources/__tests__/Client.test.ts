@@ -1,4 +1,5 @@
 import type { ClientJSON, ClientJSONSnapshot } from '@clerk/types';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '../../test/fixtures';
 import { BaseResource, Client } from '../internal';
@@ -16,12 +17,12 @@ describe('Client Singleton', () => {
         sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
         sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
         sessions: [session],
-        created_at: jest.now() - 1000,
-        updated_at: jest.now(),
+        created_at: Date.now() - 1000,
+        updated_at: Date.now(),
       } as any;
 
       // @ts-expect-error This is a private method that we are mocking
-      BaseResource._baseFetch = jest.fn();
+      BaseResource._baseFetch = vi.fn();
 
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
       await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
@@ -46,12 +47,12 @@ describe('Client Singleton', () => {
         sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
         sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
         sessions: [session],
-        created_at: jest.now() - 1000,
-        updated_at: jest.now(),
+        created_at: Date.now() - 1000,
+        updated_at: Date.now(),
       } as any;
 
       // @ts-expect-error This is a private method that we are mocking
-      BaseResource._baseFetch = jest.fn().mockResolvedValueOnce(Promise.resolve(null));
+      BaseResource._baseFetch = vi.fn().mockResolvedValueOnce(Promise.resolve(null));
 
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
       await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
@@ -78,14 +79,14 @@ describe('Client Singleton', () => {
       sign_in: createSignIn({ id: 'test_sign_in_id' }, user),
       sign_up: createSignUp({ id: 'test_sign_up_id' }), //  This is only for testing purposes, this will never happen
       sessions: [session],
-      created_at: jest.now() - 1000,
-      updated_at: jest.now(),
+      created_at: Date.now() - 1000,
+      updated_at: Date.now(),
     };
 
     const destroyedSession = createSession(
       {
         id: 'test_session_id',
-        abandon_at: jest.now(),
+        abandon_at: Date.now(),
         status: 'ended',
         last_active_token: undefined,
       },
@@ -99,12 +100,12 @@ describe('Client Singleton', () => {
       sign_in: null,
       sign_up: null,
       sessions: [destroyedSession],
-      created_at: jest.now() - 1000,
-      updated_at: jest.now(),
+      created_at: Date.now() - 1000,
+      updated_at: Date.now(),
     };
 
     // @ts-expect-error This is a private method that we are mocking
-    BaseResource._fetch = jest.fn().mockReturnValue(
+    BaseResource._fetch = vi.fn().mockReturnValue(
       Promise.resolve({
         client: null,
         response: clientObjectDeletedJSON,

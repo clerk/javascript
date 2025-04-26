@@ -1,10 +1,12 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { getSecureAttribute } from '../getSecureAttribute';
 
 describe('getSecureAttribute', () => {
   let windowSpy: any;
 
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get');
+    windowSpy = vi.spyOn(window, 'window', 'get');
   });
 
   afterEach(() => {

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { getCookieDomain as _getCookieDomain } from '../getCookieDomain';
 
 type CookieHandler = NonNullable<Parameters<typeof _getCookieDomain>[1]>;
@@ -6,7 +8,7 @@ describe('getCookieDomain', () => {
   let getCookieDomain: typeof _getCookieDomain;
   beforeEach(async () => {
     // We're dynamically importing getCookieDomain here to reset the module-level cache
-    jest.resetModules();
+    vi.resetModules();
     getCookieDomain = await import('../getCookieDomain').then(m => m.getCookieDomain);
   });
 
@@ -20,14 +22,14 @@ describe('getCookieDomain', () => {
     // assume that the Public Suffix List is correctly handled by the browser.
     const hostname = 'app.fr.hosting.co.uk';
     const handler: CookieHandler = {
-      get: jest
+      get: vi
         .fn()
         .mockReturnValueOnce(undefined)
         .mockReturnValueOnce(undefined)
         .mockReturnValueOnce(undefined)
         .mockReturnValueOnce('1'),
-      set: jest.fn().mockReturnValue(undefined),
-      remove: jest.fn().mockReturnValue(undefined),
+      set: vi.fn().mockReturnValue(undefined),
+      remove: vi.fn().mockReturnValue(undefined),
     };
     const result = getCookieDomain(hostname, handler);
     expect(result).toBe(hostname);
@@ -53,9 +55,9 @@ describe('getCookieDomain', () => {
 
   it('returns undefined if the domain could not be determined', () => {
     const handler: CookieHandler = {
-      get: jest.fn().mockReturnValue(undefined),
-      set: jest.fn().mockReturnValue(undefined),
-      remove: jest.fn().mockReturnValue(undefined),
+      get: vi.fn().mockReturnValue(undefined),
+      set: vi.fn().mockReturnValue(undefined),
+      remove: vi.fn().mockReturnValue(undefined),
     };
     const hostname = 'app.hello.co.uk';
     const result = getCookieDomain(hostname, handler);
@@ -65,9 +67,9 @@ describe('getCookieDomain', () => {
   it('uses cached value if there is one', () => {
     const hostname = 'clerk.com';
     const handler: CookieHandler = {
-      get: jest.fn().mockReturnValue('1'),
-      set: jest.fn().mockReturnValue(undefined),
-      remove: jest.fn().mockReturnValue(undefined),
+      get: vi.fn().mockReturnValue('1'),
+      set: vi.fn().mockReturnValue(undefined),
+      remove: vi.fn().mockReturnValue(undefined),
     };
     expect(getCookieDomain(hostname, handler)).toBe(hostname);
     expect(getCookieDomain(hostname, handler)).toBe(hostname);

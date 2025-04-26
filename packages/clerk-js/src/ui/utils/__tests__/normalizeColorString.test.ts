@@ -1,12 +1,14 @@
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { normalizeColorString } from '../normalizeColorString';
 
 describe('normalizeColorString', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => {}) as jest.Mock;
+    vi.spyOn(console, 'warn').mockImplementation(() => {}) as vi.Mock;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Hex color tests
@@ -34,7 +36,7 @@ describe('normalizeColorString', () => {
     expect(normalizeColorString('#12')).toBe('#12');
     expect(console.warn).toHaveBeenCalledTimes(1);
 
-    (console.warn as jest.Mock).mockClear();
+    (console.warn as vi.Mock).mockClear();
     expect(normalizeColorString('#12345')).toBe('#12345');
     expect(console.warn).toHaveBeenCalledTimes(1);
   });
@@ -78,11 +80,11 @@ describe('normalizeColorString', () => {
     expect(normalizeColorString('')).toBe('');
     expect(console.warn).toHaveBeenCalledTimes(1);
 
-    (console.warn as jest.Mock).mockClear();
+    (console.warn as vi.Mock).mockClear();
     expect(normalizeColorString('invalid')).toBe('invalid');
     expect(console.warn).toHaveBeenCalledTimes(1);
 
-    (console.warn as jest.Mock).mockClear();
+    (console.warn as vi.Mock).mockClear();
     expect(normalizeColorString('rgb(255,0)')).toBe('rgb(255,0)');
     expect(console.warn).toHaveBeenCalledTimes(1);
   });
@@ -91,7 +93,7 @@ describe('normalizeColorString', () => {
     expect(normalizeColorString(null as any)).toBe('');
     expect(console.warn).toHaveBeenCalledTimes(1);
 
-    (console.warn as jest.Mock).mockClear();
+    (console.warn as vi.Mock).mockClear();
     expect(normalizeColorString(123 as any)).toBe(123 as any);
     expect(console.warn).toHaveBeenCalledTimes(1);
   });

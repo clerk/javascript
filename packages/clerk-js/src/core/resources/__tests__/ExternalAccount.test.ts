@@ -1,4 +1,5 @@
 import { BaseResource, ExternalAccount } from '../internal';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('External account', () => {
   it('reauthorize', async () => {
@@ -10,7 +11,7 @@ describe('External account', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
 
     const externalAccount = new ExternalAccount({ id: targetId }, '/me/external_accounts');
     await externalAccount.reauthorize({ additionalScopes: ['read', 'write'], redirectUrl: 'https://test.com' });
@@ -36,7 +37,7 @@ describe('External account', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
 
     const externalAccount = new ExternalAccount({ id: targetId }, '/me/external_accounts');
     await externalAccount.destroy();

@@ -1,4 +1,5 @@
 import type { InstanceType } from '@clerk/types';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest';
 
 import { SUPPORTED_FAPI_VERSION } from '../constants';
 import { createFapiClient } from '../fapiClient';
@@ -25,10 +26,10 @@ type RecursivePartial<T> = {
 };
 
 // @ts-ignore -- We don't need to fully satisfy the fetch types for the sake of this mock
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve<RecursivePartial<Response>>({
     headers: {
-      get: jest.fn(() => 'sess_43'),
+      get: vi.fn(() => 'sess_43'),
     },
     json: () => Promise.resolve({ foo: 42 }),
   }),
@@ -54,7 +55,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  (global.fetch as jest.Mock).mockClear();
+  (global.fetch as vi.Mock).mockClear();
 });
 
 afterAll(() => {
@@ -184,10 +185,10 @@ describe('request', () => {
   });
 
   it('returns array response as array', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce(
+    (global.fetch as vi.Mock).mockResolvedValueOnce(
       Promise.resolve<RecursivePartial<Response>>({
         headers: {
-          get: jest.fn(() => 'sess_43'),
+          get: vi.fn(() => 'sess_43'),
         },
         json: () => Promise.resolve([{ foo: 42 }]),
       }),
@@ -201,7 +202,7 @@ describe('request', () => {
   });
 
   it('handles the empty body on 204 response, returning null', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce(
+    (global.fetch as vi.Mock).mockResolvedValueOnce(
       Promise.resolve<RecursivePartial<Response>>({
         status: 204,
         json: () => {

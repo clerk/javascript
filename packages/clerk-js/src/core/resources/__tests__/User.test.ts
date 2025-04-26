@@ -1,4 +1,5 @@
 import type { UserJSON } from '@clerk/types';
+import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';
 import { User } from '../User';
@@ -14,7 +15,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: externalAccountJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -49,7 +50,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -148,7 +149,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -176,7 +177,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: totpJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -203,7 +204,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -229,7 +230,7 @@ describe('User', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: backupCodeJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: backupCodeJSON }));
 
     const user = new User({
       email_addresses: [],
@@ -270,7 +271,7 @@ describe('User', () => {
 
   it('.updatePassword triggers a request to change password', async () => {
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: {} }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
 
     const user = new User({} as unknown as UserJSON);
     const params = {
@@ -289,7 +290,7 @@ describe('User', () => {
 
   it('.removePassword triggers a request to remove password', async () => {
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: {} }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: {} }));
 
     const user = new User({} as unknown as UserJSON);
     const params = {

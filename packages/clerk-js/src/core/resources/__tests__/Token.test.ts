@@ -1,4 +1,5 @@
 import type { InstanceType } from '@clerk/types';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
@@ -17,7 +18,7 @@ const baseFapiClientOptions = {
 describe('Token', () => {
   describe('create', () => {
     afterEach(() => {
-      (global.fetch as jest.Mock)?.mockClear();
+      (global.fetch as Mock)?.mockClear();
       BaseResource.clerk = null as any;
     });
 
@@ -49,7 +50,7 @@ describe('Token', () => {
           writable: true,
           value: false,
         });
-        warnSpy = jest.spyOn(console, 'warn').mockReturnValue();
+        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {

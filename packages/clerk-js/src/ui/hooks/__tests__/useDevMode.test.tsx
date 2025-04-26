@@ -1,20 +1,21 @@
 import type { EnvironmentResource } from '@clerk/types';
 import { renderHook } from '@testing-library/react';
+import { describe, expect, test, vi } from 'vitest';
 
 import { useDevMode } from '../useDevMode';
 
-const mockUseEnvironment = jest.fn();
-const mockUseOptions = jest.fn();
-const mockUseAppearance = jest.fn();
+const mockUseEnvironment = vi.fn();
+const mockUseOptions = vi.fn();
+const mockUseAppearance = vi.fn();
 
-jest.mock('../../contexts', () => {
+vi.mock('../../contexts', () => {
   return {
     useEnvironment: () => mockUseEnvironment(),
     useOptions: () => mockUseOptions(),
   };
 });
 
-jest.mock('../../customizables', () => {
+vi.mock('../../customizables', () => {
   return {
     useAppearance: () => mockUseAppearance(),
   };

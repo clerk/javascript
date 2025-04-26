@@ -1,5 +1,7 @@
 // TODO: jest fails because of a circular dependency on Client -> Base -> Client
 // This circular dep is a known issue we plan to address soon. Enable the tests then
+import { describe, it } from 'vitest';
+
 describe.skip('memoizeStateListenerCallback', () => {
   it.skip('runs', () => {
     // TODO

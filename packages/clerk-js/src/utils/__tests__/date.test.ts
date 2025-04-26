@@ -1,13 +1,14 @@
 import { unixEpochToDate } from '../date';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 describe('date utilities', () => {
   beforeAll(() => {
-    jest.useFakeTimers('modern');
-    jest.setSystemTime();
+    vi.useFakeTimers();
+    vi.setSystemTime(Date.now());
   });
 
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('unixEpochToDate', () => {

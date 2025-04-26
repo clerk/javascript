@@ -1,4 +1,4 @@
-import { describe } from '@jest/globals';
+import { describe, it } from 'vitest';
 
 import { createDynamicParamParser } from '../dynamicParamParser';
 

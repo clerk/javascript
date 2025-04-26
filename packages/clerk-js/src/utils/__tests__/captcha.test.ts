@@ -1,4 +1,5 @@
 import { shouldRetryTurnstileErrorCode } from '../captcha/turnstile';
+import { describe, it } from 'vitest';
 
 describe('shouldRetryTurnstileErrorCode', () => {
   it.each([

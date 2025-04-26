@@ -1,13 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Clerk } from '../../../core/clerk';
 import { PathRouter, Route, useRouter } from '..';
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('@clerk/shared/react', () => {
+vi.mock('@clerk/shared/react', () => {
   return {
     useClerk: () => {
       return {

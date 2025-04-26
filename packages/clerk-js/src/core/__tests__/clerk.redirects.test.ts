@@ -2,28 +2,29 @@ import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import type { DisplayConfig } from '../resources/internal';
 import { Client, Environment } from '../resources/internal';
+import { describe, it, expect, beforeEach, afterEach, afterAll, vi } from 'vitest';
 
-const mockClientFetch = jest.fn();
-const mockEnvironmentFetch = jest.fn();
+const mockClientFetch = vi.fn();
+const mockEnvironmentFetch = vi.fn();
 
-jest.mock('../resources/Client');
-jest.mock('../resources/Environment');
+vi.mock('../resources/Client');
+vi.mock('../resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('../auth/devBrowser', () => ({
+vi.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
-    clear: jest.fn(),
-    setup: jest.fn(),
-    getDevBrowserJWT: jest.fn(() => 'deadbeef'),
-    setDevBrowserJWT: jest.fn(),
-    removeDevBrowserJWT: jest.fn(),
+    clear: vi.fn(),
+    setup: vi.fn(),
+    getDevBrowserJWT: vi.fn(() => 'deadbeef'),
+    setDevBrowserJWT: vi.fn(),
+    removeDevBrowserJWT: vi.fn(),
   }),
 }));
 
-Client.getOrCreateInstance = jest.fn().mockImplementation(() => {
+Client.getOrCreateInstance = vi.fn().mockImplementation(() => {
   return { fetch: mockClientFetch };
 });
-Environment.getInstance = jest.fn().mockImplementation(() => {
+Environment.getInstance = vi.fn().mockImplementation(() => {
   return { fetch: mockEnvironmentFetch };
 });
 
@@ -59,14 +60,14 @@ const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZ
 const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
 describe('Clerk singleton - Redirects', () => {
-  const mockNavigate = jest.fn((to: string) => Promise.resolve(to));
+  const mockNavigate = vi.fn((to: string) => Promise.resolve(to));
   const mockedLoadOptions = { routerPush: mockNavigate, routerReplace: mockNavigate };
 
   let mockWindowLocation;
-  let mockHref: jest.Mock;
+  let mockHref: vi.Mock;
 
   beforeEach(() => {
-    mockHref = jest.fn();
+    mockHref = vi.fn();
     mockWindowLocation = {
       host: 'test.host',
       hostname: 'test.host',

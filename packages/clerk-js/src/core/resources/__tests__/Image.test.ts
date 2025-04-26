@@ -1,5 +1,6 @@
 import { Image } from '../Image';
 import { BaseResource } from '../internal';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('Image', () => {
   it('.create returns the newly created image', async () => {
@@ -10,7 +11,7 @@ describe('Image', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(
+    BaseResource._fetch = vi.fn().mockReturnValue(
       Promise.resolve({
         client: {},
         response: mockResponse,

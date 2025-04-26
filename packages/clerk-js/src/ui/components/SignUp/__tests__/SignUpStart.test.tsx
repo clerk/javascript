@@ -1,5 +1,6 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
+import { vi } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
@@ -297,7 +298,7 @@ describe('SignUpStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(
@@ -332,7 +333,7 @@ describe('SignUpStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(
@@ -372,7 +373,7 @@ describe('SignUpStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(

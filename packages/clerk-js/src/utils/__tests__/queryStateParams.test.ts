@@ -1,4 +1,5 @@
 import { appendModalState } from '../queryStateParams';
+import { describe, it } from 'vitest';
 
 describe('appendModalState function', () => {
   it('returns url with query param', () => {

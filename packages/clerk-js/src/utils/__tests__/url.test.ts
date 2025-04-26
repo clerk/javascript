@@ -1,5 +1,6 @@
 import { logger } from '@clerk/shared/logger';
 import type { SignUpResource } from '@clerk/types';
+import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import {
   buildURL,
@@ -148,7 +149,7 @@ describe('hasBannedProtocol(url)', () => {
 
 describe('buildURL(options: URLParams, skipOrigin)', () => {
   it('builds a URL()', () => {
-    expect(buildURL({}, { stringify: true })).toBe('http://localhost/');
+    expect(buildURL({}, { stringify: true })).toBe('http://localhost:3000/');
     expect(
       buildURL(
         {
@@ -158,7 +159,7 @@ describe('buildURL(options: URLParams, skipOrigin)', () => {
         },
         { stringify: true },
       ),
-    ).toBe('http://localhost/my-path?my-search#my-hash?my-hashed-search');
+    ).toBe('http://localhost:3000/my-path?my-search#my-hash?my-hashed-search');
     expect(
       buildURL(
         {
@@ -499,7 +500,7 @@ describe('isAllowedRedirect', () => {
     ['..//evil.com', ['https://www.clerk.com'], false],
   ];
 
-  const warnMock = jest.spyOn(logger, 'warnOnce');
+  const warnMock = vi.spyOn(logger, 'warnOnce');
 
   beforeEach(() => warnMock.mockClear());
   afterAll(() => warnMock.mockRestore());
@@ -516,11 +517,7 @@ describe('createAllowedRedirectOrigins', () => {
     const allowedRedirectOriginsValuesUndefined = createAllowedRedirectOrigins(undefined, frontendApi, 'production');
     const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi, 'production');
 
-    const expectedAllowedRedirectOrigins = [
-      'http://localhost', // Current location
-      `https://example.com`, // Primary domain
-      `https://*.example.com`, // Wildcard subdomains
-    ];
+    const expectedAllowedRedirectOrigins = ['http://localhost:3000', `https://example.com`, `https://*.example.com`];
 
     expect(allowedRedirectOriginsValuesUndefined).toEqual(expectedAllowedRedirectOrigins);
     expect(allowedRedirectOriginsValuesEmptyArray).toEqual(expectedAllowedRedirectOrigins);
@@ -532,10 +529,10 @@ describe('createAllowedRedirectOrigins', () => {
     const allowedRedirectOriginsValuesEmptyArray = createAllowedRedirectOrigins([], frontendApi, 'development');
 
     const expectedAllowedRedirectOrigins = [
-      'http://localhost', // Current location
-      `https://foo-bar-42.accounts.dev`, // Account Portal
-      `https://*.foo-bar-42.accounts.dev`, // Account Portal subdomains
-      `https://foo-bar-42.clerk.accounts.dev`, // Frontend API
+      'http://localhost:3000',
+      `https://foo-bar-42.accounts.dev`,
+      `https://*.foo-bar-42.accounts.dev`,
+      `https://foo-bar-42.clerk.accounts.dev`,
     ];
 
     expect(allowedRedirectOriginsValuesUndefined).toEqual(expectedAllowedRedirectOrigins);

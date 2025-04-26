@@ -4,6 +4,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
+import { describe, it } from 'vitest';
 
 import {
   bufferToBase64Url,

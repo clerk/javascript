@@ -1,8 +1,9 @@
 import { unixEpochToDate } from '../../../utils/date';
 import { AuthConfig } from '../AuthConfig';
+import { describe, expect, it, vi } from 'vitest';
 
-jest.mock('../../../utils/date', () => ({
-  unixEpochToDate: jest.fn(timestamp => new Date(timestamp)),
+vi.mock('../../../utils/date', () => ({
+  unixEpochToDate: vi.fn(timestamp => new Date(timestamp)),
 }));
 
 describe('AuthConfig', () => {

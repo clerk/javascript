@@ -1,4 +1,5 @@
 import type { UserSettingsJSON } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import { UserSettings } from '../internal';
 

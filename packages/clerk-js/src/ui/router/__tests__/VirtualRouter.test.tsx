@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Route, useRouter, VirtualRouter } from '..';
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('@clerk/shared/react', () => ({
+vi.mock('@clerk/shared/react', () => ({
   useClerk: () => ({
-    navigate: jest.fn(to => {
+    navigate: vi.fn(to => {
       mockNavigate(to);
       if (to) {
         // @ts-ignore

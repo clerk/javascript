@@ -3,10 +3,11 @@ import { matchers } from '@emotion/jest';
 import type { RenderOptions } from '@testing-library/react';
 import { render as _render } from '@testing-library/react';
 import UserEvent from '@testing-library/user-event';
+import { afterAll, beforeAll, describe, expect, vi, type SpyInstance } from 'vitest';
 
 expect.extend(matchers);
 
-Element.prototype.scrollIntoView = jest.fn();
+Element.prototype.scrollIntoView = vi.fn();
 
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });
@@ -30,14 +31,14 @@ const render = (ui: React.ReactElement, options?: RenderOptions) => {
  */
 export const mockNativeRuntime = (fn: () => void) => {
   describe('native runtime', () => {
-    let spyDocument: jest.SpyInstance;
-    let spyNavigator: jest.SpyInstance;
+    let spyDocument: SpyInstance;
+    let spyNavigator: SpyInstance;
 
     beforeAll(() => {
-      spyDocument = jest.spyOn(globalThis, 'document', 'get');
+      spyDocument = vi.spyOn(globalThis, 'document', 'get');
       spyDocument.mockReturnValue(undefined);
 
-      spyNavigator = jest.spyOn(globalThis.navigator, 'product', 'get');
+      spyNavigator = vi.spyOn(globalThis.navigator, 'product', 'get');
       spyNavigator.mockReturnValue('ReactNative');
     });
 

@@ -1,10 +1,11 @@
 import type { SignUpField, SignUpResource } from '@clerk/types';
+import { describe, it, vi, beforeEach } from 'vitest';
 
 import { completeSignUpFlow } from '../completeSignUpFlow';
 
-const mockHandleComplete = jest.fn();
-const mockNavigate = jest.fn();
-const mockAuthenticateWithRedirect = jest.fn();
+const mockHandleComplete = vi.fn();
+const mockNavigate = vi.fn();
+const mockAuthenticateWithRedirect = vi.fn();
 
 describe('completeSignUpFlow', () => {
   beforeEach(() => {

@@ -1,4 +1,5 @@
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
@@ -23,7 +24,7 @@ describe('Session', () => {
     let dispatchSpy;
 
     beforeEach(() => {
-      dispatchSpy = jest.spyOn(eventBus, 'emit');
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
       BaseResource.clerk = clerkMock() as any;
     });
 
@@ -169,7 +170,7 @@ describe('Session', () => {
           writable: true,
           value: false,
         });
-        warnSpy = jest.spyOn(console, 'warn').mockReturnValue();
+        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
       });
 
       afterEach(() => {
@@ -221,7 +222,7 @@ describe('Session', () => {
 
       await session.getToken();
 
-      expect((BaseResource.fapiClient.request as jest.Mock<any>).mock.calls[0][0]).toMatchObject({
+      expect((BaseResource.fapiClient.request as Mock<any>).mock.calls[0][0]).toMatchObject({
         body: { organizationId: 'newActiveOrganization' },
       });
     });

@@ -13,6 +13,7 @@ import type {
   SignUpJSON,
   UserJSON,
 } from '@clerk/types';
+import { vi } from 'vitest';
 
 export const mockJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
@@ -175,9 +176,9 @@ export const createSession = (sessionParams: WithSessionParams = {}, user: Parti
     object: 'session',
     id: sessionParams.id,
     status: sessionParams.status,
-    expire_at: sessionParams.expire_at || jest.now() + 5000,
+    expire_at: sessionParams.expire_at || Date.now() + 5000,
     abandon_at: sessionParams.abandon_at,
-    last_active_at: sessionParams.last_active_at || jest.now(),
+    last_active_at: sessionParams.last_active_at || Date.now(),
     last_active_organization_id: sessionParams.last_active_organization_id,
     actor: sessionParams.actor,
     user: createUser({}),
@@ -188,8 +189,8 @@ export const createSession = (sessionParams: WithSessionParams = {}, user: Parti
       has_image: user.has_image,
       identifier: user.email_addresses?.find(e => e.id === user.primary_email_address_id)?.email_address || '',
     },
-    created_at: sessionParams.created_at || jest.now() - 1000,
-    updated_at: sessionParams.updated_at || jest.now(),
+    created_at: sessionParams.created_at || Date.now() - 1000,
+    updated_at: sessionParams.updated_at || Date.now(),
     last_active_token: {
       object: 'token',
       jwt: mockJwt,
@@ -245,8 +246,8 @@ export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
 
 export const clerkMock = (params?: Partial<Clerk>) => {
   return {
-    getFapiClient: jest.fn().mockReturnValue({
-      request: jest.fn().mockReturnValue({ payload: { object: 'token', jwt: mockJwt }, status: 200 }),
+    getFapiClient: vi.fn().mockReturnValue({
+      request: vi.fn().mockReturnValue({ payload: { object: 'token', jwt: mockJwt }, status: 200 }),
     }),
     ...params,
   };
@@ -258,7 +259,7 @@ type RecursivePartial<T> = {
 
 export const mockFetch = (ok = true, status = 200, responsePayload = {}) => {
   // @ts-ignore
-  global.fetch = jest.fn(() => {
+  global.fetch = vi.fn(() => {
     return Promise.resolve<RecursivePartial<Response>>({
       status,
       statusText: status.toString(),
@@ -270,7 +271,7 @@ export const mockFetch = (ok = true, status = 200, responsePayload = {}) => {
 
 export const mockNetworkFailedFetch = () => {
   // @ts-ignore
-  global.fetch = jest.fn(() => {
+  global.fetch = vi.fn(() => {
     return Promise.reject(new TypeError('Failed to fetch'));
   });
 };

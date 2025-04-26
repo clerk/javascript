@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Client Singleton __internal_toSnapshot() 1`] = `
+exports[`Client Singleton > __internal_toSnapshot() 1`] = `
 {
   "captcha_bypass": false,
   "cookie_expires_at": null,
@@ -204,7 +204,7 @@ exports[`Client Singleton __internal_toSnapshot() 1`] = `
 }
 `;
 
-exports[`Client Singleton has the same initial properties 1`] = `
+exports[`Client Singleton > has the same initial properties 1`] = `
 Client {
   "captchaBypass": false,
   "cookieExpiresAt": null,

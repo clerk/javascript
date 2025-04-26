@@ -1,4 +1,5 @@
 import { ignoreEventValue } from '../ignoreEventValue';
+import { describe, it } from 'vitest';
 
 const noop = (..._args: any[]): void => {
   // do nothing.

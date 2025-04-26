@@ -1,13 +1,14 @@
 import { FraudProtection } from './fraudProtection';
 import type { Clerk, Client } from './resources/internal';
 import { ClerkAPIResponseError } from './resources/internal';
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 describe('FraudProtectionService', () => {
   let sut: FraudProtection;
   let mockClerk: Clerk;
   let mockClient: typeof Client;
   let solveCaptcha: any;
-  let mockManagedInModal: jest.Mock;
+  let mockManagedInModal: Mock;
 
   function MockCaptchaChallenge() {
     // @ts-ignore - we don't need to implement the entire class
@@ -22,14 +23,14 @@ describe('FraudProtectionService', () => {
   };
 
   beforeEach(() => {
-    mockManagedInModal = jest.fn().mockResolvedValue(
+    mockManagedInModal = vi.fn().mockResolvedValue(
       new Promise(r => {
         solveCaptcha = r;
       }),
     );
 
     const mockClientInstance = {
-      __internal_sendCaptchaToken: jest.fn().mockResolvedValue({}),
+      __internal_sendCaptchaToken: vi.fn().mockResolvedValue({}),
     };
 
     mockClient = {
@@ -45,7 +46,7 @@ describe('FraudProtectionService', () => {
   });
 
   it('does not handle requests that did not throw', async () => {
-    const fn1 = jest.fn().mockResolvedValue('result');
+    const fn1 = vi.fn().mockResolvedValue('result');
 
     const fn1res = sut.execute(mockClerk, fn1);
 
@@ -64,17 +65,17 @@ describe('FraudProtectionService', () => {
       data: [{ code: 'no-idea' } as any],
       status: 401,
     });
-    const fn1 = jest.fn().mockRejectedValueOnce(unrelatedError);
+    const fn1 = vi.fn().mockRejectedValueOnce(unrelatedError);
     const fn1res = sut.execute(mockClerk, fn1);
-    expect(fn1res).rejects.toEqual(unrelatedError);
+    await expect(fn1res).rejects.toEqual(unrelatedError);
     expect(mockManagedInModal).toHaveBeenCalledTimes(0);
     expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).toHaveBeenCalledTimes(0);
     expect(fn1).toHaveBeenCalledTimes(1);
   });
 
   it('handles parallel requests that began at the same time by handling any requests that returned requires_captcha', async () => {
-    const fn1 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
-    const fn2 = jest.fn().mockResolvedValue('result2');
+    const fn1 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
+    const fn2 = vi.fn().mockResolvedValue('result2');
 
     const fn1res = sut.execute(mockClerk, fn1);
     const fn2res = sut.execute(mockClerk, fn2);
@@ -93,8 +94,8 @@ describe('FraudProtectionService', () => {
   });
 
   it('handles parallel requests that returned 401 requires_captcha', async () => {
-    const fn1 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
-    const fn2 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result2');
+    const fn1 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
+    const fn2 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result2');
 
     const fn1res = sut.execute(mockClerk, fn1);
     const fn2res = sut.execute(mockClerk, fn2);
@@ -115,8 +116,8 @@ describe('FraudProtectionService', () => {
   });
 
   it('handles requests that were made in close succession by blocking all other requests if the first returns requires_captcha', async () => {
-    const fn1 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
-    const fn2 = jest.fn().mockResolvedValue('result2');
+    const fn1 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValueOnce('result1');
+    const fn2 = vi.fn().mockResolvedValue('result2');
 
     // Start the first request
     const fn1res = sut.execute(mockClerk, fn1);
@@ -147,10 +148,10 @@ describe('FraudProtectionService', () => {
     });
 
     // both with fail in parallel but fn2 will temporarily be blocked from retrying
-    const fn1 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockRejectedValueOnce(unrelatedError);
-    const fn2 = jest.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValue('result2');
+    const fn1 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockRejectedValueOnce(unrelatedError);
+    const fn2 = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValue('result2');
     // fn3 will be blocked until the captcha is solved
-    const fn3 = jest.fn().mockResolvedValue('result3');
+    const fn3 = vi.fn().mockResolvedValue('result3');
 
     const fn1res = sut.execute(mockClerk, fn1);
     const fn2res = sut.execute(mockClerk, fn2);
@@ -163,7 +164,7 @@ describe('FraudProtectionService', () => {
 
     solveCaptcha();
     // fn1 rejects
-    expect(fn1res).rejects.toEqual(unrelatedError);
+    await expect(fn1res).rejects.toEqual(unrelatedError);
     // but the other requests will be unblocked and retried
     await Promise.all([fn2res, fn3res]);
 

@@ -1,4 +1,5 @@
 import { joinPaths } from '../path';
+import { describe, it } from 'vitest';
 
 describe('joinPaths(a, b)', () => {
   const cases = [

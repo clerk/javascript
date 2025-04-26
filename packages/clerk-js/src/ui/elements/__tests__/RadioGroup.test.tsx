@@ -1,4 +1,3 @@
-import { describe, it } from '@jest/globals';
 import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -167,7 +166,7 @@ describe('RadioGroup', () => {
     );
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText(/some error/i)).toBeInTheDocument();
+    expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
     const radios = getAllByRole('radio');
     radios.forEach(radio => {

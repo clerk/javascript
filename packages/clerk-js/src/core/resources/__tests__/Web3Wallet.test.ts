@@ -1,4 +1,5 @@
 import type { Web3WalletJSON } from '@clerk/types';
+import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, Web3Wallet } from '../internal';
 
@@ -10,7 +11,7 @@ describe('Web3 wallet', () => {
     } as Web3WalletJSON;
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
 
     const web3Wallet = new Web3Wallet(web3WalletJSON, '/me/web3_wallets');
     await web3Wallet.create();
@@ -33,7 +34,7 @@ describe('Web3 wallet', () => {
     } as Web3WalletJSON;
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
 
     const web3Wallet = new Web3Wallet(web3WalletJSON, '/me/web3_wallets');
     await web3Wallet.prepareVerification({ strategy: 'web3_metamask_signature' });
@@ -56,7 +57,7 @@ describe('Web3 wallet', () => {
     } as Web3WalletJSON;
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: web3WalletJSON }));
 
     const web3Wallet = new Web3Wallet(web3WalletJSON, '/me/web3_wallets');
     await web3Wallet.attemptVerification({ signature: 'mock-signature' });
@@ -81,7 +82,7 @@ describe('Web3 wallet', () => {
     };
 
     // @ts-ignore
-    BaseResource._fetch = jest.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedObjectJSON }));
 
     const web3Wallet = new Web3Wallet({ id: targetId }, '/me/web3_wallets');
     await web3Wallet.destroy();

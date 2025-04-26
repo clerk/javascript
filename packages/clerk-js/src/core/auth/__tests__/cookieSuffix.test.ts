@@ -1,8 +1,10 @@
-jest.mock('@clerk/shared/keys', () => {
-  return { getCookieSuffix: jest.fn() };
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+vi.mock('@clerk/shared/keys', () => {
+  return { getCookieSuffix: vi.fn() };
 });
-jest.mock('@clerk/shared/logger', () => {
-  return { logger: { logOnce: jest.fn() } };
+vi.mock('@clerk/shared/logger', () => {
+  return { logger: { logOnce: vi.fn() } };
 });
 import { getCookieSuffix as getSharedCookieSuffix } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
@@ -11,12 +13,12 @@ import { getCookieSuffix } from '../cookieSuffix';
 
 describe('getCookieSuffix', () => {
   beforeEach(() => {
-    (getSharedCookieSuffix as jest.Mock).mockRejectedValue(new Error('mocked error for insecure context'));
+    (getSharedCookieSuffix as vi.Mock).mockRejectedValue(new Error('mocked error for insecure context'));
   });
 
   afterEach(() => {
-    (getSharedCookieSuffix as jest.Mock).mockReset();
-    (logger.logOnce as jest.Mock).mockReset();
+    (getSharedCookieSuffix as vi.Mock).mockReset();
+    (logger.logOnce as vi.Mock).mockReset();
   });
 
   describe('getCookieSuffix(publishableKey, subtle?)', () => {

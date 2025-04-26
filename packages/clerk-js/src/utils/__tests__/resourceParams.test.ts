@@ -1,4 +1,5 @@
 import type { UpdateUserParams } from '@clerk/types';
+import { describe, it } from 'vitest';
 
 import { normalizeUnsafeMetadata } from '../resourceParams';
 

@@ -1,13 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 
 import { HashRouter, Route, Switch } from '../../router';
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('@clerk/shared/react', () => ({
+vi.mock('@clerk/shared/react', () => ({
   useClerk: () => ({
-    navigate: jest.fn(to => {
+    navigate: vi.fn(to => {
       mockNavigate(to);
       if (to) {
         // @ts-ignore
@@ -29,7 +30,7 @@ const setWindowOrigin = (origin: string) => {
 
 describe('<Switch >', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {

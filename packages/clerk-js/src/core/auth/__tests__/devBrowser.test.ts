@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { FapiClient } from '../../fapiClient';
 import { createDevBrowser } from '../devBrowser';
 
@@ -8,7 +10,7 @@ type RecursivePartial<T> = {
 describe('Thrown errors', () => {
   beforeEach(() => {
     // @ts-ignore
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
       Promise.resolve<RecursivePartial<Response>>({
         ok: false,
         json: () =>
@@ -29,17 +31,17 @@ describe('Thrown errors', () => {
 
   afterEach(() => {
     // @ts-ignore
-    global.fetch?.mockClear();
+    vi.mocked(global.fetch)?.mockClear();
   });
 
   // Note: The test runs without any initial or mocked values on __clerk_db_jwt cookies.
   // It is expected to modify the test accordingly if cookies are mocked for future extra testing.
   it('throws any FAPI errors during dev browser creation', async () => {
-    const mockCreateFapiClient = jest.fn().mockImplementation(() => {
+    const mockCreateFapiClient = vi.fn().mockImplementation(() => {
       return {
-        buildUrl: jest.fn(() => 'https://white-koala-42.clerk.accounts.dev/dev_browser'),
-        onAfterResponse: jest.fn(),
-        onBeforeRequest: jest.fn(),
+        buildUrl: vi.fn(() => 'https://white-koala-42.clerk.accounts.dev/dev_browser'),
+        onAfterResponse: vi.fn(),
+        onBeforeRequest: vi.fn(),
       };
     });
 

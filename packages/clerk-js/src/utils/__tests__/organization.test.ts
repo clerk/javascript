@@ -1,4 +1,5 @@
 import { isOrganizationId } from '../organization';
+import { describe, it } from 'vitest';
 
 describe('isOrganizationId(string)', () => {
   it('should return true for strings starting with `org_`', () => {

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { applyTokensToString } from '../applyTokensToString';
 
 describe('applyTokensToString', function () {
@@ -34,7 +36,7 @@ describe('applyTokensToString', function () {
 
   describe('Date related tokens and modifiers', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {});
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
     });
 
     const tokens = {

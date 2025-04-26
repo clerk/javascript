@@ -1,4 +1,5 @@
 import { BaseResource } from '../internal';
+import { describe, expect, it, vi } from 'vitest';
 
 class TestResource extends BaseResource {
   constructor() {
@@ -20,7 +21,7 @@ describe('BaseResource', () => {
       // @ts-expect-error - We're not about to mock the entire FapiClient
       getFapiClient: () => {
         return {
-          request: jest.fn().mockResolvedValue({
+          request: vi.fn().mockResolvedValue({
             payload: {},
             status: 429,
             statusText: 'Too Many Requests',
@@ -28,7 +29,7 @@ describe('BaseResource', () => {
           }),
         };
       },
-      __internal_setCountry: jest.fn(),
+      __internal_setCountry: vi.fn(),
     };
     const resource = new TestResource();
     const errResponse = await resource.fetch().catch(err => err);
@@ -41,7 +42,7 @@ describe('BaseResource', () => {
       // @ts-expect-error - We're not about to mock the entire FapiClient
       getFapiClient: () => {
         return {
-          request: jest.fn().mockResolvedValue({
+          request: vi.fn().mockResolvedValue({
             payload: {},
             status: 429,
             statusText: 'Too Many Requests',
@@ -49,7 +50,7 @@ describe('BaseResource', () => {
           }),
         };
       },
-      __internal_setCountry: jest.fn(),
+      __internal_setCountry: vi.fn(),
     };
     const resource = new TestResource();
     const errResponse = await resource.fetch().catch(err => err);

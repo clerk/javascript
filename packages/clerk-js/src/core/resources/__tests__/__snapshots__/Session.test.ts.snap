@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Session getToken() dispatches token:update event on getToken with active organization 1`] = `
+exports[`Session > getToken() > dispatches token:update event on getToken with active organization 1`] = `
 [
   "token:update",
   {
@@ -34,14 +34,14 @@ exports[`Session getToken() dispatches token:update event on getToken with activ
 ]
 `;
 
-exports[`Session getToken() dispatches token:update event on getToken with active organization 2`] = `
+exports[`Session > getToken() > dispatches token:update event on getToken with active organization 2`] = `
 [
   "session:tokenResolved",
   null,
 ]
 `;
 
-exports[`Session getToken() dispatches token:update event on getToken without active organization 1`] = `
+exports[`Session > getToken() > dispatches token:update event on getToken without active organization 1`] = `
 [
   "token:update",
   {
@@ -75,7 +75,7 @@ exports[`Session getToken() dispatches token:update event on getToken without ac
 ]
 `;
 
-exports[`Session getToken() dispatches token:update event on getToken without active organization 2`] = `
+exports[`Session > getToken() > dispatches token:update event on getToken without active organization 2`] = `
 [
   "session:tokenResolved",
   null,

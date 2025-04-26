@@ -1,4 +1,5 @@
 import { SafeLocalStorage } from '../localStorage';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('SafeLocalStorage', () => {
   let mockStorage: { [key: string]: string } = {};
@@ -26,7 +27,7 @@ describe('SafeLocalStorage', () => {
 
   afterEach(() => {
     mockStorage = {};
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('setItem', () => {
@@ -53,13 +54,13 @@ describe('SafeLocalStorage', () => {
     });
 
     it('sets expiration when provided', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const now = Date.now();
       SafeLocalStorage.setItem('test', 'value', 1000);
 
       const stored = JSON.parse(mockStorage['__clerk_test']);
       expect(stored.exp).toBe(now + 1000);
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('stores complex objects correctly', () => {
@@ -105,15 +106,15 @@ describe('SafeLocalStorage', () => {
     });
 
     it('returns default value and removes item when expired', () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       SafeLocalStorage.setItem('test', 'value', 1_000);
 
       // Advance time beyond expiration
-      jest.advanceTimersByTime(1_001);
+      vi.advanceTimersByTime(1_001);
 
       expect(SafeLocalStorage.getItem('test', 'default')).toBe('default');
       expect(mockStorage['__clerk_test']).toBeUndefined();
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('handles malformed JSON data by returning default value', () => {

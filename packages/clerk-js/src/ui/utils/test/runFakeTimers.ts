@@ -1,4 +1,5 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
+// import { jest } from '@jest/globals';
 import { act } from '@testing-library/react';
 
 type WithAct = <T>(fn: T) => T;
@@ -9,9 +10,9 @@ const withAct = ((fn: any) =>
     });
   }) as WithAct;
 
-const advanceTimersByTime = withAct(jest.advanceTimersByTime.bind(jest));
-const runAllTimers = withAct(jest.runAllTimers.bind(jest));
-const runOnlyPendingTimers = withAct(jest.runOnlyPendingTimers.bind(jest));
+const advanceTimersByTime = withAct(vi.advanceTimersByTime.bind(vi));
+const runAllTimers = withAct(vi.runAllTimers.bind(vi));
+const runOnlyPendingTimers = withAct(vi.runOnlyPendingTimers.bind(vi));
 
 const createFakeTimersHelpers = () => {
   return { advanceTimersByTime, runAllTimers, runOnlyPendingTimers };
@@ -23,13 +24,13 @@ type RunFakeTimersCallback = (timers: FakeTimersHelpers) => void | Promise<void>
 export const runFakeTimers = <T extends RunFakeTimersCallback, R extends ReturnType<T>>(
   cb: T,
 ): R extends Promise<any> ? Promise<void> : void => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   const res = cb(createFakeTimersHelpers());
   if (res && 'then' in res) {
     // @ts-expect-error
-    return res.finally(() => jest.useRealTimers());
+    return res.finally(() => vi.useRealTimers());
   }
-  jest.useRealTimers();
+  vi.useRealTimers();
   // @ts-ignore
   return;
 };
