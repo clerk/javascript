@@ -2,18 +2,12 @@ import { lazy, Suspense } from 'react';
 
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import {
-  __experimental_PricingTableContext,
-  InvoicesContextProvider,
-  useEnvironment,
-  useUserProfileContext,
-} from '../../contexts';
+import { InvoicesContextProvider, useEnvironment, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { InvoicePage } from '../Invoices/InvoicePage';
 import { AccountPage } from './AccountPage';
-import { SecurityPage } from './SecurityPage';
-import { __experimental_PricingTable } from '../PricingTable/PricingTable';
 import { PlansPage } from './PlansPage';
+import { SecurityPage } from './SecurityPage';
 
 const BillingPage = lazy(() =>
   import(/* webpackChunkName: "up-billing-page"*/ './BillingPage').then(module => ({
