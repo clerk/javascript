@@ -10,6 +10,7 @@ import { usePlansContext, usePricingTableContext } from '../../contexts';
 import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
+import { FreePlanRow } from './FreePlanRow';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
@@ -43,9 +44,10 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   return (
     <>
+      <FreePlanRow />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans || []}
+          plans={plans.filter(plan => !plan.isDefault)}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -53,7 +55,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans}
+          plans={plans.filter(plan => !plan.isDefault)}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

@@ -5,7 +5,7 @@ import {
   useSubscriptions,
   withPlans,
 } from '../../contexts';
-import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -18,6 +18,8 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { ArrowRightIcon } from '../../icons';
+import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
@@ -34,7 +36,7 @@ export const OrganizationBillingPage = withPlans(
     const card = useCardState();
     const { data: subscriptions } = useSubscriptions('org');
     const { selectedTab, handleTabChange } = useTabState(orgTabMap);
-
+    const { navigate } = useRouter();
     if (!Array.isArray(subscriptions?.data)) {
       return null;
     }
@@ -81,23 +83,27 @@ export const OrganizationBillingPage = withPlans(
             </TabsList>
             <TabPanels>
               <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-                {subscriptions.data.length > 0 && (
+                {subscriptions.data.length > 0 ? (
                   <>
                     <SubscriptionsList />
-                    <Hr sx={t => ({ marginBlock: t.space.$6 })} />
-                    <Heading
-                      textVariant='h3'
-                      as='h2'
-                      localizationKey='Available Plans'
-                      sx={t => ({ marginBlockEnd: t.space.$4, fontWeight: t.fontWeights.$medium })}
+                    <Button
+                      localizationKey='View all plans'
+                      arrowIcon={ArrowRightIcon}
+                      variant='ghost'
+                      onClick={() => navigate('plans')}
+                      sx={t => ({
+                        width: 'fit-content',
+                        marginTop: t.space.$4,
+                      })}
                     />
                   </>
+                ) : (
+                  <__experimental_PricingTableContext.Provider
+                    value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
+                  >
+                    <__experimental_PricingTable />
+                  </__experimental_PricingTableContext.Provider>
                 )}
-                <__experimental_PricingTableContext.Provider
-                  value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
-                >
-                  <__experimental_PricingTable />
-                </__experimental_PricingTableContext.Provider>
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
                 <InvoicesContextProvider subscriberType='org'>

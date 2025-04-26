@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import type { ComponentType, PropsWithChildren } from 'react';
 import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
@@ -163,11 +163,12 @@ type OwnProps = PrimitiveProps<'button'> & {
   isActive?: boolean;
   hoverAsFocus?: boolean;
   hasArrow?: boolean;
+  arrowIcon?: ComponentType<{}>;
 };
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
-const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
+const ButtonChildrenWithArrow = ({ children, arrowIcon }: PropsWithChildren<{ arrowIcon?: ComponentType<{}> }>) => {
   return (
     <Flex
       align='center'
@@ -176,11 +177,11 @@ const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
       {children}
       <Icon
         elementDescriptor={descriptors.buttonArrowIcon}
-        icon={ArrowRightButtonIcon}
+        icon={arrowIcon || ArrowRightButtonIcon}
         sx={t => ({
           marginLeft: t.space.$2,
-          width: t.sizes.$2x5,
-          height: t.sizes.$2x5,
+          width: arrowIcon ? t.sizes.$4 : t.sizes.$2x5,
+          height: arrowIcon ? t.sizes.$4 : t.sizes.$2x5,
           opacity: t.opacity.$inactive,
         })}
       />
@@ -197,6 +198,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     loadingText,
     children,
     hasArrow,
+    arrowIcon,
     onClick: onClickProp,
     ...rest
   } = filterProps(parsedProps);
@@ -241,7 +243,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           {loadingText || <span style={{ display: 'inline-flex', visibility: 'hidden' }}>{children}</span>}
         </Flex>
       )}
-      {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
+      {!isLoading &&
+        (hasArrow || arrowIcon ? (
+          <ButtonChildrenWithArrow arrowIcon={arrowIcon}>{children}</ButtonChildrenWithArrow>
+        ) : (
+          children
+        ))}
     </button>
   );
 });

@@ -7,6 +7,7 @@ import { Route, Switch } from '../../router';
 import { InvoicePage } from '../Invoices/InvoicePage';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { OrganizationPlansPage } from './OrganizationPlansPage';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -65,6 +66,12 @@ export const OrganizationProfileRoutes = () => {
               <Route index>
                 <Suspense fallback={''}>
                   <OrganizationBillingPage providerProps={{ subscriberType: 'org' }} />
+                </Suspense>
+              </Route>
+              <Route path='plans'>
+                {/* TODO(@commerce): Should this be lazy loaded ? */}
+                <Suspense fallback={''}>
+                  <OrganizationPlansPage providerProps={{ subscriberType: 'org' }} />
                 </Suspense>
               </Route>
               <Route path='invoice/:invoiceId'>

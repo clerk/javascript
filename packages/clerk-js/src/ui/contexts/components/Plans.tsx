@@ -148,7 +148,7 @@ export const usePlansContext = () => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
-  const shouldDisplayPlanButton = useCallback(
+  const canManageSubscription = useCallback(
     ({
       plan,
       subscription: sub,
@@ -191,6 +191,16 @@ export const usePlansContext = () => {
     },
     [activeOrUpcomingSubscription],
   );
+
+  const captionForSubscription = useCallback((subscription: __experimental_CommerceSubscriptionResource) => {
+    if (subscription.status === 'upcoming') {
+      return localizationKeys('badge__startsAt', { date: subscription.periodStart });
+    } else if (subscription.canceledAt) {
+      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
+    } else {
+      return localizationKeys('badge__renewsAt', { date: subscription.periodEnd });
+    }
+  }, []);
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
@@ -239,6 +249,10 @@ export const usePlansContext = () => {
     [clerk, ctx, activeOrUpcomingSubscription],
   );
 
+  const defaultFreePlan = useMemo(() => {
+    return ctx.plans.find(plan => plan.isDefault);
+  }, [ctx.plans]);
+
   return {
     ...ctx,
     componentName,
@@ -246,6 +260,8 @@ export const usePlansContext = () => {
     isDefaultPlanImplicitlyActive,
     handleSelectPlan,
     buttonPropsForPlan,
-    shouldDisplayPlanButton,
+    canManageSubscription,
+    captionForSubscription,
+    defaultFreePlan,
   };
 };

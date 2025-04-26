@@ -10,6 +10,7 @@ import {
   Badge,
   Box,
   Button,
+  Col,
   descriptors,
   Flex,
   Heading,
@@ -63,7 +64,7 @@ export function PricingTableDefault({
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
           gap: `var(--grid-gap-y, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
-          alignItems: 'start',
+          alignItems: 'stretch',
           width: '100%',
           minWidth: '0',
         })}
@@ -100,9 +101,9 @@ interface CardProps {
 
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
-  const ctaPosition = pricingTableProps.ctaPosition || 'top';
+  const ctaPosition = pricingTableProps.ctaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
-  const { id, slug, isDefault, features } = plan;
+  const { id, slug, features } = plan;
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
 
@@ -137,14 +138,14 @@ function Card(props: CardProps) {
         setPlanPeriod={setPlanPeriod}
       />
       <ReversibleContainer reverse={ctaPosition === 'top'}>
-        {!collapseFeatures && hasFeatures ? (
+        {!collapseFeatures ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
               display: 'flex',
               flexDirection: 'column',
               flex: '1',
-              padding: isCompact ? t.space.$3 : t.space.$4,
+              padding: hasFeatures ? (isCompact ? t.space.$3 : t.space.$4) : 0,
               backgroundColor: t.colors.$colorBackground,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
@@ -158,28 +159,26 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-        {!isDefault ? (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardAction}
-            sx={t => ({
-              marginTop: 'auto',
-              padding: isCompact ? t.space.$3 : t.space.$4,
-              borderTopWidth: t.borderWidths.$normal,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-              background: collapseFeatures || !hasFeatures ? t.colors.$colorBackground : undefined,
-            })}
-          >
-            <Button
-              block
-              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              {...buttonPropsForPlan({ plan, isCompact })}
-              onClick={() => {
-                onSelect(plan);
-              }}
-            />
-          </Box>
-        ) : null}
+        <Box
+          elementDescriptor={descriptors.pricingTableCardAction}
+          sx={t => ({
+            marginTop: 'auto',
+            padding: isCompact ? t.space.$3 : t.space.$4,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$neutralAlpha100,
+            background: undefined,
+          })}
+        >
+          <Button
+            block
+            textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+            {...buttonPropsForPlan({ plan, isCompact })}
+            onClick={() => {
+              onSelect(plan);
+            }}
+          />
+        </Box>
       </ReversibleContainer>
     </Box>
   );
@@ -428,11 +427,12 @@ interface CardFeaturesListProps {
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
   const { plan, isCompact } = props;
   const totalFeatures = plan.features.length;
-  const [showAllFeatures, setShowAllFeatures] = React.useState(false);
-  const canToggleFeatures = isCompact && totalFeatures > 3;
-  const toggleFeatures = () => {
-    setShowAllFeatures(prev => !prev);
+  const hasMoreFeatures = isCompact ? totalFeatures > 3 : totalFeatures > 8;
+
+  const showPlanDetails = () => {
+    console.log('showPlanDetails');
   };
+
   return (
     <Box
       ref={ref}
@@ -443,18 +443,17 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
         rowGap: isCompact ? t.space.$2 : t.space.$3,
       })}
     >
-      <Box
+      <Col
         elementDescriptor={descriptors.pricingTableCardFeaturesList}
         data-variant={isCompact ? 'compact' : 'default'}
         as='ul'
         role='list'
         sx={t => ({
-          display: 'grid',
           flex: '1',
           rowGap: isCompact ? t.space.$2 : t.space.$3,
         })}
       >
-        {plan.features.slice(0, showAllFeatures || !canToggleFeatures ? totalFeatures : 3).map(feature => (
+        {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeaturesListItem}
             elementId={descriptors.pricingTableCardFeaturesListItem.setId(feature.slug)}
@@ -488,10 +487,10 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             </Span>
           </Box>
         ))}
-      </Box>
-      {canToggleFeatures && (
+      </Col>
+      {hasMoreFeatures && (
         <SimpleButton
-          onClick={toggleFeatures}
+          onClick={() => showPlanDetails()}
           variant='link'
           sx={t => ({
             marginBlockStart: t.space.$2,
@@ -499,13 +498,12 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           })}
         >
           <Icon
-            icon={showAllFeatures ? Minus : Plus}
+            icon={Plus}
             colorScheme='neutral'
             size='md'
             aria-hidden
           />
-          {/* TODO(@Commerce): needs localization */}
-          {showAllFeatures ? 'Hide features' : 'See all features'}
+          <Span localizationKey={localizationKeys('__experimental_commerce.seeAllFeatures')} />
         </SimpleButton>
       )}
     </Box>
