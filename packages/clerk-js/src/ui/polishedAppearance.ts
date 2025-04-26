@@ -237,9 +237,6 @@ export const polishedAppearance: Appearance = {
           borderWidth: 0,
           boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
         },
-        '&[data-variant="compact"]': {
-          boxShadow: 'none',
-        },
       },
       scrollBox: {
         ...cardContentStyles(theme),

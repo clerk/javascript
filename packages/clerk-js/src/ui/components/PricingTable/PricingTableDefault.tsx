@@ -124,7 +124,7 @@ function Card(props: CardProps) {
         borderWidth: t.borderWidths.$normal,
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
-        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : undefined,
+        boxShadow: !isCompact ? t.shadows.$cardBoxShadow : t.shadows.$tableBodyShadow,
         borderRadius: t.radii.$xl,
         overflow: 'hidden',
         textAlign: 'left',

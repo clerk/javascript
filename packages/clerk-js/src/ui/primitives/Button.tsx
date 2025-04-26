@@ -1,4 +1,4 @@
-import type { ComponentType, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { descriptors, Icon, Spinner } from '../customizables';
@@ -163,12 +163,15 @@ type OwnProps = PrimitiveProps<'button'> & {
   isActive?: boolean;
   hoverAsFocus?: boolean;
   hasArrow?: boolean;
-  arrowIcon?: ComponentType<{}>;
+  arrowIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
-const ButtonChildrenWithArrow = ({ children, arrowIcon }: PropsWithChildren<{ arrowIcon?: ComponentType<{}> }>) => {
+const ButtonChildrenWithArrow = ({
+  children,
+  arrowIcon,
+}: PropsWithChildren<{ arrowIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>> }>) => {
   return (
     <Flex
       align='center'
