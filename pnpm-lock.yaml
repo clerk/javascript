@@ -156,7 +156,7 @@ importers:
         version: 10.1.2(eslint@9.24.0(jiti@2.4.2))
       eslint-config-turbo:
         specifier: 2.5.0
-        version: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.0)
+        version: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.2)
       eslint-import-resolver-typescript:
         specifier: 3.10.0
         version: 3.10.0(eslint-plugin-import@2.31.0)(eslint@9.24.0(jiti@2.4.2))
@@ -186,7 +186,7 @@ importers:
         version: 12.1.1(eslint@9.24.0(jiti@2.4.2))
       eslint-plugin-turbo:
         specifier: 2.5.0
-        version: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.0)
+        version: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.2)
       eslint-plugin-unused-imports:
         specifier: 4.1.4
         version: 4.1.4(@typescript-eslint/eslint-plugin@8.30.1(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))
@@ -272,20 +272,20 @@ importers:
         specifier: catalog:repo
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
       turbo:
-        specifier: ^2.5.0
-        version: 2.5.0
+        specifier: ^2.5.1
+        version: 2.5.2
       turbo-ignore:
-        specifier: ^2.5.0
-        version: 2.5.0
+        specifier: ^2.5.1
+        version: 2.5.2
       typedoc:
-        specifier: 0.28.2
-        version: 0.28.2(typescript@5.8.3)
+        specifier: 0.28.3
+        version: 0.28.3(typescript@5.8.3)
       typedoc-plugin-markdown:
-        specifier: 4.6.2
-        version: 4.6.2(typedoc@0.28.2(typescript@5.8.3))
+        specifier: 4.6.3
+        version: 4.6.3(typedoc@0.28.3(typescript@5.8.3))
       typedoc-plugin-replace-text:
         specifier: 4.2.0
-        version: 4.2.0(typedoc@0.28.2(typescript@5.8.3))
+        version: 4.2.0(typedoc@0.28.3(typescript@5.8.3))
       typescript:
         specifier: catalog:repo
         version: 5.8.3
@@ -13386,45 +13386,45 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  turbo-darwin-64@2.5.0:
-    resolution: {integrity: sha512-fP1hhI9zY8hv0idym3hAaXdPi80TLovmGmgZFocVAykFtOxF+GlfIgM/l4iLAV9ObIO4SUXPVWHeBZQQ+Hpjag==}
+  turbo-darwin-64@2.5.2:
+    resolution: {integrity: sha512-2aIl0Sx230nLk+Cg2qSVxvPOBWCZpwKNuAMKoROTvWKif6VMpkWWiR9XEPoz7sHeLmCOed4GYGMjL1bqAiIS/g==}
     cpu: [x64]
     os: [darwin]
 
-  turbo-darwin-arm64@2.5.0:
-    resolution: {integrity: sha512-p9sYq7kXH7qeJwIQE86cOWv/xNqvow846l6c/qWc26Ib1ci5W7V0sI5thsrP3eH+VA0d+SHalTKg5SQXgNQBWA==}
+  turbo-darwin-arm64@2.5.2:
+    resolution: {integrity: sha512-MrFYhK/jYu8N6QlqZtqSHi3e4QVxlzqU3ANHTKn3/tThuwTLbNHEvzBPWSj5W7nZcM58dCqi6gYrfRz6bJZyAA==}
     cpu: [arm64]
     os: [darwin]
 
-  turbo-ignore@2.5.0:
-    resolution: {integrity: sha512-AjNz9ntAMVHsrXMwlOfZgt3cQ2Fmei3+8+KJ2iUOOZgswebnl4xhNQ8bmBwMQ4Qe3mok/ZA0bFC9f5uXAGffSQ==}
+  turbo-ignore@2.5.2:
+    resolution: {integrity: sha512-13EV4kda0rAskAkuAXBheDxB4idYipBf2P5Q/RoN25Lub6Fk96TOXpt7AynkTyT3nn1p2RpqTwXQnIqchFZG9A==}
     hasBin: true
 
-  turbo-linux-64@2.5.0:
-    resolution: {integrity: sha512-1iEln2GWiF3iPPPS1HQJT6ZCFXynJPd89gs9SkggH2EJsj3eRUSVMmMC8y6d7bBbhBFsiGGazwFIYrI12zs6uQ==}
+  turbo-linux-64@2.5.2:
+    resolution: {integrity: sha512-LxNqUE2HmAJQ/8deoLgMUDzKxd5bKxqH0UBogWa+DF+JcXhtze3UTMr6lEr0dEofdsEUYK1zg8FRjglmwlN5YA==}
     cpu: [x64]
     os: [linux]
 
-  turbo-linux-arm64@2.5.0:
-    resolution: {integrity: sha512-bKBcbvuQHmsX116KcxHJuAcppiiBOfivOObh2O5aXNER6mce7YDDQJy00xQQNp1DhEfcSV2uOsvb3O3nN2cbcA==}
+  turbo-linux-arm64@2.5.2:
+    resolution: {integrity: sha512-0MI1Ao1q8zhd+UUbIEsrM+yLq1BsrcJQRGZkxIsHFlGp7WQQH1oR3laBgfnUCNdCotCMD6w4moc9pUbXdOR3bg==}
     cpu: [arm64]
     os: [linux]
 
   turbo-stream@2.4.0:
     resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
-  turbo-windows-64@2.5.0:
-    resolution: {integrity: sha512-9BCo8oQ7BO7J0K913Czbc3tw8QwLqn2nTe4E47k6aVYkM12ASTScweXPTuaPFP5iYXAT6z5Dsniw704Ixa5eGg==}
+  turbo-windows-64@2.5.2:
+    resolution: {integrity: sha512-hOLcbgZzE5ttACHHyc1ajmWYq4zKT42IC3G6XqgiXxMbS+4eyVYTL+7UvCZBd3Kca1u4TLQdLQjeO76zyDJc2A==}
     cpu: [x64]
     os: [win32]
 
-  turbo-windows-arm64@2.5.0:
-    resolution: {integrity: sha512-OUHCV+ueXa3UzfZ4co/ueIHgeq9B2K48pZwIxKSm5VaLVuv8M13MhM7unukW09g++dpdrrE1w4IOVgxKZ0/exg==}
+  turbo-windows-arm64@2.5.2:
+    resolution: {integrity: sha512-fMU41ABhSLa18H8V3Z7BMCGynQ8x+wj9WyBMvWm1jeyRKgkvUYJsO2vkIsy8m0vrwnIeVXKOIn6eSe1ddlBVqw==}
     cpu: [arm64]
     os: [win32]
 
-  turbo@2.5.0:
-    resolution: {integrity: sha512-PvSRruOsitjy6qdqwIIyolv99+fEn57gP6gn4zhsHTEcCYgXPhv6BAxzAjleS8XKpo+Y582vTTA9nuqYDmbRuA==}
+  turbo@2.5.2:
+    resolution: {integrity: sha512-Qo5lfuStr6LQh3sPQl7kIi243bGU4aHGDQJUf6ylAdGwks30jJFloc9NYHP7Y373+gGU9OS0faA4Mb5Sy8X9Xw==}
     hasBin: true
 
   tweetnacl@0.14.5:
@@ -13501,8 +13501,8 @@ packages:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
 
-  typedoc-plugin-markdown@4.6.2:
-    resolution: {integrity: sha512-JVCIoK7FDN3t3PSLkwDyrBFyjtDznqDCJotP9evxhLyb6bEZTqhAGB0tPy1RmgHuY2WoAONMrsWs8LfLsD+A6A==}
+  typedoc-plugin-markdown@4.6.3:
+    resolution: {integrity: sha512-86oODyM2zajXwLs4Wok2mwVEfCwCnp756QyhLGX2IfsdRYr1DXLCgJgnLndaMUjJD7FBhnLk2okbNE9PdLxYRw==}
     engines: {node: '>= 18'}
     peerDependencies:
       typedoc: 0.28.x
@@ -13512,8 +13512,8 @@ packages:
     peerDependencies:
       typedoc: 0.26.x || 0.27.x || 0.28.x
 
-  typedoc@0.28.2:
-    resolution: {integrity: sha512-9Giuv+eppFKnJ0oi+vxqLM817b/IrIsEMYgy3jj6zdvppAfDqV3d6DXL2vXUg2TnlL62V48th25Zf/tcQKAJdg==}
+  typedoc@0.28.3:
+    resolution: {integrity: sha512-5svOCTfXvVSh6zbZKSQluZhR8yN2tKpTeHZxlmWpE6N5vc3R8k/jhg9nnD6n5tN9/ObuQTojkONrOxFdUFUG9w==}
     engines: {node: '>= 18', pnpm: '>= 10'}
     hasBin: true
     peerDependencies:
@@ -23125,11 +23125,11 @@ snapshots:
     dependencies:
       eslint: 9.24.0(jiti@2.4.2)
 
-  eslint-config-turbo@2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.0):
+  eslint-config-turbo@2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.2):
     dependencies:
       eslint: 9.24.0(jiti@2.4.2)
-      eslint-plugin-turbo: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.0)
-      turbo: 2.5.0
+      eslint-plugin-turbo: 2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.2)
+      turbo: 2.5.2
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
@@ -23276,11 +23276,11 @@ snapshots:
     dependencies:
       eslint: 9.24.0(jiti@2.4.2)
 
-  eslint-plugin-turbo@2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.0):
+  eslint-plugin-turbo@2.5.0(eslint@9.24.0(jiti@2.4.2))(turbo@2.5.2):
     dependencies:
       dotenv: 16.0.3
       eslint: 9.24.0(jiti@2.4.2)
-      turbo: 2.5.0
+      turbo: 2.5.2
 
   eslint-plugin-unused-imports@4.1.4(@typescript-eslint/eslint-plugin@8.30.1(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2)):
     dependencies:
@@ -30231,38 +30231,38 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  turbo-darwin-64@2.5.0:
+  turbo-darwin-64@2.5.2:
     optional: true
 
-  turbo-darwin-arm64@2.5.0:
+  turbo-darwin-arm64@2.5.2:
     optional: true
 
-  turbo-ignore@2.5.0:
+  turbo-ignore@2.5.2:
     dependencies:
       json5: 2.2.3
 
-  turbo-linux-64@2.5.0:
+  turbo-linux-64@2.5.2:
     optional: true
 
-  turbo-linux-arm64@2.5.0:
+  turbo-linux-arm64@2.5.2:
     optional: true
 
   turbo-stream@2.4.0: {}
 
-  turbo-windows-64@2.5.0:
+  turbo-windows-64@2.5.2:
     optional: true
 
-  turbo-windows-arm64@2.5.0:
+  turbo-windows-arm64@2.5.2:
     optional: true
 
-  turbo@2.5.0:
+  turbo@2.5.2:
     optionalDependencies:
-      turbo-darwin-64: 2.5.0
-      turbo-darwin-arm64: 2.5.0
-      turbo-linux-64: 2.5.0
-      turbo-linux-arm64: 2.5.0
-      turbo-windows-64: 2.5.0
-      turbo-windows-arm64: 2.5.0
+      turbo-darwin-64: 2.5.2
+      turbo-darwin-arm64: 2.5.2
+      turbo-linux-64: 2.5.2
+      turbo-linux-arm64: 2.5.2
+      turbo-windows-64: 2.5.2
+      turbo-windows-arm64: 2.5.2
 
   tweetnacl@0.14.5: {}
 
@@ -30338,15 +30338,15 @@ snapshots:
       possible-typed-array-names: 1.0.0
       reflect.getprototypeof: 1.0.10
 
-  typedoc-plugin-markdown@4.6.2(typedoc@0.28.2(typescript@5.8.3)):
+  typedoc-plugin-markdown@4.6.3(typedoc@0.28.3(typescript@5.8.3)):
     dependencies:
-      typedoc: 0.28.2(typescript@5.8.3)
+      typedoc: 0.28.3(typescript@5.8.3)
 
-  typedoc-plugin-replace-text@4.2.0(typedoc@0.28.2(typescript@5.8.3)):
+  typedoc-plugin-replace-text@4.2.0(typedoc@0.28.3(typescript@5.8.3)):
     dependencies:
-      typedoc: 0.28.2(typescript@5.8.3)
+      typedoc: 0.28.3(typescript@5.8.3)
 
-  typedoc@0.28.2(typescript@5.8.3):
+  typedoc@0.28.3(typescript@5.8.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.2.2
       lunr: 2.3.9
