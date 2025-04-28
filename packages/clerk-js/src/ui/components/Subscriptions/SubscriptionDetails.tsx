@@ -133,6 +133,16 @@ const _SubscriptionDetails = ({
 
       {hasFeatures ? (
         <Drawer.Body>
+          <Text
+            elementDescriptor={descriptors.subscriptionDetailCaption}
+            variant={'caption'}
+            localizationKey={localizationKeys('__experimental_commerce.availableFeatures')}
+            colorScheme='secondary'
+            sx={t => ({
+              padding: t.space.$4,
+              paddingBottom: 0,
+            })}
+          />
           <Box
             elementDescriptor={descriptors.subscriptionDetailFeaturesList}
             as='ul'
@@ -143,13 +153,6 @@ const _SubscriptionDetails = ({
               padding: t.space.$4,
             })}
           >
-            <Text
-              elementDescriptor={descriptors.subscriptionDetailCaption}
-              variant={'caption'}
-              localizationKey={localizationKeys('__experimental_commerce.availableFeatures')}
-              colorScheme='secondary'
-            />
-
             {features.map(feature => (
               <Box
                 key={feature.id}
