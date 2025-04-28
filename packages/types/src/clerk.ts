@@ -20,7 +20,6 @@ import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
