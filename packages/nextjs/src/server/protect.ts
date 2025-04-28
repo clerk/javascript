@@ -1,5 +1,11 @@
 import type { AuthObject } from '@clerk/backend';
-import type { AuthenticatedMachineObject, RedirectFun, SignedInAuthObject, TokenType } from '@clerk/backend/internal';
+import type {
+  AuthenticatedMachineObject,
+  AuthenticateRequestOptions,
+  RedirectFun,
+  SignedInAuthObject,
+  TokenType,
+} from '@clerk/backend/internal';
 import { constants, isTokenTypeAccepted } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationFromSessionClaims,
@@ -17,7 +23,7 @@ type AuthProtectOptions = {
   /**
    * The token type to check.
    */
-  token?: TokenType | TokenType[];
+  token?: AuthenticateRequestOptions['acceptsToken'];
   /**
    * The URL to redirect the user to if they are not authorized.
    */
@@ -32,11 +38,20 @@ type AuthProtectOptions = {
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
+  /**
+   * @example
+   * auth.protect({ permission: 'org:admin:example1' });
+   * auth.protect({ role: 'admin' });
+   */
   <P extends OrganizationCustomPermissionKey>(
     params?: CheckAuthorizationParamsFromSessionClaims<P>,
     options?: AuthProtectOptions,
   ): Promise<SignedInAuthObject>;
 
+  /**
+   * @example
+   * auth.protect(has => has({ permission: 'org:admin:example1' }));
+   */
   (
     params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
     options?: AuthProtectOptions,
@@ -88,15 +103,10 @@ export function createProtect(opts: {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
   return (async (...args: any[]) => {
-    const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
-    const paramsOrFunction = optionValuesAsParam
-      ? undefined
-      : (args[0] as
-          | CheckAuthorizationParamsWithCustomPermissions
-          | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
+    const paramsOrFunction = getAuthorizationParams(args[0]);
     const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
     const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
-    const requestedToken = (args[0]?.token || args[1]?.token) as TokenType | TokenType[] | undefined;
+    const requestedToken = (args[0]?.token || args[1]?.token || 'session_token') as TokenType | TokenType[];
 
     const handleUnauthenticated = () => {
       // For machine tokens, always return notFound instead of redirecting
@@ -121,11 +131,8 @@ export function createProtect(opts: {
       return notFound();
     };
 
-    if (requestedToken) {
-      if (!isTokenTypeAccepted(authObject.tokenType, requestedToken)) {
-        return handleUnauthorized();
-      }
-      return authObject;
+    if (!isTokenTypeAccepted(authObject.tokenType, requestedToken)) {
+      return handleUnauthorized();
     }
 
     if (authObject.tokenType !== 'session_token') {
@@ -178,6 +185,27 @@ export function createProtect(opts: {
     return handleUnauthorized();
   }) as AuthProtect;
 }
+
+const getAuthorizationParams = (arg: any) => {
+  if (!arg) {
+    return undefined;
+  }
+
+  // Skip authorization check if the arg contains any of these options
+  if (arg.unauthenticatedUrl || arg.unauthorizedUrl || arg.token) {
+    return undefined;
+  }
+
+  // Skip if it's just a token-only object
+  if (Object.keys(arg).length === 1 && 'token' in arg) {
+    return undefined;
+  }
+
+  // Return the authorization params/function
+  return arg as
+    | CheckAuthorizationParamsWithCustomPermissions
+    | ((has: CheckAuthorizationWithCustomPermissions) => boolean);
+};
 
 const isServerActionRequest = (req: Request) => {
   return (

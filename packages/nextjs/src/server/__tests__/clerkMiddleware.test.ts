@@ -108,6 +108,13 @@ describe('ClerkMiddleware type tests', () => {
     });
   });
 
+  it('can be used with a handler that expects a machine auth object', () => {
+    clerkMiddlewareMock(async auth => {
+      const { getToken } = await auth({ acceptsToken: 'machine_token' });
+      await getToken();
+    });
+  });
+
   it('can be used with just an optional options object', () => {
     clerkMiddlewareMock({ secretKey: '', publishableKey: '' });
     clerkMiddlewareMock();
@@ -466,6 +473,30 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
+    it('does not throw when protect is called and the request is authenticated with a machine token', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: 'api_key', id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: 'api_key' });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
     it('throws a not found error when protect is called, the user is signed out, and is not a page request', async () => {
       const req = mockRequest({
         url: '/protected',
@@ -482,6 +513,33 @@ describe('clerkMiddleware(params)', () => {
 
       const resp = await clerkMiddleware(async auth => {
         await auth.protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws a not found error when protect is called, the machine auth token is invalid, and is not a page request', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({
+          tokenType: 'api_key',
+          id: null,
+        }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: 'api_key' });
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
@@ -563,6 +621,78 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/discover');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws a not found error when protect is called with mismatching token types', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer m2m_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: 'machine_token', id: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: 'api_key' });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('does not throw when protect is called with array of token types and request matches one', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: 'api_key', id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: ['session_token', 'api_key'] });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws a not found error when protect is called with array of token types and request does not match any', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: 'api_key', id: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: ['session_token', 'machine_token'] });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
   });
