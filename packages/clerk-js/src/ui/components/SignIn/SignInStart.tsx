@@ -7,8 +7,12 @@ import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
-import { buildSSOCallbackURL } from '../../common/redirects';
+import {
+  buildSSOCallbackURL,
+  getIdentifierControlDisplayValues,
+  groupIdentifiers,
+  withRedirectToAfterSignIn,
+} from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -20,6 +24,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
@@ -29,7 +34,6 @@ import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { getSignUpAttributeFromIdentifier } from './utils';
-import { CaptchaElement } from '../../elements/CaptchaElement';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
