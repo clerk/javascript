@@ -30,6 +30,7 @@ export const enUS: LocalizationResource = {
     reSubscribe: 'Re-subscribe',
     switchPlan: 'Switch to this plan',
     defaultFreePlanActive: "You're currently on the Free plan",
+    availableFeatures: 'Available features',
     viewFeatures: 'View features',
     seeAllFeatures: 'See all features',
   },

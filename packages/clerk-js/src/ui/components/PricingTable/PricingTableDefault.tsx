@@ -1,3 +1,5 @@
+import { useClerk } from '@clerk/shared/react';
+
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -5,7 +7,8 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
-import { usePlansContext } from '../../contexts';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
+import { usePlansContext, usePricingTableContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -101,6 +104,9 @@ interface CardProps {
 
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
+  const clerk = useClerk();
+  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+
   const ctaPosition = pricingTableProps.ctaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug, features } = plan;
@@ -108,6 +114,20 @@ function Card(props: CardProps) {
   const hasFeatures = totalFeatures > 0;
 
   const { buttonPropsForPlan } = usePlansContext();
+
+  const showPlanDetails = () => {
+    clerk.__internal_openSubscriptionDetails({
+      plan,
+      subscriberType,
+      planPeriod,
+      portalId:
+        mode === 'modal'
+          ? subscriberType === 'user'
+            ? USER_PROFILE_CARD_SCROLLBOX_ID
+            : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
+          : undefined,
+    });
+  };
 
   return (
     <Box
@@ -156,6 +176,7 @@ function Card(props: CardProps) {
             <CardFeaturesList
               plan={plan}
               isCompact={isCompact}
+              showPlanDetails={showPlanDetails}
             />
           </Box>
         ) : null}
@@ -306,7 +327,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           columnGap: t.space.$1x5,
         })}
       >
-        {plan.hasBaseFee ? (
+        {plan.amount > 0 ? (
           <>
             <Text
               elementDescriptor={descriptors.pricingTableCardFee}
@@ -422,16 +443,14 @@ interface CardFeaturesListProps {
    * @default false
    */
   isCompact?: boolean;
+  showPlanDetails: () => void;
 }
 
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
-  const { plan, isCompact } = props;
+  const { plan, isCompact, showPlanDetails } = props;
+
   const totalFeatures = plan.features.length;
   const hasMoreFeatures = isCompact ? totalFeatures > 3 : totalFeatures > 8;
-
-  const showPlanDetails = () => {
-    console.log('showPlanDetails');
-  };
 
   return (
     <Box

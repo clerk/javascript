@@ -119,6 +119,7 @@ type _LocalizationResource = {
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
+    availableFeatures: LocalizationValue;
     checkout: {
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;

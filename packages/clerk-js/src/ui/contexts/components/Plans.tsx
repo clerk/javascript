@@ -209,7 +209,7 @@ export const usePlansContext = () => {
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openSubscriptionDetails({
-          subscription,
+          plan,
           subscriberType: ctx.subscriberType,
           onSubscriptionCancel: () => {
             ctx.revalidate();
