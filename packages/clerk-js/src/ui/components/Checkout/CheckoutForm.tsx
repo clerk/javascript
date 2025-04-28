@@ -28,6 +28,9 @@ export const CheckoutForm = ({
 }) => {
   const { plan, planPeriod, totals } = checkout;
 
+  const showAdjustment = totals.proration && totals.totalDueNow.amount > 0;
+  const showDowngradeInfo = totals.totalDueNow.amount === 0;
+
   return (
     <Drawer.Body>
       <Box
@@ -40,11 +43,13 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group expand>
-            <LineItems.Title description={'Your features will remain the end of your current subscription.'} />
-          </LineItems.Group>
+          {showDowngradeInfo && (
+            <LineItems.Group expand>
+              <LineItems.Title description={'Your features will remain the end of your current subscription.'} />
+            </LineItems.Group>
+          )}
 
-          <LineItems.Group borderTop>
+          <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
@@ -52,7 +57,7 @@ export const CheckoutForm = ({
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
-          {totals.proration && totals.totalDueNow.amount > 0 && (
+          {showAdjustment && (
             <LineItems.Group>
               {/* TODO(@Commerce): needs localization */}
               <LineItems.Title
