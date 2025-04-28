@@ -16,8 +16,8 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
   __experimental_PlanDetailsProps,
+  __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
