@@ -3,7 +3,7 @@ import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 import type { BuildClerkOptions } from './types';
 
 /**
- * @deprecated Use `getClerkInstance` instead. `Clerk` will be removed in the next major version.
+ * @deprecated Use `getClerkInstance()` instead. `Clerk` will be removed in the next major version.
  */
 export const clerk = globalThis?.window?.Clerk;
 

@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react/index';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -253,7 +253,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   );
 });
 
-Overlay.displayName = 'Drawer.Content';
+Content.displayName = 'Drawer.Content';
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer.Header

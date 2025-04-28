@@ -22,6 +22,14 @@ export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => 
   return !environment?.organizationSettings.enabled;
 };
 
-export const disabledCommerceFeature: ComponentGuard = (_, environment) => {
-  return !environment?.__experimental_commerceSettings.enabled;
+export const disabledBillingFeature: ComponentGuard = (_, environment) => {
+  return !environment?.__experimental_commerceSettings.billing.enabled;
+};
+
+export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
+  return environment?.__experimental_commerceSettings.billing.hasPaidOrgPlans || false;
+};
+
+export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
+  return environment?.__experimental_commerceSettings.billing.hasPaidUserPlans || false;
 };

@@ -1,17 +1,23 @@
 import type {
   __experimental_CommerceBillingNamespace,
   __experimental_CommerceCheckoutJSON,
+  __experimental_CommerceInvoiceJSON,
+  __experimental_CommerceInvoiceResource,
   __experimental_CommercePlanResource,
   __experimental_CommerceProductJSON,
   __experimental_CommerceSubscriptionJSON,
   __experimental_CommerceSubscriptionResource,
   __experimental_CreateCheckoutParams,
+  __experimental_GetInvoicesParams,
   __experimental_GetPlansParams,
+  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   __experimental_CommerceCheckout,
+  __experimental_CommerceInvoice,
   __experimental_CommercePlan,
   __experimental_CommerceSubscription,
   BaseResource,
@@ -29,10 +35,15 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     return defaultProduct?.plans.map(plan => new __experimental_CommercePlan(plan)) || [];
   };
 
-  getSubscriptions = async (): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+  getSubscriptions = async (
+    params: __experimental_GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>> => {
+    const { orgId, ...rest } = params;
+
     return await BaseResource._fetch({
-      path: `/me/subscriptions`,
+      path: orgId ? `/organizations/${orgId}/subscriptions` : `/me/commerce/subscriptions`,
       method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: subscriptions, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceSubscriptionJSON>;
@@ -44,15 +55,36 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     });
   };
 
+  getInvoices = async (
+    params: __experimental_GetInvoicesParams,
+  ): Promise<ClerkPaginatedResponse<__experimental_CommerceInvoiceResource>> => {
+    const { orgId, ...rest } = params;
+
+    return await BaseResource._fetch({
+      path: orgId ? `/organizations/${orgId}/commerce/invoices` : `/me/commerce/invoices`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(rest),
+    }).then(res => {
+      const { data: invoices, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceInvoiceJSON>;
+
+      return {
+        total_count,
+        data: invoices.map(invoice => new __experimental_CommerceInvoice(invoice)),
+      };
+    });
+  };
+
   startCheckout = async (params: __experimental_CreateCheckoutParams) => {
+    const { orgId, ...rest } = params;
     const json = (
       await BaseResource._fetch<__experimental_CommerceCheckoutJSON>({
-        path: `/me/commerce/checkouts`,
+        path: orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`,
         method: 'POST',
-        body: params as any,
+        body: rest as any,
       })
     )?.response as unknown as __experimental_CommerceCheckoutJSON;
 
-    return new __experimental_CommerceCheckout(json);
+    return new __experimental_CommerceCheckout(json, orgId);
   };
 }

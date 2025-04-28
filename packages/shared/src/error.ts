@@ -164,7 +164,6 @@ export class ClerkRuntimeError extends Error {
    * The error message.
    *
    * @type {string}
-   * @memberof ClerkRuntimeError
    */
   message: string;
 
@@ -172,7 +171,6 @@ export class ClerkRuntimeError extends Error {
    * A unique code identifying the error, can be used for localization.
    *
    * @type {string}
-   * @memberof ClerkRuntimeError
    */
   code: string;
 
@@ -195,7 +193,6 @@ export class ClerkRuntimeError extends Error {
    * Returns a string representation of the error.
    *
    * @returns {string} A formatted string with the error name and message.
-   * @memberof ClerkRuntimeError
    */
   public toString = () => {
     return `[${this.name}]\nMessage:${this.message}`;
@@ -218,7 +215,7 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
 }
 
 /**
- * @deprecated Please use `EmailLinkErrorCodeStatus` instead.
+ * @deprecated Use `EmailLinkErrorCodeStatus` instead.
  *
  * @hidden
  */

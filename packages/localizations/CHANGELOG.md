@@ -1,5 +1,102 @@
 # Change Log
 
+## 3.14.0
+
+### Minor Changes
+
+- Remove `not_allowed_access` localizations from `en_*` localization files to rely on more-specific API-based error messages. ([#5701](https://github.com/clerk/javascript/pull/5701)) by [@tmilewski](https://github.com/tmilewski)
+
+  Update and translate additional non-english `not_allowed_access` error messages.
+
+### Patch Changes
+
+- Simplify `form_identifier_not_found` localization to "We couldn't find an account with those details." ([#5700](https://github.com/clerk/javascript/pull/5700)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.13.14
+
+### Patch Changes
+
+- Make the `session_exists` error message more user-friendly and localize ([#5699](https://github.com/clerk/javascript/pull/5699)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e)]:
+  - @clerk/types@4.55.1
+
+## 3.13.13
+
+### Patch Changes
+
+- Account for all possible cases from `not_allowed_access` error codes ([#5688](https://github.com/clerk/javascript/pull/5688)) by [@tmilewski](https://github.com/tmilewski)
+
+- - Adds support for collecting and verifying user email (when they don't already have one associated with their payer) during checkout ([#5671](https://github.com/clerk/javascript/pull/5671)) by [@aeliox](https://github.com/aeliox)
+
+  - Fixes incorrect org invoices endpoint.
+  - Extracts plan CTA button styling, labeling, and selecting into context methods.
+  - Adds UserProfile / OrgProfile specific scrollbox IDs for drawer portal-ing (fixes issue where both could be open)
+  - Fixes incorrect button action in SubscriptionList for active but expiring subscriptions.
+
+- Add `<SubscriptionsList />` to both UserProfile and OrgProfile components. ([#5658](https://github.com/clerk/javascript/pull/5658)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Introduce experimental method for opening `<SubscriptionDetails />` component.
+
+  ```tsx
+  clerk.__experimental_openSubscriptionDetails(...)
+  ```
+
+- Updated dependencies [[`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/types@4.55.0
+
+## 3.13.12
+
+### Patch Changes
+
+- Add Spanish translations for email and password inputs ([#5657](https://github.com/clerk/javascript/pull/5657)) by [@LFCisneros](https://github.com/LFCisneros)
+
+- Updated dependencies [[`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/types@4.54.2
+
+## 3.13.11
+
+### Patch Changes
+
+- Chore: tidy up checkout complete state for upcoming subscriptions ([#5644](https://github.com/clerk/javascript/pull/5644)) by [@aeliox](https://github.com/aeliox)
+
+- Fix German account deletion confirmation ([#5624](https://github.com/clerk/javascript/pull/5624)) by [@hansemannn](https://github.com/hansemannn)
+
+- Updates `PricingTable` and `SubscriptionDetailDrawer` to handle `upcoming` and "expiring" subscriptions. ([#5601](https://github.com/clerk/javascript/pull/5601)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+
+## 3.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/types@4.54.0
+
+## 3.13.9
+
+### Patch Changes
+
+- Improve the CAPTCHA error message to better assist users ([#5577](https://github.com/clerk/javascript/pull/5577)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5)]:
+  - @clerk/types@4.53.0
+
+## 3.13.8
+
+### Patch Changes
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/types@4.52.0
+
+## 3.13.7
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/types@4.51.1
+
 ## 3.13.6
 
 ### Patch Changes

@@ -711,8 +711,7 @@ export const enUS_v4: any = {
   },
   unstable__errors: {
     identification_deletion_failed: 'You cannot delete your last identification.',
-    phone_number_exists: 'This phone number is taken. Please try another.',
-    form_identifier_not_found: '',
+    form_identifier_not_found: "We couldn't find an account with those details.",
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_invalid:
@@ -727,7 +726,6 @@ export const enUS_v4: any = {
     form_param_nil: '',
     form_code_incorrect: '',
     form_password_incorrect: '',
-    not_allowed_access: '',
     form_identifier_exists: '',
     form_password_validation_failed: 'Incorrect Password',
     form_password_not_strong_enough: 'Your password is not strong enough.',
@@ -742,6 +740,8 @@ export const enUS_v4: any = {
       requireUppercase: 'an uppercase letter',
       requireSpecialCharacter: 'a special character',
     },
+    phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: "You're already signed in.",
     zxcvbn: {
       notEnough: 'Your password is not strong enough.',
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',

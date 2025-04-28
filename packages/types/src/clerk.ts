@@ -8,13 +8,19 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
+  SubscriptionDetailTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace, __experimental_CommerceSubscriptionPlanPeriod } from './commerce';
+import type {
+  __experimental_CommerceNamespace,
+  __experimental_CommerceSubscriberType,
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
+} from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -90,6 +96,19 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+type ClerkEvent = keyof ClerkEventPayload;
+type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
+export type ClerkEventPayload = {
+  status: ClerkStatus;
+};
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * @inline
+ */
+export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
+
 /**
  * Main Clerk SDK object.
  */
@@ -109,6 +128,15 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
+   */
+  status: ClerkStatus;
 
   /**
    * @internal
@@ -190,7 +218,17 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
+   */
+  __internal_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
+
+  /**
+   * Closes the Clerk SubscriptionDetails drawer.
+   */
+  __internal_closeSubscriptionDetails: () => void;
+
+  /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -432,6 +470,22 @@ export interface Clerk {
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+
+  /**
+   * Registers an event handler for a specific Clerk event.
+   * @param event - The event name to subscribe to
+   * @param handler - The callback function to execute when the event is dispatched
+   * @param opt - Optional configuration object
+   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   */
+  on: OnEventListener;
+
+  /**
+   * Removes an event handler for a specific Clerk event.
+   * @param event - The event name to unsubscribe from
+   * @param handler - The callback function to remove
+   */
+  off: OffEventListener;
 
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
@@ -720,6 +774,10 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The underlying resource to optionally reload before processing an OAuth callback.
+     */
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -760,11 +818,11 @@ export type ClerkOptions = PendingSessionOptions &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -777,7 +835,7 @@ export type ClerkOptions = PendingSessionOptions &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -831,7 +889,8 @@ export type ClerkOptions = PendingSessionOptions &
     experimental?: Autocomplete<
       {
         /**
-         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         * Persist the Clerk client to match the user's device with a client.
+         * @default true
          */
         persistClient: boolean;
         /**
@@ -991,7 +1050,7 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated in favor of `redirectUrl`.
+   * @deprecated Use `redirectUrl` instead.
    *
    * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
@@ -1317,13 +1376,13 @@ export type UserButtonProps = UserButtonProfileMode & {
 
   /**
    * Full URL or path to navigate to after sign out is complete
-   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
+   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterSignOutUrl?: string;
   /**
    * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
-   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
+   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**
@@ -1396,7 +1455,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Full URL or path to navigate to after a successful organization switch.
      * @default undefined
-     * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
+     * @deprecated Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`.
      */
     afterSwitchOrganizationUrl?: string;
     /**
@@ -1518,14 +1577,8 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 type __experimental_PricingTableDefaultProps = {
-  layout?: 'default';
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-};
-
-type __experimental_PricingTableMatrixProps = {
-  layout?: 'matrix';
-  highlightPlan?: string;
 };
 
 type __experimental_PricingTableBaseProps = {
@@ -1534,19 +1587,28 @@ type __experimental_PricingTableBaseProps = {
 };
 
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
+  __experimental_PricingTableDefaultProps;
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
 };
 
+export type __experimental_SubscriptionDetailsProps = {
+  appearance?: SubscriptionDetailTheme;
+  subscription?: __experimental_CommerceSubscriptionResource;
+  subscriberType?: __experimental_CommerceSubscriberType;
+  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  onSubscriptionCancel?: () => void;
+  portalId?: string;
+};
+
 export type __experimental_PaymentSourcesProps = {
-  orgId?: string;
+  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export interface HandleEmailLinkVerificationParams {
@@ -1614,10 +1676,16 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * @inline
+ * @interface
  */
 export interface CreateOrganizationParams {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug?: string;
 }
 
@@ -1628,6 +1696,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
   legalAccepted?: boolean;
+  secondFactorUrl?: string;
 }
 
 export type JoinWaitlistParams = {

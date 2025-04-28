@@ -49,7 +49,12 @@ export async function Protect(props: ProtectProps): Promise<React.JSX.Element | 
     return restAuthorizedParams.condition(has) ? authorized : unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (
+    restAuthorizedParams.role ||
+    restAuthorizedParams.permission ||
+    restAuthorizedParams.feature ||
+    restAuthorizedParams.plan
+  ) {
     return has(restAuthorizedParams) ? authorized : unauthorized;
   }
 

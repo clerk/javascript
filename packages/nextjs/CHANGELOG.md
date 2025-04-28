@@ -1,5 +1,246 @@
 # Change Log
 
+## 6.18.0
+
+### Minor Changes
+
+- Adding reportTo and reportOnly configuration options to the contentSecurityPolicy config for clerkMiddleware ([#5702](https://github.com/clerk/javascript/pull/5702)) by [@jacekradko](https://github.com/jacekradko)
+
+- Export `<__experimental_PricingTable />`. ([#5691](https://github.com/clerk/javascript/pull/5691)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Resolved an issue with Keyless on Safari where users appeared to be signed out immediately after a successful sign-in. ([#5696](https://github.com/clerk/javascript/pull/5696)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ba19465`](https://github.com/clerk/javascript/commit/ba194654b15d326bf0ab1b2bf0cab608042d20ec), [`8b25035`](https://github.com/clerk/javascript/commit/8b25035aa49382fe1cd1c6f30ec80e86bcf9d66e), [`f0f1ed7`](https://github.com/clerk/javascript/commit/f0f1ed7ef3666bfc1cbf945326e94a51e83c4646), [`25c3502`](https://github.com/clerk/javascript/commit/25c35023ee995acbf8f5c8989619ebc176a366d6)]:
+  - @clerk/backend@1.30.0
+  - @clerk/types@4.55.1
+  - @clerk/clerk-react@5.30.0
+  - @clerk/shared@3.7.4
+
+## 6.17.0
+
+### Minor Changes
+
+- Introduce `useClerk().status` alongside `<ClerkFailed />` and `<ClerkDegraded />`. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### `useClerk().status`
+
+  Possible values for `useClerk().status` are:
+
+  - `"loading"`: Set during initialization
+  - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
+  - `"ready"`: Set when Clerk is fully operational
+  - `"degraded"`: Set when Clerk is partially operational
+    The computed value of `useClerk().loaded` is:
+  - `true` when `useClerk().status` is either `"ready"` or `"degraded"`.
+  - `false` when `useClerk().status` is `"loading"` or `"error"`.
+
+  ### `<ClerkFailed />`
+
+  ```tsx
+  <ClerkLoaded>
+    <MyCustomSignInForm/>
+  </ClerkLoaded>
+  <ClerkFailed>
+    <ContactSupportBanner/>
+  </ClerkFailed>
+  ```
+
+  ### `<ClerkDegraded />`
+
+  ```tsx
+  <ClerkLoaded>
+    <MyCustomPasskeyRegistration />
+    <ClerkDegraded>We are experiencing issues, registering a passkey might fail.</ClerkDegraded>
+  </ClerkLoaded>
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`33201bf`](https://github.com/clerk/javascript/commit/33201bf972d6a980617d47ebd776bef76f871833), [`4334598`](https://github.com/clerk/javascript/commit/4334598108ff2cfa3c25b5a46117c1c9c65b7974), [`0ae0403`](https://github.com/clerk/javascript/commit/0ae040303d239b75a3221436354a2c2ecdb85aae)]:
+  - @clerk/clerk-react@5.29.0
+  - @clerk/types@4.55.0
+  - @clerk/backend@1.29.2
+  - @clerk/shared@3.7.3
+
+## 6.16.0
+
+### Minor Changes
+
+- Adjust the CSP configuration option from mode to boolean strict to make it more intuitive ([#5648](https://github.com/clerk/javascript/pull/5648)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Default `strict` configuration option for CSP to false ([#5652](https://github.com/clerk/javascript/pull/5652)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`45486ac`](https://github.com/clerk/javascript/commit/45486acebf4d133efb09a3622a738cdbf4e51d66), [`837692a`](https://github.com/clerk/javascript/commit/837692aa40197b1574783ad36d0d017a771c08e1), [`0c00e59`](https://github.com/clerk/javascript/commit/0c00e59ff4714491650ac9480ae3b327c626d30d), [`6a5f644`](https://github.com/clerk/javascript/commit/6a5f6447a36a635d6201f8bb7619fb844ab21b79)]:
+  - @clerk/types@4.54.2
+  - @clerk/backend@1.29.1
+  - @clerk/shared@3.7.2
+  - @clerk/clerk-react@5.28.2
+
+## 6.15.1
+
+### Patch Changes
+
+- Add support for webhook verification with Next.js Pages Router. ([#5618](https://github.com/clerk/javascript/pull/5618)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Next.js Pages Router
+  import type { NextApiRequest, NextApiResponse } from 'next';
+  import { verifyWebhook } from '@clerk/nextjs/webhooks';
+
+  export const config = {
+    api: {
+      bodyParser: false,
+    },
+  };
+
+  export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+      const evt = await verifyWebhook(req);
+      // Handle webhook event
+      res.status(200).json({ received: true });
+    } catch (err) {
+      res.status(400).json({ error: 'Webhook verification failed' });
+    }
+  }
+
+  // tRPC
+  import { verifyWebhook } from '@clerk/nextjs/webhooks';
+
+  const webhookRouter = router({
+    webhook: publicProcedure.input(/** schema */).mutation(async ({ ctx }) => {
+      const evt = await verifyWebhook(ctx.req);
+      // Handle webhook event
+      return { received: true };
+    }),
+  });
+  ```
+
+- Updated dependencies [[`ab939fd`](https://github.com/clerk/javascript/commit/ab939fdb29150c376280b42f861a188a33f57dcc), [`03284da`](https://github.com/clerk/javascript/commit/03284da6a93a790ce3e3ebbd871c06e19f5a8803), [`7389ba3`](https://github.com/clerk/javascript/commit/7389ba3164ca0d848fb0a9de5d7e9716925fadcc), [`00f16e4`](https://github.com/clerk/javascript/commit/00f16e4c62fc9e965c352a4fd199c7fad8704f79), [`bb35660`](https://github.com/clerk/javascript/commit/bb35660884d04c8a426790ed439592e33434c87f), [`efb5d8c`](https://github.com/clerk/javascript/commit/efb5d8c03b14f6c2b5ecaed55a09869abe76ebbc), [`c2712e7`](https://github.com/clerk/javascript/commit/c2712e7f288271c022b5586b8b4718f57c9b6007), [`aa93f7f`](https://github.com/clerk/javascript/commit/aa93f7f94b5e146eb7166244f7e667213fa210ca), [`a7f3ebc`](https://github.com/clerk/javascript/commit/a7f3ebc63adbab274497ca24279862d2788423c7), [`d3fa403`](https://github.com/clerk/javascript/commit/d3fa4036b7768134131c008c087a90a841f225e5), [`f6ef841`](https://github.com/clerk/javascript/commit/f6ef841125ff21ca8cae731d1f47f3a101d887e1), [`6cba4e2`](https://github.com/clerk/javascript/commit/6cba4e28e904779dd448a7c29d761fcf53465dbf), [`fb6aa20`](https://github.com/clerk/javascript/commit/fb6aa20abe1c0c8579ba8f07343474f915bc22c6), [`e634830`](https://github.com/clerk/javascript/commit/e6348301ab56a7868f24c1b9a4dd9e1d60f6027b), [`f8887b2`](https://github.com/clerk/javascript/commit/f8887b2cbd145e8e49bec890e8b6e02e34178d6a)]:
+  - @clerk/types@4.54.1
+  - @clerk/backend@1.29.0
+  - @clerk/shared@3.7.1
+  - @clerk/clerk-react@5.28.1
+
+## 6.15.0
+
+### Minor Changes
+
+- Add support for feature or plan based authorization ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
+
+  ## `await auth()`
+
+  ### Plan
+
+  - `(await auth()).has({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `(await auth()).has({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `(await auth()).has({ feature: "org:my-feature" })`
+  - `(await auth()).has({ feature: "user:my-feature" })`
+  - `(await auth()).has({ plan: "user:my-plan" })`
+  - `(await auth()).has({ plan: "org:my-plan" })`
+
+  ## `auth.protect()`
+
+  ### Plan
+
+  - `auth.protect({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `auth.protect({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `auth.protect({ feature: "org:my-feature" })`
+  - `auth.protect({ feature: "user:my-feature" })`
+  - `auth.protect({ plan: "user:my-plan" })`
+  - `auth.protect({ plan: "org:my-plan" })`
+
+  ## `<Protect />`
+
+  ### Plan
+
+  - `<Protect plan="my-plan" />`
+
+  ### Feature
+
+  - `<Protect feature="my-feature" />`
+
+  ### Scoped per user or per org
+
+  - `<Protect feature="org:my-feature" />`
+  - `<Protect feature="user:my-feature" />`
+  - `<Protect plan="org:my-plan" />`
+  - `<Protect plan="user:my-plan" />`
+
+  ## `useAuth()`
+
+  ### Plan
+
+  - `useAuth().has({ plan: "my-plan" })`
+
+  ### Feature
+
+  - `useAuth().has({ feature: "my-feature" })`
+
+  ### Scoped per user or per org
+
+  - `useAuth().has({ feature: "org:my-feature" })`
+  - `useAuth().has({ feature: "user:my-feature" })`
+  - `useAuth().has({ plan: "user:my-plan" })`
+  - `useAuth().has({ plan: "org:my-plan" })`
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5596](https://github.com/clerk/javascript/pull/5596)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`950ffed`](https://github.com/clerk/javascript/commit/950ffedd5ce93678274c721400fc7464bb1e2f99), [`d3e6c32`](https://github.com/clerk/javascript/commit/d3e6c32864487bb9c4dec361866ec2cd427b7cd0), [`e4d04ae`](https://github.com/clerk/javascript/commit/e4d04aea490ab67e3431729398d3f4c46fc3e7e7), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`93068ea`](https://github.com/clerk/javascript/commit/93068ea9eb19d8c8b9c7ade35d0cd860e08049fc), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`103bc03`](https://github.com/clerk/javascript/commit/103bc03571c8845df205f4c6fd0c871c3368d1d0), [`431a821`](https://github.com/clerk/javascript/commit/431a821b590835bcf6193a4cbdd234c5e763e08c), [`a0cc247`](https://github.com/clerk/javascript/commit/a0cc24764cc2229abae97f7c9183b413609febc7), [`85ed003`](https://github.com/clerk/javascript/commit/85ed003e65802ac02d69d7b671848938c9816c45), [`48438b4`](https://github.com/clerk/javascript/commit/48438b409036088701bda7e1e732d6a51bee8cdc), [`e60e3aa`](https://github.com/clerk/javascript/commit/e60e3aa41630b987b6a481643caf67d70584f2e1), [`65712dc`](https://github.com/clerk/javascript/commit/65712dccb3f3f2bc6028e53406e3f7f31622e961), [`9ee0531`](https://github.com/clerk/javascript/commit/9ee0531c81d1bb260ec0f87130d8394d7825b6d4), [`78d22d4`](https://github.com/clerk/javascript/commit/78d22d443446ac1c0d30b1b93aaf5cddde75a9a3), [`196dcb4`](https://github.com/clerk/javascript/commit/196dcb47928bd22a3382197f8594a590f688faee)]:
+  - @clerk/backend@1.28.0
+  - @clerk/types@4.54.0
+  - @clerk/shared@3.7.0
+  - @clerk/clerk-react@5.28.0
+
+## 6.14.3
+
+### Patch Changes
+
+- Improve JSDoc comments ([#5575](https://github.com/clerk/javascript/pull/5575)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`70c9db9`](https://github.com/clerk/javascript/commit/70c9db9f3b51ba034f76e0cc4cf338e7b406d9b1), [`554242e`](https://github.com/clerk/javascript/commit/554242e16e50c92a6afb6ed74c681b04b9f113b5), [`cc1f9a0`](https://github.com/clerk/javascript/commit/cc1f9a0adb7771b615b0f2994a5ac571b59889dd), [`8186cb5`](https://github.com/clerk/javascript/commit/8186cb564575ac3ce97079ec203865bf5deb05ee)]:
+  - @clerk/backend@1.27.3
+  - @clerk/shared@3.6.0
+  - @clerk/clerk-react@5.27.0
+  - @clerk/types@4.53.0
+
+## 6.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`3ad3bc8`](https://github.com/clerk/javascript/commit/3ad3bc8380b354b0cd952eb58eb6c07650efa0f2), [`cfa94b8`](https://github.com/clerk/javascript/commit/cfa94b88476608edf8c2486e8ec0d3f3f82e0bfb), [`2033919`](https://github.com/clerk/javascript/commit/203391964857b98dae11944799d1e6328439e838), [`1b34bcb`](https://github.com/clerk/javascript/commit/1b34bcb17e1a7f22644c0ea073857c528a8f81b7), [`5f3cc46`](https://github.com/clerk/javascript/commit/5f3cc460b6b775b5a74746758b8cff11649a877a)]:
+  - @clerk/shared@3.5.0
+  - @clerk/types@4.52.0
+  - @clerk/backend@1.27.2
+  - @clerk/clerk-react@5.26.2
+
+## 6.14.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6f275d`](https://github.com/clerk/javascript/commit/f6f275dac5ae83ac0c2016a85a6a0cee9513f224)]:
+  - @clerk/backend@1.27.1
+  - @clerk/types@4.51.1
+  - @clerk/clerk-react@5.26.1
+  - @clerk/shared@3.4.1
+
 ## 6.14.0
 
 ### Minor Changes

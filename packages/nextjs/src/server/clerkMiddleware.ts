@@ -11,7 +11,7 @@ import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
-import { createCSPHeader, type CSPDirective, type CSPMode } from './content-security-policy';
+import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
@@ -56,7 +56,7 @@ type ClerkMiddlewareHandler = (
  * The `clerkMiddleware()` function accepts an optional object. The following options are available.
  * @interface
  */
-export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+export interface ClerkMiddlewareOptions extends AuthenticateRequestOptions {
   /**
    * If true, additional debug information will be logged to the console.
    */
@@ -65,17 +65,8 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   /**
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
-  contentSecurityPolicy?: {
-    /**
-     * The CSP mode to use - either 'standard' or 'strict-dynamic'
-     */
-    mode: CSPMode;
-    /**
-     * Custom CSP directives to merge with Clerk's default directives
-     */
-    directives?: Partial<Record<CSPDirective, string[]>>;
-  };
-};
+  contentSecurityPolicy?: ContentSecurityPolicyOptions;
+}
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
 
@@ -209,20 +200,17 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handlerResult = handleControlFlowErrors(e, clerkRequest, request, requestState);
       }
       if (options.contentSecurityPolicy) {
-        const { header, nonce } = createCSPHeader(
-          options.contentSecurityPolicy.mode,
+        const { headers } = createContentSecurityPolicyHeaders(
           (parsePublishableKey(publishableKey)?.frontendApi ?? '').replace('$', ''),
-          options.contentSecurityPolicy.directives,
+          options.contentSecurityPolicy,
         );
 
-        setHeader(handlerResult, constants.Headers.ContentSecurityPolicy, header);
-        if (nonce) {
-          setHeader(handlerResult, constants.Headers.Nonce, nonce);
-        }
+        headers.forEach(([key, value]) => {
+          setHeader(handlerResult, key, value);
+        });
 
         logger.debug('Clerk generated CSP', () => ({
-          header,
-          nonce,
+          headers,
         }));
       }
 

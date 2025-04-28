@@ -42,6 +42,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'lineItemsDescriptionSuffix',
   'lineItemsDescriptionPrefix',
   'lineItemsDescriptionText',
+  'lineItemsCopyButton',
 
   'actionCard',
 
@@ -51,6 +52,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'header',
   'headerTitle',
   'headerSubtitle',
+  'headerBackLink',
 
   'main',
 
@@ -107,6 +109,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'drawerTitle',
   'drawerBody',
   'drawerFooter',
+  'drawerFooterTitle',
+  'drawerFooterDescription',
   'drawerClose',
   'drawerConfirmationBackdrop',
   'drawerConfirmationRoot',
@@ -328,6 +332,32 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectButtonIcon',
   'selectOptionsContainer',
   'selectOption',
+
+  'paymentSourceRow',
+  'paymentSourceRowIcon',
+  'paymentSourceRowText',
+  'paymentSourceRowType',
+  'paymentSourceRowValue',
+  'paymentSourceRowBadge',
+
+  'invoiceRoot',
+  'invoiceCard',
+  'invoiceHeader',
+  'invoiceHeaderContent',
+  'invoiceTitle',
+  'invoiceHeaderTitleBadgeContainer',
+  'invoiceId',
+  'invoiceIdContainer',
+  'invoiceTitleIdContainer',
+  'invoiceBadge',
+  'invoiceDetails',
+  'invoiceDetailsItem',
+  'invoiceDetailsItemTitle',
+  'invoiceDetailsItemTitleText',
+  'invoiceDetailsItemValue',
+  'invoiceDetailsItemValueText',
+  'invoiceCopyButton',
+  'invoiceContent',
 
   'menuButton',
   'menuButtonEllipsis',

@@ -10,8 +10,12 @@ import { BaseResource } from './internal';
  * @internal
  */
 export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
-  stripePublishableKey: string = '';
-  enabled: boolean = false;
+  billing: __experimental_CommerceSettingsResource['billing'] = {
+    stripePublishableKey: '',
+    enabled: false,
+    hasPaidUserPlans: false,
+    hasPaidOrgPlans: false,
+  };
 
   public constructor(
     data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null = null,
@@ -26,15 +30,24 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
     if (!data) {
       return this;
     }
-    this.stripePublishableKey = data.stripe_publishable_key;
-    this.enabled = data.enabled;
+
+    // TODO(@commerce): Remove `?.` once we launch.
+    this.billing.stripePublishableKey = data?.billing?.stripe_publishable_key || '';
+    this.billing.enabled = data?.billing?.enabled || false;
+    this.billing.hasPaidUserPlans = data?.billing?.has_paid_user_plans || false;
+    this.billing.hasPaidOrgPlans = data?.billing?.has_paid_org_plans || false;
+
     return this;
   }
 
   public __internal_toSnapshot(): __experimental_CommerceSettingsJSONSnapshot {
     return {
-      stripe_publishable_key: this.stripePublishableKey,
-      enabled: this.enabled,
+      billing: {
+        stripe_publishable_key: this.billing.stripePublishableKey,
+        enabled: this.billing.enabled,
+        has_paid_user_plans: this.billing.hasPaidUserPlans,
+        has_paid_org_plans: this.billing.hasPaidOrgPlans,
+      },
     } as unknown as __experimental_CommerceSettingsJSONSnapshot;
   }
 }

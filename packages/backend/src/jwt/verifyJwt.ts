@@ -76,6 +76,7 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
   const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
+
   const signature = base64url.parse(rawSignature, { loose: true });
 
   const data = {
@@ -107,7 +108,8 @@ export type VerifyJwtOptions = {
    */
   authorizedParties?: string[];
   /**
-   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token. Defaults to 5000 ms (5 seconds).
+   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token.
+   * @default 5000
    */
   clockSkewInMs?: number;
   /**

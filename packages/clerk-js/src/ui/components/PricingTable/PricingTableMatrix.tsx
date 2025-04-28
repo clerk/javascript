@@ -1,6 +1,7 @@
 import type { __experimental_CommercePlanResource, __experimental_CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
+import { usePlansContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -40,6 +41,8 @@ export function PricingTableMatrix({
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const pricingTableMatrixId = React.useId();
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
+
+  const { buttonPropsForPlan } = usePlansContext();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -305,32 +308,29 @@ export function PricingTableMatrix({
                         )}
                       </Flex>
                     </Box>
-                    <Box
-                      sx={t => ({
-                        width: '100%',
-                        marginBlockStart: 'auto',
-                        marginBlockEnd: t.space.$8,
-                        paddingBlockStart: t.space.$2,
-                        paddingBlockEnd: t.space.$4,
-                        paddingInline: t.space.$4,
-                      })}
-                    >
-                      <Button
-                        block
-                        variant='bordered'
-                        colorScheme={highlight ? 'primary' : 'secondary'}
-                        textVariant='buttonSmall'
-                        size='xs'
-                        onClick={() => {
-                          onSelect(plan);
-                        }}
-                        localizationKey={
-                          plan.subscriptionIdForCurrentSubscriber
-                            ? 'Manage'
-                            : localizationKeys('__experimental_commerce.getStarted')
-                        }
-                      />
-                    </Box>
+                    {!plan.isDefault ? (
+                      <Box
+                        sx={t => ({
+                          width: '100%',
+                          marginBlockStart: 'auto',
+                          marginBlockEnd: t.space.$8,
+                          paddingBlockStart: t.space.$2,
+                          paddingBlockEnd: t.space.$4,
+                          paddingInline: t.space.$4,
+                        })}
+                      >
+                        <Button
+                          block
+                          textVariant='buttonSmall'
+                          size='xs'
+                          onClick={() => {
+                            onSelect(plan);
+                          }}
+                          {...buttonPropsForPlan({ plan })}
+                          colorScheme={highlight ? 'primary' : 'secondary'}
+                        />
+                      </Box>
+                    ) : null}
                   </Box>
                 );
               })}

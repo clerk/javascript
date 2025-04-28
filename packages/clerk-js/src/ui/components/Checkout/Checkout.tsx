@@ -12,6 +12,7 @@ export const __experimental_Checkout = (props: __experimental_CheckoutProps) => 
         <__experimental_CheckoutContext.Provider
           value={{
             componentName: 'Checkout',
+            ...props,
           }}
         >
           <Drawer.Content>

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.4.35",
+  "version": "1.5.1",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -34,6 +34,16 @@
       "require": {
         "types": "./dist/types/playwright/index.d.ts",
         "default": "./dist/playwright/index.js"
+      }
+    },
+    "./playwright/unstable": {
+      "import": {
+        "types": "./dist/types/playwright/unstable/index.d.ts",
+        "default": "./dist/playwright/unstable/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/playwright/unstable/index.d.ts",
+        "default": "./dist/playwright/unstable/index.js"
       }
     },
     "./cypress": {

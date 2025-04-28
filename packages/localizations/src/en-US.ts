@@ -4,21 +4,44 @@ export const enUS: LocalizationResource = {
   locale: 'en-US',
   __experimental_commerce: {
     billedAnnually: 'Billed annually',
+    cancelSubscription: 'Cancel subscription',
+    checkout: {
+      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__subscriptionSuccessful: 'Your new subscription is all set.',
+      emailForm: {
+        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+        title: 'Add an email address',
+      },
+      lineItems: {
+        title__invoiceId: 'Invoice ID',
+        title__paymentMethod: 'Payment method',
+        title__subscriptionBegins: 'Subscription begins',
+        title__totalPaid: 'Total paid',
+      },
+      title__paymentSuccessful: 'Payment was successful!',
+      title__subscriptionSuccessful: 'Success!',
+    },
     free: 'Free',
     getStarted: 'Get started',
-    manageMembership: 'Manage membership',
+    keepSubscription: 'Keep subscription',
+    manage: 'Manage',
+    manageSubscription: 'Manage subscription',
     month: 'Month',
+    reSubscribe: 'Re-subscribe',
     switchPlan: 'Switch to this plan',
   },
   backButton: 'Back',
   badge__currentPlan: 'Current Plan',
   badge__default: 'Default',
+  badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
   badge__requiresAction: 'Requires action',
+  badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
   badge__unverified: 'Unverified',
+  badge__upcomingPlan: 'Upcoming Plan',
   badge__userDevice: 'User device',
   badge__you: 'You',
   createOrganization: {
@@ -169,11 +192,11 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
+      billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
       title: 'Organization',
-      billing: 'Billing',
     },
     profilePage: {
       dangerSection: {
@@ -560,14 +583,14 @@ export const enUS: LocalizationResource = {
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid:
-      'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
+      'Sign up unsuccessful due to failed security validations. Please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
-    form_identifier_not_found: 'No account found with this identifier. Please check and try again.',
+    form_identifier_not_found: "We couldn't find an account with those details.",
     form_param_format_invalid: 'The value entered is in an invalid format. Please check and correct it.',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
@@ -590,8 +613,7 @@ export const enUS: LocalizationResource = {
       'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access:
-      'You do not have permission to access this page. Please contact support if you believe this is an error.',
+    not_allowed_access: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
     organization_domain_common: 'This is a common email provider domain. Please use a different one.',
     organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organization’s SSO',
@@ -614,6 +636,7 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: 'This phone number is taken. Please try another.',
+    session_exists: "You're already signed in.",
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
@@ -663,29 +686,33 @@ export const enUS: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'Invoices',
-        headerTitle__paymentSources: 'Payment Sources',
-        headerTitle__plans: 'Plans',
-      },
-      title: 'Billing & Payments',
       paymentSourcesSection: {
-        title: 'Available options',
-        add: 'Add new payment source',
-        addSubtitle: 'Add a new payment source to your account.',
-        cancelButton: 'Cancel',
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         removeResource: {
-          title: 'Remove payment source',
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
             'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
           successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
         },
+        title: 'Available options',
       },
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__paymentMethods: 'Payment Methods',
+        headerTitle__plans: 'Plans',
+        headerTitle__subscriptions: 'Subscriptions',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      title: 'Billing & Payments',
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',

@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
@@ -8,13 +8,14 @@ import type {
 } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
-import { Box, Button, Col, descriptors, Flex, Form, Icon, localizationKeys, Text } from '../../customizables';
+import { __experimental_PaymentSourcesContext, useCheckoutContext } from '../../contexts';
+import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
-import { ArrowUpDown, CreditCard } from '../../icons';
+import { ArrowUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from '../PaymentSources';
+import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
@@ -90,23 +91,36 @@ const CheckoutFormElements = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { __experimental_commerce } = useClerk();
+  const { user } = useUser();
+  const { organization } = useOrganization();
+  const { subscriberType } = useCheckoutContext();
+
+  const { data } = useFetch(
+    __experimental_commerce?.getPaymentSources,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-payment-sources-${user?.id}`,
+  );
+
   const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
-  const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState(true);
+  const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState((data?.data.length || 0) === 0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  const { data } = useFetch(__experimental_commerce?.getPaymentSources, 'commerce-payment-sources');
   const { data: paymentSources } = data || { data: [] };
 
   const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
-    return checkout
-      .confirm({ paymentSourceId })
-      .then(newCheckout => {
-        onCheckoutComplete(newCheckout);
-      })
-      .catch(error => {
-        throw error;
+    try {
+      const newCheckout = await checkout.confirm({
+        paymentSourceId,
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
+      onCheckoutComplete(newCheckout);
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
   };
 
   const onPaymentSourceSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -117,17 +131,13 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    try {
-      await confirmCheckout({ paymentSourceId });
-    } catch (error) {
-      handleError(error, [], setSubmitError);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await confirmCheckout({ paymentSourceId });
+    setIsSubmitting(false);
   };
 
   const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
     await confirmCheckout({ paymentSourceId: paymentSource.id });
+    setIsSubmitting(false);
   };
 
   return (
@@ -153,12 +163,13 @@ const CheckoutFormElements = ({
             onOpenChange={setOpenAccountFundsDropDown}
           >
             {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger text='Account Funds' />
+            <Disclosure.Trigger text='Payment Methods' />
             <Disclosure.Content>
               <Col gap={3}>
                 <PaymentSourceMethods
+                  checkout={checkout}
                   paymentSources={paymentSources}
-                  totalDueNow={checkout.totals.totalDueNow || checkout.totals.grandTotal}
+                  totalDueNow={checkout.totals.totalDueNow}
                   onPaymentSourceSubmit={onPaymentSourceSubmit}
                   isSubmitting={isSubmitting}
                 />
@@ -173,19 +184,27 @@ const CheckoutFormElements = ({
         open={openAddNewSourceDropDown}
         onOpenChange={setOpenAddNewSourceDropDown}
       >
-        {/* TODO(@Commerce): needs localization */}
-        <Disclosure.Trigger text='Add a New Payment Source' />
+        <Disclosure.Trigger
+          text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
+        />
         <Disclosure.Content>
-          <AddPaymentSource
-            checkout={checkout}
-            onSuccess={onAddPaymentSourceSuccess}
-            submitLabel={localizationKeys(
-              'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-              {
-                amount: `${(checkout.totals.totalDueNow || checkout.totals.grandTotal).currencySymbol}${(checkout.totals.totalDueNow || checkout.totals.grandTotal).amountFormatted}`,
-              },
-            )}
-          />
+          <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources', subscriberType }}>
+            <AddPaymentSource
+              checkout={checkout}
+              onSuccess={onAddPaymentSourceSuccess}
+              // @ts-ignore TODO(@COMMERCE): needs localization
+              submitLabel={
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys(
+                      'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+                      {
+                        amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                      },
+                    )
+                  : 'Subscribe'
+              }
+            />
+          </__experimental_PaymentSourcesContext.Provider>
         </Disclosure.Content>
       </Disclosure.Root>
     </Col>
@@ -193,11 +212,13 @@ const CheckoutFormElements = ({
 };
 
 const PaymentSourceMethods = ({
+  checkout,
   totalDueNow,
   paymentSources,
   onPaymentSourceSubmit,
   isSubmitting,
 }: {
+  checkout: __experimental_CommerceCheckoutResource;
   totalDueNow: __experimental_CommerceMoney;
   paymentSources: __experimental_CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
@@ -205,7 +226,7 @@ const PaymentSourceMethods = ({
 }) => {
   const [selectedPaymentSource, setSelectedPaymentSource] = useState<
     __experimental_CommercePaymentSourceResource | undefined
-  >(paymentSources.length > 0 ? paymentSources[0] : undefined);
+  >(checkout.paymentSource || paymentSources.find(p => p.isDefault));
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
@@ -226,7 +247,7 @@ const PaymentSourceMethods = ({
       })}
     >
       <Select
-        elementId='role'
+        elementId='paymentSource'
         options={options}
         value={selectedPaymentSource?.id || null}
         onChange={option => {
@@ -248,20 +269,7 @@ const PaymentSourceMethods = ({
             backgroundColor: t.colors.$colorBackground,
           })}
         >
-          {selectedPaymentSource && (
-            <Flex
-              gap={3}
-              align='center'
-            >
-              <Icon icon={CreditCard} />
-              <Text
-                as='span'
-                colorScheme='body'
-              >
-                {capitalize(selectedPaymentSource.cardType)} ⋯ {selectedPaymentSource.last4}
-              </Text>
-            </Flex>
-          )}
+          {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
         </SelectButton>
         <SelectOptionList
           sx={t => ({
@@ -280,9 +288,15 @@ const PaymentSourceMethods = ({
         }}
         isLoading={isSubmitting}
       >
-        {/* TODO(@COMMERCE): needs localization */}
-        Pay {totalDueNow.currencySymbol}
-        {totalDueNow.amountFormatted}
+        {totalDueNow.amount > 0 ? (
+          <>
+            {/* TODO(@COMMERCE): needs localization */}
+            Pay {totalDueNow.currencySymbol}
+            {totalDueNow.amountFormatted}
+          </>
+        ) : (
+          'Subscribe'
+        )}
       </Button>
     </Form>
   );

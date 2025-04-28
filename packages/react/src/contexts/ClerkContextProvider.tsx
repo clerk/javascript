@@ -18,7 +18,7 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -31,13 +31,20 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
-  const derivedState = deriveState(clerkLoaded, state, initialState);
-  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
+  const derivedState = deriveState(clerk.loaded, state, initialState);
+  const clerkCtx = React.useMemo(
+    () => ({ value: clerk }),
+    [
+      // Only update the clerk reference on status change
+      clerkStatus,
+    ],
+  );
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const {
     sessionId,
     sessionStatus,
+    sessionClaims,
     session,
     userId,
     user,
@@ -54,6 +61,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     const value = {
       sessionId,
       sessionStatus,
+      sessionClaims,
       userId,
       actor,
       orgId,
@@ -63,7 +71,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       factorVerificationAge,
     };
     return { value };
-  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge]);
+  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge, sessionClaims?.__raw]);
+
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
   const organizationCtx = React.useMemo(() => {
@@ -90,8 +99,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 }
 
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
-  const [loaded, setLoaded] = React.useState(false);
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
+  const [clerkStatus, setStatus] = React.useState(isomorphicClerk.status);
 
   React.useEffect(() => {
     void isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
@@ -102,15 +111,15 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   }, [options.localization]);
 
   React.useEffect(() => {
-    isomorphicClerk.addOnLoaded(() => setLoaded(true));
-  }, []);
+    isomorphicClerk.on('status', setStatus);
+    return () => isomorphicClerk.off('status', setStatus);
+  }, [isomorphicClerk]);
 
   React.useEffect(() => {
     return () => {
       IsomorphicClerk.clearInstance();
-      setLoaded(false);
     };
   }, []);
 
-  return { isomorphicClerk, loaded };
+  return { isomorphicClerk, clerkStatus };
 };

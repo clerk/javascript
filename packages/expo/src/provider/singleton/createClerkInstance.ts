@@ -25,7 +25,7 @@ import type { BuildClerkOptions } from './types';
 const KEY = '__clerk_client_jwt';
 
 /**
- * @deprecated Use `getClerkInstance` instead. `Clerk` will be removed in the next major version.
+ * @deprecated Use `getClerkInstance()` instead. `Clerk` will be removed in the next major version.
  */
 export let clerk: HeadlessBrowserClerk | BrowserClerk;
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;

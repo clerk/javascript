@@ -16,20 +16,44 @@ export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   __experimental_commerce: {
     billedAnnually: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
     free: undefined,
     getStarted: undefined,
-    manageMembership: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
     month: undefined,
+    reSubscribe: undefined,
     switchPlan: undefined,
   },
   backButton: 'Retour',
   badge__currentPlan: undefined,
   badge__default: 'Défaut',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
   badge__primary: 'Principal',
   badge__requiresAction: 'Nécessite une action',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Cet appareil',
   badge__unverified: 'Non vérifié',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
   createOrganization: {
@@ -181,6 +205,7 @@ export const frFR: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gérer votre organisation.',
       general: 'Général',
       members: 'Membres',
@@ -531,7 +556,8 @@ export const frFR: LocalizationResource = {
       checkbox: {
         label__onlyPrivacyPolicy: "J'accepte la Politique de confidentialité.",
         label__onlyTermsOfService: "J'accepte les Conditions d'utilisation.",
-        label__termsOfServiceAndPrivacyPolicy: `J'accepte les {{ termsOfServiceLink || link("Conditions d'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.`,
+        label__termsOfServiceAndPrivacyPolicy:
+          'J\'accepte les {{ termsOfServiceLink || link("Conditions d\'utilisation") }} et la {{ privacyPolicyLink || link("Politique de confidentialité") }}.',
       },
       continue: {
         subtitle: 'Lisez et acceptez les conditions pour continuer.',
@@ -577,7 +603,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
-    form_identifier_not_found: 'Identifiant introuvable',
+    form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',
@@ -598,7 +624,8 @@ export const frFR: LocalizationResource = {
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
-    not_allowed_access: 'Accès non autorisé',
+    not_allowed_access:
+      "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
     organization_domain_blocked: "Ce domaine d'organisation est bloqué.",
     organization_domain_common: 'Ce domaine est trop courant pour une organisation.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -619,6 +646,7 @@ export const frFR: LocalizationResource = {
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
+    session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
@@ -669,10 +697,30 @@ export const frFR: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
       },
       title: undefined,
     },

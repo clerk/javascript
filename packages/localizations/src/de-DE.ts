@@ -16,20 +16,44 @@ export const deDE: LocalizationResource = {
   locale: 'de-DE',
   __experimental_commerce: {
     billedAnnually: 'Jährlich abgerechnet',
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
-    manageMembership: 'Mitgliedschaft verwalten',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'Mitgliedschaft verwalten',
     month: 'Monat',
+    reSubscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
   },
   backButton: 'Zurück',
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
   badge__requiresAction: 'Erfordert Handeln',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Dieses Gerät',
   badge__unverified: 'Unbestätigt',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
   createOrganization: {
@@ -63,7 +87,7 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Account löschen',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -182,6 +206,7 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
       members: 'Mitglieder',
@@ -580,7 +605,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
-    form_identifier_not_found: 'Die eingegebene Kennung wurde nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.',
+    form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',
@@ -604,7 +629,7 @@ export const deDE: LocalizationResource = {
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access:
-      'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte kontaktieren Sie den Support, wenn Sie glauben, dass dies ein Fehler ist.',
+      "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
     organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
     organization_domain_common: 'Dies ist eine gängige E-Mail-Provider-Domain. Bitte verwenden Sie eine andere.',
     organization_domain_exists_for_enterprise_connection:
@@ -630,6 +655,7 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     zxcvbn: {
@@ -681,10 +707,30 @@ export const deDE: LocalizationResource = {
   },
   userProfile: {
     __experimental_billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       start: {
         headerTitle__invoices: 'Rechnungen',
-        headerTitle__paymentSources: 'Zahlungsquellen',
+        headerTitle__paymentMethods: 'Zahlungsquellen',
         headerTitle__plans: 'Pläne',
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
       },
       title: 'Abrechnung & Zahlungen',
     },
