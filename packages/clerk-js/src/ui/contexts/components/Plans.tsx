@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
@@ -23,12 +23,12 @@ const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscriberType) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-
+  const { user } = useUser();
   return useFetch(
-    __experimental_commerce?.__experimental_billing.getSubscriptions,
+    user ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
     { orgId: subscriberType === 'org' ? organization?.id : undefined },
     undefined,
-    'commerce-subscriptions',
+    `commerce-subscriptions-${user?.id}`,
   );
 };
 
@@ -39,7 +39,8 @@ export const PlansContextProvider = ({
   children: ReactNode;
 }) => {
   const { __experimental_commerce } = useClerk();
-
+  const { organization } = useOrganization();
+  const { user } = useUser();
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
@@ -57,10 +58,21 @@ export const PlansContextProvider = ({
     'commerce-plans',
   );
 
+  // Revalidates the next time the hooks gets mounted
+  const { revalidate: revalidateInvoices } = useFetch(
+    undefined,
+    {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-invoices-${user?.id}`,
+  );
+
   const revalidate = () => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
+    revalidateInvoices();
   };
 
   return (
@@ -136,6 +148,21 @@ export const usePlansContext = () => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
+  const shouldDisplayPlanButton = useCallback(
+    ({
+      plan,
+      subscription: sub,
+    }: {
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
+    }) => {
+      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+
+      return !subscription || !subscription.canceledAt;
+    },
+    [activeOrUpcomingSubscription],
+  );
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
@@ -154,7 +181,10 @@ export const usePlansContext = () => {
           ? subscription.canceledAt
             ? localizationKeys('__experimental_commerce.reSubscribe')
             : localizationKeys('__experimental_commerce.manageSubscription')
-          : localizationKeys('__experimental_commerce.getStarted'),
+          : // If there are no active or grace period subscriptions, show the get started button
+            ctx.subscriptions.length > 0
+            ? localizationKeys('__experimental_commerce.switchPlan')
+            : localizationKeys('__experimental_commerce.getStarted'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
@@ -174,7 +204,6 @@ export const usePlansContext = () => {
           onSubscriptionCancel: () => {
             ctx.revalidate();
             onSubscriptionChange?.();
-            clerk.__internal_closeSubscriptionDetails();
           },
           portalId:
             mode === 'modal'
@@ -217,5 +246,6 @@ export const usePlansContext = () => {
     isDefaultPlanImplicitlyActive,
     handleSelectPlan,
     buttonPropsForPlan,
+    shouldDisplayPlanButton,
   };
 };

@@ -1,8 +1,8 @@
 import type {
   __experimental_CommerceCheckoutJSON,
   __experimental_CommerceCheckoutResource,
+  __experimental_CommerceCheckoutTotals,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceTotals,
   __experimental_ConfirmCheckoutParams,
 } from '@clerk/types';
 
@@ -24,7 +24,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   planPeriod!: __experimental_CommerceSubscriptionPlanPeriod;
   status!: string;
   subscription?: __experimental_CommerceSubscription;
-  totals!: __experimental_CommerceTotals;
+  totals!: __experimental_CommerceCheckoutTotals;
 
   constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();

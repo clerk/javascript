@@ -20,6 +20,10 @@ export const csCZ: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -592,7 +596,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
-    form_identifier_not_found: 'Identifikátor nebyl nalezen.',
+    form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
@@ -612,7 +616,8 @@ export const csCZ: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "E-mailová adresa nebo telefonní číslo není povoleno k registraci. Může to být způsobeno použitím '+', '=', '#' nebo '.' ve vaší e-mailové adrese, pomocí domény propojené s dočasnou e-mailovou službou nebo jsou explicitně blokovány. Pokud se domníváte, že se jedná o chybu, kontaktujte podporu.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -701,7 +706,7 @@ export const csCZ: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

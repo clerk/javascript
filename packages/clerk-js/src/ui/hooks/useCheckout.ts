@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CheckoutProps,
   __experimental_CommerceCheckoutResource,
@@ -14,6 +14,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
   const { organization } = useOrganization();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
 
+  const { user } = useUser();
   const {
     data: initialCheckout,
     isLoading,
@@ -28,7 +29,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    'commerce-checkout',
+    `commerce-checkout-${user?.id}`,
   );
 
   const updateCheckout = useCallback((newCheckout: __experimental_CommerceCheckoutResource) => {

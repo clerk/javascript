@@ -20,6 +20,10 @@ export const daDK: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -593,7 +597,7 @@ export const daDK: LocalizationResource = {
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
-    form_identifier_not_found: 'Identifikatoren blev ikke fundet.',
+    form_identifier_not_found: 'Vi kunne ikke finde en konto med disse detaljer.',
     form_param_format_invalid: 'Formatet er ugyldigt.',
     form_param_format_invalid__email_address: 'E-mailadressen skal være en gyldig e-mailadresse.',
     form_param_format_invalid__phone_number: 'Telefonnummeret skal være i et gyldigt internationalt format.',
@@ -613,7 +617,8 @@ export const daDK: LocalizationResource = {
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
-    not_allowed_access: 'Adgang ikke tilladt.',
+    not_allowed_access:
+      "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -702,7 +707,7 @@ export const daDK: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

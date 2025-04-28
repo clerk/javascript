@@ -20,6 +20,10 @@ export const svSE: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -598,7 +602,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
-    form_identifier_not_found: 'Identifieraren hittades inte.',
+    form_identifier_not_found: 'Vi kunde inte hitta ett konto med dessa uppgifter.',
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',
@@ -618,7 +622,8 @@ export const svSE: LocalizationResource = {
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
-    not_allowed_access: 'Åtkomst nekad.',
+    not_allowed_access:
+      "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
     organization_domain_blocked: 'Domänen är blockerad.',
     organization_domain_common: 'Domänen är vanlig.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -707,7 +712,7 @@ export const svSE: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

@@ -1561,14 +1561,8 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 type __experimental_PricingTableDefaultProps = {
-  layout?: 'default';
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-};
-
-type __experimental_PricingTableMatrixProps = {
-  layout?: 'matrix';
-  highlightPlan?: string;
 };
 
 type __experimental_PricingTableBaseProps = {
@@ -1577,7 +1571,7 @@ type __experimental_PricingTableBaseProps = {
 };
 
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  (__experimental_PricingTableDefaultProps | __experimental_PricingTableMatrixProps);
+  __experimental_PricingTableDefaultProps;
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
