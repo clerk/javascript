@@ -108,9 +108,9 @@ describe('ClerkMiddleware type tests', () => {
     });
   });
 
-  it('can be used with a handler that expects a machine auth object', () => {
+  it('can be used with a handler that expects a token type', () => {
     clerkMiddlewareMock(async auth => {
-      const { getToken } = await auth({ acceptsToken: 'machine_token' });
+      const { getToken } = await auth({ acceptsToken: 'api_key' });
       await getToken();
     });
   });
