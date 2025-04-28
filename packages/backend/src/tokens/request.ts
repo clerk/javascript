@@ -1,6 +1,7 @@
 import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
 import { match } from '@clerk/shared/pathToRegexp';
 import type { JwtPayload } from '@clerk/types';
+import type { MachineTokenType, SessionTokenType } from 'src/tokens/tokenTypes';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -17,7 +18,8 @@ import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
-import type { AuthenticateRequestOptions, MachineTokenType, OrganizationSyncOptions, TokenType } from './types';
+import { TokenType } from './tokenTypes';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -136,7 +138,7 @@ export interface AuthenticateRequest {
    * @example
    * clerkClient.authenticateRequest(request);
    */
-  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<'session_token'>>;
+  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<SessionTokenType>>;
 }
 
 export const authenticateRequest: AuthenticateRequest = (async (
@@ -147,7 +149,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   assertValidSecretKey(authenticateContext.secretKey);
 
   // Default tokenType is session_token for backwards compatibility.
-  const acceptsToken = options.acceptsToken ?? 'session_token';
+  const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -230,7 +232,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     if (sessionToken === '') {
       return signedOut({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason: AuthErrorReason.SessionTokenMissing,
         headers,
@@ -240,7 +242,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
       return signedIn({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         sessionClaims: data,
         headers,
@@ -273,7 +275,7 @@ ${error.getFullMessage()}`,
       });
       if (retryResult) {
         return signedIn({
-          tokenType: 'session_token',
+          tokenType: TokenType.SessionToken,
           authenticateContext,
           sessionClaims: retryResult,
           headers,
@@ -442,7 +444,7 @@ ${error.getFullMessage()}`,
         const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
         console.log(msg);
         return signedOut({
-          tokenType: 'session_token',
+          tokenType: TokenType.SessionToken,
           authenticateContext,
           reason,
           message,
@@ -453,7 +455,7 @@ ${error.getFullMessage()}`,
     }
 
     return signedOut({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       reason,
       message,
@@ -532,7 +534,7 @@ ${error.getFullMessage()}`,
       }
       // use `await` to force this try/catch handle the signedIn invocation
       return signedIn({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -671,7 +673,7 @@ ${error.getFullMessage()}`,
 
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut({
-        tokenType: 'api_key',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason: AuthErrorReason.SessionTokenAndUATMissing,
       });
@@ -705,7 +707,7 @@ ${error.getFullMessage()}`,
       }
 
       const signedInRequestState = signedIn({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -729,7 +731,7 @@ ${error.getFullMessage()}`,
 
     // Unreachable
     return signedOut({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       reason: AuthErrorReason.UnexpectedError,
     });
@@ -741,7 +743,7 @@ ${error.getFullMessage()}`,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
       return signedOut({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason: AuthErrorReason.UnexpectedError,
       });
@@ -753,7 +755,7 @@ ${error.getFullMessage()}`,
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
         return signedIn({
-          tokenType: 'session_token',
+          tokenType: TokenType.SessionToken,
           authenticateContext,
           sessionClaims: data.jwtPayload,
           headers: data.headers,
@@ -795,7 +797,7 @@ ${error.getFullMessage()}`,
     }
 
     return signedOut({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       reason: err.reason,
       message: err.getFullMessage(),
@@ -895,7 +897,7 @@ ${error.getFullMessage()}`,
     }
 
     return signedIn({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       sessionClaims: data,
       token: sessionOrMachineTokenInHeader,
@@ -907,7 +909,7 @@ ${error.getFullMessage()}`,
       return authenticateAnyRequestWithTokenInHeader();
     }
 
-    if (acceptsToken === 'session_token') {
+    if (acceptsToken === TokenType.SessionToken) {
       return authenticateRequestWithTokenInHeader();
     }
 
@@ -915,7 +917,11 @@ ${error.getFullMessage()}`,
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (acceptsToken === 'oauth_token' || acceptsToken === 'api_key' || acceptsToken === 'machine_token') {
+  if (
+    acceptsToken === TokenType.OAuthToken ||
+    acceptsToken === TokenType.ApiKey ||
+    acceptsToken === TokenType.MachineToken
+  ) {
     return signedOut({
       tokenType: acceptsToken,
       authenticateContext,
