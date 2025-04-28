@@ -1,3 +1,4 @@
+import { retry } from '@clerk/shared/retry';
 import type {
   __experimental_CommerceCheckoutJSON,
   __experimental_CommerceCheckoutResource,
@@ -55,11 +56,28 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
 
   confirm = (params: __experimental_ConfirmCheckoutParams): Promise<this> => {
     const { orgId, ...rest } = params;
-    return this._basePatch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
-        : `/me/commerce/checkouts/${this.id}/confirm`,
-      body: rest as any,
-    });
+
+    // Retry confirmation in case of a 500 error
+    // This will retry up to 3 times with an increasing delay
+    // It retries at 2s, 4s, 6s and 8s
+    return retry(
+      () =>
+        this._basePatch({
+          path: orgId
+            ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
+            : `/me/commerce/checkouts/${this.id}/confirm`,
+          body: rest as any,
+        }),
+      {
+        factor: 1.1,
+        maxDelayBetweenRetries: 2 * 1_000,
+        initialDelay: 2 * 1_000,
+        jitter: false,
+        shouldRetry(error: any, iterations: number) {
+          const status = error?.status;
+          return !!status && status >= 500 && iterations <= 4;
+        },
+      },
+    );
   };
 }
