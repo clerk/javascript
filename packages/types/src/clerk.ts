@@ -1566,6 +1566,7 @@ type __experimental_PricingTableDefaultProps = {
 };
 
 type __experimental_PricingTableBaseProps = {
+  forOrganizations?: boolean;
   appearance?: PricingTableTheme;
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
@@ -1589,10 +1590,6 @@ export type __experimental_SubscriptionDetailsProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
-};
-
-export type __experimental_PaymentSourcesProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export interface HandleEmailLinkVerificationParams {

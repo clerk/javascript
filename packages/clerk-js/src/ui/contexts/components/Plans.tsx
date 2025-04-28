@@ -5,7 +5,7 @@ import type {
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
 } from '@clerk/types';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType, PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
@@ -13,10 +13,7 @@ import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import type { __experimental_PlansCtx } from '../../types';
-
-type PlansContextProviderProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
-};
+import { useSubscriberTypeContext } from './SubscriberType';
 
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 
@@ -32,15 +29,11 @@ export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscri
   );
 };
 
-export const PlansContextProvider = ({
-  subscriberType = 'user',
-  children,
-}: PlansContextProviderProps & {
-  children: ReactNode;
-}) => {
+export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
   const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
@@ -68,18 +61,17 @@ export const PlansContextProvider = ({
     `commerce-invoices-${user?.id}`,
   );
 
-  const revalidate = () => {
+  const revalidate = useCallback(() => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
     revalidateInvoices();
-  };
+  }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
 
   return (
     <PlansContext.Provider
       value={{
         componentName: 'Plans',
-        subscriberType: subscriberType || 'user',
         plans: plans || [],
         subscriptions: subscriptions?.data || [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
@@ -93,11 +85,11 @@ export const PlansContextProvider = ({
 
 export const withPlans = <T extends object>(
   WrappedComponent: ComponentType<T>,
-  providerPropsFromHOC: PlansContextProviderProps = {},
+  providerPropsFromHOC: PropsWithChildren = {},
 ) => {
   // Define props for the returned component
   type WithPlansProps = T & {
-    providerProps?: PlansContextProviderProps;
+    providerProps?: PropsWithChildren;
   };
 
   const WithPlans: React.FC<WithPlansProps> = ({ providerProps = {}, ...componentProps }) => {
@@ -127,6 +119,7 @@ type HandleSelectPlanProps = {
 
 export const usePlansContext = () => {
   const clerk = useClerk();
+  const subscriberType = useSubscriberTypeContext();
   const context = useContext(PlansContext);
 
   if (!context || context.componentName !== 'Plans') {
@@ -210,14 +203,14 @@ export const usePlansContext = () => {
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openSubscriptionDetails({
           plan,
-          subscriberType: ctx.subscriberType,
+          subscriberType,
           onSubscriptionCancel: () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
           portalId:
             mode === 'modal'
-              ? ctx.subscriberType === 'user'
+              ? subscriberType === 'user'
                 ? USER_PROFILE_CARD_SCROLLBOX_ID
                 : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
               : undefined,
@@ -232,21 +225,21 @@ export const usePlansContext = () => {
         clerk.__internal_openCheckout({
           planId: plan.id,
           planPeriod: _planPeriod,
-          subscriberType: ctx.subscriberType,
+          subscriberType: subscriberType,
           onSubscriptionComplete: () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
           portalId:
             mode === 'modal'
-              ? ctx.subscriberType === 'user'
+              ? subscriberType === 'user'
                 ? USER_PROFILE_CARD_SCROLLBOX_ID
                 : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
               : undefined,
         });
       }
     },
-    [clerk, ctx, activeOrUpcomingSubscription],
+    [clerk, ctx, activeOrUpcomingSubscription, subscriberType],
   );
 
   const defaultFreePlan = useMemo(() => {

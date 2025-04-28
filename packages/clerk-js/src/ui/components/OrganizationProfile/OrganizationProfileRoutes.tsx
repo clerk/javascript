@@ -2,10 +2,10 @@ import { lazy, Suspense } from 'react';
 
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { InvoicesContextProvider, useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
-import { InvoicePage } from '../Invoices/InvoicePage';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
+import { OrganizationInvoicePage } from './OrganizationInvoicePage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationPlansPage } from './OrganizationPlansPage';
 
@@ -65,7 +65,7 @@ export const OrganizationProfileRoutes = () => {
             <Switch>
               <Route index>
                 <Suspense fallback={''}>
-                  <OrganizationBillingPage providerProps={{ subscriberType: 'org' }} />
+                  <OrganizationBillingPage />
                 </Suspense>
               </Route>
               <Route path='plans'>
@@ -77,9 +77,7 @@ export const OrganizationProfileRoutes = () => {
               <Route path='invoice/:invoiceId'>
                 {/* TODO(@commerce): Should this be lazy loaded ? */}
                 <Suspense fallback={''}>
-                  <InvoicesContextProvider subscriberType='org'>
-                    <InvoicePage />
-                  </InvoicesContextProvider>
+                  <OrganizationInvoicePage />
                 </Suspense>
               </Route>
             </Switch>
