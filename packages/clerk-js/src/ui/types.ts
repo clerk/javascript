@@ -2,7 +2,6 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceInvoiceResource,
   __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
   __experimental_SubscriptionDetailsProps,
@@ -115,7 +114,6 @@ export type WaitlistCtx = WaitlistProps & {
 export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
@@ -124,12 +122,10 @@ export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
 
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export type __experimental_InvoicesCtx = {
   componentName: 'Invoices';
-  subscriberType: __experimental_CommerceSubscriberType;
   invoices: __experimental_CommerceInvoiceResource[];
   totalCount: number;
   isLoading: boolean;
@@ -139,7 +135,6 @@ export type __experimental_InvoicesCtx = {
 
 export type __experimental_PlansCtx = {
   componentName: 'Plans';
-  subscriberType: __experimental_CommerceSubscriberType;
   plans: __experimental_CommercePlanResource[];
   subscriptions: __experimental_CommerceSubscriptionResource[];
   isLoading: boolean;

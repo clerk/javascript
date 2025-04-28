@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type { Application, Request as ExpressRequest, RequestHandler, Response as ExpressResponse } from 'express';
 import express from 'express';
 import supertest from 'supertest';
@@ -26,7 +26,9 @@ export function mockRequest(): ExpressRequest {
   return {} as ExpressRequest;
 }
 
-export function mockRequestWithAuth(auth: Partial<AuthObject> = {}): ExpressRequestWithAuth {
+export function mockRequestWithAuth(
+  auth: Partial<SignedInAuthObject | SignedOutAuthObject> = {},
+): ExpressRequestWithAuth {
   return {
     auth: {
       sessionClaims: null,

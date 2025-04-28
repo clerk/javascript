@@ -1,7 +1,7 @@
 import {
-  __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
   InvoicesContextProvider,
+  SubscriberTypeContext,
   useSubscriptions,
   withPlans,
 } from '../../contexts';
@@ -29,7 +29,7 @@ const orgTabMap = {
   2: 'payment-methods',
 } as const;
 
-export const OrganizationBillingPage = withPlans(
+const OrganizationBillingPageInternal = withPlans(
   withCardStateProvider(() => {
     const card = useCardState();
     const { data: subscriptions } = useSubscriptions('org');
@@ -93,23 +93,18 @@ export const OrganizationBillingPage = withPlans(
                     />
                   </>
                 )}
-                <__experimental_PricingTableContext.Provider
-                  value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
-                >
+
+                <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
-                <InvoicesContextProvider subscriberType='org'>
+                <InvoicesContextProvider>
                   <InvoicesList />
                 </InvoicesContextProvider>
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
-                <__experimental_PaymentSourcesContext.Provider
-                  value={{ componentName: 'PaymentSources', subscriberType: 'org' }}
-                >
-                  <__experimental_PaymentSources />
-                </__experimental_PaymentSourcesContext.Provider>
+                <__experimental_PaymentSources />
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -118,3 +113,11 @@ export const OrganizationBillingPage = withPlans(
     );
   }),
 );
+
+export const OrganizationBillingPage = () => {
+  return (
+    <SubscriberTypeContext.Provider value='org'>
+      <OrganizationBillingPageInternal />
+    </SubscriberTypeContext.Provider>
+  );
+};

@@ -112,8 +112,6 @@ export type __experimental_CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due
 
 export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
-  planId: string;
-  paymentSourceId: string;
   totals: __experimental_CommerceInvoiceTotals;
   paymentDueOn: number;
   paidOn: number;
