@@ -541,45 +541,6 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
-  // const mountedCheckoutDrawer = checkoutDrawer.props && (
-  //   <MountedDrawer
-  //     globalAppearance={state.appearance}
-  //     appearanceKey={'checkout' as any}
-  //     componentAppearance={{}}
-  //     flowName={'checkout'}
-  //     open={checkoutDrawer.open}
-  //     onOpenChange={() => componentsControls.closeDrawer('checkout')}
-  //     componentName={'Checkout'}
-  //     portalId={checkoutDrawer.props.portalId}
-  //   >
-  //     <Checkout
-  //       planId={checkoutDrawer.props.planId}
-  //       planPeriod={checkoutDrawer.props.planPeriod}
-  //       subscriberType={checkoutDrawer.props.subscriberType}
-  //       onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
-  //     />
-  //   </MountedDrawer>
-  // );
-
-  // const mountedSubscriptionDetailDrawer = subscriptionDetailsDrawer.props && (
-  //   <MountedDrawer
-  //     globalAppearance={state.appearance}
-  //     appearanceKey={'subscriptionDetails' as any}
-  //     componentAppearance={{}}
-  //     flowName={'subscriptionDetails'}
-  //     open={subscriptionDetailsDrawer.open}
-  //     onOpenChange={() => componentsControls.closeDrawer('subscriptionDetails')}
-  //     componentName={'SubscriptionDetails'}
-  //     portalId={subscriptionDetailsDrawer.props.portalId}
-  //   >
-  //     <SubscriptionDetails
-  //       {...subscriptionDetailsDrawer.props}
-  //       subscriberType={subscriptionDetailsDrawer.props.subscriberType || 'user'}
-  //       onSubscriptionCancel={subscriptionDetailsDrawer.props.onSubscriptionCancel || (() => {})}
-  //     />
-  //   </MountedDrawer>
-  // );
-
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -610,8 +571,6 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {/* {mountedCheckoutDrawer}
-        {mountedSubscriptionDetailDrawer} */}
 
         <MountedCheckoutDrawer
           appearance={state.appearance}
