@@ -37,7 +37,7 @@ import {
   UserVerificationModal,
   WaitlistModal,
 } from './lazyModules/components';
-import { MountedCheckoutDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
+import { MountedCheckoutDrawer, MountedPlanDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
   LazyImpersonationFabProvider,
@@ -578,7 +578,7 @@ const Components = (props: ComponentsProps) => {
           onOpenChange={() => componentsControls.closeDrawer('checkout')}
         />
 
-        <MountedSubscriptionDetailDrawer
+        <MountedPlanDetailDrawer
           appearance={state.appearance}
           planDetailsDrawer={planDetailsDrawer}
           onOpenChange={() => componentsControls.closeDrawer('planDetails')}

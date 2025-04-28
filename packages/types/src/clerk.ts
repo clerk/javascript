@@ -8,7 +8,7 @@ import type {
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
-  SubscriptionDetailTheme,
+  PlanDetailTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -1584,7 +1584,7 @@ export type __experimental_CheckoutProps = {
 };
 
 export type __experimental_PlanDetailsProps = {
-  appearance?: SubscriptionDetailTheme;
+  appearance?: PlanDetailTheme;
   plan?: __experimental_CommercePlanResource;
   subscriberType?: __experimental_CommerceSubscriberType;
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;

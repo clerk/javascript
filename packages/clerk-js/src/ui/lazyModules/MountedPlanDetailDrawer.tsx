@@ -4,7 +4,7 @@ import type { __experimental_PlanDetailsProps, Appearance } from '@clerk/types';
 import { PlanDetails } from './components';
 import { LazyDrawerRenderer } from './providers';
 
-export function MountedSubscriptionDetailDrawer({
+export function MountedPlanDetailDrawer({
   appearance,
   planDetailsDrawer,
   onOpenChange,
