@@ -8,7 +8,7 @@ import type {
 } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
-import { __experimental_PaymentSourcesContext, useCheckoutContext } from '../../contexts';
+import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
@@ -188,23 +188,21 @@ const CheckoutFormElements = ({
           text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
         />
         <Disclosure.Content>
-          <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources', subscriberType }}>
-            <AddPaymentSource
-              checkout={checkout}
-              onSuccess={onAddPaymentSourceSuccess}
-              // @ts-ignore TODO(@COMMERCE): needs localization
-              submitLabel={
-                checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys(
-                      'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                      {
-                        amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                      },
-                    )
-                  : 'Subscribe'
-              }
-            />
-          </__experimental_PaymentSourcesContext.Provider>
+          <AddPaymentSource
+            checkout={checkout}
+            onSuccess={onAddPaymentSourceSuccess}
+            // @ts-ignore TODO(@COMMERCE): needs localization
+            submitLabel={
+              checkout.totals.totalDueNow.amount > 0
+                ? localizationKeys(
+                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+                    {
+                      amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                    },
+                  )
+                : 'Subscribe'
+            }
+          />
         </Disclosure.Content>
       </Disclosure.Root>
     </Col>
