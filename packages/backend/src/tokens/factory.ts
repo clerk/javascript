@@ -47,7 +47,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
   const buildTimeOptions = mergePreDefinedOptions(defaultOptions, params.options);
   const apiClient = params.apiClient;
 
-  const authenticateRequest: AuthenticateRequest = ((request: Request, options: RunTimeOptions = {}) => {
+  const authenticateRequest: AuthenticateRequest = (request: Request, options: RunTimeOptions = {}) => {
     const { apiUrl, apiVersion } = buildTimeOptions;
     const runTimeOptions = mergePreDefinedOptions(buildTimeOptions, options);
     return authenticateRequestOriginal(request, {
@@ -59,7 +59,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
       apiVersion,
       apiClient,
     });
-  }) satisfies AuthenticateRequest;
+  };
 
   return {
     authenticateRequest,
