@@ -18,7 +18,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { ArrowRightIcon } from '../../icons';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
