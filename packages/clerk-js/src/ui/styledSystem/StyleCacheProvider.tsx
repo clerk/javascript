@@ -4,7 +4,7 @@ import type { StylisPlugin } from '@emotion/cache';
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
 import { CacheProvider } from '@emotion/react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 /**
  * A Stylis plugin that wraps CSS rules in a CSS layer
@@ -59,13 +59,8 @@ type StyleCacheProviderProps = React.PropsWithChildren<{
  * @returns A CacheProvider component with configured Emotion cache
  */
 export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
-  const [insertionPoint, setInsertionPoint] = useState<HTMLElement | undefined>();
-
-  useEffect(() => {
-    setInsertionPoint(getInsertionPoint());
-  }, []);
-
   const cache = useMemo(() => {
+    const insertionPoint = getInsertionPoint();
     return createCache({
       key: 'cl-internal',
       prepend: !insertionPoint,
@@ -73,7 +68,7 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
       nonce: props.nonce,
       stylisPlugins: props.cssLayerName ? [wrapInLayer(props.cssLayerName)] : undefined,
     });
-  }, [props.nonce, props.cssLayerName, insertionPoint]);
+  }, [props.nonce, props.cssLayerName]);
 
   return <CacheProvider value={cache}>{props.children}</CacheProvider>;
 };
