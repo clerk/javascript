@@ -58,8 +58,8 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     const { orgId, ...rest } = params;
 
     // Retry confirmation in case of a 500 error
-    // This will retry up to 6 times with an increasing delay
-    // It retries at 2s, 5s, ~9s, ~14s, ~19s, and ~24s after the initial attempt.
+    // This will retry up to 3 times with an increasing delay
+    // It retries at 2s, 4s, 6s and 8s
     return retry(
       () =>
         this._basePatch({
@@ -69,13 +69,13 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
           body: rest as any,
         }),
       {
-        factor: 1.45,
-        maxDelayBetweenRetries: 5 * 1_000,
+        factor: 1.1,
+        maxDelayBetweenRetries: 2 * 1_000,
         initialDelay: 2 * 1_000,
         jitter: false,
         shouldRetry(error: any, iterations: number) {
           const status = error?.status;
-          return !!status && status >= 500 && iterations <= 6;
+          return !!status && status >= 500 && iterations <= 4;
         },
       },
     );
