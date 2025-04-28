@@ -40,14 +40,31 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group>
+          <LineItems.Group expand>
+            <LineItems.Title description={'Your features will remain the end of your current subscription.'} />
+          </LineItems.Group>
+
+          <LineItems.Group borderTop>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
-              text={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
+          {totals.proration && totals.totalDueNow.amount > 0 && (
+            <LineItems.Group>
+              {/* TODO(@Commerce): needs localization */}
+              <LineItems.Title
+                title={'Adjustment'}
+                description={'Prorated credit for the remainder of your subscription.'}
+              />
+              {/* TODO(@Commerce): needs localization */}
+              <LineItems.Description
+                text={`- ${totals.proration?.totalProration.currencySymbol}${(totals.proration?.days * totals.proration?.ratePerDay.amount) / 100}`}
+              />
+            </LineItems.Group>
+          )}
           <LineItems.Group
             borderTop
             variant='tertiary'

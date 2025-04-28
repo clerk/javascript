@@ -48,9 +48,10 @@ interface GroupProps {
    */
   borderTop?: boolean;
   variant?: GroupVariant;
+  expand?: boolean;
 }
 
-function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
+function Group({ children, borderTop = false, variant = 'primary', expand = false }: GroupProps) {
   return (
     <GroupContext.Provider value={{ variant }}>
       <Box
@@ -58,7 +59,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
         elementId={descriptors.lineItemsGroup.setId(variant)}
         sx={t => ({
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gridTemplateColumns: `repeat(${expand ? 1 : 2}, minmax(0, 1fr))`,
           ...(borderTop
             ? {
                 borderTopWidth: t.borderWidths.$normal,
@@ -80,7 +81,7 @@ function Group({ children, borderTop = false, variant = 'primary' }: GroupProps)
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  title: string | LocalizationKey;
+  title?: string | LocalizationKey;
   description?: string | LocalizationKey;
 }
 
@@ -162,7 +163,6 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'center',
           gap: t.space.$1,
           minWidth: '0',
         })}
