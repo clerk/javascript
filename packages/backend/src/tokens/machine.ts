@@ -1,4 +1,6 @@
-import type { AuthenticateRequestOptions, MachineTokenType, TokenType } from '../tokens/types';
+import type { AuthenticateRequestOptions } from '../tokens/types';
+import type { MachineTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
 
 export const M2M_TOKEN_PREFIX = 'm2m_';
 export const OAUTH_TOKEN_PREFIX = 'oauth_access_';
@@ -12,15 +14,15 @@ export function isMachineToken(token: string): boolean {
 
 export function getMachineTokenType(token: string): MachineTokenType {
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
-    return 'machine_token';
+    return TokenType.MachineToken;
   }
 
   if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
-    return 'oauth_token';
+    return TokenType.OAuthToken;
   }
 
   if (token.startsWith(API_KEY_PREFIX)) {
-    return 'api_key';
+    return TokenType.ApiKey;
   }
 
   throw new Error('Unknown machine token type');

@@ -11,7 +11,9 @@ import type {
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-import type { MachineAuthType, MachineTokenType } from './types';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
+import type { MachineAuthType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
@@ -29,7 +31,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
-  tokenType: 'session_token';
+  tokenType: SessionTokenType;
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -43,7 +45,7 @@ export type SignedOutAuthObject = {
   sessionId: null;
   sessionStatus: null;
   actor: null;
-  tokenType: 'session_token';
+  tokenType: SessionTokenType;
   userId: null;
   orgId: null;
   orgRole: null;
@@ -137,7 +139,7 @@ export function signedInAuthObject(
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
   return {
-    tokenType: 'session_token',
+    tokenType: TokenType.SessionToken,
     actor,
     sessionClaims,
     sessionId,
@@ -167,7 +169,7 @@ export function signedInAuthObject(
  */
 export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
   return {
-    tokenType: 'session_token',
+    tokenType: TokenType.SessionToken,
     sessionClaims: null,
     sessionId: null,
     sessionStatus: null,
@@ -207,7 +209,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
   // just from the tokenType discriminator.
 
   switch (tokenType) {
-    case 'api_key': {
+    case TokenType.ApiKey: {
       const result = verificationResult as APIKey;
       return {
         ...baseObject,
@@ -216,7 +218,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         scopes: result.scopes,
       };
     }
-    case 'machine_token': {
+    case TokenType.MachineToken: {
       const result = verificationResult as MachineToken;
       return {
         ...baseObject,
@@ -225,7 +227,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         scopes: result.scopes,
       };
     }
-    case 'oauth_token': {
+    case TokenType.OAuthToken: {
       return {
         ...baseObject,
         tokenType,
@@ -255,21 +257,21 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
   };
 
   switch (tokenType) {
-    case 'api_key': {
+    case TokenType.ApiKey: {
       return {
         ...baseObject,
         tokenType,
         claims: null,
       };
     }
-    case 'machine_token': {
+    case TokenType.MachineToken: {
       return {
         ...baseObject,
         tokenType,
         claims: null,
       };
     }
-    case 'oauth_token': {
+    case TokenType.OAuthToken: {
       return {
         ...baseObject,
         tokenType,
