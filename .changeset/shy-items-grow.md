@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Remove stale properties from `\_\_experimental_CommerceInvoiceResource`
+Remove stale properties from `__experimental_CommerceInvoiceResource`
