@@ -106,7 +106,7 @@ export default defineNuxtModule<ModuleOptions>({
         filename: 'types/clerk.d.ts',
         getContents: () => `import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
           declare module 'h3' {
-            type AuthObjectHandler = SignedInAuthObject | SignedOutAuthObject & {
+            type AuthObjectHandler = (SignedInAuthObject | SignedOutAuthObject) & {
               (): SignedInAuthObject | SignedOutAuthObject;
             }
 
