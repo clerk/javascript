@@ -3,7 +3,7 @@ import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
-  __experimental_SubscriptionDetailsProps,
+  __experimental_PlanDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
@@ -27,22 +27,22 @@ import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../..
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsProps) => {
+export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
-        <_SubscriptionDetails {...props} />
+        <_PlanDetails {...props} />
       </PlansContextProvider>
     </SubscriberTypeContext.Provider>
   );
 };
 
-const _SubscriptionDetails = ({
+const _PlanDetails = ({
   plan,
   onSubscriptionCancel,
   portalId,
   planPeriod: _planPeriod = 'month',
-}: __experimental_SubscriptionDetailsProps) => {
+}: __experimental_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);

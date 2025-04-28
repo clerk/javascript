@@ -4,7 +4,7 @@ import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionResource,
   __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailsProps,
+  __experimental_PlanDetailsProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -49,7 +49,7 @@ export type AvailableComponentProps =
   | __experimental_PricingTableProps
   | __experimental_CheckoutProps
   | __internal_UserVerificationProps
-  | __experimental_SubscriptionDetailsProps;
+  | __experimental_PlanDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 

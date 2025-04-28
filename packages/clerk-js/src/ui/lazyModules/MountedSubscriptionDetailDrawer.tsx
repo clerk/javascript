@@ -1,23 +1,23 @@
 import { useUser } from '@clerk/shared/react';
-import type { __experimental_SubscriptionDetailsProps, Appearance } from '@clerk/types';
+import type { __experimental_PlanDetailsProps, Appearance } from '@clerk/types';
 
-import { SubscriptionDetails } from './components';
+import { PlanDetails } from './components';
 import { LazyDrawerRenderer } from './providers';
 
 export function MountedSubscriptionDetailDrawer({
   appearance,
-  subscriptionDetailsDrawer,
+  planDetailsDrawer,
   onOpenChange,
 }: {
   appearance?: Appearance;
   onOpenChange: (open: boolean) => void;
-  subscriptionDetailsDrawer: {
+  planDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailsProps;
+    props: null | __experimental_PlanDetailsProps;
   };
 }) {
   const { user } = useUser();
-  if (!subscriptionDetailsDrawer.props) {
+  if (!planDetailsDrawer.props) {
     return null;
   }
 
@@ -27,18 +27,18 @@ export function MountedSubscriptionDetailDrawer({
       // Without this, the drawer would not be rendered after a session switch.
       key={user?.id}
       globalAppearance={appearance}
-      appearanceKey={'subscriptionDetails' as any}
+      appearanceKey={'planDetails' as any}
       componentAppearance={{}}
-      flowName={'subscriptionDetails'}
-      open={subscriptionDetailsDrawer.open}
+      flowName={'planDetails'}
+      open={planDetailsDrawer.open}
       onOpenChange={onOpenChange}
-      componentName={'SubscriptionDetails'}
-      portalId={subscriptionDetailsDrawer.props.portalId}
+      componentName={'PlanDetails'}
+      portalId={planDetailsDrawer.props.portalId}
     >
-      <SubscriptionDetails
-        {...subscriptionDetailsDrawer.props}
-        subscriberType={subscriptionDetailsDrawer.props.subscriberType || 'user'}
-        onSubscriptionCancel={subscriptionDetailsDrawer.props.onSubscriptionCancel || (() => {})}
+      <PlanDetails
+        {...planDetailsDrawer.props}
+        subscriberType={planDetailsDrawer.props.subscriberType || 'user'}
+        onSubscriptionCancel={planDetailsDrawer.props.onSubscriptionCancel || (() => {})}
       />
     </LazyDrawerRenderer>
   );

@@ -18,7 +18,7 @@ export const FreePlanRow = () => {
       return;
     }
 
-    clerk.__internal_openSubscriptionDetails({
+    clerk.__internal_openPlanDetails({
       plan: defaultFreePlan,
       subscriberType: subscriberType,
       portalId:
