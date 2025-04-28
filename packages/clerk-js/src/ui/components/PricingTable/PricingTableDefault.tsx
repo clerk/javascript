@@ -166,8 +166,8 @@ function Card(props: CardProps) {
               flexDirection: 'column',
               flex: '1',
               padding: hasFeatures ? (isCompact ? t.space.$3 : t.space.$4) : 0,
-              backgroundColor: t.colors.$colorBackground,
-              borderTopWidth: t.borderWidths.$normal,
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : undefined,
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
@@ -185,7 +185,7 @@ function Card(props: CardProps) {
           sx={t => ({
             marginTop: 'auto',
             padding: isCompact ? t.space.$3 : t.space.$4,
-            borderTopWidth: t.borderWidths.$normal,
+            borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
             borderTopStyle: t.borderStyles.$solid,
             borderTopColor: t.colors.$neutralAlpha100,
             background: undefined,
