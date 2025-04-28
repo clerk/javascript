@@ -6,6 +6,8 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import React, { useEffect, useMemo, useState } from 'react';
 
+let globalCache: ReturnType<typeof createCache> | null = null;
+
 /**
  * A Stylis plugin that wraps CSS rules in a CSS layer
  * @param layerName - The name of the CSS layer to wrap the styles in
@@ -65,17 +67,19 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
     setInsertionPoint(getInsertionPoint());
   }, []);
 
-  const cache = useMemo(
-    () =>
-      createCache({
+  const cache = useMemo(() => {
+    // Only create a new cache if one doesn't exist or if the nonce changes
+    if (!globalCache || (props.nonce && globalCache.nonce !== props.nonce)) {
+      globalCache = createCache({
         key: 'cl-internal',
         prepend: !insertionPoint,
         insertionPoint: insertionPoint ?? undefined,
         nonce: props.nonce,
         stylisPlugins: props.cssLayerName ? [wrapInLayer(props.cssLayerName)] : undefined,
-      }),
-    [props.nonce, props.cssLayerName, insertionPoint],
-  );
+      });
+    }
+    return globalCache;
+  }, [props.nonce, props.cssLayerName, insertionPoint]);
 
   return <CacheProvider value={cache}>{props.children}</CacheProvider>;
 };
