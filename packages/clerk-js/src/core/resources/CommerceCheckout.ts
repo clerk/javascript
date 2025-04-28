@@ -69,7 +69,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
           body: rest as any,
         }),
       {
-        factor: 1.55,
+        factor: 1.45,
         maxDelayBetweenRetries: 5 * 1_000,
         initialDelay: 2 * 1_000,
         jitter: false,
