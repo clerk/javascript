@@ -66,12 +66,6 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
   }, []);
 
   const cache = useMemo(() => {
-    // Clean up any existing style tags with the same key
-    const existingStyle = document.querySelector(`style[data-emotion="cl-internal"]`);
-    if (existingStyle) {
-      existingStyle.remove();
-    }
-
     return createCache({
       key: 'cl-internal',
       prepend: !insertionPoint,
