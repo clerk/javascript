@@ -1,22 +1,17 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommerceSubscriberType } from '@clerk/types';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 
 import { useFetch } from '../../hooks';
 import type { __experimental_InvoicesCtx } from '../../types';
+import { useSubscriberTypeContext } from './SubscriberType';
 
 const InvoicesContext = createContext<__experimental_InvoicesCtx | null>(null);
 
-export const InvoicesContextProvider = ({
-  subscriberType,
-  children,
-}: {
-  subscriberType?: __experimental_CommerceSubscriberType;
-  children: ReactNode;
-}) => {
+export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
+  const subscriberType = useSubscriberTypeContext();
   const { user } = useUser();
 
   const { data, isLoading, revalidate } = useFetch(
@@ -35,7 +30,6 @@ export const InvoicesContextProvider = ({
     <InvoicesContext.Provider
       value={{
         componentName: 'Invoices',
-        subscriberType: subscriberType || 'user',
         invoices,
         totalCount: totalCount || 0,
         isLoading: isLoading || false,
@@ -52,7 +46,7 @@ export const useInvoicesContext = () => {
   const context = useContext(InvoicesContext);
 
   if (!context || context.componentName !== 'Invoices') {
-    throw new Error('Clerk: usePaymentSourcesContext called outside PaymentSources.');
+    throw new Error('Clerk: useInvoicesContext called outside Invoices.');
   }
 
   const { componentName, ...ctx } = context;

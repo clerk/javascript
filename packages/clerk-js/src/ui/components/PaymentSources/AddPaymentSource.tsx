@@ -11,7 +11,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, usePaymentSourcesContext } from '../../contexts';
+import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
@@ -32,7 +32,8 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { __experimental_commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
   const { user } = useUser();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
+  console.log('subscriberType', subscriberType);
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -141,7 +142,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     const { displayConfig } = useEnvironment();
     const { organization } = useOrganization();
     const { user } = useUser();
-    const { subscriberType } = usePaymentSourcesContext();
+    const subscriberType = useSubscriberTypeContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
     // Revalidates the next time the hooks gets mounted

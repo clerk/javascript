@@ -1,5 +1,4 @@
 import {
-  __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
   InvoicesContextProvider,
   useSubscriptions,
@@ -104,9 +103,7 @@ export const BillingPage = withPlans(
                 </InvoicesContextProvider>
               </TabPanel>
               <TabPanel sx={{ width: '100%' }}>
-                <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
-                  <__experimental_PaymentSources />
-                </__experimental_PaymentSourcesContext.Provider>
+                <__experimental_PaymentSources />
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -156,6 +156,11 @@ declare global {
   }
 }
 
+const CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE = 'cannot_render_billing_disabled';
+const CANNOT_RENDER_USER_MISSING_ERROR_CODE = 'cannot_render_user_missing';
+const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizations_disabled';
+const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
+const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -521,7 +526,7 @@ export class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
-          code: 'cannot_render_single_session_enabled',
+          code: CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE,
         });
       }
       return;
@@ -541,6 +546,14 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openCheckout = (props?: __experimental_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledBillingFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
+          code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
       .then(controls => controls.openDrawer('checkout', props || {}));
@@ -553,6 +566,14 @@ export class Clerk implements ClerkInterface {
 
   public __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledBillingFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('SubscriptionDetails'), {
+          code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SubscriptionDetails' })
       .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
@@ -568,7 +589,7 @@ export class Clerk implements ClerkInterface {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
-          code: 'cannot_render_user_missing',
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
         });
       }
       return;
@@ -604,7 +625,7 @@ export class Clerk implements ClerkInterface {
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
-          code: 'cannot_render_single_session_enabled',
+          code: CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE,
         });
       }
       return;
@@ -626,7 +647,7 @@ export class Clerk implements ClerkInterface {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
-          code: 'cannot_render_user_missing',
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
         });
       }
       return;
@@ -649,7 +670,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -657,7 +678,7 @@ export class Clerk implements ClerkInterface {
     if (noOrganizationExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
-          code: 'cannot_render_organization_missing',
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
       return;
@@ -679,7 +700,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -762,7 +783,7 @@ export class Clerk implements ClerkInterface {
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
-          code: 'cannot_render_user_missing',
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
         });
       }
       return;
@@ -794,7 +815,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -803,7 +824,7 @@ export class Clerk implements ClerkInterface {
     if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
-          code: 'cannot_render_organization_missing',
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
         });
       }
       return;
@@ -834,7 +855,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -865,7 +886,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -904,7 +925,7 @@ export class Clerk implements ClerkInterface {
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
-          code: 'cannot_render_organizations_disabled',
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -979,7 +1000,7 @@ export class Clerk implements ClerkInterface {
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
-          code: 'cannot_render_commerce_disabled',
+          code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
       return;
