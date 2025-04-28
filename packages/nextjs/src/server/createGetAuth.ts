@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';

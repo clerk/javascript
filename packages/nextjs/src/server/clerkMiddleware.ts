@@ -52,7 +52,7 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
-export type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
+export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignIn: RedirectFun<Response>;
   redirectToSignUp: RedirectFun<Response>;
 };
@@ -81,11 +81,6 @@ export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
    * When set, automatically injects a Content-Security-Policy header(s) compatible with Clerk.
    */
   contentSecurityPolicy?: ContentSecurityPolicyOptions;
-  /**
-   * The type of token to accept.
-   * @default 'session_token'
-   */
-  acceptsTokenType?: AuthenticateRequestOptions['acceptsToken'];
 }
 
 type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptions | Promise<ClerkMiddlewareOptions>;
@@ -356,7 +351,7 @@ export const createAuthenticateRequestOptions = (
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
-): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
+): ClerkMiddlewareSessionAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
     redirectToSignInError(url, opts.returnBackUrl);
@@ -365,7 +360,7 @@ const createMiddlewareRedirectToSignIn = (
 
 const createMiddlewareRedirectToSignUp = (
   clerkRequest: ClerkRequest,
-): ClerkMiddlewareAuthObject['redirectToSignUp'] => {
+): ClerkMiddlewareSessionAuthObject['redirectToSignUp'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
     redirectToSignUpError(url, opts.returnBackUrl);
