@@ -17,9 +17,9 @@ import type {
 import type { ClientResource } from './client';
 import type {
   __experimental_CommerceNamespace,
+  __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -1585,9 +1585,9 @@ export type __experimental_CheckoutProps = {
 
 export type __experimental_SubscriptionDetailsProps = {
   appearance?: SubscriptionDetailTheme;
-  subscription?: __experimental_CommerceSubscriptionResource;
+  plan?: __experimental_CommercePlanResource;
   subscriberType?: __experimental_CommerceSubscriberType;
-  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
 };
