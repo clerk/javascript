@@ -6,14 +6,15 @@ import type {
 } from '@clerk/types';
 import { useState } from 'react';
 
-import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
+  const subscriberType = useSubscriberTypeContext();
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
 
