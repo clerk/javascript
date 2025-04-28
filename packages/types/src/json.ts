@@ -645,8 +645,6 @@ export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
   id: string;
   paid_on: number;
   payment_due_on: number;
-  payment_source_id: string;
-  plan_id: string;
   status: __experimental_CommerceInvoiceStatus;
   totals: __experimental_CommerceInvoiceTotalsJSON;
 }
