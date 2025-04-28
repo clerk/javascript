@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,

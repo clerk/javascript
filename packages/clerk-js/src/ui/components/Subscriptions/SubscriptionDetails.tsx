@@ -10,7 +10,7 @@ import type {
 import { useState } from 'react';
 import * as React from 'react';
 
-import { __experimental_PricingTableContext, PlansContextProvider, usePlansContext } from '../../contexts';
+import { PlansContextProvider, usePlansContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -198,8 +198,8 @@ const _SubscriptionDetails = ({
 
       {plan.amount > 0 ? (
         <Drawer.Footer>
-          {!!subscription ? (
-            !!subscription.canceledAt ? (
+          {subscription ? (
+            subscription.canceledAt ? (
               <Button
                 block
                 textVariant='buttonLarge'
