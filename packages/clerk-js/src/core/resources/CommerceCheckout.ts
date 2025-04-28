@@ -74,7 +74,6 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
         initialDelay: 2 * 1_000,
         jitter: false,
         shouldRetry(error: any, iterations: number) {
-          console.error('Retrying checkout confirmation', error);
           const status = error?.status;
           return !!status && status >= 500 && iterations <= 6;
         },
