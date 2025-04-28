@@ -43,13 +43,13 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   return (
     <>
-      {mode !== 'modal' && props.layout === 'matrix' ? (
+      {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
           plans={plans || []}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
-          highlightedPlan={props.highlightPlan}
+          highlightedPlan={(props as any).highlightPlan}
         />
       ) : (
         <PricingTableDefault

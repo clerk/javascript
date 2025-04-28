@@ -689,8 +689,8 @@ export const enUS: LocalizationResource = {
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
-        add: 'Add new payment source',
-        addSubtitle: 'Add a new payment source to your account.',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
         cancelButton: 'Cancel',
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
@@ -699,13 +699,13 @@ export const enUS: LocalizationResource = {
           messageLine2:
             'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
           successMessage: '{{paymentSource}} has been removed from your account.',
-          title: 'Remove payment source',
+          title: 'Remove payment method',
         },
         title: 'Available options',
       },
       start: {
         headerTitle__invoices: 'Invoices',
-        headerTitle__paymentSources: 'Payment Sources',
+        headerTitle__paymentMethods: 'Payment Methods',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscriptions',
       },
