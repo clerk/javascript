@@ -5,8 +5,8 @@ import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
   __experimental_PlanDetailsProps,
+  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -243,7 +243,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
     this.#eventBus.emit(clerkEvents.Status, 'loading');
-    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status as ClerkStatus));
+    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
