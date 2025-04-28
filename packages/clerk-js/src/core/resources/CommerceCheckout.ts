@@ -1,3 +1,4 @@
+import { retry } from '@clerk/shared/retry';
 import type {
   __experimental_CommerceCheckoutJSON,
   __experimental_CommerceCheckoutResource,
@@ -13,7 +14,6 @@ import {
   __experimental_CommerceSubscription,
   BaseResource,
 } from './internal';
-import { retry } from '@clerk/shared/retry';
 
 export class __experimental_CommerceCheckout extends BaseResource implements __experimental_CommerceCheckoutResource {
   id!: string;
