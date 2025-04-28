@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommercePaymentSourceResource, __experimental_PaymentSourcesProps } from '@clerk/types';
+import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
 
@@ -17,7 +17,7 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const { __experimental_commerce } = useClerk();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
