@@ -1,5 +1,5 @@
-import type { AuthObject, Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
-import type { RequestState } from '@clerk/backend/internal';
+import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { RequestState, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type {
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
@@ -10,7 +10,7 @@ import type {
 } from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
-export type GetAuthReturn = Promise<AuthObject>;
+export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
 
 export type RootAuthLoaderOptions = {
   publishableKey?: string;
@@ -66,7 +66,7 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
 };
 
 export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
-  auth: Omit<AuthObject, 'session' | 'user' | 'organization'>;
+  auth: Omit<SignedInAuthObject | SignedOutAuthObject, 'session' | 'user' | 'organization'>;
 } & (Options extends { loadSession: true } ? { session: Session | null } : object) &
   (Options extends { loadUser: true } ? { user: User | null } : object) &
   (Options extends { loadOrganization: true } ? { organization: Organization | null } : object);
