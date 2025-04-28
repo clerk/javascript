@@ -1,6 +1,7 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 
-import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { ApiClient } from '../api';
+import type { TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
 export type AuthenticateRequestOptions = {
@@ -136,8 +137,3 @@ export type OrganizationSyncTargetMatchers = {
 export type OrganizationSyncTarget =
   | { type: 'personalAccount' }
   | { type: 'organization'; organizationId?: string; organizationSlug?: string };
-export type TokenType = 'session_token' | 'oauth_token' | 'api_key' | 'machine_token';
-
-export type MachineTokenType = Exclude<TokenType, 'session_token'>;
-
-export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;

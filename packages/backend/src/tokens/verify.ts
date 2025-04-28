@@ -13,10 +13,11 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import type { MachineTokenType } from '../tokens/types';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
+import type { MachineTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
 
 /**
  * @interface
@@ -193,7 +194,7 @@ async function verifyMachineToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.machineTokens.verifySecret(secret);
-    return { data: verifiedToken, tokenType: 'machine_token', errors: undefined };
+    return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError('machine_token', err, 'Machine token not found');
   }
@@ -206,9 +207,9 @@ async function verifyOAuthToken(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verifySecret(secret);
-    return { data: verifiedToken, tokenType: 'oauth_token', errors: undefined };
+    return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
-    return handleClerkAPIError('oauth_token', err, 'OAuth token not found');
+    return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
 }
 
@@ -219,9 +220,9 @@ async function verifyAPIKey(
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.apiKeys.verifySecret(secret);
-    return { data: verifiedToken, tokenType: 'api_key', errors: undefined };
+    return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
   } catch (err: any) {
-    return handleClerkAPIError('api_key', err, 'API key not found');
+    return handleClerkAPIError(TokenType.ApiKey, err, 'API key not found');
   }
 }
 

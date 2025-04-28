@@ -16,7 +16,9 @@ import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
 import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
-import type { AuthenticateRequestOptions, MachineTokenType, TokenType } from './types';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
+import type { AuthenticateRequestOptions } from './types';
 import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -115,7 +117,7 @@ export interface AuthenticateRequest {
    * @example
    * clerkClient.authenticateRequest(request);
    */
-  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<'session_token'>>;
+  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<SessionTokenType>>;
 }
 
 export const authenticateRequest: AuthenticateRequest = (async (
@@ -126,7 +128,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   assertValidSecretKey(authenticateContext.secretKey);
 
   // Default tokenType is session_token for backwards compatibility.
-  const acceptsToken = options.acceptsToken ?? 'session_token';
+  const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -384,7 +386,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
       // use `await` to force this try/catch handle the signedIn invocation
       return signedIn({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -495,7 +497,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut({
-        tokenType: 'api_key',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason: AuthErrorReason.SessionTokenAndUATMissing,
       });
@@ -529,7 +531,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       }
 
       const signedInRequestState = signedIn({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         sessionClaims: data,
         headers: new Headers(),
@@ -553,7 +555,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     // Unreachable
     return signedOut({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       reason: AuthErrorReason.UnexpectedError,
     });
@@ -565,7 +567,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
       return signedOut({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason: AuthErrorReason.UnexpectedError,
       });
@@ -577,7 +579,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
         return signedIn({
-          tokenType: 'session_token',
+          tokenType: TokenType.SessionToken,
           authenticateContext,
           sessionClaims: data.jwtPayload,
           headers: data.headers,
@@ -619,7 +621,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     return signedOut({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       reason: err.reason,
       message: err.getFullMessage(),
@@ -719,7 +721,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     return signedIn({
-      tokenType: 'session_token',
+      tokenType: TokenType.SessionToken,
       authenticateContext,
       sessionClaims: data,
       token: sessionOrMachineTokenInHeader,
@@ -731,7 +733,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return authenticateAnyRequestWithTokenInHeader();
     }
 
-    if (acceptsToken === 'session_token') {
+    if (acceptsToken === TokenType.SessionToken) {
       return authenticateRequestWithTokenInHeader();
     }
 
@@ -739,7 +741,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   // Machine requests cannot have the token in the cookie, it must be in header.
-  if (acceptsToken === 'oauth_token' || acceptsToken === 'api_key' || acceptsToken === 'machine_token') {
+  if (
+    acceptsToken === TokenType.OAuthToken ||
+    acceptsToken === TokenType.ApiKey ||
+    acceptsToken === TokenType.MachineToken
+  ) {
     return signedOut({
       tokenType: acceptsToken,
       authenticateContext,
