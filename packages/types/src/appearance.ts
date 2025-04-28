@@ -427,12 +427,14 @@ export type ElementsConfig = {
   subscriptionDetailFeePeriodNotice: WithOptions;
   subscriptionDetailFeePeriodNoticeInner: WithOptions;
   subscriptionDetailFeePeriodNoticeLabel: WithOptions;
+  subscriptionDetailCaption: WithOptions;
   subscriptionDetailFeatures: WithOptions;
   subscriptionDetailFeaturesList: WithOptions<string>;
   subscriptionDetailFeaturesListItem: WithOptions<string>;
   subscriptionDetailFeaturesListItemContent: WithOptions;
   subscriptionDetailFeaturesListItemTitle: WithOptions;
   subscriptionDetailFeaturesListItemDescription: WithOptions;
+  subscriptionDetailPeriodToggle: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
