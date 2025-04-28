@@ -71,7 +71,7 @@ export const OrganizationProfileRoutes = () => {
               <Route path='plans'>
                 {/* TODO(@commerce): Should this be lazy loaded ? */}
                 <Suspense fallback={''}>
-                  <OrganizationPlansPage providerProps={{ subscriberType: 'org' }} />
+                  <OrganizationPlansPage />
                 </Suspense>
               </Route>
               <Route path='invoice/:invoiceId'>

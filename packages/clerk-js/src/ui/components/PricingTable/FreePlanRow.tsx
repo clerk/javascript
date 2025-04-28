@@ -1,14 +1,16 @@
 import { useClerk } from '@clerk/shared/react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Button, Col, Flex, Icon, localizationKeys, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Plans } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
 
 export const FreePlanRow = () => {
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
+  const subscriberType = useSubscriberTypeContext();
+
   const { isLoading, defaultFreePlan, isDefaultPlanImplicitlyActive } = usePlansContext();
 
   const handleSelect = () => {

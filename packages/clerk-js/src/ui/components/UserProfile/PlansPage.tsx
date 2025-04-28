@@ -1,9 +1,9 @@
-import { __experimental_PricingTableContext, withPlans } from '../../contexts';
+import { __experimental_PricingTableContext, PlansContextProvider, SubscriberTypeContext } from '../../contexts';
 import { Header } from '../../elements';
 import { useRouter } from '../../router';
 import { __experimental_PricingTable } from '../PricingTable/PricingTable';
 
-export const PlansPage = withPlans(() => {
+const PlansPageInternal = () => {
   const { navigate } = useRouter();
 
   return (
@@ -30,4 +30,14 @@ export const PlansPage = withPlans(() => {
       </__experimental_PricingTableContext.Provider>
     </>
   );
-});
+};
+
+export const PlansPage = () => {
+  return (
+    <SubscriberTypeContext.Provider value='user'>
+      <PlansContextProvider>
+        <PlansPageInternal />
+      </PlansContextProvider>
+    </SubscriberTypeContext.Provider>
+  );
+};

@@ -10,7 +10,7 @@ import type {
 import { useState } from 'react';
 import * as React from 'react';
 
-import { PlansContextProvider, usePlansContext } from '../../contexts';
+import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -29,15 +29,16 @@ import { formatDate, handleError } from '../../utils';
 
 export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsProps) => {
   return (
-    <PlansContextProvider subscriberType={props.subscriberType}>
-      <_SubscriptionDetails {...props} />
-    </PlansContextProvider>
+    <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
+      <PlansContextProvider>
+        <_SubscriptionDetails {...props} />
+      </PlansContextProvider>
+    </SubscriberTypeContext.Provider>
   );
 };
 
 const _SubscriptionDetails = ({
   plan,
-  subscriberType,
   onSubscriptionCancel,
   portalId,
   planPeriod: _planPeriod = 'month',
@@ -51,6 +52,7 @@ const _SubscriptionDetails = ({
 
   const { setIsOpen } = useDrawerContext();
   const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan } = usePlansContext();
+  const subscriberType = useSubscriberTypeContext();
 
   if (!plan) {
     return null;

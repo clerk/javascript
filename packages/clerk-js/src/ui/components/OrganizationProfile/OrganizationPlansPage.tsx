@@ -1,9 +1,9 @@
-import { __experimental_PricingTableContext, withPlans } from '../../contexts';
+import { __experimental_PricingTableContext, PlansContextProvider, SubscriberTypeContext } from '../../contexts';
 import { Header } from '../../elements';
 import { useRouter } from '../../router';
 import { __experimental_PricingTable } from '../PricingTable/PricingTable';
 
-export const OrganizationPlansPage = withPlans(() => {
+const OrganizationPlansPageInternal = () => {
   const { navigate } = useRouter();
 
   return (
@@ -17,11 +17,19 @@ export const OrganizationPlansPage = withPlans(() => {
         </Header.BackLink>
       </Header.Root>
 
-      <__experimental_PricingTableContext.Provider
-        value={{ componentName: 'PricingTable', mode: 'modal', subscriberType: 'org' }}
-      >
+      <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
         <__experimental_PricingTable />
       </__experimental_PricingTableContext.Provider>
     </>
   );
-});
+};
+
+export const OrganizationPlansPage = () => {
+  return (
+    <SubscriberTypeContext.Provider value='org'>
+      <PlansContextProvider>
+        <OrganizationPlansPageInternal />
+      </PlansContextProvider>
+    </SubscriberTypeContext.Provider>
+  );
+};

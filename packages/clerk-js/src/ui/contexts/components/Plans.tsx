@@ -5,7 +5,7 @@ import type {
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
 } from '@clerk/types';
-import type { ComponentType, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
@@ -81,33 +81,6 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
       {children}
     </PlansContext.Provider>
   );
-};
-
-export const withPlans = <T extends object>(
-  WrappedComponent: ComponentType<T>,
-  providerPropsFromHOC: PropsWithChildren = {},
-) => {
-  // Define props for the returned component
-  type WithPlansProps = T & {
-    providerProps?: PropsWithChildren;
-  };
-
-  const WithPlans: React.FC<WithPlansProps> = ({ providerProps = {}, ...componentProps }) => {
-    const mergedProviderProps = {
-      ...providerPropsFromHOC,
-      ...providerProps,
-    };
-
-    return (
-      <PlansContextProvider {...mergedProviderProps}>
-        <WrappedComponent {...(componentProps as T)} />
-      </PlansContextProvider>
-    );
-  };
-
-  WithPlans.displayName = `WithPlans(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-
-  return WithPlans;
 };
 
 type HandleSelectPlanProps = {

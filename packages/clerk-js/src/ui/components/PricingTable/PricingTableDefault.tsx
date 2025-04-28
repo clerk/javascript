@@ -7,7 +7,7 @@ import type {
 import * as React from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { usePlansContext, usePricingTableContext } from '../../contexts';
+import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Box,
@@ -104,7 +104,8 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
-  const { mode = 'mounted', subscriberType } = usePricingTableContext();
+  const { mode = 'mounted' } = usePricingTableContext();
+  const subscriberType = useSubscriberTypeContext();
 
   const ctaPosition = pricingTableProps.ctaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
