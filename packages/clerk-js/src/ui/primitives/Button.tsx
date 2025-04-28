@@ -163,15 +163,11 @@ type OwnProps = PrimitiveProps<'button'> & {
   isActive?: boolean;
   hoverAsFocus?: boolean;
   hasArrow?: boolean;
-  arrowIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 type ButtonProps = OwnProps & StyleVariants<typeof applyVariants>;
 
-const ButtonChildrenWithArrow = ({
-  children,
-  arrowIcon,
-}: PropsWithChildren<{ arrowIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>> }>) => {
+const ButtonChildrenWithArrow = ({ children }: PropsWithChildren) => {
   return (
     <Flex
       align='center'
@@ -180,11 +176,11 @@ const ButtonChildrenWithArrow = ({
       {children}
       <Icon
         elementDescriptor={descriptors.buttonArrowIcon}
-        icon={arrowIcon || ArrowRightButtonIcon}
+        icon={ArrowRightButtonIcon}
         sx={t => ({
           marginLeft: t.space.$2,
-          width: arrowIcon ? t.sizes.$4 : t.sizes.$2x5,
-          height: arrowIcon ? t.sizes.$4 : t.sizes.$2x5,
+          width: t.sizes.$2x5,
+          height: t.sizes.$2x5,
           opacity: t.opacity.$inactive,
         })}
       />
@@ -201,7 +197,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
     loadingText,
     children,
     hasArrow,
-    arrowIcon,
     onClick: onClickProp,
     ...rest
   } = filterProps(parsedProps);
@@ -246,12 +241,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
           {loadingText || <span style={{ display: 'inline-flex', visibility: 'hidden' }}>{children}</span>}
         </Flex>
       )}
-      {!isLoading &&
-        (hasArrow || arrowIcon ? (
-          <ButtonChildrenWithArrow arrowIcon={arrowIcon}>{children}</ButtonChildrenWithArrow>
-        ) : (
-          children
-        ))}
+      {!isLoading && (hasArrow ? <ButtonChildrenWithArrow>{children}</ButtonChildrenWithArrow> : children)}
     </button>
   );
 });

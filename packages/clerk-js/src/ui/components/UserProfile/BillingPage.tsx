@@ -89,7 +89,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                   <SubscriptionsList />
                   <Button
                     localizationKey='View all plans'
-                    arrowIcon={ArrowRightIcon}
+                    hasArrow
                     variant='ghost'
                     onClick={() => navigate('plans')}
                     sx={t => ({

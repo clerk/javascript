@@ -31,19 +31,7 @@ export function SubscriptionsList() {
   };
 
   return (
-    <Table
-      tableHeadVisuallyHidden
-      sx={t => ({
-        'tr > td': {
-          paddingInline: t.sizes.$4,
-          paddingBlock: t.sizes.$2,
-        },
-        'tr > th': {
-          paddingInline: t.sizes.$4,
-          paddingBlock: t.sizes.$2,
-        },
-      })}
-    >
+    <Table tableHeadVisuallyHidden>
       <Thead>
         <Tr>
           <Th>Plan</Th>
@@ -122,6 +110,7 @@ export function SubscriptionsList() {
             >
               {canManageSubscription({ subscription }) && (
                 <Button
+                  aria-label='Manage subscription'
                   onClick={() => handleSelectSubscription(subscription)}
                   variant='bordered'
                   colorScheme='secondary'
