@@ -1,3 +1,4 @@
+// @ts-nocheck This will be fixed in #5710
 import type { ProtectProps } from '@clerk/clerk-react';
 import React from 'react';
 
