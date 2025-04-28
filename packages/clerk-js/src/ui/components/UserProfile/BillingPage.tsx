@@ -1,8 +1,8 @@
 import {
   __experimental_PricingTableContext,
   InvoicesContextProvider,
-  SubscriberTypeContext,
   PlansContextProvider,
+  SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
 import { Button, Col, descriptors, localizationKeys } from '../../customizables';
