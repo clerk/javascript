@@ -366,6 +366,7 @@ export type ElementsConfig = {
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
+  pricingTableRootBox: WithOptions;
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
   pricingTableCardHeader: WithOptions;
@@ -390,7 +391,8 @@ export type ElementsConfig = {
   pricingTableCardFeePeriodNoticeInner: WithOptions;
   pricingTableCardFeePeriodNoticeLabel: WithOptions;
 
-  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrixRootBox: WithOptions;
+  pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRowGroupHeader: WithOptions;
