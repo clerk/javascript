@@ -5,16 +5,13 @@ export const RootBox = (props: PropsOfComponent<typeof Col>) => {
   return (
     <Col
       {...props}
-      sx={[
-        t => ({
-          boxSizing: 'border-box',
-          width: 'fit-content',
-          color: t.colors.$colorText,
-          fontFamily: t.fonts.$main,
-          fontStyle: t.fontStyles.$normal,
-        }),
-        props.sx,
-      ]}
+      sx={t => ({
+        boxSizing: 'border-box',
+        width: 'fit-content',
+        color: t.colors.$colorText,
+        fontFamily: t.fonts.$main,
+        fontStyle: t.fontStyles.$normal,
+      })}
     />
   );
 };

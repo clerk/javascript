@@ -23,7 +23,7 @@ import {
   Text,
   useAppearance,
 } from '../../customizables';
-import { Avatar, ReversibleContainer, RootBox, SegmentedControl } from '../../elements';
+import { Avatar, ReversibleContainer, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
