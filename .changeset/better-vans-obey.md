@@ -2,4 +2,4 @@
 '@clerk/backend': minor
 ---
 
-Support new handshake payload flow with nonce
+Initial stub of the new handshake payload flow with nonce
