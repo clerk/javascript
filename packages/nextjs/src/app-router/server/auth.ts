@@ -5,10 +5,9 @@ import type {
   RedirectFun,
   SignedInAuthObject,
   SignedOutAuthObject,
-  TokenType,
   UnauthenticatedMachineObject,
 } from '@clerk/backend/internal';
-import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -133,7 +132,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
     options: {
-      acceptsToken: options?.acceptsToken ?? 'session_token',
+      acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
     },
   })(request);
 
@@ -156,7 +155,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
         publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-        sessionStatus: authObject.tokenType === 'session_token' ? authObject.sessionStatus : null,
+        sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
     ] as const;

@@ -14,6 +14,7 @@ import {
   createRedirect,
   isTokenTypeAccepted,
   signedOutAuthObject,
+  TokenType,
   unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -396,7 +397,7 @@ const createMiddlewareAuthHandler = (
 ): ClerkMiddlewareAuth => {
   const authObjWithMethods = Object.assign(
     authObject,
-    authObject.tokenType === 'session_token'
+    authObject.tokenType === TokenType.SessionToken
       ? {
           redirectToSignIn,
           redirectToSignUp,
@@ -405,14 +406,14 @@ const createMiddlewareAuthHandler = (
   );
 
   const authHandler = async (options?: GetAuthOptions) => {
-    const acceptsToken = options?.acceptsToken ?? 'session_token';
+    const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
     if (acceptsToken === 'any') {
       return authObjWithMethods;
     }
 
     if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
-      if (authObject.tokenType === 'session_token') {
+      if (authObject.tokenType === TokenType.SessionToken) {
         return {
           ...signedOutAuthObject(),
           redirectToSignIn,

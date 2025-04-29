@@ -4,9 +4,8 @@ import type {
   AuthenticateRequestOptions,
   RedirectFun,
   SignedInAuthObject,
-  TokenType,
 } from '@clerk/backend/internal';
-import { constants, isTokenTypeAccepted } from '@clerk/backend/internal';
+import { constants, isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationFromSessionClaims,
   CheckAuthorizationParamsFromSessionClaims,
@@ -106,11 +105,11 @@ export function createProtect(opts: {
     const paramsOrFunction = getAuthorizationParams(args[0]);
     const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
     const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
-    const requestedToken = (args[0]?.token || args[1]?.token || 'session_token') as TokenType | TokenType[];
+    const requestedToken = (args[0]?.token || args[1]?.token || TokenType.SessionToken) as TokenType | TokenType[];
 
     const handleUnauthenticated = () => {
       // For machine tokens, always return notFound instead of redirecting
-      if (authObject.tokenType !== 'session_token') {
+      if (authObject.tokenType !== TokenType.SessionToken) {
         return notFound();
       }
 
@@ -135,7 +134,7 @@ export function createProtect(opts: {
       return handleUnauthorized();
     }
 
-    if (authObject.tokenType !== 'session_token') {
+    if (authObject.tokenType !== TokenType.SessionToken) {
       // For machine tokens, we only check if they're authenticated
       // They don't have session status or organization permissions
       if (!authObject.id) {

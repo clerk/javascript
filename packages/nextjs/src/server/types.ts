@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type { TokenType } from '@clerk/backend/internal';
+import type { SessionTokenType, TokenType } from '@clerk/backend/internal';
 import type { IncomingMessage } from 'http';
 import type { NextApiRequest } from 'next';
 import type { NextApiRequestCookies } from 'next/dist/server/api-utils';
@@ -18,8 +18,8 @@ export type InferAuthObjectFromTokenArray<
   T extends readonly TokenType[],
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = 'session_token' extends T[number]
-  ? T[number] extends 'session_token'
+> = SessionTokenType extends T[number]
+  ? T[number] extends SessionTokenType
     ? SessionType
     : SessionType | (MachineType & { tokenType: T[number] })
   : MachineType & { tokenType: T[number] };
@@ -28,4 +28,4 @@ export type InferAuthObjectFromToken<
   T extends TokenType,
   SessionType extends AuthObject,
   MachineType extends AuthObject,
-> = T extends 'session_token' ? SessionType : MachineType & { tokenType: T };
+> = T extends SessionTokenType ? SessionType : MachineType & { tokenType: T };

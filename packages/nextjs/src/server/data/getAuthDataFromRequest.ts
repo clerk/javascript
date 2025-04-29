@@ -9,6 +9,7 @@ import {
   isTokenTypeAccepted,
   signedInAuthObject,
   signedOutAuthObject,
+  TokenType,
   unauthenticatedMachineObject,
   verifyMachineAuthToken,
 } from '@clerk/backend/internal';
@@ -52,7 +53,7 @@ export const getAuthDataFromRequestSync = (
   };
 
   // Only accept session tokens in sync version
-  if (!isTokenTypeAccepted('session_token', opts.acceptsToken || 'session_token')) {
+  if (!isTokenTypeAccepted(TokenType.SessionToken, opts.acceptsToken || TokenType.SessionToken)) {
     return signedOutAuthObject(options);
   }
 
@@ -77,7 +78,7 @@ export const getAuthDataFromRequestAsync = async (
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
-  const acceptsToken = opts.acceptsToken || 'session_token';
+  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
 
   if (bearerToken && isMachineToken(bearerToken)) {
     const tokenType = getMachineTokenType(bearerToken);
