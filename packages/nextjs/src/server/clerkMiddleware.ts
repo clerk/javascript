@@ -390,6 +390,11 @@ const createMiddlewareProtect = (
   }) as unknown as Promise<AuthProtect>;
 };
 
+/**
+ * Modifies the auth object based on the token type.
+ * - For session tokens: adds redirect functions to the auth object
+ * - For machine tokens: validates token type and returns appropriate auth object
+ */
 const createMiddlewareAuthHandler = (
   authObject: AuthObject,
   redirectToSignIn: RedirectFun<Response>,

@@ -72,7 +72,7 @@ export const getAuthDataFromRequestSync = (
 /**
  * Note: We intentionally avoid using interface/function overloads here since these functions
  * are used internally. The complex type overloads are more valuable at the public API level
- * (like in auth.protect()) where users interact directly with the types.
+ * (like in auth.protect(), auth()) where users interact directly with the types.
  *
  * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
  * to auth data for a given request.

@@ -14,6 +14,12 @@ export type NextMiddlewareRequestParam = Parameters<NextMiddleware>['0'];
 export type NextMiddlewareEvtParam = Parameters<NextMiddleware>['1'];
 export type NextMiddlewareReturn = ReturnType<NextMiddleware>;
 
+/**
+ * Infers auth object type from an array of token types.
+ * - Session token only -> SessionType
+ * - Mixed tokens -> SessionType | MachineType
+ * - Machine tokens only -> MachineType
+ */
 export type InferAuthObjectFromTokenArray<
   T extends readonly TokenType[],
   SessionType extends AuthObject,
@@ -24,6 +30,10 @@ export type InferAuthObjectFromTokenArray<
     : SessionType | (MachineType & { tokenType: T[number] })
   : MachineType & { tokenType: T[number] };
 
+/**
+ * Infers auth object type from a single token type.
+ * Returns SessionType for session tokens, or MachineType for machine tokens.
+ */
 export type InferAuthObjectFromToken<
   T extends TokenType,
   SessionType extends AuthObject,
