@@ -20,6 +20,10 @@ export const thTH: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -614,7 +618,8 @@ export const thTH: LocalizationResource = {
       'ชื่อผู้ใช้ของคุณมีอักขระที่ไม่ถูกต้อง โปรดใช้เฉพาะตัวอักษร ตัวเลข และขีดล่างเท่านั้น',
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
     identification_deletion_failed: 'คุณไม่สามารถลบรูปแบบการยืนยันตัวตนสุดท้ายของคุณได้',
-    not_allowed_access: 'คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้ โปรดติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่านี่เป็นข้อผิดพลาด',
+    not_allowed_access:
+      'ไม่อนุญาตให้ใช้ที่อยู่อีเมลหรือหมายเลขโทรศัพท์ในการลงทะเบียน สาเหตุอาจเกิดจากการใช้เครื่องหมาย "+" "=" "#" หรือ "." ในที่อยู่อีเมลของคุณ การใช้โดเมนที่เชื่อมต่อกับบริการอีเมลชั่วคราว หรือการถูกบล็อกโดยชัดเจน หากคุณเชื่อว่านี่คือข้อผิดพลาด โปรดติดต่อฝ่ายสนับสนุน',
     organization_domain_blocked: 'นี่เป็นโดเมนผู้ให้บริการอีเมลที่ถูกบล็อก โปรดใช้โดเมนอื่น',
     organization_domain_common: 'นี่เป็นโดเมนผู้ให้บริการอีเมลทั่วไป โปรดใช้โดเมนอื่น',
     organization_domain_exists_for_enterprise_connection: 'โดเมนนี้ถูกใช้สำหรับ SSO ขององค์กรของคุณแล้ว',
@@ -703,7 +708,7 @@ export const thTH: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

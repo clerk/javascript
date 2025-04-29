@@ -1,11 +1,11 @@
 import {
-  __experimental_PaymentSourcesContext,
   __experimental_PricingTableContext,
   InvoicesContextProvider,
+  PlansContextProvider,
+  SubscriberTypeContext,
   useSubscriptions,
-  withPlans,
 } from '../../contexts';
-import { Col, descriptors, Heading, Hr, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -18,6 +18,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources';
 import { __experimental_PricingTable } from '../PricingTable';
@@ -26,92 +27,103 @@ import { SubscriptionsList } from '../Subscriptions';
 const tabMap = {
   0: 'plans',
   1: 'invoices',
-  2: 'payment-sources',
+  2: 'payment-methods',
 } as const;
 
-export const BillingPage = withPlans(
-  withCardStateProvider(() => {
-    const card = useCardState();
-    const { data: subscriptions } = useSubscriptions();
+const BillingPageInternal = withCardStateProvider(() => {
+  const card = useCardState();
+  const { data: subscriptions } = useSubscriptions();
+  const { navigate } = useRouter();
 
-    const { selectedTab, handleTabChange } = useTabState(tabMap);
+  const { selectedTab, handleTabChange } = useTabState(tabMap);
 
-    if (!Array.isArray(subscriptions?.data)) {
-      return null;
-    }
+  if (!Array.isArray(subscriptions?.data)) {
+    return null;
+  }
 
-    return (
+  return (
+    <Col
+      elementDescriptor={descriptors.page}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+    >
       <Col
-        elementDescriptor={descriptors.page}
-        sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('billing')}
+        gap={4}
       >
-        <Col
-          elementDescriptor={descriptors.profilePage}
-          elementId={descriptors.profilePage.setId('billing')}
-          gap={4}
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('userProfile.__experimental_billingPage.title')}
+            textVariant='h2'
+          />
+        </Header.Root>
+
+        <Card.Alert>{card.error}</Card.Alert>
+
+        <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
         >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.title')}
-              textVariant='h2'
+          <TabsList sx={t => ({ gap: t.space.$6 })}>
+            <Tab
+              localizationKey={
+                subscriptions.data.length > 0
+                  ? localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__subscriptions')
+                  : localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')
+              }
             />
-          </Header.Root>
-
-          <Card.Alert>{card.error}</Card.Alert>
-
-          <Tabs
-            value={selectedTab}
-            onChange={handleTabChange}
-          >
-            <TabsList sx={t => ({ gap: t.space.$6 })}>
-              <Tab
-                localizationKey={
-                  subscriptions.data.length > 0
-                    ? localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__subscriptions')
-                    : localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')
-                }
-              />
-              <Tab
-                localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
-              />
-              <Tab
-                localizationKey={localizationKeys(
-                  'userProfile.__experimental_billingPage.start.headerTitle__paymentSources',
-                )}
-              />
-            </TabsList>
-            <TabPanels>
-              <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-                {subscriptions.data.length > 0 && (
-                  <>
-                    <SubscriptionsList />
-                    <Hr sx={t => ({ marginBlock: t.space.$6 })} />
-                    <Heading
-                      textVariant='h3'
-                      as='h2'
-                      localizationKey='Available Plans'
-                      sx={t => ({ marginBlockEnd: t.space.$4, fontWeight: t.fontWeights.$medium })}
-                    />
-                  </>
-                )}
+            <Tab
+              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
+            />
+            <Tab
+              localizationKey={localizationKeys(
+                'userProfile.__experimental_billingPage.start.headerTitle__paymentMethods',
+              )}
+            />
+          </TabsList>
+          <TabPanels>
+            <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
+              {subscriptions.data.length > 0 ? (
+                <>
+                  <SubscriptionsList />
+                  <Button
+                    localizationKey='View all plans'
+                    hasArrow
+                    variant='ghost'
+                    onClick={() => navigate('plans')}
+                    sx={t => ({
+                      width: 'fit-content',
+                      marginTop: t.space.$4,
+                    })}
+                  />
+                </>
+              ) : (
                 <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <__experimental_PricingTable />
                 </__experimental_PricingTableContext.Provider>
-              </TabPanel>
-              <TabPanel sx={{ width: '100%' }}>
-                <InvoicesContextProvider>
-                  <InvoicesList />
-                </InvoicesContextProvider>
-              </TabPanel>
-              <TabPanel sx={{ width: '100%' }}>
-                <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources' }}>
-                  <__experimental_PaymentSources />
-                </__experimental_PaymentSourcesContext.Provider>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </Col>
+              )}
+            </TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <InvoicesContextProvider>
+                <InvoicesList />
+              </InvoicesContextProvider>
+            </TabPanel>
+            <TabPanel sx={{ width: '100%' }}>
+              <__experimental_PaymentSources />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Col>
-    );
-  }),
-);
+    </Col>
+  );
+});
+
+export const BillingPage = () => {
+  return (
+    <SubscriberTypeContext.Provider value='user'>
+      <PlansContextProvider>
+        <BillingPageInternal />
+      </PlansContextProvider>
+    </SubscriberTypeContext.Provider>
+  );
+};

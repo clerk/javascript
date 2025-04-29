@@ -1,4 +1,4 @@
-import { useInvoicesContext } from '../../contexts';
+import { InvoicesContextProvider, useInvoicesContext } from '../../contexts';
 import { Badge, Box, Button, Dd, descriptors, Dl, Dt, Heading, Icon, Span, Spinner, Text } from '../../customizables';
 import { Header, LineItems } from '../../elements';
 import { useClipboard } from '../../hooks';
@@ -8,7 +8,7 @@ import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
-export const InvoicePage = () => {
+const InvoicePageInternal = () => {
   const { params, navigate } = useRouter();
   const { getInvoiceById, isLoading } = useInvoicesContext();
   const invoice = params.invoiceId ? getInvoiceById(params.invoiceId) : null;
@@ -253,3 +253,11 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
     </Button>
   );
 }
+
+export const InvoicePage = () => {
+  return (
+    <InvoicesContextProvider>
+      <InvoicePageInternal />
+    </InvoicesContextProvider>
+  );
+};

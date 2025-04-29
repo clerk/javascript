@@ -77,12 +77,14 @@ export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 
 
 export type __experimental_GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
+export type __experimental_PaymentGateway = 'stripe' | 'paypal';
+
 export type __experimental_InitializePaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
 }>;
 
 export type __experimental_AddPaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
   paymentToken: string;
 }>;
 
@@ -112,9 +114,7 @@ export type __experimental_CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due
 
 export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
-  planId: string;
-  paymentSourceId: string;
-  totals: __experimental_CommerceTotals;
+  totals: __experimental_CommerceInvoiceTotals;
   paymentDueOn: number;
   paidOn: number;
   status: __experimental_CommerceInvoiceStatus;
@@ -142,22 +142,31 @@ export interface __experimental_CommerceMoney {
   currencySymbol: string;
 }
 
-export interface __experimental_CommerceTotals {
+export interface __experimental_CommerceCheckoutTotals {
   subtotal: __experimental_CommerceMoney;
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
-  totalDueNow?: __experimental_CommerceMoney;
+  totalDueNow: __experimental_CommerceMoney;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface __experimental_CommerceInvoiceTotals
+  extends Omit<__experimental_CommerceCheckoutTotals, 'totalDueNow'> {}
 
 export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
   planId: string;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
 }>;
 
-export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<{
-  paymentSourceId?: string;
-}>;
-
+export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<
+  | {
+      paymentSourceId?: string;
+    }
+  | {
+      paymentToken?: string;
+      gateway?: __experimental_PaymentGateway;
+    }
+>;
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
@@ -167,7 +176,7 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   status: string;
-  totals: __experimental_CommerceTotals;
+  totals: __experimental_CommerceCheckoutTotals;
   subscription?: __experimental_CommerceSubscriptionResource;
   confirm: (params: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }

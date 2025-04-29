@@ -20,6 +20,10 @@ export const deDE: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -601,7 +605,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
-    form_identifier_not_found: 'Die eingegebene Kennung wurde nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.',
+    form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',
@@ -625,7 +629,7 @@ export const deDE: LocalizationResource = {
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access:
-      'Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte kontaktieren Sie den Support, wenn Sie glauben, dass dies ein Fehler ist.',
+      "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
     organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
     organization_domain_common: 'Dies ist eine gängige E-Mail-Provider-Domain. Bitte verwenden Sie eine andere.',
     organization_domain_exists_for_enterprise_connection:
@@ -721,7 +725,7 @@ export const deDE: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: 'Rechnungen',
-        headerTitle__paymentSources: 'Zahlungsquellen',
+        headerTitle__paymentMethods: 'Zahlungsquellen',
         headerTitle__plans: 'Pläne',
         headerTitle__subscriptions: undefined,
       },

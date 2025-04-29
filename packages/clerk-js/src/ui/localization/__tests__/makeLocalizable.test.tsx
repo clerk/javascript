@@ -100,7 +100,7 @@ describe('Test localizable components', () => {
         form_param_nil: 'form_param_nil',
         form_code_incorrect: 'form_code_incorrect',
         form_password_incorrect: 'form_password_incorrect',
-        not_allowed_access: 'not_allowed_access',
+        not_allowed_access: undefined,
         form_identifier_exists: 'form_identifier_exists',
         form_identifier_exists__username: 'form_identifier_exists__username',
         form_identifier_exists__email_address: 'form_identifier_exists__email_address',
@@ -126,7 +126,7 @@ describe('Test localizable components', () => {
     expect(translateError({ code: 'form_param_nil', message: 'message' })).toBe('form_param_nil');
     expect(translateError({ code: 'form_code_incorrect', message: 'message' })).toBe('form_code_incorrect');
     expect(translateError({ code: 'form_password_incorrect', message: 'message' })).toBe('form_password_incorrect');
-    expect(translateError({ code: 'not_allowed_access', message: 'message' })).toBe('not_allowed_access');
+    expect(translateError({ code: 'not_allowed_access', message: 'message' })).toBe('message');
     expect(translateError({ code: 'form_identifier_exists', message: 'message' })).toBe('form_identifier_exists');
     expect(
       translateError({ code: 'form_identifier_exists', message: 'message', meta: { paramName: 'username' } }),

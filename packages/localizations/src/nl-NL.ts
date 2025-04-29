@@ -20,6 +20,10 @@ export const nlNL: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -594,7 +598,7 @@ export const nlNL: LocalizationResource = {
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
-    form_identifier_not_found: 'Dit identificerende gegeven kan niet worden gevonden.',
+    form_identifier_not_found: 'We konden geen account vinden met deze details.',
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',
@@ -614,7 +618,8 @@ export const nlNL: LocalizationResource = {
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
-    not_allowed_access: 'Toegang niet toegestaan.',
+    not_allowed_access:
+      "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
     organization_domain_blocked: 'Het domein van de organisatie is geblokkeerd.',
     organization_domain_common: 'Het domein van de organisatie is te algemeen.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -703,7 +708,7 @@ export const nlNL: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

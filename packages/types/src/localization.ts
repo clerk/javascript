@@ -92,6 +92,8 @@ type _LocalizationResource = {
   badge__startsAt: LocalizationValue;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
+  badge__canceledEndsAt: LocalizationValue;
+  badge__renewsAt: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -114,6 +116,10 @@ type _LocalizationResource = {
     switchPlan: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
+    defaultFreePlanActive: LocalizationValue;
+    viewFeatures: LocalizationValue;
+    seeAllFeatures: LocalizationValue;
+    availableFeatures: LocalizationValue;
     checkout: {
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
@@ -684,7 +690,7 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
-        headerTitle__paymentSources: LocalizationValue;
+        headerTitle__paymentMethods: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;

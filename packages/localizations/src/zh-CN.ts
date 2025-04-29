@@ -20,6 +20,10 @@ export const zhCN: LocalizationResource = {
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
       lineItems: {
         title__invoiceId: undefined,
         title__paymentMethod: undefined,
@@ -581,7 +585,7 @@ export const zhCN: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: '我们无法找到具有这些信息的账户。',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '邮箱地址必须是有效的邮箱格式。',
     form_param_format_invalid__phone_number: '电话号码必须符合有效的国际格式。',
@@ -600,7 +604,8 @@ export const zhCN: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: '您无法删除最后一个身份标识。',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "您使用的电子邮件地址或电话号码不允许注册。这可能是因为您在电子邮件地址中使用了 '+', '=', '#' 或 '.'，使用了与临时电子邮件服务关联的域名，或者有明确的排除。如果您认为这是错误，请联系支持。",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -689,7 +694,7 @@ export const zhCN: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
+        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
