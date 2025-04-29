@@ -22,7 +22,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   test('renders pricing table with plans', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/pricing-table');
-    await expect(u.po.page.getByText('Free plan for users')).toBeVisible();
+    await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
   });
 
   test('when signed out, clicking get started button navigates to sign in page', async ({ page, context }) => {
@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.getByText('Manage subscription').click();
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
-    await expect(u.po.page.getByRole('button', { name: 'Re-subscribe' })).toBeVisible();
+    await expect(u.po.page.getByRole('button', { name: 'Re-subscribe' }).first()).toBeVisible();
   });
 
   test.describe('in UserProfile', () => {
@@ -79,7 +79,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.page.goToRelative('/user');
       await u.po.userProfile.waitForMounted();
       await u.po.page.getByText(/Billing/i).click();
-      await expect(u.po.page.getByText('Available Plans')).toBeVisible();
+      await u.po.page.getByRole('button', { name: 'View all plans' }).click();
+      await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
   });
 });
