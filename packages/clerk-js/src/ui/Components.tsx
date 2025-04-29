@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
-  __experimental_SubscriptionDetailsProps,
+  __experimental_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -37,7 +37,7 @@ import {
   UserVerificationModal,
   WaitlistModal,
 } from './lazyModules/components';
-import { MountedCheckoutDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
+import { MountedCheckoutDrawer, MountedPlanDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
   LazyImpersonationFabProvider,
@@ -107,16 +107,16 @@ export type ComponentControls = {
       notify?: boolean;
     },
   ) => void;
-  openDrawer: <T extends 'checkout' | 'subscriptionDetails'>(
+  openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
     props: T extends 'checkout'
       ? __experimental_CheckoutProps
-      : T extends 'subscriptionDetails'
-        ? __experimental_SubscriptionDetailsProps
+      : T extends 'planDetails'
+        ? __experimental_PlanDetailsProps
         : never,
   ) => void;
   closeDrawer: (
-    drawer: 'checkout' | 'subscriptionDetails',
+    drawer: 'checkout' | 'planDetails',
     options?: {
       notify?: boolean;
     },
@@ -157,9 +157,9 @@ interface ComponentsState {
     open: false;
     props: null | __experimental_CheckoutProps;
   };
-  subscriptionDetailsDrawer: {
+  planDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailsProps;
+    props: null | __experimental_PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
@@ -246,7 +246,7 @@ const Components = (props: ComponentsProps) => {
       open: false,
       props: null,
     },
-    subscriptionDetailsDrawer: {
+    planDetailsDrawer: {
       open: false,
       props: null,
     },
@@ -265,7 +265,7 @@ const Components = (props: ComponentsProps) => {
     waitlistModal,
     blankCaptchaModal,
     checkoutDrawer,
-    subscriptionDetailsDrawer,
+    planDetailsDrawer,
     nodes,
   } = state;
 
@@ -578,10 +578,10 @@ const Components = (props: ComponentsProps) => {
           onOpenChange={() => componentsControls.closeDrawer('checkout')}
         />
 
-        <MountedSubscriptionDetailDrawer
+        <MountedPlanDetailDrawer
           appearance={state.appearance}
-          subscriptionDetailsDrawer={subscriptionDetailsDrawer}
-          onOpenChange={() => componentsControls.closeDrawer('subscriptionDetails')}
+          planDetailsDrawer={planDetailsDrawer}
+          onOpenChange={() => componentsControls.closeDrawer('planDetails')}
         />
 
         {state.impersonationFab && (

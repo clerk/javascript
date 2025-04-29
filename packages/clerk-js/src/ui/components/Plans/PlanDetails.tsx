@@ -3,7 +3,7 @@ import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
-  __experimental_SubscriptionDetailsProps,
+  __experimental_PlanDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
@@ -27,22 +27,22 @@ import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../..
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export const SubscriptionDetails = (props: __experimental_SubscriptionDetailsProps) => {
+export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
-        <_SubscriptionDetails {...props} />
+        <_PlanDetails {...props} />
       </PlansContextProvider>
     </SubscriberTypeContext.Provider>
   );
 };
 
-const _SubscriptionDetails = ({
+const _PlanDetails = ({
   plan,
   onSubscriptionCancel,
   portalId,
   planPeriod: _planPeriod = 'month',
-}: __experimental_SubscriptionDetailsProps) => {
+}: __experimental_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -134,7 +134,7 @@ const _SubscriptionDetails = ({
       {hasFeatures ? (
         <Drawer.Body>
           <Text
-            elementDescriptor={descriptors.subscriptionDetailCaption}
+            elementDescriptor={descriptors.planDetailCaption}
             variant={'caption'}
             localizationKey={localizationKeys('__experimental_commerce.availableFeatures')}
             colorScheme='secondary'
@@ -144,7 +144,7 @@ const _SubscriptionDetails = ({
             })}
           />
           <Box
-            elementDescriptor={descriptors.subscriptionDetailFeaturesList}
+            elementDescriptor={descriptors.planDetailFeaturesList}
             as='ul'
             role='list'
             sx={t => ({
@@ -156,7 +156,7 @@ const _SubscriptionDetails = ({
             {features.map(feature => (
               <Box
                 key={feature.id}
-                elementDescriptor={descriptors.subscriptionDetailFeaturesListItem}
+                elementDescriptor={descriptors.planDetailFeaturesListItem}
                 as='li'
                 sx={t => ({
                   display: 'flex',
@@ -173,9 +173,9 @@ const _SubscriptionDetails = ({
                     imageUrl={feature.avatarUrl}
                   />
                 ) : null}
-                <Span elementDescriptor={descriptors.subscriptionDetailFeaturesListItemContent}>
+                <Span elementDescriptor={descriptors.planDetailFeaturesListItemContent}>
                   <Text
-                    elementDescriptor={descriptors.subscriptionDetailFeaturesListItemTitle}
+                    elementDescriptor={descriptors.planDetailFeaturesListItemTitle}
                     colorScheme='body'
                     sx={t => ({
                       fontWeight: t.fontWeights.$medium,
@@ -185,7 +185,7 @@ const _SubscriptionDetails = ({
                   </Text>
                   {feature.description ? (
                     <Text
-                      elementDescriptor={descriptors.subscriptionDetailFeaturesListItemDescription}
+                      elementDescriptor={descriptors.planDetailFeaturesListItemDescription}
                       colorScheme='secondary'
                       sx={t => ({
                         marginBlockStart: t.space.$0x25,
@@ -319,7 +319,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   return (
     <Box
       ref={ref}
-      elementDescriptor={descriptors.subscriptionDetailHeader}
+      elementDescriptor={descriptors.planDetailHeader}
       sx={t => ({
         width: '100%',
         padding: t.space.$4,
@@ -340,7 +340,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
 
       {plan.avatarUrl ? (
         <Avatar
-          boxElementDescriptor={descriptors.subscriptionDetailAvatar}
+          boxElementDescriptor={descriptors.planDetailAvatar}
           size={_ => 40}
           title={plan.name}
           initials={plan.name[0]}
@@ -353,20 +353,20 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
       ) : null}
       {subscription ? (
         <Box
-          elementDescriptor={descriptors.subscriptionDetailBadgeContainer}
+          elementDescriptor={descriptors.planDetailBadgeContainer}
           sx={t => ({
             marginBlockEnd: t.space.$3,
           })}
         >
           {subscription.status === 'active' ? (
             <Badge
-              elementDescriptor={descriptors.subscriptionDetailBadge}
+              elementDescriptor={descriptors.planDetailBadge}
               localizationKey={localizationKeys('badge__currentPlan')}
               colorScheme={'secondary'}
             />
           ) : (
             <Badge
-              elementDescriptor={descriptors.subscriptionDetailBadge}
+              elementDescriptor={descriptors.planDetailBadge}
               localizationKey={localizationKeys('badge__upcomingPlan')}
               colorScheme={'primary'}
             />
@@ -380,7 +380,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         })}
       >
         <Heading
-          elementDescriptor={descriptors.subscriptionDetailTitle}
+          elementDescriptor={descriptors.planDetailTitle}
           as='h2'
           textVariant='h2'
         >
@@ -388,7 +388,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </Heading>
         {plan.description ? (
           <Text
-            elementDescriptor={descriptors.subscriptionDetailDescription}
+            elementDescriptor={descriptors.planDetailDescription}
             variant='subtitle'
             colorScheme='secondary'
           >
@@ -399,7 +399,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
 
       {plan.amount > 0 ? (
         <Flex
-          elementDescriptor={descriptors.subscriptionDetailFeeContainer}
+          elementDescriptor={descriptors.planDetailFeeContainer}
           align='center'
           wrap='wrap'
           sx={t => ({
@@ -409,7 +409,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         >
           <>
             <Text
-              elementDescriptor={descriptors.subscriptionDetailFee}
+              elementDescriptor={descriptors.planDetailFee}
               variant='h1'
               colorScheme='body'
             >
@@ -419,7 +419,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                 : plan.amountFormatted}
             </Text>
             <Text
-              elementDescriptor={descriptors.subscriptionDetailFeePeriod}
+              elementDescriptor={descriptors.planDetailFeePeriod}
               variant='caption'
               colorScheme='secondary'
               sx={t => ({
@@ -433,7 +433,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             />
             {plan.annualMonthlyAmount > 0 ? (
               <Box
-                elementDescriptor={descriptors.subscriptionDetailFeePeriodNotice}
+                elementDescriptor={descriptors.planDetailFeePeriodNotice}
                 sx={[
                   _ => ({
                     width: '100%',
@@ -448,14 +448,14 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                 }
               >
                 <Box
-                  elementDescriptor={descriptors.subscriptionDetailFeePeriodNoticeInner}
+                  elementDescriptor={descriptors.planDetailFeePeriodNoticeInner}
                   sx={{
                     overflow: 'hidden',
                     minHeight: 0,
                   }}
                 >
                   <Text
-                    elementDescriptor={descriptors.subscriptionDetailFeePeriodNoticeLabel}
+                    elementDescriptor={descriptors.planDetailFeePeriodNoticeLabel}
                     variant='caption'
                     colorScheme='secondary'
                     sx={t => ({
@@ -482,7 +482,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
 
       {!!subscription && (
         <Text
-          elementDescriptor={descriptors.subscriptionDetailCaption}
+          elementDescriptor={descriptors.planDetailCaption}
           variant={'caption'}
           localizationKey={captionForSubscription(subscription)}
           colorScheme='secondary'
@@ -494,7 +494,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
 
       {!subscription && plan.annualMonthlyAmount > 0 ? (
         <Box
-          elementDescriptor={descriptors.subscriptionDetailPeriodToggle}
+          elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({
             display: 'flex',
             marginTop: t.space.$3,

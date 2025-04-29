@@ -116,7 +116,7 @@ function Card(props: CardProps) {
   const { buttonPropsForPlan } = usePlansContext();
 
   const showPlanDetails = () => {
-    clerk.__internal_openSubscriptionDetails({
+    clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
       planPeriod,

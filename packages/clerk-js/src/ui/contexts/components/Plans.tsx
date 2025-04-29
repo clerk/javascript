@@ -174,7 +174,7 @@ export const usePlansContext = () => {
       const subscription = activeOrUpcomingSubscription(plan);
 
       if (subscription && !subscription.canceledAt) {
-        clerk.__internal_openSubscriptionDetails({
+        clerk.__internal_openPlanDetails({
           plan,
           subscriberType,
           onSubscriptionCancel: () => {

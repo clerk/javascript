@@ -16,7 +16,7 @@ type FlowMetadata = {
     | 'blankCaptcha'
     | 'waitlist'
     | 'checkout'
-    | 'subscriptionDetails'
+    | 'planDetails'
     | 'pricingTable';
   part?:
     | 'start'
