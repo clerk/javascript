@@ -120,7 +120,7 @@ export class HandshakeService {
 
   /**
    * Builds the redirect headers for a handshake request
-   * @param authenticateContext - The authentication context containing request information
+   * @param authenticateContext - The authentication context containing request information. This object is not modified.
    * @param organizationSyncTargetMatchers - Matchers for organization sync patterns
    * @param options - Options containing organization sync configuration
    * @param reason - The reason for the handshake (e.g. 'session-token-expired')
@@ -169,7 +169,7 @@ export class HandshakeService {
 
   /**
    * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
-   * @param authenticateContext - The authentication context containing handshake information
+   * @param authenticateContext - The authentication context containing handshake information. This object is not modified.
    * @returns Promise resolving to either a SignedInState or SignedOutState
    * @throws Error if handshake verification fails or if there are issues with the session token
    */
@@ -219,7 +219,15 @@ export class HandshakeService {
         error?.reason === TokenVerificationErrorReason.TokenNotActiveYet ||
         error?.reason === TokenVerificationErrorReason.TokenIatInTheFuture)
     ) {
-      error.tokenCarrier = 'cookie';
+      // Create a new error object with the same properties
+      const developmentError = new TokenVerificationError({
+        action: error.action,
+        message: error.message,
+        reason: error.reason,
+      });
+      // Set the tokenCarrier after construction
+      developmentError.tokenCarrier = 'cookie';
+
       console.error(
         `Clerk: Clock skew detected. This usually means that your system clock is inaccurate. Clerk will attempt to account for the clock skew in development.
 
@@ -227,7 +235,7 @@ To resolve this issue, make sure your system's clock is set to the correct time 
 
 ---
 
-${error.getFullMessage()}`,
+${developmentError.getFullMessage()}`,
       );
 
       const { data: retryResult, errors: [retryError] = [] } = await verifyToken(sessionToken, {
