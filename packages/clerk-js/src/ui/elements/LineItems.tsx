@@ -51,7 +51,7 @@ interface GroupProps {
   expand?: boolean;
 }
 
-function Group({ children, borderTop = false, variant = 'primary', expand = false }: GroupProps) {
+function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
   return (
     <GroupContext.Provider value={{ variant }}>
       <Box
@@ -59,7 +59,7 @@ function Group({ children, borderTop = false, variant = 'primary', expand = fals
         elementId={descriptors.lineItemsGroup.setId(variant)}
         sx={t => ({
           display: 'grid',
-          gridTemplateColumns: `repeat(${expand ? 1 : 2}, minmax(0, 1fr))`,
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           ...(borderTop
             ? {
                 borderTopWidth: t.borderWidths.$normal,
@@ -81,7 +81,7 @@ function Group({ children, borderTop = false, variant = 'primary', expand = fals
  * -----------------------------------------------------------------------------------------------*/
 
 interface TitleProps {
-  title?: string | LocalizationKey;
+  title: string | LocalizationKey;
   description?: string | LocalizationKey;
 }
 

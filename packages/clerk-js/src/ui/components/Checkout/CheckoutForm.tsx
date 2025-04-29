@@ -11,7 +11,7 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Span } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
@@ -45,11 +45,15 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          {showDowngradeInfo && (
-            <LineItems.Group expand>
-              <LineItems.Title description={'Your features will remain until the end of your current subscription.'} />
-            </LineItems.Group>
-          )}
+          {/* TODO(@Commerce): needs localization */}
+          <Span
+            localizationKey={'Your features will remain until the end of your current subscription.'}
+            elementDescriptor={descriptors.lineItemsDowngradeNotice}
+            sx={t => ({
+              fontSize: t.fontSizes.$sm,
+              color: t.colors.$colorTextSecondary,
+            })}
+          />
 
           <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
@@ -67,8 +71,9 @@ export const CheckoutForm = ({
                 description={'Prorated credit for the remainder of your subscription.'}
               />
               {/* TODO(@Commerce): needs localization */}
+              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
-                text={`- ${totals.proration?.totalProration.currencySymbol}${(totals.proration?.days * totals.proration?.ratePerDay.amount) / 100}`}
+                text={`- ${totals.proration?.totalProration.currencySymbol}${((totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0)) / 100}`}
               />
             </LineItems.Group>
           )}
