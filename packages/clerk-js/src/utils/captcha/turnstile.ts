@@ -219,8 +219,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
-    div.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
-    div.style.display = 'none';
+    div.style.display = 'none'; // This is to prevent the layout shift when the render method is called
     document.body.appendChild(div);
   }
 
