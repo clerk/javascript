@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
@@ -22,7 +23,7 @@ export const createAsyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
+    return async (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }

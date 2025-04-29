@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
@@ -14,7 +15,10 @@ import { assertTokenSignature, decryptClerkRequestData } from '../utils';
  */
 export function getAuthDataFromRequest(
   req: RequestLike,
-  opts: { secretKey?: string; logger?: LoggerNoCommit } = {},
+  {
+    treatPendingAsSignedOut = true,
+    ...opts
+  }: { secretKey?: string; logger?: LoggerNoCommit } & PendingSessionOptions = {},
 ): AuthObject {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
@@ -35,6 +39,7 @@ export function getAuthDataFromRequest(
     authStatus,
     authMessage,
     authReason,
+    treatPendingAsSignedOut,
   };
 
   opts.logger?.debug('auth options', options);
@@ -51,6 +56,10 @@ export function getAuthDataFromRequest(
 
     // @ts-expect-error -- Restrict parameter type of options to only list what's needed
     authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+  }
+
+  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+    authObject = signedOutAuthObject(options);
   }
 
   return authObject;
