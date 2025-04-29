@@ -189,7 +189,9 @@ export class HandshakeService {
 
     if (this.authenticateContext.handshakeNonce) {
       // TODO: implement handshake nonce handling, fetch handshake payload with nonce
-    } else if (this.authenticateContext.handshakeToken) {
+      console.warn('Clerk: Handshake nonce is not implemented yet.');
+    }
+    if (this.authenticateContext.handshakeToken) {
       const handshakePayload = await verifyHandshakeToken(
         this.authenticateContext.handshakeToken,
         this.authenticateContext,
