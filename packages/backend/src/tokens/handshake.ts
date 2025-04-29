@@ -111,11 +111,17 @@ export class HandshakeService {
 
   /**
    * Determines if a request is eligible for handshake based on its headers
+   *
+   * Currently, a request is only eligible for a handshake if we can say it's *probably* a request for a document, not a fetch or some other exotic request.
+   * This heuristic should give us a reliable enough signal for browsers that support `Sec-Fetch-Dest` and for those that don't.
+   *
    * @returns boolean indicating if the request is eligible for handshake
    */
   isRequestEligibleForHandshake(): boolean {
     const { accept, secFetchDest } = this.authenticateContext;
 
+    // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the data of a user navigation.
+    // Also, we check for 'iframe' because it's the value set when a doc request is made by an iframe.
     if (secFetchDest === 'document' || secFetchDest === 'iframe') {
       return true;
     }
@@ -261,6 +267,12 @@ ${developmentError.getFullMessage()}`,
    * @throws Error with a descriptive message about the verification failure
    */
   handleHandshakeTokenVerificationErrorInDevelopment(error: TokenVerificationError): void {
+    // In development, the handshake token is being transferred in the URL as a query parameter, so there is no
+    // possibility of collision with a handshake token of another app running on the same local domain
+    // (etc one app on localhost:3000 and one on localhost:3001).
+    // Therefore, if the handshake token is invalid, it is likely that the user has switched Clerk keys locally.
+    // We make sure to throw a descriptive error message and then stop the handshake flow in every case,
+    // to avoid the possibility of an infinite loop.
     if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
       const msg = `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`;
       throw new Error(msg);

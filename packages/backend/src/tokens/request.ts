@@ -225,12 +225,19 @@ export async function authenticateRequest(
     headers?: Headers,
   ): SignedInState | SignedOutState | HandshakeState {
     if (handshakeService.isRequestEligibleForHandshake()) {
+      // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
+      // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
       const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason);
 
+      // Chrome aggressively caches inactive tabs. If we don't set the header here,
+      // all 307 redirects will be cached and the handshake will end up in an infinite loop.
       if (handshakeHeaders.get(constants.Headers.Location)) {
         handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
       }
 
+      // Introduce the mechanism to protect for infinite handshake redirect loops
+      // using a cookie and returning true if it's infinite redirect loop or false if we can
+      // proceed with triggering handshake.
       const isRedirectLoop = handshakeService.setHandshakeInfiniteRedirectionLoopHeaders(handshakeHeaders);
       if (isRedirectLoop) {
         const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
@@ -334,6 +341,17 @@ export async function authenticateRequest(
       try {
         return await handshakeService.resolveHandshake();
       } catch (error) {
+        // In production, the handshake token is being transferred as a cookie, so there is a possibility of collision
+        // with a handshake token of another app running on the same etld+1 domain.
+        // For example, if one app is running on sub1.clerk.com and another on sub2.clerk.com, the handshake token
+        // cookie for both apps will be set on etld+1 (clerk.com) so there's a possibility that one app will accidentally
+        // use the handshake token of a different app during the handshake flow.
+        // In this scenario, verification will fail with TokenInvalidSignature. In contrast to the development case,
+        // we need to allow the flow to continue so the app eventually retries another handshake with the correct token.
+        // We need to make sure, however, that we don't allow the flow to continue indefinitely, so we throw an error after X
+        // retries to avoid an infinite loop. An infinite loop can happen if the customer switched Clerk keys for their prod app.
+
+        // Check the handleHandshakeTokenVerificationErrorInDevelopment function for the development case.
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
           handshakeService.handleHandshakeTokenVerificationErrorInDevelopment(error);
         } else {
