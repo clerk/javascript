@@ -11,6 +11,7 @@ import { useFetch } from '../../hooks/useFetch';
 import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
+import { Flow } from '../../customizables';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
@@ -44,7 +45,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   );
 
   return (
-    <>
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
       <FreePlanRow />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
@@ -64,7 +70,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-    </>
+    </Flow.Root>
   );
 };
 

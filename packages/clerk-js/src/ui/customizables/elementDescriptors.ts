@@ -239,7 +239,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'accountSwitcherActionButtonIconBox',
   'accountSwitcherActionButtonIcon',
 
-  'pricingTableRootBox',
   'pricingTable',
   'pricingTableCard',
   'pricingTableCardHeader',
@@ -264,7 +263,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pricingTableCardFeePeriodNoticeInner',
   'pricingTableCardFeePeriodNoticeLabel',
 
-  'pricingTableMatrixRootBox',
   'pricingTableMatrix',
   'pricingTableMatrixTable',
   'pricingTableMatrixRowGroup',
