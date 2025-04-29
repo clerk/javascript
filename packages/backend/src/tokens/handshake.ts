@@ -99,6 +99,11 @@ export class HandshakeService {
     this.handshakeRedirectLoopCounter = 0;
   }
 
+  /**
+   * Determines if a request is eligible for handshake based on its headers
+   * @param authenticateContext - The authentication context containing request headers
+   * @returns boolean indicating if the request is eligible for handshake
+   */
   isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: string; accept?: string }): boolean {
     const { accept, secFetchDest } = authenticateContext;
 
@@ -113,12 +118,25 @@ export class HandshakeService {
     return false;
   }
 
+  /**
+   * Builds the redirect headers for a handshake request
+   * @param authenticateContext - The authentication context containing request information
+   * @param organizationSyncTargetMatchers - Matchers for organization sync patterns
+   * @param options - Options containing organization sync configuration
+   * @param reason - The reason for the handshake (e.g. 'session-token-expired')
+   * @returns Headers object containing the Location header for redirect
+   * @throws Error if clerkUrl is missing in authenticateContext
+   */
   buildRedirectToHandshake(
     authenticateContext: AuthenticateContext,
     organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
     options: { organizationSyncOptions?: OrganizationSyncOptions },
     reason: string,
   ): Headers {
+    if (!authenticateContext?.clerkUrl) {
+      throw new Error('Missing clerkUrl in authenticateContext');
+    }
+
     const redirectUrl = this.removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
@@ -149,6 +167,12 @@ export class HandshakeService {
     return new Headers({ [constants.Headers.Location]: url.href });
   }
 
+  /**
+   * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
+   * @param authenticateContext - The authentication context containing handshake information
+   * @returns Promise resolving to either a SignedInState or SignedOutState
+   * @throws Error if handshake verification fails or if there are issues with the session token
+   */
   async resolveHandshake(authenticateContext: AuthenticateContext): Promise<SignedInState | SignedOutState> {
     const headers = new Headers({
       'Access-Control-Allow-Origin': 'null',
@@ -220,6 +244,11 @@ ${error.getFullMessage()}`,
     throw new Error(error?.message || 'Clerk: Handshake failed.');
   }
 
+  /**
+   * Handles handshake token verification errors in development mode
+   * @param error - The TokenVerificationError that occurred
+   * @throws Error with a descriptive message about the verification failure
+   */
   handleHandshakeTokenVerificationErrorInDevelopment(error: TokenVerificationError): void {
     if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
       const msg = `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`;
@@ -228,6 +257,11 @@ ${error.getFullMessage()}`,
     throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
   }
 
+  /**
+   * Sets headers to prevent infinite handshake redirection loops
+   * @param headers - The Headers object to modify
+   * @returns boolean indicating if a redirect loop was detected (true) or if the request can proceed (false)
+   */
   setHandshakeInfiniteRedirectionLoopHeaders(headers: Headers): boolean {
     if (this.handshakeRedirectLoopCounter === 3) {
       return true;
