@@ -86,7 +86,7 @@ export async function authenticateRequest(
   }
 
   const organizationSyncTargetMatchers = computeOrganizationSyncTargetMatchers(options.organizationSyncOptions);
-  const handshakeService = new HandshakeService();
+  const handshakeService = new HandshakeService(authenticateContext, organizationSyncTargetMatchers, options);
 
   async function refreshToken(
     authenticateContext: AuthenticateContext,
@@ -224,10 +224,8 @@ export async function authenticateRequest(
     message: string,
     headers?: Headers,
   ): SignedInState | SignedOutState | HandshakeState {
-    if (handshakeService.isRequestEligibleForHandshake(authenticateContext)) {
-      const handshakeHeaders =
-        headers ??
-        handshakeService.buildRedirectToHandshake(authenticateContext, organizationSyncTargetMatchers, options, reason);
+    if (handshakeService.isRequestEligibleForHandshake()) {
+      const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason);
 
       if (handshakeHeaders.get(constants.Headers.Location)) {
         handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
@@ -334,7 +332,7 @@ export async function authenticateRequest(
      */
     if (authenticateContext.handshakeToken) {
       try {
-        return await handshakeService.resolveHandshake(authenticateContext);
+        return await handshakeService.resolveHandshake();
       } catch (error) {
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
           handshakeService.handleHandshakeTokenVerificationErrorInDevelopment(error);

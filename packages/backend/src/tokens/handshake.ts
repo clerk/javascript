@@ -94,18 +94,27 @@ export type OrganizationSyncTarget =
 
 export class HandshakeService {
   private handshakeRedirectLoopCounter: number;
+  private readonly authenticateContext: AuthenticateContext;
+  private readonly organizationSyncTargetMatchers: OrganizationSyncTargetMatchers;
+  private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
 
-  constructor() {
+  constructor(
+    authenticateContext: AuthenticateContext,
+    organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
+    options: { organizationSyncOptions?: OrganizationSyncOptions },
+  ) {
     this.handshakeRedirectLoopCounter = 0;
+    this.authenticateContext = authenticateContext;
+    this.organizationSyncTargetMatchers = organizationSyncTargetMatchers;
+    this.options = options;
   }
 
   /**
    * Determines if a request is eligible for handshake based on its headers
-   * @param authenticateContext - The authentication context containing request headers
    * @returns boolean indicating if the request is eligible for handshake
    */
-  isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: string; accept?: string }): boolean {
-    const { accept, secFetchDest } = authenticateContext;
+  isRequestEligibleForHandshake(): boolean {
+    const { accept, secFetchDest } = this.authenticateContext;
 
     if (secFetchDest === 'document' || secFetchDest === 'iframe') {
       return true;
@@ -120,42 +129,34 @@ export class HandshakeService {
 
   /**
    * Builds the redirect headers for a handshake request
-   * @param authenticateContext - The authentication context containing request information. This object is not modified.
-   * @param organizationSyncTargetMatchers - Matchers for organization sync patterns
-   * @param options - Options containing organization sync configuration
    * @param reason - The reason for the handshake (e.g. 'session-token-expired')
    * @returns Headers object containing the Location header for redirect
    * @throws Error if clerkUrl is missing in authenticateContext
    */
-  buildRedirectToHandshake(
-    authenticateContext: AuthenticateContext,
-    organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
-    options: { organizationSyncOptions?: OrganizationSyncOptions },
-    reason: string,
-  ): Headers {
-    if (!authenticateContext?.clerkUrl) {
+  buildRedirectToHandshake(reason: string): Headers {
+    if (!this.authenticateContext?.clerkUrl) {
       throw new Error('Missing clerkUrl in authenticateContext');
     }
 
-    const redirectUrl = this.removeDevBrowserFromURL(authenticateContext.clerkUrl);
-    const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
+    const redirectUrl = this.removeDevBrowserFromURL(this.authenticateContext.clerkUrl);
+    const frontendApiNoProtocol = this.authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append(
       constants.QueryParameters.SuffixedCookies,
-      authenticateContext.usesSuffixedCookies().toString(),
+      this.authenticateContext.usesSuffixedCookies().toString(),
     );
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
 
-    if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
-      url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
+    if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
+      url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);
     }
 
     const toActivate = this.getOrganizationSyncTarget(
-      authenticateContext.clerkUrl,
-      options.organizationSyncOptions,
-      organizationSyncTargetMatchers,
+      this.authenticateContext.clerkUrl,
+      this.options.organizationSyncOptions,
+      this.organizationSyncTargetMatchers,
     );
     if (toActivate) {
       const params = this.getOrganizationSyncQueryParams(toActivate);
@@ -169,11 +170,10 @@ export class HandshakeService {
 
   /**
    * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
-   * @param authenticateContext - The authentication context containing handshake information. This object is not modified.
    * @returns Promise resolving to either a SignedInState or SignedOutState
    * @throws Error if handshake verification fails or if there are issues with the session token
    */
-  async resolveHandshake(authenticateContext: AuthenticateContext): Promise<SignedInState | SignedOutState> {
+  async resolveHandshake(): Promise<SignedInState | SignedOutState> {
     const headers = new Headers({
       'Access-Control-Allow-Origin': 'null',
       'Access-Control-Allow-Credentials': 'true',
@@ -181,10 +181,13 @@ export class HandshakeService {
 
     const cookiesToSet: string[] = [];
 
-    if (authenticateContext.handshakeNonce) {
+    if (this.authenticateContext.handshakeNonce) {
       // TODO: implement handshake nonce handling, fetch handshake payload with nonce
-    } else if (authenticateContext.handshakeToken) {
-      const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken, authenticateContext);
+    } else if (this.authenticateContext.handshakeToken) {
+      const handshakePayload = await verifyHandshakeToken(
+        this.authenticateContext.handshakeToken,
+        this.authenticateContext,
+      );
       cookiesToSet.push(...handshakePayload.handshake);
     }
 
@@ -196,8 +199,8 @@ export class HandshakeService {
       }
     });
 
-    if (authenticateContext.instanceType === 'development') {
-      const newUrl = new URL(authenticateContext.clerkUrl);
+    if (this.authenticateContext.instanceType === 'development') {
+      const newUrl = new URL(this.authenticateContext.clerkUrl);
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       headers.append(constants.Headers.Location, newUrl.toString());
@@ -205,16 +208,16 @@ export class HandshakeService {
     }
 
     if (sessionToken === '') {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+      return signedOut(this.authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
-    const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
+    const { data, errors: [error] = [] } = await verifyToken(sessionToken, this.authenticateContext);
     if (data) {
-      return signedIn(authenticateContext, data, headers, sessionToken);
+      return signedIn(this.authenticateContext, data, headers, sessionToken);
     }
 
     if (
-      authenticateContext.instanceType === 'development' &&
+      this.authenticateContext.instanceType === 'development' &&
       (error?.reason === TokenVerificationErrorReason.TokenExpired ||
         error?.reason === TokenVerificationErrorReason.TokenNotActiveYet ||
         error?.reason === TokenVerificationErrorReason.TokenIatInTheFuture)
@@ -239,11 +242,11 @@ ${developmentError.getFullMessage()}`,
       );
 
       const { data: retryResult, errors: [retryError] = [] } = await verifyToken(sessionToken, {
-        ...authenticateContext,
+        ...this.authenticateContext,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(authenticateContext, retryResult, headers, sessionToken);
+        return signedIn(this.authenticateContext, retryResult, headers, sessionToken);
       }
 
       throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
