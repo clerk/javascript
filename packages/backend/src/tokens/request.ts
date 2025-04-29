@@ -91,7 +91,11 @@ export async function authenticateRequest(
   }
 
   const organizationSyncTargetMatchers = computeOrganizationSyncTargetMatchers(options.organizationSyncOptions);
-  const handshakeService = new HandshakeService(authenticateContext, organizationSyncTargetMatchers, options);
+  const handshakeService = new HandshakeService(
+    authenticateContext,
+    { organizationSyncOptions: options.organizationSyncOptions },
+    organizationSyncTargetMatchers,
+  );
 
   async function refreshToken(
     authenticateContext: AuthenticateContext,
@@ -229,31 +233,31 @@ export async function authenticateRequest(
     message: string,
     headers?: Headers,
   ): SignedInState | SignedOutState | HandshakeState {
-    if (handshakeService.isRequestEligibleForHandshake()) {
-      // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
-      // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason);
-
-      // Chrome aggressively caches inactive tabs. If we don't set the header here,
-      // all 307 redirects will be cached and the handshake will end up in an infinite loop.
-      if (handshakeHeaders.get(constants.Headers.Location)) {
-        handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
-      }
-
-      // Introduce the mechanism to protect for infinite handshake redirect loops
-      // using a cookie and returning true if it's infinite redirect loop or false if we can
-      // proceed with triggering handshake.
-      const isRedirectLoop = handshakeService.setHandshakeInfiniteRedirectionLoopHeaders(handshakeHeaders);
-      if (isRedirectLoop) {
-        const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
-        console.log(msg);
-        return signedOut(authenticateContext, reason, message);
-      }
-
-      return handshake(authenticateContext, reason, message, handshakeHeaders);
+    if (!handshakeService.isRequestEligibleForHandshake()) {
+      return signedOut(authenticateContext, reason, message);
     }
 
-    return signedOut(authenticateContext, reason, message);
+    // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
+    // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
+    const handshakeHeaders = headers ?? handshakeService.buildRedirectToHandshake(reason);
+
+    // Chrome aggressively caches inactive tabs. If we don't set the header here,
+    // all 307 redirects will be cached and the handshake will end up in an infinite loop.
+    if (handshakeHeaders.get(constants.Headers.Location)) {
+      handshakeHeaders.set(constants.Headers.CacheControl, 'no-store');
+    }
+
+    // Introduce the mechanism to protect for infinite handshake redirect loops
+    // using a cookie and returning true if it's infinite redirect loop or false if we can
+    // proceed with triggering handshake.
+    const isRedirectLoop = handshakeService.checkAndTrackRedirectLoop(handshakeHeaders);
+    if (isRedirectLoop) {
+      const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
+      console.log(msg);
+      return signedOut(authenticateContext, reason, message);
+    }
+
+    return handshake(authenticateContext, reason, message, handshakeHeaders);
   }
 
   /**
@@ -356,9 +360,9 @@ export async function authenticateRequest(
         // We need to make sure, however, that we don't allow the flow to continue indefinitely, so we throw an error after X
         // retries to avoid an infinite loop. An infinite loop can happen if the customer switched Clerk keys for their prod app.
 
-        // Check the handleHandshakeTokenVerificationErrorInDevelopment function for the development case.
+        // Check the handleTokenVerificationErrorInDevelopment method for the development case.
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
-          handshakeService.handleHandshakeTokenVerificationErrorInDevelopment(error);
+          handshakeService.handleTokenVerificationErrorInDevelopment(error);
         } else {
           console.error('Clerk: unable to resolve handshake:', error);
         }

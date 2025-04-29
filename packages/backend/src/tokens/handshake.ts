@@ -84,20 +84,20 @@ export async function verifyHandshakeToken(
 }
 
 export class HandshakeService {
-  private handshakeRedirectLoopCounter: number;
+  private redirectLoopCounter: number;
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationSyncTargetMatchers: OrganizationSyncTargetMatchers;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
 
   constructor(
     authenticateContext: AuthenticateContext,
-    organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
     options: { organizationSyncOptions?: OrganizationSyncOptions },
+    organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
   ) {
-    this.handshakeRedirectLoopCounter = 0;
     this.authenticateContext = authenticateContext;
-    this.organizationSyncTargetMatchers = organizationSyncTargetMatchers;
     this.options = options;
+    this.organizationSyncTargetMatchers = organizationSyncTargetMatchers;
+    this.redirectLoopCounter = 0;
   }
 
   /**
@@ -259,7 +259,7 @@ ${developmentError.getFullMessage()}`,
    * @param error - The TokenVerificationError that occurred
    * @throws Error with a descriptive message about the verification failure
    */
-  handleHandshakeTokenVerificationErrorInDevelopment(error: TokenVerificationError): void {
+  handleTokenVerificationErrorInDevelopment(error: TokenVerificationError): void {
     // In development, the handshake token is being transferred in the URL as a query parameter, so there is no
     // possibility of collision with a handshake token of another app running on the same local domain
     // (etc one app on localhost:3000 and one on localhost:3001).
@@ -274,16 +274,16 @@ ${developmentError.getFullMessage()}`,
   }
 
   /**
-   * Sets headers to prevent infinite handshake redirection loops
+   * Checks if a redirect loop is detected and sets headers to track redirect count
    * @param headers - The Headers object to modify
    * @returns boolean indicating if a redirect loop was detected (true) or if the request can proceed (false)
    */
-  setHandshakeInfiniteRedirectionLoopHeaders(headers: Headers): boolean {
-    if (this.handshakeRedirectLoopCounter === 3) {
+  checkAndTrackRedirectLoop(headers: Headers): boolean {
+    if (this.redirectLoopCounter === 3) {
       return true;
     }
 
-    const newCounterValue = this.handshakeRedirectLoopCounter + 1;
+    const newCounterValue = this.redirectLoopCounter + 1;
     const cookieName = constants.Cookies.RedirectCount;
     headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
     return false;

@@ -90,7 +90,7 @@ describe('HandshakeService', () => {
       },
     };
 
-    handshakeService = new HandshakeService(mockAuthenticateContext, mockOrganizationSyncTargetMatchers, mockOptions);
+    handshakeService = new HandshakeService(mockAuthenticateContext, mockOptions, mockOrganizationSyncTargetMatchers);
   });
 
   describe('isRequestEligibleForHandshake', () => {
@@ -343,14 +343,14 @@ describe('HandshakeService', () => {
     });
   });
 
-  describe('handleHandshakeTokenVerificationErrorInDevelopment', () => {
+  describe('handleTokenVerificationErrorInDevelopment', () => {
     it('should throw specific error for invalid signature', () => {
       const error = new TokenVerificationError({
         reason: TokenVerificationErrorReason.TokenInvalidSignature,
         message: 'Invalid signature',
       });
 
-      expect(() => handshakeService.handleHandshakeTokenVerificationErrorInDevelopment(error)).toThrow(
+      expect(() => handshakeService.handleTokenVerificationErrorInDevelopment(error)).toThrow(
         'Clerk: Handshake token verification failed due to an invalid signature',
       );
     });
@@ -361,18 +361,18 @@ describe('HandshakeService', () => {
         message: 'Token expired',
       });
 
-      expect(() => handshakeService.handleHandshakeTokenVerificationErrorInDevelopment(error)).toThrow(
+      expect(() => handshakeService.handleTokenVerificationErrorInDevelopment(error)).toThrow(
         'Clerk: Handshake token verification failed: Token expired',
       );
     });
   });
 
-  describe('setHandshakeInfiniteRedirectionLoopHeaders', () => {
+  describe('checkAndTrackRedirectLoop', () => {
     it('should return true after 3 redirects', () => {
       const headers = new Headers();
-      handshakeService['handshakeRedirectLoopCounter'] = 3;
+      handshakeService['redirectLoopCounter'] = 3;
 
-      const result = handshakeService.setHandshakeInfiniteRedirectionLoopHeaders(headers);
+      const result = handshakeService.checkAndTrackRedirectLoop(headers);
 
       expect(result).toBe(true);
       expect(headers.get('Set-Cookie')).toBeNull();
@@ -380,9 +380,9 @@ describe('HandshakeService', () => {
 
     it('should increment counter and set cookie for first redirect', () => {
       const headers = new Headers();
-      handshakeService['handshakeRedirectLoopCounter'] = 0;
+      handshakeService['redirectLoopCounter'] = 0;
 
-      const result = handshakeService.setHandshakeInfiniteRedirectionLoopHeaders(headers);
+      const result = handshakeService.checkAndTrackRedirectLoop(headers);
 
       expect(result).toBe(false);
       expect(headers.get('Set-Cookie')).toContain('__clerk_redirect_count=1');
