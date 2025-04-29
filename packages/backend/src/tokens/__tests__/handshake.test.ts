@@ -4,8 +4,8 @@ import { constants } from '../../constants';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../../errors';
 import type { AuthenticateContext } from '../authenticateContext';
 import { AuthErrorReason, signedIn, signedOut } from '../authStatus';
-import type { OrganizationSyncTargetMatchers } from '../handshake';
 import { HandshakeService } from '../handshake';
+import type { OrganizationSyncTargetMatchers } from '../types';
 
 vi.mock('../handshake.js', async importOriginal => {
   const actual: any = await importOriginal();

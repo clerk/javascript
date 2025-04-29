@@ -16,7 +16,12 @@ import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
+import type {
+  AuthenticateRequestOptions,
+  OrganizationSyncOptions,
+  OrganizationSyncTarget,
+  OrganizationSyncTargetMatchers,
+} from './types';
 import { verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
@@ -548,11 +553,6 @@ export const debugRequestState = (params: RequestState) => {
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
-type OrganizationSyncTargetMatchers = {
-  OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
-  PersonalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
-};
-
 /**
  * Computes regex-based matchers from the given organization sync options.
  */
@@ -645,14 +645,6 @@ export function getOrganizationSyncTarget(
   }
   return null;
 }
-
-/**
- * Represents an organization or a personal account - e.g. an
- * entity that can be activated by the handshake API.
- */
-export type OrganizationSyncTarget =
-  | { type: 'personalAccount' }
-  | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
 const convertTokenVerificationErrorReasonToAuthErrorReason = ({
   tokenError,

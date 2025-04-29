@@ -1,4 +1,4 @@
-import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
+import type { Match } from '@clerk/shared/pathToRegexp';
 
 import { constants } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
@@ -10,7 +10,7 @@ import type { SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
-import type { OrganizationSyncOptions } from './types';
+import type { OrganizationSyncOptions, OrganizationSyncTarget, OrganizationSyncTargetMatchers } from './types';
 import type { VerifyTokenOptions } from './verify';
 import { verifyToken } from './verify';
 
@@ -82,15 +82,6 @@ export async function verifyHandshakeToken(
     key,
   });
 }
-
-export type OrganizationSyncTargetMatchers = {
-  OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
-  PersonalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
-};
-
-export type OrganizationSyncTarget =
-  | { type: 'personalAccount' }
-  | { type: 'organization'; organizationId?: string; organizationSlug?: string };
 
 export class HandshakeService {
   private handshakeRedirectLoopCounter: number;
