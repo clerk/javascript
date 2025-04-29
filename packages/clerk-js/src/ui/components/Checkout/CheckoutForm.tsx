@@ -45,7 +45,7 @@ export const CheckoutForm = ({
         <LineItems.Root>
           {showDowngradeInfo && (
             <LineItems.Group expand>
-              <LineItems.Title description={'Your features will remain the end of your current subscription.'} />
+              <LineItems.Title description={'Your features will remain until the end of your current subscription.'} />
             </LineItems.Group>
           )}
 
