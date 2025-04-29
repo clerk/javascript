@@ -3,12 +3,14 @@ import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
   __experimental_CommercePaymentSourceResource,
+  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
+import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
-import { __experimental_PaymentSourcesContext, useCheckoutContext } from '../../contexts';
+import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
@@ -111,10 +113,10 @@ const CheckoutFormElements = ({
 
   const { data: paymentSources } = data || { data: [] };
 
-  const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
+  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
-        paymentSourceId,
+        ...params,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
@@ -131,12 +133,19 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({ paymentSourceId });
+    await confirmCheckout({
+      paymentSourceId,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
-  const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
-    await confirmCheckout({ paymentSourceId: paymentSource.id });
+  const onAddPaymentSourceSuccess = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
+    await confirmCheckout({
+      gateway: 'stripe',
+      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
@@ -188,23 +197,21 @@ const CheckoutFormElements = ({
           text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
         />
         <Disclosure.Content>
-          <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources', subscriberType }}>
-            <AddPaymentSource
-              checkout={checkout}
-              onSuccess={onAddPaymentSourceSuccess}
-              // @ts-ignore TODO(@COMMERCE): needs localization
-              submitLabel={
-                checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys(
-                      'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                      {
-                        amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                      },
-                    )
-                  : 'Subscribe'
-              }
-            />
-          </__experimental_PaymentSourcesContext.Provider>
+          <AddPaymentSource
+            checkout={checkout}
+            onSuccess={onAddPaymentSourceSuccess}
+            // @ts-ignore TODO(@COMMERCE): needs localization
+            submitLabel={
+              checkout.totals.totalDueNow.amount > 0
+                ? localizationKeys(
+                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+                    {
+                      amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                    },
+                  )
+                : 'Subscribe'
+            }
+          />
         </Disclosure.Content>
       </Disclosure.Root>
     </Col>
