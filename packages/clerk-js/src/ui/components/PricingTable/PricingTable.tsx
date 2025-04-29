@@ -7,11 +7,11 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks/useFetch';
 import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
-import { Flow } from '../../customizables';
 
 const PricingTable = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
