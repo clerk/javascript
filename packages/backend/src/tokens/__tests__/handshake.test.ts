@@ -5,7 +5,7 @@ import { TokenVerificationError, TokenVerificationErrorReason } from '../../erro
 import type { AuthenticateContext } from '../authenticateContext';
 import { AuthErrorReason, signedIn, signedOut } from '../authStatus';
 import { HandshakeService } from '../handshake';
-import type { OrganizationSyncTargetMatchers } from '../types';
+import { OrganizationMatcher } from '../organizationMatcher';
 
 vi.mock('../handshake.js', async importOriginal => {
   const actual: any = await importOriginal();
@@ -60,7 +60,7 @@ vi.mock('../../jwt/verifyJwt.js', () => ({
 
 describe('HandshakeService', () => {
   let mockAuthenticateContext: AuthenticateContext;
-  let mockOrganizationSyncTargetMatchers: OrganizationSyncTargetMatchers;
+  let mockOrganizationMatcher: OrganizationMatcher;
   let mockOptions: {
     organizationSyncOptions?: { organizationPatterns?: string[]; personalAccountPatterns?: string[] };
   };
@@ -78,10 +78,10 @@ describe('HandshakeService', () => {
       accept: 'text/html',
     } as AuthenticateContext;
 
-    mockOrganizationSyncTargetMatchers = {
-      OrganizationMatcher: null,
-      PersonalAccountMatcher: null,
-    };
+    mockOrganizationMatcher = new OrganizationMatcher({
+      organizationPatterns: ['/org/:id'],
+      personalAccountPatterns: ['/account'],
+    });
 
     mockOptions = {
       organizationSyncOptions: {
@@ -90,7 +90,7 @@ describe('HandshakeService', () => {
       },
     };
 
-    handshakeService = new HandshakeService(mockAuthenticateContext, mockOptions, mockOrganizationSyncTargetMatchers);
+    handshakeService = new HandshakeService(mockAuthenticateContext, mockOptions, mockOrganizationMatcher);
   });
 
   describe('isRequestEligibleForHandshake', () => {

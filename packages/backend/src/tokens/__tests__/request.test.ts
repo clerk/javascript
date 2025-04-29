@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { TokenVerificationErrorReason } from '../../errors';
 import {
@@ -21,6 +21,7 @@ import {
   RefreshTokenErrorReason,
 } from '../request';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
+import { OrganizationMatcher } from '../organizationMatcher';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -261,20 +262,8 @@ const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
 };
 
-// Tests both getOrganizationSyncTarget and the organizationSyncOptions usage patterns
-// that are recommended for typical use.
-describe('tokens.getOrganizationSyncTarget(url,options)', _ => {
-  type testCase = {
-    name: string;
-    // When the customer app specifies these orgSyncOptions to middleware...
-    whenOrgSyncOptions: OrganizationSyncOptions | undefined;
-    // And the path arrives at this URL path...
-    whenAppRequestPath: string;
-    // A handshake should (or should not) occur:
-    thenExpectActivationEntity: OrganizationSyncTarget | null;
-  };
-
-  const testCases: testCase[] = [
+describe('getOrganizationSyncTarget', () => {
+  it.each([
     {
       name: 'none activates nothing',
       whenOrgSyncOptions: undefined,
@@ -426,16 +415,10 @@ describe('tokens.getOrganizationSyncTarget(url,options)', _ => {
         organizationSlug: 'org_bar',
       },
     },
-  ];
-
-  test.each(testCases)('$name', ({ name, whenOrgSyncOptions, whenAppRequestPath, thenExpectActivationEntity }) => {
-    if (!name) {
-      return;
-    }
-
-    const path = new URL(`http://localhost:3000${whenAppRequestPath}`);
-    const matchers = computeOrganizationSyncTargetMatchers(whenOrgSyncOptions);
-    const toActivate = getOrganizationSyncTarget(path, whenOrgSyncOptions, matchers);
+  ])('$name', ({ whenOrgSyncOptions, whenAppRequestPath, thenExpectActivationEntity }) => {
+    const path = new URL(`http://localhost:3000${whenAppRequestPath || ''}`);
+    const matcher = new OrganizationMatcher(whenOrgSyncOptions);
+    const toActivate = matcher.findTarget(path);
     expect(toActivate).toEqual(thenExpectActivationEntity);
   });
 });

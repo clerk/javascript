@@ -1,5 +1,3 @@
-import type { Match } from '@clerk/shared/pathToRegexp';
-
 import { constants } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
@@ -10,7 +8,8 @@ import type { SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
-import type { OrganizationSyncOptions, OrganizationSyncTarget, OrganizationSyncTargetMatchers } from './types';
+import type { OrganizationMatcher } from './organizationMatcher';
+import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
 import type { VerifyTokenOptions } from './verify';
 import { verifyToken } from './verify';
 
@@ -86,17 +85,17 @@ export async function verifyHandshakeToken(
 export class HandshakeService {
   private redirectLoopCounter: number;
   private readonly authenticateContext: AuthenticateContext;
-  private readonly organizationSyncTargetMatchers: OrganizationSyncTargetMatchers;
+  private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
 
   constructor(
     authenticateContext: AuthenticateContext,
     options: { organizationSyncOptions?: OrganizationSyncOptions },
-    organizationSyncTargetMatchers: OrganizationSyncTargetMatchers,
+    organizationMatcher: OrganizationMatcher,
   ) {
     this.authenticateContext = authenticateContext;
     this.options = options;
-    this.organizationSyncTargetMatchers = organizationSyncTargetMatchers;
+    this.organizationMatcher = organizationMatcher;
     this.redirectLoopCounter = 0;
   }
 
@@ -150,11 +149,7 @@ export class HandshakeService {
       url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);
     }
 
-    const toActivate = this.getOrganizationSyncTarget(
-      this.authenticateContext.clerkUrl,
-      this.options.organizationSyncOptions,
-      this.organizationSyncTargetMatchers,
-    );
+    const toActivate = this.getOrganizationSyncTarget(this.authenticateContext.clerkUrl, this.organizationMatcher);
     if (toActivate) {
       const params = this.getOrganizationSyncQueryParams(toActivate);
       params.forEach((value, key) => {
@@ -296,53 +291,8 @@ ${developmentError.getFullMessage()}`,
     return updatedURL;
   }
 
-  private getOrganizationSyncTarget(
-    url: URL,
-    options: OrganizationSyncOptions | undefined,
-    matchers: OrganizationSyncTargetMatchers,
-  ): OrganizationSyncTarget | null {
-    if (!options) {
-      return null;
-    }
-
-    if (matchers.OrganizationMatcher) {
-      let orgResult: Match<Partial<Record<string, string | string[]>>>;
-      try {
-        orgResult = matchers.OrganizationMatcher(url.pathname);
-      } catch (e) {
-        console.error(`Clerk: Failed to apply organization pattern "${options.organizationPatterns}" to a path`, e);
-        return null;
-      }
-
-      if (orgResult && 'params' in orgResult) {
-        const params = orgResult.params;
-
-        if ('id' in params && typeof params.id === 'string') {
-          return { type: 'organization', organizationId: params.id };
-        }
-        if ('slug' in params && typeof params.slug === 'string') {
-          return { type: 'organization', organizationSlug: params.slug };
-        }
-        console.warn(
-          'Clerk: Detected an organization pattern match, but no organization ID or slug was found in the URL. Does the pattern include `:id` or `:slug`?',
-        );
-      }
-    }
-
-    if (matchers.PersonalAccountMatcher) {
-      let personalResult: Match<Partial<Record<string, string | string[]>>>;
-      try {
-        personalResult = matchers.PersonalAccountMatcher(url.pathname);
-      } catch (e) {
-        console.error(`Failed to apply personal account pattern "${options.personalAccountPatterns}" to a path`, e);
-        return null;
-      }
-
-      if (personalResult) {
-        return { type: 'personalAccount' };
-      }
-    }
-    return null;
+  private getOrganizationSyncTarget(url: URL, matchers: OrganizationMatcher): OrganizationSyncTarget | null {
+    return matchers.findTarget(url);
   }
 
   private getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
