@@ -25,9 +25,10 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   clientUat: number;
   // handshake-related values
   devBrowserToken: string | undefined;
+  handshakeNonce: string | undefined;
   handshakeToken: string | undefined;
   handshakeRedirectLoopCounter: number;
-  handshakeNonce: string | undefined;
+
   // url derived from headers
   clerkUrl: URL;
   // enforce existence of the following props
@@ -199,7 +200,8 @@ class AuthenticateContext implements AuthenticateContext {
     this.handshakeToken =
       this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
     this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
-    this.handshakeNonce = this.getQueryParam(constants.QueryParameters.HandshakeNonce) || undefined;
+    this.handshakeNonce =
+      this.getQueryParam(constants.QueryParameters.HandshakeNonce) || this.getCookie(constants.Cookies.HandshakeNonce);
   }
 
   private getQueryParam(name: string) {
