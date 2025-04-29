@@ -1,4 +1,4 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/index.ts", "./src/webhooks.ts"]
+  "entryPoints": ["./src/index.ts", "./src/webhooks.ts", "./src/tokens/verify.ts"]
 }
