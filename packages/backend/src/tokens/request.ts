@@ -160,7 +160,6 @@ export async function authenticateRequest(
 
     if (authenticateContext.handshakeNonce) {
       // TODO: implement handshake nonce handling, fetch handshake payload with nonce
-      
     } else {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
