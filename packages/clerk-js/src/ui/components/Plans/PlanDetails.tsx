@@ -151,6 +151,7 @@ const _PlanDetails = ({
               display: 'grid',
               rowGap: t.space.$6,
               padding: t.space.$4,
+              margin: 0,
             })}
           >
             {features.map(feature => (
