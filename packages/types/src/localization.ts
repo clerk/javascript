@@ -690,6 +690,7 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
         headerTitle__paymentMethods: LocalizationValue;
       };
       paymentSourcesSection: {

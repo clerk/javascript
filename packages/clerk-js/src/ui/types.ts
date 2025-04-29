@@ -124,8 +124,8 @@ export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
 };
 
-export type __experimental_InvoicesCtx = {
-  componentName: 'Invoices';
+export type __experimental_StatementsCtx = {
+  componentName: 'Statements';
   invoices: __experimental_CommerceInvoiceResource[];
   totalCount: number;
   isLoading: boolean;

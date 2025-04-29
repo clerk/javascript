@@ -3,12 +3,12 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 
 import { useFetch } from '../../hooks';
-import type { __experimental_InvoicesCtx } from '../../types';
+import type { __experimental_StatementsCtx } from '../../types';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-const InvoicesContext = createContext<__experimental_InvoicesCtx | null>(null);
+const StatementsContext = createContext<__experimental_StatementsCtx | null>(null);
 
-export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
+export const StatementsContextProvider = ({ children }: PropsWithChildren) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
@@ -27,9 +27,9 @@ export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <InvoicesContext.Provider
+    <StatementsContext.Provider
       value={{
-        componentName: 'Invoices',
+        componentName: 'Statements',
         invoices,
         totalCount: totalCount || 0,
         isLoading: isLoading || false,
@@ -38,15 +38,15 @@ export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-    </InvoicesContext.Provider>
+    </StatementsContext.Provider>
   );
 };
 
-export const useInvoicesContext = () => {
-  const context = useContext(InvoicesContext);
+export const useStatementsContext = () => {
+  const context = useContext(StatementsContext);
 
-  if (!context || context.componentName !== 'Invoices') {
-    throw new Error('Clerk: useInvoicesContext called outside Invoices.');
+  if (!context || context.componentName !== 'Statements') {
+    throw new Error('Clerk: useStatementsContext called outside Statements.');
   }
 
   const { componentName, ...ctx } = context;

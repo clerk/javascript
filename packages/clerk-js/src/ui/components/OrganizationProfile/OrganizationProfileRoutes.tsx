@@ -5,9 +5,9 @@ import { CustomPageContentContainer } from '../../common/CustomPageContentContai
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
-import { OrganizationInvoicePage } from './OrganizationInvoicePage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { OrganizationPlansPage } from './OrganizationPlansPage';
+import { OrganizationStatementPage } from './OrganizationStatementPage';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -74,10 +74,10 @@ export const OrganizationProfileRoutes = () => {
                   <OrganizationPlansPage />
                 </Suspense>
               </Route>
-              <Route path='invoice/:invoiceId'>
+              <Route path='statement/:statementId'>
                 {/* TODO(@commerce): Should this be lazy loaded ? */}
                 <Suspense fallback={''}>
-                  <OrganizationInvoicePage />
+                  <OrganizationStatementPage />
                 </Suspense>
               </Route>
             </Switch>

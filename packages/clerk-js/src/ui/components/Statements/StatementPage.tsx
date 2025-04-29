@@ -1,4 +1,4 @@
-import { InvoicesContextProvider, useInvoicesContext } from '../../contexts';
+import { StatementsContextProvider, useStatementsContext } from '../../contexts';
 import { Badge, Box, Button, Dd, descriptors, Dl, Dt, Heading, Icon, Span, Spinner, Text } from '../../customizables';
 import { Header, LineItems } from '../../elements';
 import { useClipboard } from '../../hooks';
@@ -8,10 +8,10 @@ import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
-const InvoicePageInternal = () => {
+const StatementPageInternal = () => {
   const { params, navigate } = useRouter();
-  const { getInvoiceById, isLoading } = useInvoicesContext();
-  const invoice = params.invoiceId ? getInvoiceById(params.invoiceId) : null;
+  const { getInvoiceById, isLoading } = useStatementsContext();
+  const statement = params.statementId ? getInvoiceById(params.statementId) : null;
 
   if (isLoading) {
     return (
@@ -28,15 +28,17 @@ const InvoicePageInternal = () => {
   return (
     <>
       <Header.Root>
-        <Header.BackLink onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=invoices') })}>
+        <Header.BackLink
+          onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=statements') })}
+        >
           <Header.Title
-            localizationKey='Invoices'
+            localizationKey='Statements'
             textVariant='h2'
           />
         </Header.BackLink>
       </Header.Root>
       <Box
-        elementDescriptor={descriptors.invoiceRoot}
+        elementDescriptor={descriptors.statementRoot}
         sx={t => ({
           display: 'flex',
           flexDirection: 'column',
@@ -48,13 +50,13 @@ const InvoicePageInternal = () => {
           paddingBlockStart: t.space.$4,
         })}
       >
-        {!invoice ? (
+        {!statement ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <Text>Invoice not found</Text>
+            <Text>Statement not found</Text>
           </Box>
         ) : (
           <Box
-            elementDescriptor={descriptors.invoiceCard}
+            elementDescriptor={descriptors.statementCard}
             sx={t => ({
               borderWidth: t.borderWidths.$normal,
               borderStyle: t.borderStyles.$solid,
@@ -64,7 +66,7 @@ const InvoicePageInternal = () => {
             })}
           >
             <Box
-              elementDescriptor={descriptors.invoiceHeader}
+              elementDescriptor={descriptors.statementHeader}
               as='header'
               sx={t => ({
                 padding: t.space.$4,
@@ -78,22 +80,22 @@ const InvoicePageInternal = () => {
               })}
             >
               <Box
-                elementDescriptor={descriptors.invoiceHeaderTitleBadgeContainer}
+                elementDescriptor={descriptors.statementHeaderTitleBadgeContainer}
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'start',
                 }}
               >
-                <Span elementDescriptor={descriptors.invoiceTitleIdContainer}>
+                <Span elementDescriptor={descriptors.statementTitleIdContainer}>
                   <Heading
                     textVariant='h2'
-                    elementDescriptor={descriptors.invoiceTitle}
+                    elementDescriptor={descriptors.statementTitle}
                   >
                     Invoice ID
                   </Heading>
                   <Span
-                    elementDescriptor={descriptors.invoiceIdContainer}
+                    elementDescriptor={descriptors.statementIdContainer}
                     sx={t => ({
                       display: 'flex',
                       alignItems: 'center',
@@ -102,84 +104,84 @@ const InvoicePageInternal = () => {
                     })}
                   >
                     <CopyButton
-                      copyLabel='Copy invoice ID'
-                      text={invoice.id}
+                      copyLabel='Copy statement ID'
+                      text={statement.id}
                     />
                     <Text
-                      elementDescriptor={descriptors.invoiceId}
+                      elementDescriptor={descriptors.statementId}
                       colorScheme='secondary'
                       variant='subtitle'
                     >
-                      {truncateWithEndVisible(invoice.id)}
+                      {truncateWithEndVisible(statement.id)}
                     </Text>
                   </Span>
                 </Span>
 
                 <Badge
-                  elementDescriptor={descriptors.invoiceBadge}
+                  elementDescriptor={descriptors.statementBadge}
                   colorScheme={
-                    invoice.status === 'paid' ? 'success' : invoice.status === 'unpaid' ? 'warning' : 'danger'
+                    statement.status === 'paid' ? 'success' : statement.status === 'unpaid' ? 'warning' : 'danger'
                   }
                   sx={{ textTransform: 'capitalize' }}
                 >
-                  {invoice.status}
+                  {statement.status}
                 </Badge>
               </Box>
               <Dl
-                elementDescriptor={descriptors.invoiceDetails}
+                elementDescriptor={descriptors.statementDetails}
                 sx={t => ({
                   display: 'flex',
                   justifyContent: 'space-between',
                   marginBlockStart: t.space.$3,
                 })}
               >
-                <Box elementDescriptor={descriptors.invoiceDetailsItem}>
-                  <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
+                <Box elementDescriptor={descriptors.statementDetailsItem}>
+                  <Dt elementDescriptor={descriptors.statementDetailsItemTitle}>
                     <Text
-                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
+                      elementDescriptor={descriptors.statementDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
                       Created on
                     </Text>
                   </Dt>
-                  <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
+                  <Dd elementDescriptor={descriptors.statementDetailsItemValue}>
                     <Text
-                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      elementDescriptor={descriptors.statementDetailsItemValueText}
                       variant='subtitle'
                     >
-                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                      {new Date(statement.paymentDueOn).toLocaleDateString()}
                     </Text>
                   </Dd>
                 </Box>
                 <Box
-                  elementDescriptor={descriptors.invoiceDetailsItem}
+                  elementDescriptor={descriptors.statementDetailsItem}
                   sx={{
                     textAlign: 'right',
                   }}
                 >
-                  <Dt elementDescriptor={descriptors.invoiceDetailsItemTitle}>
+                  <Dt elementDescriptor={descriptors.statementDetailsItemTitle}>
                     <Text
-                      elementDescriptor={descriptors.invoiceDetailsItemTitleText}
+                      elementDescriptor={descriptors.statementDetailsItemTitleText}
                       colorScheme='secondary'
                       variant='body'
                     >
                       Due on
                     </Text>
                   </Dt>
-                  <Dd elementDescriptor={descriptors.invoiceDetailsItemValue}>
+                  <Dd elementDescriptor={descriptors.statementDetailsItemValue}>
                     <Text
-                      elementDescriptor={descriptors.invoiceDetailsItemValueText}
+                      elementDescriptor={descriptors.statementDetailsItemValueText}
                       variant='subtitle'
                     >
-                      {new Date(invoice.paymentDueOn).toLocaleDateString()}
+                      {new Date(statement.paymentDueOn).toLocaleDateString()}
                     </Text>
                   </Dd>
                 </Box>
               </Dl>
             </Box>
             <Box
-              elementDescriptor={descriptors.invoiceContent}
+              elementDescriptor={descriptors.statementContent}
               sx={t => ({
                 padding: t.space.$4,
               })}
@@ -188,7 +190,7 @@ const InvoicePageInternal = () => {
                 <LineItems.Group>
                   <LineItems.Title title='Plan' />
                   <LineItems.Description
-                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
                     suffix='per month'
                   />
                 </LineItems.Group>
@@ -198,19 +200,19 @@ const InvoicePageInternal = () => {
                 >
                   <LineItems.Title title='Subtotal' />
                   <LineItems.Description
-                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
                   />
                 </LineItems.Group>
                 <LineItems.Group variant='secondary'>
                   <LineItems.Title title='Tax' />
                   <LineItems.Description
-                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
                   />
                 </LineItems.Group>
                 <LineItems.Group borderTop>
                   <LineItems.Title title='Total due' />
                   <LineItems.Description
-                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
                     prefix='USD'
                   />
                 </LineItems.Group>
@@ -228,7 +230,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
 
   return (
     <Button
-      elementDescriptor={descriptors.invoiceCopyButton}
+      elementDescriptor={descriptors.statementCopyButton}
       variant='unstyled'
       onClick={onCopy}
       sx={t => ({
@@ -254,10 +256,10 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
   );
 }
 
-export const InvoicePage = () => {
+export const StatementPage = () => {
   return (
-    <InvoicesContextProvider>
-      <InvoicePageInternal />
-    </InvoicesContextProvider>
+    <StatementsContextProvider>
+      <StatementPageInternal />
+    </StatementsContextProvider>
   );
 };

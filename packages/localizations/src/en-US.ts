@@ -714,6 +714,7 @@ export const enUS: LocalizationResource = {
         headerTitle__paymentMethods: 'Payment Methods',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscriptions',
+        headerTitle__statements: 'Statements',
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
