@@ -21,7 +21,7 @@ const SessionTasksStart = withCardStateProvider(() => {
   useEffect(() => {
     // Simulates additional latency to avoid a abrupt UI transition when navigating to the next task
     const timeoutId = setTimeout(() => {
-      void clerk.__experimental_navigateToTask({ redirectUrlComplete });
+      void clerk.__experimental_nextTask({ redirectUrlComplete });
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [navigate, clerk, redirectUrlComplete]);
@@ -80,7 +80,7 @@ export function SessionTask(): JSX.Element {
   }, [clerk, navigate, redirectUrlComplete]);
 
   const nextTask = useCallback(
-    () => clerk.__experimental_navigateToTask({ redirectUrlComplete }),
+    () => clerk.__experimental_nextTask({ redirectUrlComplete }),
     [clerk, redirectUrlComplete],
   );
 
