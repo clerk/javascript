@@ -2,10 +2,14 @@
 '@clerk/nextjs': patch
 ---
 
-Introduce `treatPendingAsSignedOut` to `auth` and server-side control components
+Introduce `treatPendingAsSignedOut` to `auth`, `getAuth` and server-side control components
 
 ```ts
 const { userId } = auth({ treatPendingAsSignedOut: false })
+```
+
+```ts
+const { userId } = getAuth(req, { treatPendingAsSignedOut: false })
 ```
 
 ```tsx

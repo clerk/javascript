@@ -63,7 +63,7 @@ export const createSyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
+    return (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): AuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
