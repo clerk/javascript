@@ -156,9 +156,16 @@ export async function authenticateRequest(
       'Access-Control-Allow-Credentials': 'true',
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
-    const cookiesToSet = handshakePayload.handshake;
+    const cookiesToSet: string[] = [];
+
+    if (authenticateContext.handshakeNonce) {
+      // TODO: implement handshake nonce handling, fetch handshake payload with nonce
+      
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
+      cookiesToSet.push(...handshakePayload.handshake);
+    }
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
