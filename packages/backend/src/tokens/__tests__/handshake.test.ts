@@ -7,7 +7,6 @@ import { AuthErrorReason, signedIn, signedOut } from '../authStatus';
 import type { OrganizationSyncTargetMatchers } from '../handshake';
 import { HandshakeService } from '../handshake';
 
-// Mock dependencies
 vi.mock('../handshake.js', async importOriginal => {
   const actual: any = await importOriginal();
   return {
@@ -68,10 +67,8 @@ describe('HandshakeService', () => {
   let handshakeService: HandshakeService;
 
   beforeEach(() => {
-    // Reset mocks
     vi.clearAllMocks();
 
-    // Setup mock authenticate context
     mockAuthenticateContext = {
       clerkUrl: new URL('https://example.com'),
       frontendApi: 'api.clerk.com',
@@ -81,13 +78,11 @@ describe('HandshakeService', () => {
       accept: 'text/html',
     } as AuthenticateContext;
 
-    // Setup mock organization sync matchers
     mockOrganizationSyncTargetMatchers = {
       OrganizationMatcher: null,
       PersonalAccountMatcher: null,
     };
 
-    // Setup mock options
     mockOptions = {
       organizationSyncOptions: {
         organizationPatterns: ['/org/:id'],
@@ -95,7 +90,6 @@ describe('HandshakeService', () => {
       },
     };
 
-    // Create service instance
     handshakeService = new HandshakeService(mockAuthenticateContext, mockOrganizationSyncTargetMatchers, mockOptions);
   });
 
@@ -162,7 +156,6 @@ describe('HandshakeService', () => {
 
   describe.skip('resolveHandshake', () => {
     it('should resolve handshake with valid token', async () => {
-      // Mock a valid JWT structure
       const mockJwt = {
         header: {
           typ: 'JWT',
@@ -213,7 +206,6 @@ describe('HandshakeService', () => {
         errors: undefined,
       });
 
-      // Mock verifyHandshakeToken to return our mock data directly
       vi.mocked(await import('../handshake.js')).verifyHandshakeToken.mockResolvedValue(mockHandshakePayload);
 
       mockAuthenticateContext.handshakeToken = 'any-token';
@@ -261,7 +253,6 @@ describe('HandshakeService', () => {
     it('should handle development mode clock skew', async () => {
       mockAuthenticateContext.instanceType = 'development';
 
-      // Mock a valid JWT structure
       const mockJwt = {
         header: {
           typ: 'JWT',
