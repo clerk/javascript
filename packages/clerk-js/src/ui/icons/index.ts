@@ -48,6 +48,7 @@ export { default as Mobile } from './mobile-small.svg';
 export { default as Organization } from './organization.svg';
 export { default as Pencil } from './pencil.svg';
 export { default as PencilEdit } from './pencil-edit.svg';
+export { default as Plans } from './plans.svg';
 export { default as Plus } from './plus.svg';
 export { default as Print } from './print.svg';
 export { default as QuestionMark } from './question-mark.svg';

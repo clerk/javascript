@@ -77,12 +77,14 @@ export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 
 
 export type __experimental_GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
+export type __experimental_PaymentGateway = 'stripe' | 'paypal';
+
 export type __experimental_InitializePaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
 }>;
 
 export type __experimental_AddPaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
   paymentToken: string;
 }>;
 
@@ -161,10 +163,15 @@ export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
 }>;
 
-export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<{
-  paymentSourceId?: string;
-}>;
-
+export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<
+  | {
+      paymentSourceId?: string;
+    }
+  | {
+      paymentToken?: string;
+      gateway?: __experimental_PaymentGateway;
+    }
+>;
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;

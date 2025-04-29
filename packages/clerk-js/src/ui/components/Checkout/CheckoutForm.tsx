@@ -3,9 +3,11 @@ import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
   __experimental_CommercePaymentSourceResource,
+  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
+import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
@@ -133,10 +135,10 @@ const CheckoutFormElements = ({
 
   const { data: paymentSources } = data || { data: [] };
 
-  const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
+  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
-        paymentSourceId,
+        ...params,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
@@ -153,12 +155,19 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({ paymentSourceId });
+    await confirmCheckout({
+      paymentSourceId,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
-  const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
-    await confirmCheckout({ paymentSourceId: paymentSource.id });
+  const onAddPaymentSourceSuccess = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
+    await confirmCheckout({
+      gateway: 'stripe',
+      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
