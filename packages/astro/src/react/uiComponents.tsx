@@ -197,5 +197,5 @@ export const __experimental_PricingTable = withClerk(
       />
     );
   },
-  'Waitlist',
+  '__experimental_PricingTable',
 );
