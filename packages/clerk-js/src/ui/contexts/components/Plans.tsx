@@ -5,7 +5,7 @@ import type {
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionResource,
 } from '@clerk/types';
-import type { ComponentType, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
@@ -83,33 +83,6 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-export const withPlans = <T extends object>(
-  WrappedComponent: ComponentType<T>,
-  providerPropsFromHOC: PropsWithChildren = {},
-) => {
-  // Define props for the returned component
-  type WithPlansProps = T & {
-    providerProps?: PropsWithChildren;
-  };
-
-  const WithPlans: React.FC<WithPlansProps> = ({ providerProps = {}, ...componentProps }) => {
-    const mergedProviderProps = {
-      ...providerPropsFromHOC,
-      ...providerProps,
-    };
-
-    return (
-      <PlansContextProvider {...mergedProviderProps}>
-        <WrappedComponent {...(componentProps as T)} />
-      </PlansContextProvider>
-    );
-  };
-
-  WithPlans.displayName = `WithPlans(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-
-  return WithPlans;
-};
-
 type HandleSelectPlanProps = {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
@@ -141,7 +114,7 @@ export const usePlansContext = () => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
-  const shouldDisplayPlanButton = useCallback(
+  const canManageSubscription = useCallback(
     ({
       plan,
       subscription: sub,
@@ -185,14 +158,24 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscription],
   );
 
+  const captionForSubscription = useCallback((subscription: __experimental_CommerceSubscriptionResource) => {
+    if (subscription.status === 'upcoming') {
+      return localizationKeys('badge__startsAt', { date: subscription.periodStart });
+    } else if (subscription.canceledAt) {
+      return localizationKeys('badge__canceledEndsAt', { date: subscription.periodEnd });
+    } else {
+      return localizationKeys('badge__renewsAt', { date: subscription.periodEnd });
+    }
+  }, []);
+
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
     ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted' }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
 
       if (subscription && !subscription.canceledAt) {
-        clerk.__internal_openSubscriptionDetails({
-          subscription,
+        clerk.__internal_openPlanDetails({
+          plan,
           subscriberType,
           onSubscriptionCancel: () => {
             ctx.revalidate();
@@ -232,6 +215,10 @@ export const usePlansContext = () => {
     [clerk, ctx, activeOrUpcomingSubscription, subscriberType],
   );
 
+  const defaultFreePlan = useMemo(() => {
+    return ctx.plans.find(plan => plan.isDefault);
+  }, [ctx.plans]);
+
   return {
     ...ctx,
     componentName,
@@ -239,6 +226,8 @@ export const usePlansContext = () => {
     isDefaultPlanImplicitlyActive,
     handleSelectPlan,
     buttonPropsForPlan,
-    shouldDisplayPlanButton,
+    canManageSubscription,
+    captionForSubscription,
+    defaultFreePlan,
   };
 };

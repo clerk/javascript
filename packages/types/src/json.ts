@@ -673,6 +673,11 @@ export interface __experimental_CommerceCheckoutTotalsJSON {
   subtotal: __experimental_CommerceMoneyJSON;
   tax_total: __experimental_CommerceMoneyJSON;
   total_due_now: __experimental_CommerceMoneyJSON;
+  proration?: {
+    days: number;
+    rate_per_day: __experimental_CommerceMoneyJSON;
+    total_proration: __experimental_CommerceMoneyJSON;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -691,4 +696,5 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   status: string;
   subscription?: __experimental_CommerceSubscriptionJSON;
   totals: __experimental_CommerceCheckoutTotalsJSON;
+  is_immediate_plan_change: boolean;
 }

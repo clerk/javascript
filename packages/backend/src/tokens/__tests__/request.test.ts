@@ -303,7 +303,8 @@ const mockRequest = (headers = {}, requestUrl = 'http://clerk.com/path') => {
 };
 
 /* An otherwise bare state on a request. */
-const mockOptions = (options?: Partial<AuthenticateRequestOptions>) => {
+// @ts-expect-error - Testing
+const mockOptions = (options?) => {
   return {
     secretKey: 'deadbeef',
     apiUrl: 'https://api.clerk.test',
@@ -321,11 +322,13 @@ const mockOptions = (options?: Partial<AuthenticateRequestOptions>) => {
   } satisfies AuthenticateRequestOptions;
 };
 
-const mockRequestWithHeaderAuth = (headers?: Record<string, string>, requestUrl?: string) => {
+// @ts-expect-error - Testing
+const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
-const mockRequestWithCookies = (headers?: Record<string, string>, cookies = {}, requestUrl?: string) => {
+// @ts-expect-error - Testing
+const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   const cookieStr = Object.entries(cookies)
     .map(([k, v]) => `${k}=${v}`)
     .join(';');

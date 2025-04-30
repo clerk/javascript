@@ -7,7 +7,9 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks/useFetch';
+import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
@@ -24,7 +26,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
     if (!clerk.isSignedIn) {
-      void clerk.redirectToSignIn();
+      return clerk.redirectToSignIn();
     }
 
     handleSelectPlan({ mode, plan, planPeriod });
@@ -43,10 +45,16 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   );
 
   return (
-    <>
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
+      <FreePlanRow />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans || []}
+          plans={plans.filter(plan => !plan.isDefault)}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -54,7 +62,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans}
+          plans={plans.filter(plan => !plan.isDefault)}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -62,7 +70,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-    </>
+    </Flow.Root>
   );
 };
 

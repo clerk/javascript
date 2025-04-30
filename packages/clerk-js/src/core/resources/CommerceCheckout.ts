@@ -1,3 +1,4 @@
+import { retry } from '@clerk/shared/retry';
 import type {
   __experimental_CommerceCheckoutJSON,
   __experimental_CommerceCheckoutResource,
@@ -12,6 +13,7 @@ import {
   __experimental_CommercePlan,
   __experimental_CommerceSubscription,
   BaseResource,
+  isClerkAPIResponseError,
 } from './internal';
 
 export class __experimental_CommerceCheckout extends BaseResource implements __experimental_CommerceCheckoutResource {
@@ -25,6 +27,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   status!: string;
   subscription?: __experimental_CommerceSubscription;
   totals!: __experimental_CommerceCheckoutTotals;
+  isImmediatePlanChange!: boolean;
 
   constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();
@@ -49,17 +52,42 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     this.status = data.status;
     this.subscription = data.subscription ? new __experimental_CommerceSubscription(data.subscription) : undefined;
     this.totals = commerceTotalsFromJSON(data.totals);
-
+    this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;
   }
 
   confirm = (params: __experimental_ConfirmCheckoutParams): Promise<this> => {
     const { orgId, ...rest } = params;
-    return this._basePatch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
-        : `/me/commerce/checkouts/${this.id}/confirm`,
-      body: rest as any,
-    });
+
+    // Retry confirmation in case of a 500 error
+    // This will retry up to 3 times with an increasing delay
+    // It retries at 2s, 4s, 6s and 8s
+    return retry(
+      () =>
+        this._basePatch({
+          path: orgId
+            ? `/organizations/${orgId}/commerce/checkouts/${this.id}/confirm`
+            : `/me/commerce/checkouts/${this.id}/confirm`,
+          body: rest as any,
+        }),
+      {
+        factor: 1.1,
+        maxDelayBetweenRetries: 2 * 1_000,
+        initialDelay: 2 * 1_000,
+        jitter: false,
+        shouldRetry(error: any, iterations: number) {
+          if (!isClerkAPIResponseError(error) || iterations >= 4) {
+            return false;
+          }
+
+          const status = error?.status;
+          const isServerError = status >= 500;
+          const checkoutAlreadyInProgress =
+            status === 409 && error.errors?.[0]?.code === 'checkout_already_in_progress';
+
+          return isServerError || checkoutAlreadyInProgress;
+        },
+      },
+    );
   };
 }

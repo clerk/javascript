@@ -94,6 +94,9 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   return { data };
 }
 
+/**
+ * @inline
+ */
 export type VerifyJwtOptions = {
   /**
    * A string or list of [audiences](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3). If passed, it is checked against the `aud` claim in the token.
@@ -103,7 +106,7 @@ export type VerifyJwtOptions = {
    * An allowlist of origins to verify against, to protect your application from the subdomain cookie leaking attack.
    * @example
    * ```ts
-   * authorizedParties: ['http://localhost:3000', 'https://example.com']
+   * ['http://localhost:3000', 'https://example.com']
    * ```
    */
   authorizedParties?: string[];

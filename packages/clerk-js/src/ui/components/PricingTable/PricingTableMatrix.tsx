@@ -73,7 +73,7 @@ export function PricingTableMatrix({
   return (
     <InternalThemeProvider>
       <Box
-        elementDescriptor={descriptors.pricingTableMatrixRoot}
+        elementDescriptor={descriptors.pricingTableMatrix}
         sx={t => ({
           position: 'relative',
           minWidth: '100%',
