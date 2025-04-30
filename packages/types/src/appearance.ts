@@ -391,7 +391,7 @@ export type ElementsConfig = {
   pricingTableCardFeePeriodNoticeInner: WithOptions;
   pricingTableCardFeePeriodNoticeLabel: WithOptions;
 
-  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRowGroupHeader: WithOptions;
