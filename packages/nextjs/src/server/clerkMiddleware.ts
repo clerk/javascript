@@ -466,10 +466,11 @@ const handleControlFlowErrors = (
       // Following MCP spec, we return WWW-Authenticate header on 401 responses
       // to enable OAuth 2.0 authorization server discovery (RFC9728).
       // See https://modelcontextprotocol.io/specification/draft/basic/authorization#2-3-1-authorization-server-location
+      const publishableKey = parsePublishableKey(requestState.publishableKey);
       return setHeader(
         response,
         'WWW-Authenticate',
-        'Bearer resource_metadata="https://resource.example.com/.well-known/oauth-protected-resource"',
+        `Bearer resource_metadata="https://${publishableKey?.frontendApi}/.well-known/oauth-protected-resource"`,
       );
     }
 
