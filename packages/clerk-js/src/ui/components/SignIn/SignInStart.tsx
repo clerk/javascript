@@ -469,6 +469,7 @@ function SignInStartInternal(): JSX.Element {
                 <SignInSocialButtons
                   enableWeb3Providers
                   enableOAuthProviders
+                  enableAlternativePhoneCodeProviders
                 />
               )}
               {standardFormAttributes.length ? (

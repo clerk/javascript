@@ -1,7 +1,7 @@
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { UserSettingsJSONSnapshot } from './snapshots';
-import type { OAuthStrategy, Web3Strategy } from './strategies';
+import type { AlternativePhoneCodeStrategy, OAuthStrategy, Web3Strategy } from './strategies';
 
 export type Attribute =
   | 'email_address'
@@ -146,6 +146,7 @@ export interface UserSettingsResource extends ClerkResource {
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];
+  alternativePhoneCodeFirstFactors: AlternativePhoneCodeStrategy[];
   enabledFirstFactorIdentifiers: Attribute[];
   instanceIsPasswordBased: boolean;
   hasValidAuthFactor: boolean;

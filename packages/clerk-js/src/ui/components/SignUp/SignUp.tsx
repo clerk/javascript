@@ -13,6 +13,7 @@ import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
+import { SignUpVerifyPhoneWithAlternativeProvider } from './SignUpVerifyPhoneWithAlternativeProvider';
 
 function RedirectToSignUp() {
   const clerk = useClerk();
@@ -26,6 +27,7 @@ function SignUpRoutes(): JSX.Element {
   usePreloadTasks();
 
   const { __internal_setComponentNavigationContext } = useClerk();
+  // const { userSettings } = useEnvironment();
   const { navigate, indexPath } = useRouter();
   const signUpContext = useSignUpContext();
 
@@ -46,7 +48,12 @@ function SignUpRoutes(): JSX.Element {
           path='verify-phone-number'
           canActivate={clerk => !!clerk.client.signUp.phoneNumber}
         >
-          <SignUpVerifyPhone />
+          <Route path='whatsapp'>
+            <SignUpVerifyPhoneWithAlternativeProvider phoneCodeStrategy='whatsapp_code' />
+          </Route>
+          <Route index>
+            <SignUpVerifyPhone />
+          </Route>
         </Route>
         <Route path='sso-callback'>
           <SignUpSSOCallback

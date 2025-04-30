@@ -1,13 +1,13 @@
 import type { IdentificationLinkResource } from './identificationLink';
 import type { ClerkResource } from './resource';
 import type { PhoneNumberJSONSnapshot } from './snapshots';
-import type { PhoneCodeStrategy } from './strategies';
+import type { AlternativePhoneCodeStrategy, PhoneCodeStrategy } from './strategies';
 import type { VerificationResource } from './verification';
 
 export type PhoneNumberVerificationStrategy = PhoneCodeStrategy;
 
 export type PreparePhoneNumberVerificationParams = {
-  strategy: PhoneNumberVerificationStrategy;
+  strategy: PhoneNumberVerificationStrategy | AlternativePhoneCodeStrategy;
 };
 
 export type AttemptPhoneNumberVerificationParams = {

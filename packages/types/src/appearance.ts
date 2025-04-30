@@ -1,5 +1,6 @@
 import type * as CSS from 'csstype';
 
+import type { AlternativePhoneCodeProvider } from './alternativePhoneCode';
 import type {
   AlertId,
   CardActionId,
@@ -187,21 +188,27 @@ export type ElementsConfig = {
 
   socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
-  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider, LoadingState>;
+  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider, LoadingState>;
+  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider>;
+  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider, LoadingState>;
+  socialButtonsProviderInitialIcon: WithOptions<
+    OAuthProvider | Web3Provider | AlternativePhoneCodeProvider,
+    LoadingState
+  >;
 
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
-  providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
-  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerIcon: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider | SamlIdpSlug, LoadingState>;
+  providerInitialIcon: WithOptions<
+    OAuthProvider | Web3Provider | AlternativePhoneCodeProvider | SamlIdpSlug,
+    LoadingState
+  >;
 
   alternativeMethods: WithOptions;
-  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
+  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider, LoadingState>;
+  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider>;
+  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | AlternativePhoneCodeProvider>;
 
   checkoutFormLineItemsRoot: WithOptions;
   checkoutFormElementsRoot: WithOptions;
