@@ -14,6 +14,7 @@ import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constant
 import { createAsyncGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
+import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
 import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from '../../server/types';
@@ -191,6 +192,7 @@ auth.protect = async (...args: any[]) => {
     redirectToSignIn: authObject.redirectToSignIn,
     notFound,
     redirect,
+    unauthorized,
   });
 
   return protect(...args);

@@ -520,7 +520,7 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
-    it('throws a not found error when protect is called, the machine auth token is invalid, and is not a page request', async () => {
+    it('throws an unauthorized error when protect is called and the machine auth token is invalid', async () => {
       const req = mockRequest({
         url: '/protected',
         headers: new Headers({
@@ -542,8 +542,9 @@ describe('clerkMiddleware(params)', () => {
         await auth.protect({ token: TokenType.ApiKey });
       })(req, {} as NextFetchEvent);
 
-      expect(resp?.status).toEqual(200);
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('WWW-Authenticate')).toContain('Bearer realm=');
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -624,7 +625,7 @@ describe('clerkMiddleware(params)', () => {
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
-    it('throws a not found error when protect is called with mismatching token types', async () => {
+    it('throws an unauthorized error when protect is called with mismatching token types', async () => {
       const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
@@ -643,8 +644,8 @@ describe('clerkMiddleware(params)', () => {
         await auth.protect({ token: TokenType.ApiKey });
       })(req, {} as NextFetchEvent);
 
-      expect(resp?.status).toEqual(200);
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -691,8 +692,8 @@ describe('clerkMiddleware(params)', () => {
         await auth.protect({ token: [TokenType.SessionToken, TokenType.MachineToken] });
       })(req, {} as NextFetchEvent);
 
-      expect(resp?.status).toEqual(200);
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
   });

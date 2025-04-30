@@ -36,11 +36,13 @@ import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } fr
 import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
+  isNextjsUnauthorizedError,
   isRedirectToSignInError,
   isRedirectToSignUpError,
   nextjsRedirectError,
   redirectToSignInError,
   redirectToSignUpError,
+  unauthorized,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -386,7 +388,14 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
+    return createProtect({
+      request: clerkRequest,
+      redirect,
+      notFound,
+      unauthorized,
+      authObject,
+      redirectToSignIn,
+    })(params, options);
   }) as unknown as Promise<AuthProtect>;
 };
 
@@ -447,6 +456,18 @@ const handleControlFlowErrors = (
   nextRequest: NextRequest,
   requestState: RequestState,
 ): Response => {
+  if (isNextjsUnauthorizedError(e)) {
+    const response = NextResponse.next({ status: 401 });
+    // Following Model Context Protocol (MCP), we return WWW-Authenticate header on 401 responses
+    // to enable OAuth 2.0 authorization server discovery (RFC9728)
+    setHeader(
+      response,
+      'WWW-Authenticate',
+      `Bearer realm="${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}", authorization_server_metadata_url="${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}/oauth/.well-known/oauth-authorization-server"`,
+    );
+    return setHeader(response, constants.Headers.AuthReason, 'protect-error');
+  }
+
   if (isNextjsNotFoundError(e)) {
     // Rewrite to a bogus URL to force not found error
     return setHeader(

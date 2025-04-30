@@ -92,6 +92,7 @@ export function createProtect(opts: {
    * see {@link notFound} above
    */
   redirect: (url: string) => void;
+  unauthorized: () => never;
   /**
    * protect() in middleware redirects to signInUrl if signed out
    * protect() in pages throws a notFound error if signed out
@@ -99,20 +100,15 @@ export function createProtect(opts: {
    */
   redirectToSignIn: RedirectFun<unknown>;
 }): AuthProtect {
-  const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
+  const { redirectToSignIn, authObject, redirect, notFound, request, unauthorized } = opts;
 
   return (async (...args: any[]) => {
     const paramsOrFunction = getAuthorizationParams(args[0]);
     const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
     const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
-    const requestedToken = (args[0]?.token || args[1]?.token || TokenType.SessionToken) as TokenType | TokenType[];
+    const requestedToken = args[0]?.token || args[1]?.token || TokenType.SessionToken;
 
     const handleUnauthenticated = () => {
-      // For machine tokens, always return notFound instead of redirecting
-      if (authObject.tokenType !== TokenType.SessionToken) {
-        return notFound();
-      }
-
       if (unauthenticatedUrl) {
         return redirect(unauthenticatedUrl);
       }
@@ -124,6 +120,11 @@ export function createProtect(opts: {
     };
 
     const handleUnauthorized = () => {
+      // For machine tokens, return a 401 response
+      if (authObject.tokenType !== TokenType.SessionToken) {
+        return unauthorized();
+      }
+
       if (unauthorizedUrl) {
         return redirect(unauthorizedUrl);
       }
@@ -138,7 +139,7 @@ export function createProtect(opts: {
       // For machine tokens, we only check if they're authenticated
       // They don't have session status or organization permissions
       if (!authObject.id) {
-        return handleUnauthenticated();
+        return handleUnauthorized();
       }
       return authObject;
     }
