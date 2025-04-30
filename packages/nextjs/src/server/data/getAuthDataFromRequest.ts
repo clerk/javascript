@@ -59,7 +59,7 @@ export function getAuthDataFromRequest(
   }
 
   if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
-    authObject = signedOutAuthObject(options);
+    authObject = signedOutAuthObject(options, authObject.sessionStatus);
   }
 
   return authObject;
