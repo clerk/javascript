@@ -1,7 +1,7 @@
 import {
-  __experimental_PricingTableContext,
   InvoicesContextProvider,
   PlansContextProvider,
+  PricingTableContext,
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
@@ -20,8 +20,8 @@ import {
 import { useTabState } from '../../hooks/useTabState';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
-import { __experimental_PaymentSources } from '../PaymentSources';
-import { __experimental_PricingTable } from '../PricingTable';
+import { PaymentSources } from '../PaymentSources/PaymentSources';
+import { PricingTable } from '../PricingTable';
 import { SubscriptionsList } from '../Subscriptions';
 
 const tabMap = {
@@ -98,9 +98,9 @@ const BillingPageInternal = withCardStateProvider(() => {
                   />
                 </>
               ) : (
-                <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <__experimental_PricingTable />
-                </__experimental_PricingTableContext.Provider>
+                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                  <PricingTable />
+                </PricingTableContext.Provider>
               )}
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
@@ -109,7 +109,7 @@ const BillingPageInternal = withCardStateProvider(() => {
               </InvoicesContextProvider>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <__experimental_PaymentSources />
+              <PaymentSources />
             </TabPanel>
           </TabPanels>
         </Tabs>

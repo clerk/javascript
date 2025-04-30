@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { __experimental_CheckoutProps, Appearance } from '@clerk/types';
+import type { __internal_CheckoutProps, Appearance } from '@clerk/types';
 
 import { Checkout } from './components';
 import { LazyDrawerRenderer } from './providers';
@@ -13,7 +13,7 @@ export function MountedCheckoutDrawer({
   onOpenChange: (open: boolean) => void;
   checkoutDrawer: {
     open: false;
-    props: null | __experimental_CheckoutProps;
+    props: null | __internal_CheckoutProps;
   };
 }) {
   const { user } = useUser();

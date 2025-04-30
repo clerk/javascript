@@ -1,4 +1,4 @@
-import type { __experimental_CommercePlanResource, __experimental_CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import { usePlansContext } from '../../contexts';
@@ -22,11 +22,11 @@ import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../
 import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
-  plans: __experimental_CommercePlanResource[];
-  highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plans: CommercePlanResource[];
+  highlightedPlan?: CommercePlanResource['slug'];
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource) => void;
 }
 
 export function PricingTableMatrix({
@@ -135,7 +135,7 @@ export function PricingTableMatrix({
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
+                      onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'

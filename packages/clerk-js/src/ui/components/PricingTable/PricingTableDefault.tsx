@@ -1,9 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_PricingTableProps,
-} from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
 import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
@@ -31,13 +27,13 @@ import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors } from '../../utils';
 
 interface PricingTableDefaultProps {
-  plans?: __experimental_CommercePlanResource[] | null;
-  highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plans?: CommercePlanResource[] | null;
+  highlightedPlan?: CommercePlanResource['slug'];
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 export function PricingTableDefault({
@@ -93,12 +89,12 @@ export function PricingTableDefault({
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardProps {
-  plan: __experimental_CommercePlanResource;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plan: CommercePlanResource;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (p: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 function Card(props: CardProps) {
@@ -210,10 +206,10 @@ function Card(props: CardProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardHeaderProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   isCompact?: boolean;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
@@ -414,7 +410,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           <SegmentedControl.Root
             aria-label='Set pay period'
             value={planPeriod}
-            onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
+            onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button
               value='month'
@@ -438,7 +434,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardFeaturesListProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   /**
    * @default false
    */

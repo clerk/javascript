@@ -1,9 +1,8 @@
-import type { __experimental_CommerceSettingsJSONSnapshot } from 'snapshots';
-
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
+import type { CommerceSettingsJSONSnapshot } from './snapshots';
 
-export interface __experimental_CommerceSettingsJSON extends ClerkResourceJSON {
+export interface CommerceSettingsJSON extends ClerkResourceJSON {
   billing: {
     enabled: boolean;
     stripe_publishable_key: string;
@@ -12,7 +11,7 @@ export interface __experimental_CommerceSettingsJSON extends ClerkResourceJSON {
   };
 }
 
-export interface __experimental_CommerceSettingsResource extends ClerkResource {
+export interface CommerceSettingsResource extends ClerkResource {
   billing: {
     enabled: boolean;
     stripePublishableKey: string;
@@ -20,5 +19,5 @@ export interface __experimental_CommerceSettingsResource extends ClerkResource {
     hasPaidOrgPlans: boolean;
   };
 
-  __internal_toSnapshot: () => __experimental_CommerceSettingsJSONSnapshot;
+  __internal_toSnapshot: () => CommerceSettingsJSONSnapshot;
 }

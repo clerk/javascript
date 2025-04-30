@@ -1,4 +1,4 @@
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 
 import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
@@ -7,7 +7,7 @@ import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-export const CheckoutPage = (props: __experimental_CheckoutProps) => {
+export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen } = useDrawerContext();
 
@@ -17,7 +17,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     subscriberType,
   });
 
-  const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();

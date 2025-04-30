@@ -1,9 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_PricingTableProps,
-} from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -12,7 +8,7 @@ import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
-const PricingTable = (props: __experimental_PricingTableProps) => {
+export const PricingTable = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
@@ -21,9 +17,9 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   const { plans, handleSelectPlan } = usePlansContext();
 
-  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('month');
 
-  const selectPlan = (plan: __experimental_CommercePlanResource) => {
+  const selectPlan = (plan: CommercePlanResource) => {
     if (!clerk.isSignedIn) {
       return clerk.redirectToSignIn();
     }
@@ -31,11 +27,11 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
     handleSelectPlan({ mode, plan, planPeriod });
   };
 
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
 
   const { user } = useUser();
   useFetch(
-    user ? __experimental_commerce?.getPaymentSources : undefined,
+    user ? commerce?.getPaymentSources : undefined,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
@@ -67,5 +63,3 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
     </>
   );
 };
-
-export const __experimental_PricingTable = PricingTable;

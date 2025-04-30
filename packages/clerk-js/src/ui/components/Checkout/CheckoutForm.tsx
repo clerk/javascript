@@ -1,11 +1,11 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommerceMoney,
-  __experimental_CommercePaymentSourceResource,
-  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
+  CommerceCheckoutResource,
+  CommerceMoney,
+  CommercePaymentSourceResource,
+  ConfirmCheckoutParams,
 } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
@@ -25,8 +25,8 @@ export const CheckoutForm = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals } = checkout;
 
@@ -118,16 +118,16 @@ const CheckoutFormElements = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { user } = useUser();
   const { organization } = useOrganization();
   const { subscriberType } = useCheckoutContext();
 
   const { data } = useFetch(
-    __experimental_commerce?.getPaymentSources,
+    commerce?.getPaymentSources,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
@@ -142,7 +142,7 @@ const CheckoutFormElements = ({
 
   const { data: paymentSources } = data || { data: [] };
 
-  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
+  const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
         ...params,
@@ -254,15 +254,15 @@ const PaymentSourceMethods = ({
   onPaymentSourceSubmit,
   isSubmitting,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  totalDueNow: __experimental_CommerceMoney;
-  paymentSources: __experimental_CommercePaymentSourceResource[];
+  checkout: CommerceCheckoutResource;
+  totalDueNow: CommerceMoney;
+  paymentSources: CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
   isSubmitting: boolean;
 }) => {
-  const [selectedPaymentSource, setSelectedPaymentSource] = useState<
-    __experimental_CommercePaymentSourceResource | undefined
-  >(checkout.paymentSource || paymentSources.find(p => p.isDefault));
+  const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    checkout.paymentSource || paymentSources.find(p => p.isDefault),
+  );
 
   const options = useMemo(() => {
     return paymentSources.map(source => {

@@ -14,11 +14,9 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceNamespace,
-  __experimental_PlanDetailsProps,
-  __experimental_PricingTableProps,
+  __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -30,6 +28,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  CommerceNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -50,6 +49,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PendingSessionResource,
+  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -130,7 +130,7 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
-import { __experimental_Commerce } from './modules/commerce';
+import { Commerce } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -185,7 +185,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  private static _commerce: __experimental_CommerceNamespace;
+  private static _commerce: CommerceNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -314,9 +314,9 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get __experimental_commerce(): __experimental_CommerceNamespace {
+  get commerce(): CommerceNamespace {
     if (!Clerk._commerce) {
-      Clerk._commerce = new __experimental_Commerce();
+      Clerk._commerce = new Commerce();
     }
     return Clerk._commerce;
   }
@@ -544,7 +544,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public __internal_openCheckout = (props?: __experimental_CheckoutProps): void => {
+  public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -564,7 +564,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openPlanDetails = (props?: __experimental_PlanDetailsProps): void => {
+  public __internal_openPlanDetails = (props?: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -995,7 +995,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+  public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -1017,7 +1017,7 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
   };
 
-  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
+  public unmountPricingTable = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

@@ -1,11 +1,11 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PlanDetailsProps,
+  __internal_PlanDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
+  CommercePlanResource,
+  CommerceSubscriptionPlanPeriod,
+  CommerceSubscriptionResource,
 } from '@clerk/types';
 import { useState } from 'react';
 import * as React from 'react';
@@ -27,7 +27,7 @@ import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../..
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
+export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
@@ -42,13 +42,13 @@ const _PlanDetails = ({
   onSubscriptionCancel,
   portalId,
   planPeriod: _planPeriod = 'month',
-}: __experimental_PlanDetailsProps) => {
+}: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>(_planPeriod);
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(_planPeriod);
 
   const { setIsOpen } = useDrawerContext();
   const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan } = usePlansContext();
@@ -305,10 +305,10 @@ const _PlanDetails = ({
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  plan: __experimental_CommercePlanResource;
-  subscription?: __experimental_CommerceSubscriptionResource;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  plan: CommercePlanResource;
+  subscription?: CommerceSubscriptionResource;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -504,7 +504,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           <SegmentedControl.Root
             aria-label='Set pay period'
             value={planPeriod}
-            onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
+            onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button
               value='month'

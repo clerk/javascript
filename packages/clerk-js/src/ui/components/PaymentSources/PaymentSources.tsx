@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
+import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
 
@@ -16,12 +16,12 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
-    await __experimental_commerce.addPaymentSource({
+    await commerce.addPaymentSource({
       gateway: 'stripe',
       paymentToken: context.stripeSetupIntent?.payment_method as string,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
@@ -43,7 +43,7 @@ const RemoveScreen = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: __experimental_CommercePaymentSourceResource;
+  paymentSource: CommercePaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -93,13 +93,13 @@ const RemoveScreen = ({
 };
 
 const PaymentSources = () => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
 
   const { user } = useUser();
   const { data, revalidate } = useFetch(
-    __experimental_commerce?.getPaymentSources,
+    commerce?.getPaymentSources,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
     `commerce-payment-sources-${user?.id}`,
@@ -152,13 +152,11 @@ const PaymentSources = () => {
   );
 };
 
-export const __experimental_PaymentSources = PaymentSources;
-
 const PaymentSourceMenu = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: __experimental_CommercePaymentSourceResource;
+  paymentSource: CommercePaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
@@ -193,3 +191,5 @@ const PaymentSourceMenu = ({
 
   return <ThreeDotsMenu actions={actions} />;
 };
+
+export { PaymentSources };

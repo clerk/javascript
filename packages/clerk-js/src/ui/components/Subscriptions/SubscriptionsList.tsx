@@ -1,4 +1,4 @@
-import type { __experimental_CommerceSubscriptionResource } from '@clerk/types';
+import type { CommerceSubscriptionResource } from '@clerk/types';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -22,7 +22,7 @@ import { CogFilled, Plans } from '../../icons';
 export function SubscriptionsList() {
   const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
 
-  const handleSelectSubscription = (subscription: __experimental_CommerceSubscriptionResource) => {
+  const handleSelectSubscription = (subscription: CommerceSubscriptionResource) => {
     handleSelectPlan({
       mode: 'modal', // always modal for now
       plan: subscription.plan,

@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_PlanDetailsProps,
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -110,9 +110,9 @@ export type ComponentControls = {
   openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
     props: T extends 'checkout'
-      ? __experimental_CheckoutProps
+      ? __internal_CheckoutProps
       : T extends 'planDetails'
-        ? __experimental_PlanDetailsProps
+        ? __internal_PlanDetailsProps
         : never,
   ) => void;
   closeDrawer: (
@@ -155,11 +155,11 @@ interface ComponentsState {
   waitlistModal: null | WaitlistProps;
   checkoutDrawer: {
     open: false;
-    props: null | __experimental_CheckoutProps;
+    props: null | __internal_CheckoutProps;
   };
   planDetailsDrawer: {
     open: false;
-    props: null | __experimental_PlanDetailsProps;
+    props: null | __internal_PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;

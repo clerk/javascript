@@ -1,26 +1,26 @@
 import type {
-  __experimental_CommerceInvoiceJSON,
-  __experimental_CommerceInvoiceResource,
-  __experimental_CommerceInvoiceStatus,
-  __experimental_CommerceInvoiceTotals,
+  CommerceInvoiceJSON,
+  CommerceInvoiceResource,
+  CommerceInvoiceStatus,
+  CommerceInvoiceTotals,
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
 import { BaseResource } from './internal';
 
-export class __experimental_CommerceInvoice extends BaseResource implements __experimental_CommerceInvoiceResource {
+export class CommerceInvoice extends BaseResource implements CommerceInvoiceResource {
   id!: string;
   paymentDueOn!: number;
   paidOn!: number;
-  status!: __experimental_CommerceInvoiceStatus;
-  totals!: __experimental_CommerceInvoiceTotals;
+  status!: CommerceInvoiceStatus;
+  totals!: CommerceInvoiceTotals;
 
-  constructor(data: __experimental_CommerceInvoiceJSON) {
+  constructor(data: CommerceInvoiceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceInvoiceJSON | null): this {
+  protected fromJSON(data: CommerceInvoiceJSON | null): this {
     if (!data) {
       return this;
     }

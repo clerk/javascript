@@ -1,4 +1,4 @@
-import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { CommerceCheckoutResource } from '@clerk/types';
 
 import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
@@ -7,7 +7,7 @@ import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+export const CheckoutComplete = ({ checkout }: { checkout: CommerceCheckoutResource }) => {
   const { setIsOpen } = useDrawerContext();
 
   const handleClose = () => {

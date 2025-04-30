@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommerceCheckoutResource, ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError, CommerceCheckoutResource } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { Appearance as StripeAppearance, SetupIntent, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -16,15 +16,15 @@ import { handleError, normalizeColorString } from '../../utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
-  checkout?: __experimental_CommerceCheckoutResource;
+  checkout?: CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
 };
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { checkout, submitLabel, onSuccess, cancelAction } = props;
-  const { __experimental_commerce } = useClerk();
-  const { __experimental_commerceSettings } = useEnvironment();
+  const { commerce } = useClerk();
+  const { commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
   const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
@@ -58,7 +58,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   // if we have a checkout, we can use the checkout's client secret and gateway id
   // otherwise, we need to initialize a new payment source
   const { data: initializedPaymentSource, invalidate } = useFetch(
-    !checkout ? __experimental_commerce.initializePaymentSource : undefined,
+    !checkout ? commerce.initializePaymentSource : undefined,
     {
       gateway: 'stripe',
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
@@ -70,7 +70,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = checkout?.externalClientSecret ?? initializedPaymentSource?.externalClientSecret;
 
-  const stripePublishableKey = __experimental_commerceSettings.billing.stripePublishableKey;
+  const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
   useEffect(() => {
     if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
@@ -87,7 +87,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         setStripe(stripeInstance);
       });
     }
-  }, [externalGatewayId, __experimental_commerceSettings]);
+  }, [externalGatewayId, commerceSettings]);
 
   // invalidate the initialized payment source when the component unmounts
   useEffect(() => {
