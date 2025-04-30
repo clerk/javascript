@@ -34,6 +34,7 @@ export function MountedCheckoutDrawer({
       onOpenChange={onOpenChange}
       componentName={'Checkout'}
       portalId={checkoutDrawer.props?.portalId}
+      portalRoot={checkoutDrawer.props?.portalRoot}
     >
       {checkoutDrawer.props && (
         <Checkout

@@ -88,6 +88,7 @@ type HandleSelectPlanProps = {
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
+  event?: React.MouseEvent<HTMLElement>;
 };
 
 export const usePlansContext = () => {
@@ -170,8 +171,15 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted' }: HandleSelectPlanProps) => {
+    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
+
+      const portalRoot =
+        mode === 'modal'
+          ? subscriberType === 'user'
+            ? (event?.target as HTMLElement)?.closest(`#${USER_PROFILE_CARD_SCROLLBOX_ID}`)
+            : (event?.target as HTMLElement)?.closest(`#${ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID}`)
+          : undefined;
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
@@ -203,12 +211,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       }
     },

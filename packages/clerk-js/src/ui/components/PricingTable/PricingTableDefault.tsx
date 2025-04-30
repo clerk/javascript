@@ -96,7 +96,7 @@ interface CardProps {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
 }
@@ -195,8 +195,8 @@ function Card(props: CardProps) {
             block
             textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
             {...buttonPropsForPlan({ plan, isCompact })}
-            onClick={() => {
-              onSelect(plan);
+            onClick={event => {
+              onSelect(plan, event);
             }}
           />
         </Box>

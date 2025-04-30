@@ -1581,6 +1581,7 @@ export type __experimental_CheckoutProps = {
   subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: Element | null | undefined;
 };
 
 export type __experimental_PlanDetailsProps = {
