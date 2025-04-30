@@ -712,10 +712,10 @@ export interface Clerk {
   /**
    * Navigates to the next task or redirects to completion URL.
    * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
    * @experimental
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.

@@ -53,7 +53,7 @@ export const createAsyncGetAuth = ({
 /**
  * Previous known as `createGetAuth`. We needed to create a sync and async variant in order to allow for improvements
  * that required dynamic imports (using `require` would not work).
- * It powers the synchronous top-level api `getAuh()`.
+ * It powers the synchronous top-level api `getAuth()`.
  */
 export const createSyncGetAuth = ({
   debugLoggerName,

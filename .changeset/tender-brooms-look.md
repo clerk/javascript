@@ -1,8 +1,10 @@
 ---
-'@clerk/nextjs': patch
+'@clerk/nextjs': minor
 ---
 
-Introduce `treatPendingAsSignedOut` to `auth`, `getAuth` and server-side control components
+Introduce `treatPendingAsSignedOut` option to `getAuth` and `auth` from `clerkMiddleware`
+
+By default, `treatPendingAsSignedOut` is set to `true`, which means pending sessions are treated as signed-out. You can set this option to `false` to treat pending sessions as authenticated.
 
 ```ts
 const { userId } = auth({ treatPendingAsSignedOut: false })
