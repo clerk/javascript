@@ -31,6 +31,7 @@ const typedocPluginMarkdownOptions = {
   useHTMLAnchors: false,
   tableColumnSettings: {
     hideSources: true,
+    hideModifiers: true,
   },
   fileExtension: '.mdx',
   excludeScopesInPaths: true,
