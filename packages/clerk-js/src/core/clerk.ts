@@ -554,6 +554,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
       .then(controls => controls.openDrawer('checkout', props || {}));

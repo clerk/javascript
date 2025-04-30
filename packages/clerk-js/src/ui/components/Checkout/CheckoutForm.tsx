@@ -28,11 +28,11 @@ export const CheckoutForm = ({
   checkout: __experimental_CommerceCheckoutResource;
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
-  const { plan, planPeriod, totals } = checkout;
+  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
 
   const adjustmentAmount = (totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0);
   const showAdjustment = totals.totalDueNow.amount > 0 && adjustmentAmount > 0;
-  const showDowngradeInfo = totals.totalDueNow.amount === 0;
+  const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
     <Drawer.Body>
