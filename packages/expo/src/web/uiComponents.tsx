@@ -1,10 +1,10 @@
 import {
-  PricingTable as BasePricingTable,
   CreateOrganization as BaseCreateOrganization,
   GoogleOneTap as BaseGoogleOneTap,
   OrganizationList as BaseOrganizationList,
   OrganizationProfile as BaseOrganizationProfile,
   OrganizationSwitcher as BaseOrganizationSwitcher,
+  PricingTable as BasePricingTable,
   SignIn as BaseSignIn,
   SignInButton as BaseSignInButton,
   SignInWithMetamaskButton as BaseSignInWithMetamaskButton,
