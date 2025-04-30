@@ -16,8 +16,8 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
+  __experimental_PlanDetailsProps,
   __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailsProps,
   __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -554,6 +554,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
       .then(controls => controls.openDrawer('checkout', props || {}));
@@ -564,24 +573,24 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
+  public __internal_openPlanDetails = (props?: __experimental_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('SubscriptionDetails'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
       return;
     }
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'SubscriptionDetails' })
-      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
+      .ensureMounted({ preloadHint: 'PlanDetails' })
+      .then(controls => controls.openDrawer('planDetails', props || {}));
   };
 
-  public __internal_closeSubscriptionDetails = (): void => {
+  public __internal_closePlanDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {

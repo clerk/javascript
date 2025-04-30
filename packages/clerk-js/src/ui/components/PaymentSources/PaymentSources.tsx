@@ -1,5 +1,6 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
+import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
@@ -15,8 +16,16 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
+  const { __experimental_commerce } = useClerk();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
 
-  const onAddPaymentSourceSuccess = (_: __experimental_CommercePaymentSourceResource) => {
+  const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
+    await __experimental_commerce.addPaymentSource({
+      gateway: 'stripe',
+      paymentToken: context.stripeSetupIntent?.payment_method as string,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     onSuccess();
     close();
     return Promise.resolve();

@@ -48,6 +48,7 @@ interface GroupProps {
    */
   borderTop?: boolean;
   variant?: GroupVariant;
+  expand?: boolean;
 }
 
 function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {
@@ -162,7 +163,6 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'center',
           gap: t.space.$1,
           minWidth: '0',
         })}

@@ -17,7 +17,8 @@ describe('makeAuthObjectSerializable', () => {
     const serializableAuthObject = makeAuthObjectSerializable(authObject);
 
     for (const key in serializableAuthObject) {
-      expect(typeof serializableAuthObject[key as keyof typeof serializableAuthObject]).not.toBe('function');
+      // @ts-expect-error - Testing
+      expect(typeof serializableAuthObject[key]).not.toBe('function');
     }
   });
 });

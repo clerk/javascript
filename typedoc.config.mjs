@@ -105,7 +105,7 @@ const config = {
     disableSources: true,
     ...typedocPluginReplaceTextOptions,
   },
-  entryPoints: ['packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
+  entryPoints: ['packages/backend', 'packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
   ...typedocPluginMarkdownOptions,
 };
 
