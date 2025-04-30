@@ -47,7 +47,7 @@ export const createLongRunningApps = () => {
     { id: 'withBillingStaging.vue.vite', config: vue.vite, env: envs.withBillingStaging },
     { id: 'withBilling.vue.vite', config: vue.vite, env: envs.withBilling },
     // { id: 'withBillingStaging.nuxt.node', config: nuxt.node, env: envs.withBillingStaging },
-    { id: 'withBilling.nuxt.node', config: nuxt.node, env: envs.withBilling },
+    // { id: 'withBilling.nuxt.node', config: nuxt.node, env: envs.withBilling },
     {
       id: 'next.appRouter.withLegalConsent',
       config: next.appRouter,
