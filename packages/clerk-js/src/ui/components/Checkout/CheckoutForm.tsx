@@ -30,7 +30,8 @@ export const CheckoutForm = ({
 }) => {
   const { plan, planPeriod, totals } = checkout;
 
-  const showAdjustment = totals.proration && totals.totalDueNow.amount > 0;
+  const adjustmentAmount = (totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0);
+  const showAdjustment = totals.totalDueNow.amount > 0 && adjustmentAmount > 0;
   const showDowngradeInfo = totals.totalDueNow.amount === 0;
 
   return (
@@ -75,7 +76,7 @@ export const CheckoutForm = ({
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
-                text={`- ${totals.proration?.totalProration.currencySymbol}${((totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0)) / 100}`}
+                text={`- ${totals.proration?.totalProration.currencySymbol}${adjustmentAmount / 100}`}
               />
             </LineItems.Group>
           )}
