@@ -696,4 +696,5 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   status: string;
   subscription?: __experimental_CommerceSubscriptionJSON;
   totals: __experimental_CommerceCheckoutTotalsJSON;
+  is_immediate_plan_change: boolean;
 }
