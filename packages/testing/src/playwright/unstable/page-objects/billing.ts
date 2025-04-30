@@ -1,7 +1,7 @@
 import type { EnhancedPage } from './app';
 import { common } from './common';
 
-export const createCommerceComponentPageObject = (testArgs: { page: EnhancedPage }) => {
+export const createBillingComponentPageObject = (testArgs: { page: EnhancedPage }) => {
   const { page } = testArgs;
 
   const self = {
