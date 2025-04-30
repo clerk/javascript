@@ -1,7 +1,13 @@
 import type { AttributeMappingJSON, SamlAccountConnectionJSON, SamlConnectionJSON } from './JSON';
 
+/**
+ * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
+ */
 export class SamlConnection {
   constructor(
+    /**
+     * The unique identifier for the connection.
+     */
     readonly id: string,
     readonly name: string,
     readonly domain: string,
@@ -11,6 +17,9 @@ export class SamlConnection {
     readonly idpCertificate: string | null,
     readonly idpMetadataUrl: string | null,
     readonly idpMetadata: string | null,
+    /**
+     * The Assertion Consumer Service (ACS) URL of the connection.
+     */
     readonly acsUrl: string,
     readonly spEntityId: string,
     readonly spMetadataUrl: string,
