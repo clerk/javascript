@@ -45,37 +45,32 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   );
 
   return (
-    <>
-      {/*TODO: Used by InvisibleRootBox, can we simplify? */}
-      <div>
-        <Flow.Root
-          flow='pricingTable'
-          sx={{
-            width: '100%',
-          }}
-        >
-          <FreePlanRow />
-          {mode !== 'modal' && (props as any).layout === 'matrix' ? (
-            <PricingTableMatrix
-              plans={plans.filter(plan => !plan.isDefault)}
-              planPeriod={planPeriod}
-              setPlanPeriod={setPlanPeriod}
-              onSelect={selectPlan}
-              highlightedPlan={(props as any).highlightPlan}
-            />
-          ) : (
-            <PricingTableDefault
-              plans={plans.filter(plan => !plan.isDefault)}
-              planPeriod={planPeriod}
-              setPlanPeriod={setPlanPeriod}
-              onSelect={selectPlan}
-              isCompact={isCompact}
-              props={props}
-            />
-          )}
-        </Flow.Root>
-      </div>
-    </>
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
+      <FreePlanRow />
+      {mode !== 'modal' && (props as any).layout === 'matrix' ? (
+        <PricingTableMatrix
+          plans={plans.filter(plan => !plan.isDefault)}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          onSelect={selectPlan}
+          highlightedPlan={(props as any).highlightPlan}
+        />
+      ) : (
+        <PricingTableDefault
+          plans={plans.filter(plan => !plan.isDefault)}
+          planPeriod={planPeriod}
+          setPlanPeriod={setPlanPeriod}
+          onSelect={selectPlan}
+          isCompact={isCompact}
+          props={props}
+        />
+      )}
+    </Flow.Root>
   );
 };
 

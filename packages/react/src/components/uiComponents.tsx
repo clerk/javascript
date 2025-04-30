@@ -593,7 +593,6 @@ export const __experimental_PricingTable = withClerk(
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}
-            hideRootHtmlElement
           />
         )}
       </>
