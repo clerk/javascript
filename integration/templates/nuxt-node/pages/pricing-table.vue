@@ -1,3 +1,3 @@
 <template>
-  <Experimental_PricingTable />
+  <experimental_PricingTable />
 </template>

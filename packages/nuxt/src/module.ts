@@ -162,7 +162,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
-      'Experimental_PricingTable',
+      'experimental_PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

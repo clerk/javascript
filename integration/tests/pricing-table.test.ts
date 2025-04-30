@@ -23,6 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   test('renders pricing table with plans', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/pricing-table');
+    await u.po.page.waitForURL(/pricing-table/);
     await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
   });
 
