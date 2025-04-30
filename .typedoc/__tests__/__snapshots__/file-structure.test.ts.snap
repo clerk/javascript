@@ -139,5 +139,9 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "clerk-react/use-sign-in.mdx",
   "clerk-react/use-sign-up.mdx",
   "clerk-react/use-user.mdx",
+  "backend/verify-token-options.mdx",
+  "backend/verify-token.mdx",
+  "backend/verify-webhook-options.mdx",
+  "backend/verify-webhook.mdx",
 ]
 `;

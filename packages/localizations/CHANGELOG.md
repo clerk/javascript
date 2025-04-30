@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.14.1
+
+### Patch Changes
+
+- - Break out subscriptions and plans into different pages within `UserProfile` and `OrgProfile` ([#5727](https://github.com/clerk/javascript/pull/5727)) by [@aeliox](https://github.com/aeliox)
+
+  - Display free plan row when "active" and plan has features
+  - Tidy up design of subscription rows and badging
+  - Adds `SubscriptionDetails` support for plans without a current subscription
+
+- Switch to "Payment method" terminology instead of "Payment source". ([#5721](https://github.com/clerk/javascript/pull/5721)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Removes `userProfile.__experimental_billingPage.start.headerTitle__paymentSources`
+  - Adds `userProfile.__experimental_billingPage.start.headerTitle__paymentMethods`
+
+- Updated dependencies [[`b02e766`](https://github.com/clerk/javascript/commit/b02e76627e47aec314573586451fa345a089115a), [`5d78b28`](https://github.com/clerk/javascript/commit/5d78b286b63e35fbcf44aac1f7657cbeaba4d659), [`d7f4438`](https://github.com/clerk/javascript/commit/d7f4438fa4bfd04474d5cdb9212ba908568ad6d2), [`5866855`](https://github.com/clerk/javascript/commit/58668550ec91d5511cf775972c54dc485185cc58), [`0007106`](https://github.com/clerk/javascript/commit/00071065998a3676c51e396b4c0afcbf930a9898), [`462b5b2`](https://github.com/clerk/javascript/commit/462b5b271d4e120d58a85818a358b60a6b3c8100), [`447d7a9`](https://github.com/clerk/javascript/commit/447d7a9e133c2a0e7db014bd5837e6ffff08f572), [`2beea29`](https://github.com/clerk/javascript/commit/2beea2957c67bc62446fe24d36332b0a4e850d7d), [`115601d`](https://github.com/clerk/javascript/commit/115601d12fd65dbf3011c0cda368525a2b95bfeb)]:
+  - @clerk/types@4.56.0
+
 ## 3.14.0
 
 ### Minor Changes

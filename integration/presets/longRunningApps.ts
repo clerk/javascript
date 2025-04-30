@@ -43,6 +43,7 @@ export const createLongRunningApps = () => {
       env: envs.withSessionTasks,
     },
     { id: 'next.appRouter.withBillingStaging', config: next.appRouter, env: envs.withBillingStaging },
+    { id: 'next.appRouter.withBilling', config: next.appRouter, env: envs.withBilling },
     {
       id: 'next.appRouter.withLegalConsent',
       config: next.appRouter,

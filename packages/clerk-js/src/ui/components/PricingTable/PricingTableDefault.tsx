@@ -470,6 +470,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
         sx={t => ({
           flex: '1',
           rowGap: isCompact ? t.space.$2 : t.space.$3,
+          margin: 0,
+          padding: 0,
         })}
       >
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
@@ -482,6 +484,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
               display: 'flex',
               alignItems: 'baseline',
               gap: t.space.$2,
+              margin: 0,
+              padding: 0,
             })}
           >
             <Icon
