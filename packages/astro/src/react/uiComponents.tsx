@@ -1,4 +1,5 @@
 import type {
+  __experimental_PricingTableProps,
   GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -185,3 +186,16 @@ export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistPr
     />
   );
 }, 'Waitlist');
+
+export const __experimental_PricingTable = withClerk(
+  ({ clerk, ...props }: WithClerkProp<__experimental_PricingTableProps>) => {
+    return (
+      <Portal
+        mount={clerk?.__experimental_mountPricingTable}
+        unmount={clerk?.__experimental_unmountPricingTable}
+        props={props}
+      />
+    );
+  },
+  'Waitlist',
+);

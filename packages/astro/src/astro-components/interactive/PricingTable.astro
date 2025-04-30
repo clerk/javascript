@@ -1,0 +1,8 @@
+---
+import type { __experimental_PricingTableProps } from "@clerk/types";
+type Props = __experimental_PricingTableProps
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="__experimental_PricingTable" />
