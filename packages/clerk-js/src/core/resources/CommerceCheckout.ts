@@ -26,6 +26,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   status!: string;
   subscription?: __experimental_CommerceSubscription;
   totals!: __experimental_CommerceCheckoutTotals;
+  isImmediatePlanChange!: boolean;
 
   constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();
@@ -50,7 +51,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     this.status = data.status;
     this.subscription = data.subscription ? new __experimental_CommerceSubscription(data.subscription) : undefined;
     this.totals = commerceTotalsFromJSON(data.totals);
-
+    this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;
   }
 
