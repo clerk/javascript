@@ -36,18 +36,16 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
       authReason,
     };
 
-    let authObject;
-
     if (authStatus !== AuthStatus.SignedIn) {
-      authObject = signedOutAuthObject(options);
+      return signedOutAuthObject(options);
     }
 
     const jwt = decodeJwt(authToken as string);
-    // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+    // @ts-expect-error - TODO: Align types
+    const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
 
     if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
-      authObject = signedOutAuthObject(options);
+      return signedOutAuthObject(options);
     }
 
     return authObject;
