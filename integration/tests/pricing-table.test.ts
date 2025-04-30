@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import { createTestUtils, FakeUser, testAgainstRunningApps } from '../testUtils';
+import type { FakeUser } from '../testUtils';
+import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing table @billing', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
@@ -30,6 +31,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
     await u.po.page.getByText('Get started').first().click();
     await u.po.signIn.waitForMounted();
+    await expect(u.po.page.getByText('Checkout')).toBeHidden();
   });
 
   test('when signed in, clicking get started button opens checkout drawer', async ({ page, context }) => {
