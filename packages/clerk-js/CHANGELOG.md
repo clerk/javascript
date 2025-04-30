@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.63.1
+
+### Patch Changes
+
+- Correct the entry point for the clerk.chips.browser.js bundle ([#5758](https://github.com/clerk/javascript/pull/5758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update dependency qrcode.react from 3.1.0 to 4.2.0. This fixes peer dependency warnings with React 19. ([#5760](https://github.com/clerk/javascript/pull/5760)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 5.63.0
 
 ### Minor Changes
