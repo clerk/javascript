@@ -1,11 +1,11 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
-  PricingTableProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
