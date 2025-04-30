@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { __experimental_PricingTable as ExperimentalPricingTable } from '@clerk/nuxt/components';
+import { Experimental_PricingTable } from '@clerk/nuxt/components';
+const { data: user } = await useFetch('/api/me');
 </script>
 
 <template>
-  <ExperimentalPricingTable />
+  <Experimental_PricingTable />
 </template>

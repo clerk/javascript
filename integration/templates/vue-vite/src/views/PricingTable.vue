@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { __experimental_PricingTable as ExperimentalPricingTable, useUser } from '@clerk/vue';
+import { Experimental_PricingTable } from '@clerk/vue';
 </script>
 
 <template>
-  <ExperimentalPricingTable />
+  <Experimental_PricingTable />
 </template>
