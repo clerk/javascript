@@ -3,4 +3,4 @@
 '@clerk/vue': minor
 ---
 
-Introducing <experimental_PricingTable/>
+Introducing `<experimental_PricingTable/>`
