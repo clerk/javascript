@@ -147,6 +147,11 @@ export interface __experimental_CommerceCheckoutTotals {
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
   totalDueNow: __experimental_CommerceMoney;
+  proration?: {
+    days: number;
+    ratePerDay: __experimental_CommerceMoney;
+    totalProration: __experimental_CommerceMoney;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

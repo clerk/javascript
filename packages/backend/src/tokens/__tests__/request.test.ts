@@ -231,6 +231,7 @@ const mockRequest = (headers = {}, requestUrl = 'http://clerk.com/path') => {
 };
 
 /* An otherwise bare state on a request. */
+// @ts-expect-error - Testing
 const mockOptions = (options?) => {
   return {
     secretKey: 'deadbeef',
@@ -249,10 +250,12 @@ const mockOptions = (options?) => {
   } satisfies AuthenticateRequestOptions;
 };
 
+// @ts-expect-error - Testing
 const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
+// @ts-expect-error - Testing
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   const cookieStr = Object.entries(cookies)
     .map(([k, v]) => `${k}=${v}`)

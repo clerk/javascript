@@ -26,7 +26,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
     if (!clerk.isSignedIn) {
-      void clerk.redirectToSignIn();
+      return clerk.redirectToSignIn();
     }
 
     handleSelectPlan({ mode, plan, planPeriod });
