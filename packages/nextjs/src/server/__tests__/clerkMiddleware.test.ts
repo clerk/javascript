@@ -494,6 +494,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('location')).toBeFalsy();
+      expect(resp?.headers.get('WWW-Authenticate')).toBeFalsy();
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -543,8 +544,34 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get('WWW-Authenticate')).toContain('Bearer realm=');
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
+      expect(resp?.headers.get('WWW-Authenticate')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws an unauthorized error with WWW-Authenticate header when protect is called and the oauth token is invalid', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer oauth_token_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({
+          tokenType: TokenType.OAuthToken,
+          id: null,
+        }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: TokenType.ApiKey });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('WWW-Authenticate')).toBeTruthy();
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -645,7 +672,6 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -693,7 +719,6 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-error');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
   });

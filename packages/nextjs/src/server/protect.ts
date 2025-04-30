@@ -92,7 +92,10 @@ export function createProtect(opts: {
    * see {@link notFound} above
    */
   redirect: (url: string) => void;
-  unauthorized: () => never;
+  /**
+   * For m2m requests, throws a 401 response
+   */
+  unauthorized: () => void;
   /**
    * protect() in middleware redirects to signInUrl if signed out
    * protect() in pages throws a notFound error if signed out

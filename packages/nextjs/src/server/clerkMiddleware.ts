@@ -458,14 +458,22 @@ const handleControlFlowErrors = (
 ): Response => {
   if (isNextjsUnauthorizedError(e)) {
     const response = NextResponse.next({ status: 401 });
-    // Following Model Context Protocol (MCP), we return WWW-Authenticate header on 401 responses
-    // to enable OAuth 2.0 authorization server discovery (RFC9728)
-    setHeader(
-      response,
-      'WWW-Authenticate',
-      `Bearer realm="${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}", authorization_server_metadata_url="${process.env.NEXT_PUBLIC_CLERK_FRONTEND_API || ''}/oauth/.well-known/oauth-authorization-server"`,
-    );
-    return setHeader(response, constants.Headers.AuthReason, 'protect-error');
+
+    // RequestState.toAuth() returns a session_token type by default.
+    // We need to cast it to the correct type to check for OAuth tokens.
+    const authObject = (requestState as RequestState<TokenType>).toAuth();
+    if (authObject && authObject.tokenType === TokenType.OAuthToken) {
+      // Following MCP spec, we return WWW-Authenticate header on 401 responses
+      // to enable OAuth 2.0 authorization server discovery (RFC9728).
+      // See https://modelcontextprotocol.io/specification/draft/basic/authorization#2-3-1-authorization-server-location
+      return setHeader(
+        response,
+        'WWW-Authenticate',
+        'Bearer resource_metadata="https://resource.example.com/.well-known/oauth-protected-resource"',
+      );
+    }
+
+    return response;
   }
 
   if (isNextjsNotFoundError(e)) {
