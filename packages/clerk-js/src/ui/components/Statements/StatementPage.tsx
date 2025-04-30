@@ -1,11 +1,9 @@
 import { StatementsContextProvider, useStatementsContext } from '../../contexts';
-import { Badge, Box, Button, Dd, descriptors, Dl, Dt, Heading, Icon, Span, Spinner, Text } from '../../customizables';
+import { Badge, Box, Button, descriptors, Heading, Icon, Span, Spinner, Text } from '../../customizables';
 import { Header, LineItems } from '../../elements';
 import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
-import { common } from '../../styledSystem';
-import { colors } from '../../utils';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 const StatementPageInternal = () => {
@@ -58,9 +56,7 @@ const StatementPageInternal = () => {
           <Box
             elementDescriptor={descriptors.statementCard}
             sx={t => ({
-              borderWidth: t.borderWidths.$normal,
-              borderStyle: t.borderStyles.$solid,
-              borderColor: t.colors.$neutralAlpha100,
+              boxShadow: t.shadows.$tableBodyShadow,
               borderRadius: t.radii.$lg,
               overflow: 'hidden',
             })}
@@ -70,10 +66,7 @@ const StatementPageInternal = () => {
               as='header'
               sx={t => ({
                 padding: t.space.$4,
-                background: common.mergedColorsBackground(
-                  colors.setAlpha(t.colors.$colorBackground, 1),
-                  t.colors.$neutralAlpha50,
-                ),
+                background: t.colors.$neutralAlpha25,
                 borderBlockEndWidth: t.borderWidths.$normal,
                 borderBlockEndStyle: t.borderStyles.$solid,
                 borderBlockEndColor: t.colors.$neutralAlpha100,
@@ -92,7 +85,7 @@ const StatementPageInternal = () => {
                     textVariant='h2'
                     elementDescriptor={descriptors.statementTitle}
                   >
-                    Invoice ID
+                    April 2025
                   </Heading>
                   <Span
                     elementDescriptor={descriptors.statementIdContainer}
@@ -127,58 +120,6 @@ const StatementPageInternal = () => {
                   {statement.status}
                 </Badge>
               </Box>
-              <Dl
-                elementDescriptor={descriptors.statementDetails}
-                sx={t => ({
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBlockStart: t.space.$3,
-                })}
-              >
-                <Box elementDescriptor={descriptors.statementDetailsItem}>
-                  <Dt elementDescriptor={descriptors.statementDetailsItemTitle}>
-                    <Text
-                      elementDescriptor={descriptors.statementDetailsItemTitleText}
-                      colorScheme='secondary'
-                      variant='body'
-                    >
-                      Created on
-                    </Text>
-                  </Dt>
-                  <Dd elementDescriptor={descriptors.statementDetailsItemValue}>
-                    <Text
-                      elementDescriptor={descriptors.statementDetailsItemValueText}
-                      variant='subtitle'
-                    >
-                      {new Date(statement.paymentDueOn).toLocaleDateString()}
-                    </Text>
-                  </Dd>
-                </Box>
-                <Box
-                  elementDescriptor={descriptors.statementDetailsItem}
-                  sx={{
-                    textAlign: 'right',
-                  }}
-                >
-                  <Dt elementDescriptor={descriptors.statementDetailsItemTitle}>
-                    <Text
-                      elementDescriptor={descriptors.statementDetailsItemTitleText}
-                      colorScheme='secondary'
-                      variant='body'
-                    >
-                      Due on
-                    </Text>
-                  </Dt>
-                  <Dd elementDescriptor={descriptors.statementDetailsItemValue}>
-                    <Text
-                      elementDescriptor={descriptors.statementDetailsItemValueText}
-                      variant='subtitle'
-                    >
-                      {new Date(statement.paymentDueOn).toLocaleDateString()}
-                    </Text>
-                  </Dd>
-                </Box>
-              </Dl>
             </Box>
             <Box
               elementDescriptor={descriptors.statementContent}

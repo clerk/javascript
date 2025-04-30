@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useStatementsContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import { Col, descriptors, Flex, Link, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Pagination } from '../../elements';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
@@ -54,13 +54,12 @@ const StatementsListRow = ({ statement }: { statement: __experimental_CommerceIn
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>
-          <Link onClick={handleClick}>{new Date(paymentDueOn).toLocaleDateString()}</Link>
-        </Text>
+        <Text variant='subtitle'>{new Date(paymentDueOn).toLocaleDateString()}</Text>
         <Text
           colorScheme='secondary'
+          variant='caption'
           truncate
-          sx={t => ({ marginTop: t.space.$0x5, textTransform: 'uppercase' })}
+          sx={t => ({ marginTop: t.space.$0x5 })}
         >
           {truncateWithEndVisible(id)}
         </Text>
@@ -125,7 +124,7 @@ const DataTable = (props: DataTableProps) => {
                   elementDescriptor={descriptors.tableHead}
                   key={index}
                   localizationKey={h}
-                  sx={{ width: index === 0 ? 'auto' : '30%' }}
+                  sx={{ width: index === 0 ? 'auto' : '25%' }}
                 />
               ))}
             </Tr>
