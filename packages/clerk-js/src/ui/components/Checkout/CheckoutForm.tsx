@@ -46,14 +46,16 @@ export const CheckoutForm = ({
       >
         <LineItems.Root>
           {/* TODO(@Commerce): needs localization */}
-          <Span
-            localizationKey={'Your features will remain until the end of your current subscription.'}
-            elementDescriptor={descriptors.lineItemsDowngradeNotice}
-            sx={t => ({
-              fontSize: t.fontSizes.$sm,
-              color: t.colors.$colorTextSecondary,
-            })}
-          />
+          {showDowngradeInfo && (
+            <Span
+              localizationKey={'Your features will remain until the end of your current subscription.'}
+              elementDescriptor={descriptors.lineItemsDowngradeNotice}
+              sx={t => ({
+                fontSize: t.fontSizes.$sm,
+                color: t.colors.$colorTextSecondary,
+              })}
+            />
+          )}
 
           <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
