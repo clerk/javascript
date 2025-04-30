@@ -1,5 +1,5 @@
 import { PricingTable } from '@clerk/nextjs';
 
-export default function PricingTable() {
+export default function PricingTablePage() {
   return <PricingTable />;
 }
