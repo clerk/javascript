@@ -15,6 +15,8 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-list-return.mdx',
   'use-organization-list-params.mdx',
   'create-organization-params.mdx',
+  'authenticate-request-options.mdx',
+  'verify-token-options.mdx',
 ];
 
 /**

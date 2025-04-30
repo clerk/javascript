@@ -1,6 +1,9 @@
 import type { ApiClient } from '../api';
 import type { VerifyTokenOptions } from './verify';
 
+/**
+ * @interface
+ */
 export type AuthenticateRequestOptions = {
   /**
    * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
@@ -49,9 +52,6 @@ export type AuthenticateRequestOptions = {
   apiClient?: ApiClient;
 } & VerifyTokenOptions;
 
-/**
- * @expand
- */
 export type OrganizationSyncOptions = {
   /**
    * Specifies URL patterns that are organization-specific, containing an organization ID or slug as a path parameter. If a request matches this path, the organization identifier will be used to set that org as active.

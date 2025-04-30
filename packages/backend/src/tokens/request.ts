@@ -90,6 +90,66 @@ function isRequestEligibleForRefresh(
   );
 }
 
+/**
+ * Authenticates a token passed from the frontend. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
+ *
+ * @param request - `Request` object.
+ * @param options - Optional options to configure the authentication.
+ *
+ * @example
+ * ### Backend SDK on its own
+ *
+ * If you are using the [JavaScript Backend SDK](https://clerk.com/docs/references/backend/overview) on its own, you need to provide the `secretKey` and `publishableKey` to `createClerkClient()` so that it is passed to `authenticateRequest()`. You can set these values as [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#clerk-publishable-and-secret-keys) and then pass them to the function.
+ *
+ * ```tsx
+ * import { createClerkClient } from '@clerk/backend'
+ *
+ * export async function GET(req: Request) {
+ *   const clerkClient = createClerkClient({
+ *     secretKey: process.env.CLERK_SECRET_KEY,
+ *     publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+ *   })
+ *
+ *   const { isSignedIn } = await clerkClient.authenticateRequest(req, {
+ *     authorizedParties: ['https://example.com'],
+ *   })
+ *
+ *   if (!isSignedIn) {
+ *     return Response.json({ status: 401 })
+ *   }
+ *
+ *   // Add logic to perform protected actions
+ *
+ *   return Response.json({ message: 'This is a reply' })
+ * }
+ * ```
+ *
+ * @example
+ * ### With other Clerk SDKs
+ *
+ * `authenticateRequest()` requires `publishableKey` to be set. If you are importing `clerkClient` from a higher-level SDK, such as Next.js, then `clerkClient` infers the `publishableKey` from your [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#clerk-publishable-and-secret-keys). The following example uses Next.js, but the same logic applies for other frameworks.
+ *
+ * ```tsx
+ * import { clerkClient } from '@clerk/nextjs/server'
+ *
+ * const client = await clerkClient()
+ *
+ * export async function GET(req: Request) {
+ *   const { isSignedIn } = await client.authenticateRequest(req, {
+ *     authorizedParties: ['https://example.com'],
+ *   })
+ *
+ *   if (!isSignedIn) {
+ *     return Response.json({ status: 401 })
+ *   }
+ *
+ *   // Perform protected actions
+ *   // Add logic to perform protected actions
+ *
+ *   return Response.json({ message: 'This is a reply' })
+ * }
+ * ```
+ */
 export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,
@@ -713,6 +773,8 @@ type OrganizationSyncTargetMatchers = {
 
 /**
  * Computes regex-based matchers from the given organization sync options.
+ *
+ * @internal
  */
 export function computeOrganizationSyncTargetMatchers(
   options: OrganizationSyncOptions | undefined,
@@ -746,6 +808,8 @@ export function computeOrganizationSyncTargetMatchers(
 /**
  * Determines if the given URL and settings indicate a desire to activate a specific
  * organization or personal account.
+ *
+ * @internal
  *
  * @param url - The URL of the original request.
  * @param options - The organization sync options.
@@ -807,6 +871,8 @@ export function getOrganizationSyncTarget(
 /**
  * Represents an organization or a personal account - e.g. an
  * entity that can be activated by the handshake API.
+ *
+ * @internal
  */
 export type OrganizationSyncTarget =
   | { type: 'personalAccount' }
@@ -815,6 +881,8 @@ export type OrganizationSyncTarget =
 /**
  * Generates the query parameters to activate an organization or personal account
  * via the FAPI handshake api.
+ *
+ * @internal
  */
 function getOrganizationSyncQueryParams(toActivate: OrganizationSyncTarget): Map<string, string> {
   const ret = new Map();
