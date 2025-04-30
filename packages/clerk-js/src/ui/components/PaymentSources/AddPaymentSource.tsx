@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
-import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
-import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
+import { Box, descriptors, Flex, localizationKeys, Spinner, Text, useAppearance } from '../../customizables';
+import { Alert, Form, FormButtons, FormContainer, LineItems, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
 import { animations } from '../../styledSystem';
@@ -131,6 +131,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
 const AddPaymentSourceForm = withCardStateProvider(
   ({ submitLabel, onSuccess, cancelAction, checkout }: AddPaymentSourceProps) => {
+    const clerk = useClerk();
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
@@ -179,7 +180,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     return (
       <FormContainer
         headerTitle={
-          checkout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
+          !checkout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
         }
         headerSubtitle={
           !checkout
@@ -195,6 +196,38 @@ const AddPaymentSourceForm = withCardStateProvider(
             rowGap: t.space.$3,
           })}
         >
+          {clerk.instanceType === 'development' && (
+            <Box
+              sx={t => ({
+                background: t.colors.$neutralAlpha50,
+                paddingInline: t.space.$2,
+                paddingBlock: t.space.$1x5,
+                borderRadius: t.radii.$md,
+                borderWidth: t.borderWidths.$normal,
+                borderStyle: t.borderStyles.$solid,
+                borderColor: t.colors.$neutralAlpha100,
+                display: 'flex',
+                flexDirection: 'column',
+                rowGap: t.space.$2,
+              })}
+            >
+              <Text variant='caption'>Test card information</Text>
+              <LineItems.Root>
+                <LineItems.Group variant='tertiary'>
+                  <LineItems.Title title={'Card number'} />
+                  <LineItems.Description text={'4242 4242 4242 4242'} />
+                </LineItems.Group>
+                <LineItems.Group variant='tertiary'>
+                  <LineItems.Title title={'Expiration date'} />
+                  <LineItems.Description text={'11/44'} />
+                </LineItems.Group>
+                <LineItems.Group variant='tertiary'>
+                  <LineItems.Title title={'CVC, ZIP'} />
+                  <LineItems.Description text={'Any numbers'} />
+                </LineItems.Group>
+              </LineItems.Root>
+            </Box>
+          )}
           <PaymentElement
             options={{
               layout: {

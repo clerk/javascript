@@ -149,6 +149,10 @@ const CheckoutFormElements = ({
     setIsSubmitting(false);
   };
 
+  const defaultPaymentSource = useMemo(() => {
+    return checkout.paymentSource || paymentSources.find(p => p.isDefault);
+  }, [checkout.paymentSource, paymentSources]);
+
   return (
     <Col
       elementDescriptor={descriptors.checkoutFormElementsRoot}
@@ -165,7 +169,9 @@ const CheckoutFormElements = ({
           {typeof submitError === 'string' ? submitError : submitError.message}
         </Alert>
       )}
-      {paymentSources.length > 0 && (
+
+      {/* don't show if there are no payment sources or if there is no total due now */}
+      {paymentSources.length > 0 && checkout.totals.totalDueNow.amount > 0 ? (
         <>
           <Disclosure.Root
             open={openAccountFundsDropDown}
@@ -187,33 +193,63 @@ const CheckoutFormElements = ({
           </Disclosure.Root>
           <Divider />
         </>
+      ) : (
+        <Form
+          onSubmit={onPaymentSourceSubmit}
+          sx={t => ({
+            display: 'flex',
+            flexDirection: 'column',
+            rowGap: t.space.$3,
+          })}
+        >
+          <input
+            name='payment_source_id'
+            type='hidden'
+            value={defaultPaymentSource?.id}
+          />
+          <Button
+            type='submit'
+            colorScheme='primary'
+            size='sm'
+            textVariant={'buttonLarge'}
+            sx={{
+              width: '100%',
+            }}
+            isLoading={isSubmitting}
+          >
+            Subscribe
+          </Button>
+        </Form>
       )}
 
-      <Disclosure.Root
-        open={openAddNewSourceDropDown}
-        onOpenChange={setOpenAddNewSourceDropDown}
-      >
-        <Disclosure.Trigger
-          text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
-        />
-        <Disclosure.Content>
-          <AddPaymentSource
-            checkout={checkout}
-            onSuccess={onAddPaymentSourceSuccess}
-            // @ts-ignore TODO(@COMMERCE): needs localization
-            submitLabel={
-              checkout.totals.totalDueNow.amount > 0
-                ? localizationKeys(
-                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                    {
-                      amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                    },
-                  )
-                : 'Subscribe'
-            }
+      {/* only show add form if there is a total due now or we don't have any payment sources */}
+      {(checkout.totals.totalDueNow.amount > 0 || paymentSources.length === 0) && (
+        <Disclosure.Root
+          open={openAddNewSourceDropDown}
+          onOpenChange={setOpenAddNewSourceDropDown}
+        >
+          <Disclosure.Trigger
+            text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
           />
-        </Disclosure.Content>
-      </Disclosure.Root>
+          <Disclosure.Content>
+            <AddPaymentSource
+              checkout={checkout}
+              onSuccess={onAddPaymentSourceSuccess}
+              // @ts-ignore TODO(@COMMERCE): needs localization
+              submitLabel={
+                checkout.totals.totalDueNow.amount > 0
+                  ? localizationKeys(
+                      'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+                      {
+                        amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                      },
+                    )
+                  : 'Subscribe'
+              }
+            />
+          </Disclosure.Content>
+        </Disclosure.Root>
+      )}
     </Col>
   );
 };
