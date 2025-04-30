@@ -29,7 +29,7 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
-    const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : (inCrossOriginIframe() ? 'None' : 'Lax');
+    const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
     const secure = getSecureAttribute(sameSite);
     const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
 
