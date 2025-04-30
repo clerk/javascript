@@ -1567,27 +1567,76 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
   appearance?: PricingTableTheme;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {...}}} />
+   */
   checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type __internal_CheckoutProps = {
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
   appearance?: CheckoutTheme;
+  /**
+   * The ID of the plan a user or organization is subscribing to.
+   */
   planId?: string;
+  /**
+   * The period of the plan a user or organization is subscribing to.
+   */
   planPeriod?: CommerceSubscriptionPlanPeriod;
+  /**
+   * The type of subscriber the planId is for.
+   */
   subscriberType?: CommerceSubscriberType;
+  /**
+   * A callback function to be executed after a subscription is completed.
+   */
   onSubscriptionComplete?: () => void;
+  /**
+   * The ID of a html element where the drawer will mount to.
+   */
   portalId?: string;
 };
 
 export type __internal_PlanDetailsProps = {
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
   appearance?: PlanDetailTheme;
+  /**
+   * The plan of a user or organization to see details of.
+   */
   plan?: CommercePlanResource;
+  /**
+   * The type of subscriber the planId is for.
+   */
   subscriberType?: CommerceSubscriberType;
+  /**
+   * The period of the plan a user or organization is subscribing to.
+   */
   planPeriod?: CommerceSubscriptionPlanPeriod;
+  /**
+   * A callback function to be executed after a subscription is cancelled.
+   */
   onSubscriptionCancel?: () => void;
+  /**
+   * The ID of a html element where the drawer will mount to.
+   */
   portalId?: string;
 };
 
