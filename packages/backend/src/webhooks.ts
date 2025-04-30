@@ -4,7 +4,13 @@ import { Webhook } from 'svix';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
 
+/**
+ * @inline
+ */
 export type VerifyWebhookOptions = {
+  /**
+   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#webhooks) instead.
+   */
   signingSecret?: string;
 };
 
@@ -17,33 +23,32 @@ const REQUIRED_SVIX_HEADERS = [SVIX_ID_HEADER, SVIX_TIMESTAMP_HEADER, SVIX_SIGNA
 export * from './api/resources/Webhooks';
 
 /**
- * Verifies the authenticity of a webhook request using Svix.
+ * Verifies the authenticity of a webhook request using Svix. Returns a promise that resolves to the verified webhook event data.
  *
- * @param request - The incoming webhook request object
- * @param options - Optional configuration object
- * @param options.signingSecret - Custom signing secret. If not provided, falls back to CLERK_WEBHOOK_SIGNING_SECRET env variable
- * @throws Will throw an error if the webhook signature verification fails
- * @returns A promise that resolves to the verified webhook event data
+ * @param request - The request object.
+ * @param options - Optional configuration object.
  *
  * @example
- * ```typescript
+ * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
+ *
+ * ```ts
  * try {
- *   const evt = await verifyWebhook(request);
+ *   const evt = await verifyWebhook(request)
  *
  *   // Access the event data
- *   const { id } = evt.data;
- *   const eventType = evt.type;
+ *   const { id } = evt.data
+ *   const eventType = evt.type
  *
  *   // Handle specific event types
  *   if (evt.type === 'user.created') {
- *     console.log('New user created:', evt.data.id);
+ *     console.log('New user created:', evt.data.id)
  *     // Handle user creation
  *   }
  *
- *   return new Response('Success', { status: 200 });
+ *   return new Response('Success', { status: 200 })
  * } catch (err) {
- *   console.error('Webhook verification failed:', err);
- *   return new Response('Webhook verification failed', { status: 400 });
+ *   console.error('Webhook verification failed:', err)
+ *   return new Response('Webhook verification failed', { status: 400 })
  * }
  * ```
  */

@@ -151,6 +151,12 @@ const withBillingStaging = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
 
+const withBilling = base
+  .clone()
+  .setId('withBilling')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing').pk);
+
 export const envs = {
   base,
   withKeyless,
@@ -173,4 +179,5 @@ export const envs = {
   withSignInOrUpwithRestrictedModeFlow,
   withSessionTasks,
   withBillingStaging,
+  withBilling,
 } as const;

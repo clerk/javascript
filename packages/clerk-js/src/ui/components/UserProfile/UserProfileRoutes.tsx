@@ -2,10 +2,11 @@ import { lazy, Suspense } from 'react';
 
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
-import { InvoicesContextProvider, useEnvironment, useUserProfileContext } from '../../contexts';
+import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { InvoicePage } from '../Invoices/InvoicePage';
 import { AccountPage } from './AccountPage';
+import { PlansPage } from './PlansPage';
 import { SecurityPage } from './SecurityPage';
 
 const BillingPage = lazy(() =>
@@ -65,12 +66,16 @@ export const UserProfileRoutes = () => {
                     <BillingPage />
                   </Suspense>
                 </Route>
+                <Route path='plans'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <PlansPage />
+                  </Suspense>
+                </Route>
                 <Route path='invoice/:invoiceId'>
                   {/* TODO(@commerce): Should this be lazy loaded ? */}
                   <Suspense fallback={''}>
-                    <InvoicesContextProvider>
-                      <InvoicePage />
-                    </InvoicesContextProvider>
+                    <InvoicePage />
                   </Suspense>
                 </Route>
               </Switch>

@@ -5,10 +5,10 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PlanDetailTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
-  SubscriptionDetailTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -17,9 +17,9 @@ import type {
 import type { ClientResource } from './client';
 import type {
   __experimental_CommerceNamespace,
+  __experimental_CommercePlanResource,
   __experimental_CommerceSubscriberType,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -218,15 +218,15 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * Opens the Clerk PlanDetails drawer component in a drawer.
    * @param props Optional subscription details drawer configuration parameters.
    */
-  __internal_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
+  __internal_openPlanDetails: (props?: __experimental_PlanDetailsProps) => void;
 
   /**
-   * Closes the Clerk SubscriptionDetails drawer.
+   * Closes the Clerk PlanDetails drawer.
    */
-  __internal_closeSubscriptionDetails: () => void;
+  __internal_closePlanDetails: () => void;
 
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
@@ -1566,6 +1566,7 @@ type __experimental_PricingTableDefaultProps = {
 };
 
 type __experimental_PricingTableBaseProps = {
+  forOrganizations?: boolean;
   appearance?: PricingTableTheme;
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
@@ -1582,17 +1583,13 @@ export type __experimental_CheckoutProps = {
   portalId?: string;
 };
 
-export type __experimental_SubscriptionDetailsProps = {
-  appearance?: SubscriptionDetailTheme;
-  subscription?: __experimental_CommerceSubscriptionResource;
+export type __experimental_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: __experimental_CommercePlanResource;
   subscriberType?: __experimental_CommerceSubscriberType;
-  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
-};
-
-export type __experimental_PaymentSourcesProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
 export interface HandleEmailLinkVerificationParams {

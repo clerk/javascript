@@ -1,7 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutProps,
-  __experimental_SubscriptionDetailsProps,
+  __experimental_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
   Clerk,
@@ -26,7 +26,6 @@ import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
-  Checkout,
   CreateOrganizationModal,
   ImpersonationFab,
   KeylessPrompt,
@@ -34,14 +33,13 @@ import {
   preloadComponent,
   SignInModal,
   SignUpModal,
-  SubscriptionDetails,
   UserProfileModal,
   UserVerificationModal,
   WaitlistModal,
 } from './lazyModules/components';
+import { MountedCheckoutDrawer, MountedPlanDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
-  LazyDrawerRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -109,16 +107,16 @@ export type ComponentControls = {
       notify?: boolean;
     },
   ) => void;
-  openDrawer: <T extends 'checkout' | 'subscriptionDetails'>(
+  openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
     props: T extends 'checkout'
       ? __experimental_CheckoutProps
-      : T extends 'subscriptionDetails'
-        ? __experimental_SubscriptionDetailsProps
+      : T extends 'planDetails'
+        ? __experimental_PlanDetailsProps
         : never,
   ) => void;
   closeDrawer: (
-    drawer: 'checkout' | 'subscriptionDetails',
+    drawer: 'checkout' | 'planDetails',
     options?: {
       notify?: boolean;
     },
@@ -159,9 +157,9 @@ interface ComponentsState {
     open: false;
     props: null | __experimental_CheckoutProps;
   };
-  subscriptionDetailsDrawer: {
+  planDetailsDrawer: {
     open: false;
-    props: null | __experimental_SubscriptionDetailsProps;
+    props: null | __experimental_PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
@@ -248,7 +246,7 @@ const Components = (props: ComponentsProps) => {
       open: false,
       props: null,
     },
-    subscriptionDetailsDrawer: {
+    planDetailsDrawer: {
       open: false,
       props: null,
     },
@@ -267,7 +265,7 @@ const Components = (props: ComponentsProps) => {
     waitlistModal,
     blankCaptchaModal,
     checkoutDrawer,
-    subscriptionDetailsDrawer,
+    planDetailsDrawer,
     nodes,
   } = state;
 
@@ -543,45 +541,6 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
-  const mountedCheckoutDrawer = checkoutDrawer.props && (
-    <LazyDrawerRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'checkout' as any}
-      componentAppearance={{}}
-      flowName={'checkout'}
-      open={checkoutDrawer.open}
-      onOpenChange={() => componentsControls.closeDrawer('checkout')}
-      componentName={'Checkout'}
-      portalId={checkoutDrawer.props.portalId}
-    >
-      <Checkout
-        planId={checkoutDrawer.props.planId}
-        planPeriod={checkoutDrawer.props.planPeriod}
-        subscriberType={checkoutDrawer.props.subscriberType}
-        onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
-      />
-    </LazyDrawerRenderer>
-  );
-
-  const mountedSubscriptionDetailDrawer = subscriptionDetailsDrawer.props && (
-    <LazyDrawerRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'subscriptionDetails' as any}
-      componentAppearance={{}}
-      flowName={'subscriptionDetails'}
-      open={subscriptionDetailsDrawer.open}
-      onOpenChange={() => componentsControls.closeDrawer('subscriptionDetails')}
-      componentName={'SubscriptionDetails'}
-      portalId={subscriptionDetailsDrawer.props.portalId}
-    >
-      <SubscriptionDetails
-        {...subscriptionDetailsDrawer.props}
-        subscriberType={subscriptionDetailsDrawer.props.subscriberType || 'user'}
-        onSubscriptionCancel={subscriptionDetailsDrawer.props.onSubscriptionCancel || (() => {})}
-      />
-    </LazyDrawerRenderer>
-  );
-
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -612,8 +571,19 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {mountedCheckoutDrawer}
-        {mountedSubscriptionDetailDrawer}
+
+        <MountedCheckoutDrawer
+          appearance={state.appearance}
+          checkoutDrawer={checkoutDrawer}
+          onOpenChange={() => componentsControls.closeDrawer('checkout')}
+        />
+
+        <MountedPlanDetailDrawer
+          appearance={state.appearance}
+          planDetailsDrawer={planDetailsDrawer}
+          onOpenChange={() => componentsControls.closeDrawer('planDetails')}
+        />
+
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />

@@ -3,13 +3,15 @@ import type {
   __experimental_CommerceCheckoutResource,
   __experimental_CommerceMoney,
   __experimental_CommercePaymentSourceResource,
+  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
 } from '@clerk/types';
+import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
-import { __experimental_PaymentSourcesContext, useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
+import { useCheckoutContext } from '../../contexts';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Span } from '../../customizables';
 import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
@@ -28,6 +30,10 @@ export const CheckoutForm = ({
 }) => {
   const { plan, planPeriod, totals } = checkout;
 
+  const adjustmentAmount = (totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0);
+  const showAdjustment = totals.totalDueNow.amount > 0 && adjustmentAmount > 0;
+  const showDowngradeInfo = totals.totalDueNow.amount === 0;
+
   return (
     <Drawer.Body>
       <Box
@@ -40,14 +46,40 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group>
+          {/* TODO(@Commerce): needs localization */}
+          {showDowngradeInfo && (
+            <Span
+              localizationKey={'Your features will remain until the end of your current subscription.'}
+              elementDescriptor={descriptors.lineItemsDowngradeNotice}
+              sx={t => ({
+                fontSize: t.fontSizes.$sm,
+                color: t.colors.$colorTextSecondary,
+              })}
+            />
+          )}
+
+          <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
-              text={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
+          {showAdjustment && (
+            <LineItems.Group>
+              {/* TODO(@Commerce): needs localization */}
+              <LineItems.Title
+                title={'Adjustment'}
+                description={'Prorated credit for the remainder of your subscription.'}
+              />
+              {/* TODO(@Commerce): needs localization */}
+              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
+              <LineItems.Description
+                text={`- ${totals.proration?.totalProration.currencySymbol}${adjustmentAmount / 100}`}
+              />
+            </LineItems.Group>
+          )}
           <LineItems.Group
             borderTop
             variant='tertiary'
@@ -111,10 +143,10 @@ const CheckoutFormElements = ({
 
   const { data: paymentSources } = data || { data: [] };
 
-  const confirmCheckout = async ({ paymentSourceId }: { paymentSourceId: string }) => {
+  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
-        paymentSourceId,
+        ...params,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
@@ -131,12 +163,19 @@ const CheckoutFormElements = ({
     const data = new FormData(e.currentTarget);
     const paymentSourceId = data.get('payment_source_id') as string;
 
-    await confirmCheckout({ paymentSourceId });
+    await confirmCheckout({
+      paymentSourceId,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
-  const onAddPaymentSourceSuccess = async (paymentSource: __experimental_CommercePaymentSourceResource) => {
-    await confirmCheckout({ paymentSourceId: paymentSource.id });
+  const onAddPaymentSourceSuccess = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
+    await confirmCheckout({
+      gateway: 'stripe',
+      paymentToken: ctx.stripeSetupIntent?.payment_method as string,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     setIsSubmitting(false);
   };
 
@@ -188,23 +227,21 @@ const CheckoutFormElements = ({
           text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
         />
         <Disclosure.Content>
-          <__experimental_PaymentSourcesContext.Provider value={{ componentName: 'PaymentSources', subscriberType }}>
-            <AddPaymentSource
-              checkout={checkout}
-              onSuccess={onAddPaymentSourceSuccess}
-              // @ts-ignore TODO(@COMMERCE): needs localization
-              submitLabel={
-                checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys(
-                      'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                      {
-                        amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                      },
-                    )
-                  : 'Subscribe'
-              }
-            />
-          </__experimental_PaymentSourcesContext.Provider>
+          <AddPaymentSource
+            checkout={checkout}
+            onSuccess={onAddPaymentSourceSuccess}
+            // @ts-ignore TODO(@COMMERCE): needs localization
+            submitLabel={
+              checkout.totals.totalDueNow.amount > 0
+                ? localizationKeys(
+                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
+                    {
+                      amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                    },
+                  )
+                : 'Subscribe'
+            }
+          />
         </Disclosure.Content>
       </Disclosure.Root>
     </Col>

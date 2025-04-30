@@ -98,6 +98,13 @@ function getCatchAllReplacements() {
       pattern: /\*\*Default\*\* `([^`]+)`/g,
       replace: 'Defaults to `$1`.',
     },
+    {
+      /**
+       * By default, `@example` is output with "**Example** `value`". We want to capture the value and place it inside "Example: `value`."
+       */
+      pattern: /\*\*Example\*\* `([^`]+)`/g,
+      replace: 'Example: `$1`.',
+    },
   ];
 }
 

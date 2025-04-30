@@ -645,8 +645,6 @@ export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
   id: string;
   paid_on: number;
   payment_due_on: number;
-  payment_source_id: string;
-  plan_id: string;
   status: __experimental_CommerceInvoiceStatus;
   totals: __experimental_CommerceInvoiceTotalsJSON;
 }
@@ -675,6 +673,11 @@ export interface __experimental_CommerceCheckoutTotalsJSON {
   subtotal: __experimental_CommerceMoneyJSON;
   tax_total: __experimental_CommerceMoneyJSON;
   total_due_now: __experimental_CommerceMoneyJSON;
+  proration?: {
+    days: number;
+    rate_per_day: __experimental_CommerceMoneyJSON;
+    total_proration: __experimental_CommerceMoneyJSON;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

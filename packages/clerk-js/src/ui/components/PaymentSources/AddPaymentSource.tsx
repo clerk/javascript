@@ -1,17 +1,12 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type {
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommercePaymentSourceResource,
-  ClerkAPIError,
-  ClerkRuntimeError,
-} from '@clerk/types';
+import type { __experimental_CommerceCheckoutResource, ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, SetupIntent, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
-import { useEnvironment, usePaymentSourcesContext } from '../../contexts';
+import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Spinner, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
@@ -20,7 +15,7 @@ import { animations } from '../../styledSystem';
 import { handleError, normalizeColorString } from '../../utils';
 
 type AddPaymentSourceProps = {
-  onSuccess: (paymentSource: __experimental_CommercePaymentSourceResource) => Promise<void>;
+  onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
   checkout?: __experimental_CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
@@ -32,7 +27,8 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { __experimental_commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
   const { user } = useUser();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
+  console.log('subscriberType', subscriberType);
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -135,13 +131,12 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
 const AddPaymentSourceForm = withCardStateProvider(
   ({ submitLabel, onSuccess, cancelAction, checkout }: AddPaymentSourceProps) => {
-    const { __experimental_commerce } = useClerk();
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
     const { organization } = useOrganization();
     const { user } = useUser();
-    const { subscriberType } = usePaymentSourcesContext();
+    const subscriberType = useSubscriberTypeContext();
     const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
     // Revalidates the next time the hooks gets mounted
@@ -173,15 +168,9 @@ const AddPaymentSourceForm = withCardStateProvider(
           return; // just return, since stripe will handle the error
         }
 
-        const paymentSource = await __experimental_commerce.addPaymentSource({
-          gateway: 'stripe',
-          paymentToken: setupIntent.payment_method as string,
-          ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-        });
+        await onSuccess({ stripeSetupIntent: setupIntent });
 
         revalidate();
-
-        void onSuccess(paymentSource);
       } catch (error) {
         void handleError(error, [], setSubmitError);
       }

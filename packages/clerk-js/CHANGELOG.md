@@ -1,5 +1,65 @@
 # Change Log
 
+## 5.63.1
+
+### Patch Changes
+
+- Correct the entry point for the clerk.chips.browser.js bundle ([#5758](https://github.com/clerk/javascript/pull/5758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update dependency qrcode.react from 3.1.0 to 4.2.0. This fixes peer dependency warnings with React 19. ([#5760](https://github.com/clerk/javascript/pull/5760)) by [@LekoArts](https://github.com/LekoArts)
+
+## 5.63.0
+
+### Minor Changes
+
+- Introduce `<PricingTable forOrganizations />` to display plans that available only for organizations. ([#5740](https://github.com/clerk/javascript/pull/5740)) by [@panteliselef](https://github.com/panteliselef)
+
+- Setting the Partitioned attribute on \_\_session cookie ([#5514](https://github.com/clerk/javascript/pull/5514)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Checkout confirm request handles both new/existing payment sources ([#5745](https://github.com/clerk/javascript/pull/5745)) by [@octoper](https://github.com/octoper)
+
+- Exclude matrix variant of `<PricingTable />`. ([#5724](https://github.com/clerk/javascript/pull/5724)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix layout shift caused by the invisible captcha mechanism ([#5753](https://github.com/clerk/javascript/pull/5753)) by [@anagstef](https://github.com/anagstef)
+
+- For each plan inside the `<PricingTable/>` display "Switch to this plan" instead of "Get started" when a subscription already exists. ([#5722](https://github.com/clerk/javascript/pull/5722)) by [@panteliselef](https://github.com/panteliselef)
+
+- Renames all instances of `SubscriptionDetails` to `PlanDetails` to better reflect the capabilities, use cases, and params of the component. ([#5749](https://github.com/clerk/javascript/pull/5749)) by [@aeliox](https://github.com/aeliox)
+
+- Split `CommerceTotals` to `CommerceCheckoutTotals` and `CommerceInvoiceTotals`. ([#5726](https://github.com/clerk/javascript/pull/5726)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Break out subscriptions and plans into different pages within `UserProfile` and `OrgProfile` ([#5727](https://github.com/clerk/javascript/pull/5727)) by [@aeliox](https://github.com/aeliox)
+
+  - Display free plan row when "active" and plan has features
+  - Tidy up design of subscription rows and badging
+  - Adds `SubscriptionDetails` support for plans without a current subscription
+
+- Bug fix: Checkout drawer not opening after user selected another account from UserButton. ([#5743](https://github.com/clerk/javascript/pull/5743)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix list spacing within PricingTable and PlanDetails components. ([#5755](https://github.com/clerk/javascript/pull/5755)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Replace `"commerce"` with `"billing"` in error message when components cannot render because the feature is disabled. ([#5741](https://github.com/clerk/javascript/pull/5741)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove stale properties from `__experimental_CommerceInvoiceResource` ([#5738](https://github.com/clerk/javascript/pull/5738)) by [@panteliselef](https://github.com/panteliselef)
+
+- Switch to "Payment method" terminology instead of "Payment source". ([#5721](https://github.com/clerk/javascript/pull/5721)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Removes `userProfile.__experimental_billingPage.start.headerTitle__paymentSources`
+  - Adds `userProfile.__experimental_billingPage.start.headerTitle__paymentMethods`
+
+- Retry confrim checkout requests if any erros with >=500 status code occur ([#5742](https://github.com/clerk/javascript/pull/5742)) by [@octoper](https://github.com/octoper)
+
+- Add the CAPTCHA element on the SignIn component ([#5739](https://github.com/clerk/javascript/pull/5739)) by [@anagstef](https://github.com/anagstef)
+
+- Update the text in Checkout buttons from "Pay $0" to "Subscribe". ([#5720](https://github.com/clerk/javascript/pull/5720)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b02e766`](https://github.com/clerk/javascript/commit/b02e76627e47aec314573586451fa345a089115a), [`5d78b28`](https://github.com/clerk/javascript/commit/5d78b286b63e35fbcf44aac1f7657cbeaba4d659), [`d7f4438`](https://github.com/clerk/javascript/commit/d7f4438fa4bfd04474d5cdb9212ba908568ad6d2), [`5866855`](https://github.com/clerk/javascript/commit/58668550ec91d5511cf775972c54dc485185cc58), [`0007106`](https://github.com/clerk/javascript/commit/00071065998a3676c51e396b4c0afcbf930a9898), [`462b5b2`](https://github.com/clerk/javascript/commit/462b5b271d4e120d58a85818a358b60a6b3c8100), [`447d7a9`](https://github.com/clerk/javascript/commit/447d7a9e133c2a0e7db014bd5837e6ffff08f572), [`2beea29`](https://github.com/clerk/javascript/commit/2beea2957c67bc62446fe24d36332b0a4e850d7d), [`115601d`](https://github.com/clerk/javascript/commit/115601d12fd65dbf3011c0cda368525a2b95bfeb)]:
+  - @clerk/types@4.56.0
+  - @clerk/localizations@3.14.1
+  - @clerk/shared@3.7.5
+
 ## 5.62.2
 
 ### Patch Changes

@@ -77,12 +77,14 @@ export type __experimental_CommercePaymentSourceStatus = 'active' | 'expired' | 
 
 export type __experimental_GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
+export type __experimental_PaymentGateway = 'stripe' | 'paypal';
+
 export type __experimental_InitializePaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
 }>;
 
 export type __experimental_AddPaymentSourceParams = WithOptionalOrgType<{
-  gateway: 'stripe' | 'paypal';
+  gateway: __experimental_PaymentGateway;
   paymentToken: string;
 }>;
 
@@ -112,8 +114,6 @@ export type __experimental_CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due
 
 export interface __experimental_CommerceInvoiceResource extends ClerkResource {
   id: string;
-  planId: string;
-  paymentSourceId: string;
   totals: __experimental_CommerceInvoiceTotals;
   paymentDueOn: number;
   paidOn: number;
@@ -147,6 +147,11 @@ export interface __experimental_CommerceCheckoutTotals {
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
   totalDueNow: __experimental_CommerceMoney;
+  proration?: {
+    days: number;
+    ratePerDay: __experimental_CommerceMoney;
+    totalProration: __experimental_CommerceMoney;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -158,10 +163,15 @@ export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
 }>;
 
-export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<{
-  paymentSourceId?: string;
-}>;
-
+export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<
+  | {
+      paymentSourceId?: string;
+    }
+  | {
+      paymentToken?: string;
+      gateway?: __experimental_PaymentGateway;
+    }
+>;
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;

@@ -1,9 +1,10 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommercePaymentSourceResource, __experimental_PaymentSourcesProps } from '@clerk/types';
+import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
+import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { usePaymentSourcesContext } from '../../contexts';
+import { useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -15,8 +16,16 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
+  const { __experimental_commerce } = useClerk();
+  const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
 
-  const onAddPaymentSourceSuccess = (_: __experimental_CommercePaymentSourceResource) => {
+  const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
+    await __experimental_commerce.addPaymentSource({
+      gateway: 'stripe',
+      paymentToken: context.stripeSetupIntent?.payment_method as string,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    });
     onSuccess();
     close();
     return Promise.resolve();
@@ -39,7 +48,7 @@ const RemoveScreen = ({
 }) => {
   const { close } = useActionContext();
   const card = useCardState();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const ref = useRef(
     `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
@@ -83,10 +92,10 @@ const RemoveScreen = ({
   );
 };
 
-const PaymentSources = (_: __experimental_PaymentSourcesProps) => {
+const PaymentSources = () => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
 
   const { user } = useUser();
   const { data, revalidate } = useFetch(
@@ -155,7 +164,7 @@ const PaymentSourceMenu = ({
   const { open } = useActionContext();
   const card = useCardState();
   const { organization } = useOrganization();
-  const { subscriberType } = usePaymentSourcesContext();
+  const subscriberType = useSubscriberTypeContext();
 
   const actions = [
     {

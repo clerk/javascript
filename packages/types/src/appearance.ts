@@ -163,6 +163,7 @@ export type ElementsConfig = {
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
   lineItemsCopyButton: WithOptions;
+  lineItemsDowngradeNotice: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -411,26 +412,28 @@ export type ElementsConfig = {
   pricingTableMatrixFeePeriodNoticeLabel: WithOptions;
   pricingTableMatrixFooter: WithOptions;
 
-  subscriptionDetailHeader: WithOptions;
-  subscriptionDetailAvatarBadgeContainer: WithOptions;
-  subscriptionDetailAvatar: WithOptions;
-  subscriptionDetailBadgeContainer: WithOptions;
-  subscriptionDetailBadge: WithOptions;
-  subscriptionDetailTitle: WithOptions;
-  subscriptionDetailDescription: WithOptions;
-  subscriptionDetailAction: WithOptions;
-  subscriptionDetailFeeContainer: WithOptions;
-  subscriptionDetailFee: WithOptions;
-  subscriptionDetailFeePeriod: WithOptions;
-  subscriptionDetailFeePeriodNotice: WithOptions;
-  subscriptionDetailFeePeriodNoticeInner: WithOptions;
-  subscriptionDetailFeePeriodNoticeLabel: WithOptions;
-  subscriptionDetailFeatures: WithOptions;
-  subscriptionDetailFeaturesList: WithOptions<string>;
-  subscriptionDetailFeaturesListItem: WithOptions<string>;
-  subscriptionDetailFeaturesListItemContent: WithOptions;
-  subscriptionDetailFeaturesListItemTitle: WithOptions;
-  subscriptionDetailFeaturesListItemDescription: WithOptions;
+  planDetailHeader: WithOptions;
+  planDetailAvatarBadgeContainer: WithOptions;
+  planDetailAvatar: WithOptions;
+  planDetailBadgeContainer: WithOptions;
+  planDetailBadge: WithOptions;
+  planDetailTitle: WithOptions;
+  planDetailDescription: WithOptions;
+  planDetailAction: WithOptions;
+  planDetailFeeContainer: WithOptions;
+  planDetailFee: WithOptions;
+  planDetailFeePeriod: WithOptions;
+  planDetailFeePeriodNotice: WithOptions;
+  planDetailFeePeriodNoticeInner: WithOptions;
+  planDetailFeePeriodNoticeLabel: WithOptions;
+  planDetailCaption: WithOptions;
+  planDetailFeatures: WithOptions;
+  planDetailFeaturesList: WithOptions<string>;
+  planDetailFeaturesListItem: WithOptions<string>;
+  planDetailFeaturesListItemContent: WithOptions;
+  planDetailFeaturesListItemTitle: WithOptions;
+  planDetailFeaturesListItemDescription: WithOptions;
+  planDetailPeriodToggle: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
@@ -806,7 +809,7 @@ export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
-export type SubscriptionDetailTheme = Theme;
+export type PlanDetailTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**
