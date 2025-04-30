@@ -120,6 +120,7 @@
     "organization",
     "jwtPayloadParser",
     "eventBus",
+    "netlifyCacheHandler",
     "clerkEventBus"
   ],
   "scripts": {

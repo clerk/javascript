@@ -5,6 +5,7 @@ import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResp
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
+import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
@@ -2622,6 +2623,7 @@ export class Clerk implements ClerkInterface {
   #clearClerkQueryParams = () => {
     try {
       removeClerkQueryParam(CLERK_SYNCED);
+      removeClerkQueryParam(CLERK_NETLIFY_CACHE_BUST_PARAM);
       // @nikos: we're looking into dropping this param completely
       // in the meantime, we're removing it here to keep the URL clean
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
