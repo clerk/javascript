@@ -52,7 +52,8 @@ export const getAuthDataFromRequestSync = (
     authReason,
   };
 
-  // Only accept session tokens in sync version
+  // Only accept session tokens in the synchronous version.
+  // Machine tokens are not supported in this function. Any machine token input will result in a signed-out state.
   if (!isTokenTypeAccepted(TokenType.SessionToken, opts.acceptsToken || TokenType.SessionToken)) {
     return signedOutAuthObject(options);
   }
