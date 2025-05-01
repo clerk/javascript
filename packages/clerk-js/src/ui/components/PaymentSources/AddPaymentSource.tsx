@@ -21,6 +21,7 @@ type AddPaymentSourceProps = {
   cancelAction?: () => void;
   submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
+  resetStripeElements?: () => void;
 };
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
@@ -30,7 +31,6 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const { organization } = useOrganization();
   const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  console.log('subscriberType', subscriberType);
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -57,10 +57,12 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     },
   };
 
-  // if we have a checkout, we can use the checkout's client secret and gateway id
-  // otherwise, we need to initialize a new payment source
-  const { data: initializedPaymentSource, invalidate } = useFetch(
-    !checkout ? __experimental_commerce.initializePaymentSource : undefined,
+  const {
+    data: initializedPaymentSource,
+    invalidate,
+    revalidate: revalidateInitializedPaymentSource,
+  } = useFetch(
+    __experimental_commerce.initializePaymentSource,
     {
       gateway: 'stripe',
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
@@ -69,8 +71,8 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     `commerce-payment-source-initialize-${user?.id}`,
   );
 
-  const externalGatewayId = checkout?.externalGatewayId ?? initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = checkout?.externalClientSecret ?? initializedPaymentSource?.externalClientSecret;
+  const externalGatewayId = initializedPaymentSource?.externalGatewayId;
+  const externalClientSecret = initializedPaymentSource?.externalClientSecret;
 
   const stripePublishableKey = __experimental_commerceSettings.billing.stripePublishableKey;
 
@@ -89,12 +91,18 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         setStripe(stripeInstance);
       });
     }
-  }, [externalGatewayId, __experimental_commerceSettings]);
+  }, [externalGatewayId, externalClientSecret, stripePublishableKey, __experimental_commerceSettings]);
 
   // invalidate the initialized payment source when the component unmounts
   useEffect(() => {
     return invalidate;
   }, [invalidate]);
+
+  const resetStripeElements = () => {
+    setStripe(null);
+    stripePromiseRef.current = null;
+    revalidateInitializedPaymentSource?.();
+  };
 
   if (!stripe || !externalClientSecret) {
     return (
@@ -128,13 +136,22 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         checkout={checkout}
         submitError={submitError}
         setSubmitError={setSubmitError}
+        resetStripeElements={resetStripeElements}
       />
     </Elements>
   );
 };
 
 const AddPaymentSourceForm = withCardStateProvider(
-  ({ submitLabel, onSuccess, cancelAction, checkout, submitError, setSubmitError }: AddPaymentSourceProps) => {
+  ({
+    submitLabel,
+    onSuccess,
+    cancelAction,
+    checkout,
+    submitError,
+    setSubmitError,
+    resetStripeElements,
+  }: AddPaymentSourceProps) => {
     const clerk = useClerk();
     const stripe = useStripe();
     const elements = useElements();
@@ -174,7 +191,9 @@ const AddPaymentSourceForm = withCardStateProvider(
 
         await onSuccess({ stripeSetupIntent: setupIntent });
 
+        // if onSuccess doesn't redirect us, revalidate the payment sources and reset the stripe elements in case we need to input a different payment source
         revalidate();
+        resetStripeElements?.();
       } catch (error) {
         void handleError(error, [], setSubmitError);
       }
@@ -223,11 +242,11 @@ const AddPaymentSourceForm = withCardStateProvider(
                 })}
               />
               <Box
-                sx={t => ({
+                sx={{
                   display: 'flex',
                   alignItems: 'baseline',
                   justifyContent: 'space-between',
-                })}
+                }}
               >
                 <Text
                   variant='caption'
