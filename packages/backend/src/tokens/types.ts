@@ -1,6 +1,6 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 
-import type { ApiClient } from '../api';
+import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import type { TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
@@ -124,6 +124,8 @@ export type OrganizationSyncOptions = {
  * ```
  */
 type Pattern = string;
+
+export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
 
 export type OrganizationSyncTargetMatchers = {
   OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;

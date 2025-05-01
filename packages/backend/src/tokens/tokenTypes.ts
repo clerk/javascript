@@ -1,5 +1,3 @@
-import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
-
 export const TokenType = {
   SessionToken: 'session_token',
   ApiKey: 'api_key',
@@ -11,4 +9,3 @@ export type TokenType = (typeof TokenType)[keyof typeof TokenType];
 
 export type SessionTokenType = typeof TokenType.SessionToken;
 export type MachineTokenType = Exclude<TokenType, SessionTokenType>;
-export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
