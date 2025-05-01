@@ -1,11 +1,11 @@
-import { createClientUatCookie } from '../clientUat';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+
 import { inCrossOriginIframe } from '../../../../utils';
 import { getCookieDomain } from '../../getCookieDomain';
 import { getSecureAttribute } from '../../getSecureAttribute';
+import { createClientUatCookie } from '../clientUat';
 
-// Mock dependencies
 jest.mock('@clerk/shared/cookie');
 jest.mock('@clerk/shared/date');
 jest.mock('../../../../utils');

@@ -1,10 +1,10 @@
-import { createSessionCookie } from '../session';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+
 import { inCrossOriginIframe } from '../../../../utils';
 import { getSecureAttribute } from '../../getSecureAttribute';
+import { createSessionCookie } from '../session';
 
-// Mock dependencies
 jest.mock('@clerk/shared/cookie');
 jest.mock('@clerk/shared/date');
 jest.mock('../../../../utils');
