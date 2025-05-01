@@ -174,7 +174,7 @@ export const usePlansContext = () => {
     ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
 
-      const portalRoot = getClosestProfileScrollBox(mode, subscriberType, event);
+      const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({

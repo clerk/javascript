@@ -114,7 +114,7 @@ function Card(props: CardProps) {
   const { buttonPropsForPlan } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
-    const portalRoot = getClosestProfileScrollBox(mode, subscriberType, event);
+    const portalRoot = getClosestProfileScrollBox(mode, event);
 
     clerk.__internal_openPlanDetails({
       plan,
