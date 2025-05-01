@@ -1,11 +1,10 @@
 import { useClerk } from '@clerk/shared/react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Button, Col, Flex, Icon, localizationKeys, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Plans } from '../../icons';
 import { InternalThemeProvider } from '../../styledSystem';
-
+import { getClosestProfileScrollBox } from '../../utils';
 export const FreePlanRow = () => {
   const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
@@ -13,20 +12,17 @@ export const FreePlanRow = () => {
 
   const { isLoading, defaultFreePlan, isDefaultPlanImplicitlyActive } = usePlansContext();
 
-  const handleSelect = () => {
+  const handleSelect = (event?: React.MouseEvent<HTMLElement>) => {
     if (!defaultFreePlan) {
       return;
     }
 
+    const portalRoot = getClosestProfileScrollBox(mode, subscriberType, event);
+
     clerk.__internal_openPlanDetails({
       plan: defaultFreePlan,
       subscriberType: subscriberType,
-      portalId:
-        mode === 'modal'
-          ? subscriberType === 'user'
-            ? USER_PROFILE_CARD_SCROLLBOX_ID
-            : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-          : undefined,
+      portalRoot,
     });
   };
 
@@ -93,7 +89,7 @@ export const FreePlanRow = () => {
               })}
             >
               <Button
-                onClick={() => handleSelect()}
+                onClick={event => handleSelect(event)}
                 variant='bordered'
                 colorScheme='secondary'
                 localizationKey={localizationKeys('__experimental_commerce.viewFeatures')}

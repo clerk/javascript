@@ -8,11 +8,11 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import type { __experimental_PlansCtx } from '../../types';
+import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
@@ -174,12 +174,7 @@ export const usePlansContext = () => {
     ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
 
-      const portalRoot =
-        mode === 'modal'
-          ? subscriberType === 'user'
-            ? (event?.target as HTMLElement)?.closest(`#${USER_PROFILE_CARD_SCROLLBOX_ID}`)
-            : (event?.target as HTMLElement)?.closest(`#${ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID}`)
-          : undefined;
+      const portalRoot = getClosestProfileScrollBox(mode, subscriberType, event);
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
@@ -189,12 +184,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       } else {
         // if the plan doesn't support annual, use monthly

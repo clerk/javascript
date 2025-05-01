@@ -142,7 +142,7 @@ type LazyDrawerRendererProps = React.PropsWithChildren<
     open: DrawerProps['open'];
     onOpenChange: DrawerProps['onOpenChange'];
     portalId?: string;
-    portalRoot?: HTMLElement;
+    portalRoot?: HTMLElement | null | undefined;
   } & AppearanceProviderProps
 >;
 
