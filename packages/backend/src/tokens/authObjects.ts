@@ -11,8 +11,9 @@ import type {
 import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-import type { MachineAuthType, MachineTokenType, SessionTokenType } from './tokenTypes';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
+import type { MachineAuthType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;

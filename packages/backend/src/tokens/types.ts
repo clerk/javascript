@@ -1,4 +1,3 @@
-
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 import type { TokenType } from './tokenTypes';

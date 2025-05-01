@@ -15,8 +15,9 @@ import {
   signedOutAuthObject,
   unauthenticatedMachineObject,
 } from './authObjects';
-import type { MachineAuthType, MachineTokenType, SessionTokenType } from './tokenTypes';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
+import type { MachineAuthType } from './types';
 
 export const AuthStatus = {
   SignedIn: 'signed-in',
