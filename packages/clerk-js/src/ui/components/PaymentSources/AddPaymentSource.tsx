@@ -19,10 +19,12 @@ type AddPaymentSourceProps = {
   checkout?: __experimental_CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
+  submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
+  setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
 };
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
-  const { checkout, submitLabel, onSuccess, cancelAction } = props;
+  const { checkout, submitLabel, onSuccess, cancelAction, submitError, setSubmitError } = props;
   const { __experimental_commerce } = useClerk();
   const { __experimental_commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
@@ -124,13 +126,15 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         onSuccess={onSuccess}
         cancelAction={cancelAction}
         checkout={checkout}
+        submitError={submitError}
+        setSubmitError={setSubmitError}
       />
     </Elements>
   );
 };
 
 const AddPaymentSourceForm = withCardStateProvider(
-  ({ submitLabel, onSuccess, cancelAction, checkout }: AddPaymentSourceProps) => {
+  ({ submitLabel, onSuccess, cancelAction, checkout, submitError, setSubmitError }: AddPaymentSourceProps) => {
     const clerk = useClerk();
     const stripe = useStripe();
     const elements = useElements();
@@ -138,7 +142,6 @@ const AddPaymentSourceForm = withCardStateProvider(
     const { organization } = useOrganization();
     const { user } = useUser();
     const subscriberType = useSubscriberTypeContext();
-    const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
     // Revalidates the next time the hooks gets mounted
     const { revalidate } = useFetch(
@@ -155,7 +158,7 @@ const AddPaymentSourceForm = withCardStateProvider(
       if (!stripe || !elements) {
         return;
       }
-      setSubmitError(undefined);
+      setSubmitError?.(undefined);
 
       try {
         const { setupIntent, error } = await stripe.confirmSetup({
@@ -211,7 +214,12 @@ const AddPaymentSourceForm = withCardStateProvider(
                 rowGap: t.space.$2,
               })}
             >
-              <Text variant='caption'>Test card information</Text>
+              <Text
+                variant='caption'
+                colorScheme='body'
+              >
+                Test card information
+              </Text>
               <LineItems.Root>
                 <LineItems.Group variant='tertiary'>
                   <LineItems.Title title={'Card number'} />

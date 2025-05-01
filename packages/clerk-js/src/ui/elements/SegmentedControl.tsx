@@ -8,9 +8,12 @@ import { descriptors, Flex, SimpleButton } from '../customizables';
  * SegmentedControl Context
  * -----------------------------------------------------------------------------------------------*/
 
+type SegmentedControlVariant = 'default' | 'large';
+
 type SegmentedControlContextType = {
   currentValue: string | undefined;
   onValueChange: (value: string) => void;
+  variant: SegmentedControlVariant;
 };
 
 const SegmentedControlContext = createContext<SegmentedControlContextType | null>(null);
@@ -34,6 +37,7 @@ interface RootProps {
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
+  variant?: SegmentedControlVariant;
 }
 
 const Root = React.forwardRef<HTMLDivElement, RootProps>(
@@ -45,6 +49,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
       onChange,
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledby,
+      variant = 'default',
     },
     ref,
   ) => {
@@ -60,7 +65,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
     };
 
     return (
-      <SegmentedControlContext.Provider value={{ currentValue, onValueChange: handleValueChange }}>
+      <SegmentedControlContext.Provider value={{ currentValue, onValueChange: handleValueChange, variant }}>
         <Composite
           orientation='horizontal'
           role='radiogroup'
@@ -101,7 +106,7 @@ interface ButtonProps {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
-  const { currentValue, onValueChange } = useSegmentedControlContext();
+  const { currentValue, onValueChange, variant } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
   return (
@@ -120,10 +125,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }
             isActive={isSelected}
             sx={t => ({
               position: 'relative',
-              padding: `${t.space.$1} ${t.space.$2x5}`,
+              width: variant === 'large' ? '100%' : 'auto',
               backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
               color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
-              fontSize: t.fontSizes.$xs,
+              fontSize: variant === 'large' ? t.fontSizes.$md : t.fontSizes.$xs,
               minHeight: t.sizes.$6,
               boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
               borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
