@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 
-import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
+import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
