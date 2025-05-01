@@ -229,7 +229,6 @@ describe('authenticatedMachineObject', () => {
     it('properly initializes properties', () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
       expect(authObject.tokenType).toBe('oauth_token');
-      expect(authObject.name).toBe('GitHub OAuth');
       expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
     });

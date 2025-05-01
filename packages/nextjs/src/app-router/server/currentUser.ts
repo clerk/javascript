@@ -1,4 +1,3 @@
-// @ts-nocheck This will be fixed in #5710
 import type { User } from '@clerk/backend';
 
 import { clerkClient } from '../../server/clerkClient';

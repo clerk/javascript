@@ -74,8 +74,14 @@ export type SignedOutAuthObject = {
  * @template TAuthenticated - Whether the machine object is authenticated or not
  */
 type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
-  api_key: { claims: TAuthenticated extends true ? Claims | null : null };
-  machine_token: { claims: TAuthenticated extends true ? Claims | null : null };
+  api_key: {
+    name: TAuthenticated extends true ? string : null;
+    claims: TAuthenticated extends true ? Claims | null : null;
+  };
+  machine_token: {
+    name: TAuthenticated extends true ? string : null;
+    claims: TAuthenticated extends true ? Claims | null : null;
+  };
   oauth_token: object;
 };
 
@@ -84,7 +90,6 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
  */
 export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
   id: string;
-  name: string;
   subject: string;
   scopes: string[];
   getToken: () => Promise<string>;
@@ -98,7 +103,6 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
  */
 export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
   id: null;
-  name: null;
   subject: null;
   scopes: null;
   getToken: () => Promise<null>;
@@ -197,7 +201,6 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
 ): AuthenticatedMachineObject<T> {
   const baseObject = {
     id: verificationResult.id,
-    name: verificationResult.name,
     subject: verificationResult.subject,
     getToken: () => Promise.resolve(token),
     has: () => false,
@@ -214,6 +217,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
+        name: result.name,
         claims: result.claims,
         scopes: result.scopes,
       };
@@ -223,6 +227,7 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
+        name: result.name,
         claims: result.claims,
         scopes: result.scopes,
       };
@@ -248,7 +253,6 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
 ): UnauthenticatedMachineObject<T> {
   const baseObject = {
     id: null,
-    name: null,
     subject: null,
     scopes: null,
     has: () => false,
@@ -261,6 +265,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
+        name: null,
         claims: null,
       };
     }
@@ -268,6 +273,7 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
       return {
         ...baseObject,
         tokenType,
+        name: null,
         claims: null,
       };
     }
