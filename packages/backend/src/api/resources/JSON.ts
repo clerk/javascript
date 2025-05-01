@@ -680,7 +680,7 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   name: string;
   subject: string;
   scopes: string[];
-  claims: Record<string, string> | null;
+  claims: Record<string, any> | null;
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;
@@ -697,14 +697,13 @@ export interface APIKeyJSON extends ClerkResourceJSON {
   name: string;
   subject: string;
   scopes: string[];
-  claims: Record<string, string> | null;
+  claims: Record<string, any> | null;
   revoked: boolean;
   revocation_reason: string | null;
   expired: boolean;
   expiration: number | null;
   created_by: string | null;
   creation_reason: string | null;
-  seconds_until_expiration: number | null;
   created_at: number;
   updated_at: number;
 }
@@ -713,7 +712,6 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   object: typeof ObjectType.IdpOAuthAccessToken;
   client_id: string;
   type: string;
-  name: string;
   subject: string;
   scopes: string[];
   revoked: boolean;
