@@ -6,7 +6,6 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -28,8 +27,7 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors } from '../../utils';
-
+import { colors, getClosestProfileScrollBox } from '../../utils';
 interface PricingTableDefaultProps {
   plans?: __experimental_CommercePlanResource[] | null;
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
@@ -96,7 +94,7 @@ interface CardProps {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
 }
@@ -115,17 +113,14 @@ function Card(props: CardProps) {
 
   const { buttonPropsForPlan } = usePlansContext();
 
-  const showPlanDetails = () => {
+  const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
+    const portalRoot = getClosestProfileScrollBox(mode, event);
+
     clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
       planPeriod,
-      portalId:
-        mode === 'modal'
-          ? subscriberType === 'user'
-            ? USER_PROFILE_CARD_SCROLLBOX_ID
-            : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-          : undefined,
+      portalRoot,
     });
   };
 
@@ -196,8 +191,8 @@ function Card(props: CardProps) {
               block
               textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
               {...buttonPropsForPlan({ plan, isCompact })}
-              onClick={() => {
-                onSelect(plan);
+              onClick={event => {
+                onSelect(plan, event);
               }}
             />
           </Box>
@@ -434,7 +429,7 @@ interface CardFeaturesListProps {
    * @default false
    */
   isCompact?: boolean;
-  showPlanDetails: () => void;
+  showPlanDetails: (event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
@@ -504,7 +499,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
       </Col>
       {hasMoreFeatures && (
         <SimpleButton
-          onClick={() => showPlanDetails()}
+          onClick={event => showPlanDetails(event)}
           variant='link'
           sx={t => ({
             marginBlockStart: t.space.$2,

@@ -23,12 +23,12 @@ const PricingTableRoot = (props: __experimental_PricingTableProps) => {
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
 
-  const selectPlan = (plan: __experimental_CommercePlanResource) => {
+  const selectPlan = (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       return clerk.redirectToSignIn();
     }
 
-    handleSelectPlan({ mode, plan, planPeriod });
+    handleSelectPlan({ mode, plan, planPeriod, event });
   };
 
   const { __experimental_commerce } = useClerk();
