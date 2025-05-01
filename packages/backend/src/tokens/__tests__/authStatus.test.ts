@@ -56,7 +56,7 @@ describe('signed-in', () => {
       }).toAuth();
 
       const token = await authObject.getToken();
-      expect(token).toBe('api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=');
+      expect(token).toBe('ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=');
     });
   });
 });
