@@ -13,8 +13,8 @@ const createTestComplexityCases = (config: Pick<UsePasswordComplexityConfig, 'al
   let specialCharsRegex: RegExp;
   if (config.allowed_special_characters) {
     // Avoid a nested group by escaping the `[]` characters
-    let escaped = config.allowed_special_characters.replace('[', '\\[');
-    escaped = escaped.replace(']', '\\]');
+    let escaped = config.allowed_special_characters.replace(/\[/g, '\\[');
+    escaped = escaped.replace(/\]/g, '\\]');
     specialCharsRegex = new RegExp(`[${escaped}]`);
   } else {
     specialCharsRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
