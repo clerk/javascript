@@ -123,8 +123,8 @@ export async function authenticateRequest(
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
-    url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
+    url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append(
       constants.QueryParameters.SuffixedCookies,
       authenticateContext.usesSuffixedCookies().toString(),
