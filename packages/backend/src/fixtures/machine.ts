@@ -1,12 +1,12 @@
 export const mockTokens = {
-  api_key: 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
-  oauth_token: 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij',
-  machine_token: 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij',
+  api_key: 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=',
+  oauth_token: 'oat_8XOIucKvqHVr5tYP123456789abcdefghij',
+  machine_token: 'mt_8XOIucKvqHVr5tYP123456789abcdefghij',
 } as const;
 
 export const mockVerificationResults = {
   api_key: {
-    id: 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1',
+    id: 'ak_ey966f1b1xf93586b2debdcadb0b3bd1',
     type: 'api_key',
     name: 'my-api-key',
     subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
@@ -23,7 +23,7 @@ export const mockVerificationResults = {
     updatedAt: 1745354860746,
   },
   oauth_token: {
-    id: 'oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc',
+    id: 'oat_2VTWUzvGC5UhdJCNx6xG1D98edc',
     clientId: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
     type: 'oauth:access_token',
     name: 'GitHub OAuth',
@@ -37,7 +37,7 @@ export const mockVerificationResults = {
     updatedAt: 1744928754551,
   },
   machine_token: {
-    id: 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1',
+    id: 'mt_ey966f1b1xf93586b2debdcadb0b3bd1',
     name: 'my-machine-token',
     subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['read:foo', 'write:bar'],

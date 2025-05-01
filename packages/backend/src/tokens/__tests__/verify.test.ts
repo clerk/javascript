@@ -69,7 +69,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies provided API key', async () => {
-    const token = 'api_key_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
+    const token = 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
 
     server.use(
       http.post(
@@ -90,7 +90,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as APIKey;
-    expect(data.id).toBe('api_key_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('ak_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-api-key');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
@@ -98,7 +98,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies provided Machine token', async () => {
-    const token = 'm2m_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'mt_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
@@ -119,7 +119,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as MachineToken;
-    expect(data.id).toBe('m2m_ey966f1b1xf93586b2debdcadb0b3bd1');
+    expect(data.id).toBe('mt_ey966f1b1xf93586b2debdcadb0b3bd1');
     expect(data.name).toBe('my-machine-token');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
@@ -127,7 +127,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   it('verifies provided OAuth token', async () => {
-    const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
+    const token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
@@ -148,7 +148,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(result.errors).toBeUndefined();
 
     const data = result.data as IdPOAuthAccessToken;
-    expect(data.id).toBe('oauth_access_2VTWUzvGC5UhdJCNx6xG1D98edc');
+    expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
@@ -156,7 +156,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   describe('handles API errors for API keys', () => {
     it('handles invalid token', async () => {
-      const token = 'api_key_invalid_token';
+      const token = 'ak_invalid_token';
 
       server.use(
         http.post('https://api.clerk.test/api_keys/verify', () => {
@@ -177,7 +177,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     it('handles unexpected error', async () => {
-      const token = 'api_key_ey966f1b1xf93586b2debdcadb0b3bd1';
+      const token = 'ak_ey966f1b1xf93586b2debdcadb0b3bd1';
 
       server.use(
         http.post('https://api.clerk.test/api_keys/verify', () => {
@@ -200,7 +200,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   describe('handles API errors for M2M tokens', () => {
     it('handles invalid token', async () => {
-      const token = 'm2m_invalid_token';
+      const token = 'mt_invalid_token';
 
       server.use(
         http.post('https://api.clerk.test/m2m_tokens/verify', () => {
@@ -221,7 +221,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     it('handles unexpected error', async () => {
-      const token = 'm2m_ey966f1b1xf93586b2debdcadb0b3bd1';
+      const token = 'mt_ey966f1b1xf93586b2debdcadb0b3bd1';
 
       server.use(
         http.post('https://api.clerk.test/m2m_tokens/verify', () => {
@@ -244,7 +244,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
   describe('handles API errors for OAuth tokens', () => {
     it('handles invalid token', async () => {
-      const token = 'oauth_access_invalid_token';
+      const token = 'oat_invalid_token';
 
       server.use(
         http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () => {
@@ -265,7 +265,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     it('handles unexpected error', async () => {
-      const token = 'oauth_access_8XOIucKvqHVr5tYP123456789abcdefghij';
+      const token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
 
       server.use(
         http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () => {

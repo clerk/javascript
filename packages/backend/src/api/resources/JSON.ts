@@ -34,7 +34,7 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
-  MachineToken: 'machine_token',
+  MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
