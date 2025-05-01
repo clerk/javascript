@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.63.2
+
+### Patch Changes
+
+- Retry checkout confirmation if there is another checkout in progress ([#5771](https://github.com/clerk/javascript/pull/5771)) by [@octoper](https://github.com/octoper)
+
+- Avoid opening checkout from `<PricingTable />` without a session, when selecting a plan. ([#5765](https://github.com/clerk/javascript/pull/5765)) by [@panteliselef](https://github.com/panteliselef)
+
+- Forcing \_\_session cookie to have SameSite=none attribute in the CHIPS build variant ([#5775](https://github.com/clerk/javascript/pull/5775)) by [@jacekradko](https://github.com/jacekradko)
+
+- Display upgrade and downgrade information on `<Checkout />`. ([#5746](https://github.com/clerk/javascript/pull/5746)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix handshake redirect loop in applications deployed to Netlify with a Clerk development instance. ([#5656](https://github.com/clerk/javascript/pull/5656)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Throw error in development when opening `<Checkout />` without a session. ([#5767](https://github.com/clerk/javascript/pull/5767)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor PricingTable components to use RootBox component for top level element. ([#5747](https://github.com/clerk/javascript/pull/5747)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`387bf62`](https://github.com/clerk/javascript/commit/387bf623406306e0c5c08da937f4930a7ec5e4a5), [`2716622`](https://github.com/clerk/javascript/commit/27166224e12af582298460d438bd7f83ea8e04bf), [`294da82`](https://github.com/clerk/javascript/commit/294da82336e7a345900d7ef9b28f56a7c8864c52)]:
+  - @clerk/types@4.56.1
+  - @clerk/shared@3.7.6
+  - @clerk/localizations@3.14.2
+
 ## 5.63.1
 
 ### Patch Changes

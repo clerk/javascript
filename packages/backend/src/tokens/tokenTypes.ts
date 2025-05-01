@@ -1,3 +1,5 @@
+import type { APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+
 export const TokenType = {
   SessionToken: 'session_token',
   ApiKey: 'api_key',

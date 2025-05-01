@@ -1,4 +1,6 @@
+
 import type { ApiClient, APIKey, IdPOAuthAccessToken, MachineToken } from '../api';
+import type { MatchFunction } from '@clerk/shared/pathToRegexp';
 import type { TokenType } from './tokenTypes';
 import type { VerifyTokenOptions } from './verify';
 
@@ -124,3 +126,16 @@ export type OrganizationSyncOptions = {
 type Pattern = string;
 
 export type MachineAuthType = MachineToken | APIKey | IdPOAuthAccessToken;
+
+export type OrganizationSyncTargetMatchers = {
+  OrganizationMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+  PersonalAccountMatcher: MatchFunction<Partial<Record<string, string | string[]>>> | null;
+};
+
+/**
+ * Represents an organization or a personal account - e.g. an
+ * entity that can be activated by the handshake API.
+ */
+export type OrganizationSyncTarget =
+  | { type: 'personalAccount' }
+  | { type: 'organization'; organizationId?: string; organizationSlug?: string };
