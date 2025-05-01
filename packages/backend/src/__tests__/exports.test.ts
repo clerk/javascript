@@ -39,6 +39,7 @@ describe('subpath /internal exports', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
         "AuthStatus",
+        "TokenType",
         "authenticatedMachineObject",
         "constants",
         "createAuthenticateRequest",
