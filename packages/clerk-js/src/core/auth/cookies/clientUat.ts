@@ -31,6 +31,12 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
 
   const set = (client: ClientResource | undefined) => {
     const expires = addYears(Date.now(), 1);
+    /*
+     * SameSite=Strict is used here to force requests originating from a different domain to resolve the auth state.
+     * In development, it's possible that the auth state has changed on a different domain.
+     * Generally, this is handled by redirectWithAuth() being called and relying on the dev browser ID in the URL,
+     * but if that isn't used we rely on this. In production, nothing is cross-domain and Lax is used when client_uat is set from FAPI.
+     */
     const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
     const secure = getSecureAttribute(sameSite);
     const domain = getCookieDomain();
