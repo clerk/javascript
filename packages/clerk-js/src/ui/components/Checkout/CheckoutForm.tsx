@@ -192,27 +192,24 @@ const CheckoutFormElements = ({
     >
       {/* only show if there are payment sources and there is a total due now */}
       {paymentSources.length > 0 && checkout.totals.totalDueNow.amount > 0 && (
-        <Box
-        // elementDescriptor={descriptors.checkoutFormPaymentMethodToggle} TODO(@Commerce): add this
+        <SegmentedControl.Root
+          aria-label='Payment method source'
+          value={paymentMethodSource}
+          onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
+          size='lg'
+          fullWidth
         >
-          <SegmentedControl.Root
-            aria-label='Payment method source'
-            value={paymentMethodSource}
-            onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
-            variant='large'
-          >
-            <SegmentedControl.Button
-              value='existing'
-              // TODO(@Commerce): needs localization
-              text='Payment Methods'
-            />
-            <SegmentedControl.Button
-              value='new'
-              // TODO(@Commerce): needs localization
-              text='Add payment method'
-            />
-          </SegmentedControl.Root>
-        </Box>
+          <SegmentedControl.Button
+            value='existing'
+            // TODO(@Commerce): needs localization
+            text='Payment Methods'
+          />
+          <SegmentedControl.Button
+            value='new'
+            // TODO(@Commerce): needs localization
+            text='Add payment method'
+          />
+        </SegmentedControl.Root>
       )}
 
       {paymentMethodSource === 'existing' && (

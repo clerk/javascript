@@ -239,6 +239,7 @@ const AddPaymentSourceForm = withCardStateProvider(
                   inset: 0,
                   background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
                   maskImage: `linear-gradient(transparent 20%, black)`,
+                  pointerEvents: 'none',
                 })}
               />
               <Box
