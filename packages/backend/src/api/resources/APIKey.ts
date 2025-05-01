@@ -7,7 +7,7 @@ export class APIKey {
     readonly name: string,
     readonly subject: string,
     readonly scopes: string[],
-    readonly claims: Record<string, string> | null,
+    readonly claims: Record<string, any> | null,
     readonly revoked: boolean,
     readonly revocationReason: string | null,
     readonly expired: boolean,
