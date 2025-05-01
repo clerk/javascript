@@ -1,5 +1,5 @@
-import type { AuthObject } from '@clerk/backend';
-import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -15,7 +15,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type Auth = AuthObject & {
+type Auth = (SignedInAuthObject | SignedOutAuthObject) & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -68,7 +68,7 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = async () => {
+export const auth: AuthFn = (async () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -132,7 +132,7 @@ export const auth: AuthFn = async () => {
   };
 
   return Object.assign(authObject, { redirectToSignIn, redirectToSignUp });
-};
+}) as AuthFn;
 
 auth.protect = async (...args: any[]) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
