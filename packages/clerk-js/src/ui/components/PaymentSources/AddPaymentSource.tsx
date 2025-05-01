@@ -203,8 +203,7 @@ const AddPaymentSourceForm = withCardStateProvider(
             <Box
               sx={t => ({
                 background: t.colors.$neutralAlpha50,
-                paddingInline: t.space.$2,
-                paddingBlock: t.space.$1x5,
+                padding: t.space.$2x5,
                 borderRadius: t.radii.$md,
                 borderWidth: t.borderWidths.$normal,
                 borderStyle: t.borderStyles.$solid,
@@ -212,14 +211,40 @@ const AddPaymentSourceForm = withCardStateProvider(
                 display: 'flex',
                 flexDirection: 'column',
                 rowGap: t.space.$2,
+                position: 'relative',
               })}
             >
-              <Text
-                variant='caption'
-                colorScheme='body'
+              <Box
+                sx={t => ({
+                  position: 'absolute',
+                  inset: 0,
+                  background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
+                  maskImage: `linear-gradient(transparent 20%, black)`,
+                })}
+              />
+              <Box
+                sx={t => ({
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                })}
               >
-                Test card information
-              </Text>
+                <Text
+                  variant='caption'
+                  colorScheme='body'
+                >
+                  Test card information
+                </Text>
+                <Text
+                  variant='caption'
+                  sx={t => ({
+                    color: t.colors.$warning500,
+                    fontWeight: t.fontWeights.$semibold,
+                  })}
+                >
+                  Development mode
+                </Text>
+              </Box>
               <LineItems.Root>
                 <LineItems.Group variant='tertiary'>
                   <LineItems.Title title={'Card number'} />

@@ -253,7 +253,7 @@ const ExistingPaymentSourceForm = ({
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
-        rowGap: t.space.$3,
+        rowGap: t.space.$4,
       })}
     >
       {checkout.totals.totalDueNow.amount > 0 ? (
