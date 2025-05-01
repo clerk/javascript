@@ -7,12 +7,13 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks/useFetch';
 import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
-const PricingTable = (props: __experimental_PricingTableProps) => {
+const PricingTableRoot = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
@@ -25,7 +26,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   const selectPlan = (plan: __experimental_CommercePlanResource) => {
     if (!clerk.isSignedIn) {
-      void clerk.redirectToSignIn();
+      return clerk.redirectToSignIn();
     }
 
     handleSelectPlan({ mode, plan, planPeriod });
@@ -44,7 +45,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   );
 
   return (
-    <>
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
       <FreePlanRow />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
@@ -64,8 +70,25 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-    </>
+    </Flow.Root>
   );
+};
+
+// When used in a modal, we need to wrap the root in a div to avoid layout issues
+// within UserProfile and OrganizationProfile.
+const PricingTableModal = (props: __experimental_PricingTableProps) => {
+  return (
+    // TODO: Used by InvisibleRootBox, can we simplify?
+    <div>
+      <PricingTableRoot {...props} />
+    </div>
+  );
+};
+
+const PricingTable = (props: __experimental_PricingTableProps) => {
+  const { mode = 'mounted' } = usePricingTableContext();
+
+  return mode === 'modal' ? <PricingTableModal {...props} /> : <PricingTableRoot {...props} />;
 };
 
 export const __experimental_PricingTable = PricingTable;

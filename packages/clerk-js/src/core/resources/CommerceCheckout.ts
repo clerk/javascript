@@ -13,6 +13,7 @@ import {
   __experimental_CommercePlan,
   __experimental_CommerceSubscription,
   BaseResource,
+  isClerkAPIResponseError,
 } from './internal';
 
 export class __experimental_CommerceCheckout extends BaseResource implements __experimental_CommerceCheckoutResource {
@@ -26,6 +27,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   status!: string;
   subscription?: __experimental_CommerceSubscription;
   totals!: __experimental_CommerceCheckoutTotals;
+  isImmediatePlanChange!: boolean;
 
   constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
     super();
@@ -50,7 +52,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     this.status = data.status;
     this.subscription = data.subscription ? new __experimental_CommerceSubscription(data.subscription) : undefined;
     this.totals = commerceTotalsFromJSON(data.totals);
-
+    this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;
   }
 
@@ -74,8 +76,16 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
         initialDelay: 2 * 1_000,
         jitter: false,
         shouldRetry(error: any, iterations: number) {
+          if (!isClerkAPIResponseError(error) || iterations >= 4) {
+            return false;
+          }
+
           const status = error?.status;
-          return !!status && status >= 500 && iterations <= 4;
+          const isServerError = status >= 500;
+          const checkoutAlreadyInProgress =
+            status === 409 && error.errors?.[0]?.code === 'checkout_already_in_progress';
+
+          return isServerError || checkoutAlreadyInProgress;
         },
       },
     );

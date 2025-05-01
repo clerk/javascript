@@ -11,7 +11,7 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Span } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
@@ -30,7 +30,11 @@ export const CheckoutForm = ({
   checkout: __experimental_CommerceCheckoutResource;
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
-  const { plan, planPeriod, totals } = checkout;
+  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
+
+  const adjustmentAmount = (totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0);
+  const showAdjustment = totals.totalDueNow.amount > 0 && adjustmentAmount > 0;
+  const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
     <Drawer.Body>
@@ -44,14 +48,40 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group>
+          {/* TODO(@Commerce): needs localization */}
+          {showDowngradeInfo && (
+            <Span
+              localizationKey={'Your features will remain until the end of your current subscription.'}
+              elementDescriptor={descriptors.lineItemsDowngradeNotice}
+              sx={t => ({
+                fontSize: t.fontSizes.$sm,
+                color: t.colors.$colorTextSecondary,
+              })}
+            />
+          )}
+
+          <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
-              text={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
+          {showAdjustment && (
+            <LineItems.Group>
+              {/* TODO(@Commerce): needs localization */}
+              <LineItems.Title
+                title={'Adjustment'}
+                description={'Prorated credit for the remainder of your subscription.'}
+              />
+              {/* TODO(@Commerce): needs localization */}
+              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
+              <LineItems.Description
+                text={`- ${totals.proration?.totalProration.currencySymbol}${adjustmentAmount / 100}`}
+              />
+            </LineItems.Group>
+          )}
           <LineItems.Group
             borderTop
             variant='tertiary'
