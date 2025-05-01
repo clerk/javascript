@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.31.0
+
+### Minor Changes
+
+- Initial stub of the new handshake payload flow with nonce ([#5750](https://github.com/clerk/javascript/pull/5750)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Fix an issue where the handshake redirect was not respecting the supported Clerk API version specified in `@clerk/backend`. ([#5780](https://github.com/clerk/javascript/pull/5780)) by [@brkalow](https://github.com/brkalow)
+
 ## 1.30.2
 
 ### Patch Changes

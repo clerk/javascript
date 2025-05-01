@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.63.3
+
+### Patch Changes
+
+- Fix issue within profile components where the ProfileBox was removed when mounting the pricing table component causing padding issues. ([#5777](https://github.com/clerk/javascript/pull/5777)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.63.2
 
 ### Patch Changes
