@@ -9,7 +9,6 @@ import { useState } from 'react';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks/useFetch';
-import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
@@ -51,10 +50,9 @@ const PricingTableRoot = (props: __experimental_PricingTableProps) => {
         width: '100%',
       }}
     >
-      <FreePlanRow />
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans.filter(plan => !plan.isDefault)}
+          plans={plans}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -62,7 +60,7 @@ const PricingTableRoot = (props: __experimental_PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans.filter(plan => !plan.isDefault)}
+          plans={plans}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}

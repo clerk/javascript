@@ -175,26 +175,28 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-        <Box
-          elementDescriptor={descriptors.pricingTableCardAction}
-          sx={t => ({
-            marginTop: 'auto',
-            padding: isCompact ? t.space.$3 : t.space.$4,
-            borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
-            borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$neutralAlpha100,
-            background: undefined,
-          })}
-        >
-          <Button
-            block
-            textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            {...buttonPropsForPlan({ plan, isCompact })}
-            onClick={event => {
-              onSelect(plan, event);
-            }}
-          />
-        </Box>
+        {!plan.isDefault && (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardAction}
+            sx={t => ({
+              marginTop: 'auto',
+              padding: isCompact ? t.space.$3 : t.space.$4,
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+              background: undefined,
+            })}
+          >
+            <Button
+              block
+              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+              {...buttonPropsForPlan({ plan, isCompact })}
+              onClick={event => {
+                onSelect(plan, event);
+              }}
+            />
+          </Box>
+        )}
       </ReversibleContainer>
     </Box>
   );
@@ -322,81 +324,70 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           columnGap: t.space.$1x5,
         })}
       >
-        {plan.amount > 0 ? (
-          <>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFee}
-              variant={isCompact ? 'h2' : 'h1'}
-              colorScheme='body'
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFee}
+          variant={isCompact ? 'h2' : 'h1'}
+          colorScheme='body'
+        >
+          {plan.currencySymbol}
+          {getPlanFee}
+        </Text>
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFeePeriod}
+          variant='caption'
+          colorScheme='secondary'
+          sx={t => ({
+            textTransform: 'lowercase',
+            ':before': {
+              content: '"/"',
+              marginInlineEnd: t.space.$1,
+            },
+          })}
+          localizationKey={localizationKeys('__experimental_commerce.month')}
+        />
+        {annualMonthlyAmount > 0 ? (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+            sx={[
+              _ => ({
+                width: '100%',
+                display: 'grid',
+                gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
+              }),
+              pricingTableCardFeePeriodNoticeAnimation,
+            ]}
+            // @ts-ignore - Needed until React 19 support
+            inert={planPeriod !== 'annual' ? 'true' : undefined}
+          >
+            <Box
+              elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeInner}
+              sx={{
+                overflow: 'hidden',
+                minHeight: 0,
+              }}
             >
-              {plan.currencySymbol}
-              {getPlanFee}
-            </Text>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFeePeriod}
-              variant='caption'
-              colorScheme='secondary'
-              sx={t => ({
-                textTransform: 'lowercase',
-                ':before': {
-                  content: '"/"',
-                  marginInlineEnd: t.space.$1,
-                },
-              })}
-              localizationKey={localizationKeys('__experimental_commerce.month')}
-            />
-            {annualMonthlyAmount > 0 ? (
-              <Box
-                elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
-                sx={[
-                  _ => ({
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
-                  }),
-                  pricingTableCardFeePeriodNoticeAnimation,
-                ]}
-                // @ts-ignore - Needed until React 19 support
-                inert={planPeriod !== 'annual' ? 'true' : undefined}
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeLabel}
+                variant='caption'
+                colorScheme='secondary'
+                sx={t => ({
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  columnGap: t.space.$1,
+                })}
               >
-                <Box
-                  elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeInner}
-                  sx={{
-                    overflow: 'hidden',
-                    minHeight: 0,
-                  }}
-                >
-                  <Text
-                    elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeLabel}
-                    variant='caption'
-                    colorScheme='secondary'
-                    sx={t => ({
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: t.space.$1,
-                    })}
-                  >
-                    <Icon
-                      icon={InformationCircle}
-                      colorScheme='neutral'
-                      size='sm'
-                      aria-hidden
-                    />{' '}
-                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
-                  </Text>
-                </Box>
-              </Box>
-            ) : null}
-          </>
-        ) : (
-          <Text
-            elementDescriptor={descriptors.pricingTableCardFee}
-            variant={isCompact ? 'h2' : 'h1'}
-            localizationKey={localizationKeys('__experimental_commerce.free')}
-            colorScheme='body'
-          />
-        )}
+                <Icon
+                  icon={InformationCircle}
+                  colorScheme='neutral'
+                  size='sm'
+                  aria-hidden
+                />{' '}
+                <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+              </Text>
+            </Box>
+          </Box>
+        ) : null}
       </Flex>
       {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
