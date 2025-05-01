@@ -26,7 +26,7 @@ interface PricingTableMatrixProps {
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function PricingTableMatrix({
@@ -323,8 +323,8 @@ export function PricingTableMatrix({
                           block
                           textVariant='buttonSmall'
                           size='xs'
-                          onClick={() => {
-                            onSelect(plan);
+                          onClick={event => {
+                            onSelect(plan, event);
                           }}
                           {...buttonPropsForPlan({ plan })}
                           colorScheme={highlight ? 'primary' : 'secondary'}

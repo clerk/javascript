@@ -22,11 +22,15 @@ import { CogFilled, Plans } from '../../icons';
 export function SubscriptionsList() {
   const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
 
-  const handleSelectSubscription = (subscription: __experimental_CommerceSubscriptionResource) => {
+  const handleSelectSubscription = (
+    subscription: __experimental_CommerceSubscriptionResource,
+    event?: React.MouseEvent<HTMLElement>,
+  ) => {
     handleSelectPlan({
       mode: 'modal', // always modal for now
       plan: subscription.plan,
       planPeriod: subscription.planPeriod,
+      event,
     });
   };
 
@@ -111,7 +115,7 @@ export function SubscriptionsList() {
               {canManageSubscription({ subscription }) && (
                 <Button
                   aria-label='Manage subscription'
-                  onClick={() => handleSelectSubscription(subscription)}
+                  onClick={event => handleSelectSubscription(subscription, event)}
                   variant='bordered'
                   colorScheme='secondary'
                   sx={t => ({
