@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.56.2
+
+### Patch Changes
+
+- Fix issue where the checkout component was portaling into the wrong profile component when two profile components were rendered at once. ([#5779](https://github.com/clerk/javascript/pull/5779)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.56.1
 
 ### Patch Changes
