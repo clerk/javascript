@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.63.4
+
+### Patch Changes
+
+- Brings back the free plan card in the PricingTable ([#5787](https://github.com/clerk/javascript/pull/5787)) by [@aeliox](https://github.com/aeliox)
+
+- Fix issue where the checkout component was portaling into the wrong profile component when two profile components were rendered at once. ([#5779](https://github.com/clerk/javascript/pull/5779)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only render add / select payment method UI during checkout when the total due is greater than $0 ([#5762](https://github.com/clerk/javascript/pull/5762)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`225b9ca`](https://github.com/clerk/javascript/commit/225b9ca21aba44930872a85d6b112ee2a1b606b9)]:
+  - @clerk/types@4.56.2
+  - @clerk/localizations@3.14.3
+  - @clerk/shared@3.7.7
+
 ## 5.63.3
 
 ### Patch Changes
