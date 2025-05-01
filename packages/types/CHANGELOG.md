@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.56.1
+
+### Patch Changes
+
+- Display upgrade and downgrade information on `<Checkout />`. ([#5746](https://github.com/clerk/javascript/pull/5746)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor PricingTable components to use RootBox component for top level element. ([#5747](https://github.com/clerk/javascript/pull/5747)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.56.0
 
 ### Minor Changes
