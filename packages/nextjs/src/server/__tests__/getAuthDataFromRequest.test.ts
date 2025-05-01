@@ -34,7 +34,7 @@ describe('getAuthDataFromRequestAsync', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
     });
 
@@ -48,7 +48,7 @@ describe('getAuthDataFromRequestAsync', () => {
 
   it('returns authenticated machine object when token type matches', async () => {
     vi.mocked(verifyMachineAuthToken).mockResolvedValueOnce({
-      data: { id: 'api_key_123' } as any,
+      data: { id: 'ak_123' } as any,
       tokenType: 'api_key',
       errors: undefined,
     });
@@ -56,7 +56,7 @@ describe('getAuthDataFromRequestAsync', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({
-        [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        [constants.Headers.Authorization]: 'Bearer ak_xxx',
       }),
     });
 
@@ -65,7 +65,7 @@ describe('getAuthDataFromRequestAsync', () => {
     });
 
     expect(auth.tokenType).toBe('api_key');
-    expect((auth as AuthenticatedMachineObject).id).toBe('api_key_123');
+    expect((auth as AuthenticatedMachineObject).id).toBe('ak_123');
   });
 
   it('falls back to session token handling', async () => {
