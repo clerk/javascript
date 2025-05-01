@@ -2,7 +2,7 @@ import type { Match, MatchFunction } from '@clerk/shared/pathToRegexp';
 import { match } from '@clerk/shared/pathToRegexp';
 import type { JwtPayload } from '@clerk/types';
 
-import { constants } from '../constants';
+import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
@@ -123,6 +123,7 @@ export async function authenticateRequest(
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
+    url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
     url.searchParams.append(
       constants.QueryParameters.SuffixedCookies,
