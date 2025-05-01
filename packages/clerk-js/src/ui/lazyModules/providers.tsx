@@ -142,6 +142,7 @@ type LazyDrawerRendererProps = React.PropsWithChildren<
     open: DrawerProps['open'];
     onOpenChange: DrawerProps['onOpenChange'];
     portalId?: string;
+    portalRoot?: HTMLElement | null | undefined;
   } & AppearanceProviderProps
 >;
 
@@ -159,9 +160,10 @@ export const LazyDrawerRenderer = (props: LazyDrawerRendererProps) => {
               <DrawerRoot
                 open={props.open}
                 onOpenChange={props.onOpenChange}
-                strategy={props.portalId ? 'absolute' : 'fixed'}
+                strategy={props.portalId || props.portalRoot ? 'absolute' : 'fixed'}
                 portalProps={{
                   id: props.portalId ? props.portalId : undefined,
+                  root: props.portalRoot ? props.portalRoot : undefined,
                 }}
               >
                 <DrawerOverlay />
