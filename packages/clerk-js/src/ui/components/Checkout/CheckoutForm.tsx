@@ -78,7 +78,7 @@ export const CheckoutForm = ({
           {showCredits && (
             <LineItems.Group variant='tertiary'>
               {/* TODO(@Commerce): needs localization */}
-              <LineItems.Title title={'Prorated credit for the remainder of your subscription.'} />
+              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
