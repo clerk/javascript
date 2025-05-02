@@ -22,13 +22,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
   test('renders pricing table with plans', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.po.billing.goToPricingTable();
+    await u.po.page.goToRelative('/pricing-table');
+
+    await u.po.page.locator('.cl-pricingTable-root').waitFor({ state: 'attached' });
+
     await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
   });
 
   test('when signed out, clicking get started button navigates to sign in page', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.po.billing.goToPricingTable();
+    await u.po.page.goToRelative('/pricing-table');
+    await u.po.page.locator('.cl-pricingTable-root').waitFor({ state: 'attached' });
+
     await u.po.page.getByText('Get started').first().click();
     await u.po.signIn.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeHidden();
@@ -38,21 +43,23 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.billing.goToPricingTable();
+    await u.po.page.goToRelative('/pricing-table');
+    await u.po.page.locator('.cl-pricingTable-root').waitFor({ state: 'attached' });
     await u.po.page.getByText('Get started').first().click();
-    await u.po.billing.waitForDrawerMounted();
-    await expect(u.po.page.getByText('Checkout')).toBeVisible();
+    await u.po.page.locator('.cl-checkout-root').waitFor({ state: 'attached' });
+    await expect(u.po.page.getByText(/Checkout/i)).toBeVisible();
   });
 
   test('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.billing.goToPricingTable();
+    await u.po.page.goToRelative('/pricing-table');
+    await u.po.page.locator('.cl-pricingTable-root').waitFor({ state: 'attached' });
     // We have two plans, so subscribe to the first one
     await u.po.page.getByText('Get started').first().click();
 
-    await u.po.billing.waitForDrawerMounted();
+    await u.po.page.locator('.cl-checkout-root').waitFor({ state: 'attached' });
 
     // Stripe uses multiple iframes, so we need to find the correct one
     const frame = u.po.page.frameLocator('iframe[src*="elements-inner-payment"]');
@@ -70,9 +77,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.billing.goToPricingTable();
+    await u.po.page.goToRelative('/pricing-table');
+    await u.po.page.locator('.cl-pricingTable-root').waitFor({ state: 'attached' });
+
     await u.po.page.getByText('Manage subscription').click();
-    await u.po.billing.waitForDrawerMounted();
+
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
     await expect(u.po.page.getByRole('button', { name: 'Re-subscribe' }).first()).toBeVisible();

@@ -1,7 +1,6 @@
 import type { Page } from '@playwright/test';
 
 import { createAppPageObject } from './app';
-import { createBillingComponentPageObject } from './billing';
 import { createClerkPageObject } from './clerk';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
@@ -43,6 +42,5 @@ export const createPageObjects = ({
     userProfile: createUserProfileComponentPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),
     waitlist: createWaitlistComponentPageObject(testArgs),
-    billing: createBillingComponentPageObject(testArgs),
   };
 };
