@@ -61,7 +61,6 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
             text={id}
           />
           <Text
-            elementDescriptor={descriptors.statementId}
             colorScheme='secondary'
             variant='subtitle'
           >
@@ -84,15 +83,21 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
  * -----------------------------------------------------------------------------------------------*/
 
 function Body({ children }: { children: React.ReactNode }) {
-  return <Box>{children}</Box>;
+  return <Box elementDescriptor={descriptors.statementBody}>{children}</Box>;
 }
-
 /* -------------------------------------------------------------------------------------------------
  * Statement.Section
  * -----------------------------------------------------------------------------------------------*/
 
 function Section({ children }: { children: React.ReactNode }) {
-  return <Box>{children}</Box>;
+  return (
+    <Box
+      elementDescriptor={descriptors.statementSection}
+      as='section'
+    >
+      {children}
+    </Box>
+  );
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -102,6 +107,7 @@ function Section({ children }: { children: React.ReactNode }) {
 function SectionHeader({ text }: { text: string | LocalizationKey }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementSectionHeader}
       sx={t => ({
         paddingInline: t.space.$4,
         paddingBlock: t.space.$1,
@@ -125,7 +131,7 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
  * -----------------------------------------------------------------------------------------------*/
 
 function SectionContent({ children }: { children: React.ReactNode }) {
-  return <Box>{children}</Box>;
+  return <Box elementDescriptor={descriptors.statementSectionContent}>{children}</Box>;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -135,6 +141,7 @@ function SectionContent({ children }: { children: React.ReactNode }) {
 function SectionContentItem({ children }: { children: React.ReactNode }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementSectionContentItem}
       sx={t => ({
         paddingInline: t.space.$4,
         paddingBlock: t.space.$3,
@@ -167,6 +174,7 @@ function SectionContentDetailsHeader({
 }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementSectionContentDetailsHeader}
       sx={t => ({
         marginBlockEnd: t.space.$2,
         display: 'flex',
@@ -223,6 +231,7 @@ function SectionContentDetailsHeader({
 function SectionContentDetailsList({ children }: { children: React.ReactNode }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementSectionContentDetailsList}
       as='ul'
       sx={t => ({
         margin: 0,
@@ -259,6 +268,7 @@ function SectionContentDetailsListItem({
 }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementSectionContentDetailsListItem}
       as='li'
       sx={t => ({
         margin: 0,
@@ -266,6 +276,9 @@ function SectionContentDetailsListItem({
         paddingBlock: t.space.$1x5,
         display: 'flex',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        columnGap: t.space.$2,
+        rowGap: t.space.$0x5,
         '&:not(:first-child)': {
           borderBlockStartWidth: t.borderWidths.$normal,
           borderBlockStartStyle: t.borderStyles.$solid,
@@ -293,7 +306,6 @@ function SectionContentDetailsListItem({
         />
       </Span>
       <Span
-        elementDescriptor={descriptors.statementIdContainer}
         sx={t => ({
           display: 'flex',
           alignItems: 'center',
@@ -310,7 +322,6 @@ function SectionContentDetailsListItem({
               />
             ) : null}
             <Text
-              elementDescriptor={descriptors.statementId}
               colorScheme='secondary'
               variant='caption'
             >
@@ -319,7 +330,6 @@ function SectionContentDetailsListItem({
           </>
         ) : (
           <Text
-            elementDescriptor={descriptors.statementId}
             colorScheme='secondary'
             variant='caption'
             localizationKey={value}
@@ -337,6 +347,7 @@ function SectionContentDetailsListItem({
 function Footer({ label, value }: { label: string | LocalizationKey; value: string }) {
   return (
     <Box
+      elementDescriptor={descriptors.statementFooter}
       as='footer'
       sx={t => ({
         paddingInline: t.space.$4,
@@ -377,7 +388,6 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
 
   return (
     <Button
-      elementDescriptor={descriptors.statementCopyButton}
       variant='unstyled'
       onClick={onCopy}
       sx={t => ({

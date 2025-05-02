@@ -468,23 +468,16 @@ export type ElementsConfig = {
   paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
 
   statementRoot: WithOptions;
-  statementCard: WithOptions;
   statementHeader: WithOptions;
-  statementHeaderContent: WithOptions;
-  statementTitle: WithOptions;
-  statementHeaderTitleBadgeContainer: WithOptions;
-  statementTitleIdContainer: WithOptions;
-  statementId: WithOptions;
-  statementIdContainer: WithOptions;
-  statementBadge: WithOptions;
-  statementDetails: WithOptions;
-  statementDetailsItem: WithOptions;
-  statementDetailsItemTitle: WithOptions;
-  statementDetailsItemTitleText: WithOptions;
-  statementDetailsItemValue: WithOptions;
-  statementDetailsItemValueText: WithOptions;
-  statementCopyButton: WithOptions;
-  statementContent: WithOptions;
+  statementBody: WithOptions;
+  statementSection: WithOptions;
+  statementSectionHeader: WithOptions;
+  statementSectionContent: WithOptions;
+  statementSectionContentItem: WithOptions;
+  statementSectionContentDetailsList: WithOptions;
+  statementSectionContentDetailsListItem: WithOptions;
+  statementSectionContentDetailsHeader: WithOptions;
+  statementFooter: WithOptions;
 
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
