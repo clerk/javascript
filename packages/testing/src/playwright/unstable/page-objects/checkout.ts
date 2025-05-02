@@ -25,22 +25,14 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('Country').selectOption(card.country);
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
-    continueWithSavedCard: async () => {
-      await page
-        .locator('.cl-disclosureRoot')
-        .filter({ has: page.getByRole('button', { name: 'Payment Methods' }) })
-        .getByRole('button', { name: /subscribe|pay\s/i })
-        .click();
+    clickPayOrSubscribe: async () => {
+      await page.getByRole('button', { name: /subscribe|pay\s/i }).click();
     },
-    clickAddNewPaymentMethod: async () => {
-      await page.getByRole('button', { name: 'Add new payment method' }).click();
+    clickAddPaymentMethod: async () => {
+      await page.getByRole('radio', { name: 'Add payment method' }).click();
     },
-    continueWithNewCard: async () => {
-      await page
-        .locator('.cl-formContainer')
-        .filter({ has: page.getByRole('heading', { name: 'Add new payment method' }) })
-        .getByRole('button', { name: /subscribe|pay\s/i })
-        .click();
+    clickPaymentMethods: async () => {
+      await page.getByRole('radio', { name: 'Payment Methods' }).click();
     },
   };
   return self;

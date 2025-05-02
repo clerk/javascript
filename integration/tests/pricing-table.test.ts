@@ -60,7 +60,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await u.po.checkout.fillTestCard();
-    await u.po.checkout.continueWithNewCard();
+    await u.po.checkout.clickPayOrSubscribe();
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
   });
 
@@ -73,11 +73,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true });
     await u.po.checkout.waitForMounted();
-    await u.po.checkout.continueWithSavedCard();
+    await u.po.checkout.clickPayOrSubscribe();
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
   });
 
-  test('can downgrade to previous plan with new card', async ({ page, context }) => {
+  test('can downgrade to previous plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -87,15 +87,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.startCheckout({ planSlug: 'plus', shouldSwitch: true });
     await u.po.checkout.waitForMounted();
 
-    await u.po.checkout.clickAddNewPaymentMethod();
-    await u.po.checkout.fillCard({
-      number: '4000056655665556',
-      expiration: '1234',
-      cvc: '123',
-      country: 'United States',
-      zip: '12345',
-    });
-    await u.po.checkout.continueWithNewCard();
+    await u.po.checkout.clickPayOrSubscribe();
     await expect(u.po.page.getByText('Success!')).toBeVisible();
   });
 
