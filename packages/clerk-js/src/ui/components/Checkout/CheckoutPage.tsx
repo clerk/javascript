@@ -1,4 +1,5 @@
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
@@ -6,7 +7,6 @@ import { useCheckout } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
-import { useEffect } from 'react';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
