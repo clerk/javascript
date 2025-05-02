@@ -151,6 +151,7 @@ export interface __experimental_CommerceCheckoutTotals {
     days: number;
     ratePerDay: __experimental_CommerceMoney;
     totalProration: __experimental_CommerceMoney;
+    credit: __experimental_CommerceMoney;
   };
 }
 
