@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.56.3
+
+### Patch Changes
+
+- Use the `total.proration.credit` to show the proration credit on checkout flow ([#5792](https://github.com/clerk/javascript/pull/5792)) by [@octoper](https://github.com/octoper)
+
+- Remove unused properties from proration response in checkout ([#5793](https://github.com/clerk/javascript/pull/5793)) by [@octoper](https://github.com/octoper)
+
 ## 4.56.2
 
 ### Patch Changes
