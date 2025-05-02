@@ -38,7 +38,7 @@
     "expo": "~52.0.46"
   },
   "peerDependencies": {
-    "expo": "^50 || ^51 || ^52",
+    "expo": ">=50 <54",
     "react": "catalog:peer-react",
     "react-native": "*"
   }
