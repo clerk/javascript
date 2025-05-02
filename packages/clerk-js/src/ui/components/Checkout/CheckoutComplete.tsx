@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
@@ -7,10 +8,19 @@ import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+export const CheckoutComplete = ({
+  checkout,
+  checkoutContinueUrl,
+}: {
+  checkout: __experimental_CommerceCheckoutResource;
+  checkoutContinueUrl?: string;
+}) => {
+  const clerk = useClerk();
   const { setIsOpen } = useDrawerContext();
+  const resolvedCheckoutContinueUrl = checkoutContinueUrl || clerk.buildCheckoutContinueUrl();
 
   const handleClose = () => {
+    void clerk.navigate(resolvedCheckoutContinueUrl);
     if (setIsOpen) {
       setIsOpen(false);
     }

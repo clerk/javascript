@@ -9,7 +9,7 @@ import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete, checkoutContinueUrl } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, isMissingPayerEmail } = useCheckout({
@@ -42,7 +42,12 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   if (checkout) {
     if (checkout?.status === 'completed') {
-      return <CheckoutComplete checkout={checkout} />;
+      return (
+        <CheckoutComplete
+          checkout={checkout}
+          checkoutContinueUrl={checkoutContinueUrl}
+        />
+      );
     }
 
     return (
