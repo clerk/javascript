@@ -58,7 +58,7 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     },
     waitForDrawerMounted: () => {
       return page.locator('.cl-drawerContent').waitFor({ state: 'attached' });
-    }
+    },
   };
 
   return self;
