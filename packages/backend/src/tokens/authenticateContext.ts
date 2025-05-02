@@ -10,7 +10,7 @@ import type { AuthenticateRequestOptions } from './types';
 
 interface AuthenticateContext extends AuthenticateRequestOptions {
   // header-based values
-  sessionOrMachineTokenInHeader: string | undefined;
+  tokenInHeader: string | undefined;
   origin: string | undefined;
   host: string | undefined;
   forwardedHost: string | undefined;
@@ -50,7 +50,7 @@ class AuthenticateContext implements AuthenticateContext {
    * @returns {string | undefined} The session token if available, otherwise undefined.
    */
   public get sessionToken(): string | undefined {
-    return this.sessionTokenInCookie || this.sessionOrMachineTokenInHeader;
+    return this.sessionTokenInCookie || this.tokenInHeader;
   }
 
   public constructor(
@@ -173,7 +173,7 @@ class AuthenticateContext implements AuthenticateContext {
   }
 
   private initHeaderValues() {
-    this.sessionOrMachineTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.tokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
     this.host = this.getHeader(constants.Headers.Host);
     this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);

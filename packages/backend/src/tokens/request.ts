@@ -376,11 +376,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   async function authenticateRequestWithTokenInHeader() {
-    const { sessionOrMachineTokenInHeader } = authenticateContext;
+    const { tokenInHeader } = authenticateContext;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const { data, errors } = await verifyToken(sessionOrMachineTokenInHeader!, authenticateContext);
+      const { data, errors } = await verifyToken(tokenInHeader!, authenticateContext);
       if (errors) {
         throw errors[0];
       }
@@ -391,7 +391,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
         sessionClaims: data,
         headers: new Headers(),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        token: sessionOrMachineTokenInHeader!,
+        token: tokenInHeader!,
       });
     } catch (err) {
       return handleError(err, 'header');
@@ -646,14 +646,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
   }
 
   async function authenticateMachineRequestWithTokenInHeader() {
-    const { sessionOrMachineTokenInHeader } = authenticateContext;
+    const { tokenInHeader } = authenticateContext;
     // Use session token error handling if no token in header (default behavior)
-    if (!sessionOrMachineTokenInHeader) {
+    if (!tokenInHeader) {
       return handleError(new Error('Missing token in header'), 'header');
     }
 
     // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineToken(sessionOrMachineTokenInHeader)) {
+    if (!isMachineToken(tokenInHeader)) {
       return signedOut({
         tokenType: acceptsToken as MachineTokenType,
         authenticateContext,
@@ -662,16 +662,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    const parsedTokenType = getMachineTokenType(sessionOrMachineTokenInHeader);
+    const parsedTokenType = getMachineTokenType(tokenInHeader);
     const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {
       return mismatchState;
     }
 
-    const { data, tokenType, errors } = await verifyMachineAuthToken(
-      sessionOrMachineTokenInHeader,
-      authenticateContext,
-    );
+    const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleMachineError(tokenType, errors[0]);
     }
@@ -679,29 +676,26 @@ export const authenticateRequest: AuthenticateRequest = (async (
       tokenType,
       authenticateContext,
       machineData: data,
-      token: sessionOrMachineTokenInHeader,
+      token: tokenInHeader,
     });
   }
 
   async function authenticateAnyRequestWithTokenInHeader() {
-    const { sessionOrMachineTokenInHeader } = authenticateContext;
+    const { tokenInHeader } = authenticateContext;
     // Use session token error handling if no token in header (default behavior)
-    if (!sessionOrMachineTokenInHeader) {
+    if (!tokenInHeader) {
       return handleError(new Error('Missing token in header'), 'header');
     }
 
     // Handle as a machine token
-    if (isMachineToken(sessionOrMachineTokenInHeader)) {
-      const parsedTokenType = getMachineTokenType(sessionOrMachineTokenInHeader);
+    if (isMachineToken(tokenInHeader)) {
+      const parsedTokenType = getMachineTokenType(tokenInHeader);
       const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {
         return mismatchState;
       }
 
-      const { data, tokenType, errors } = await verifyMachineAuthToken(
-        sessionOrMachineTokenInHeader,
-        authenticateContext,
-      );
+      const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
       if (errors) {
         return handleMachineError(tokenType, errors[0]);
       }
@@ -710,12 +704,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
         tokenType,
         authenticateContext,
         machineData: data,
-        token: sessionOrMachineTokenInHeader,
+        token: tokenInHeader,
       });
     }
 
     // Handle as a regular session token
-    const { data, errors } = await verifyToken(sessionOrMachineTokenInHeader, authenticateContext);
+    const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleError(errors[0], 'header');
     }
@@ -724,11 +718,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
       tokenType: TokenType.SessionToken,
       authenticateContext,
       sessionClaims: data,
-      token: sessionOrMachineTokenInHeader,
+      token: tokenInHeader,
     });
   }
 
-  if (authenticateContext.sessionOrMachineTokenInHeader) {
+  if (authenticateContext.tokenInHeader) {
     if (acceptsToken === 'any') {
       return authenticateAnyRequestWithTokenInHeader();
     }
