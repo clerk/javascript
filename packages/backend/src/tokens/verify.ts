@@ -196,7 +196,7 @@ async function verifyMachineToken(
     const verifiedToken = await client.machineTokens.verifySecret(secret);
     return { data: verifiedToken, tokenType: TokenType.MachineToken, errors: undefined };
   } catch (err: any) {
-    return handleClerkAPIError('machine_token', err, 'Machine token not found');
+    return handleClerkAPIError(TokenType.MachineToken, err, 'Machine token not found');
   }
 }
 
