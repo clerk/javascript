@@ -1,18 +1,20 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
-import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
+import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
-import { usePrefersReducedMotion } from '../../hooks';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+export const CheckoutComplete = ({
+  checkout,
+  isMotionSafe,
+}: {
+  checkout: __experimental_CommerceCheckoutResource;
+  isMotionSafe: boolean;
+}) => {
   const { setIsOpen } = useDrawerContext();
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
-  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
   const handleClose = () => {
     if (setIsOpen) {
@@ -37,6 +39,8 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             animationName: 'scaleIn',
             animationDuration: `${transitionDurationValues.slowest}ms`,
             animationTimingFunction: transitionTiming.bezier,
+            animationFillMode: 'forwards',
+            opacity: 0,
             '@keyframes scaleIn': {
               '0%': {
                 filter: 'blur(10px)',
@@ -49,6 +53,10 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                 opacity: 1,
               },
             },
+            ...(!isMotionSafe && {
+              animation: 'none',
+              opacity: 1,
+            }),
           })}
         >
           {[1, 0.75, 0.5].map((scale, index, array) => {
@@ -57,6 +65,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                 key={scale}
                 scale={scale}
                 index={array.length - 1 - index}
+                isMotionSafe={isMotionSafe}
               />
             );
           })}
@@ -107,6 +116,10 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                   animationTimingFunction: transitionTiming.bezier,
                   animationFillMode: 'forwards',
                   animationDelay: `${transitionDurationValues.slow}ms`,
+                  ...(!isMotionSafe && {
+                    strokeDashoffset: '0',
+                    animation: 'none',
+                  }),
                 }}
               />
             </svg>
@@ -154,6 +167,10 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                     opacity: 1,
                   },
                 },
+                ...(!isMotionSafe && {
+                  opacity: 1,
+                  animation: 'none',
+                }),
               }}
             />
             <Text
@@ -178,6 +195,10 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
                     opacity: 1,
                   },
                 },
+                ...(!isMotionSafe && {
+                  opacity: 1,
+                  animation: 'none',
+                }),
               })}
               localizationKey={
                 checkout.subscription?.status === 'active'
@@ -204,6 +225,9 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               opacity: 1,
             },
           },
+          ...(!isMotionSafe && {
+            animation: 'none',
+          }),
         })}
       >
         <LineItems.Root>
@@ -255,6 +279,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
 function Ring({
   scale,
   index,
+  isMotionSafe,
 }: {
   /**
    * Number between 0-1
@@ -264,6 +289,7 @@ function Ring({
    * Index of the ring (0-2)
    */
   index: number;
+  isMotionSafe: boolean;
 }) {
   return (
     <Span
@@ -284,6 +310,10 @@ function Ring({
         animationTimingFunction: transitionTiming.bezier,
         animationFillMode: 'forwards',
         animationDelay: `${index * transitionDurationValues.slow}ms`,
+        ...(!isMotionSafe && {
+          animation: 'none',
+          opacity: 1,
+        }),
       })}
     />
   );
