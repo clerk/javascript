@@ -56,9 +56,6 @@ export const common = ({ page }: { page: EnhancedPage }) => {
         return !!window.Clerk?.session;
       });
     },
-    waitForDrawerMounted: () => {
-      return page.locator('.cl-drawerContent').waitFor({ state: 'attached' });
-    },
   };
 
   return self;
