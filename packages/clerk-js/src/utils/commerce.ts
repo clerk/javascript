@@ -1,8 +1,8 @@
 import type {
   __experimental_CommerceCheckoutTotals,
   __experimental_CommerceCheckoutTotalsJSON,
-  __experimental_CommerceInvoiceTotals,
-  __experimental_CommerceInvoiceTotalsJSON,
+  __experimental_CommerceStatementTotals,
+  __experimental_CommerceStatementTotalsJSON,
   __experimental_CommerceMoney,
   __experimental_CommerceMoneyJSON,
 } from '@clerk/types';
@@ -17,7 +17,7 @@ export const commerceMoneyFromJSON = (data: __experimental_CommerceMoneyJSON): _
 };
 
 export const commerceTotalsFromJSON = <
-  T extends __experimental_CommerceInvoiceTotalsJSON | __experimental_CommerceCheckoutTotalsJSON,
+  T extends __experimental_CommerceStatementTotalsJSON | __experimental_CommerceCheckoutTotalsJSON,
 >(
   data: T,
 ) => {
@@ -40,5 +40,5 @@ export const commerceTotalsFromJSON = <
 
   return totals as T extends { total_due_now: __experimental_CommerceMoneyJSON }
     ? __experimental_CommerceCheckoutTotals
-    : __experimental_CommerceInvoiceTotals;
+    : __experimental_CommerceStatementTotals;
 };

@@ -3,7 +3,7 @@
  */
 
 import type {
-  __experimental_CommerceInvoiceStatus,
+  __experimental_CommerceStatementStatus,
   __experimental_CommercePaymentSourceStatus,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionStatus,
@@ -640,13 +640,13 @@ export interface __experimental_CommerceInitializedPaymentSourceJSON extends Cle
   external_gateway_id: string;
 }
 
-export interface __experimental_CommerceInvoiceJSON extends ClerkResourceJSON {
+export interface __experimental_CommerceStatementJSON extends ClerkResourceJSON {
   object: 'commerce_invoice';
   id: string;
   paid_on: number;
   payment_due_on: number;
-  status: __experimental_CommerceInvoiceStatus;
-  totals: __experimental_CommerceInvoiceTotalsJSON;
+  status: __experimental_CommerceStatementStatus;
+  totals: __experimental_CommerceStatementTotalsJSON;
 }
 
 export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
@@ -681,7 +681,7 @@ export interface __experimental_CommerceCheckoutTotalsJSON {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface __experimental_CommerceInvoiceTotalsJSON
+export interface __experimental_CommerceStatementTotalsJSON
   extends Omit<__experimental_CommerceCheckoutTotalsJSON, 'total_due_now'> {}
 
 export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {

@@ -1,4 +1,4 @@
-import type { __experimental_CommerceInvoiceResource } from '@clerk/types';
+import type { __experimental_CommerceStatementResource } from '@clerk/types';
 import React from 'react';
 
 import { useStatementsContext } from '../../contexts';
@@ -36,7 +36,7 @@ export const StatementsList = () => {
   );
 };
 
-const StatementsListRow = ({ statement }: { statement: __experimental_CommerceInvoiceResource }) => {
+const StatementsListRow = ({ statement }: { statement: __experimental_CommerceStatementResource }) => {
   const {
     paymentDueOn,
     id,

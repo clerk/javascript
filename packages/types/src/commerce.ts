@@ -25,7 +25,7 @@ export interface __experimental_CommerceBillingNamespace {
   ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
   getInvoices: (
     params: __experimental_GetInvoicesParams,
-  ) => Promise<ClerkPaginatedResponse<__experimental_CommerceInvoiceResource>>;
+  ) => Promise<ClerkPaginatedResponse<__experimental_CommerceStatementResource>>;
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
 
@@ -110,14 +110,14 @@ export interface __experimental_CommerceInitializedPaymentSourceResource extends
 
 export type __experimental_GetInvoicesParams = WithOptionalOrgType<ClerkPaginationParams>;
 
-export type __experimental_CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due';
+export type __experimental_CommerceStatementStatus = 'paid' | 'unpaid' | 'past_due';
 
-export interface __experimental_CommerceInvoiceResource extends ClerkResource {
+export interface __experimental_CommerceStatementResource extends ClerkResource {
   id: string;
-  totals: __experimental_CommerceInvoiceTotals;
+  totals: __experimental_CommerceStatementTotals;
   paymentDueOn: number;
   paidOn: number;
-  status: __experimental_CommerceInvoiceStatus;
+  status: __experimental_CommerceStatementStatus;
 }
 
 export type __experimental_GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
@@ -153,7 +153,7 @@ export interface __experimental_CommerceCheckoutTotals {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface __experimental_CommerceInvoiceTotals
+export interface __experimental_CommerceStatementTotals
   extends Omit<__experimental_CommerceCheckoutTotals, 'totalDueNow'> {}
 
 export type __experimental_CreateCheckoutParams = WithOptionalOrgType<{
