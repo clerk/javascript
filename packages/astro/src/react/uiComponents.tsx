@@ -187,7 +187,7 @@ export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistPr
   );
 }, 'Waitlist');
 
-export const __experimental_PricingTable = withClerk(
+export const experimental_PricingTable = withClerk(
   ({ clerk, ...props }: WithClerkProp<__experimental_PricingTableProps>) => {
     return (
       <Portal
@@ -197,5 +197,5 @@ export const __experimental_PricingTable = withClerk(
       />
     );
   },
-  '__experimental_PricingTable',
+  'experimental_PricingTable',
 );
