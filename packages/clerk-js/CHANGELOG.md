@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.63.5
+
+### Patch Changes
+
+- Use the `total.proration.credit` to show the proration credit on checkout flow ([#5792](https://github.com/clerk/javascript/pull/5792)) by [@octoper](https://github.com/octoper)
+
+- Adding Partitioned attribute to \_\_client_uat cookie in CHIPS build variant ([#5785](https://github.com/clerk/javascript/pull/5785)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix wrong tax value on invoices ([#5796](https://github.com/clerk/javascript/pull/5796)) by [@octoper](https://github.com/octoper)
+
+- Fix credits section show check ([#5795](https://github.com/clerk/javascript/pull/5795)) by [@octoper](https://github.com/octoper)
+
+- Remove usage of `totals.grandTotal` from checkout flows ([#5794](https://github.com/clerk/javascript/pull/5794)) by [@octoper](https://github.com/octoper)
+
+- Remove unused properties from proration response in checkout ([#5793](https://github.com/clerk/javascript/pull/5793)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`9ec0a73`](https://github.com/clerk/javascript/commit/9ec0a7353e9f6ea661c3d7b9542423b6eb1d29e9), [`d9222fc`](https://github.com/clerk/javascript/commit/d9222fc3c21da2bcae30b06f0b1897f526935582)]:
+  - @clerk/types@4.56.3
+  - @clerk/localizations@3.14.4
+  - @clerk/shared@3.7.8
+
 ## 5.63.4
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # @clerk/nuxt
 
+## 1.6.0
+
+### Minor Changes
+
+- Introducing `<experimental_PricingTable/>` ([#5769](https://github.com/clerk/javascript/pull/5769)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`9ec0a73`](https://github.com/clerk/javascript/commit/9ec0a7353e9f6ea661c3d7b9542423b6eb1d29e9), [`d9222fc`](https://github.com/clerk/javascript/commit/d9222fc3c21da2bcae30b06f0b1897f526935582), [`56ba4e2`](https://github.com/clerk/javascript/commit/56ba4e271d6f27880486c6479bde7d392922801d)]:
+  - @clerk/types@4.56.3
+  - @clerk/vue@1.7.0
+  - @clerk/backend@1.31.2
+  - @clerk/shared@3.7.8
+
 ## 1.5.13
 
 ### Patch Changes
