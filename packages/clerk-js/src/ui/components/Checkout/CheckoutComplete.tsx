@@ -257,15 +257,6 @@ export const CheckoutComplete = ({
               }
             />
           </LineItems.Group>
-          <LineItems.Group variant='tertiary'>
-            <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__invoiceId')} />
-            <LineItems.Description
-              text={checkout.invoice_id || '–'}
-              truncateText
-              copyText
-              copyLabel='Copy invoice ID'
-            />
-          </LineItems.Group>
         </LineItems.Root>
         <Button
           onClick={handleClose}
