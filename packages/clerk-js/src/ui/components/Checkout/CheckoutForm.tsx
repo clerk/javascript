@@ -31,8 +31,8 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
-  const showAdjustment =
-    totals.totalDueNow.amount > 0 && totals.proration?.credit?.amount && totals.proration.credit.amount > 0;
+  const showCredits =
+    totals.totalDueNow.amount > 0 && !!totals.proration?.credit?.amount && totals.proration.credit.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
@@ -67,7 +67,7 @@ export const CheckoutForm = ({
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
-          {showAdjustment && (
+          {showCredits && (
             <LineItems.Group>
               {/* TODO(@Commerce): needs localization */}
               <LineItems.Title
