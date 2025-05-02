@@ -1571,6 +1571,8 @@ type __experimental_PricingTableBaseProps = {
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
 
+type PortalRoot = HTMLElement | null | undefined;
+
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
   __experimental_PricingTableDefaultProps;
 
@@ -1581,6 +1583,7 @@ export type __experimental_CheckoutProps = {
   subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
 export type __experimental_PlanDetailsProps = {
@@ -1590,6 +1593,7 @@ export type __experimental_PlanDetailsProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
 export interface HandleEmailLinkVerificationParams {

@@ -51,9 +51,14 @@ export const common = ({ page }: { page: EnhancedPage }) => {
     getLastNameInput: () => {
       return page.locator('input[name=lastName]');
     },
+    waitForSession: async () => {
+      return page.waitForFunction(() => {
+        return !!window.Clerk?.session;
+      });
+    },
     waitForDrawerMounted: () => {
       return page.locator('.cl-drawerContent').waitFor({ state: 'attached' });
-    },
+    }
   };
 
   return self;

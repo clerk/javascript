@@ -1,5 +1,21 @@
 # Change Log
 
+## 3.7.7
+
+### Patch Changes
+
+- Updated dependencies [[`225b9ca`](https://github.com/clerk/javascript/commit/225b9ca21aba44930872a85d6b112ee2a1b606b9)]:
+  - @clerk/types@4.56.2
+
+## 3.7.6
+
+### Patch Changes
+
+- Fix handshake redirect loop in applications deployed to Netlify with a Clerk development instance. ([#5656](https://github.com/clerk/javascript/pull/5656)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`387bf62`](https://github.com/clerk/javascript/commit/387bf623406306e0c5c08da937f4930a7ec5e4a5), [`294da82`](https://github.com/clerk/javascript/commit/294da82336e7a345900d7ef9b28f56a7c8864c52)]:
+  - @clerk/types@4.56.1
+
 ## 3.7.5
 
 ### Patch Changes

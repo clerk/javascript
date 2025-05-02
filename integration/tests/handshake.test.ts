@@ -156,11 +156,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('expired session token - prod', async () => {
@@ -179,11 +182,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('expired session token - authorization header - prod', async () => {
@@ -203,11 +209,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('early session token - dev', async () => {
@@ -226,11 +235,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('session-token-nbf');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('early session token - authorization header - dev', async () => {
@@ -250,11 +260,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-nbf${devBrowserQuery}`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('session-token-nbf');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('proxyUrl - dev', async () => {
@@ -274,11 +285,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://example.com/clerk/v1/client/handshake');
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('proxyUrl - prod', async () => {
@@ -298,11 +312,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://example.com/clerk/v1/client/handshake');
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('domain - dev', async () => {
@@ -322,11 +339,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('domain - prod', async () => {
@@ -346,11 +366,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('missing session token, positive uat - dev', async () => {
@@ -367,11 +390,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token${devBrowserQuery}`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('client-uat-but-no-session-token');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('missing session token, positive uat - prod', async () => {
@@ -388,11 +412,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=client-uat-but-no-session-token`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('client-uat-but-no-session-token');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('missing session token, 0 uat (indicating signed out) - dev', async () => {
@@ -489,11 +514,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
-        app.serverUrl + '/',
-      )}&suffixed_cookies=false&__clerk_hs_reason=satellite-needs-syncing`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('satellite-needs-syncing');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('signed out satellite - dev', async () => {
@@ -526,11 +552,12 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-missing`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('dev-browser-missing');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - path and qs - dev', async () => {
@@ -549,11 +576,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/hello?foo=bar`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - path and qs - prod', async () => {
@@ -572,11 +602,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/hello?foo=bar`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - proxy - dev', async () => {
@@ -597,9 +630,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe('https://example.com/hello?foo=bar');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - proxy - prod', async () => {
@@ -620,9 +658,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe('https://example.com/hello?foo=bar');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - proxy with port - dev', async () => {
@@ -643,9 +686,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie${devBrowserQuery}`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe('https://example.com:3213/hello?foo=bar');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('redirect url - proxy with port - prod', async () => {
@@ -666,9 +714,14 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=false&__clerk_hs_reason=session-token-expired-refresh-non-eligible-no-refresh-cookie`,
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe('https://example.com:3213/hello?foo=bar');
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
+      'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
   });
 
   test('Handshake result - dev - nominal', async () => {
@@ -793,11 +846,13 @@ test.describe('Client handshake @generic', () => {
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
-        `${app.serverUrl}/`,
-      )}&suffixed_cookies=false&__clerk_hs_reason=dev-browser-sync&__clerk_db_jwt=asdf`,
-    );
+    const locationUrl = new URL(res.headers.get('location'));
+    expect(locationUrl.origin + locationUrl.pathname).toBe(`https://${config.pkHost}/v1/client/handshake`);
+    expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
+    expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe('dev-browser-sync');
+    expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
+    expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
+    expect(locationUrl.searchParams.get('__clerk_db_jwt')).toBe('asdf');
   });
 
   test('Handshake result - prod - nominal', async () => {
@@ -904,7 +959,9 @@ test.describe('Client handshake with organization activation @nextjs', () => {
   test.beforeAll('setup local jwks server', async () => {
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
-    app = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
+    const address = jwksServer.address();
+    const port = typeof address === 'string' ? 0 : address?.port;
+    app = await startAppWithOrganizationSyncOptions(`http://localhost:${port}`);
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
@@ -1285,8 +1342,9 @@ test.describe('Client handshake with an organization activation avoids infinite 
   test.beforeAll('setup local jwks server', async () => {
     // Start the jwks server
     await new Promise<void>(resolve => jwksServer.listen(0, resolve));
-
-    thisApp = await startAppWithOrganizationSyncOptions(`http://localhost:${jwksServer.address().port}`);
+    const address = jwksServer.address();
+    const port = typeof address === 'string' ? 0 : address?.port;
+    thisApp = await startAppWithOrganizationSyncOptions(`http://localhost:${port}`);
   });
 
   test.afterAll('setup local Clerk API mock', async () => {
