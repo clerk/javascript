@@ -72,7 +72,7 @@ function isRequestEligibleForRefresh(
   );
 }
 
-function maybeHandleTokenTypeMismatch(
+function checkTokenTypeMismatch(
   parsedTokenType: MachineTokenType,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   authenticateContext: AuthenticateContext,
@@ -663,7 +663,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     const parsedTokenType = getMachineTokenType(tokenInHeader);
-    const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+    const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
     if (mismatchState) {
       return mismatchState;
     }
@@ -690,7 +690,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Handle as a machine token
     if (isMachineToken(tokenInHeader)) {
       const parsedTokenType = getMachineTokenType(tokenInHeader);
-      const mismatchState = maybeHandleTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+      const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {
         return mismatchState;
       }
