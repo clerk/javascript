@@ -87,12 +87,12 @@ export const CheckoutForm = ({
           >
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Title title='Subtotal' />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
+            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group variant='tertiary'>
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Title title='Tax' />
-            <LineItems.Description text={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
+            <LineItems.Description text={`${totals.taxTotal.currencySymbol}${totals.taxTotal.amountFormatted}`} />
           </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
