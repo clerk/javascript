@@ -43,8 +43,9 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
         alignItems: 'flex-start',
       })}
     >
-      <Span>
+      <Span elementDescriptor={descriptors.statementHeaderTitleContainer}>
         <Heading
+          elementDescriptor={descriptors.statementHeaderTitle}
           textVariant='h2'
           localizationKey={title}
         />
@@ -69,6 +70,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
         </Span>
       </Span>
       <Badge
+        elementDescriptor={descriptors.statementHeaderBadge}
         colorScheme={status === 'paid' ? 'success' : status === 'unpaid' ? 'warning' : 'danger'}
         sx={{ textTransform: 'capitalize' }}
       >
@@ -118,6 +120,7 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
       })}
     >
       <Heading
+        elementDescriptor={descriptors.statementSectionHeaderTitle}
         textVariant='h3'
         as='h2'
         localizationKey={text}
@@ -181,7 +184,7 @@ function SectionContentDetailsHeader({
         justifyContent: 'space-between',
       })}
     >
-      <Box>
+      <Box elementDescriptor={descriptors.statementSectionContentDetailsHeaderItem}>
         <Span
           sx={t => ({
             display: 'flex',
@@ -190,10 +193,12 @@ function SectionContentDetailsHeader({
           })}
         >
           <Icon
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderItemIcon}
             icon={Plans}
             colorScheme='neutral'
           />
           <Heading
+            elementDescriptor={descriptors.statementSectionContentDetailsHeaderTitle}
             as='h3'
             textVariant='h3'
             localizationKey={title}
@@ -202,21 +207,25 @@ function SectionContentDetailsHeader({
         <Text
           variant='caption'
           colorScheme='secondary'
+          elementDescriptor={descriptors.statementSectionContentDetailsHeaderDescription}
           localizationKey={description}
         />
       </Box>
       <Box
+        elementDescriptor={descriptors.statementSectionContentDetailsHeaderItem}
         sx={{
           textAlign: 'right',
         }}
       >
         <Text
           variant='h3'
+          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryTitle}
           localizationKey={secondaryTitle}
         />
         <Text
           variant='caption'
           colorScheme='secondary'
+          elementDescriptor={descriptors.statementSectionContentDetailsHeaderSecondaryDescription}
           localizationKey={secondaryDescription}
         />
       </Box>
@@ -287,6 +296,7 @@ function SectionContentDetailsListItem({
       })}
     >
       <Span
+        elementDescriptor={descriptors.statementSectionContentDetailsListItemLabelContainer}
         sx={t => ({
           display: 'flex',
           alignItems: 'center',
@@ -302,6 +312,7 @@ function SectionContentDetailsListItem({
         <Text
           variant='caption'
           colorScheme='secondary'
+          elementDescriptor={descriptors.statementSectionContentDetailsListItemLabel}
           localizationKey={label}
         />
       </Span>
@@ -324,12 +335,14 @@ function SectionContentDetailsListItem({
             <Text
               colorScheme='secondary'
               variant='caption'
+              elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
             >
               {valueTruncated ? truncateWithEndVisible(value) : value}
             </Text>
           </>
         ) : (
           <Text
+            elementDescriptor={descriptors.statementSectionContentDetailsListItemValue}
             colorScheme='secondary'
             variant='caption'
             localizationKey={value}
@@ -363,8 +376,10 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
       <Text
         variant='h3'
         localizationKey={label}
+        elementDescriptor={descriptors.statementFooterLabel}
       />
       <Span
+        elementDescriptor={descriptors.statementFooterValueContainer}
         sx={t => ({
           display: 'flex',
           alignItems: 'center',
@@ -374,10 +389,16 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
         <Text
           variant='caption'
           colorScheme='secondary'
+          elementDescriptor={descriptors.statementFooterCurrency}
         >
           USD
         </Text>
-        <Text variant='h3'>{value}</Text>
+        <Text
+          variant='h3'
+          elementDescriptor={descriptors.statementFooterValue}
+        >
+          {value}
+        </Text>
       </Span>
     </Box>
   );
@@ -388,6 +409,7 @@ function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: st
 
   return (
     <Button
+      elementDescriptor={descriptors.statementCopyButton}
       variant='unstyled'
       onClick={onCopy}
       sx={t => ({

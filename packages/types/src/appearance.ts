@@ -469,16 +469,33 @@ export type ElementsConfig = {
 
   statementRoot: WithOptions;
   statementHeader: WithOptions;
+  statementHeaderTitle: WithOptions;
+  statementHeaderBadge: WithOptions;
   statementBody: WithOptions;
   statementSection: WithOptions;
   statementSectionHeader: WithOptions;
+  statementHeaderTitleContainer: WithOptions;
+  statementSectionHeaderTitle: WithOptions;
   statementSectionContent: WithOptions;
   statementSectionContentItem: WithOptions;
   statementSectionContentDetailsList: WithOptions;
   statementSectionContentDetailsListItem: WithOptions;
+  statementSectionContentDetailsListItemLabelContainer: WithOptions;
+  statementSectionContentDetailsListItemLabel: WithOptions;
+  statementSectionContentDetailsListItemValue: WithOptions;
   statementSectionContentDetailsHeader: WithOptions;
+  statementSectionContentDetailsHeaderItem: WithOptions;
+  statementSectionContentDetailsHeaderItemIcon: WithOptions;
+  statementSectionContentDetailsHeaderTitle: WithOptions;
+  statementSectionContentDetailsHeaderDescription: WithOptions;
+  statementSectionContentDetailsHeaderSecondaryTitle: WithOptions;
+  statementSectionContentDetailsHeaderSecondaryDescription: WithOptions;
   statementFooter: WithOptions;
-
+  statementFooterLabel: WithOptions;
+  statementFooterValueContainer: WithOptions;
+  statementFooterCurrency: WithOptions;
+  statementFooterValue: WithOptions;
+  statementCopyButton: WithOptions;
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
