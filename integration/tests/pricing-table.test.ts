@@ -69,7 +69,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     // await frame.getByLabel('ZIP code').fill('12345');
 
     await u.po.page.getByRole('button', { name: 'Pay $' }).click();
-    await u.po.page.locator('.cl-checkoutSuccessTitle').waitFor({ state: 'visible' });
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
   });
 
