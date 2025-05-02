@@ -39,6 +39,8 @@ export const commerceTotalsFromJSON = <
       ratePerDay: commerceMoneyFromJSON(data.proration.rate_per_day),
       // @ts-ignore
       totalProration: commerceMoneyFromJSON(data.proration.total_proration),
+      // @ts-ignore
+      credit: commerceMoneyFromJSON(data.proration.credit),
     };
   }
 

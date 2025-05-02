@@ -31,9 +31,8 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
-
-  const adjustmentAmount = (totals.proration?.days || 0) * (totals.proration?.ratePerDay.amount || 0);
-  const showAdjustment = totals.totalDueNow.amount > 0 && adjustmentAmount > 0;
+  const showAdjustment =
+    totals.totalDueNow.amount > 0 && totals.proration?.credit?.amount && totals.proration.credit.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
@@ -72,13 +71,13 @@ export const CheckoutForm = ({
             <LineItems.Group>
               {/* TODO(@Commerce): needs localization */}
               <LineItems.Title
-                title={'Adjustment'}
+                title={'Credit'}
                 description={'Prorated credit for the remainder of your subscription.'}
               />
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
-                text={`- ${totals.proration?.totalProration.currencySymbol}${adjustmentAmount / 100}`}
+                text={`- ${totals.proration?.credit.currencySymbol}${totals.proration?.credit.amountFormatted}`}
               />
             </LineItems.Group>
           )}
