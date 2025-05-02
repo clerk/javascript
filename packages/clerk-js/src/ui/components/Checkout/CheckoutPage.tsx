@@ -1,7 +1,11 @@
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type {
+  __experimental_CheckoutProps,
+  __experimental_CommerceCheckoutResource,
+  ClerkAPIError,
+} from '@clerk/types';
 import { useEffect } from 'react';
 
-import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
+import { Alert, Box, localizationKeys, Spinner, useLocalizations } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
@@ -9,14 +13,17 @@ import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
+  const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
 
-  const { checkout, isLoading, invalidate, revalidate, updateCheckout, isMissingPayerEmail } = useCheckout({
+  const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
     planId,
     planPeriod,
     subscriberType,
   });
+
+  const isMissingPayerEmail = errors.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
@@ -82,7 +89,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           margin: 'auto',
         }}
       >
-        There was a problem, please try again later.
+        {errors[0] ? translateError(errors[0]) : 'There was a problem, please try again later.'}
       </Alert>
     </>
   );

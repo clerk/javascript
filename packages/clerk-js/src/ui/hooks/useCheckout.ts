@@ -1,9 +1,6 @@
+import type { ClerkAPIResponseError } from '@clerk/shared';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceCheckoutResource,
-  ClerkAPIError,
-} from '@clerk/types';
+import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
@@ -20,7 +17,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     isLoading,
     invalidate,
     revalidate,
-    error,
+    error: _error,
   } = useFetch(
     __experimental_commerce?.__experimental_billing.startCheckout,
     {
@@ -31,6 +28,8 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     undefined,
     `commerce-checkout-${user?.id}`,
   );
+
+  const error = _error as ClerkAPIResponseError;
 
   const updateCheckout = useCallback((newCheckout: __experimental_CommerceCheckoutResource) => {
     setCurrentCheckout(newCheckout);
@@ -48,6 +47,6 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     isLoading,
     invalidate,
     revalidate,
-    isMissingPayerEmail: error?.errors.some((e: ClerkAPIError) => e.code === 'missing_payer_email'),
+    errors: error.errors,
   };
 };
