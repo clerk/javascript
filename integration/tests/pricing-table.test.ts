@@ -66,7 +66,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await frame.getByLabel('Card number').fill('4242424242424242');
     await frame.getByLabel('Expiration date').fill('1234');
     await frame.getByLabel('Security code').fill('123');
-    // await frame.getByLabel('ZIP code').fill('12345');
+    await frame.getByLabel('ZIP code').fill('12345');
 
     await u.po.page.getByRole('button', { name: 'Pay $' }).click();
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
