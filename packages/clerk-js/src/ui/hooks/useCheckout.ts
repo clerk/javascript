@@ -1,4 +1,4 @@
-import type { ClerkAPIResponseError } from '@clerk/shared';
+import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
