@@ -5,7 +5,7 @@ import type {
 } from '@clerk/types';
 import { useEffect } from 'react';
 
-import { Alert, Box, localizationKeys, Spinner, useLocalizations } from '../../customizables';
+import { Alert, Box, Flex, localizationKeys, Spinner, useLocalizations } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
 import { useCheckout } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
@@ -23,7 +23,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     subscriberType,
   });
 
-  const isMissingPayerEmail = errors.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
+  const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
 
   const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
@@ -81,16 +81,20 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   }
 
   return (
-    <>
-      {/* TODO(@COMMERCE): needs localization */}
-      <Alert
-        colorScheme='danger'
-        sx={{
-          margin: 'auto',
-        }}
+    <Drawer.Body>
+      <Flex
+        align={'center'}
+        justify={'center'}
+        sx={t => ({
+          height: '100%',
+          padding: t.space.$4,
+          fontSize: t.fontSizes.$md,
+        })}
       >
-        {errors[0] ? translateError(errors[0]) : 'There was a problem, please try again later.'}
-      </Alert>
-    </>
+        <Alert colorScheme='danger'>
+          {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
+        </Alert>
+      </Flex>
+    </Drawer.Body>
   );
 };

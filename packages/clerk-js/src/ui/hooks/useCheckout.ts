@@ -29,7 +29,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     `commerce-checkout-${user?.id}`,
   );
 
-  const error = _error as ClerkAPIResponseError;
+  const error = _error as ClerkAPIResponseError | undefined;
 
   const updateCheckout = useCallback((newCheckout: __experimental_CommerceCheckoutResource) => {
     setCurrentCheckout(newCheckout);
@@ -47,6 +47,6 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     isLoading,
     invalidate,
     revalidate,
-    errors: error.errors,
+    errors: error?.errors,
   };
 };
