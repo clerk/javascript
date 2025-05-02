@@ -96,14 +96,8 @@ export const CheckoutForm = ({
           </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title={`Total${totals.totalDueNow ? ' Due Today' : ''}`} />
-            <LineItems.Description
-              text={`${
-                totals.totalDueNow
-                  ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
-                  : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`
-              }`}
-            />
+            <LineItems.Title title={`Total Due Today`} />
+            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
