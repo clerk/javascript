@@ -72,7 +72,7 @@ export const CheckoutForm = ({
             <LineItems.Group>
               {/* TODO(@Commerce): needs localization */}
               <LineItems.Title
-                title={'Adjustment'}
+                title={'Credit'}
                 description={'Prorated credit for the remainder of your subscription.'}
               />
               {/* TODO(@Commerce): needs localization */}
