@@ -283,7 +283,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
   ): SignedInState | SignedOutState | HandshakeState {
     if (!handshakeService.isRequestEligibleForHandshake()) {
       return signedOut({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason,
         message,
@@ -308,7 +308,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
       console.log(msg);
       return signedOut({
-        tokenType: 'session_token',
+        tokenType: TokenType.SessionToken,
         authenticateContext,
         reason,
         message,
