@@ -6,7 +6,6 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -28,8 +27,7 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common, InternalThemeProvider } from '../../styledSystem';
-import { colors } from '../../utils';
-
+import { colors, getClosestProfileScrollBox } from '../../utils';
 interface PricingTableDefaultProps {
   plans?: __experimental_CommercePlanResource[] | null;
   highlightedPlan?: __experimental_CommercePlanResource['slug'];
@@ -96,7 +94,7 @@ interface CardProps {
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
   props: __experimental_PricingTableProps;
 }
@@ -115,17 +113,14 @@ function Card(props: CardProps) {
 
   const { buttonPropsForPlan } = usePlansContext();
 
-  const showPlanDetails = () => {
+  const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
+    const portalRoot = getClosestProfileScrollBox(mode, event);
+
     clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
       planPeriod,
-      portalId:
-        mode === 'modal'
-          ? subscriberType === 'user'
-            ? USER_PROFILE_CARD_SCROLLBOX_ID
-            : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-          : undefined,
+      portalRoot,
     });
   };
 
@@ -180,26 +175,28 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-        <Box
-          elementDescriptor={descriptors.pricingTableCardAction}
-          sx={t => ({
-            marginTop: 'auto',
-            padding: isCompact ? t.space.$3 : t.space.$4,
-            borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
-            borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$neutralAlpha100,
-            background: undefined,
-          })}
-        >
-          <Button
-            block
-            textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-            {...buttonPropsForPlan({ plan, isCompact })}
-            onClick={() => {
-              onSelect(plan);
-            }}
-          />
-        </Box>
+        {!plan.isDefault && (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardAction}
+            sx={t => ({
+              marginTop: 'auto',
+              padding: isCompact ? t.space.$3 : t.space.$4,
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+              background: undefined,
+            })}
+          >
+            <Button
+              block
+              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+              {...buttonPropsForPlan({ plan, isCompact })}
+              onClick={event => {
+                onSelect(plan, event);
+              }}
+            />
+          </Box>
+        )}
       </ReversibleContainer>
     </Box>
   );
@@ -327,81 +324,70 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           columnGap: t.space.$1x5,
         })}
       >
-        {plan.amount > 0 ? (
-          <>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFee}
-              variant={isCompact ? 'h2' : 'h1'}
-              colorScheme='body'
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFee}
+          variant={isCompact ? 'h2' : 'h1'}
+          colorScheme='body'
+        >
+          {plan.currencySymbol}
+          {getPlanFee}
+        </Text>
+        <Text
+          elementDescriptor={descriptors.pricingTableCardFeePeriod}
+          variant='caption'
+          colorScheme='secondary'
+          sx={t => ({
+            textTransform: 'lowercase',
+            ':before': {
+              content: '"/"',
+              marginInlineEnd: t.space.$1,
+            },
+          })}
+          localizationKey={localizationKeys('__experimental_commerce.month')}
+        />
+        {annualMonthlyAmount > 0 ? (
+          <Box
+            elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+            sx={[
+              _ => ({
+                width: '100%',
+                display: 'grid',
+                gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
+              }),
+              pricingTableCardFeePeriodNoticeAnimation,
+            ]}
+            // @ts-ignore - Needed until React 19 support
+            inert={planPeriod !== 'annual' ? 'true' : undefined}
+          >
+            <Box
+              elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeInner}
+              sx={{
+                overflow: 'hidden',
+                minHeight: 0,
+              }}
             >
-              {plan.currencySymbol}
-              {getPlanFee}
-            </Text>
-            <Text
-              elementDescriptor={descriptors.pricingTableCardFeePeriod}
-              variant='caption'
-              colorScheme='secondary'
-              sx={t => ({
-                textTransform: 'lowercase',
-                ':before': {
-                  content: '"/"',
-                  marginInlineEnd: t.space.$1,
-                },
-              })}
-              localizationKey={localizationKeys('__experimental_commerce.month')}
-            />
-            {annualMonthlyAmount > 0 ? (
-              <Box
-                elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
-                sx={[
-                  _ => ({
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateRows: planPeriod === 'annual' ? '1fr' : '0fr',
-                  }),
-                  pricingTableCardFeePeriodNoticeAnimation,
-                ]}
-                // @ts-ignore - Needed until React 19 support
-                inert={planPeriod !== 'annual' ? 'true' : undefined}
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeLabel}
+                variant='caption'
+                colorScheme='secondary'
+                sx={t => ({
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  columnGap: t.space.$1,
+                })}
               >
-                <Box
-                  elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeInner}
-                  sx={{
-                    overflow: 'hidden',
-                    minHeight: 0,
-                  }}
-                >
-                  <Text
-                    elementDescriptor={descriptors.pricingTableCardFeePeriodNoticeLabel}
-                    variant='caption'
-                    colorScheme='secondary'
-                    sx={t => ({
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: t.space.$1,
-                    })}
-                  >
-                    <Icon
-                      icon={InformationCircle}
-                      colorScheme='neutral'
-                      size='sm'
-                      aria-hidden
-                    />{' '}
-                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
-                  </Text>
-                </Box>
-              </Box>
-            ) : null}
-          </>
-        ) : (
-          <Text
-            elementDescriptor={descriptors.pricingTableCardFee}
-            variant={isCompact ? 'h2' : 'h1'}
-            localizationKey={localizationKeys('__experimental_commerce.free')}
-            colorScheme='body'
-          />
-        )}
+                <Icon
+                  icon={InformationCircle}
+                  colorScheme='neutral'
+                  size='sm'
+                  aria-hidden
+                />{' '}
+                <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+              </Text>
+            </Box>
+          </Box>
+        ) : null}
       </Flex>
       {plan.hasBaseFee && annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box
@@ -443,7 +429,7 @@ interface CardFeaturesListProps {
    * @default false
    */
   isCompact?: boolean;
-  showPlanDetails: () => void;
+  showPlanDetails: (event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>((props, ref) => {
@@ -470,6 +456,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
         sx={t => ({
           flex: '1',
           rowGap: isCompact ? t.space.$2 : t.space.$3,
+          margin: 0,
+          padding: 0,
         })}
       >
         {plan.features.slice(0, hasMoreFeatures ? (isCompact ? 3 : 8) : totalFeatures).map(feature => (
@@ -482,6 +470,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
               display: 'flex',
               alignItems: 'baseline',
               gap: t.space.$2,
+              margin: 0,
+              padding: 0,
             })}
           >
             <Icon
@@ -509,7 +499,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
       </Col>
       {hasMoreFeatures && (
         <SimpleButton
-          onClick={() => showPlanDetails()}
+          onClick={event => showPlanDetails(event)}
           variant='link'
           sx={t => ({
             marginBlockStart: t.space.$2,

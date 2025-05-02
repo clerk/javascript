@@ -16,6 +16,7 @@ export * from './range';
 export * from './getValidReactChildren';
 export * from './roleLocalizationKey';
 export * from './getRelativeToNowDateKey';
+export * from './getClosestProfileScrollBox';
 export * from './mergeRefs';
 export * from './createSlug';
 export * from './passwordUtils';

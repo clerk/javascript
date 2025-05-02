@@ -1,4 +1,5 @@
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
@@ -9,7 +10,7 @@ import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
-  const { setIsOpen } = useDrawerContext();
+  const { setIsOpen, isOpen } = useDrawerContext();
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, isMissingPayerEmail } = useCheckout({
     planId,
@@ -22,6 +23,12 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      revalidate();
+    }
+  }, [isOpen]);
 
   if (isLoading) {
     return (

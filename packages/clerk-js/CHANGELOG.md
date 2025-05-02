@@ -1,5 +1,130 @@
 # Change Log
 
+## 5.63.5
+
+### Patch Changes
+
+- Use the `total.proration.credit` to show the proration credit on checkout flow ([#5792](https://github.com/clerk/javascript/pull/5792)) by [@octoper](https://github.com/octoper)
+
+- Adding Partitioned attribute to \_\_client_uat cookie in CHIPS build variant ([#5785](https://github.com/clerk/javascript/pull/5785)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix wrong tax value on invoices ([#5796](https://github.com/clerk/javascript/pull/5796)) by [@octoper](https://github.com/octoper)
+
+- Fix credits section show check ([#5795](https://github.com/clerk/javascript/pull/5795)) by [@octoper](https://github.com/octoper)
+
+- Remove usage of `totals.grandTotal` from checkout flows ([#5794](https://github.com/clerk/javascript/pull/5794)) by [@octoper](https://github.com/octoper)
+
+- Remove unused properties from proration response in checkout ([#5793](https://github.com/clerk/javascript/pull/5793)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`9ec0a73`](https://github.com/clerk/javascript/commit/9ec0a7353e9f6ea661c3d7b9542423b6eb1d29e9), [`d9222fc`](https://github.com/clerk/javascript/commit/d9222fc3c21da2bcae30b06f0b1897f526935582)]:
+  - @clerk/types@4.56.3
+  - @clerk/localizations@3.14.4
+  - @clerk/shared@3.7.8
+
+## 5.63.4
+
+### Patch Changes
+
+- Brings back the free plan card in the PricingTable ([#5787](https://github.com/clerk/javascript/pull/5787)) by [@aeliox](https://github.com/aeliox)
+
+- Fix issue where the checkout component was portaling into the wrong profile component when two profile components were rendered at once. ([#5779](https://github.com/clerk/javascript/pull/5779)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only render add / select payment method UI during checkout when the total due is greater than $0 ([#5762](https://github.com/clerk/javascript/pull/5762)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`225b9ca`](https://github.com/clerk/javascript/commit/225b9ca21aba44930872a85d6b112ee2a1b606b9)]:
+  - @clerk/types@4.56.2
+  - @clerk/localizations@3.14.3
+  - @clerk/shared@3.7.7
+
+## 5.63.3
+
+### Patch Changes
+
+- Fix issue within profile components where the ProfileBox was removed when mounting the pricing table component causing padding issues. ([#5777](https://github.com/clerk/javascript/pull/5777)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.63.2
+
+### Patch Changes
+
+- Retry checkout confirmation if there is another checkout in progress ([#5771](https://github.com/clerk/javascript/pull/5771)) by [@octoper](https://github.com/octoper)
+
+- Avoid opening checkout from `<PricingTable />` without a session, when selecting a plan. ([#5765](https://github.com/clerk/javascript/pull/5765)) by [@panteliselef](https://github.com/panteliselef)
+
+- Forcing \_\_session cookie to have SameSite=none attribute in the CHIPS build variant ([#5775](https://github.com/clerk/javascript/pull/5775)) by [@jacekradko](https://github.com/jacekradko)
+
+- Display upgrade and downgrade information on `<Checkout />`. ([#5746](https://github.com/clerk/javascript/pull/5746)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix handshake redirect loop in applications deployed to Netlify with a Clerk development instance. ([#5656](https://github.com/clerk/javascript/pull/5656)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Throw error in development when opening `<Checkout />` without a session. ([#5767](https://github.com/clerk/javascript/pull/5767)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor PricingTable components to use RootBox component for top level element. ([#5747](https://github.com/clerk/javascript/pull/5747)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`387bf62`](https://github.com/clerk/javascript/commit/387bf623406306e0c5c08da937f4930a7ec5e4a5), [`2716622`](https://github.com/clerk/javascript/commit/27166224e12af582298460d438bd7f83ea8e04bf), [`294da82`](https://github.com/clerk/javascript/commit/294da82336e7a345900d7ef9b28f56a7c8864c52)]:
+  - @clerk/types@4.56.1
+  - @clerk/shared@3.7.6
+  - @clerk/localizations@3.14.2
+
+## 5.63.1
+
+### Patch Changes
+
+- Correct the entry point for the clerk.chips.browser.js bundle ([#5758](https://github.com/clerk/javascript/pull/5758)) by [@jacekradko](https://github.com/jacekradko)
+
+- Update dependency qrcode.react from 3.1.0 to 4.2.0. This fixes peer dependency warnings with React 19. ([#5760](https://github.com/clerk/javascript/pull/5760)) by [@LekoArts](https://github.com/LekoArts)
+
+## 5.63.0
+
+### Minor Changes
+
+- Introduce `<PricingTable forOrganizations />` to display plans that available only for organizations. ([#5740](https://github.com/clerk/javascript/pull/5740)) by [@panteliselef](https://github.com/panteliselef)
+
+- Setting the Partitioned attribute on \_\_session cookie ([#5514](https://github.com/clerk/javascript/pull/5514)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Checkout confirm request handles both new/existing payment sources ([#5745](https://github.com/clerk/javascript/pull/5745)) by [@octoper](https://github.com/octoper)
+
+- Exclude matrix variant of `<PricingTable />`. ([#5724](https://github.com/clerk/javascript/pull/5724)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix layout shift caused by the invisible captcha mechanism ([#5753](https://github.com/clerk/javascript/pull/5753)) by [@anagstef](https://github.com/anagstef)
+
+- For each plan inside the `<PricingTable/>` display "Switch to this plan" instead of "Get started" when a subscription already exists. ([#5722](https://github.com/clerk/javascript/pull/5722)) by [@panteliselef](https://github.com/panteliselef)
+
+- Renames all instances of `SubscriptionDetails` to `PlanDetails` to better reflect the capabilities, use cases, and params of the component. ([#5749](https://github.com/clerk/javascript/pull/5749)) by [@aeliox](https://github.com/aeliox)
+
+- Split `CommerceTotals` to `CommerceCheckoutTotals` and `CommerceInvoiceTotals`. ([#5726](https://github.com/clerk/javascript/pull/5726)) by [@panteliselef](https://github.com/panteliselef)
+
+- - Break out subscriptions and plans into different pages within `UserProfile` and `OrgProfile` ([#5727](https://github.com/clerk/javascript/pull/5727)) by [@aeliox](https://github.com/aeliox)
+
+  - Display free plan row when "active" and plan has features
+  - Tidy up design of subscription rows and badging
+  - Adds `SubscriptionDetails` support for plans without a current subscription
+
+- Bug fix: Checkout drawer not opening after user selected another account from UserButton. ([#5743](https://github.com/clerk/javascript/pull/5743)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix list spacing within PricingTable and PlanDetails components. ([#5755](https://github.com/clerk/javascript/pull/5755)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Replace `"commerce"` with `"billing"` in error message when components cannot render because the feature is disabled. ([#5741](https://github.com/clerk/javascript/pull/5741)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove stale properties from `__experimental_CommerceInvoiceResource` ([#5738](https://github.com/clerk/javascript/pull/5738)) by [@panteliselef](https://github.com/panteliselef)
+
+- Switch to "Payment method" terminology instead of "Payment source". ([#5721](https://github.com/clerk/javascript/pull/5721)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Removes `userProfile.__experimental_billingPage.start.headerTitle__paymentSources`
+  - Adds `userProfile.__experimental_billingPage.start.headerTitle__paymentMethods`
+
+- Retry confrim checkout requests if any erros with >=500 status code occur ([#5742](https://github.com/clerk/javascript/pull/5742)) by [@octoper](https://github.com/octoper)
+
+- Add the CAPTCHA element on the SignIn component ([#5739](https://github.com/clerk/javascript/pull/5739)) by [@anagstef](https://github.com/anagstef)
+
+- Update the text in Checkout buttons from "Pay $0" to "Subscribe". ([#5720](https://github.com/clerk/javascript/pull/5720)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b02e766`](https://github.com/clerk/javascript/commit/b02e76627e47aec314573586451fa345a089115a), [`5d78b28`](https://github.com/clerk/javascript/commit/5d78b286b63e35fbcf44aac1f7657cbeaba4d659), [`d7f4438`](https://github.com/clerk/javascript/commit/d7f4438fa4bfd04474d5cdb9212ba908568ad6d2), [`5866855`](https://github.com/clerk/javascript/commit/58668550ec91d5511cf775972c54dc485185cc58), [`0007106`](https://github.com/clerk/javascript/commit/00071065998a3676c51e396b4c0afcbf930a9898), [`462b5b2`](https://github.com/clerk/javascript/commit/462b5b271d4e120d58a85818a358b60a6b3c8100), [`447d7a9`](https://github.com/clerk/javascript/commit/447d7a9e133c2a0e7db014bd5837e6ffff08f572), [`2beea29`](https://github.com/clerk/javascript/commit/2beea2957c67bc62446fe24d36332b0a4e850d7d), [`115601d`](https://github.com/clerk/javascript/commit/115601d12fd65dbf3011c0cda368525a2b95bfeb)]:
+  - @clerk/types@4.56.0
+  - @clerk/localizations@3.14.1
+  - @clerk/shared@3.7.5
+
 ## 5.62.2
 
 ### Patch Changes

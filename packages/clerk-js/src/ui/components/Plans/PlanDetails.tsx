@@ -40,7 +40,7 @@ export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
 const _PlanDetails = ({
   plan,
   onSubscriptionCancel,
-  portalId,
+  portalRoot,
   planPeriod: _planPeriod = 'month',
 }: __experimental_PlanDetailsProps) => {
   const clerk = useClerk();
@@ -105,7 +105,7 @@ const _PlanDetails = ({
       onSubscriptionComplete: () => {
         revalidate();
       },
-      portalId,
+      portalRoot,
     });
   };
 
@@ -151,6 +151,7 @@ const _PlanDetails = ({
               display: 'grid',
               rowGap: t.space.$6,
               padding: t.space.$4,
+              margin: 0,
             })}
           >
             {features.map(feature => (

@@ -8,11 +8,11 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import type { __experimental_PlansCtx } from '../../types';
+import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
@@ -88,6 +88,7 @@ type HandleSelectPlanProps = {
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
+  event?: React.MouseEvent<HTMLElement>;
 };
 
 export const usePlansContext = () => {
@@ -170,8 +171,10 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted' }: HandleSelectPlanProps) => {
+    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
+
+      const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
@@ -181,12 +184,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       } else {
         // if the plan doesn't support annual, use monthly
@@ -203,12 +201,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       }
     },

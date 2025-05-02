@@ -43,6 +43,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'lineItemsDescriptionPrefix',
   'lineItemsDescriptionText',
   'lineItemsCopyButton',
+  'lineItemsDowngradeNotice',
 
   'actionCard',
 
@@ -263,7 +264,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pricingTableCardFeePeriodNoticeInner',
   'pricingTableCardFeePeriodNoticeLabel',
 
-  'pricingTableMatrixRoot',
+  'pricingTableMatrix',
   'pricingTableMatrixTable',
   'pricingTableMatrixRowGroup',
   'pricingTableMatrixRowGroupHeader',

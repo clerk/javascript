@@ -147,6 +147,9 @@ export interface __experimental_CommerceCheckoutTotals {
   grandTotal: __experimental_CommerceMoney;
   taxTotal: __experimental_CommerceMoney;
   totalDueNow: __experimental_CommerceMoney;
+  proration?: {
+    credit: __experimental_CommerceMoney;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -179,4 +182,5 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   totals: __experimental_CommerceCheckoutTotals;
   subscription?: __experimental_CommerceSubscriptionResource;
   confirm: (params: __experimental_ConfirmCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
+  isImmediatePlanChange: boolean;
 }
