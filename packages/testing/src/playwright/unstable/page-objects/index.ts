@@ -1,11 +1,13 @@
 import type { Page } from '@playwright/test';
 
 import { createAppPageObject } from './app';
+import { createCheckoutPageObject } from './checkout';
 import { createClerkPageObject } from './clerk';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
+import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
@@ -30,10 +32,12 @@ export const createPageObjects = ({
   return {
     page: app,
     clerk: createClerkPageObject(testArgs),
+    checkout: createCheckoutPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
+    pricingTable: createPricingTablePageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
