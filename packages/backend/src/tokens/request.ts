@@ -394,7 +394,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
         token: tokenInHeader!,
       });
     } catch (err) {
-      return handleError(err, 'header');
+      return handleSessionTokenError(err, 'header');
     }
   }
 
@@ -516,7 +516,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
 
     if (decodedErrors) {
-      return handleError(decodedErrors[0], 'cookie');
+      return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
@@ -550,7 +550,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
       return signedInRequestState;
     } catch (err) {
-      return handleError(err, 'cookie');
+      return handleSessionTokenError(err, 'cookie');
     }
 
     // Unreachable
@@ -561,7 +561,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     });
   }
 
-  async function handleError(
+  async function handleSessionTokenError(
     err: unknown,
     tokenCarrier: TokenCarrier,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
@@ -649,7 +649,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { tokenInHeader } = authenticateContext;
     // Use session token error handling if no token in header (default behavior)
     if (!tokenInHeader) {
-      return handleError(new Error('Missing token in header'), 'header');
+      return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
     // Handle case where tokenType is any and the token is not a machine token
@@ -684,7 +684,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { tokenInHeader } = authenticateContext;
     // Use session token error handling if no token in header (default behavior)
     if (!tokenInHeader) {
-      return handleError(new Error('Missing token in header'), 'header');
+      return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
     // Handle as a machine token
@@ -711,7 +711,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Handle as a regular session token
     const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
-      return handleError(errors[0], 'header');
+      return handleSessionTokenError(errors[0], 'header');
     }
 
     return signedIn({
