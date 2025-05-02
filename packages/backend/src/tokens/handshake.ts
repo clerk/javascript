@@ -1,4 +1,4 @@
-import { constants } from '../constants';
+import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import { assertHeaderAlgorithm, assertHeaderType } from '../jwt/assertions';
@@ -139,6 +139,7 @@ export class HandshakeService {
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
+    url.searchParams.append('__clerk_api_version', SUPPORTED_BAPI_VERSION);
     url.searchParams.append(
       constants.QueryParameters.SuffixedCookies,
       this.authenticateContext.usesSuffixedCookies().toString(),

@@ -32,6 +32,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.signIn.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeHidden();
@@ -43,6 +44,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
@@ -54,6 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await u.po.checkout.fillTestCard();
@@ -67,6 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true });
     await u.po.checkout.waitForMounted();
     await u.po.checkout.continueWithSavedCard();
@@ -79,6 +83,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.startCheckout({ planSlug: 'plus', shouldSwitch: true });
     await u.po.checkout.waitForMounted();
 
@@ -100,6 +105,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.page.goToRelative('/pricing-table');
 
+    await u.po.pricingTable.waitForMounted();
     await u.po.pricingTable.clickManageSubscription();
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();

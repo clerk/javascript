@@ -159,8 +159,12 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
   await u.page.getByRole('button', { name: /Sign in/i }).click();
   await u.po.signIn.waitForMounted();
 
-  // Sign in with email and password
-  await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  // Sign in with email and password. If we wait for the session, we will miss the initial redirect back to localhost.
+  await u.po.signIn.signInWithEmailAndInstantPassword({
+    email: fakeUser.email,
+    password: fakeUser.password,
+    waitForSession: false,
+  });
 
   // Navigate back to localhost
   const response = await page.waitForResponse(
