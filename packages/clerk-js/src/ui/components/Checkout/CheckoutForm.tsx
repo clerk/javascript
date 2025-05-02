@@ -67,13 +67,18 @@ export const CheckoutForm = ({
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
+          <LineItems.Group
+            borderTop
+            variant='tertiary'
+          >
+            {/* TODO(@Commerce): needs localization */}
+            <LineItems.Title title='Subtotal' />
+            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
+          </LineItems.Group>
           {showCredits && (
-            <LineItems.Group>
+            <LineItems.Group variant='tertiary'>
               {/* TODO(@Commerce): needs localization */}
-              <LineItems.Title
-                title={'Credit'}
-                description={'Prorated credit for the remainder of your subscription.'}
-              />
+              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
@@ -81,19 +86,6 @@ export const CheckoutForm = ({
               />
             </LineItems.Group>
           )}
-          <LineItems.Group
-            borderTop
-            variant='tertiary'
-          >
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Subtotal' />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
-          </LineItems.Group>
-          <LineItems.Group variant='tertiary'>
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Tax' />
-            <LineItems.Description text={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
-          </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Title title={`Total Due Today`} />
