@@ -370,7 +370,7 @@ export type ElementsConfig = {
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
   pricingTableCardHeader: WithOptions;
-  pricingTableCardAvatarBadgeContainer: WithOptions;
+  pricingTableCardBadgeTitleContainer: WithOptions;
   pricingTableCardAvatar: WithOptions;
   pricingTableCardBadgeContainer: WithOptions;
   pricingTableCardBadge: WithOptions;

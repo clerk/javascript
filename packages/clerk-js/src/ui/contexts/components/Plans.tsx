@@ -111,7 +111,7 @@ export const usePlansContext = () => {
   );
 
   // should the default plan be shown as active
-  const isDefaultPlanImplicitlyActive = useMemo(() => {
+  const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     return ctx.subscriptions.length === 0;
   }, [ctx.subscriptions]);
 
@@ -216,7 +216,7 @@ export const usePlansContext = () => {
     ...ctx,
     componentName,
     activeOrUpcomingSubscription,
-    isDefaultPlanImplicitlyActive,
+    isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,
     canManageSubscription,
