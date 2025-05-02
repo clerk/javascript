@@ -107,7 +107,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
-              text={`${checkout.totals.grandTotal.currencySymbol}${checkout.totals.grandTotal.amountFormatted}`}
+              text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
             />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>

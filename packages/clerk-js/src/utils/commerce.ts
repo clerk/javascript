@@ -22,10 +22,14 @@ export const commerceTotalsFromJSON = <
   data: T,
 ) => {
   const totals = {
-    grandTotal: commerceMoneyFromJSON(data.grand_total),
     subtotal: commerceMoneyFromJSON(data.subtotal),
     taxTotal: commerceMoneyFromJSON(data.tax_total),
   };
+  if ('grandTotal' in data) {
+    // @ts-ignore
+    totals['grandTotal'] = commerceMoneyFromJSON(data.grand_total);
+  }
+
   if ('total_due_now' in data) {
     // @ts-ignore
     totals['totalDueNow'] = commerceMoneyFromJSON(data.total_due_now);
