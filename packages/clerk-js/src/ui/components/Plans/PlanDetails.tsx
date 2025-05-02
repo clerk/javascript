@@ -22,6 +22,7 @@ import {
   localizationKeys,
   Span,
   Text,
+  useLocalizations,
 } from '../../customizables';
 import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../../elements';
 import { InformationCircle } from '../../icons';
@@ -314,6 +315,7 @@ interface HeaderProps {
 
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
+  const { t } = useLocalizations();
 
   const { captionForSubscription } = usePlansContext();
 
@@ -502,19 +504,17 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           })}
         >
           <SegmentedControl.Root
-            aria-label='Set pay period'
+            aria-label={t(localizationKeys('__experimental_commerce.setPayPeriod'))}
             value={planPeriod}
             onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button
               value='month'
-              // TODO(@Commerce): needs localization
-              text='Monthly'
+              text={localizationKeys('__experimental_commerce.monthly')}
             />
             <SegmentedControl.Button
               value='annual'
-              // TODO(@Commerce): needs localization
-              text='Annually'
+              text={localizationKeys('__experimental_commerce.annually')}
             />
           </SegmentedControl.Root>
         </Box>

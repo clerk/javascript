@@ -3,8 +3,12 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   __experimental_commerce: {
+    monthly: 'Monthly',
+    annually: 'Annually',
     billedAnnually: 'Billed annually',
+    billingCycle: 'Billing cycle',
     cancelSubscription: 'Cancel subscription',
+    setPayPeriod: 'Set pay period',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',

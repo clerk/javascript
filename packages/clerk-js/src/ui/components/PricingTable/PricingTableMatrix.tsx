@@ -129,9 +129,8 @@ export function PricingTableMatrix({
                       id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
-                    >
-                      Billing cycle
-                    </Text>
+                      localizationKey={localizationKeys('__experimental_commerce.billingCycle')}
+                    />
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
@@ -139,13 +138,11 @@ export function PricingTableMatrix({
                     >
                       <SegmentedControl.Button
                         value='month'
-                        // TODO(@Commerce): needs localization
-                        text='Monthly'
+                        text={localizationKeys('__experimental_commerce.monthly')}
                       />
                       <SegmentedControl.Button
                         value='annual'
-                        // TODO(@Commerce): needs localization
-                        text='Annually'
+                        text={localizationKeys('__experimental_commerce.annually')}
                       />
                     </SegmentedControl.Root>
                   </>

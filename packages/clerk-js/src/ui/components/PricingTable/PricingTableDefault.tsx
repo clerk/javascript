@@ -21,6 +21,7 @@ import {
   Span,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../../customizables';
 import { Avatar, ReversibleContainer, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
@@ -219,6 +220,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   const { plan, isCompact, planPeriod, setPlanPeriod } = props;
   const { name, avatarUrl, annualMonthlyAmount } = plan;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const { t } = useLocalizations();
   const pricingTableCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
       ? `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`
@@ -398,19 +400,17 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           })}
         >
           <SegmentedControl.Root
-            aria-label='Set pay period'
+            aria-label={t(localizationKeys('__experimental_commerce.setPayPeriod'))}
             value={planPeriod}
             onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button
               value='month'
-              // TODO(@Commerce): needs localization
-              text='Monthly'
+              text={localizationKeys('__experimental_commerce.monthly')}
             />
             <SegmentedControl.Button
               value='annual'
-              // TODO(@Commerce): needs localization
-              text='Annually'
+              text={localizationKeys('__experimental_commerce.annually')}
             />
           </SegmentedControl.Root>
         </Box>
