@@ -6,10 +6,11 @@ import { useCheckout } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
+import { useEffect } from 'react';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
-  const { setIsOpen } = useDrawerContext();
+  const { setIsOpen, isOpen } = useDrawerContext();
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, isMissingPayerEmail } = useCheckout({
     planId,
@@ -22,6 +23,12 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      revalidate();
+    }
+  }, [isOpen]);
 
   if (isLoading) {
     return (
