@@ -23,8 +23,8 @@ export interface __experimental_CommerceBillingNamespace {
   getSubscriptions: (
     params: __experimental_GetSubscriptionsParams,
   ) => Promise<ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>>;
-  getInvoices: (
-    params: __experimental_GetInvoicesParams,
+  getStatements: (
+    params: __experimental_GetStatementsParams,
   ) => Promise<ClerkPaginatedResponse<__experimental_CommerceStatementResource>>;
   startCheckout: (params: __experimental_CreateCheckoutParams) => Promise<__experimental_CommerceCheckoutResource>;
 }
@@ -108,7 +108,7 @@ export interface __experimental_CommerceInitializedPaymentSourceResource extends
   externalGatewayId: string;
 }
 
-export type __experimental_GetInvoicesParams = WithOptionalOrgType<ClerkPaginationParams>;
+export type __experimental_GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 export type __experimental_CommerceStatementStatus = 'paid' | 'unpaid' | 'past_due';
 
@@ -174,7 +174,7 @@ export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
   externalGatewayId: string;
-  invoice_id: string;
+  statement_id: string;
   paymentSource?: __experimental_CommercePaymentSourceResource;
   plan: __experimental_CommercePlanResource;
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;

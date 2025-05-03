@@ -14,7 +14,7 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
  * -----------------------------------------------------------------------------------------------*/
 
 export const StatementsList = () => {
-  const { invoices, isLoading, totalCount } = useStatementsContext();
+  const { statements, isLoading, totalCount } = useStatementsContext();
 
   return (
     <DataTable
@@ -26,7 +26,7 @@ export const StatementsList = () => {
       isLoading={isLoading}
       emptyStateLocalizationKey='No statements to display'
       headers={['Date', 'Amount']}
-      rows={invoices.map(i => (
+      rows={statements.map(i => (
         <StatementsListRow
           key={i.id}
           statement={i}

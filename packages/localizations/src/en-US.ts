@@ -13,7 +13,7 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
-        title__invoiceId: 'Invoice ID',
+        title__statementId: 'Statement ID',
         title__paymentMethod: 'Payment method',
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
@@ -710,7 +710,6 @@ export const enUS: LocalizationResource = {
         title: 'Available options',
       },
       start: {
-        headerTitle__invoices: 'Invoices',
         headerTitle__paymentMethods: 'Payment Methods',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscriptions',

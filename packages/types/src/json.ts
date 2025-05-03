@@ -641,7 +641,7 @@ export interface __experimental_CommerceInitializedPaymentSourceJSON extends Cle
 }
 
 export interface __experimental_CommerceStatementJSON extends ClerkResourceJSON {
-  object: 'commerce_invoice';
+  object: 'commerce_statement';
   id: string;
   paid_on: number;
   payment_due_on: number;
@@ -689,7 +689,7 @@ export interface __experimental_CommerceCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice_id: string;
+  statement_id: string;
   payment_source?: __experimental_CommercePaymentSourceJSON;
   plan: __experimental_CommercePlanJSON;
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;

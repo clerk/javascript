@@ -15,26 +15,26 @@ export const StatementsContextProvider = ({ children }: PropsWithChildren) => {
   const { user } = useUser();
 
   const { data, isLoading, revalidate } = useFetch(
-    __experimental_commerce?.__experimental_billing.getInvoices,
+    __experimental_commerce?.__experimental_billing.getStatements,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
-    `commerce-invoices-${user?.id}`,
+    `commerce-statements-${user?.id}`,
   );
-  const { data: invoices, total_count: totalCount } = data || { data: [], totalCount: 0 };
+  const { data: statements, total_count: totalCount } = data || { data: [], totalCount: 0 };
 
-  const getInvoiceById = (invoiceId: string) => {
-    return invoices.find(invoice => invoice.id === invoiceId);
+  const getStatementById = (statementId: string) => {
+    return statements.find(statement => statement.id === statementId);
   };
 
   return (
     <StatementsContext.Provider
       value={{
         componentName: 'Statements',
-        invoices,
+        statements,
         totalCount: totalCount || 0,
         isLoading: isLoading || false,
         revalidate,
-        getInvoiceById,
+        getStatementById,
       }}
     >
       {children}

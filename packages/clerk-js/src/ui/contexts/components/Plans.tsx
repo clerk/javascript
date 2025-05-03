@@ -52,21 +52,21 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   );
 
   // Revalidates the next time the hooks gets mounted
-  const { revalidate: revalidateInvoices } = useFetch(
+  const { revalidate: revalidateStatements } = useFetch(
     undefined,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    `commerce-invoices-${user?.id}`,
+    `commerce-statements-${user?.id}`,
   );
 
   const revalidate = useCallback(() => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
-    revalidateInvoices();
-  }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
+    revalidateStatements();
+  }, [revalidateStatements, revalidatePlans, revalidateSubscriptions]);
 
   return (
     <PlansContext.Provider

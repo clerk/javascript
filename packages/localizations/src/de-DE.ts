@@ -25,7 +25,7 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
+        title__statementId: undefined,
         title__paymentMethod: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
@@ -724,7 +724,7 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: 'Rechnungen',
+        headerTitle__statements: 'Rechnungen',
         headerTitle__paymentMethods: 'Zahlungsquellen',
         headerTitle__plans: 'Pläne',
         headerTitle__subscriptions: undefined,

@@ -8,8 +8,8 @@ import type {
   __experimental_CommerceSubscriptionJSON,
   __experimental_CommerceSubscriptionResource,
   __experimental_CreateCheckoutParams,
-  __experimental_GetInvoicesParams,
   __experimental_GetPlansParams,
+  __experimental_GetStatementsParams,
   __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
 } from '@clerk/types';
@@ -55,22 +55,22 @@ export class __experimental_CommerceBilling implements __experimental_CommerceBi
     });
   };
 
-  getInvoices = async (
-    params: __experimental_GetInvoicesParams,
+  getStatements = async (
+    params: __experimental_GetStatementsParams,
   ): Promise<ClerkPaginatedResponse<__experimental_CommerceStatementResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/invoices` : `/me/commerce/invoices`,
+      path: orgId ? `/organizations/${orgId}/commerce/statements` : `/me/commerce/statements`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
-      const { data: invoices, total_count } =
+      const { data: statements, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<__experimental_CommerceStatementJSON>;
 
       return {
         total_count,
-        data: invoices.map(invoice => new __experimental_CommerceStatement(invoice)),
+        data: statements.map(statement => new __experimental_CommerceStatement(statement)),
       };
     });
   };

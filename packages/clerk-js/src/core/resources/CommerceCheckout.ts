@@ -20,7 +20,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  invoice_id!: string;
+  statement_id!: string;
   paymentSource?: __experimental_CommercePaymentSource;
   plan!: __experimental_CommercePlan;
   planPeriod!: __experimental_CommerceSubscriptionPlanPeriod;
@@ -43,7 +43,7 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.invoice_id = data.invoice_id;
+    this.statement_id = data.statement_id;
     this.paymentSource = data.payment_source
       ? new __experimental_CommercePaymentSource(data.payment_source)
       : undefined;

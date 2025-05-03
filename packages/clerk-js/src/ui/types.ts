@@ -1,7 +1,7 @@
 import type {
   __experimental_CheckoutProps,
-  __experimental_CommerceStatementResource,
   __experimental_CommercePlanResource,
+  __experimental_CommerceStatementResource,
   __experimental_CommerceSubscriptionResource,
   __experimental_PlanDetailsProps,
   __experimental_PricingTableProps,
@@ -126,11 +126,11 @@ export type __experimental_PaymentSourcesCtx = {
 
 export type __experimental_StatementsCtx = {
   componentName: 'Statements';
-  invoices: __experimental_CommerceStatementResource[];
+  statements: __experimental_CommerceStatementResource[];
   totalCount: number;
   isLoading: boolean;
   revalidate: () => void;
-  getInvoiceById: (invoiceId: string) => __experimental_CommerceStatementResource | undefined;
+  getStatementById: (statementId: string) => __experimental_CommerceStatementResource | undefined;
 };
 
 export type __experimental_PlansCtx = {

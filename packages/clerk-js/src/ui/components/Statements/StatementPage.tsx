@@ -7,8 +7,8 @@ import { Statement } from './Statement';
 
 const StatementPageInternal = () => {
   const { params, navigate } = useRouter();
-  const { getInvoiceById, isLoading } = useStatementsContext();
-  const statement = params.statementId ? getInvoiceById(params.statementId) : null;
+  const { getStatementById, isLoading } = useStatementsContext();
+  const statement = params.statementId ? getStatementById(params.statementId) : null;
 
   if (isLoading) {
     return (
