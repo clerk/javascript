@@ -276,9 +276,13 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             ) : (
               <Badge
                 elementDescriptor={descriptors.pricingTableCardBadge}
-                localizationKey={localizationKeys('badge__startsAt', {
-                  date: subscription?.periodStart,
-                })}
+                localizationKey={
+                  subscription
+                    ? localizationKeys('badge__startsAt', {
+                        date: subscription.periodStart,
+                      })
+                    : localizationKeys('badge__upcomingPlan')
+                }
                 colorScheme={'primary'}
               />
             )}

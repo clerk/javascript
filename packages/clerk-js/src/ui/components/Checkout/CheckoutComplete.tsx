@@ -79,7 +79,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.title__subscriptionSuccessful')
               }
@@ -89,7 +89,7 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               colorScheme='secondary'
               sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.description__subscriptionSuccessful')
               }
@@ -113,14 +113,14 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('__experimental_commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? checkout.paymentSource
                     ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
