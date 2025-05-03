@@ -15,6 +15,7 @@ import {
   Badge,
   Box,
   Button,
+  Col,
   descriptors,
   Flex,
   Heading,
@@ -90,12 +91,16 @@ const PlanDetailsInternal = ({
       });
   };
 
-  const openCheckout = () => {
+  type OpenCheckoutProps = {
+    planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
+  };
+
+  const openCheckout = (props?: OpenCheckoutProps) => {
     handleClose();
 
     // if the plan doesn't support annual, use monthly
-    let _planPeriod = planPeriod;
-    if (planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
+    let _planPeriod = props?.planPeriod || planPeriod;
+    if (_planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
       _planPeriod = 'month';
     }
 
@@ -211,24 +216,36 @@ const PlanDetailsInternal = ({
                 block
                 textVariant='buttonLarge'
                 {...buttonPropsForPlan({ plan })}
-                onClick={openCheckout}
+                onClick={() => openCheckout()}
               />
             ) : (
-              <Button
-                block
-                variant='bordered'
-                colorScheme='secondary'
-                textVariant='buttonLarge'
-                onClick={() => setShowConfirmation(true)}
-                localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
-              />
+              <Col gap={4}>
+                {!!subscription && subscription.planPeriod === 'month' && plan.annualMonthlyAmount > 0 ? (
+                  <Button
+                    block
+                    variant='bordered'
+                    colorScheme='secondary'
+                    textVariant='buttonLarge'
+                    onClick={() => openCheckout({ planPeriod: 'annual' })}
+                    localizationKey={localizationKeys('__experimental_commerce.switchToAnnual')}
+                  />
+                ) : null}
+                <Button
+                  block
+                  variant='bordered'
+                  colorScheme='danger'
+                  textVariant='buttonLarge'
+                  onClick={() => setShowConfirmation(true)}
+                  localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
+                />
+              </Col>
             )
           ) : (
             <Button
               block
               textVariant='buttonLarge'
               {...buttonPropsForPlan({ plan })}
-              onClick={openCheckout}
+              onClick={() => openCheckout()}
             />
           )}
         </Drawer.Footer>
@@ -484,19 +501,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {!!subscription && (
-        <Text
-          elementDescriptor={descriptors.planDetailCaption}
-          variant={'caption'}
-          localizationKey={captionForSubscription(subscription)}
-          colorScheme='secondary'
-          sx={t => ({
-            marginTop: t.space.$3,
-          })}
-        />
-      )}
-
-      {!subscription && plan.annualMonthlyAmount > 0 ? (
+      {!subscription || (subscription.planPeriod === 'month' && plan.annualMonthlyAmount > 0) ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({
@@ -522,6 +527,18 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           </SegmentedControl.Root>
         </Box>
       ) : null}
+
+      {!!subscription && (
+        <Text
+          elementDescriptor={descriptors.planDetailCaption}
+          variant={'caption'}
+          localizationKey={captionForSubscription(subscription)}
+          colorScheme='secondary'
+          sx={t => ({
+            marginTop: t.space.$3,
+          })}
+        />
+      )}
     </Box>
   );
 });
