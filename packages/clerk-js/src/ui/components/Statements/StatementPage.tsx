@@ -1,10 +1,9 @@
 import { StatementsContextProvider, useStatementsContext } from '../../contexts';
-import { Badge, Box, Button, descriptors, Heading, Icon, Span, Spinner, Text } from '../../customizables';
-import { Header, LineItems } from '../../elements';
-import { useClipboard } from '../../hooks';
-import { Check, Copy } from '../../icons';
+import { Box, descriptors, Spinner, Text } from '../../customizables';
+import { Header } from '../../elements';
+import { Block, Plus } from '../../icons';
 import { useRouter } from '../../router';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { Statement } from './Statement';
 
 const StatementPageInternal = () => {
   const { params, navigate } = useRouter();
@@ -23,9 +22,21 @@ const StatementPageInternal = () => {
     );
   }
 
+  if (!statement) {
+    return <Text>Statement not found</Text>;
+  }
+
   return (
     <>
-      <Header.Root>
+      <Header.Root
+        sx={t => ({
+          borderBlockEndWidth: t.borderWidths.$normal,
+          borderBlockEndStyle: t.borderStyles.$solid,
+          borderBlockEndColor: t.colors.$neutralAlpha100,
+          marginBlockEnd: t.space.$4,
+          paddingBlockEnd: t.space.$4,
+        })}
+      >
         <Header.BackLink
           onClick={() => void navigate('../../', { searchParams: new URLSearchParams('tab=statements') })}
         >
@@ -35,167 +46,72 @@ const StatementPageInternal = () => {
           />
         </Header.BackLink>
       </Header.Root>
-      <Box
-        elementDescriptor={descriptors.statementRoot}
-        sx={t => ({
-          display: 'flex',
-          flexDirection: 'column',
-          gap: t.space.$4,
-          borderTopWidth: t.borderWidths.$normal,
-          borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
-          marginBlockStart: t.space.$4,
-          paddingBlockStart: t.space.$4,
-        })}
-      >
-        {!statement ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <Text>Statement not found</Text>
-          </Box>
-        ) : (
-          <Box
-            elementDescriptor={descriptors.statementCard}
-            sx={t => ({
-              boxShadow: t.shadows.$tableBodyShadow,
-              borderRadius: t.radii.$lg,
-              overflow: 'hidden',
-            })}
-          >
-            <Box
-              elementDescriptor={descriptors.statementHeader}
-              as='header'
-              sx={t => ({
-                padding: t.space.$4,
-                background: t.colors.$neutralAlpha25,
-                borderBlockEndWidth: t.borderWidths.$normal,
-                borderBlockEndStyle: t.borderStyles.$solid,
-                borderBlockEndColor: t.colors.$neutralAlpha100,
-              })}
-            >
-              <Box
-                elementDescriptor={descriptors.statementHeaderTitleBadgeContainer}
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'start',
-                }}
-              >
-                <Span elementDescriptor={descriptors.statementTitleIdContainer}>
-                  <Heading
-                    textVariant='h2'
-                    elementDescriptor={descriptors.statementTitle}
-                  >
-                    April 2025
-                  </Heading>
-                  <Span
-                    elementDescriptor={descriptors.statementIdContainer}
-                    sx={t => ({
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: t.space.$0x25,
-                      color: t.colors.$colorTextSecondary,
-                    })}
-                  >
-                    <CopyButton
-                      copyLabel='Copy statement ID'
-                      text={statement.id}
-                    />
-                    <Text
-                      elementDescriptor={descriptors.statementId}
-                      colorScheme='secondary'
-                      variant='subtitle'
-                    >
-                      {truncateWithEndVisible(statement.id)}
-                    </Text>
-                  </Span>
-                </Span>
-
-                <Badge
-                  elementDescriptor={descriptors.statementBadge}
-                  colorScheme={
-                    statement.status === 'paid' ? 'success' : statement.status === 'unpaid' ? 'warning' : 'danger'
-                  }
-                  sx={{ textTransform: 'capitalize' }}
-                >
-                  {statement.status}
-                </Badge>
-              </Box>
-            </Box>
-            <Box
-              elementDescriptor={descriptors.statementContent}
-              sx={t => ({
-                padding: t.space.$4,
-              })}
-            >
-              <LineItems.Root>
-                <LineItems.Group>
-                  <LineItems.Title title='Plan' />
-                  <LineItems.Description
-                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
-                    suffix='per month'
+      <Statement.Root>
+        <Statement.Header
+          title='January 2025'
+          id={statement.id}
+          status={statement.status}
+        />
+        <Statement.Body>
+          <Statement.Section>
+            <Statement.SectionHeader text='Jan 9, 2025' />
+            <Statement.SectionContent>
+              <Statement.SectionContentItem>
+                <Statement.SectionContentDetailsList>
+                  <Statement.SectionContentDetailsListItem
+                    labelIcon={Plus}
+                    label='Subscribed and paid for Platinum annual plan'
+                    value={statement?.id}
+                    valueTruncated
+                    valueCopyable
                   />
-                </LineItems.Group>
-                <LineItems.Group
-                  variant='secondary'
-                  borderTop
-                >
-                  <LineItems.Title title='Subtotal' />
-                  <LineItems.Description
-                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
+                  <Statement.SectionContentDetailsListItem
+                    labelIcon={Block}
+                    label='Rebate for partial usage of previous subscription'
+                    value='-$100.00'
                   />
-                </LineItems.Group>
-                <LineItems.Group variant='secondary'>
-                  <LineItems.Title title='Tax' />
-                  <LineItems.Description
-                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
+                </Statement.SectionContentDetailsList>
+              </Statement.SectionContentItem>
+              <Statement.SectionContentItem>
+                <Statement.SectionContentDetailsHeader
+                  title='Platinum'
+                  description='$1,800.00 / year'
+                  secondaryTitle='$1,584.71'
+                  secondaryDescription='Prorated'
+                />
+                <Statement.SectionContentDetailsList>
+                  <Statement.SectionContentDetailsListItem
+                    label='Canceled Gold monthly subscription'
+                    value='-$100.00'
                   />
-                </LineItems.Group>
-                <LineItems.Group borderTop>
-                  <LineItems.Title title='Total due' />
-                  <LineItems.Description
-                    text={`${statement.totals.grandTotal.currencySymbol}${statement.totals.grandTotal.amountFormatted}`}
-                    prefix='USD'
+                </Statement.SectionContentDetailsList>
+              </Statement.SectionContentItem>
+            </Statement.SectionContent>
+          </Statement.Section>
+          <Statement.Section>
+            <Statement.SectionHeader text='Jan 9, 2025' />
+            <Statement.SectionContent>
+              <Statement.SectionContentItem>
+                <Statement.SectionContentDetailsList>
+                  <Statement.SectionContentDetailsListItem
+                    label='Paid for Gold monthly plan'
+                    value={statement?.id}
+                    valueTruncated
+                    valueCopyable
                   />
-                </LineItems.Group>
-              </LineItems.Root>
-            </Box>
-          </Box>
-        )}
-      </Box>
+                </Statement.SectionContentDetailsList>
+              </Statement.SectionContentItem>
+            </Statement.SectionContent>
+          </Statement.Section>
+        </Statement.Body>
+        <Statement.Footer
+          label='Total paid'
+          value='$299.00'
+        />
+      </Statement.Root>
     </>
   );
 };
-
-function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
-  const { onCopy, hasCopied } = useClipboard(text);
-
-  return (
-    <Button
-      elementDescriptor={descriptors.statementCopyButton}
-      variant='unstyled'
-      onClick={onCopy}
-      sx={t => ({
-        color: 'inherit',
-        width: t.sizes.$4,
-        height: t.sizes.$4,
-        padding: 0,
-        borderRadius: t.radii.$sm,
-        '&:focus-visible': {
-          outline: '2px solid',
-          outlineColor: t.colors.$neutralAlpha200,
-        },
-      })}
-      focusRing={false}
-      aria-label={hasCopied ? 'Copied' : copyLabel}
-    >
-      <Icon
-        size='sm'
-        icon={hasCopied ? Check : Copy}
-        aria-hidden
-      />
-    </Button>
-  );
-}
 
 export const StatementPage = () => {
   return (
