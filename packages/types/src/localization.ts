@@ -114,6 +114,7 @@ type _LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
