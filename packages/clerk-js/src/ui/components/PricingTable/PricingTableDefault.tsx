@@ -22,7 +22,7 @@ import {
   Text,
   useAppearance,
 } from '../../customizables';
-import { Avatar, ReversibleContainer, SegmentedControl } from '../../elements';
+import { ReversibleContainer, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
 import { Check, InformationCircle, Plus } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
@@ -111,7 +111,7 @@ function Card(props: CardProps) {
   const totalFeatures = features.length;
   const hasFeatures = totalFeatures > 0;
 
-  const { buttonPropsForPlan } = usePlansContext();
+  const { buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -175,7 +175,7 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-        {!plan.isDefault && (
+        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
           <Box
             elementDescriptor={descriptors.pricingTableCardAction}
             sx={t => ({
@@ -217,7 +217,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const { plan, isCompact, planPeriod, setPlanPeriod } = props;
-  const { name, avatarUrl, annualMonthlyAmount } = plan;
+  const { name, annualMonthlyAmount } = plan;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const pricingTableCardFeePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -231,11 +231,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
 
-  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActive } = usePlansContext();
+  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActiveOrUpcoming, subscriptions } = usePlansContext();
   const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActive = isDefaultPlanImplicitlyActive && plan.isDefault;
+  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 
-  const showBadge = !!subscription || isImplicitlyActive;
+  const showBadge = !!subscription || isImplicitlyActiveOrUpcoming;
 
   return (
     <Box
@@ -247,64 +247,56 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
-      {avatarUrl || showBadge ? (
-        <Box
-          elementDescriptor={descriptors.pricingTableCardAvatarBadgeContainer}
-          sx={t => ({
-            marginBlockEnd: t.space.$3,
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: t.space.$3,
-            float: !avatarUrl && !showBadge ? 'right' : undefined,
-          })}
-        >
-          {avatarUrl ? (
-            <Avatar
-              boxElementDescriptor={descriptors.pricingTableCardAvatar}
-              size={_ => 40}
-              title={name}
-              initials={name[0]}
-              rounded={false}
-              imageUrl={avatarUrl}
-            />
-          ) : null}
-          <ReversibleContainer reverse={!avatarUrl}>
-            {showBadge ? (
-              <Span
-                elementDescriptor={descriptors.pricingTableCardBadgeContainer}
-                sx={{
-                  flexBasis: avatarUrl ? '100%' : undefined,
-                }}
-              >
-                {isImplicitlyActive || subscription?.status === 'active' ? (
-                  <Badge
-                    elementDescriptor={descriptors.pricingTableCardBadge}
-                    localizationKey={localizationKeys('badge__currentPlan')}
-                    colorScheme={'secondary'}
-                  />
-                ) : (
-                  <Badge
-                    elementDescriptor={descriptors.pricingTableCardBadge}
-                    localizationKey={localizationKeys('badge__startsAt', {
-                      date: subscription?.periodStart,
-                    })}
-                    colorScheme={'primary'}
-                  />
-                )}
-              </Span>
-            ) : null}
-          </ReversibleContainer>
-        </Box>
-      ) : null}
-      <Heading
-        elementDescriptor={descriptors.pricingTableCardTitle}
-        as='h2'
-        textVariant={isCompact ? 'h3' : 'h2'}
+      <Box
+        elementDescriptor={descriptors.pricingTableCardBadgeTitleContainer}
+        sx={t => ({
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row-reverse',
+          alignItems: 'baseline',
+          justifyContent: 'flex-end',
+          flexWrap: 'wrap',
+          gap: t.space.$3,
+          marginBlockEnd: t.space.$3,
+        })}
       >
-        {plan.name}
-      </Heading>
+        {showBadge ? (
+          <Span
+            elementDescriptor={descriptors.pricingTableCardBadgeContainer}
+            sx={{
+              flex: '0 0 auto',
+            }}
+          >
+            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
+              <Badge
+                elementDescriptor={descriptors.pricingTableCardBadge}
+                localizationKey={localizationKeys('badge__currentPlan')}
+                colorScheme={'secondary'}
+              />
+            ) : (
+              <Badge
+                elementDescriptor={descriptors.pricingTableCardBadge}
+                localizationKey={
+                  subscription
+                    ? localizationKeys('badge__startsAt', {
+                        date: subscription.periodStart,
+                      })
+                    : localizationKeys('badge__upcomingPlan')
+                }
+                colorScheme={'primary'}
+              />
+            )}
+          </Span>
+        ) : null}
+        <Heading
+          elementDescriptor={descriptors.pricingTableCardTitle}
+          as='h2'
+          textVariant={isCompact ? 'h3' : 'h2'}
+          sx={{ flex: '1 1 auto' }}
+        >
+          {name}
+        </Heading>
+      </Box>
       {!isCompact && plan.description ? (
         <Text
           elementDescriptor={descriptors.pricingTableCardDescription}
@@ -502,7 +494,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           onClick={event => showPlanDetails(event)}
           variant='link'
           sx={t => ({
-            marginBlockStart: t.space.$2,
+            marginBlockStart: 'auto',
+            paddingBlockStart: t.space.$2,
             gap: t.space.$1,
           })}
         >
