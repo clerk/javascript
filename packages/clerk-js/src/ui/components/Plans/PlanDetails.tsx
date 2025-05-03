@@ -31,13 +31,13 @@ export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
-        <_PlanDetails {...props} />
+        <PlanDetailsInternal {...props} />
       </PlansContextProvider>
     </SubscriberTypeContext.Provider>
   );
 };
 
-const _PlanDetails = ({
+const PlanDetailsInternal = ({
   plan,
   onSubscriptionCancel,
   portalRoot,
@@ -51,7 +51,8 @@ const _PlanDetails = ({
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>(_planPeriod);
 
   const { setIsOpen } = useDrawerContext();
-  const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan } = usePlansContext();
+  const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
+    usePlansContext();
   const subscriberType = useSubscriberTypeContext();
 
   if (!plan) {
@@ -202,7 +203,7 @@ const _PlanDetails = ({
         </Drawer.Body>
       ) : null}
 
-      {plan.amount > 0 ? (
+      {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
         <Drawer.Footer>
           {subscription ? (
             subscription.canceledAt ? (
@@ -315,7 +316,11 @@ interface HeaderProps {
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const { captionForSubscription } = usePlansContext();
+  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming, subscriptions } = usePlansContext();
+
+  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
+
+  const showBadge = !!subscription || isImplicitlyActiveOrUpcoming;
 
   return (
     <Box
@@ -352,14 +357,14 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           })}
         />
       ) : null}
-      {subscription ? (
+      {showBadge ? (
         <Box
           elementDescriptor={descriptors.planDetailBadgeContainer}
           sx={t => ({
             marginBlockEnd: t.space.$3,
           })}
         >
-          {subscription.status === 'active' ? (
+          {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
             <Badge
               elementDescriptor={descriptors.planDetailBadge}
               localizationKey={localizationKeys('badge__currentPlan')}
@@ -398,88 +403,86 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         ) : null}
       </Box>
 
-      {plan.amount > 0 ? (
-        <Flex
-          elementDescriptor={descriptors.planDetailFeeContainer}
-          align='center'
-          wrap='wrap'
-          sx={t => ({
-            marginTop: t.space.$3,
-            columnGap: t.space.$1x5,
-          })}
-        >
-          <>
-            <Text
-              elementDescriptor={descriptors.planDetailFee}
-              variant='h1'
-              colorScheme='body'
+      <Flex
+        elementDescriptor={descriptors.planDetailFeeContainer}
+        align='center'
+        wrap='wrap'
+        sx={t => ({
+          marginTop: t.space.$3,
+          columnGap: t.space.$1x5,
+        })}
+      >
+        <>
+          <Text
+            elementDescriptor={descriptors.planDetailFee}
+            variant='h1'
+            colorScheme='body'
+          >
+            {plan.currencySymbol}
+            {(subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual'
+              ? plan.annualMonthlyAmountFormatted
+              : plan.amountFormatted}
+          </Text>
+          <Text
+            elementDescriptor={descriptors.planDetailFeePeriod}
+            variant='caption'
+            colorScheme='secondary'
+            sx={t => ({
+              textTransform: 'lowercase',
+              ':before': {
+                content: '"/"',
+                marginInlineEnd: t.space.$1,
+              },
+            })}
+            localizationKey={localizationKeys('__experimental_commerce.month')}
+          />
+          {plan.annualMonthlyAmount > 0 ? (
+            <Box
+              elementDescriptor={descriptors.planDetailFeePeriodNotice}
+              sx={[
+                _ => ({
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateRows:
+                    (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? '1fr' : '0fr',
+                }),
+              ]}
+              // @ts-ignore - Needed until React 19 support
+              inert={
+                (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? 'true' : undefined
+              }
             >
-              {plan.currencySymbol}
-              {(subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual'
-                ? plan.annualMonthlyAmountFormatted
-                : plan.amountFormatted}
-            </Text>
-            <Text
-              elementDescriptor={descriptors.planDetailFeePeriod}
-              variant='caption'
-              colorScheme='secondary'
-              sx={t => ({
-                textTransform: 'lowercase',
-                ':before': {
-                  content: '"/"',
-                  marginInlineEnd: t.space.$1,
-                },
-              })}
-              localizationKey={localizationKeys('__experimental_commerce.month')}
-            />
-            {plan.annualMonthlyAmount > 0 ? (
               <Box
-                elementDescriptor={descriptors.planDetailFeePeriodNotice}
-                sx={[
-                  _ => ({
-                    width: '100%',
-                    display: 'grid',
-                    gridTemplateRows:
-                      (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? '1fr' : '0fr',
-                  }),
-                ]}
-                // @ts-ignore - Needed until React 19 support
-                inert={
-                  (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? 'true' : undefined
-                }
+                elementDescriptor={descriptors.planDetailFeePeriodNoticeInner}
+                sx={{
+                  overflow: 'hidden',
+                  minHeight: 0,
+                }}
               >
-                <Box
-                  elementDescriptor={descriptors.planDetailFeePeriodNoticeInner}
-                  sx={{
-                    overflow: 'hidden',
-                    minHeight: 0,
-                  }}
+                <Text
+                  elementDescriptor={descriptors.planDetailFeePeriodNoticeLabel}
+                  variant='caption'
+                  colorScheme='secondary'
+                  sx={t => ({
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    columnGap: t.space.$1,
+                  })}
                 >
-                  <Text
-                    elementDescriptor={descriptors.planDetailFeePeriodNoticeLabel}
-                    variant='caption'
-                    colorScheme='secondary'
-                    sx={t => ({
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      columnGap: t.space.$1,
-                    })}
-                  >
-                    <Icon
-                      icon={InformationCircle}
-                      colorScheme='neutral'
-                      size='sm'
-                      aria-hidden
-                    />{' '}
-                    <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
-                  </Text>
-                </Box>
+                  <Icon
+                    icon={InformationCircle}
+                    colorScheme='neutral'
+                    size='sm'
+                    aria-hidden
+                  />{' '}
+                  <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+                </Text>
               </Box>
-            ) : null}
-          </>
-        </Flex>
-      ) : null}
+            </Box>
+          ) : null}
+        </>
+      </Flex>
 
       {!!subscription && (
         <Text

@@ -494,7 +494,8 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           onClick={event => showPlanDetails(event)}
           variant='link'
           sx={t => ({
-            marginBlockStart: t.space.$2,
+            marginBlockStart: 'auto',
+            paddingBlockStart: t.space.$2,
             gap: t.space.$1,
           })}
         >
