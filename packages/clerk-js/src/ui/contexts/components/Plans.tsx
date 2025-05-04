@@ -152,7 +152,7 @@ export const usePlansContext = () => {
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.length > 0
             ? localizationKeys('__experimental_commerce.switchPlan')
-            : localizationKeys('__experimental_commerce.getStarted'),
+            : localizationKeys('__experimental_commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
