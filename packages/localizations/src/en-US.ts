@@ -33,6 +33,7 @@ export const enUS: LocalizationResource = {
     month: 'Month',
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
+    subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
