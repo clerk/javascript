@@ -38,7 +38,7 @@ export const StatementsList = () => {
 
 const StatementsListRow = ({ statement }: { statement: __experimental_CommerceStatementResource }) => {
   const {
-    paymentDueOn,
+    timestamp,
     id,
     totals: { grandTotal },
   } = statement;
@@ -54,7 +54,9 @@ const StatementsListRow = ({ statement }: { statement: __experimental_CommerceSt
           cursor: 'pointer',
         }}
       >
-        <Text variant='subtitle'>{new Date(paymentDueOn).toLocaleDateString()}</Text>
+        <Text variant='subtitle'>
+          {new Date(timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+        </Text>
         <Text
           colorScheme='secondary'
           variant='caption'

@@ -110,14 +110,32 @@ export interface __experimental_CommerceInitializedPaymentSourceResource extends
 
 export type __experimental_GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
-export type __experimental_CommerceStatementStatus = 'paid' | 'unpaid' | 'past_due';
+export type __experimental_CommerceStatementStatus = 'open' | 'closed';
 
 export interface __experimental_CommerceStatementResource extends ClerkResource {
   id: string;
   totals: __experimental_CommerceStatementTotals;
-  paymentDueOn: number;
-  paidOn: number;
   status: __experimental_CommerceStatementStatus;
+  timestamp: number;
+  groups: __experimental_CommerceStatementGroup[];
+}
+
+export interface __experimental_CommerceStatementGroup {
+  totals: __experimental_CommerceStatementTotals;
+  timestamp: number;
+  items: __experimental_CommercePayment[];
+}
+
+export type __experimental_CommercePaymentChargeType = 'checkout' | 'recurring';
+export type __experimental_CommercePaymentStatus = 'pending' | 'paid' | 'failed';
+
+export interface __experimental_CommercePayment {
+  id: string;
+  amount: __experimental_CommerceMoney;
+  paymentSource: __experimental_CommercePaymentSourceResource;
+  subscription: __experimental_CommerceSubscriptionResource;
+  chargeType: __experimental_CommercePaymentChargeType;
+  status: __experimental_CommercePaymentStatus;
 }
 
 export type __experimental_GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;

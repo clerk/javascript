@@ -3,8 +3,10 @@
  */
 
 import type {
-  __experimental_CommerceStatementStatus,
+  __experimental_CommercePaymentChargeType,
   __experimental_CommercePaymentSourceStatus,
+  __experimental_CommercePaymentStatus,
+  __experimental_CommerceStatementStatus,
   __experimental_CommerceSubscriptionPlanPeriod,
   __experimental_CommerceSubscriptionStatus,
 } from './commerce';
@@ -643,10 +645,27 @@ export interface __experimental_CommerceInitializedPaymentSourceJSON extends Cle
 export interface __experimental_CommerceStatementJSON extends ClerkResourceJSON {
   object: 'commerce_statement';
   id: string;
-  paid_on: number;
-  payment_due_on: number;
   status: __experimental_CommerceStatementStatus;
+  timestamp: number;
+  groups: __experimental_CommerceStatementGroupJSON[];
   totals: __experimental_CommerceStatementTotalsJSON;
+}
+
+export interface __experimental_CommerceStatementGroupJSON extends ClerkResourceJSON {
+  object: 'commerce_statement_group';
+  totals: __experimental_CommerceStatementTotalsJSON;
+  timestamp: number;
+  items: __experimental_CommercePaymentJSON[];
+}
+
+export interface __experimental_CommercePaymentJSON extends ClerkResourceJSON {
+  object: 'commerce_payment';
+  id: string;
+  amount: __experimental_CommerceMoneyJSON;
+  payment_source: __experimental_CommercePaymentSourceJSON;
+  subscription: __experimental_CommerceSubscriptionJSON;
+  charge_type: __experimental_CommercePaymentChargeType;
+  status: __experimental_CommercePaymentStatus;
 }
 
 export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
