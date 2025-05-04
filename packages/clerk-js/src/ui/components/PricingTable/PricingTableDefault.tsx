@@ -249,39 +249,27 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         width: '100%',
         padding: isCompact ? t.space.$3 : t.space.$4,
         display: 'grid',
+        gap: 0,
         gridRow: 'span 4',
         gridTemplateRows: 'subgrid',
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
-      <Box
-        elementDescriptor={descriptors.pricingTableCardBadgeTitleContainer}
-        sx={t => ({
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'row-reverse',
-          alignItems: 'baseline',
-          justifyContent: 'flex-end',
-          flexWrap: 'wrap',
-          gap: t.space.$3,
-          marginBlockEnd: t.space.$3,
-        })}
+      <Heading
+        elementDescriptor={descriptors.pricingTableCardTitle}
+        as='h2'
+        textVariant={isCompact ? 'h3' : 'h2'}
+        sx={{
+          gridRow: !isCompact && plan.description ? 'auto' : 'span 2',
+        }}
       >
-        <Heading
-          elementDescriptor={descriptors.pricingTableCardTitle}
-          as='h2'
-          textVariant={isCompact ? 'h3' : 'h2'}
-          sx={{ flex: '1 1 auto', gridRow: 1 }}
-        >
-          {name}
-        </Heading>
-      </Box>
+        {name}
+      </Heading>
       {!isCompact && plan.description ? (
         <Text
           elementDescriptor={descriptors.pricingTableCardDescription}
           variant='subtitle'
           colorScheme='secondary'
-          sx={{ gridRow: 2 }}
         >
           {plan.description}
         </Text>
@@ -294,7 +282,6 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         sx={t => ({
           marginTop: isCompact ? t.space.$2 : t.space.$3,
           columnGap: t.space.$1x5,
-          gridRow: 3,
         })}
       >
         <Text
@@ -368,7 +355,6 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           sx={t => ({
             display: 'flex',
             marginTop: t.space.$3,
-            gridRow: 4,
           })}
         >
           <SegmentedControl.Root
