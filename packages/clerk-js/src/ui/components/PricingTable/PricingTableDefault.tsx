@@ -63,6 +63,7 @@ export function PricingTableDefault({
           '--column-width': 'max(var(--max-column-width), min(var(--grid-min-size, 10rem), 100%))',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(var(--column-width), 1fr))',
+          gridTemplateRows: 'auto 1fr',
           gap: `var(--grid-gap-y, var(--grid-gap, ${t.space.$4})) var(--grid-gap, ${t.space.$4})`,
           alignItems: 'stretch',
           width: '100%',
@@ -130,8 +131,10 @@ function Card(props: CardProps) {
       elementDescriptor={descriptors.pricingTableCard}
       elementId={descriptors.pricingTableCard.setId(slug)}
       sx={t => ({
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gap: 0,
+        gridTemplateRows: 'subgrid',
+        gridRow: 'span 2',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -152,52 +155,60 @@ function Card(props: CardProps) {
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
       />
-      <ReversibleContainer reverse={ctaPosition === 'top'}>
-        {!collapseFeatures ? (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardFeatures}
-            sx={t => ({
-              display: 'flex',
-              flexDirection: 'column',
-              flex: '1',
-              padding: hasFeatures ? (isCompact ? t.space.$3 : t.space.$4) : 0,
-              backgroundColor: hasFeatures ? t.colors.$colorBackground : undefined,
-              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-            })}
-            data-variant={isCompact ? 'compact' : 'default'}
-          >
-            <CardFeaturesList
-              plan={plan}
-              isCompact={isCompact}
-              showPlanDetails={showPlanDetails}
-            />
-          </Box>
-        ) : null}
-        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardAction}
-            sx={t => ({
-              marginTop: 'auto',
-              padding: isCompact ? t.space.$3 : t.space.$4,
-              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-              background: undefined,
-            })}
-          >
-            <Button
-              block
-              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              {...buttonPropsForPlan({ plan, isCompact })}
-              onClick={event => {
-                onSelect(plan, event);
-              }}
-            />
-          </Box>
-        )}
-      </ReversibleContainer>
+      <Box
+        sx={{
+          gridRow: 2,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <ReversibleContainer reverse={ctaPosition === 'top'}>
+          {!collapseFeatures ? (
+            <Box
+              elementDescriptor={descriptors.pricingTableCardFeatures}
+              sx={t => ({
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '1',
+                padding: hasFeatures ? (isCompact ? t.space.$3 : t.space.$4) : 0,
+                backgroundColor: hasFeatures ? t.colors.$colorBackground : undefined,
+                borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+              })}
+              data-variant={isCompact ? 'compact' : 'default'}
+            >
+              <CardFeaturesList
+                plan={plan}
+                isCompact={isCompact}
+                showPlanDetails={showPlanDetails}
+              />
+            </Box>
+          ) : null}
+          {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
+            <Box
+              elementDescriptor={descriptors.pricingTableCardAction}
+              sx={t => ({
+                marginTop: 'auto',
+                padding: isCompact ? t.space.$3 : t.space.$4,
+                borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                background: undefined,
+              })}
+            >
+              <Button
+                block
+                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                {...buttonPropsForPlan({ plan, isCompact })}
+                onClick={event => {
+                  onSelect(plan, event);
+                }}
+              />
+            </Box>
+          )}
+        </ReversibleContainer>
+      </Box>
     </Box>
   );
 }
@@ -244,6 +255,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       sx={t => ({
         width: '100%',
         padding: isCompact ? t.space.$3 : t.space.$4,
+        gridRow: 1,
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
