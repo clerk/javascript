@@ -8,7 +8,6 @@ import * as React from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
-  Badge,
   Box,
   Button,
   Col,
@@ -108,9 +107,7 @@ function Card(props: CardProps) {
 
   const ctaPosition = pricingTableProps.ctaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
-  const { id, slug, features } = plan;
-  const totalFeatures = features.length;
-  const hasFeatures = totalFeatures > 0;
+  const { id, slug } = plan;
 
   const { buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
 
@@ -134,7 +131,7 @@ function Card(props: CardProps) {
         display: 'grid',
         gap: 0,
         gridTemplateRows: 'subgrid',
-        gridRow: 'span 2',
+        gridRow: 'span 6',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -157,9 +154,10 @@ function Card(props: CardProps) {
       />
       <Box
         sx={{
-          gridRow: 2,
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gap: 0,
+          gridRow: 'span 2',
+          gridTemplateRows: 'subgrid',
         }}
       >
         <ReversibleContainer reverse={ctaPosition === 'top'}>
@@ -170,11 +168,12 @@ function Card(props: CardProps) {
                 display: 'flex',
                 flexDirection: 'column',
                 flex: '1',
-                padding: hasFeatures ? (isCompact ? t.space.$3 : t.space.$4) : 0,
-                backgroundColor: hasFeatures ? t.colors.$colorBackground : undefined,
-                borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+                padding: isCompact ? t.space.$3 : t.space.$4,
+                backgroundColor: t.colors.$colorBackground,
+                borderTopWidth: t.borderWidths.$normal,
                 borderTopStyle: t.borderStyles.$solid,
                 borderTopColor: t.colors.$neutralAlpha100,
+                gridRow: !plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? 'auto' : 'span 2',
               })}
               data-variant={isCompact ? 'compact' : 'default'}
             >
@@ -191,7 +190,7 @@ function Card(props: CardProps) {
               sx={t => ({
                 marginTop: 'auto',
                 padding: isCompact ? t.space.$3 : t.space.$4,
-                borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
+                borderTopWidth: t.borderWidths.$normal,
                 borderTopStyle: t.borderStyles.$solid,
                 borderTopColor: t.colors.$neutralAlpha100,
                 background: undefined,
@@ -242,12 +241,6 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
     return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
   }, [annualMonthlyAmount, planPeriod, plan.amountFormatted, plan.annualMonthlyAmountFormatted]);
 
-  const { activeOrUpcomingSubscription, isDefaultPlanImplicitlyActiveOrUpcoming, subscriptions } = usePlansContext();
-  const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
-
-  const showBadge = !!subscription || isImplicitlyActiveOrUpcoming;
-
   return (
     <Box
       ref={ref}
@@ -255,7 +248,9 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       sx={t => ({
         width: '100%',
         padding: isCompact ? t.space.$3 : t.space.$4,
-        gridRow: 1,
+        display: 'grid',
+        gridRow: 'span 4',
+        gridTemplateRows: 'subgrid',
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
@@ -272,39 +267,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           marginBlockEnd: t.space.$3,
         })}
       >
-        {showBadge ? (
-          <Span
-            elementDescriptor={descriptors.pricingTableCardBadgeContainer}
-            sx={{
-              flex: '0 0 auto',
-            }}
-          >
-            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-              <Badge
-                elementDescriptor={descriptors.pricingTableCardBadge}
-                localizationKey={localizationKeys('badge__currentPlan')}
-                colorScheme={'secondary'}
-              />
-            ) : (
-              <Badge
-                elementDescriptor={descriptors.pricingTableCardBadge}
-                localizationKey={
-                  subscription
-                    ? localizationKeys('badge__startsAt', {
-                        date: subscription.periodStart,
-                      })
-                    : localizationKeys('badge__upcomingPlan')
-                }
-                colorScheme={'primary'}
-              />
-            )}
-          </Span>
-        ) : null}
         <Heading
           elementDescriptor={descriptors.pricingTableCardTitle}
           as='h2'
           textVariant={isCompact ? 'h3' : 'h2'}
-          sx={{ flex: '1 1 auto' }}
+          sx={{ flex: '1 1 auto', gridRow: 1 }}
         >
           {name}
         </Heading>
@@ -314,6 +281,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           elementDescriptor={descriptors.pricingTableCardDescription}
           variant='subtitle'
           colorScheme='secondary'
+          sx={{ gridRow: 2 }}
         >
           {plan.description}
         </Text>
@@ -326,6 +294,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         sx={t => ({
           marginTop: isCompact ? t.space.$2 : t.space.$3,
           columnGap: t.space.$1x5,
+          gridRow: 3,
         })}
       >
         <Text
@@ -399,6 +368,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           sx={t => ({
             display: 'flex',
             marginTop: t.space.$3,
+            gridRow: 4,
           })}
         >
           <SegmentedControl.Root
@@ -448,7 +418,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
       elementDescriptor={descriptors.pricingTableCardFeatures}
       sx={t => ({
         display: 'grid',
-        flex: '1',
+        flex: 1,
         rowGap: isCompact ? t.space.$2 : t.space.$3,
       })}
     >

@@ -29,7 +29,7 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
-    reSubscribe: 'Re-subscribe',
+    reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
@@ -37,7 +37,7 @@ export const enUS: LocalizationResource = {
   },
   backButton: 'Back',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
-  badge__currentPlan: 'Current Plan',
+  badge__currentPlan: 'Current plan',
   badge__default: 'Default',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
@@ -714,7 +714,7 @@ export const enUS: LocalizationResource = {
       subscriptionsSection: {
         actionLabel__default: 'Manage',
       },
-      title: 'Billing & Payments',
+      title: 'Billing',
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
