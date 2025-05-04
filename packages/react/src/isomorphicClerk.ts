@@ -323,12 +323,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildCheckoutContinueUrl = (): string | void => {
-    const callback = () => this.clerkjs?.buildCheckoutContinueUrl() || '';
+  __experimental_buildCheckoutContinueUrl = (): string | void => {
+    const callback = () => this.clerkjs?.__experimental_buildCheckoutContinueUrl() || '';
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {
-      this.premountMethodCalls.set('buildCheckoutContinueUrl', callback);
+      this.premountMethodCalls.set('__experimental_buildCheckoutContinueUrl', callback);
     }
   };
 
