@@ -1,23 +1,15 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
 export const useCheckout = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod, subscriberType = 'user', __experimental_checkoutContinueUrl } = props;
+  const { planId, planPeriod, subscriberType = 'user' } = props;
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
-
-  const checkoutContinueUrl = useMemo(() => {
-    if (__experimental_checkoutContinueUrl) {
-      return __experimental_checkoutContinueUrl;
-    }
-
-    return clerk.__experimental_buildCheckoutContinueUrl?.();
-  }, [__experimental_checkoutContinueUrl, clerk]);
 
   const { user } = useUser();
   const {
@@ -56,6 +48,5 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     invalidate,
     revalidate,
     errors: error?.errors,
-    __experimental_checkoutContinueUrl: checkoutContinueUrl,
   };
 };
