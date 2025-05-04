@@ -272,10 +272,10 @@ importers:
         specifier: catalog:repo
         version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.7.1)
       turbo:
-        specifier: ^2.5.1
+        specifier: ^2.5.2
         version: 2.5.2
       turbo-ignore:
-        specifier: ^2.5.1
+        specifier: ^2.5.2
         version: 2.5.2
       typedoc:
         specifier: 0.28.3
