@@ -46,7 +46,6 @@ export function PricingTableDefault({
   isCompact,
   props,
 }: PricingTableDefaultProps) {
-  console.log(props.__experimental_checkoutContinueUrl);
   return (
     <InternalThemeProvider>
       <Box
