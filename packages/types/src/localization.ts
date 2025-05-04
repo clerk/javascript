@@ -117,6 +117,7 @@ type _LocalizationResource = {
     switchPlan: LocalizationValue;
     switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;

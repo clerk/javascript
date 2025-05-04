@@ -4,6 +4,7 @@ export const enUS: LocalizationResource = {
   locale: 'en-US',
   __experimental_commerce: {
     billedAnnually: 'Billed annually',
+    billedMonthlyOnly: 'Only billed monthly',
     cancelSubscription: 'Cancel subscription',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
