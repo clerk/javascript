@@ -134,7 +134,7 @@ function Card(props: CardProps) {
         display: 'grid',
         gap: 0,
         gridTemplateRows: 'subgrid',
-        gridRow: 'span 6',
+        gridRow: 'span 4',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
