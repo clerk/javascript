@@ -14,7 +14,7 @@ import { CheckoutForm } from './CheckoutForm';
 
 export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { translateError } = useLocalizations();
-  const { planId, planPeriod, subscriberType, onSubscriptionComplete, checkoutContinueUrl } = props;
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
@@ -49,12 +49,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   if (checkout) {
     if (checkout?.status === 'completed') {
-      return (
-        <CheckoutComplete
-          checkout={checkout}
-          checkoutContinueUrl={checkoutContinueUrl}
-        />
-      );
+      return <CheckoutComplete checkout={checkout} />;
     }
 
     return (
