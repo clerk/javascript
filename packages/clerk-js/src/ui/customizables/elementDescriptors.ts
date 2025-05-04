@@ -311,6 +311,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'segmentedControlRoot',
   'segmentedControlButton',
 
+  'switchRoot',
+  'switchThumb',
+
   'alert',
   'alertIcon',
   'alertText',
