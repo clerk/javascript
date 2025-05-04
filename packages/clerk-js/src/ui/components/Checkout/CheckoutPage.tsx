@@ -5,9 +5,9 @@ import type {
 } from '@clerk/types';
 import { useEffect } from 'react';
 
-import { Alert, Box, Flex, localizationKeys, Spinner, useLocalizations } from '../../customizables';
+import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
-import { useCheckout } from '../../hooks';
+import { useCheckout, usePrefersReducedMotion } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
@@ -16,6 +16,9 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
     planId,
@@ -49,7 +52,12 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   if (checkout) {
     if (checkout?.status === 'completed') {
-      return <CheckoutComplete checkout={checkout} />;
+      return (
+        <CheckoutComplete
+          checkout={checkout}
+          isMotionSafe={isMotionSafe}
+        />
+      );
     }
 
     return (

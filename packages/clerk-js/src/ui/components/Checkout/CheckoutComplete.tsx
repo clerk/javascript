@@ -2,14 +2,20 @@ import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, Icon, localizationKeys, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
-import { Check } from '../../icons';
+import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
-
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutComplete = ({ checkout }: { checkout: __experimental_CommerceCheckoutResource }) => {
+export const CheckoutComplete = ({
+  checkout,
+  isMotionSafe,
+}: {
+  checkout: __experimental_CommerceCheckoutResource;
+  isMotionSafe: boolean;
+}) => {
   const clerk = useClerk();
   const { setIsOpen } = useDrawerContext();
   const { __experimental_checkoutContinueUrl } = useCheckoutContext();
@@ -34,11 +40,40 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
             width: '100%',
             padding: t.space.$4,
             flexShrink: 0,
+            transformOrigin: 'bottom center',
+            animationName: 'scaleIn',
+            animationDuration: `${transitionDurationValues.slowest}ms`,
+            animationTimingFunction: transitionTiming.bezier,
+            animationFillMode: 'forwards',
+            opacity: 0,
+            '@keyframes scaleIn': {
+              '0%': {
+                filter: 'blur(10px)',
+                transform: 'scale(0.85)',
+                opacity: 0,
+              },
+              '100%': {
+                filter: 'blur(0px)',
+                transform: 'scale(1)',
+                opacity: 1,
+              },
+            },
+            ...(!isMotionSafe && {
+              animation: 'none',
+              opacity: 1,
+            }),
           })}
         >
-          <Ring scale={1} />
-          <Ring scale={0.75} />
-          <Ring scale={0.5} />
+          {[1, 0.75, 0.5].map((scale, index, array) => {
+            return (
+              <Ring
+                key={scale}
+                scale={scale}
+                index={array.length - 1 - index}
+                isMotionSafe={isMotionSafe}
+              />
+            );
+          })}
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
@@ -60,15 +95,48 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               },
             })}
           >
-            <Icon
-              icon={Check}
-              colorScheme='neutral'
-              sx={{
+            <svg
+              fill='none'
+              viewBox='0 0 10 10'
+              aria-hidden='true'
+              style={{
                 position: 'relative',
                 margin: 'auto',
+                width: '1rem',
+                height: '1rem',
               }}
-              aria-hidden
-            />
+            >
+              <path
+                d='m1 6 3 3 5-8'
+                stroke='currentColor'
+                strokeWidth='1.25'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeDasharray='1'
+                pathLength='1'
+                style={{
+                  strokeDashoffset: '1',
+                  animationName: 'check',
+                  animationDuration: `${transitionDurationValues.drawer}ms`,
+                  animationTimingFunction: transitionTiming.bezier,
+                  animationFillMode: 'forwards',
+                  animationDelay: `${transitionDurationValues.slow}ms`,
+                  ...(!isMotionSafe && {
+                    strokeDashoffset: '0',
+                    animation: 'none',
+                  }),
+                }}
+              />
+            </svg>
+            <style>{`
+              @keyframes check {
+                0% {
+                  stroke-dashoffset: 1;
+                }
+                100% {
+                  stroke-dashoffset: 0;
+                }
+            `}</style>
           </Box>
           <Span
             sx={t => ({
@@ -84,17 +152,61 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.title__subscriptionSuccessful')
               }
+              sx={{
+                opacity: 0,
+                animationName: 'slideUp',
+                animationDuration: `${transitionDurationValues.slowest}ms`,
+                animationTimingFunction: transitionTiming.bezier,
+                animationFillMode: 'forwards',
+                '@keyframes slideUp': {
+                  '0%': {
+                    transform: 'translateY(30px)',
+                    opacity: 0,
+                  },
+                  '100%': {
+                    transform: 'translateY(0)',
+                    opacity: 1,
+                  },
+                },
+                ...(!isMotionSafe && {
+                  opacity: 1,
+                  animation: 'none',
+                }),
+              }}
             />
             <Text
               elementDescriptor={descriptors.checkoutSuccessDescription}
               colorScheme='secondary'
-              sx={t => ({ textAlign: 'center', paddingInline: t.space.$8, marginBlockStart: t.space.$2 })}
+              sx={t => ({
+                textAlign: 'center',
+                paddingInline: t.space.$8,
+                marginBlockStart: t.space.$2,
+                opacity: 0,
+                animationName: 'slideUp',
+                animationDuration: `${transitionDurationValues.slowest * 1.5}ms`,
+                animationTimingFunction: transitionTiming.bezier,
+                animationFillMode: 'forwards',
+                '@keyframes slideUp': {
+                  '0%': {
+                    transform: 'translateY(30px)',
+                    opacity: 0,
+                  },
+                  '100%': {
+                    transform: 'translateY(0)',
+                    opacity: 1,
+                  },
+                },
+                ...(!isMotionSafe && {
+                  opacity: 1,
+                  animation: 'none',
+                }),
+              })}
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.description__subscriptionSuccessful')
               }
@@ -102,10 +214,25 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           </Span>
         </Span>
       </Drawer.Body>
-
       <Drawer.Footer
         sx={t => ({
           rowGap: t.space.$4,
+          animationName: 'footerSlideInUp',
+          animationDuration: `${transitionDurationValues.drawer}ms`,
+          animationTimingFunction: transitionTiming.bezier,
+          '@keyframes footerSlideInUp': {
+            '0%': {
+              transform: 'translateY(100%)',
+              opacity: 0,
+            },
+            '100%': {
+              transform: 'translateY(0)',
+              opacity: 1,
+            },
+          },
+          ...(!isMotionSafe && {
+            animation: 'none',
+          }),
         })}
       >
         <LineItems.Root>
@@ -118,14 +245,14 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('__experimental_commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? checkout.paymentSource
                     ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
@@ -147,11 +274,18 @@ export const CheckoutComplete = ({ checkout }: { checkout: __experimental_Commer
 
 function Ring({
   scale,
+  index,
+  isMotionSafe,
 }: {
   /**
    * Number between 0-1
    */
   scale: number;
+  /**
+   * Index of the ring (0-2)
+   */
+  index: number;
+  isMotionSafe: boolean;
 }) {
   return (
     <Span
@@ -166,6 +300,16 @@ function Ring({
         borderColor: t.colors.$neutralAlpha200,
         borderRadius: t.radii.$circle,
         maskImage: `linear-gradient(to bottom, transparent 15%, black, transparent 85%)`,
+        opacity: 0,
+        animationName: animations.fadeIn,
+        animationDuration: `${transitionDurationValues.slow}ms`,
+        animationTimingFunction: transitionTiming.bezier,
+        animationFillMode: 'forwards',
+        animationDelay: `${index * transitionDurationValues.slow}ms`,
+        ...(!isMotionSafe && {
+          animation: 'none',
+          opacity: 1,
+        }),
       })}
     />
   );
