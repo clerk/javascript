@@ -88,7 +88,7 @@
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
-    "expo-auth-session": "^5.4.0",
+    "expo-auth-session": "^5.5.2",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
