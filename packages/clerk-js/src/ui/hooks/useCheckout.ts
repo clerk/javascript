@@ -7,7 +7,7 @@ import { useFetch } from './useFetch';
 
 export const useCheckout = (props: __experimental_CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user', __experimental_checkoutContinueUrl } = props;
-  const { __experimental_commerce, __experimental_buildCheckoutContinueUrl } = useClerk();
+  const clerk = useClerk();
   const { organization } = useOrganization();
   const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
 
@@ -16,8 +16,8 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
       return __experimental_checkoutContinueUrl;
     }
 
-    return __experimental_buildCheckoutContinueUrl?.();
-  }, [__experimental_checkoutContinueUrl, __experimental_buildCheckoutContinueUrl]);
+    return clerk.__experimental_buildCheckoutContinueUrl?.();
+  }, [__experimental_checkoutContinueUrl, clerk]);
 
   const { user } = useUser();
   const {
@@ -27,7 +27,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     revalidate,
     error: _error,
   } = useFetch(
-    __experimental_commerce?.__experimental_billing.startCheckout,
+    clerk.__experimental_commerce?.__experimental_billing.startCheckout,
     {
       planId,
       planPeriod,
@@ -56,6 +56,6 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     invalidate,
     revalidate,
     errors: error?.errors,
-    checkoutContinueUrl,
+    __experimental_checkoutContinueUrl: checkoutContinueUrl,
   };
 };

@@ -1,12 +1,13 @@
-import { useClerk } from '@clerk/shared/react';
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
+
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutComplete = ({
@@ -16,12 +17,12 @@ export const CheckoutComplete = ({
   checkout: __experimental_CommerceCheckoutResource;
   isMotionSafe: boolean;
 }) => {
-  const clerk = useClerk();
+  const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { __experimental_checkoutContinueUrl } = useCheckoutContext();
 
   const handleClose = () => {
-    void clerk.navigate(__experimental_checkoutContinueUrl);
+    void router.navigate(__experimental_checkoutContinueUrl);
     if (setIsOpen) {
       setIsOpen(false);
     }
