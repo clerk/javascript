@@ -28,7 +28,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
   });
 
-  test('when signed out, clicking get started button navigates to sign in page', async ({ page, context }) => {
+  test('when signed out, clicking subscribe button navigates to sign in page', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.page.goToRelative('/pricing-table');
 
@@ -101,7 +101,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.clickManageSubscription();
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
-    await expect(u.po.page.getByRole('button', { name: 'Re-subscribe' }).first()).toBeVisible();
+    await expect(u.po.page.getByRole('button', { name: /resubscribe|re-subscribe/i }).first()).toBeVisible();
   });
 
   test.describe('in UserProfile', () => {
