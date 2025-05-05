@@ -33,7 +33,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
+    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
     await u.po.signIn.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeHidden();
   });
@@ -45,7 +46,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
+    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
     await u.po.checkout.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
@@ -57,7 +59,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
+    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
     await u.po.checkout.waitForMounted();
     await u.po.checkout.fillTestCard();
     await u.po.checkout.clickPayOrSubscribe();
