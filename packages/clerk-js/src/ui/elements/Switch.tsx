@@ -36,7 +36,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         as='label'
         sx={t => ({
           width: 'fit-content',
-          '&:has(input:focus-visible) > span': {
+          '&:has(input:focus-visible) > input + span': {
             ...common.focusRingStyles(t),
           },
         })}
