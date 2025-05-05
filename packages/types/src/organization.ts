@@ -1,4 +1,4 @@
-import type { CommerceSubscriptionResource } from './commerce';
+import type { CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';

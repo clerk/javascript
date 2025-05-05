@@ -5,6 +5,7 @@ import type {
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembersParams,
+  GetSubscriptionsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,

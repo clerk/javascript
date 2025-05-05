@@ -1,6 +1,6 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { CommerceCheckoutResource } from '@clerk/types';
+import type { CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';

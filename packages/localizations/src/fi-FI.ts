@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -698,7 +698,7 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

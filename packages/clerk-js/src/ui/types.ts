@@ -1,5 +1,6 @@
 import type {
   __internal_UserVerificationProps,
+  CheckoutProps,
   CommerceInvoiceResource,
   CommercePlanResource,
   CommerceSubscriptionResource,
@@ -9,6 +10,7 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PlanDetailsProps,
   PricingTableProps,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,

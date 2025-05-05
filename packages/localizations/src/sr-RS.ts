@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -697,7 +697,7 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

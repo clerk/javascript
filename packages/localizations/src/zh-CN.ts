@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -682,7 +682,7 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

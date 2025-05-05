@@ -1,15 +1,15 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
+  CheckoutProps,
   Clerk,
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
   GoogleOneTapProps,
   OrganizationProfileProps,
+  PlanDetailsProps,
   SignInProps,
   SignUpProps,
   UserProfileProps,
@@ -20,8 +20,7 @@ import React, { Suspense } from 'react';
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
 import { buildVirtualRouterUrl } from '../utils';
 import { disambiguateRedirectOptions } from '../utils/disambiguateRedirectOptions';
-import type { AppearanceCascade } from './customizables/parseAppearance';
-// NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
+import type { AppearanceCascade } from './customizables/parseAppearance'; // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
@@ -109,11 +108,7 @@ export type ComponentControls = {
   ) => void;
   openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
-    props: T extends 'checkout'
-      ? __experimental_CheckoutProps
-      : T extends 'planDetails'
-        ? __experimental_PlanDetailsProps
-        : never,
+    props: T extends 'checkout' ? CheckoutProps : T extends 'planDetails' ? PlanDetailsProps : never,
   ) => void;
   closeDrawer: (
     drawer: 'checkout' | 'planDetails',
@@ -155,11 +150,11 @@ interface ComponentsState {
   waitlistModal: null | WaitlistProps;
   checkoutDrawer: {
     open: false;
-    props: null | __experimental_CheckoutProps;
+    props: null | CheckoutProps;
   };
   planDetailsDrawer: {
     open: false;
-    props: null | __experimental_PlanDetailsProps;
+    props: null | PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;

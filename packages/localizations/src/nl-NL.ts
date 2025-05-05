@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -696,7 +696,7 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

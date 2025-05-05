@@ -10,6 +10,7 @@ import type {
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
+  GetSubscriptionsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,

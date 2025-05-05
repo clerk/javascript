@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -701,7 +701,7 @@ export const esMX: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

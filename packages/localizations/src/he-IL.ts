@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -688,7 +688,7 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

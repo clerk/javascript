@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -694,7 +694,7 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

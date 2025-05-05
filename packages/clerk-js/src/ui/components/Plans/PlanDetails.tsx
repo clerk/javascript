@@ -5,6 +5,7 @@ import type {
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
+  PlanDetailsProps,
 } from '@clerk/types';
 import * as React from 'react';
 import { useState } from 'react';

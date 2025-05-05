@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -695,7 +695,7 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

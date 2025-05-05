@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { __experimental_PlanDetailsProps, Appearance } from '@clerk/types';
+import type { Appearance, PlanDetailsProps } from '@clerk/types';
 
 import { PlanDetails } from './components';
 import { LazyDrawerRenderer } from './providers';
@@ -13,7 +13,7 @@ export function MountedPlanDetailDrawer({
   onOpenChange: (open: boolean) => void;
   planDetailsDrawer: {
     open: false;
-    props: null | __experimental_PlanDetailsProps;
+    props: null | PlanDetailsProps;
   };
 }) {
   const { user } = useUser();

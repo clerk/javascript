@@ -5,6 +5,8 @@ import type {
   CommercePaymentSourceResource,
   CommercePaymentSourceStatus,
   DeletedObjectJSON,
+  MakeDefaultPaymentSourceParams,
+  RemovePaymentSourceParams,
 } from '@clerk/types';
 
 import { BaseResource, DeletedObject } from './internal';

@@ -84,7 +84,7 @@ const RemoveScreen = ({
   );
 };
 
-const PaymentSources = () => {
+export const PaymentSources = () => {
   const { commerce } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
@@ -148,8 +148,6 @@ const PaymentSources = () => {
     </ProfileSection.Root>
   );
 };
-
-export const PaymentSources = PaymentSources;
 
 const PaymentSourceMenu = ({
   paymentSource,

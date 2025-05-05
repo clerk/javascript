@@ -1,4 +1,4 @@
-import type { ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
+import type { CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 
 import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';

@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
@@ -698,7 +698,7 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
