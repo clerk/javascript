@@ -34,6 +34,7 @@ export function MountedCheckoutDrawer({
       onOpenChange={onOpenChange}
       componentName={'Checkout'}
       portalId={checkoutDrawer.props?.portalId}
+      portalRoot={checkoutDrawer.props?.portalRoot as HTMLElement | null | undefined}
     >
       {checkoutDrawer.props && (
         <Checkout
@@ -41,6 +42,7 @@ export function MountedCheckoutDrawer({
           planPeriod={checkoutDrawer.props.planPeriod}
           subscriberType={checkoutDrawer.props.subscriberType}
           onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
+          portalRoot={checkoutDrawer.props.portalRoot}
         />
       )}
     </LazyDrawerRenderer>

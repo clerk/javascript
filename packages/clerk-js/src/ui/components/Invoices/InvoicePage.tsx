@@ -204,7 +204,7 @@ const InvoicePageInternal = () => {
                 <LineItems.Group variant='secondary'>
                   <LineItems.Title title='Tax' />
                   <LineItems.Description
-                    text={`${invoice.totals.grandTotal.currencySymbol}${invoice.totals.grandTotal.amountFormatted}`}
+                    text={`${invoice.totals.taxTotal.currencySymbol}${invoice.totals.taxTotal.amountFormatted}`}
                   />
                 </LineItems.Group>
                 <LineItems.Group borderTop>

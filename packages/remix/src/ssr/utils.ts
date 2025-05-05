@@ -94,6 +94,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signUpForceRedirectUrl: requestState.signUpForceRedirectUrl,
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
+    __experimental_checkoutContinueUrl: requestState.__experimental_checkoutContinueUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS', context),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),

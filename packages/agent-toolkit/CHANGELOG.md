@@ -1,5 +1,30 @@
 # @clerk/agent-toolkit
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [[`9ec0a73`](https://github.com/clerk/javascript/commit/9ec0a7353e9f6ea661c3d7b9542423b6eb1d29e9), [`d9222fc`](https://github.com/clerk/javascript/commit/d9222fc3c21da2bcae30b06f0b1897f526935582)]:
+  - @clerk/types@4.56.3
+  - @clerk/backend@1.31.2
+  - @clerk/shared@3.7.8
+
+## 0.0.30
+
+### Patch Changes
+
+- Updated dependencies [[`225b9ca`](https://github.com/clerk/javascript/commit/225b9ca21aba44930872a85d6b112ee2a1b606b9)]:
+  - @clerk/types@4.56.2
+  - @clerk/backend@1.31.1
+  - @clerk/shared@3.7.7
+
+## 0.0.29
+
+### Patch Changes
+
+- Updated dependencies [[`be1c5d6`](https://github.com/clerk/javascript/commit/be1c5d67b27852303dc8148e3be514473ce3e190), [`a122121`](https://github.com/clerk/javascript/commit/a122121e4fe55148963ed85b99ff24ba02a2d170)]:
+  - @clerk/backend@1.31.0
+
 ## 0.0.28
 
 ### Patch Changes

@@ -63,13 +63,25 @@ export const createSignInComponentPageObject = (testArgs: { page: EnhancedPage }
     signInWithOauth: (provider: string) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },
-    signInWithEmailAndInstantPassword: async (opts: { email: string; password: string }) => {
+    signInWithEmailAndInstantPassword: async ({
+      email,
+      password,
+      waitForSession = true,
+    }: {
+      email: string;
+      password: string;
+      waitForSession?: boolean;
+    }) => {
       const identifierField = self.getIdentifierInput();
       await expect(identifierField).toBeVisible();
 
-      await identifierField.fill(opts.email);
-      await self.setInstantPassword(opts.password);
+      await identifierField.fill(email);
+      await self.setInstantPassword(password);
       await self.continue();
+
+      if (waitForSession) {
+        await self.waitForSession();
+      }
     },
   };
   return self;

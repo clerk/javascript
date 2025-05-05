@@ -323,6 +323,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __experimental_buildCheckoutContinueUrl = (): string | void => {
+    const callback = () => this.clerkjs?.__experimental_buildCheckoutContinueUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('__experimental_buildCheckoutContinueUrl', callback);
+    }
+  };
+
   buildAfterMultiSessionSingleSignOutUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildAfterMultiSessionSingleSignOutUrl() || '';
     if (this.clerkjs && this.loaded) {
@@ -693,9 +702,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_nextTask = async (params?: NextTaskParams): Promise<void> => {
+  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_nextTask(params);
+      return this.clerkjs.__experimental_navigateToTask(params);
     } else {
       return Promise.reject();
     }
