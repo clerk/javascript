@@ -11,7 +11,7 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys, Span } from '../../customizables';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
@@ -47,18 +47,6 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          {/* TODO(@Commerce): needs localization */}
-          {showDowngradeInfo && (
-            <Span
-              localizationKey={'Your features will remain until the end of your current subscription.'}
-              elementDescriptor={descriptors.lineItemsDowngradeNotice}
-              sx={t => ({
-                fontSize: t.fontSizes.$sm,
-                color: t.colors.$colorTextSecondary,
-              })}
-            />
-          )}
-
           <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
@@ -93,6 +81,23 @@ export const CheckoutForm = ({
           </LineItems.Group>
         </LineItems.Root>
       </Box>
+
+      {/* TODO(@Commerce): needs localization */}
+      {showDowngradeInfo && (
+        <Box
+          elementDescriptor={descriptors.checkoutFormLineItemsRoot}
+          sx={t => ({
+            paddingBlockStart: t.space.$4,
+            paddingInline: t.space.$4,
+          })}
+        >
+          <Text
+            localizationKey={localizationKeys('commerce.checkout.downgradeNotice')}
+            variant='caption'
+            colorScheme='secondary'
+          />
+        </Box>
+      )}
 
       <CheckoutFormElements
         checkout={checkout}

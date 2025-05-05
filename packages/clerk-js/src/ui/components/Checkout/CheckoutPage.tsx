@@ -1,4 +1,4 @@
-import type { CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
+import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 
 import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
@@ -8,7 +8,7 @@ import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-export const CheckoutPage = (props: CheckoutProps) => {
+export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();

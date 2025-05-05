@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  backButton: 'กลับ',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'ค่าเริ่มต้น',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
+  badge__primary: 'หลัก',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'ต้องการการดำเนินการ',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'อุปกรณ์นี้',
+  badge__unverified: 'ยังไม่ได้ตรวจสอบ',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'อุปกรณ์ผู้ใช้',
+  badge__you: 'คุณ',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const thTH: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'กลับ',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'ค่าเริ่มต้น',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
-  badge__primary: 'หลัก',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'ต้องการการดำเนินการ',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'อุปกรณ์นี้',
-  badge__unverified: 'ยังไม่ได้ตรวจสอบ',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'อุปกรณ์ผู้ใช้',
-  badge__you: 'คุณ',
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -696,6 +700,21 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'คัดลอกแล้ว!',
+      actionLabel__copy: 'คัดลอกทั้งหมด',
+      actionLabel__download: 'ดาวน์โหลด .txt',
+      actionLabel__print: 'พิมพ์',
+      infoText1: 'จะเปิดใช้งานรหัสสำรองสำหรับบัญชีนี้',
+      infoText2: 'เก็บรหัสสำรองไว้เป็นความลับและเก็บไว้อย่างปลอดภัย คุณอาจสร้างรหัสสำรองใหม่หากคุณสงสัยว่ามีการเปิดเผย',
+      subtitle__codelist: 'เก็บไว้อย่างปลอดภัยและเก็บไว้เป็นความลับ',
+      successMessage:
+        'ตอนนี้ได้เปิดใช้งานรหัสสำรองแล้ว คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้ แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียว',
+      successSubtitle:
+        'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
+      title: 'เพิ่มการยืนยันรหัสสำรอง',
+      title__codelist: 'รหัสสำรอง',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -723,21 +742,6 @@ export const thTH: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'คัดลอกแล้ว!',
-      actionLabel__copy: 'คัดลอกทั้งหมด',
-      actionLabel__download: 'ดาวน์โหลด .txt',
-      actionLabel__print: 'พิมพ์',
-      infoText1: 'จะเปิดใช้งานรหัสสำรองสำหรับบัญชีนี้',
-      infoText2: 'เก็บรหัสสำรองไว้เป็นความลับและเก็บไว้อย่างปลอดภัย คุณอาจสร้างรหัสสำรองใหม่หากคุณสงสัยว่ามีการเปิดเผย',
-      subtitle__codelist: 'เก็บไว้อย่างปลอดภัยและเก็บไว้เป็นความลับ',
-      successMessage:
-        'ตอนนี้ได้เปิดใช้งานรหัสสำรองแล้ว คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้ แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียว',
-      successSubtitle:
-        'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
-      title: 'เพิ่มการยืนยันรหัสสำรอง',
-      title__codelist: 'รหัสสำรอง',
     },
     connectedAccountPage: {
       formHint: 'เลือกผู้ให้บริการเพื่อเชื่อมต่อบัญชีของคุณ',

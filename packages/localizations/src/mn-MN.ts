@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  backButton: 'Буцах',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Анхдагч',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
+  badge__primary: 'Үндсэн',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Үйлдэл шаардлагтай',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Энэ төхөөрөмж',
+  badge__unverified: 'Баталгаажаагүй',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
+  badge__you: 'Чи',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const mnMN: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Буцах',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Анхдагч',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
-  badge__primary: 'Үндсэн',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Үйлдэл шаардлагтай',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Энэ төхөөрөмж',
-  badge__unverified: 'Баталгаажаагүй',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
-  badge__you: 'Чи',
   createOrganization: {
     formButtonSubmit: 'Байгуулга үүсгэх',
     invitePage: {
@@ -698,6 +702,22 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Хуулсан!',
+      actionLabel__copy: 'Бүгдийг хуулах',
+      actionLabel__download: 'Татах .txt',
+      actionLabel__print: 'Хэвлэх',
+      infoText1: 'Энэ бүртгэлд нөөц кодуудыг идэвхжүүлэх',
+      infoText2:
+        'Нөөц кодыг нууцалж, найдвартай хадгална уу. Хэрэв та нөөц кодыг эвдэрсэн гэж сэжиглэж байгаа бол тэдгээрийг дахин үүсгэж болно.',
+      subtitle__codelist: 'Тэдгээрийг найдвартай хадгалж, нууцаар хадгал.',
+      successMessage:
+        'Нөөц кодуудыг одоо идэвхжүүлсэн. Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно. Код бүрийг зөвхөн нэг удаа ашиглах боломжтой.',
+      successSubtitle:
+        'Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно.',
+      title: 'Нөөц кодын баталгаажуулалтыг нэмэх',
+      title__codelist: 'Нөөц кодууд',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -725,22 +745,6 @@ export const mnMN: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Хуулсан!',
-      actionLabel__copy: 'Бүгдийг хуулах',
-      actionLabel__download: 'Татах .txt',
-      actionLabel__print: 'Хэвлэх',
-      infoText1: 'Энэ бүртгэлд нөөц кодуудыг идэвхжүүлэх',
-      infoText2:
-        'Нөөц кодыг нууцалж, найдвартай хадгална уу. Хэрэв та нөөц кодыг эвдэрсэн гэж сэжиглэж байгаа бол тэдгээрийг дахин үүсгэж болно.',
-      subtitle__codelist: 'Тэдгээрийг найдвартай хадгалж, нууцаар хадгал.',
-      successMessage:
-        'Нөөц кодуудыг одоо идэвхжүүлсэн. Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно. Код бүрийг зөвхөн нэг удаа ашиглах боломжтой.',
-      successSubtitle:
-        'Хэрэв та баталгаажуулах төхөөрөмждөө хандах эрхээ алдсан тохиолдолд эдгээрийн аль нэгийг ашиглан бүртгэлдээ нэвтэрч болно.',
-      title: 'Нөөц кодын баталгаажуулалтыг нэмэх',
-      title__codelist: 'Нөөц кодууд',
     },
     connectedAccountPage: {
       formHint: 'Бүртгэлээ холбох үйлчилгээ үзүүлэгчээ сонгоно уу.',

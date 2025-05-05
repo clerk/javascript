@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  backButton: 'Retour',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Défaut',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
+  badge__primary: 'Principal',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Nécessite une action',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Cet appareil',
+  badge__unverified: 'Non vérifié',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Appareil utilisateur',
+  badge__you: 'Vous',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const frFR: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Retour',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Défaut',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
-  badge__primary: 'Principal',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Nécessite une action',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Cet appareil',
-  badge__unverified: 'Non vérifié',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Appareil utilisateur',
-  badge__you: 'Vous',
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {
@@ -703,6 +707,22 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Copié !',
+      actionLabel__copy: 'Copier tous les codes',
+      actionLabel__download: 'Télécharger en .txt',
+      actionLabel__print: 'Imprimer',
+      infoText1: 'Les codes de récupération seront activés pour ce compte.',
+      infoText2:
+        "Gardez les codes de récupération secrets et stockez-les en toute sécurité. Vous pouvez régénérer les codes de récupération si vous pensez qu'ils ont été compromis.",
+      subtitle__codelist: 'Conservez-les en toute sécurité et gardez-les secrets.',
+      successMessage:
+        "Les codes de récupération sont maintenant activés. Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification. Chaque code ne peut être utilisé qu'une seule fois.",
+      successSubtitle:
+        "Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification.",
+      title: 'Ajouter la vérification du code de récupération',
+      title__codelist: 'Codes de récupération',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -730,22 +750,6 @@ export const frFR: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copié !',
-      actionLabel__copy: 'Copier tous les codes',
-      actionLabel__download: 'Télécharger en .txt',
-      actionLabel__print: 'Imprimer',
-      infoText1: 'Les codes de récupération seront activés pour ce compte.',
-      infoText2:
-        "Gardez les codes de récupération secrets et stockez-les en toute sécurité. Vous pouvez régénérer les codes de récupération si vous pensez qu'ils ont été compromis.",
-      subtitle__codelist: 'Conservez-les en toute sécurité et gardez-les secrets.',
-      successMessage:
-        "Les codes de récupération sont maintenant activés. Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification. Chaque code ne peut être utilisé qu'une seule fois.",
-      successSubtitle:
-        "Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification.",
-      title: 'Ajouter la vérification du code de récupération',
-      title__codelist: 'Codes de récupération',
     },
     connectedAccountPage: {
       formHint: 'Sélectionnez un fournisseur pour connecter votre compte.',

@@ -3,13 +3,14 @@ import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
-  CheckoutProps,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
@@ -30,7 +31,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  PlanDetailsProps,
   PricingTableProps,
   RedirectOptions,
   SetActiveParams,
@@ -113,8 +113,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
-  private preopenCheckout?: null | CheckoutProps = null;
-  private preopenPlanDetails?: null | PlanDetailsProps = null;
+  private preopenCheckout?: null | __internal_CheckoutProps = null;
+  private preopenPlanDetails?: null | __internal_PlanDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -737,7 +737,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openCheckout = (props?: CheckoutProps) => {
+  __internal_openCheckout = (props?: __internal_CheckoutProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openCheckout(props);
     } else {
@@ -753,7 +753,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openPlanDetails = (props?: PlanDetailsProps) => {
+  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openPlanDetails(props);
     } else {

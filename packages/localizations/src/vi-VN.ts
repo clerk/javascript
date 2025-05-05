@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  backButton: 'Quay lại',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Mặc định',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
+  badge__primary: 'Chính',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Yêu cầu hành động',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Thiết bị này',
+  badge__unverified: 'Chưa xác minh',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Thiết bị người dùng',
+  badge__you: 'Bạn',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const viVN: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Quay lại',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Mặc định',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
-  badge__primary: 'Chính',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Yêu cầu hành động',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Thiết bị này',
-  badge__unverified: 'Chưa xác minh',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Thiết bị người dùng',
-  badge__you: 'Bạn',
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
@@ -695,6 +699,22 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Đã sao chép!',
+      actionLabel__copy: 'Sao chép tất cả',
+      actionLabel__download: 'Tải xuống .txt',
+      actionLabel__print: 'In',
+      infoText1: 'Các mã sao lưu sẽ được kích hoạt cho tài khoản này.',
+      infoText2:
+        'Giữ các mã sao lưu bí mật và lưu chúng một cách an toàn. Bạn có thể tạo lại các mã sao lưu nếu bạn nghi ngờ chúng đã bị xâm phạm.',
+      subtitle__codelist: 'Lưu chúng một cách an toàn và giữ chúng bí mật.',
+      successMessage:
+        'Mã sao lưu đã được kích hoạt. Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình. Mỗi mã chỉ có thể sử dụng một lần.',
+      successSubtitle:
+        'Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình.',
+      title: 'Thêm mã xác thực sao lưu',
+      title__codelist: 'Các mã sao lưu',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -722,22 +742,6 @@ export const viVN: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Đã sao chép!',
-      actionLabel__copy: 'Sao chép tất cả',
-      actionLabel__download: 'Tải xuống .txt',
-      actionLabel__print: 'In',
-      infoText1: 'Các mã sao lưu sẽ được kích hoạt cho tài khoản này.',
-      infoText2:
-        'Giữ các mã sao lưu bí mật và lưu chúng một cách an toàn. Bạn có thể tạo lại các mã sao lưu nếu bạn nghi ngờ chúng đã bị xâm phạm.',
-      subtitle__codelist: 'Lưu chúng một cách an toàn và giữ chúng bí mật.',
-      successMessage:
-        'Mã sao lưu đã được kích hoạt. Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình. Mỗi mã chỉ có thể sử dụng một lần.',
-      successSubtitle:
-        'Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình.',
-      title: 'Thêm mã xác thực sao lưu',
-      title__codelist: 'Các mã sao lưu',
     },
     connectedAccountPage: {
       formHint: 'Chọn một nhà cung cấp để kết nối tài khoản của bạn.',
