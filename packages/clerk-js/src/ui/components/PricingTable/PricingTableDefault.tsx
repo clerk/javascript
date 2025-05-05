@@ -157,6 +157,7 @@ function Card(props: CardProps) {
         setPlanPeriod={setPlanPeriod}
       />
       <Box
+        elementDescriptor={descriptors.pricingTableCardBody}
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -188,6 +189,7 @@ function Card(props: CardProps) {
 
         {showStatusRow && (
           <Box
+            elementDescriptor={descriptors.pricingTableCardStatusRow}
             sx={t => ({
               padding: t.space.$1,
               borderTopWidth: t.borderWidths.$normal,
@@ -197,7 +199,7 @@ function Card(props: CardProps) {
           >
             {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
               <Text
-                elementDescriptor={descriptors.pricingTableCardBadge}
+                elementDescriptor={descriptors.pricingTableCardStatus}
                 variant='caption'
                 colorScheme='body'
                 localizationKey={localizationKeys('badge__currentPlan')}
@@ -205,7 +207,7 @@ function Card(props: CardProps) {
               />
             ) : (
               <Text
-                elementDescriptor={descriptors.pricingTableCardBadge}
+                elementDescriptor={descriptors.pricingTableCardStatus}
                 variant='caption'
                 colorScheme='body'
                 localizationKey={
@@ -235,6 +237,7 @@ function Card(props: CardProps) {
             })}
           >
             <Button
+              elementDescriptor={descriptors.pricingTableCardActionButton}
               block
               textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
               {...buttonPropsForPlan({ plan, isCompact })}
@@ -285,7 +288,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       })}
       data-variant={isCompact ? 'compact' : 'default'}
     >
-      <Box>
+      <Box elementDescriptor={descriptors.pricingTableCardTitleContainer}>
         <Heading
           elementDescriptor={descriptors.pricingTableCardTitle}
           as='h2'
