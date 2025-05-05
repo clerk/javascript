@@ -707,6 +707,7 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+        payWithTestCardButton: LocalizationValue;
       };
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;

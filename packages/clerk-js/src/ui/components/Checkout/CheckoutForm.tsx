@@ -169,6 +169,20 @@ const CheckoutFormElements = ({
     setIsSubmitting(false);
   };
 
+  const onPayWithTestPaymentSourceSuccess = async () => {
+    try {
+      const newCheckout = await checkout.confirm({
+        gateway: 'stripe',
+        useTestCard: true,
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      });
+      onCheckoutComplete(newCheckout);
+      void revalidatePaymentSources();
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
+  };
+
   return (
     <Col
       elementDescriptor={descriptors.checkoutFormElementsRoot}
@@ -212,6 +226,7 @@ const CheckoutFormElements = ({
         <AddPaymentSource
           checkout={checkout}
           onSuccess={onAddPaymentSourceSuccess}
+          onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
           // @ts-ignore TODO(@COMMERCE): needs localization
           submitLabel={
             checkout.totals.totalDueNow.amount > 0
@@ -225,6 +240,7 @@ const CheckoutFormElements = ({
           }
           submitError={submitError}
           setSubmitError={setSubmitError}
+          showPayWithTestCardSection
         />
       )}
     </Col>
@@ -252,9 +268,14 @@ const ExistingPaymentSourceForm = ({
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
+      const label =
+        source.paymentMethod !== 'card'
+          ? `${capitalize(source.paymentMethod)}`
+          : `${capitalize(source.cardType)} ⋯ ${source.last4}`;
+
       return {
         value: source.id,
-        label: `${capitalize(source.cardType)} ⋯ ${source.last4}`,
+        label,
       };
     });
   }, [paymentSources]);

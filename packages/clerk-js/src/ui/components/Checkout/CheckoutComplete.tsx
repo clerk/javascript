@@ -257,7 +257,9 @@ export const CheckoutComplete = ({
               text={
                 checkout.totals.totalDueNow.amount > 0
                   ? checkout.paymentSource
-                    ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
+                    ? checkout.paymentSource.paymentMethod !== 'card'
+                      ? `${capitalize(checkout.paymentSource.paymentMethod)}`
+                      : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
                   : checkout.subscription?.periodStart
                     ? formatDate(new Date(checkout.subscription.periodStart))
