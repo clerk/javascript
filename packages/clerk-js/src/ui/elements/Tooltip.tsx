@@ -16,7 +16,8 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, type LocalizationKey, Span, Text } from '../customizables';
+import { Box, descriptors, type LocalizationKey, Span, Text, useAppearance } from '../customizables';
+import { usePrefersReducedMotion } from '../hooks';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -35,6 +36,12 @@ export function useTooltip({
 
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = setControlledOpen ?? setUncontrolledOpen;
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
+  console.log(isMotionSafe);
 
   const data = useFloating({
     placement,
@@ -65,7 +72,7 @@ export function useTooltip({
   const role = useRole(context, { role: 'tooltip' });
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
-    duration: 200,
+    duration: isMotionSafe ? 200 : 0,
     initial: ({ side }) => {
       return {
         opacity: 0,
