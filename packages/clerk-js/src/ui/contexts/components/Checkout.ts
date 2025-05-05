@@ -1,13 +1,16 @@
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
+import { isAllowedRedirect } from '../../../utils';
 import type { __experimental_CheckoutCtx } from '../../types';
+import { useOptions } from '../OptionsContext';
 
 export const __experimental_CheckoutContext = createContext<__experimental_CheckoutCtx | null>(null);
 
 export const useCheckoutContext = () => {
   const context = useContext(__experimental_CheckoutContext);
   const clerk = useClerk();
+  const options = useOptions();
 
   if (!context || context.componentName !== 'Checkout') {
     throw new Error('Clerk: useCheckoutContext called outside Checkout.');
@@ -20,18 +23,15 @@ export const useCheckoutContext = () => {
       return undefined;
     }
 
-    if (context.checkoutContinueUrl) {
-      return context.checkoutContinueUrl;
-    }
-
-    return clerk.buildCheckoutContinueUrl?.();
-  }, [context.portalRoot, context.checkoutContinueUrl, clerk]);
+    const url = context.checkoutContinueUrl || clerk.buildCheckoutContinueUrl?.();
+    return isAllowedRedirect(options?.allowedRedirectOrigins, window.location.origin)(url) ? url : undefined;
+  }, [context.portalRoot, context.checkoutContinueUrl, clerk, options?.allowedRedirectOrigins]);
 
   const { componentName, ...ctx } = context;
 
   return {
     ...ctx,
     componentName,
-    checkoutContinueUrl: checkoutContinueUrl,
+    checkoutContinueUrl,
   };
 };
