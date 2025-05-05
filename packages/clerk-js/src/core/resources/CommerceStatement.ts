@@ -41,7 +41,6 @@ export class __experimental_CommerceStatement extends BaseResource implements __
 
 export class __experimental_CommerceStatementGroup {
   id!: string;
-  totals!: __experimental_CommerceStatementTotals;
   timestamp!: number;
   items!: __experimental_CommercePayment[];
 
@@ -55,7 +54,6 @@ export class __experimental_CommerceStatementGroup {
     }
 
     this.id = data.id;
-    this.totals = commerceTotalsFromJSON(data.totals);
     this.timestamp = data.timestamp;
     this.items = data.items.map(item => new __experimental_CommercePayment(item));
     return this;
