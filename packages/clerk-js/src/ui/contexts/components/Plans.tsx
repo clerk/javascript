@@ -8,6 +8,7 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
+import { useProtect } from '../../common';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -95,6 +96,9 @@ export const usePlansContext = () => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const context = useContext(PlansContext);
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
 
   if (!context || context.componentName !== 'Plans') {
     throw new Error('Clerk: usePlansContext called outside Plans.');
@@ -124,11 +128,15 @@ export const usePlansContext = () => {
       plan?: __experimental_CommercePlanResource;
       subscription?: __experimental_CommerceSubscriptionResource;
     }) => {
+      if (!canManageBilling) {
+        return false;
+      }
+
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return !subscription || !subscription.canceledAt;
     },
-    [activeOrUpcomingSubscription],
+    [activeOrUpcomingSubscription, canManageBilling],
   );
 
   // return the CTA button props for a plan

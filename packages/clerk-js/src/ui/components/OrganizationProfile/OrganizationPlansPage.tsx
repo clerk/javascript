@@ -18,7 +18,7 @@ const OrganizationPlansPageInternal = () => {
       </Header.Root>
 
       <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-        <__experimental_PricingTable />
+        <__experimental_PricingTable forOrganizations />
       </__experimental_PricingTableContext.Provider>
     </>
   );

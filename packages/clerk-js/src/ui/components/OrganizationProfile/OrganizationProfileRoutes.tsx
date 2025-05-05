@@ -62,25 +62,32 @@ export const OrganizationProfileRoutes = () => {
         </Route>
         {__experimental_commerceSettings.billing.enabled && __experimental_commerceSettings.billing.hasPaidOrgPlans && (
           <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationBillingPage />
-                </Suspense>
-              </Route>
-              <Route path='plans'>
-                {/* TODO(@commerce): Should this be lazy loaded ? */}
-                <Suspense fallback={''}>
-                  <OrganizationPlansPage />
-                </Suspense>
-              </Route>
-              <Route path='invoice/:invoiceId'>
-                {/* TODO(@commerce): Should this be lazy loaded ? */}
-                <Suspense fallback={''}>
-                  <OrganizationInvoicePage />
-                </Suspense>
-              </Route>
-            </Switch>
+            <Protect
+              condition={has =>
+                has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
+              }
+              redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
+            >
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationBillingPage />
+                  </Suspense>
+                </Route>
+                <Route path='plans'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationPlansPage />
+                  </Suspense>
+                </Route>
+                <Route path='invoice/:invoiceId'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationInvoicePage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Protect>
           </Route>
         )}
       </Route>

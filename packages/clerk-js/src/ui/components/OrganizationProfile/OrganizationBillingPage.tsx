@@ -1,3 +1,4 @@
+import { Protect } from '../../common';
 import {
   __experimental_PricingTableContext,
   InvoicesContextProvider,
@@ -91,11 +92,13 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       width: 'fit-content',
                     }}
                   />
-                  <__experimental_PaymentSources />
+                  <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                    <__experimental_PaymentSources />
+                  </Protect>
                 </Flex>
               ) : (
                 <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <__experimental_PricingTable />
+                  <__experimental_PricingTable forOrganizations />
                 </__experimental_PricingTableContext.Provider>
               )}
             </TabPanel>
