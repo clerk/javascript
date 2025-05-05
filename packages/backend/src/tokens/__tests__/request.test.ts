@@ -1184,6 +1184,17 @@ describe('tokens.authenticateRequest(options)', () => {
       );
       expect(refreshSession).toHaveBeenCalled();
     });
+
+    test('should default to session_token if acceptsToken is not provided', async () => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json({}, { status: 200 });
+        }),
+      );
+
+      const result = await authenticateRequest(mockRequestWithHeaderAuth(), mockOptions());
+      expect(result.tokenType).toBe('session_token');
+    });
   });
 
   describe('Machine authentication', () => {
