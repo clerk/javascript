@@ -76,39 +76,52 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
-                    <Alert
-                      variant='info'
-                      colorScheme='info'
-                      title={localizationKeys(
-                        'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
-                      )}
+              <Flex
+                sx={{ width: '100%', flexDirection: 'column' }}
+                gap={4}
+              >
+                {subscriptions.data.length > 0 ? (
+                  <>
+                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                      <Alert
+                        variant='info'
+                        colorScheme='info'
+                        title={localizationKeys(
+                          'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
+                        )}
+                      />
+                    </Protect>
+                    <SubscriptionsList />
+                    <Button
+                      localizationKey='View all plans'
+                      hasArrow
+                      variant='ghost'
+                      onClick={() => navigate('plans')}
+                      sx={{
+                        width: 'fit-content',
+                      }}
                     />
-                  </Protect>
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  />
-                  <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
-                    <PaymentSources />
-                  </Protect>
-                </Flex>
-              ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
-              )}
+                    <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                      <PaymentSources />
+                    </Protect>
+                  </>
+                ) : (
+                  <>
+                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                      <Alert
+                        variant='info'
+                        colorScheme='info'
+                        title={localizationKeys(
+                          'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
+                        )}
+                      />
+                    </Protect>
+                    <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                      <PricingTable />
+                    </PricingTableContext.Provider>
+                  </>
+                )}
+              </Flex>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <InvoicesContextProvider>
