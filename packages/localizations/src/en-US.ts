@@ -5,6 +5,8 @@ export const enUS: LocalizationResource = {
   commerce: {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
+    billedMonthlyOnly: 'Only billed monthly',
+    alwaysFree: 'Always free',
     cancelSubscription: 'Cancel subscription',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
@@ -29,15 +31,16 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
-    reSubscribe: 'Re-subscribe',
+    reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
+    subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
   },
   backButton: 'Back',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
-  badge__currentPlan: 'Current Plan',
+  badge__currentPlan: 'Current plan',
   badge__default: 'Default',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
@@ -714,7 +717,7 @@ export const enUS: LocalizationResource = {
       subscriptionsSection: {
         actionLabel__default: 'Manage',
       },
-      title: 'Billing & Payments',
+      title: 'Billing',
     },
     backupCodePage: {
       actionLabel__copied: 'Copied!',

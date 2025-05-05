@@ -130,15 +130,21 @@ const borderColor = (t: InternalTheme, props?: any) => {
   } as const;
 };
 
+const focusRingStyles = (t: InternalTheme) => {
+  return {
+    '&::-moz-focus-inner': { border: '0' },
+    WebkitTapHighlightColor: 'transparent',
+    boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
+    transitionProperty: t.transitionProperty.$common,
+    transitionTimingFunction: t.transitionTiming.$common,
+    transitionDuration: t.transitionDuration.$focusRing,
+  } as const;
+};
+
 const focusRing = (t: InternalTheme) => {
   return {
     '&:focus': {
-      '&::-moz-focus-inner': { border: '0' },
-      WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
-      transitionProperty: t.transitionProperty.$common,
-      transitionTimingFunction: t.transitionTiming.$common,
-      transitionDuration: t.transitionDuration.$focusRing,
+      ...focusRingStyles(t),
     },
   } as const;
 };
@@ -198,6 +204,7 @@ const visuallyHidden = () =>
 export const common = {
   textVariants,
   borderVariants,
+  focusRingStyles,
   focusRing,
   disabled,
   borderColor,

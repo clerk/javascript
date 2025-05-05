@@ -1,9 +1,9 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
-  CommercePlanResource,
-  CommerceSubscriberType,
-  CommerceSubscriptionPlanPeriod,
-  CommerceSubscriptionResource,
+  __experimental_CommercePlanResource,
+  __experimental_CommerceSubscriberType,
+  __experimental_CommerceSubscriptionPlanPeriod,
+  __experimental_CommerceSubscriptionResource,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
@@ -11,18 +11,18 @@ import { createContext, useCallback, useContext, useMemo } from 'react';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import type { PlansCtx } from '../../types';
+import type { __experimental_PlansCtx } from '../../types';
 import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-const PlansContext = createContext<PlansCtx | null>(null);
+const PlansContext = createContext<__experimental_PlansCtx | null>(null);
 
-export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
-  const { commerce } = useClerk();
+export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscriberType) => {
+  const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
   const { user } = useUser();
   return useFetch(
-    user ? commerce?.billing.getSubscriptions : undefined,
+    user ? __experimental_commerce?.__experimental_billing.getSubscriptions : undefined,
     { orgId: subscriberType === 'org' ? organization?.id : undefined },
     undefined,
     `commerce-subscriptions-${user?.id}`,
@@ -30,9 +30,9 @@ export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
 };
 
 export const PlansContextProvider = ({ children }: PropsWithChildren) => {
-  const { commerce } = useClerk();
+  const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
   const {
     data: subscriptions,
@@ -44,7 +44,12 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     data: plans,
     isLoading: isLoadingPlans,
     revalidate: revalidatePlans,
-  } = useFetch(commerce?.billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
+  } = useFetch(
+    __experimental_commerce?.__experimental_billing.getPlans,
+    { subscriberType },
+    undefined,
+    'commerce-plans',
+  );
 
   // Revalidates the next time the hooks gets mounted
   const { revalidate: revalidateInvoices } = useFetch(
@@ -63,11 +68,18 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     revalidateInvoices();
   }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
 
+  const isLoaded = useMemo(() => {
+    if (isSignedIn) {
+      return isLoadingSubscriptions === false && isLoadingPlans === false;
+    }
+    return isLoadingPlans === false;
+  }, [isLoadingPlans, isLoadingSubscriptions, isSignedIn]);
+
   return (
     <PlansContext.Provider
       value={{
         componentName: 'Plans',
-        plans: plans || [],
+        plans: isLoaded ? (plans ?? []) : [],
         subscriptions: subscriptions?.data || [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
@@ -79,8 +91,8 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
 };
 
 type HandleSelectPlanProps = {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  plan: __experimental_CommercePlanResource;
+  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
@@ -99,7 +111,7 @@ export const usePlansContext = () => {
 
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
-    (plan: CommercePlanResource) => {
+    (plan: __experimental_CommercePlanResource) => {
       return ctx.subscriptions.find(subscription => subscription.plan.id === plan.id);
     },
     [ctx.subscriptions],
@@ -112,7 +124,13 @@ export const usePlansContext = () => {
   }, [ctx.subscriptions]);
 
   const canManageSubscription = useCallback(
-    ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
+    ({
+      plan,
+      subscription: sub,
+    }: {
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
+    }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return !subscription || !subscription.canceledAt;
@@ -127,8 +145,8 @@ export const usePlansContext = () => {
       subscription: sub,
       isCompact = false,
     }: {
-      plan?: CommercePlanResource;
-      subscription?: CommerceSubscriptionResource;
+      plan?: __experimental_CommercePlanResource;
+      subscription?: __experimental_CommerceSubscriptionResource;
       isCompact?: boolean;
     }): { localizationKey: LocalizationKey; variant: 'bordered' | 'solid'; colorScheme: 'secondary' | 'primary' } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
@@ -136,12 +154,12 @@ export const usePlansContext = () => {
       return {
         localizationKey: subscription
           ? subscription.canceledAt
-            ? localizationKeys('commerce.reSubscribe')
-            : localizationKeys('commerce.manageSubscription')
+            ? localizationKeys('__experimental_commerce.reSubscribe')
+            : localizationKeys('__experimental_commerce.manageSubscription')
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.length > 0
-            ? localizationKeys('commerce.switchPlan')
-            : localizationKeys('commerce.getStarted'),
+            ? localizationKeys('__experimental_commerce.switchPlan')
+            : localizationKeys('__experimental_commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
@@ -149,7 +167,7 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscription],
   );
 
-  const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
+  const captionForSubscription = useCallback((subscription: __experimental_CommerceSubscriptionResource) => {
     if (subscription.status === 'upcoming') {
       return localizationKeys('badge__startsAt', { date: subscription.periodStart });
     } else if (subscription.canceledAt) {

@@ -113,9 +113,12 @@ type _LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
     switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
+    alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
