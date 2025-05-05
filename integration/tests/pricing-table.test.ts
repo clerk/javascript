@@ -33,8 +33,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
-    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.signIn.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeHidden();
   });
@@ -46,8 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
-    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
@@ -59,8 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.page.goToRelative('/pricing-table');
 
     await u.po.pricingTable.waitForMounted();
-    // await u.po.pricingTable.startCheckout({ planSlug: 'plus' }); - This is not working consistently for some reason
-    await u.po.page.locator(`.cl-pricingTableCard__plus .cl-pricingTableCardAction`).getByRole('button').click();
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await u.po.checkout.fillTestCard();
     await u.po.checkout.clickPayOrSubscribe();
@@ -104,7 +101,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.clickManageSubscription();
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
-    await expect(u.po.page.getByRole('button', { name: 'Re-subscribe' }).first()).toBeVisible();
+    await expect(u.po.page.getByRole('button', { name: 'Resubscribe' }).first()).toBeVisible();
   });
 
   test.describe('in UserProfile', () => {

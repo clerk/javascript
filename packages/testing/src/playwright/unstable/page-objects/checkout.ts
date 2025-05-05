@@ -27,8 +27,8 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
     },
     clickPayOrSubscribe: async () => {
       await page
-        .locator('.cl-checkoutFormElementsRoot .cl-formButtonPrimary')
-        .getByRole('button', { name: /subscribe|pay/i })
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /subscribe|pay\s/i })
         .click();
     },
     clickAddPaymentMethod: async () => {
