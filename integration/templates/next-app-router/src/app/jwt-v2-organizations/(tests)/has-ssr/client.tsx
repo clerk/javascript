@@ -23,6 +23,8 @@ export function SSR() {
         role={orgRole}
         hasImpersonationFeature={has({ feature: 'org:impersonation' })}
         hasMagicLinksFeature={has({ feature: 'org:magic_links' })}
+        hasMagicLinksCreateUnscoped={has({ permission: 'magic_links:create' })}
+        hasImpersonationReaderRoleUnscoped={has({ role: 'impersonation_reader' })}
       />
     </>
   );
