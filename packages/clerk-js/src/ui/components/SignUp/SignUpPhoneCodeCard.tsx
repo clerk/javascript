@@ -40,7 +40,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(({ phoneCodeStrategy }:
     },
   );
 
-  const attempt = (code: string) => signUp.attemptPhoneNumberVerification({ code });
+  const attempt = (code: string) => signUp.attemptPhoneNumberVerification({ code, strategy });
 
   return (
     <Flow.Part part='phoneCode'>

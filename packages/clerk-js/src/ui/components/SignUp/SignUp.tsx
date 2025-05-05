@@ -4,7 +4,7 @@ import React from 'react';
 
 import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { SignUpContext, useEnvironment, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { usePreloadTasks } from '../../hooks/usePreloadTasks';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
@@ -27,7 +27,7 @@ function SignUpRoutes(): JSX.Element {
   usePreloadTasks();
 
   const { __internal_setComponentNavigationContext } = useClerk();
-  // const { userSettings } = useEnvironment();
+  const { userSettings } = useEnvironment();
   const { navigate, indexPath } = useRouter();
   const signUpContext = useSignUpContext();
 
@@ -48,9 +48,16 @@ function SignUpRoutes(): JSX.Element {
           path='verify-phone-number'
           canActivate={clerk => !!clerk.client.signUp.phoneNumber}
         >
-          <Route path='whatsapp'>
-            <SignUpVerifyPhoneWithAlternativeProvider phoneCodeStrategy='whatsapp_code' />
-          </Route>
+          {userSettings.alternativePhoneCodeFirstFactors.map(factor => {
+            return (
+              <Route
+                key={factor}
+                path={`${factor.replace('_code', '')}`}
+              >
+                <SignUpVerifyPhoneWithAlternativeProvider phoneCodeStrategy={factor} />
+              </Route>
+            );
+          })}
           <Route index>
             <SignUpVerifyPhone />
           </Route>
@@ -85,7 +92,19 @@ function SignUpRoutes(): JSX.Element {
             path='verify-phone-number'
             canActivate={clerk => !!clerk.client.signUp.phoneNumber}
           >
-            <SignUpVerifyPhone />
+            {userSettings.alternativePhoneCodeFirstFactors.map(factor => {
+              return (
+                <Route
+                  key={factor}
+                  path={`${factor.replace('_code', '')}`}
+                >
+                  <SignUpVerifyPhoneWithAlternativeProvider phoneCodeStrategy={factor} />
+                </Route>
+              );
+            })}
+            <Route index>
+              <SignUpVerifyPhone />
+            </Route>
           </Route>
           <Route index>
             <SignUpContinue />

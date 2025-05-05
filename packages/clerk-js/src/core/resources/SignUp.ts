@@ -165,7 +165,8 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptPhoneNumberVerification = (params: AttemptPhoneNumberVerificationParams): Promise<SignUpResource> => {
-    return this.attemptVerification({ ...params, strategy: 'phone_code' });
+    const strategy = params?.strategy || 'phone_code';
+    return this.attemptVerification({ ...params, strategy });
   };
 
   prepareWeb3WalletVerification = (params?: PrepareWeb3WalletVerificationParams): Promise<SignUpResource> => {

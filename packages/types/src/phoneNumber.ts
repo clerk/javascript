@@ -11,6 +11,7 @@ export type PreparePhoneNumberVerificationParams = {
 };
 
 export type AttemptPhoneNumberVerificationParams = {
+  strategy?: PhoneNumberVerificationStrategy | AlternativePhoneCodeStrategy;
   code: string;
 };
 
