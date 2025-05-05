@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_PricingTableProps,
+  PricingTableProps,
 } from '@clerk/types';
 import * as React from 'react';
 
@@ -35,7 +35,7 @@ interface PricingTableDefaultProps {
   setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 export function PricingTableDefault({
@@ -96,7 +96,7 @@ interface CardProps {
   setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
   onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
-  props: __experimental_PricingTableProps;
+  props: PricingTableProps;
 }
 
 function Card(props: CardProps) {

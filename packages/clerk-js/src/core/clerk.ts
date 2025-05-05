@@ -18,7 +18,6 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PlanDetailsProps,
-  __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -51,6 +50,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PendingSessionResource,
+  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -1006,7 +1006,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {

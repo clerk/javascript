@@ -4,7 +4,6 @@ import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionResource,
   __experimental_PlanDetailsProps,
-  __experimental_PricingTableProps,
   __internal_UserVerificationProps,
   CheckoutContinueUrl,
   CreateOrganizationProps,
@@ -12,6 +11,7 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
@@ -47,7 +47,7 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | __experimental_PricingTableProps
+  | PricingTableProps
   | __experimental_CheckoutProps
   | __internal_UserVerificationProps
   | __experimental_PlanDetailsProps;
@@ -112,7 +112,7 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
-export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
+export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
 };
@@ -159,6 +159,6 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | __experimental_PricingTableCtx
+  | PricingTableCtx
   | __experimental_CheckoutCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
