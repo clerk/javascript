@@ -13,6 +13,7 @@ import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from
 import type { ClerkResource } from './resource';
 import type { SignUpJSONSnapshot, SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
+  AlternativePhoneCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
   EnterpriseSSOStrategy,
@@ -129,7 +130,7 @@ export type PrepareVerificationParams =
       redirectUrl?: string;
     }
   | {
-      strategy: PhoneCodeStrategy;
+      strategy: PhoneCodeStrategy | AlternativePhoneCodeStrategy;
     }
   | {
       strategy: Web3Strategy;
