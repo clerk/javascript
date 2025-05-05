@@ -1,20 +1,20 @@
-import type { __experimental_CommerceFeatureJSON, __experimental_CommerceFeatureResource } from '@clerk/types';
+import type { CommerceFeatureJSON, CommerceFeatureResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
-export class __experimental_CommerceFeature extends BaseResource implements __experimental_CommerceFeatureResource {
+export class CommerceFeature extends BaseResource implements CommerceFeatureResource {
   id!: string;
   name!: string;
   description!: string;
   slug!: string;
   avatarUrl!: string;
 
-  constructor(data: __experimental_CommerceFeatureJSON) {
+  constructor(data: CommerceFeatureJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceFeatureJSON | null): this {
+  protected fromJSON(data: CommerceFeatureJSON | null): this {
     if (!data) {
       return this;
     }

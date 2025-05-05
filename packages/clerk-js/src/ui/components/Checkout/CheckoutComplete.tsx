@@ -1,4 +1,4 @@
-import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { CommerceCheckoutResource } from '@clerk/types';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
@@ -14,7 +14,7 @@ export const CheckoutComplete = ({
   checkout,
   isMotionSafe,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
+  checkout: CommerceCheckoutResource;
   isMotionSafe: boolean;
 }) => {
   const router = useRouter();
@@ -156,8 +156,8 @@ export const CheckoutComplete = ({
               textVariant='h2'
               localizationKey={
                 checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys('__experimental_commerce.checkout.title__paymentSuccessful')
-                  : localizationKeys('__experimental_commerce.checkout.title__subscriptionSuccessful')
+                  ? localizationKeys('commerce.checkout.title__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
               sx={{
                 opacity: 0,
@@ -210,8 +210,8 @@ export const CheckoutComplete = ({
               })}
               localizationKey={
                 checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys('__experimental_commerce.checkout.description__paymentSuccessful')
-                  : localizationKeys('__experimental_commerce.checkout.description__subscriptionSuccessful')
+                  ? localizationKeys('commerce.checkout.description__paymentSuccessful')
+                  : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
               }
             />
           </Span>
@@ -240,7 +240,7 @@ export const CheckoutComplete = ({
       >
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
-            <LineItems.Title title={localizationKeys('__experimental_commerce.checkout.lineItems.title__totalPaid')} />
+            <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
               text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
             />
@@ -249,8 +249,8 @@ export const CheckoutComplete = ({
             <LineItems.Title
               title={
                 checkout.totals.totalDueNow.amount > 0
-                  ? localizationKeys('__experimental_commerce.checkout.lineItems.title__paymentMethod')
-                  : localizationKeys('__experimental_commerce.checkout.lineItems.title__subscriptionBegins')
+                  ? localizationKeys('commerce.checkout.lineItems.title__paymentMethod')
+                  : localizationKeys('commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description

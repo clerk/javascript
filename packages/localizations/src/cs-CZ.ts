@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
-  __experimental_commerce: {
+  backButton: 'Zpět',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Výchozí',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
+  badge__primary: 'Hlavní',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Vyžaduje akci',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Toto zařízení',
+  badge__unverified: 'Nepotvrzené',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Zařízení uživatele',
+  badge__you: 'Vy',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const csCZ: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Zpět',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Výchozí',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
-  badge__primary: 'Hlavní',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Vyžaduje akci',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Toto zařízení',
-  badge__unverified: 'Nepotvrzené',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Zařízení uživatele',
-  badge__you: 'Vy',
   createOrganization: {
     formButtonSubmit: 'Vytvořit organizaci',
     invitePage: {
@@ -694,7 +698,23 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Zkopírováno!',
+      actionLabel__copy: 'Zkopírovat vše',
+      actionLabel__download: 'Stáhnout .txt',
+      actionLabel__print: 'Vytisknout',
+      infoText1: 'Pro tento účet budou povoleny záložní kódy.',
+      infoText2:
+        'Záložní kódy uchovávejte tajně a bezpečně. Můžete vygenerovat nové záložní kódy, pokud máte podezření, že byly kompromitovány.',
+      subtitle__codelist: 'Uchovávejte je bezpečně a tajně.',
+      successMessage:
+        'Záložní kódy jsou nyní povoleny. Pokud ztratíte přístup k vašemu ověřovacímu zařízení, můžete použít jeden z těchto kódů k přihlášení do svého účtu. Každý kód lze použít pouze jednou.',
+      successSubtitle:
+        'Použijte jeden z těchto kódů k přihlášení do svého účtu, pokud ztratíte přístup k vašemu ověřovacímu zařízení.',
+      title: 'Přidat ověřování pomocí záložních kódů',
+      title__codelist: 'Záložní kódy',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -721,22 +741,6 @@ export const csCZ: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Zkopírováno!',
-      actionLabel__copy: 'Zkopírovat vše',
-      actionLabel__download: 'Stáhnout .txt',
-      actionLabel__print: 'Vytisknout',
-      infoText1: 'Pro tento účet budou povoleny záložní kódy.',
-      infoText2:
-        'Záložní kódy uchovávejte tajně a bezpečně. Můžete vygenerovat nové záložní kódy, pokud máte podezření, že byly kompromitovány.',
-      subtitle__codelist: 'Uchovávejte je bezpečně a tajně.',
-      successMessage:
-        'Záložní kódy jsou nyní povoleny. Pokud ztratíte přístup k vašemu ověřovacímu zařízení, můžete použít jeden z těchto kódů k přihlášení do svého účtu. Každý kód lze použít pouze jednou.',
-      successSubtitle:
-        'Použijte jeden z těchto kódů k přihlášení do svého účtu, pokud ztratíte přístup k vašemu ověřovacímu zařízení.',
-      title: 'Přidat ověřování pomocí záložních kódů',
-      title__codelist: 'Záložní kódy',
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovatele pro připojení vašeho účtu.',

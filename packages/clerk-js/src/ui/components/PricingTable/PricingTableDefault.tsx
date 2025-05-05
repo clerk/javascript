@@ -1,9 +1,5 @@
 import { useClerk, useUser } from '@clerk/shared/react';
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  PricingTableProps,
-} from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -24,12 +20,13 @@ import { Switch } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
+
 interface PricingTableDefaultProps {
-  plans?: __experimental_CommercePlanResource[] | null;
-  highlightedPlan?: __experimental_CommercePlanResource['slug'];
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource) => void;
+  plans?: CommercePlanResource[] | null;
+  highlightedPlan?: CommercePlanResource['slug'];
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource) => void;
   isCompact?: boolean;
   props: PricingTableProps;
 }
@@ -88,10 +85,10 @@ export function PricingTableDefault({
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardProps {
-  plan: __experimental_CommercePlanResource;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  plan: CommercePlanResource;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (p: CommerceSubscriptionPlanPeriod) => void;
+  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
   isCompact?: boolean;
   props: PricingTableProps;
 }
@@ -257,10 +254,10 @@ function Card(props: CardProps) {
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardHeaderProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   isCompact?: boolean;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
@@ -337,7 +334,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('__experimental_commerce.month')}
+            localizationKey={localizationKeys('commerce.month')}
           />
         ) : null}
       </Flex>
@@ -352,7 +349,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           <Switch
             checked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('__experimental_commerce.billedAnnually')}
+            label={localizationKeys('commerce.billedAnnually')}
           />
         </Box>
       ) : (
@@ -361,9 +358,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant='caption'
           colorScheme='secondary'
           localizationKey={
-            plan.isDefault
-              ? localizationKeys('__experimental_commerce.alwaysFree')
-              : localizationKeys('__experimental_commerce.billedMonthlyOnly')
+            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
           sx={{
             alignSelf: 'center',
@@ -379,7 +374,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
  * -----------------------------------------------------------------------------------------------*/
 
 interface CardFeaturesListProps {
-  plan: __experimental_CommercePlanResource;
+  plan: CommercePlanResource;
   /**
    * @default false
    */
@@ -468,7 +463,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             size='md'
             aria-hidden
           />
-          <Span localizationKey={localizationKeys('__experimental_commerce.seeAllFeatures')} />
+          <Span localizationKey={localizationKeys('commerce.seeAllFeatures')} />
         </SimpleButton>
       )}
     </Box>

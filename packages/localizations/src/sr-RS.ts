@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
-  __experimental_commerce: {
+  backButton: 'Nazad',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Podrazumevano',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
+  badge__primary: 'Primarni',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Zahteva akciju',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Ovaj uređaj',
+  badge__unverified: 'Nepotvrđen',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Korisnički uređaj',
+  badge__you: 'Vi',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const srRS: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Nazad',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Podrazumevano',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
-  badge__primary: 'Primarni',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Zahteva akciju',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Ovaj uređaj',
-  badge__unverified: 'Nepotvrđen',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Korisnički uređaj',
-  badge__you: 'Vi',
   createOrganization: {
     formButtonSubmit: 'Kreiraj organizaciju',
     invitePage: {
@@ -697,7 +701,23 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopirano!',
+      actionLabel__copy: 'Kopiraj sve',
+      actionLabel__download: 'Preuzmi .txt',
+      actionLabel__print: 'Štampaj',
+      infoText1: 'Rezervni kodovi će biti omogućeni za ovaj nalog.',
+      infoText2:
+        'Čuvaj rezervne kodove u tajnosti i čuvaj ih na sigurnom mestu. Možeš regenerisati rezervne kodove ako sumnjaš da su kompromitovani.',
+      subtitle__codelist: 'Čuvaj ih na sigurnom i drži ih u tajnosti.',
+      successMessage:
+        'Rezervni kodovi su sada omogućeni. Možeš koristiti jedan od ovih kodova za prijavu na svoj nalog, ako izgubiš pristup svom uređaju za autentifikaciju. Svaki kod može biti korišćen samo jednom.',
+      successSubtitle:
+        'Možeš koristiti jedan od ovih kodova za prijavu na svoj nalog, ako izgubiš pristup svom uređaju za autentifikaciju.',
+      title: 'Dodaj verifikaciju rezervnim kodom',
+      title__codelist: 'Rezervni kodovi',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -724,22 +744,6 @@ export const srRS: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopirano!',
-      actionLabel__copy: 'Kopiraj sve',
-      actionLabel__download: 'Preuzmi .txt',
-      actionLabel__print: 'Štampaj',
-      infoText1: 'Rezervni kodovi će biti omogućeni za ovaj nalog.',
-      infoText2:
-        'Čuvaj rezervne kodove u tajnosti i čuvaj ih na sigurnom mestu. Možeš regenerisati rezervne kodove ako sumnjaš da su kompromitovani.',
-      subtitle__codelist: 'Čuvaj ih na sigurnom i drži ih u tajnosti.',
-      successMessage:
-        'Rezervni kodovi su sada omogućeni. Možeš koristiti jedan od ovih kodova za prijavu na svoj nalog, ako izgubiš pristup svom uređaju za autentifikaciju. Svaki kod može biti korišćen samo jednom.',
-      successSubtitle:
-        'Možeš koristiti jedan od ovih kodova za prijavu na svoj nalog, ako izgubiš pristup svom uređaju za autentifikaciju.',
-      title: 'Dodaj verifikaciju rezervnim kodom',
-      title__codelist: 'Rezervni kodovi',
     },
     connectedAccountPage: {
       formHint: 'Izaberi provajdera da povežeš svoj nalog.',

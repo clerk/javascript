@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
-  __experimental_commerce: {
+  backButton: 'Enrere',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Per defecte',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
+  badge__primary: 'Principal',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Requereix acció',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Aquest dispositiu',
+  badge__unverified: 'No verificat',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: "Dispositiu de l'usuari",
+  badge__you: 'Tu',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const caES: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Enrere',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Per defecte',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
-  badge__primary: 'Principal',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Requereix acció',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Aquest dispositiu',
-  badge__unverified: 'No verificat',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: "Dispositiu de l'usuari",
-  badge__you: 'Tu',
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {
@@ -698,7 +702,23 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Copiat!',
+      actionLabel__copy: 'Copia tot',
+      actionLabel__download: 'Descarrega .txt',
+      actionLabel__print: 'Imprimeix',
+      infoText1: "Els codis de seguretat s'activaran per a aquest compte.",
+      infoText2:
+        "Guarda els codis de seguretat en secret i emmagatzema'ls de manera segura. Pots regenerar els codis de seguretat si sospites que han estat compromesos.",
+      subtitle__codelist: "Emmagatzema'ls de manera segura i mantingues-los en secret.",
+      successMessage:
+        "Ara els codis de seguretat estan activats. Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació. Cada codi només es pot utilitzar una vegada.",
+      successSubtitle:
+        "Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació.",
+      title: 'Afegeix verificació amb codi de seguretat',
+      title__codelist: 'Codis de seguretat',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -725,22 +745,6 @@ export const caES: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copiat!',
-      actionLabel__copy: 'Copia tot',
-      actionLabel__download: 'Descarrega .txt',
-      actionLabel__print: 'Imprimeix',
-      infoText1: "Els codis de seguretat s'activaran per a aquest compte.",
-      infoText2:
-        "Guarda els codis de seguretat en secret i emmagatzema'ls de manera segura. Pots regenerar els codis de seguretat si sospites que han estat compromesos.",
-      subtitle__codelist: "Emmagatzema'ls de manera segura i mantingues-los en secret.",
-      successMessage:
-        "Ara els codis de seguretat estan activats. Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació. Cada codi només es pot utilitzar una vegada.",
-      successSubtitle:
-        "Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació.",
-      title: 'Afegeix verificació amb codi de seguretat',
-      title__codelist: 'Codis de seguretat',
     },
     connectedAccountPage: {
       formHint: 'Selecciona un proveïdor per connectar el teu compte.',

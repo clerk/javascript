@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_commerce: {
+  backButton: 'חזור',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'ברירת מחדל',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
+  badge__primary: 'ראשי',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'דורש פעולה',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'מכשיר זה',
+  badge__unverified: 'לא מאומת',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'מכשיר משתמש',
+  badge__you: 'אתה',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const heIL: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'חזור',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'ברירת מחדל',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
-  badge__primary: 'ראשי',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'דורש פעולה',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'מכשיר זה',
-  badge__unverified: 'לא מאומת',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'מכשיר משתמש',
-  badge__you: 'אתה',
   createOrganization: {
     formButtonSubmit: 'צור ארגון',
     invitePage: {
@@ -688,7 +692,21 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'הועתק!',
+      actionLabel__copy: 'העתק הכל',
+      actionLabel__download: 'הורד .txt',
+      actionLabel__print: 'הדפס',
+      infoText1: 'קודי גיבוי יהיו מופעלים לחשבון זה.',
+      infoText2: 'שמור את קודי הגיבוי בסוד ואחסן אותם בבטחה. תוכל לחולל מחדש קודי גיבוי אם אתה חושד שהם נפגעו.',
+      subtitle__codelist: 'אחסן אותם בבטחה ושמור עליהם בסוד.',
+      successMessage:
+        'קודי הגיבוי מופעלים כעת. תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך. כל קוד יכול להשתמש בו רק פעם אחת.',
+      successSubtitle: 'תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך.',
+      title: 'הוסף אימות קוד גיבוי',
+      title__codelist: 'קודי גיבוי',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -715,20 +733,6 @@ export const heIL: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'הועתק!',
-      actionLabel__copy: 'העתק הכל',
-      actionLabel__download: 'הורד .txt',
-      actionLabel__print: 'הדפס',
-      infoText1: 'קודי גיבוי יהיו מופעלים לחשבון זה.',
-      infoText2: 'שמור את קודי הגיבוי בסוד ואחסן אותם בבטחה. תוכל לחולל מחדש קודי גיבוי אם אתה חושד שהם נפגעו.',
-      subtitle__codelist: 'אחסן אותם בבטחה ושמור עליהם בסוד.',
-      successMessage:
-        'קודי הגיבוי מופעלים כעת. תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך. כל קוד יכול להשתמש בו רק פעם אחת.',
-      successSubtitle: 'תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך.',
-      title: 'הוסף אימות קוד גיבוי',
-      title__codelist: 'קודי גיבוי',
     },
     connectedAccountPage: {
       formHint: 'בחר ספק כדי לחבר את החשבון שלך.',

@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
-  __experimental_commerce: {
+  backButton: 'Voltar',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Padrão',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
+  badge__primary: 'Principal',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Requer ação',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Este dispositivo',
+  badge__unverified: 'Não verificado',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Dispositivo do usuário',
+  badge__you: 'Você',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const ptBR: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Voltar',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Padrão',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
-  badge__primary: 'Principal',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Requer ação',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Este dispositivo',
-  badge__unverified: 'Não verificado',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Dispositivo do usuário',
-  badge__you: 'Você',
   createOrganization: {
     formButtonSubmit: 'Criar organização',
     invitePage: {
@@ -702,7 +706,23 @@ export const ptBR: LocalizationResource = {
     action__signOutAll: 'Sair de todas as contas',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Copiado!',
+      actionLabel__copy: 'Copiar tudo',
+      actionLabel__download: 'Download .txt',
+      actionLabel__print: 'Imprimir',
+      infoText1: 'Códigos de backup serão ativados para esta conta.',
+      infoText2:
+        'Guarde-os em segurança e mantenha-os em sigilo. Você pode gerar novos códigos de backup se suspeitar que eles tenham sido comprometidos.',
+      subtitle__codelist: 'Guarde-os em segurança e mantenha-os em sigilo.',
+      successMessage:
+        'Códigos de backup foram ativados para esta conta. Você pode usar um deles para fazer login na sua conta caso perca o acesso ao seu dispositivo de autenticação. Cada código poderá ser utilizado apenas uma vez.',
+      successSubtitle:
+        'Você pode usar um deles para fazer login na sua conta caso perca o acesso ao seu dispositivo de autenticação.',
+      title: 'Adicionar código de backup para verificação',
+      title__codelist: 'Códigos de backup',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -729,22 +749,6 @@ export const ptBR: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copiado!',
-      actionLabel__copy: 'Copiar tudo',
-      actionLabel__download: 'Download .txt',
-      actionLabel__print: 'Imprimir',
-      infoText1: 'Códigos de backup serão ativados para esta conta.',
-      infoText2:
-        'Guarde-os em segurança e mantenha-os em sigilo. Você pode gerar novos códigos de backup se suspeitar que eles tenham sido comprometidos.',
-      subtitle__codelist: 'Guarde-os em segurança e mantenha-os em sigilo.',
-      successMessage:
-        'Códigos de backup foram ativados para esta conta. Você pode usar um deles para fazer login na sua conta caso perca o acesso ao seu dispositivo de autenticação. Cada código poderá ser utilizado apenas uma vez.',
-      successSubtitle:
-        'Você pode usar um deles para fazer login na sua conta caso perca o acesso ao seu dispositivo de autenticação.',
-      title: 'Adicionar código de backup para verificação',
-      title__codelist: 'Códigos de backup',
     },
     connectedAccountPage: {
       formHint: 'Selecione um provedor para conectar à sua conta.',

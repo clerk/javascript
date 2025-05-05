@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
-  __experimental_commerce: {
+  backButton: 'Πίσω',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Προεπιλογή',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
+  badge__primary: 'Κύριο',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Απαιτεί ενέργεια',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Αυτή η συσκευή',
+  badge__unverified: 'Μη επαληθευμένο',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Συσκευή χρήστη',
+  badge__you: 'Εσείς',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const elGR: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Πίσω',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Προεπιλογή',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
-  badge__primary: 'Κύριο',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Απαιτεί ενέργεια',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Αυτή η συσκευή',
-  badge__unverified: 'Μη επαληθευμένο',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Συσκευή χρήστη',
-  badge__you: 'Εσείς',
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
     invitePage: {
@@ -703,7 +707,23 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Αντιγράφηκαν!',
+      actionLabel__copy: 'Αντιγραφή όλων',
+      actionLabel__download: 'Λήψη .txt',
+      actionLabel__print: 'Εκτύπωση',
+      infoText1: 'Οι εφεδρικοί κωδικοί θα είναι ενεργοποιημένοι για αυτόν τον λογαριασμό.',
+      infoText2:
+        'Φυλάξτε τους εφεδρικούς κωδικούς μυστικούς και αποθηκεύστε τους με ασφάλεια. Μπορείτε να δημιουργήσετε νέους εφεδρικούς κωδικούς εάν υποψιάζεστε ότι έχουν διαρρεύσει.',
+      subtitle__codelist: 'Φυλάξτε τους με ασφάλεια και κρατήστε τους μυστικούς.',
+      successMessage:
+        'Οι εφεδρικοί κωδικοί είναι πλέον ενεργοποιημένοι. Μπορείτε να χρησιμοποιήσετε έναν από αυτούς για να συνδεθείτε στον λογαριασμό σας, εάν χάσετε την πρόσβαση στη συσκευή επαλήθευσής σας. Κάθε κωδικός μπορεί να χρησιμοποιηθεί μόνο μία φορά.',
+      successSubtitle:
+        'Μπορείτε να χρησιμοποιήσετε έναν από αυτούς για να συνδεθείτε στον λογαριασμό σας, εάν χάσετε την πρόσβαση στη συσκευή επαλήθευσής σας.',
+      title: 'Προσθήκη επαλήθευσης με εφεδρικούς κωδικούς',
+      title__codelist: 'Εφεδρικοί κωδικοί',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -730,22 +750,6 @@ export const elGR: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Αντιγράφηκαν!',
-      actionLabel__copy: 'Αντιγραφή όλων',
-      actionLabel__download: 'Λήψη .txt',
-      actionLabel__print: 'Εκτύπωση',
-      infoText1: 'Οι εφεδρικοί κωδικοί θα είναι ενεργοποιημένοι για αυτόν τον λογαριασμό.',
-      infoText2:
-        'Φυλάξτε τους εφεδρικούς κωδικούς μυστικούς και αποθηκεύστε τους με ασφάλεια. Μπορείτε να δημιουργήσετε νέους εφεδρικούς κωδικούς εάν υποψιάζεστε ότι έχουν διαρρεύσει.',
-      subtitle__codelist: 'Φυλάξτε τους με ασφάλεια και κρατήστε τους μυστικούς.',
-      successMessage:
-        'Οι εφεδρικοί κωδικοί είναι πλέον ενεργοποιημένοι. Μπορείτε να χρησιμοποιήσετε έναν από αυτούς για να συνδεθείτε στον λογαριασμό σας, εάν χάσετε την πρόσβαση στη συσκευή επαλήθευσής σας. Κάθε κωδικός μπορεί να χρησιμοποιηθεί μόνο μία φορά.',
-      successSubtitle:
-        'Μπορείτε να χρησιμοποιήσετε έναν από αυτούς για να συνδεθείτε στον λογαριασμό σας, εάν χάσετε την πρόσβαση στη συσκευή επαλήθευσής σας.',
-      title: 'Προσθήκη επαλήθευσης με εφεδρικούς κωδικούς',
-      title__codelist: 'Εφεδρικοί κωδικοί',
     },
     connectedAccountPage: {
       formHint: 'Επιλέξτε έναν πάροχο για να συνδέσετε τον λογαριασμό σας.',

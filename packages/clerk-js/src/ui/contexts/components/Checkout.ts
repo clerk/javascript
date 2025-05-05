@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import { isAllowedRedirect } from '../../../utils';
-import type { __experimental_CheckoutCtx } from '../../types';
+import type { CheckoutCtx } from '../../types';
 import { useOptions } from '../OptionsContext';
 
-export const __experimental_CheckoutContext = createContext<__experimental_CheckoutCtx | null>(null);
+export const CheckoutContext = createContext<CheckoutCtx | null>(null);
 
 export const useCheckoutContext = () => {
-  const context = useContext(__experimental_CheckoutContext);
+  const context = useContext(CheckoutContext);
   const clerk = useClerk();
   const options = useOptions();
 

@@ -9,8 +9,8 @@ const props = defineProps<PricingTableProps>();
 
 <template>
   <ClerkHostRenderer
-    :mount="clerk?.__experimental_mountPricingTable"
-    :unmount="clerk?.__experimental_unmountPricingTable"
+    :mount="clerk?.mountPricingTable"
+    :unmount="clerk?.unmountPricingTable"
     :update-props="(clerk as any)?.__unstable__updateProps"
     :props="props"
   />

@@ -2,15 +2,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  __experimental_commerce: {
+  backButton: 'Back',
+  badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
+  badge__currentPlan: 'Current plan',
+  badge__default: 'Default',
+  badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
+  badge__expired: 'Expired',
+  badge__otherImpersonatorDevice: 'Other impersonator device',
+  badge__primary: 'Primary',
+  badge__renewsAt: "Renews {{ date | shortDate('en-US') }}",
+  badge__requiresAction: 'Requires action',
+  badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
+  badge__thisDevice: 'This device',
+  badge__unverified: 'Unverified',
+  badge__upcomingPlan: 'Upcoming',
+  badge__userDevice: 'User device',
+  badge__you: 'You',
+  commerce: {
+    alwaysFree: 'Always free',
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
-    alwaysFree: 'Always free',
     cancelSubscription: 'Cancel subscription',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      downgradeNotice:
+        'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       emailForm: {
         subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
         title: 'Add an email address',
@@ -38,22 +56,6 @@ export const enUS: LocalizationResource = {
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
   },
-  backButton: 'Back',
-  badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
-  badge__currentPlan: 'Current plan',
-  badge__default: 'Default',
-  badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
-  badge__expired: 'Expired',
-  badge__otherImpersonatorDevice: 'Other impersonator device',
-  badge__primary: 'Primary',
-  badge__renewsAt: "Renews {{ date | shortDate('en-US') }}",
-  badge__requiresAction: 'Requires action',
-  badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
-  badge__thisDevice: 'This device',
-  badge__unverified: 'Unverified',
-  badge__upcomingPlan: 'Upcoming',
-  badge__userDevice: 'User device',
-  badge__you: 'You',
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -690,7 +692,23 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Copied!',
+      actionLabel__copy: 'Copy all',
+      actionLabel__download: 'Download .txt',
+      actionLabel__print: 'Print',
+      infoText1: 'Backup codes will be enabled for this account.',
+      infoText2:
+        'Keep the backup codes secret and store them securely. You may regenerate backup codes if you suspect they have been compromised.',
+      subtitle__codelist: 'Store them securely and keep them secret.',
+      successMessage:
+        'Backup codes are now enabled. You can use one of these to sign in to your account, if you lose access to your authentication device. Each code can only be used once.',
+      successSubtitle:
+        'You can use one of these to sign in to your account, if you lose access to your authentication device.',
+      title: 'Add backup code verification',
+      title__codelist: 'Backup codes',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -718,22 +736,6 @@ export const enUS: LocalizationResource = {
         actionLabel__default: 'Manage',
       },
       title: 'Billing',
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copied!',
-      actionLabel__copy: 'Copy all',
-      actionLabel__download: 'Download .txt',
-      actionLabel__print: 'Print',
-      infoText1: 'Backup codes will be enabled for this account.',
-      infoText2:
-        'Keep the backup codes secret and store them securely. You may regenerate backup codes if you suspect they have been compromised.',
-      subtitle__codelist: 'Store them securely and keep them secret.',
-      successMessage:
-        'Backup codes are now enabled. You can use one of these to sign in to your account, if you lose access to your authentication device. Each code can only be used once.',
-      successSubtitle:
-        'You can use one of these to sign in to your account, if you lose access to your authentication device.',
-      title: 'Add backup code verification',
-      title__codelist: 'Backup codes',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',

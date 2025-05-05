@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
-  __experimental_commerce: {
+  backButton: 'Takaisin',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Oletus',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
+  badge__primary: 'Ensisijainen',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Vaaditaan toimia',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Tämä laite',
+  badge__unverified: 'Vahvistamaton',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Käyttäjän laite',
+  badge__you: 'Sinä',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const fiFI: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Takaisin',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Oletus',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Toinen jäljitelty laite',
-  badge__primary: 'Ensisijainen',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Vaaditaan toimia',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Tämä laite',
-  badge__unverified: 'Vahvistamaton',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Käyttäjän laite',
-  badge__you: 'Sinä',
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
     invitePage: {
@@ -698,7 +702,23 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopioitu',
+      actionLabel__copy: 'Kopioi',
+      actionLabel__download: 'Lataa .txt',
+      actionLabel__print: 'Tulosta',
+      infoText1: 'Varakoodit otetaan käyttöön tälle tilille.',
+      infoText2:
+        'Pidä varakoodit salassa ja säilytä ne turvallisesti. Voit luoda uudelleen varakoodit, jos epäilet, että ne ovat vaarantuneet.',
+      subtitle__codelist: 'Säilytä varakoodit turvallisessa paikassa ja pidä ne salassa.',
+      successMessage:
+        'Varakoodit ovat nyt käytössä. Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi. Jokaista koodia voi käyttää vain kerran.',
+      successSubtitle:
+        'Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi.',
+      title: 'Lisää varakoodin vahvistus',
+      title__codelist: 'Varakoodit',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -725,22 +745,6 @@ export const fiFI: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopioitu',
-      actionLabel__copy: 'Kopioi',
-      actionLabel__download: 'Lataa .txt',
-      actionLabel__print: 'Tulosta',
-      infoText1: 'Varakoodit otetaan käyttöön tälle tilille.',
-      infoText2:
-        'Pidä varakoodit salassa ja säilytä ne turvallisesti. Voit luoda uudelleen varakoodit, jos epäilet, että ne ovat vaarantuneet.',
-      subtitle__codelist: 'Säilytä varakoodit turvallisessa paikassa ja pidä ne salassa.',
-      successMessage:
-        'Varakoodit ovat nyt käytössä. Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi. Jokaista koodia voi käyttää vain kerran.',
-      successSubtitle:
-        'Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi.',
-      title: 'Lisää varakoodin vahvistus',
-      title__codelist: 'Varakoodit',
     },
     connectedAccountPage: {
       formHint: 'Valitse palveluntarjoaja yhdistääksesi tilisi.',

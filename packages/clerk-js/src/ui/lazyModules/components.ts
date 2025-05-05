@@ -96,9 +96,7 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
-export const Checkout = lazy(() =>
-  componentImportPaths.Checkout().then(module => ({ default: module.__experimental_Checkout })),
-);
+export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
