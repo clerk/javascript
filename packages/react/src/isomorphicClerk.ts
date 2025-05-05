@@ -606,7 +606,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountPricingTableNodes.forEach((props, node) => {
-      clerkjs.__experimental_mountPricingTable(node, props);
+      clerkjs.mountPricingTable(node, props);
     });
 
     /**
@@ -1034,17 +1034,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
+  mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_mountPricingTable(node, props);
+      this.clerkjs.mountPricingTable(node, props);
     } else {
       this.premountPricingTableNodes.set(node, props);
     }
   };
 
-  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
+  unmountPricingTable = (node: HTMLDivElement) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_unmountPricingTable(node);
+      this.clerkjs.unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
     }
