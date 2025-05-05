@@ -102,8 +102,8 @@ export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
 );
 
-export const SessionTasks = lazy(() =>
-  componentImportPaths.SessionTasks().then(module => ({ default: module.SessionTask })),
+export const __experimental_SessionTasks = lazy(() =>
+  componentImportPaths.SessionTasks().then(module => ({ default: module.__experimental_SessionTasks })),
 );
 
 export const preloadComponent = async (component: unknown) => {
@@ -133,6 +133,7 @@ export const ClerkComponents = {
   PricingTable,
   Checkout,
   PlanDetails,
+  __experimental_SessionTasks,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

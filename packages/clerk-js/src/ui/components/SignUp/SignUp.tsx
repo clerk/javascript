@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/types';
 import React from 'react';
 
-import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
+import { __experimental_SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';

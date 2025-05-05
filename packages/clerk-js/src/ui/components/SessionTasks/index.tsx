@@ -1,6 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionTask } from '@clerk/types';
 import { useCallback, useContext, useEffect } from 'react';
 
 import { SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
@@ -36,7 +35,7 @@ const SessionTasksStart = withCardStateProvider(() => {
   );
 });
 
-function SessionTaskRoutes(): JSX.Element {
+function SessionTasksRoutes(): JSX.Element {
   return (
     <Switch>
       <Route path={SESSION_TASK_ROUTE_BY_KEY['org']}>
@@ -56,10 +55,7 @@ function SessionTaskRoutes(): JSX.Element {
   );
 }
 
-/**
- * @internal
- */
-export function SessionTask(): JSX.Element {
+export function __experimental_SessionTasks(): JSX.Element {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);
@@ -86,7 +82,7 @@ export function SessionTask(): JSX.Element {
 
   return (
     <SessionTasksContext.Provider value={{ nextTask, redirectUrlComplete }}>
-      <SessionTaskRoutes />
+      <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
 }
