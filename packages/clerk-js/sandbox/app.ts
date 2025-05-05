@@ -308,7 +308,7 @@ void (async () => {
       });
     },
     '/pricing-table': () => {
-      Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+      Clerk.__experimental_mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

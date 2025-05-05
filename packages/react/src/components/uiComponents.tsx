@@ -588,7 +588,7 @@ export const PricingTable = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountPricingTable}
+            mount={clerk.__experimental_mountPricingTable}
             unmount={clerk.__experimental_unmountPricingTable}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
