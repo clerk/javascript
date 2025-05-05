@@ -65,7 +65,6 @@ export const OrganizationProfileRoutes = () => {
             condition={has =>
               has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
             }
-            redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
           >
             <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
               <Switch>

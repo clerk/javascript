@@ -21,6 +21,13 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_memberships:manage' }),
   );
 
+  const allowBillingRoutes = useProtect(
+    has =>
+      has({
+        permission: 'org:sys_billing:read',
+      }) || has({ permission: 'org:sys_billing:manage' }),
+  );
+
   if (!organization) {
     return null;
   }
@@ -33,7 +40,9 @@ export const OrganizationProfileNavbar = (
         routes={pages.routes.filter(
           r =>
             r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
-            (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute),
+            (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute) ||
+            r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
+            (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
         )}
         contentRef={props.contentRef}
       />
