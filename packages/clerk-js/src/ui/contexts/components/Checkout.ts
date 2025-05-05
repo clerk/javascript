@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { __experimental_CheckoutCtx } from '../../types';
+
 export const __experimental_CheckoutContext = createContext<__experimental_CheckoutCtx | null>(null);
 
 export const useCheckoutContext = () => {
@@ -19,18 +20,18 @@ export const useCheckoutContext = () => {
       return undefined;
     }
 
-    if (context.__experimental_checkoutContinueUrl) {
-      return context.__experimental_checkoutContinueUrl;
+    if (context.checkoutContinueUrl) {
+      return context.checkoutContinueUrl;
     }
 
-    return clerk.__experimental_buildCheckoutContinueUrl?.();
-  }, [context.portalRoot, context.__experimental_checkoutContinueUrl, clerk]);
+    return clerk.buildCheckoutContinueUrl?.();
+  }, [context.portalRoot, context.checkoutContinueUrl, clerk]);
 
   const { componentName, ...ctx } = context;
 
   return {
     ...ctx,
     componentName,
-    __experimental_checkoutContinueUrl: checkoutContinueUrl,
+    checkoutContinueUrl: checkoutContinueUrl,
   };
 };

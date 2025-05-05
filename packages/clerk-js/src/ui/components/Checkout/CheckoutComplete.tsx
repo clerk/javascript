@@ -19,11 +19,11 @@ export const CheckoutComplete = ({
 }) => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
-  const { __experimental_checkoutContinueUrl } = useCheckoutContext();
+  const { checkoutContinueUrl } = useCheckoutContext();
 
   const handleClose = () => {
-    if (__experimental_checkoutContinueUrl) {
-      void router.navigate(__experimental_checkoutContinueUrl);
+    if (checkoutContinueUrl) {
+      void router.navigate(checkoutContinueUrl);
     }
     if (setIsOpen) {
       setIsOpen(false);
