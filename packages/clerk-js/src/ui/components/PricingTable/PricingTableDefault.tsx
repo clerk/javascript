@@ -16,7 +16,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch, Tooltip, TooltipContent, TooltipTrigger } from '../../elements';
+import { Switch } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
@@ -233,24 +233,15 @@ function Card(props: CardProps) {
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  elementDescriptor={descriptors.pricingTableCardActionButton}
-                  block
-                  textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                  {...buttonPropsForPlan({ plan, isCompact })}
-                  onClick={event => {
-                    onSelect(plan, event);
-                  }}
-                />
-              </TooltipTrigger>
-              <TooltipContent className='Tooltip'>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis ex recusandae iste provident praesentium
-                mollitia, esse ipsa reprehenderit assumenda minus omnis ad saepe quia? Quae odit dicta eaque sapiente
-                tempore.
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              elementDescriptor={descriptors.pricingTableCardActionButton}
+              block
+              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+              {...buttonPropsForPlan({ plan, isCompact })}
+              onClick={event => {
+                onSelect(plan, event);
+              }}
+            />
           </Box>
         )}
       </Box>
