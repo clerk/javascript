@@ -169,6 +169,10 @@ export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<
       paymentToken?: string;
       gateway?: __experimental_PaymentGateway;
     }
+  | {
+      gateway?: __experimental_PaymentGateway;
+      useTestCard?: boolean;
+    }
 >;
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {
   id: string;

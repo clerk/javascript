@@ -701,6 +701,7 @@ export const enUS: LocalizationResource = {
         cancelButton: 'Cancel',
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
         removeResource: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
