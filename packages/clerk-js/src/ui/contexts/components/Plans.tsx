@@ -32,7 +32,7 @@ export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscri
 export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
   const {
     data: subscriptions,
@@ -68,11 +68,18 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     revalidateInvoices();
   }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
 
+  const isLoaded = useMemo(() => {
+    if (isSignedIn) {
+      return isLoadingSubscriptions === false && isLoadingPlans === false;
+    }
+    return isLoadingPlans === false;
+  }, [isLoadingPlans, isLoadingSubscriptions, isSignedIn]);
+
   return (
     <PlansContext.Provider
       value={{
         componentName: 'Plans',
-        plans: plans || [],
+        plans: isLoaded ? (plans ?? []) : [],
         subscriptions: subscriptions?.data || [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
