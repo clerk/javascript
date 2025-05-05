@@ -91,6 +91,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         </Flex>
         {label && (
           <Text
+            as='span'
             variant='caption'
             colorScheme='secondary'
             localizationKey={label}
