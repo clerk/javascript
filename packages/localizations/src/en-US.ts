@@ -21,6 +21,8 @@ export const enUS: LocalizationResource = {
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
+      downgradeNotice:
+        'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },

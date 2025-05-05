@@ -135,6 +135,7 @@ type _LocalizationResource = {
         title__invoiceId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
+      downgradeNotice: LocalizationValue;
       emailForm: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
