@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
+  Badge,
   Box,
   Button,
   Col,
@@ -152,6 +153,21 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
+        badge={
+          showStatusRow ? (
+            subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
+              <Badge
+                colorScheme='secondary'
+                localizationKey={localizationKeys('badge__activePlan')}
+              />
+            ) : (
+              <Badge
+                colorScheme='primary'
+                localizationKey={localizationKeys('badge__upcomingPlan')}
+              />
+            )
+          ) : undefined
+        }
       />
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}
@@ -183,46 +199,6 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-
-        {showStatusRow && (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardStatusRow}
-            sx={t => ({
-              padding: t.space.$1,
-              borderTopWidth: t.borderWidths.$normal,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-              background: common.mergedColorsBackground(
-                colors.setAlpha(t.colors.$colorBackground, 0.3),
-                colors.setAlpha(t.colors.$colorBackground, 0.5),
-              ),
-            })}
-          >
-            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-              <Text
-                elementDescriptor={descriptors.pricingTableCardStatus}
-                variant='caption'
-                colorScheme='body'
-                localizationKey={localizationKeys('badge__currentPlan')}
-                sx={{ textAlign: 'center' }}
-              />
-            ) : (
-              <Text
-                elementDescriptor={descriptors.pricingTableCardStatus}
-                variant='caption'
-                colorScheme='body'
-                localizationKey={
-                  subscription
-                    ? localizationKeys('badge__startsAt', {
-                        date: subscription.periodStart,
-                      })
-                    : localizationKeys('badge__upcomingPlan')
-                }
-                sx={{ textAlign: 'center' }}
-              />
-            )}
-          </Box>
-        )}
 
         {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
           <Box
@@ -262,10 +238,11 @@ interface CardHeaderProps {
   isCompact?: boolean;
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  badge?: React.ReactNode;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
-  const { plan, isCompact, planPeriod, setPlanPeriod } = props;
+  const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
   const { name, annualMonthlyAmount } = plan;
 
   const getPlanFee = React.useMemo(() => {
@@ -290,13 +267,23 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       data-variant={isCompact ? 'compact' : 'default'}
     >
       <Box elementDescriptor={descriptors.pricingTableCardTitleContainer}>
-        <Heading
-          elementDescriptor={descriptors.pricingTableCardTitle}
-          as='h2'
-          textVariant={isCompact ? 'h3' : 'h2'}
+        <Box
+          sx={t => ({
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: t.space.$0x25,
+          })}
         >
-          {name}
-        </Heading>
+          <Heading
+            elementDescriptor={descriptors.pricingTableCardTitle}
+            as='h2'
+            textVariant={isCompact ? 'h3' : 'h2'}
+          >
+            {name}
+          </Heading>
+          {badge && badge}
+        </Box>
         {!isCompact && plan.description ? (
           <Text
             elementDescriptor={descriptors.pricingTableCardDescription}

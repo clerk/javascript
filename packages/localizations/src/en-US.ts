@@ -17,6 +17,7 @@ export const enUS: LocalizationResource = {
   badge__thisDevice: 'This device',
   badge__unverified: 'Unverified',
   badge__upcomingPlan: 'Upcoming',
+  badge__activePlan: 'Active',
   badge__userDevice: 'User device',
   badge__you: 'You',
   commerce: {
