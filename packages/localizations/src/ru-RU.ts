@@ -157,6 +157,11 @@ export const ruRU: LocalizationResource = {
     titleWithoutPersonal: 'Выбрать организацию',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Автоматические приглашения',
     badge__automaticSuggestion: 'Автоматические предложения',
     badge__manualInvitation: 'Нет автоматической регистрации',

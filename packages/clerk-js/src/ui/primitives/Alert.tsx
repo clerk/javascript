@@ -18,8 +18,17 @@ const { applyVariants, filterProps } = createVariants(theme => ({
           hasError: true,
         }).normal,
       },
-      warning: {},
+      info: {
+        color: theme.colors.$neutralAlpha150,
+        background: theme.colors.$neutralAlpha50,
+      },
+      warning: {
+        backgroundColor: theme.colors.$warningAlpha100,
+      },
     },
+  },
+  defaultVariants: {
+    colorScheme: 'warning',
   },
 }));
 

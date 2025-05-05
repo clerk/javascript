@@ -3,7 +3,7 @@ import { Alert as AlertCust, AlertIcon, Col, descriptors, Text } from '../custom
 import type { PropsOfComponent } from '../styledSystem';
 
 type _AlertProps = {
-  variant?: 'danger' | 'warning';
+  variant?: 'danger' | 'warning' | 'info';
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
 };
@@ -24,13 +24,13 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
       colorScheme={variant}
       align='start'
       {...rest}
-      sx={[t => ({ backgroundColor: t.colors.$warningAlpha100 }), rest.sx]}
+      sx={[rest.sx]}
     >
       <AlertIcon
         elementId={descriptors.alert.setId(variant)}
         elementDescriptor={descriptors.alertIcon}
-        variant={variant}
-        colorScheme={variant}
+        variant={variant === 'info' ? 'primary' : variant}
+        colorScheme={variant === 'info' ? 'primary' : variant}
         sx={{ flexShrink: '0' }}
       />
       <Col

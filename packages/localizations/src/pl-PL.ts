@@ -154,6 +154,11 @@ export const plPL: LocalizationResource = {
     titleWithoutPersonal: 'Wybierz organizację',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatyczne zaproszenia',
     badge__automaticSuggestion: 'Automatyczne sugestie',
     badge__manualInvitation: 'Brak automatycznej rejestracji',

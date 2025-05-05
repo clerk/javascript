@@ -154,6 +154,11 @@ export const isIS: LocalizationResource = {
     titleWithoutPersonal: 'Veldu samtök',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Sjálfvirk boð',
     badge__automaticSuggestion: 'Sjálfvirkar tillögur',
     badge__manualInvitation: 'Engin sjálfvirk skráning',

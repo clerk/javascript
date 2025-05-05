@@ -8,6 +8,7 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
+import { useProtect } from '../../common';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -127,6 +128,10 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscription],
   );
 
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
@@ -137,7 +142,12 @@ export const usePlansContext = () => {
       plan?: CommercePlanResource;
       subscription?: CommerceSubscriptionResource;
       isCompact?: boolean;
-    }): { localizationKey: LocalizationKey; variant: 'bordered' | 'solid'; colorScheme: 'secondary' | 'primary' } => {
+    }): {
+      localizationKey: LocalizationKey;
+      variant: 'bordered' | 'solid';
+      colorScheme: 'secondary' | 'primary';
+      isDisabled: boolean;
+    } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return {
@@ -151,6 +161,7 @@ export const usePlansContext = () => {
             : localizationKeys('commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
+        isDisabled: !canManageBilling,
       };
     },
     [activeOrUpcomingSubscription],

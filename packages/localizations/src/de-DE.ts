@@ -156,6 +156,11 @@ export const deDE: LocalizationResource = {
     titleWithoutPersonal: 'Organisation auswählen',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatische Einladungen',
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',

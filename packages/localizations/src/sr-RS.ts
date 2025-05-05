@@ -153,6 +153,11 @@ export const srRS: LocalizationResource = {
     titleWithoutPersonal: 'Izaberi organizaciju',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski predlozi',
     badge__manualInvitation: 'Bez automatskog uključivanja',

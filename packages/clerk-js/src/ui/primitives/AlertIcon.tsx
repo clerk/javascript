@@ -1,4 +1,4 @@
-import { ExclamationTriangle } from '../icons';
+import { ExclamationTriangle, InformationCircle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
 
@@ -18,13 +18,17 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-type OwnProps = { variant: 'danger' | 'warning' };
+type OwnProps = { variant: 'danger' | 'warning' | 'primary' };
 
 export type AlertIconProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 export const AlertIcon = (props: AlertIconProps): JSX.Element => {
   const { variant, ...rest } = props;
-  const Icon = ExclamationTriangle;
+  const Icon = {
+    warning: ExclamationTriangle,
+    danger: ExclamationTriangle,
+    primary: InformationCircle,
+  }[variant];
   return (
     <Icon
       {...filterProps(rest)}

@@ -153,6 +153,11 @@ export const heIL: LocalizationResource = {
     titleWithoutPersonal: 'בחר ארגון',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'הזמנות אוטומטיות',
     badge__automaticSuggestion: 'הצעות אוטומטיות',
     badge__manualInvitation: 'ללא הרשמה אוטומטית',

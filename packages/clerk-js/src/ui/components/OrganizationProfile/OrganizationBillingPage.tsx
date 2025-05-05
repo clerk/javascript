@@ -8,6 +8,7 @@ import {
 } from '../../contexts';
 import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
+  Alert,
   Card,
   Header,
   Tab,
@@ -80,6 +81,15 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                   sx={{ width: '100%', flexDirection: 'column' }}
                   gap={4}
                 >
+                  <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                    <Alert
+                      variant='info'
+                      colorScheme='info'
+                      title={localizationKeys(
+                        'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
+                      )}
+                    />
+                  </Protect>
                   <SubscriptionsList />
                   <Button
                     localizationKey='View all plans'

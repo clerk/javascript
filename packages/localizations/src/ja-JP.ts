@@ -154,6 +154,11 @@ export const jaJP: LocalizationResource = {
     titleWithoutPersonal: '組織を選択',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: '自動招待',
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',

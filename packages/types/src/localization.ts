@@ -879,6 +879,11 @@ type _LocalizationResource = {
         };
       };
     };
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: LocalizationValue;
+      };
+    };
   };
   createOrganization: {
     title: LocalizationValue;

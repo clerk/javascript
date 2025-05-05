@@ -23,7 +23,6 @@ export const enUS: LocalizationResource = {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
-    alwaysFree: 'Always free',
     cancelSubscription: 'Cancel subscription',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
@@ -144,6 +143,11 @@ export const enUS: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: 'You do not have permissions to manage billing for this account.',
+      },
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',

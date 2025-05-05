@@ -154,6 +154,11 @@ export const arSA: LocalizationResource = {
     titleWithoutPersonal: 'أختر منظمة',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'دعوات تلقائية',
     badge__automaticSuggestion: 'أقتراحات تلقائية',
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',

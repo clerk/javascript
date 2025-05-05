@@ -155,6 +155,11 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Selectați o organizație',
   },
   organizationProfile: {
+    __experimental_billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
