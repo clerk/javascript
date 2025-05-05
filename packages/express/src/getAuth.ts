@@ -20,6 +20,5 @@ export const getAuth = (req: ExpressRequest, options?: GetAuthOptions): AuthObje
     throw new Error(middlewareRequired('getAuth'));
   }
 
-  // this has to receive an option
   return req.auth(options);
 };

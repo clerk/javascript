@@ -99,7 +99,7 @@ export function signedIn(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    // @ts-expect-error Dynamically return `SignedOutAuthObject` based on options
+    // @ts-expect-error The return type is intentionally overridden here to support consumer-facing logic that treats pending sessions as signed out. This override does not affect internal session management like handshake flows.
     toAuth: ({ treatPendingAsSignedOut = true } = {}) => {
       if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
         return signedOutAuthObject(undefined, authObject.sessionStatus);
