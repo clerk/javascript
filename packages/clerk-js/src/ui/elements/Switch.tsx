@@ -1,4 +1,4 @@
-import React, { forwardRef, useId, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text } from '../customizables';
@@ -14,44 +14,49 @@ interface SwitchProps {
 }
 
 export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
-  ({ checked: controlledChecked, defaultChecked, onChange, disabled = false, 'aria-label': ariaLabel, label }, ref) => {
+  ({ checked: controlledChecked, defaultChecked, onChange, disabled = false, label }, ref) => {
     const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
     const isControlled = controlledChecked !== undefined;
     const checked = isControlled ? controlledChecked : internalChecked;
-    const labelId = useId();
 
-    const handleToggle = (_: React.MouseEvent | React.KeyboardEvent) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (disabled) return;
       if (!isControlled) {
-        setInternalChecked(!checked);
+        setInternalChecked(e.target.checked);
       }
-      onChange?.(!checked);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        handleToggle(e);
-      }
+      onChange?.(e.target.checked);
     };
 
     return (
       <Flex
+        ref={ref}
+        elementDescriptor={descriptors.switchRoot}
         direction='row'
         align='center'
-        as='div'
+        as='label'
+        sx={t => ({
+          width: 'fit-content',
+          '&:has(input:focus-visible) > span': {
+            ...common.focusRingStyles(t),
+          },
+        })}
       >
-        <Flex
-          as='div'
-          ref={ref}
-          tabIndex={disabled ? -1 : 0}
+        {/* The order of the elements is important here for the focus ring to work. The input is visually hidden, so the focus ring is applied to the span. */}
+        <input
+          type='checkbox'
           role='switch'
-          aria-checked={checked}
-          aria-label={ariaLabel}
-          aria-labelledby={label && !ariaLabel ? labelId : undefined}
-          elementDescriptor={descriptors.switchRoot}
-          onClick={handleToggle}
-          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          defaultChecked={defaultChecked}
+          checked={checked}
+          onChange={handleChange}
+          style={{
+            ...common.visuallyHidden(),
+          }}
+        />
+        <Flex
+          elementDescriptor={descriptors.switchIndicator}
+          as='span'
+          data-checked={checked}
           sx={t => ({
             width: t.sizes.$6,
             height: t.sizes.$4,
@@ -65,7 +70,6 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             outline: 'none',
             boxSizing: 'border-box',
             boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.06) inset',
-            ...common.focusRing(t),
           })}
         >
           <Flex
@@ -87,15 +91,14 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         </Flex>
         {label && (
           <Text
-            id={labelId}
             variant='caption'
             colorScheme='secondary'
             localizationKey={label}
-            sx={{
-              marginLeft: 8,
+            sx={t => ({
+              paddingInlineStart: t.sizes.$2,
               cursor: disabled ? 'not-allowed' : 'pointer',
               userSelect: 'none',
-            }}
+            })}
           />
         )}
       </Flex>

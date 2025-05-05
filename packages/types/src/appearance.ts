@@ -283,7 +283,9 @@ export type ElementsConfig = {
   segmentedControlButton: WithOptions;
 
   switchRoot: WithOptions;
+  switchIndicator: WithOptions;
   switchThumb: WithOptions;
+  switchLabel: WithOptions;
 
   avatarBox: WithOptions;
   avatarImage: WithOptions;
