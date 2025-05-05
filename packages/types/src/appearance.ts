@@ -391,8 +391,8 @@ export type ElementsConfig = {
   pricingTableCardFeaturesListItemTitle: WithOptions;
   pricingTableCardStatusRow: WithOptions;
   pricingTableCardStatus: WithOptions;
-  pricingTableCardAction: WithOptions;
-  pricingTableCardActionButton: WithOptions;
+  pricingTableCardFooter: WithOptions;
+  pricingTableCardFooterButton: WithOptions;
 
   pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;

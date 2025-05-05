@@ -200,9 +200,9 @@ function Card(props: CardProps) {
           </Box>
         ) : null}
 
-        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
+        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming || isImplicitlyActiveOrUpcoming) && (
           <Box
-            elementDescriptor={descriptors.pricingTableCardAction}
+            elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
               marginTop: 'auto',
               padding: isCompact ? t.space.$3 : t.space.$4,
@@ -213,15 +213,27 @@ function Card(props: CardProps) {
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            <Button
-              elementDescriptor={descriptors.pricingTableCardActionButton}
-              block
-              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              {...buttonPropsForPlan({ plan, isCompact })}
-              onClick={event => {
-                onSelect(plan, event);
-              }}
-            />
+            {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
+              <Button
+                elementDescriptor={descriptors.pricingTableCardFooterButton}
+                block
+                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                {...buttonPropsForPlan({ plan, isCompact })}
+                onClick={event => {
+                  onSelect(plan, event);
+                }}
+              />
+            ) : (
+              <Text
+                variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                localizationKey='Starts on May 23, 2025'
+                colorScheme='secondary'
+                sx={t => ({
+                  paddingBlock: t.space.$1x5,
+                  textAlign: 'center',
+                })}
+              />
+            )}
           </Box>
         )}
       </Box>
