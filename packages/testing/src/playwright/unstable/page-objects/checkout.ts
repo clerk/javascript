@@ -26,7 +26,10 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
     clickPayOrSubscribe: async () => {
-      await page.getByRole('button', { name: /subscribe|pay\s/i }).click();
+      await page
+        .locator('.cl-checkoutFormElementsRoot .cl-formButtonPrimary')
+        .getByRole('button', { name: /subscribe|pay/i })
+        .click();
     },
     clickAddPaymentMethod: async () => {
       await page.getByRole('radio', { name: 'Add payment method' }).click();

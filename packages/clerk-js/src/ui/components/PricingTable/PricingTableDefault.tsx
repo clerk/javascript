@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import type {
   __experimental_CommercePlanResource,
   __experimental_CommerceSubscriptionPlanPeriod,
@@ -99,6 +99,7 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
+  const { isSignedIn } = useUser();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
@@ -112,7 +113,7 @@ function Card(props: CardProps) {
   const subscription = activeOrUpcomingSubscription(plan);
   const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 
-  const showStatusRow = !!subscription || isImplicitlyActiveOrUpcoming;
+  const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);

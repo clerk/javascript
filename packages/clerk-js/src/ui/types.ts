@@ -6,6 +6,7 @@ import type {
   __experimental_PlanDetailsProps,
   __experimental_PricingTableProps,
   __internal_UserVerificationProps,
+  CheckoutContinueUrl,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -118,7 +119,7 @@ export type __experimental_PricingTableCtx = __experimental_PricingTableProps & 
 
 export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
-};
+} & CheckoutContinueUrl;
 
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';

@@ -175,6 +175,7 @@ const defaultOptions: ClerkOptions = {
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
   treatPendingAsSignedOut: true,
+  checkoutContinueUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -1375,6 +1376,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
+  public buildCheckoutContinueUrl(): string {
+    if (!this.#options.checkoutContinueUrl) {
+      return this.buildAfterSignInUrl();
+    }
+
+    return this.#options.checkoutContinueUrl;
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
