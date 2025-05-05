@@ -6,6 +6,7 @@ import type {
 } from '@clerk/types';
 import * as React from 'react';
 
+import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -112,6 +113,9 @@ function Card(props: CardProps) {
   const hasFeatures = totalFeatures > 0;
 
   const { buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -175,7 +179,7 @@ function Card(props: CardProps) {
             />
           </Box>
         ) : null}
-        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
+        {canManageBilling && (!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
           <Box
             elementDescriptor={descriptors.pricingTableCardAction}
             sx={t => ({

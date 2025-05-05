@@ -10,6 +10,7 @@ import type {
 import { useState } from 'react';
 import * as React from 'react';
 
+import { useProtect } from '../../common';
 import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -56,11 +57,20 @@ const PlanDetailsInternal = ({
     usePlansContext();
   const subscriberType = useSubscriberTypeContext();
 
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+
+  const subscription = React.useMemo(() => {
+    if (!plan) {
+      return;
+    }
+    return activeOrUpcomingSubscription(plan);
+  }, [activeOrUpcomingSubscription, plan]);
+
   if (!plan) {
     return null;
   }
-
-  const subscription = activeOrUpcomingSubscription(plan);
 
   const handleClose = () => {
     if (setIsOpen) {
@@ -208,7 +218,7 @@ const PlanDetailsInternal = ({
         </Drawer.Body>
       ) : null}
 
-      {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
+      {canManageBilling && (!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) ? (
         <Drawer.Footer>
           {subscription ? (
             subscription.canceledAt ? (
