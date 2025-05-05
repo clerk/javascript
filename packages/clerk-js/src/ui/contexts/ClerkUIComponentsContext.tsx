@@ -1,10 +1,11 @@
-import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { ManageApiKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   CreateOrganizationContext,
   GoogleOneTapContext,
+  ManageApiKeysContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
@@ -90,6 +91,12 @@ export function ComponentContextProvider({
             </PricingTableContext.Provider>
           </PlansContextProvider>
         </SubscriberTypeContext.Provider>
+      );
+    case 'ManageApiKeys':
+      return (
+        <ManageApiKeysContext.Provider value={{ componentName, ...(props as ManageApiKeysProps) }}>
+          {children}
+        </ManageApiKeysContext.Provider>
       );
 
     default:

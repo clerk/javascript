@@ -43,6 +43,7 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
+  ManageApiKeysProps,
   NavigateOptions,
   NextTaskParams,
   OrganizationListProps,
@@ -1029,6 +1030,29 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountManageApiKeys = (node: HTMLDivElement, props?: ManageApiKeysProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'ManageApiKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'ManageApiKeys',
+        appearanceKey: 'manageApiKeys',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('ManageApiKeys', props));
+  };
+
+  public unmountManageApiKeys = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

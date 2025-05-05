@@ -7,6 +7,7 @@ import type {
   CommerceSubscriptionResource,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  ManageApiKeysProps,
   NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -50,7 +51,8 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps;
+  | __internal_PlanDetailsProps
+  | ManageApiKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -117,6 +119,11 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
+export type ManageApiKeysCtx = ManageApiKeysProps & {
+  componentName: 'ManageApiKeys';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
@@ -160,5 +167,7 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | PricingTableCtx
-  | CheckoutCtx;
+  | CheckoutCtx
+  | ManageApiKeysCtx;
+
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
