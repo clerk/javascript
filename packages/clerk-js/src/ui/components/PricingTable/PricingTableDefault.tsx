@@ -341,9 +341,9 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       {annualMonthlyAmount > 0 && setPlanPeriod ? (
         <Box elementDescriptor={descriptors.pricingTableCardPeriodToggle}>
           <Switch
-            checked={planPeriod === 'annual'}
-            onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            title={localizationKeys('__experimental_commerce.billedAnnually')}
+            isSelected={planPeriod === 'annual'}
+            onChange={(isSelected: boolean) => setPlanPeriod(isSelected ? 'annual' : 'month')}
+            label={localizationKeys('__experimental_commerce.billedAnnually')}
           />
         </Box>
       ) : (

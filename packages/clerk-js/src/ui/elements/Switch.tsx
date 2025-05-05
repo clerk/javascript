@@ -2,68 +2,74 @@ import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text } from '../customizables';
+import { common } from '../styledSystem/common';
+
+const VisuallyHidden = ({ children }: { children: React.ReactNode }) => (
+  <span style={{ ...common.visuallyHidden() }}>{children}</span>
+);
 
 interface SwitchProps {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
-  title?: string | LocalizationKey;
+  /**
+   * Whether the Switch should be selected (uncontrolled).
+   */
+  defaultSelected?: boolean;
+  /**
+   * 	Whether the Switch should be selected (controlled).
+   */
+  isSelected?: boolean;
+  /**
+   * Fired when the user presses the switch, and receives the new state.
+   */
+  onChange?: (isSelected: boolean) => void;
+  /**
+   * The label of the switch.
+   */
+  label: string | LocalizationKey;
+  /**
+   * Whether the input is disabled.
+   */
+  isDisabled?: boolean;
 }
 
 export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
-  (
-    {
-      checked: controlledChecked,
-      defaultChecked,
-      onChange,
-      disabled = false,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledby,
-      title,
-    },
-    ref,
-  ) => {
-    const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
-    const isControlled = controlledChecked !== undefined;
-    const checked = isControlled ? controlledChecked : internalChecked;
+  ({ defaultSelected, isSelected: controlledSelected, onChange, label, isDisabled = false }, ref) => {
+    const [internalSelected, setInternalSelected] = useState(!!defaultSelected);
+    const isControlled = controlledSelected !== undefined;
+    const isSelected = isControlled ? controlledSelected : internalSelected;
 
-    const handleToggle = (_: React.MouseEvent | React.KeyboardEvent) => {
-      if (disabled) return;
+    const handleToggle = (e: React.MouseEvent | React.KeyboardEvent) => {
+      e.preventDefault();
+
+      if (isDisabled) return;
       if (!isControlled) {
-        setInternalChecked(!checked);
+        setInternalSelected(!isSelected);
       }
-      onChange?.(!checked);
+      onChange?.(!isSelected);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
         handleToggle(e);
       }
     };
 
     return (
       <Flex
-        direction='row'
-        align='center'
-        as='div'
+        as='label'
         ref={ref}
-        tabIndex={disabled ? -1 : 0}
-        role='switch'
-        aria-checked={checked}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledby}
         elementDescriptor={descriptors.switchRoot}
+        data-selected={isSelected}
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
-        sx={{
-          width: 'fit-content',
-          userSelect: 'none',
-        }}
       >
+        <VisuallyHidden>
+          <input
+            type='checkbox'
+            role='switch'
+            disabled={isDisabled}
+            tabIndex={isDisabled ? -1 : 0}
+          />
+        </VisuallyHidden>
         <Flex
           as='div'
           align='center'
@@ -72,11 +78,11 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             height: 16,
             alignItems: 'center',
             position: 'relative',
-            backgroundColor: checked ? t.colors.$primary500 : t.colors.$neutralAlpha150,
+            backgroundColor: isSelected ? t.colors.$primary500 : t.colors.$neutralAlpha150,
             borderRadius: 999,
             transition: 'background-color 0.2s',
-            opacity: disabled ? 0.6 : 1,
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            opacity: isDisabled ? 0.6 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
             outline: 'none',
             boxSizing: 'border-box',
             boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.06) inset',
@@ -87,7 +93,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             elementDescriptor={descriptors.switchThumb}
             sx={t => ({
               position: 'absolute',
-              left: checked ? 10 : 2,
+              left: isSelected ? 10 : 2,
               width: 12,
               height: 12,
               borderRadius: '50%',
@@ -98,18 +104,15 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             })}
           />
         </Flex>
-        {title && (
-          <Text
-            variant='caption'
-            colorScheme='secondary'
-            localizationKey={title}
-            sx={{
-              marginLeft: 8,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              userSelect: 'none',
-            }}
-          />
-        )}
+        <Text
+          localizationKey={label}
+          variant='caption'
+          colorScheme='secondary'
+          sx={{
+            marginLeft: 8,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+          }}
+        />
       </Flex>
     );
   },
