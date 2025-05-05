@@ -309,7 +309,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
         align='center'
         wrap='wrap'
         sx={t => ({
-          columnGap: t.space.$1x5,
+          columnGap: t.space.$1,
           marginTop: t.space.$1,
         })}
       >
@@ -330,7 +330,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
               textTransform: 'lowercase',
               ':before': {
                 content: '"/"',
-                marginInlineEnd: t.space.$1,
+                marginInlineEnd: t.space.$0x25,
               },
             })}
             localizationKey={localizationKeys('__experimental_commerce.month')}
@@ -339,7 +339,12 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       </Flex>
 
       {annualMonthlyAmount > 0 && setPlanPeriod ? (
-        <Box elementDescriptor={descriptors.pricingTableCardPeriodToggle}>
+        <Box
+          elementDescriptor={descriptors.pricingTableCardPeriodToggle}
+          sx={t => ({
+            marginTop: t.space.$1,
+          })}
+        >
           <Switch
             checked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
@@ -351,7 +356,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
           variant='caption'
           colorScheme='secondary'
-          localizationKey={plan.isDefault ? undefined : localizationKeys('__experimental_commerce.billedMonthlyOnly')}
+          localizationKey={
+            plan.isDefault
+              ? localizationKeys('__experimental_commerce.alwaysFree')
+              : localizationKeys('__experimental_commerce.billedMonthlyOnly')
+          }
           sx={{
             alignSelf: 'center',
           }}
