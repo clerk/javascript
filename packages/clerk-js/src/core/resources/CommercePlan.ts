@@ -47,7 +47,7 @@ export class __experimental_CommercePlan extends BaseResource implements __exper
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
     this.avatarUrl = data.avatar_url;
-    this.features = data.features.map(feature => new __experimental_CommerceFeature(feature));
+    this.features = (data.features || []).map(feature => new __experimental_CommerceFeature(feature));
 
     return this;
   }

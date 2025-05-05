@@ -1,10 +1,10 @@
 import type {
   __experimental_CommerceCheckoutTotals,
   __experimental_CommerceCheckoutTotalsJSON,
-  __experimental_CommerceStatementTotals,
-  __experimental_CommerceStatementTotalsJSON,
   __experimental_CommerceMoney,
   __experimental_CommerceMoneyJSON,
+  __experimental_CommerceStatementTotals,
+  __experimental_CommerceStatementTotalsJSON,
 } from '@clerk/types';
 
 export const commerceMoneyFromJSON = (data: __experimental_CommerceMoneyJSON): __experimental_CommerceMoney => {

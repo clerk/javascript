@@ -71,7 +71,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
       </Span>
       <Badge
         elementDescriptor={descriptors.statementHeaderBadge}
-        colorScheme={status === 'paid' ? 'success' : status === 'unpaid' ? 'warning' : 'danger'}
+        colorScheme={status === 'open' ? 'secondary' : 'primary'}
         sx={{ textTransform: 'capitalize' }}
       >
         {status}
@@ -124,6 +124,9 @@ function SectionHeader({ text }: { text: string | LocalizationKey }) {
         textVariant='h3'
         as='h2'
         localizationKey={text}
+        sx={t => ({
+          fontWeight: t.fontWeights.$medium,
+        })}
       />
     </Box>
   );
