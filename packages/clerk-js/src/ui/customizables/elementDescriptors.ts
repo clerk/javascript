@@ -312,7 +312,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'segmentedControlButton',
 
   'switchRoot',
+  'switchIndicator',
   'switchThumb',
+  'switchLabel',
 
   'alert',
   'alertIcon',
