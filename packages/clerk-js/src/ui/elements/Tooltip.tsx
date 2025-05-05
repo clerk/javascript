@@ -16,7 +16,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors } from '../customizables';
+import { Box, descriptors, Span } from '../customizables';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -126,19 +126,41 @@ export const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTML
   const childrenRef = (children as any).ref;
   const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
-  if (React.isValidElement(children)) {
-    return React.cloneElement(
-      children,
-      context.getReferenceProps({
-        ref,
-        ...props,
-        ...children.props,
-        'data-tooltip-state': context.open ? 'open' : 'closed',
-      }),
+  if (!React.isValidElement(children)) {
+    return null;
+  }
+
+  // If the child is disabled, wrap it in a span to handle hover events
+  if (children.props.isDisabled || children.props.disabled) {
+    return (
+      <Span
+        ref={ref}
+        {...context.getReferenceProps({
+          ...props,
+        })}
+        data-state={context.open ? 'open' : 'closed'}
+        sx={{
+          width: 'fit-content',
+          display: 'inline-block',
+          cursor: 'not-allowed',
+          outline: 'none',
+        }}
+        tabIndex={0}
+      >
+        {children}
+      </Span>
     );
   }
 
-  return null;
+  return React.cloneElement(
+    children,
+    context.getReferenceProps({
+      ref,
+      ...props,
+      ...children.props,
+      'data-state': context.open ? 'open' : 'closed',
+    }),
+  );
 });
 
 export const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function TooltipContent(
