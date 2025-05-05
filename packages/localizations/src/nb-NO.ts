@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  backButton: 'Tilbake',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Annen imitators enhet',
+  badge__primary: 'Primær',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Krever handling',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Denne enheten',
+  badge__unverified: 'Ikke verifisert',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Brukerens enhet',
+  badge__you: 'Du',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const nbNO: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Tilbake',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Annen imitators enhet',
-  badge__primary: 'Primær',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Krever handling',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Denne enheten',
-  badge__unverified: 'Ikke verifisert',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Brukerens enhet',
-  badge__you: 'Du',
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {
@@ -697,6 +701,22 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopiert!',
+      actionLabel__copy: 'Kopier alle',
+      actionLabel__download: 'Last ned .txt',
+      actionLabel__print: 'Skriv ut',
+      infoText1: 'Sikkerhetskoder vil bli aktivert for denne kontoen.',
+      infoText2:
+        'Hold sikkerhetskodene hemmelige og oppbevar dem sikkert. Du kan generere nye sikkerhetskoder hvis du mistenker at de er kompromittert.',
+      subtitle__codelist: 'Oppbevar dem sikkert og hold dem hemmelige.',
+      successMessage:
+        'Sikkerhetskoder er nå aktivert. Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten. Hver kode kan bare brukes én gang.',
+      successSubtitle:
+        'Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten.',
+      title: 'Legg til sikkerhetskopieringskodeverifisering',
+      title__codelist: 'Sikkerhetskoder',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -724,22 +744,6 @@ export const nbNO: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopiert!',
-      actionLabel__copy: 'Kopier alle',
-      actionLabel__download: 'Last ned .txt',
-      actionLabel__print: 'Skriv ut',
-      infoText1: 'Sikkerhetskoder vil bli aktivert for denne kontoen.',
-      infoText2:
-        'Hold sikkerhetskodene hemmelige og oppbevar dem sikkert. Du kan generere nye sikkerhetskoder hvis du mistenker at de er kompromittert.',
-      subtitle__codelist: 'Oppbevar dem sikkert og hold dem hemmelige.',
-      successMessage:
-        'Sikkerhetskoder er nå aktivert. Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten. Hver kode kan bare brukes én gang.',
-      successSubtitle:
-        'Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten.',
-      title: 'Legg til sikkerhetskopieringskodeverifisering',
-      title__codelist: 'Sikkerhetskoder',
     },
     connectedAccountPage: {
       formHint: 'Velg en tilbyder for å koble til kontoen din.',

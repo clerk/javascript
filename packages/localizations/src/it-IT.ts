@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  backButton: 'Indietro',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Predefinito',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
+  badge__primary: 'Primario',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Richiede azione',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Questo dispositivo',
+  badge__unverified: 'Non verificato',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Dispositivo utente',
+  badge__you: 'Tu',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const itIT: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Indietro',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Predefinito',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
-  badge__primary: 'Primario',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Richiede azione',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Questo dispositivo',
-  badge__unverified: 'Non verificato',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Dispositivo utente',
-  badge__you: 'Tu',
   createOrganization: {
     formButtonSubmit: 'Crea organizzazione',
     invitePage: {
@@ -698,6 +702,22 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Copiati!',
+      actionLabel__copy: 'Copia tutti',
+      actionLabel__download: 'Scarica .txt',
+      actionLabel__print: 'Stampa',
+      infoText1: 'I codici di backup saranno abilitati per questo account.',
+      infoText2:
+        'Tieni segreti i codici di backup e salvali in maniera sicura. Potrai generare altri codici di backup se pensi che possano essere compromessi.',
+      subtitle__codelist: 'Salvali in maniera sicura e tienili segreti.',
+      successMessage:
+        'I codici di backup sono ora abilitati. Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione. Ogni codice potrà essere utilizzato una sola volta.',
+      successSubtitle:
+        'Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione.',
+      title: 'Aggiungi verifica codici backup',
+      title__codelist: 'Codici di backup',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -725,22 +745,6 @@ export const itIT: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copiati!',
-      actionLabel__copy: 'Copia tutti',
-      actionLabel__download: 'Scarica .txt',
-      actionLabel__print: 'Stampa',
-      infoText1: 'I codici di backup saranno abilitati per questo account.',
-      infoText2:
-        'Tieni segreti i codici di backup e salvali in maniera sicura. Potrai generare altri codici di backup se pensi che possano essere compromessi.',
-      subtitle__codelist: 'Salvali in maniera sicura e tienili segreti.',
-      successMessage:
-        'I codici di backup sono ora abilitati. Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione. Ogni codice potrà essere utilizzato una sola volta.',
-      successSubtitle:
-        'Puoi ora utilizzare questi codici di backup per accedere al tuo account, nel caso di perdita del proprio strumento di autenticazione.',
-      title: 'Aggiungi verifica codici backup',
-      title__codelist: 'Codici di backup',
     },
     connectedAccountPage: {
       formHint: 'Seleziona un provider per collegare il tuo account.',

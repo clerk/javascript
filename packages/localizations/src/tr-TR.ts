@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  backButton: 'Geri',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Varsayılan',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
+  badge__primary: 'Birincil',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Eylem gerekli',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Bu cihaz',
+  badge__unverified: 'Doğrulanmamış',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Kullanıcı cihazı',
+  badge__you: 'Siz',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const trTR: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Geri',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Varsayılan',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
-  badge__primary: 'Birincil',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Eylem gerekli',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Bu cihaz',
-  badge__unverified: 'Doğrulanmamış',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Kullanıcı cihazı',
-  badge__you: 'Siz',
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -700,6 +704,22 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopyalandı!',
+      actionLabel__copy: 'Hepsini kopyala',
+      actionLabel__download: '.txt olarak indir',
+      actionLabel__print: 'Yazdır',
+      infoText1: 'Yedekleme kodları bu hesap için etkinleştirilecektir.',
+      infoText2:
+        'Yedekleme kodlarınızı güvenli bir yerde saklayın. Eğer bu kodlarınızın başkasının eline geçtiğini düşünürseniz, yenilerini oluşturabilirsiniz.',
+      subtitle__codelist: 'Yedekleme kodlarınızı güvenli bir yerde saklayın.',
+      successMessage:
+        'Yedekleme kodları başarıyla eklendi. Eğer Authenticator uygulamanızın olduğu cihaza erişiminizi kaybettiyseniz, oturum açarken bu kodlardan birini girebilirsiniz. Her kod en fazla bir kez kullanılabilir.',
+      successSubtitle:
+        'Eğer Authenticator uygulamanızın olduğu cihazınıza erişiminizi kaybederseniz, bu kodlardan birini kullanarak hesabınıza giriş yapabilirsiniz.',
+      title: 'Yedekleme kodu doğrulaması ekle',
+      title__codelist: 'Yedekleme kodları',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -727,22 +747,6 @@ export const trTR: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopyalandı!',
-      actionLabel__copy: 'Hepsini kopyala',
-      actionLabel__download: '.txt olarak indir',
-      actionLabel__print: 'Yazdır',
-      infoText1: 'Yedekleme kodları bu hesap için etkinleştirilecektir.',
-      infoText2:
-        'Yedekleme kodlarınızı güvenli bir yerde saklayın. Eğer bu kodlarınızın başkasının eline geçtiğini düşünürseniz, yenilerini oluşturabilirsiniz.',
-      subtitle__codelist: 'Yedekleme kodlarınızı güvenli bir yerde saklayın.',
-      successMessage:
-        'Yedekleme kodları başarıyla eklendi. Eğer Authenticator uygulamanızın olduğu cihaza erişiminizi kaybettiyseniz, oturum açarken bu kodlardan birini girebilirsiniz. Her kod en fazla bir kez kullanılabilir.',
-      successSubtitle:
-        'Eğer Authenticator uygulamanızın olduğu cihazınıza erişiminizi kaybederseniz, bu kodlardan birini kullanarak hesabınıza giriş yapabilirsiniz.',
-      title: 'Yedekleme kodu doğrulaması ekle',
-      title__codelist: 'Yedekleme kodları',
     },
     connectedAccountPage: {
       formHint: 'Yeni bir hesap bağlamak için bir sağlayıcı seçiniz.',

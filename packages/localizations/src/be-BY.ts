@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
+  backButton: 'Назад',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Па-змаўчанні',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Іншая прылада',
+  badge__primary: 'Асноўная',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Патрабуецца дзеянне',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Гэта прылада',
+  badge__unverified: 'Не верыфікавана',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Карыстальніцкая прылада',
+  badge__you: 'Вы',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const beBY: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Назад',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Па-змаўчанні',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Іншая прылада',
-  badge__primary: 'Асноўная',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Патрабуецца дзеянне',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Гэта прылада',
-  badge__unverified: 'Не верыфікавана',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Карыстальніцкая прылада',
-  badge__you: 'Вы',
   createOrganization: {
     formButtonSubmit: 'Стварыць арганізацыю',
     invitePage: {
@@ -703,6 +707,22 @@ export const beBY: LocalizationResource = {
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Скапіравана!',
+      actionLabel__copy: 'Скапіраваць усё',
+      actionLabel__download: 'Спампаваць .txt',
+      actionLabel__print: 'Друкаваць',
+      infoText1: 'Рэзервовыя коды будуць уключаны для гэтага ўліковага запісу.',
+      infoText2:
+        'Захоўвайце рэзервовыя коды ў тайне і захоўвайце іх у бяспецы. Вы можаце стварыць новыя рэзервовыя коды, калі падазраеце, што яны былі скампраметаваныя.',
+      subtitle__codelist: 'Захоўвайце іх у бяспецы і не паведамляйце нікому.',
+      successMessage:
+        'Рэзервовыя коды ўключаны. Вы можаце выкарыстоўваць адзін з гэтых кодоў для ўваходу ў свой уліковы запіс, калі вы страціце доступ да свайго аўтэнтыфікацыйнага прылады. Кожны код можа быць выкарыстаны толькі аднойчы.',
+      successSubtitle:
+        'Вы можаце выкарыстоўваць адзін з гэтых кодоў для ўваходу ў свой уліковы запіс, калі вы страціце доступ да свайго аўтэнтыфікацыйнага прылады.',
+      title: 'Дадаць рэзервовы код пацверджання',
+      title__codelist: 'Рэзервовы коды',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -730,22 +750,6 @@ export const beBY: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Скапіравана!',
-      actionLabel__copy: 'Скапіраваць усё',
-      actionLabel__download: 'Спампаваць .txt',
-      actionLabel__print: 'Друкаваць',
-      infoText1: 'Рэзервовыя коды будуць уключаны для гэтага ўліковага запісу.',
-      infoText2:
-        'Захоўвайце рэзервовыя коды ў тайне і захоўвайце іх у бяспецы. Вы можаце стварыць новыя рэзервовыя коды, калі падазраеце, што яны былі скампраметаваныя.',
-      subtitle__codelist: 'Захоўвайце іх у бяспецы і не паведамляйце нікому.',
-      successMessage:
-        'Рэзервовыя коды ўключаны. Вы можаце выкарыстоўваць адзін з гэтых кодоў для ўваходу ў свой уліковы запіс, калі вы страціце доступ да свайго аўтэнтыфікацыйнага прылады. Кожны код можа быць выкарыстаны толькі аднойчы.',
-      successSubtitle:
-        'Вы можаце выкарыстоўваць адзін з гэтых кодоў для ўваходу ў свой уліковы запіс, калі вы страціце доступ да свайго аўтэнтыфікацыйнага прылады.',
-      title: 'Дадаць рэзервовы код пацверджання',
-      title__codelist: 'Рэзервовы коды',
     },
     connectedAccountPage: {
       formHint: 'Выберыце правайдара для падключэння вашага ўліковага запісу.',

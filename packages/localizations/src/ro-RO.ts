@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  backButton: 'Înapoi',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Implicit',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
+  badge__primary: 'Principală',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Necesită acțiune',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Acest dispozitiv',
+  badge__unverified: 'Nedeclarat',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Dispozitiv de utilizator',
+  badge__you: 'Tu',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const roRO: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Înapoi',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Implicit',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
-  badge__primary: 'Principală',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Necesită acțiune',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Acest dispozitiv',
-  badge__unverified: 'Nedeclarat',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Dispozitiv de utilizator',
-  badge__you: 'Tu',
   createOrganization: {
     formButtonSubmit: 'Creați o organizație',
     invitePage: {
@@ -701,6 +705,22 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Copiat!',
+      actionLabel__copy: 'Copiați toate',
+      actionLabel__download: 'Descarcă .txt',
+      actionLabel__print: 'Imprimare',
+      infoText1: 'Codurile de rezervă vor fi activate pentru acest cont.',
+      infoText2:
+        'Păstrați codurile de rezervă în secret și păstrați-le în siguranță. Puteți regenera codurile de rezervă dacă bănuiți că acestea au fost compromise.',
+      subtitle__codelist: 'Păstrați-le în siguranță și păstrați-le în secret.',
+      successMessage:
+        'Codurile de rezervă sunt acum activate. Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare. Fiecare cod poate fi utilizat o singură dată.',
+      successSubtitle:
+        'Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare.',
+      title: 'Adăugați verificarea codului de rezervă',
+      title__codelist: 'Coduri de rezervă',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -728,22 +748,6 @@ export const roRO: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Copiat!',
-      actionLabel__copy: 'Copiați toate',
-      actionLabel__download: 'Descarcă .txt',
-      actionLabel__print: 'Imprimare',
-      infoText1: 'Codurile de rezervă vor fi activate pentru acest cont.',
-      infoText2:
-        'Păstrați codurile de rezervă în secret și păstrați-le în siguranță. Puteți regenera codurile de rezervă dacă bănuiți că acestea au fost compromise.',
-      subtitle__codelist: 'Păstrați-le în siguranță și păstrați-le în secret.',
-      successMessage:
-        'Codurile de rezervă sunt acum activate. Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare. Fiecare cod poate fi utilizat o singură dată.',
-      successSubtitle:
-        'Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare.',
-      title: 'Adăugați verificarea codului de rezervă',
-      title__codelist: 'Coduri de rezervă',
     },
     connectedAccountPage: {
       formHint: 'Selectați un furnizor pentru a vă conecta contul.',

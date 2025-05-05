@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  backButton: 'الرجوع',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'الأفتراضي',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
+  badge__primary: 'الرئيسي',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'الإجراء المطلوب',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'هذا الجهاز',
+  badge__unverified: 'لم يتم التحقق منه',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'جهاز المستخدم',
+  badge__you: 'أنت',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const arSA: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'الرجوع',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'الأفتراضي',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
-  badge__primary: 'الرئيسي',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'الإجراء المطلوب',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'هذا الجهاز',
-  badge__unverified: 'لم يتم التحقق منه',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'جهاز المستخدم',
-  badge__you: 'أنت',
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -695,6 +699,22 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'تم النسخ',
+      actionLabel__copy: 'نسخ الكل',
+      actionLabel__download: 'تحميل ملف .txt',
+      actionLabel__print: 'طباعة',
+      infoText1: 'سيتم تفعيل رموز النسخ الأحتياطي لهذا الحساب',
+      infoText2:
+        'قم بتخزين الرموز في مكان آمن وحافظ على سريتها. يمكنك تجديد الرموز الأحتياطية اذا كنت تشك أن حسابك معرض للخطر',
+      subtitle__codelist: 'قم بتخزين الرموز في مكان آمن وابقيها سرا.',
+      successMessage:
+        'رموز النسخ الأحتياطي مفعلة الآن. يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك. كل رمز يمكن أستعماله لمرة واحدة فقط.',
+      successSubtitle:
+        'يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك',
+      title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
+      title__codelist: 'رموز النسخ الأحتياطي',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -722,22 +742,6 @@ export const arSA: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'تم النسخ',
-      actionLabel__copy: 'نسخ الكل',
-      actionLabel__download: 'تحميل ملف .txt',
-      actionLabel__print: 'طباعة',
-      infoText1: 'سيتم تفعيل رموز النسخ الأحتياطي لهذا الحساب',
-      infoText2:
-        'قم بتخزين الرموز في مكان آمن وحافظ على سريتها. يمكنك تجديد الرموز الأحتياطية اذا كنت تشك أن حسابك معرض للخطر',
-      subtitle__codelist: 'قم بتخزين الرموز في مكان آمن وابقيها سرا.',
-      successMessage:
-        'رموز النسخ الأحتياطي مفعلة الآن. يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك. كل رمز يمكن أستعماله لمرة واحدة فقط.',
-      successSubtitle:
-        'يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك',
-      title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
-      title__codelist: 'رموز النسخ الأحتياطي',
     },
     connectedAccountPage: {
       formHint: 'أختر موفر خدمة لتوصيل حسابك',
