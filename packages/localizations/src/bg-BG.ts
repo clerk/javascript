@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  backButton: 'Назад',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'По подразбиране',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Друго устройство за имитация',
+  badge__primary: 'Основен',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Изисква действие',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Това устройство',
+  badge__unverified: 'Непотвърден',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Потребителско устройство',
+  badge__you: 'Вие',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const bgBG: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Назад',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'По подразбиране',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Друго устройство за имитация',
-  badge__primary: 'Основен',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Изисква действие',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Това устройство',
-  badge__unverified: 'Непотвърден',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Потребителско устройство',
-  badge__you: 'Вие',
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {
@@ -694,6 +698,22 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Копирано!',
+      actionLabel__copy: 'Копиране на всички',
+      actionLabel__download: 'Изтегляне на .txt',
+      actionLabel__print: 'Отпечатване',
+      infoText1: 'Резервните кодове ще бъдат активирани за този акаунт.',
+      infoText2:
+        'Дръжте резервните кодове в тайна и ги съхранявайте сигурно. Можете да генерирате нови резервни кодове, ако подозирате, че те са били компрометирани.',
+      subtitle__codelist: 'Запазете ги сигурно и ги държете в тайна.',
+      successMessage:
+        'Резервните кодове са активирани. Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване. Всеки код може да се използва само веднъж.',
+      successSubtitle:
+        'Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване.',
+      title: 'Добавяне на резервен код за потвърждение',
+      title__codelist: 'Резервни кодове',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -721,22 +741,6 @@ export const bgBG: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Копирано!',
-      actionLabel__copy: 'Копиране на всички',
-      actionLabel__download: 'Изтегляне на .txt',
-      actionLabel__print: 'Отпечатване',
-      infoText1: 'Резервните кодове ще бъдат активирани за този акаунт.',
-      infoText2:
-        'Дръжте резервните кодове в тайна и ги съхранявайте сигурно. Можете да генерирате нови резервни кодове, ако подозирате, че те са били компрометирани.',
-      subtitle__codelist: 'Запазете ги сигурно и ги държете в тайна.',
-      successMessage:
-        'Резервните кодове са активирани. Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване. Всеки код може да се използва само веднъж.',
-      successSubtitle:
-        'Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване.',
-      title: 'Добавяне на резервен код за потвърждение',
-      title__codelist: 'Резервни кодове',
     },
     connectedAccountPage: {
       formHint: 'Изберете доставчик, за да свържете вашия профил.',

@@ -139,6 +139,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
+      downgradeNotice: LocalizationValue;
     };
   };
   signUp: {

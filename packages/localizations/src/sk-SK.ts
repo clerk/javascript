@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  backButton: 'Späť',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Predvolené',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
+  badge__primary: 'Hlavný',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Vyžaduje akciu',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Toto zariadenie',
+  badge__unverified: 'Nepotvrdené',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Zariadenie používateľa',
+  badge__you: 'Vy',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const skSK: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Späť',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Predvolené',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
-  badge__primary: 'Hlavný',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Vyžaduje akciu',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Toto zariadenie',
-  badge__unverified: 'Nepotvrdené',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Zariadenie používateľa',
-  badge__you: 'Vy',
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -694,6 +698,22 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Skopírované!',
+      actionLabel__copy: 'Kopírovať všetko',
+      actionLabel__download: 'Stiahnuť .txt',
+      actionLabel__print: 'Vytlačiť',
+      infoText1: 'Pre tento účet budú povolené záložné kódy.',
+      infoText2:
+        'Záložné kódy uchovávajte tajne a bezpečne. Môžete vygenerovať nové záložné kódy, ak máte podozrenie, že boli skompromitované.',
+      subtitle__codelist: 'Uchovávajte ich bezpečne a tajne.',
+      successMessage:
+        'Záložné kódy sú teraz povolené. Ak stratíte prístup k vášmu overovaciemu zariadeniu, môžete použiť jeden z týchto kódov na prihlásenie do vášho účtu. Každý kód možno použiť iba raz.',
+      successSubtitle:
+        'Použite jeden z týchto kódov na prihlásenie do vášho účtu, ak stratíte prístup k vášmu overovaciemu zariadeniu.',
+      title: 'Pridať overovanie pomocou záložných kódov',
+      title__codelist: 'Záložné kódy',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -721,22 +741,6 @@ export const skSK: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Skopírované!',
-      actionLabel__copy: 'Kopírovať všetko',
-      actionLabel__download: 'Stiahnuť .txt',
-      actionLabel__print: 'Vytlačiť',
-      infoText1: 'Pre tento účet budú povolené záložné kódy.',
-      infoText2:
-        'Záložné kódy uchovávajte tajne a bezpečne. Môžete vygenerovať nové záložné kódy, ak máte podozrenie, že boli skompromitované.',
-      subtitle__codelist: 'Uchovávajte ich bezpečne a tajne.',
-      successMessage:
-        'Záložné kódy sú teraz povolené. Ak stratíte prístup k vášmu overovaciemu zariadeniu, môžete použiť jeden z týchto kódov na prihlásenie do vášho účtu. Každý kód možno použiť iba raz.',
-      successSubtitle:
-        'Použite jeden z týchto kódov na prihlásenie do vášho účtu, ak stratíte prístup k vášmu overovaciemu zariadeniu.',
-      title: 'Pridať overovanie pomocou záložných kódov',
-      title__codelist: 'Záložné kódy',
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovateľa pre pripojenie vášho účtu.',

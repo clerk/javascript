@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  backButton: 'Til baka',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Sjálfgefið',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
+  badge__primary: 'Aðal',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Krefst aðgerða',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Þetta tæki',
+  badge__unverified: 'Óstaðfest',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Notendatæki',
+  badge__you: 'Þú',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const isIS: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Til baka',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Sjálfgefið',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
-  badge__primary: 'Aðal',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Krefst aðgerða',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Þetta tæki',
-  badge__unverified: 'Óstaðfest',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Notendatæki',
-  badge__you: 'Þú',
   createOrganization: {
     formButtonSubmit: 'Stofna samtök',
     invitePage: {
@@ -701,6 +705,22 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Afritað!',
+      actionLabel__copy: 'Afrita allt',
+      actionLabel__download: 'Sækja .txt',
+      actionLabel__print: 'Prenta',
+      infoText1: 'Öryggiskóðar verða virkjaðir fyrir þennan reikning.',
+      infoText2:
+        'Geymdu öryggiskóðana leynilega og geymdu þá á öruggum stað. Þú getur endurmyndað öryggiskóða ef þú grunar að þeir hafi verið afhjúpaðir.',
+      subtitle__codelist: 'Geymdu þá á öruggum stað og haltu þeim leynilegum.',
+      successMessage:
+        'Öryggiskóðar eru nú virkjaðir. Þú getur notað einn af þessum til að skrá þig inn á reikninginn þinn, ef þú missir aðgang að auðkennis tækinu þínu. Hver kóði getur aðeins verið notaður einu sinni.',
+      successSubtitle:
+        'Þú getur notað einn af þessum til að skrá þig inn á reikninginn þinn, ef þú missir aðgang að auðkennis tækinu þínu.',
+      title: 'Bæta við öryggiskóða staðfestingu',
+      title__codelist: 'Öryggiskóðar',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -728,22 +748,6 @@ export const isIS: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Afritað!',
-      actionLabel__copy: 'Afrita allt',
-      actionLabel__download: 'Sækja .txt',
-      actionLabel__print: 'Prenta',
-      infoText1: 'Öryggiskóðar verða virkjaðir fyrir þennan reikning.',
-      infoText2:
-        'Geymdu öryggiskóðana leynilega og geymdu þá á öruggum stað. Þú getur endurmyndað öryggiskóða ef þú grunar að þeir hafi verið afhjúpaðir.',
-      subtitle__codelist: 'Geymdu þá á öruggum stað og haltu þeim leynilegum.',
-      successMessage:
-        'Öryggiskóðar eru nú virkjaðir. Þú getur notað einn af þessum til að skrá þig inn á reikninginn þinn, ef þú missir aðgang að auðkennis tækinu þínu. Hver kóði getur aðeins verið notaður einu sinni.',
-      successSubtitle:
-        'Þú getur notað einn af þessum til að skrá þig inn á reikninginn þinn, ef þú missir aðgang að auðkennis tækinu þínu.',
-      title: 'Bæta við öryggiskóða staðfestingu',
-      title__codelist: 'Öryggiskóðar',
     },
     connectedAccountPage: {
       formHint: 'Veldu þjónustuaðila til að tengja reikninginn þinn.',

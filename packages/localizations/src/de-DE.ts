@@ -14,13 +14,32 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  backButton: 'Zurück',
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: 'Aktueller Plan',
+  badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
+  badge__primary: 'Primär',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Erfordert Handeln',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Dieses Gerät',
+  badge__unverified: 'Unbestätigt',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Benutzergerät',
+  badge__you: 'Du',
   commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: 'Jährlich abgerechnet',
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +62,11 @@ export const deDE: LocalizationResource = {
     month: 'Monat',
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Zurück',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: 'Aktueller Plan',
-  badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
-  badge__primary: 'Primär',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Erfordert Handeln',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Dieses Gerät',
-  badge__unverified: 'Unbestätigt',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Benutzergerät',
-  badge__you: 'Du',
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -713,6 +717,22 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopiert!',
+      actionLabel__copy: 'Kopiere alle',
+      actionLabel__download: 'Laden Sie .txt herunter',
+      actionLabel__print: 'Drucken',
+      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
+      infoText2:
+        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
+      subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
+      successMessage:
+        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
+      successSubtitle:
+        'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
+      title: 'Backup-Code-Verifizierung hinzufügen',
+      title__codelist: 'Sicherungscodes',
+    },
     billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
@@ -740,22 +760,6 @@ export const deDE: LocalizationResource = {
         actionLabel__default: undefined,
       },
       title: 'Abrechnung & Zahlungen',
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopiert!',
-      actionLabel__copy: 'Kopiere alle',
-      actionLabel__download: 'Laden Sie .txt herunter',
-      actionLabel__print: 'Drucken',
-      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
-      infoText2:
-        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
-      subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
-      successMessage:
-        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
-      successSubtitle:
-        'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
-      title: 'Backup-Code-Verifizierung hinzufügen',
-      title__codelist: 'Sicherungscodes',
     },
     connectedAccountPage: {
       formHint: 'Wählen Sie einen Anbieter aus, um Ihr Konto zu verbinden.',
