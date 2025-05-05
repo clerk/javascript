@@ -16,7 +16,7 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     },
     startCheckout: async ({ planSlug, shouldSwitch }: { planSlug: string; shouldSwitch?: boolean }) => {
       const targetButtonName =
-        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? 'Subscribe' : /get|switch|subscribe/i;
+        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
 
       await page
         .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardAction`)
