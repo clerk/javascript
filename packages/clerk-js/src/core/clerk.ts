@@ -5,6 +5,7 @@ import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResp
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
+import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
@@ -174,6 +175,7 @@ const defaultOptions: ClerkOptions = {
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
   treatPendingAsSignedOut: true,
+  __experimental_checkoutContinueUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -554,6 +556,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
       .then(controls => controls.openDrawer('checkout', props || {}));
@@ -1188,7 +1199,7 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     const session = await this.session?.reload();
     if (!session || !this.environment) {
       return;
@@ -1205,7 +1216,7 @@ export class Clerk implements ClerkInterface {
     }
 
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
     this.#setTransitiveState();
 
@@ -1365,6 +1376,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
+  public __experimental_buildCheckoutContinueUrl(): string {
+    if (!this.#options.__experimental_checkoutContinueUrl) {
+      return this.buildAfterSignInUrl();
+    }
+
+    return this.#options.__experimental_checkoutContinueUrl;
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
@@ -2613,6 +2632,7 @@ export class Clerk implements ClerkInterface {
   #clearClerkQueryParams = () => {
     try {
       removeClerkQueryParam(CLERK_SYNCED);
+      removeClerkQueryParam(CLERK_NETLIFY_CACHE_BUST_PARAM);
       // @nikos: we're looking into dropping this param completely
       // in the meantime, we're removing it here to keep the URL clean
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);

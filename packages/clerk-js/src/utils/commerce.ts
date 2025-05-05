@@ -30,6 +30,13 @@ export const commerceTotalsFromJSON = <
     // @ts-ignore
     totals['totalDueNow'] = commerceMoneyFromJSON(data.total_due_now);
   }
+  if ('proration' in data) {
+    // @ts-ignore
+    totals['proration'] = {
+      // @ts-ignore
+      credit: commerceMoneyFromJSON(data.proration.credit),
+    };
+  }
 
   return totals as T extends { total_due_now: __experimental_CommerceMoneyJSON }
     ? __experimental_CommerceCheckoutTotals

@@ -164,6 +164,7 @@ export type ElementsConfig = {
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
   lineItemsCopyButton: WithOptions;
+  lineItemsDowngradeNotice: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -376,7 +377,7 @@ export type ElementsConfig = {
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
   pricingTableCardHeader: WithOptions;
-  pricingTableCardAvatarBadgeContainer: WithOptions;
+  pricingTableCardBadgeTitleContainer: WithOptions;
   pricingTableCardAvatar: WithOptions;
   pricingTableCardBadgeContainer: WithOptions;
   pricingTableCardBadge: WithOptions;
@@ -397,7 +398,7 @@ export type ElementsConfig = {
   pricingTableCardFeePeriodNoticeInner: WithOptions;
   pricingTableCardFeePeriodNoticeLabel: WithOptions;
 
-  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRowGroupHeader: WithOptions;

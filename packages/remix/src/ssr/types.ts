@@ -1,6 +1,7 @@
 import type { AuthObject, Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import type {
+  __experimental_CheckoutContinueUrl,
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
   SignInFallbackRedirectUrl,
@@ -36,6 +37,7 @@ export type RootAuthLoaderOptions = {
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  __experimental_CheckoutContinueUrl &
   LegacyRedirectProps;
 
 export type RequestStateWithRedirectUrls = RequestState &
@@ -43,6 +45,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  __experimental_CheckoutContinueUrl &
   LegacyRedirectProps;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (

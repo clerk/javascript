@@ -27,4 +27,5 @@ export {
   SignUpButton,
   SignOutButton,
   SignInWithMetamaskButton,
+  experimental_PricingTable,
 } from '@clerk/vue';

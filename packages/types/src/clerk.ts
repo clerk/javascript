@@ -30,6 +30,7 @@ import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
+  __experimental_CheckoutContinueUrl,
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
@@ -566,6 +567,11 @@ export interface Clerk {
   buildAfterSignOutUrl(): string;
 
   /**
+   * Returns the configured checkoutContinueUrl of the instance.
+   */
+  __experimental_buildCheckoutContinueUrl(): string;
+
+  /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
    */
   buildAfterMultiSessionSingleSignOutUrl(): string;
@@ -706,10 +712,10 @@ export interface Clerk {
   /**
    * Navigates to the next task or redirects to completion URL.
    * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
    * @experimental
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -814,6 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  __experimental_CheckoutContinueUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1563,6 +1570,7 @@ export type WaitlistModalProps = WaitlistProps;
 type __experimental_PricingTableDefaultProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
+  __experimental_checkoutContinueUrl?: string;
 };
 
 type __experimental_PricingTableBaseProps = {
@@ -1570,6 +1578,8 @@ type __experimental_PricingTableBaseProps = {
   appearance?: PricingTableTheme;
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
+
+type PortalRoot = HTMLElement | null | undefined;
 
 export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
   __experimental_PricingTableDefaultProps;
@@ -1581,6 +1591,12 @@ export type __experimental_CheckoutProps = {
   subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  __experimental_checkoutContinueUrl?: string;
 };
 
 export type __experimental_PlanDetailsProps = {
@@ -1590,6 +1606,7 @@ export type __experimental_PlanDetailsProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
 export interface HandleEmailLinkVerificationParams {

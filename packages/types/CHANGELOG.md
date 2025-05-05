@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.56.3
+
+### Patch Changes
+
+- Use the `total.proration.credit` to show the proration credit on checkout flow ([#5792](https://github.com/clerk/javascript/pull/5792)) by [@octoper](https://github.com/octoper)
+
+- Remove unused properties from proration response in checkout ([#5793](https://github.com/clerk/javascript/pull/5793)) by [@octoper](https://github.com/octoper)
+
+## 4.56.2
+
+### Patch Changes
+
+- Fix issue where the checkout component was portaling into the wrong profile component when two profile components were rendered at once. ([#5779](https://github.com/clerk/javascript/pull/5779)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.56.1
+
+### Patch Changes
+
+- Display upgrade and downgrade information on `<Checkout />`. ([#5746](https://github.com/clerk/javascript/pull/5746)) by [@panteliselef](https://github.com/panteliselef)
+
+- Refactor PricingTable components to use RootBox component for top level element. ([#5747](https://github.com/clerk/javascript/pull/5747)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.56.0
 
 ### Minor Changes

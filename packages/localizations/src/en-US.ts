@@ -29,6 +29,7 @@ export const enUS: LocalizationResource = {
     month: 'Month',
     reSubscribe: 'Re-subscribe',
     switchPlan: 'Switch to this plan',
+    switchToAnnual: 'Switch to annual',
     defaultFreePlanActive: "You're currently on the Free plan",
     availableFeatures: 'Available features',
     viewFeatures: 'View features',

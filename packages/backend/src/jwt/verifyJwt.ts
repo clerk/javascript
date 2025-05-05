@@ -17,7 +17,7 @@ import {
 import { importKey } from './cryptoKeys';
 import type { JwtReturnType } from './types';
 
-const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
+const DEFAULT_CLOCK_SKEW_IN_MS = 5 * 1000;
 
 export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<JwtReturnType<boolean, Error>> {
   const { header, signature, raw } = jwt;
@@ -126,7 +126,7 @@ export async function verifyJwt(
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const { audience, authorizedParties, clockSkewInMs, key } = options;
-  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
 
   const { data: decoded, errors } = decodeJwt(token);
   if (errors) {

@@ -7,12 +7,12 @@ import type {
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { Flow } from '../../customizables';
 import { useFetch } from '../../hooks/useFetch';
-import { FreePlanRow } from './FreePlanRow';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
-const PricingTable = (props: __experimental_PricingTableProps) => {
+const PricingTableRoot = (props: __experimental_PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
@@ -23,12 +23,12 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
 
   const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
 
-  const selectPlan = (plan: __experimental_CommercePlanResource) => {
+  const selectPlan = (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
-      void clerk.redirectToSignIn();
+      return clerk.redirectToSignIn();
     }
 
-    handleSelectPlan({ mode, plan, planPeriod });
+    handleSelectPlan({ mode, plan, planPeriod, event });
   };
 
   const { __experimental_commerce } = useClerk();
@@ -44,11 +44,15 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
   );
 
   return (
-    <>
-      <FreePlanRow />
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
       {mode !== 'modal' && (props as any).layout === 'matrix' ? (
         <PricingTableMatrix
-          plans={plans.filter(plan => !plan.isDefault)}
+          plans={plans}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -56,7 +60,7 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
         />
       ) : (
         <PricingTableDefault
-          plans={plans.filter(plan => !plan.isDefault)}
+          plans={plans}
           planPeriod={planPeriod}
           setPlanPeriod={setPlanPeriod}
           onSelect={selectPlan}
@@ -64,8 +68,25 @@ const PricingTable = (props: __experimental_PricingTableProps) => {
           props={props}
         />
       )}
-    </>
+    </Flow.Root>
   );
+};
+
+// When used in a modal, we need to wrap the root in a div to avoid layout issues
+// within UserProfile and OrganizationProfile.
+const PricingTableModal = (props: __experimental_PricingTableProps) => {
+  return (
+    // TODO: Used by InvisibleRootBox, can we simplify?
+    <div>
+      <PricingTableRoot {...props} />
+    </div>
+  );
+};
+
+const PricingTable = (props: __experimental_PricingTableProps) => {
+  const { mode = 'mounted' } = usePricingTableContext();
+
+  return mode === 'modal' ? <PricingTableModal {...props} /> : <PricingTableRoot {...props} />;
 };
 
 export const __experimental_PricingTable = PricingTable;
