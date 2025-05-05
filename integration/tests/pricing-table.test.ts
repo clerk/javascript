@@ -101,7 +101,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.clickManageSubscription();
     await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
     await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
-    await expect(u.po.page.getByRole('button', { name: 'Resubscribe' }).first()).toBeVisible();
+    await expect(u.po.page.getByRole('button', { name: /resubscribe|re-subscribe/i }).first()).toBeVisible();
   });
 
   test.describe('in UserProfile', () => {
