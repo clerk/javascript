@@ -422,6 +422,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'qrCodeRow',
   'qrCodeContainer',
 
+  'tooltip',
+  'tooltipContent',
+
   'badge',
   'notificationBadge',
   'buttonArrowIcon',

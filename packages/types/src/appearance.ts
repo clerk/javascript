@@ -541,6 +541,9 @@ export type ElementsConfig = {
   impersonationFabTitle: WithOptions;
   impersonationFabActionLink: WithOptions;
 
+  tooltip: WithOptions;
+  tooltipContent: WithOptions;
+
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;
 
