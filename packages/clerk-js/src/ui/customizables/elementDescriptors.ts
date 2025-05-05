@@ -261,6 +261,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'pricingTableCardFeePeriodNotice',
   'pricingTableCardFooter',
   'pricingTableCardFooterButton',
+  'pricingTableCardFooterNotice',
+
   'pricingTableMatrix',
   'pricingTableMatrixTable',
   'pricingTableMatrixRowGroup',

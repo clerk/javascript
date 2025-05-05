@@ -225,6 +225,7 @@ function Card(props: CardProps) {
               />
             ) : (
               <Text
+                elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
                 localizationKey='Starts on May 23, 2025'
                 colorScheme='secondary'

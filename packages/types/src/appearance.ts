@@ -393,6 +393,7 @@ export type ElementsConfig = {
   pricingTableCardStatus: WithOptions;
   pricingTableCardFooter: WithOptions;
   pricingTableCardFooterButton: WithOptions;
+  pricingTableCardFooterNotice: WithOptions;
 
   pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
