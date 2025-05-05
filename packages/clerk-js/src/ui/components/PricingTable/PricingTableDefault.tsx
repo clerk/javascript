@@ -347,7 +347,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           })}
         >
           <Switch
-            checked={planPeriod === 'annual'}
+            isChecked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
             label={localizationKeys('commerce.billedAnnually')}
           />
