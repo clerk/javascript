@@ -3,6 +3,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   __experimental_commerce: {
+    availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     cancelSubscription: 'Cancel subscription',
     checkout: {
@@ -21,6 +22,7 @@ export const enUS: LocalizationResource = {
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },
+    defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
     getStarted: 'Get started',
     keepSubscription: 'Keep subscription',
@@ -28,12 +30,10 @@ export const enUS: LocalizationResource = {
     manageSubscription: 'Manage subscription',
     month: 'Month',
     reSubscribe: 'Re-subscribe',
+    seeAllFeatures: 'See all features',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    defaultFreePlanActive: "You're currently on the Free plan",
-    availableFeatures: 'Available features',
     viewFeatures: 'View features',
-    seeAllFeatures: 'See all features',
   },
   backButton: 'Back',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
@@ -708,11 +708,10 @@ export const enUS: LocalizationResource = {
           successMessage: '{{paymentSource}} has been removed from your account.',
           title: 'Remove payment method',
         },
-        title: 'Available options',
+        title: 'Payment methods',
       },
       start: {
         headerTitle__invoices: 'Invoices',
-        headerTitle__paymentMethods: 'Payment Methods',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscriptions',
       },
