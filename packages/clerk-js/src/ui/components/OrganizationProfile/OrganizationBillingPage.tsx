@@ -1,3 +1,4 @@
+import { Protect } from '../../common';
 import {
   InvoicesContextProvider,
   PlansContextProvider,
@@ -89,7 +90,9 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       width: 'fit-content',
                     }}
                   />
-                  <PaymentSources />
+                  <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                    <PaymentSources />
+                  </Protect>
                 </Flex>
               ) : (
                 <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
