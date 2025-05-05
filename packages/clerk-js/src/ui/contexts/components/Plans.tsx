@@ -18,22 +18,26 @@ import { useSubscriberTypeContext } from './SubscriberType';
 const PlansContext = createContext<PlansCtx | null>(null);
 
 export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
-  const { commerce } = useClerk();
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user } = useUser();
+  const resource = subscriberType === 'org' ? organization : user;
+
   return useFetch(
-    user ? commerce?.billing.getSubscriptions : undefined,
+    user ? billing.getSubscriptions : undefined,
     { orgId: subscriberType === 'org' ? organization?.id : undefined },
     undefined,
-    `commerce-subscriptions-${user?.id}`,
+    `commerce-subscriptions-${resource?.id}`,
   );
 };
 
 export const PlansContextProvider = ({ children }: PropsWithChildren) => {
-  const { commerce } = useClerk();
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
+  const resource = subscriberType === 'org' ? organization : user;
+
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
@@ -44,7 +48,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     data: plans,
     isLoading: isLoadingPlans,
     revalidate: revalidatePlans,
-  } = useFetch(commerce?.billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
+  } = useFetch(billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
 
   // Revalidates the next time the hooks gets mounted
   const { revalidate: revalidateInvoices } = useFetch(
@@ -53,7 +57,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    `commerce-invoices-${user?.id}`,
+    `commerce-invoices-${resource?.id}`,
   );
 
   const revalidate = useCallback(() => {

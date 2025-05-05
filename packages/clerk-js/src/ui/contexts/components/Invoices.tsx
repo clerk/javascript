@@ -9,16 +9,18 @@ import { useSubscriberTypeContext } from './SubscriberType';
 const InvoicesContext = createContext<InvoicesCtx | null>(null);
 
 export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
-  const { commerce } = useClerk();
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
   const { user } = useUser();
 
+  const resource = subscriberType === 'org' ? organization : user;
+
   const { data, isLoading, revalidate } = useFetch(
-    commerce?.billing.getInvoices,
+    billing.getInvoices,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
-    `commerce-invoices-${user?.id}`,
+    `commerce-invoices-${resource?.id}`,
   );
   const { data: invoices, total_count: totalCount } = data || { data: [], totalCount: 0 };
 

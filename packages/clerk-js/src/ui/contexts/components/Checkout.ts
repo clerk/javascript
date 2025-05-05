@@ -5,6 +5,12 @@ import { isAllowedRedirect } from '../../../utils';
 import type { CheckoutCtx } from '../../types';
 import { useOptions } from '../OptionsContext';
 
+function invariant(cond: any, msg: string): asserts cond {
+  if (!cond) {
+    throw Error(msg);
+  }
+}
+
 export const CheckoutContext = createContext<CheckoutCtx | null>(null);
 
 export const useCheckoutContext = () => {
@@ -29,9 +35,22 @@ export const useCheckoutContext = () => {
 
   const { componentName, ...ctx } = context;
 
+  const subscriber = () => {
+    if (ctx.subscriberType === 'org' && clerk.organization) {
+      invariant(clerk.organization, 'Clerk: subscriberType is "org" but no active organization was found');
+
+      return clerk.organization;
+    }
+
+    invariant(clerk.user, 'Clerk: no active user found');
+
+    return clerk.user;
+  };
+
   return {
     ...ctx,
     componentName,
     newSubscriptionRedirectUrl,
+    subscriber,
   };
 };

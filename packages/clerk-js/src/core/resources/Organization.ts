@@ -35,6 +35,7 @@ import { BaseResource, CommerceSubscription, OrganizationInvitation, Organizatio
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
@@ -280,6 +281,27 @@ export class Organization extends BaseResource implements OrganizationResource {
       body,
       headers,
     }).then(res => new Organization(res?.response as OrganizationJSON));
+  };
+
+  initializePaymentSource: typeof initializePaymentSource = params => {
+    return initializePaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  addPaymentSource: typeof addPaymentSource = params => {
+    return addPaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  getPaymentSources: typeof getPaymentSources = params => {
+    return getPaymentSources({
+      ...params,
+      orgId: this.id,
+    });
   };
 
   protected fromJSON(data: OrganizationJSON | OrganizationJSONSnapshot | null): this {

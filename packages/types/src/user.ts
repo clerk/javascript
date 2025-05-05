@@ -1,4 +1,5 @@
 import type { BackupCodeResource } from './backupCode';
+import { CommercePaymentSourceMethods } from './commerce';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
@@ -60,7 +61,7 @@ declare global {
  *
  * The ClerkJS SDK provides some helper [methods](#methods) on the `User` object to help retrieve and update user information and authentication status.
  */
-export interface UserResource extends ClerkResource {
+export interface UserResource extends ClerkResource, CommercePaymentSourceMethods {
   id: string;
   externalId: string | null;
   primaryEmailAddressId: string | null;
