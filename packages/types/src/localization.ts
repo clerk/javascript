@@ -114,6 +114,7 @@ type _LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
@@ -690,7 +691,6 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
-        headerTitle__paymentMethods: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;

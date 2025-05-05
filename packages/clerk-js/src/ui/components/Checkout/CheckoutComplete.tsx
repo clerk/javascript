@@ -1,10 +1,13 @@
 import type { __experimental_CommerceCheckoutResource } from '@clerk/types';
 
+import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
+
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export const CheckoutComplete = ({
@@ -14,9 +17,14 @@ export const CheckoutComplete = ({
   checkout: __experimental_CommerceCheckoutResource;
   isMotionSafe: boolean;
 }) => {
+  const router = useRouter();
   const { setIsOpen } = useDrawerContext();
+  const { checkoutContinueUrl } = useCheckoutContext();
 
   const handleClose = () => {
+    if (checkoutContinueUrl) {
+      void router.navigate(checkoutContinueUrl);
+    }
     if (setIsOpen) {
       setIsOpen(false);
     }
@@ -147,7 +155,7 @@ export const CheckoutComplete = ({
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.title__subscriptionSuccessful')
               }
@@ -201,7 +209,7 @@ export const CheckoutComplete = ({
                 }),
               })}
               localizationKey={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('__experimental_commerce.checkout.description__subscriptionSuccessful')
               }
@@ -240,14 +248,14 @@ export const CheckoutComplete = ({
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('__experimental_commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('__experimental_commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout.subscription?.status === 'active'
+                checkout.totals.totalDueNow.amount > 0
                   ? checkout.paymentSource
                     ? `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'

@@ -42,6 +42,7 @@ export function MountedCheckoutDrawer({
           planPeriod={checkoutDrawer.props.planPeriod}
           subscriberType={checkoutDrawer.props.subscriberType}
           onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
+          portalRoot={checkoutDrawer.props.portalRoot}
         />
       )}
     </LazyDrawerRenderer>
