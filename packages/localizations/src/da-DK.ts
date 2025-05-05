@@ -154,7 +154,7 @@ export const daDK: LocalizationResource = {
     titleWithoutPersonal: 'Vælg en organisation',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

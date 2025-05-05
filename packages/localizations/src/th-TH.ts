@@ -153,7 +153,7 @@ export const thTH: LocalizationResource = {
     titleWithoutPersonal: 'เลือกองค์กร',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

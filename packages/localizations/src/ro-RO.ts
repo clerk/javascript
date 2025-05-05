@@ -155,7 +155,7 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Selectați o organizație',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

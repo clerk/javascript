@@ -86,9 +86,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       <Alert
                         variant='info'
                         colorScheme='info'
-                        title={localizationKeys(
-                          'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
-                        )}
+                        title={localizationKeys('organizationProfile.billingPage.alerts.noPemissionsToManageBilling')}
                       />
                     </Protect>
                     <SubscriptionsList />
@@ -111,9 +109,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       <Alert
                         variant='info'
                         colorScheme='info'
-                        title={localizationKeys(
-                          'organizationProfile.__experimental_billingPage.alerts.noPemissionsToManageBilling',
-                        )}
+                        title={localizationKeys('organizationProfile.billingPage.alerts.noPemissionsToManageBilling')}
                       />
                     </Protect>
                     <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>

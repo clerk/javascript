@@ -155,7 +155,7 @@ export const itIT: LocalizationResource = {
     titleWithoutPersonal: 'Scegli un’organizzazione',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

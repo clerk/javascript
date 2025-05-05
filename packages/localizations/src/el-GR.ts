@@ -154,7 +154,7 @@ export const elGR: LocalizationResource = {
     titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

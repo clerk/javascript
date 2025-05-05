@@ -154,7 +154,7 @@ export const jaJP: LocalizationResource = {
     titleWithoutPersonal: '組織を選択',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

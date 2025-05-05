@@ -153,7 +153,7 @@ export const bgBG: LocalizationResource = {
     titleWithoutPersonal: 'Изберете организация',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

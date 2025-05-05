@@ -157,7 +157,7 @@ export const ruRU: LocalizationResource = {
     titleWithoutPersonal: 'Выбрать организацию',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

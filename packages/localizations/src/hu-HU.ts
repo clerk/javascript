@@ -153,7 +153,7 @@ export const huHU: LocalizationResource = {
     titleWithoutPersonal: 'Válassz egy szervezetet',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

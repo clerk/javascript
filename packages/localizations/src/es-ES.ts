@@ -154,7 +154,7 @@ export const esES: LocalizationResource = {
     titleWithoutPersonal: 'Escoja una organización',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

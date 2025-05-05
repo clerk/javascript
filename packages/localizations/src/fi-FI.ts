@@ -154,7 +154,7 @@ export const fiFI: LocalizationResource = {
     titleWithoutPersonal: 'Valitse organisaatio',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

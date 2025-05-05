@@ -154,7 +154,7 @@ export const isIS: LocalizationResource = {
     titleWithoutPersonal: 'Veldu samtök',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

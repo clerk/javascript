@@ -154,7 +154,7 @@ export const mnMN: LocalizationResource = {
     titleWithoutPersonal: 'Байгууллага сонгоно уу',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

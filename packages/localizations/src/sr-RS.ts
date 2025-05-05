@@ -153,7 +153,7 @@ export const srRS: LocalizationResource = {
     titleWithoutPersonal: 'Izaberi organizaciju',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

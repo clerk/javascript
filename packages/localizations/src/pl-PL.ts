@@ -154,7 +154,7 @@ export const plPL: LocalizationResource = {
     titleWithoutPersonal: 'Wybierz organizację',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

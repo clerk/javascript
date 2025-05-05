@@ -154,7 +154,7 @@ export const enGB: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organisation',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

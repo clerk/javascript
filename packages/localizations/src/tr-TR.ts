@@ -153,7 +153,7 @@ export const trTR: LocalizationResource = {
     titleWithoutPersonal: 'Bir organizasyon seçin',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

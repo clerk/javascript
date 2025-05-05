@@ -154,7 +154,7 @@ export const arSA: LocalizationResource = {
     titleWithoutPersonal: 'أختر منظمة',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

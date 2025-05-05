@@ -154,7 +154,7 @@ export const nbNO: LocalizationResource = {
     titleWithoutPersonal: 'Velg en organiasjon',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

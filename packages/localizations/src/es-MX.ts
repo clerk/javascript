@@ -155,7 +155,7 @@ export const esMX: LocalizationResource = {
     titleWithoutPersonal: 'Elige una organización',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

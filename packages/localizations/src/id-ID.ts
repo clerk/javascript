@@ -154,7 +154,7 @@ export const idID: LocalizationResource = {
     titleWithoutPersonal: 'Pilih organisasi',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

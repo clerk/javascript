@@ -155,7 +155,7 @@ export const beBY: LocalizationResource = {
     titleWithoutPersonal: 'Выберыце арганізацыю',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

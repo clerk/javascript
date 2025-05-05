@@ -152,7 +152,7 @@ export const zhTW: LocalizationResource = {
     titleWithoutPersonal: '選擇一個組織',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

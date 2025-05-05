@@ -153,7 +153,7 @@ export const caES: LocalizationResource = {
     titleWithoutPersonal: 'Trieu una organització',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },

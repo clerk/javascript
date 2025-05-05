@@ -879,7 +879,7 @@ type _LocalizationResource = {
         };
       };
     };
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: LocalizationValue;
       };

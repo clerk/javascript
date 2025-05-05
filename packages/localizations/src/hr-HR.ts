@@ -153,7 +153,7 @@ export const hrHR: LocalizationResource = {
     titleWithoutPersonal: 'Odaberite organizaciju',
   },
   organizationProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       alerts: {
         noPemissionsToManageBilling: undefined,
       },
