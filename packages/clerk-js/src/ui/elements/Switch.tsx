@@ -1,4 +1,4 @@
-import React, { forwardRef, useId, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text } from '../customizables';
@@ -18,7 +18,6 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
     const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
     const isControlled = controlledChecked !== undefined;
     const checked = isControlled ? controlledChecked : internalChecked;
-    const labelId = useId();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (disabled) return;
@@ -71,7 +70,6 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             outline: 'none',
             boxSizing: 'border-box',
             boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.06) inset',
-            ...common.focusRing(t),
           })}
         >
           <Flex
