@@ -16,7 +16,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
-import { Box, descriptors, Span } from '../customizables';
+import { Box, descriptors, type LocalizationKey, Span, Text } from '../customizables';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -163,10 +163,12 @@ export const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTML
   );
 });
 
-export const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function TooltipContent(
-  { style, ...props },
-  propRef,
-) {
+export const TooltipContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLProps<HTMLDivElement> & {
+    text: string | LocalizationKey;
+  }
+>(function TooltipContent({ style, text, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
@@ -187,16 +189,19 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, React.HTMLProps<H
           elementDescriptor={descriptors.tooltipContent}
           style={context.transitionStyles}
           sx={t => ({
-            paddingBlock: t.space.$0x5,
+            paddingBlock: t.space.$1,
             paddingInline: t.space.$1x5,
             borderRadius: t.radii.$md,
-            fontSize: t.fontSizes.$sm,
             backgroundColor: t.colors.$primary500,
-            color: t.colors.$colorTextOnPrimaryBackground,
             maxWidth: t.sizes.$60,
           })}
         >
-          {props.children}
+          <Text
+            elementDescriptor={descriptors.tooltipText}
+            localizationKey={text}
+            colorScheme='onPrimaryBg'
+            variant='body'
+          />
         </Box>
       </Box>
     </FloatingPortal>

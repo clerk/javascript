@@ -543,6 +543,7 @@ export type ElementsConfig = {
 
   tooltip: WithOptions;
   tooltipContent: WithOptions;
+  tooltipText: WithOptions;
 
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;

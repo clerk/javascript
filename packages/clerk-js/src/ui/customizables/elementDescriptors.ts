@@ -424,6 +424,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'tooltip',
   'tooltipContent',
+  'tooltipText',
 
   'badge',
   'notificationBadge',
