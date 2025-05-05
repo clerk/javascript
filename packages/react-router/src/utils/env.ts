@@ -25,6 +25,6 @@ export const getPublicEnvVariables = (context: AppLoadContext | undefined) => {
     signUpFallbackRedirectUrl: getValue('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL'),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
-    checkoutContinueUrl: getValue('CLERK_CHECKOUT_CONTINUE_URL'),
+    newSubscriptionRedirectUrl: getValue('CLERK_CHECKOUT_CONTINUE_URL'),
   };
 };

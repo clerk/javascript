@@ -32,8 +32,8 @@ import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
-  CheckoutContinueUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -567,9 +567,9 @@ export interface Clerk {
   buildAfterSignOutUrl(): string;
 
   /**
-   * Returns the configured checkoutContinueUrl of the instance.
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
    */
-  buildCheckoutContinueUrl(): string;
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -820,7 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  CheckoutContinueUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1570,7 +1570,7 @@ export type WaitlistModalProps = WaitlistProps;
 type PricingTableDefaultProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-  checkoutContinueUrl?: string;
+  newSubscriptionRedirectUrl?: string;
 };
 
 type PricingTableBaseProps = {
@@ -1595,7 +1595,7 @@ export type __experimental_CheckoutProps = {
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
    * @default undefined
    */
-  checkoutContinueUrl?: string;
+  newSubscriptionRedirectUrl?: string;
 };
 
 export type __experimental_PlanDetailsProps = {

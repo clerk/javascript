@@ -5,9 +5,9 @@ import type {
   __experimental_CommerceSubscriptionResource,
   __experimental_PlanDetailsProps,
   __internal_UserVerificationProps,
-  CheckoutContinueUrl,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -119,7 +119,7 @@ export type PricingTableCtx = PricingTableProps & {
 
 export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
   componentName: 'Checkout';
-} & CheckoutContinueUrl;
+} & NewSubscriptionRedirectUrl;
 
 export type __experimental_PaymentSourcesCtx = {
   componentName: 'PaymentSources';
