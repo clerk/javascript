@@ -34,7 +34,7 @@ export {
   UserProfile,
   GoogleOneTap,
   Waitlist,
-  __experimental_PricingTable,
+  PricingTable,
 } from './client-boundary/uiComponents';
 
 /**

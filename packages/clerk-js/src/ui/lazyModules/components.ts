@@ -93,7 +93,7 @@ export const KeylessPrompt = lazy(() =>
 );
 
 export const PricingTable = lazy(() =>
-  componentImportPaths.PricingTable().then(module => ({ default: module.__experimental_PricingTable })),
+  componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
 export const Checkout = lazy(() =>

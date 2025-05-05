@@ -6,7 +6,6 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PlanDetailsProps,
-  __experimental_PricingTableProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -32,6 +31,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PricingTableProps,
   RedirectOptions,
   SetActiveParams,
   SignInProps,
@@ -130,7 +130,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps | undefined>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
-  private premountPricingTableNodes = new Map<HTMLDivElement, __experimental_PricingTableProps | undefined>();
+  private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -323,12 +323,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildCheckoutContinueUrl = (): string | void => {
-    const callback = () => this.clerkjs?.buildCheckoutContinueUrl() || '';
+  buildNewSubscriptionRedirectUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildNewSubscriptionRedirectUrl() || '';
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {
-      this.premountMethodCalls.set('buildCheckoutContinueUrl', callback);
+      this.premountMethodCalls.set('buildNewSubscriptionRedirectUrl', callback);
     }
   };
 
@@ -1034,7 +1034,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
+  __experimental_mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__experimental_mountPricingTable(node, props);
     } else {

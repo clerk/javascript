@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
-import type { __experimental_PricingTableProps } from '@clerk/types';
+import type { PricingTableProps } from '@clerk/types';
 import { useClerk } from '../../composables';
 
 const clerk = useClerk();
-const props = defineProps<__experimental_PricingTableProps>();
+const props = defineProps<PricingTableProps>();
 </script>
 
 <template>

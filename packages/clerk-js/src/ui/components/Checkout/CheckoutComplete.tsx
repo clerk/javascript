@@ -19,11 +19,11 @@ export const CheckoutComplete = ({
 }) => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
-  const { checkoutContinueUrl } = useCheckoutContext();
+  const { newSubscriptionRedirectUrl } = useCheckoutContext();
 
   const handleClose = () => {
-    if (checkoutContinueUrl) {
-      void router.navigate(checkoutContinueUrl);
+    if (newSubscriptionRedirectUrl) {
+      void router.navigate(newSubscriptionRedirectUrl);
     }
     if (setIsOpen) {
       setIsOpen(false);

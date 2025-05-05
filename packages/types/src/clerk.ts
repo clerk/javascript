@@ -32,8 +32,8 @@ import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
-  CheckoutContinueUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -448,7 +448,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -567,9 +567,9 @@ export interface Clerk {
   buildAfterSignOutUrl(): string;
 
   /**
-   * Returns the configured checkoutContinueUrl of the instance.
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
    */
-  buildCheckoutContinueUrl(): string;
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -820,7 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  CheckoutContinueUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1567,13 +1567,13 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-type __experimental_PricingTableDefaultProps = {
+type PricingTableDefaultProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-  checkoutContinueUrl?: string;
+  newSubscriptionRedirectUrl?: string;
 };
 
-type __experimental_PricingTableBaseProps = {
+type PricingTableBaseProps = {
   forOrganizations?: boolean;
   appearance?: PricingTableTheme;
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
@@ -1581,8 +1581,7 @@ type __experimental_PricingTableBaseProps = {
 
 type PortalRoot = HTMLElement | null | undefined;
 
-export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  __experimental_PricingTableDefaultProps;
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
@@ -1596,7 +1595,7 @@ export type __experimental_CheckoutProps = {
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
    * @default undefined
    */
-  checkoutContinueUrl?: string;
+  newSubscriptionRedirectUrl?: string;
 };
 
 export type __experimental_PlanDetailsProps = {
