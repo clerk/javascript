@@ -23,6 +23,7 @@ export const enUS: LocalizationResource = {
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
+    alwaysFree: 'Always free',
     cancelSubscription: 'Cancel subscription',
     checkout: {
       description__paymentSuccessful: 'Your new subscription is all set.',
