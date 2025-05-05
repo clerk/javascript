@@ -2,6 +2,7 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  ManageApiKeysTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
@@ -457,6 +458,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the PricingTable component from.
    */
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount a manage api keys component at the target element.
+   * @param targetNode Target to mount the ManageApiKeys component.
+   * @param props Configuration parameters.
+   */
+  mountManageApiKeys: (targetNode: HTMLDivElement, props?: ManageApiKeysProps) => void;
+
+  /**
+   * Unmount a manage api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ManageApiKeys component from.
+   */
+  unmountManageApiKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1620,6 +1636,11 @@ type PricingTableBaseProps = {
 type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type ManageApiKeysProps = {
+  [key: string]: unknown;
+  appearance?: ManageApiKeysTheme;
+};
 
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
