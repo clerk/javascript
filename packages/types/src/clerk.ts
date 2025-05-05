@@ -30,9 +30,9 @@ import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
-  __experimental_CheckoutContinueUrl,
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
+  CheckoutContinueUrl,
   LegacyRedirectProps,
   RedirectOptions,
   RedirectUrlProp,
@@ -569,7 +569,7 @@ export interface Clerk {
   /**
    * Returns the configured checkoutContinueUrl of the instance.
    */
-  __experimental_buildCheckoutContinueUrl(): string;
+  buildCheckoutContinueUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -820,7 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  __experimental_CheckoutContinueUrl &
+  CheckoutContinueUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1570,7 +1570,7 @@ export type WaitlistModalProps = WaitlistProps;
 type __experimental_PricingTableDefaultProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
-  __experimental_checkoutContinueUrl?: string;
+  checkoutContinueUrl?: string;
 };
 
 type __experimental_PricingTableBaseProps = {
@@ -1596,7 +1596,7 @@ export type __experimental_CheckoutProps = {
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
    * @default undefined
    */
-  __experimental_checkoutContinueUrl?: string;
+  checkoutContinueUrl?: string;
 };
 
 export type __experimental_PlanDetailsProps = {

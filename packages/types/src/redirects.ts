@@ -122,9 +122,9 @@ export type SignInForceRedirectUrl = {
   signInForceRedirectUrl?: string | null;
 };
 
-export type __experimental_CheckoutContinueUrl = {
+export type CheckoutContinueUrl = {
   /**
    * The URL to navigate to after the user completes the checkout and clicks the "Continue" button.
    */
-  __experimental_checkoutContinueUrl?: string | null;
+  checkoutContinueUrl?: string | null;
 };
