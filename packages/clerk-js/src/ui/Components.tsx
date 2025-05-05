@@ -1,15 +1,15 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   Appearance,
-  CheckoutProps,
   Clerk,
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
   GoogleOneTapProps,
   OrganizationProfileProps,
-  PlanDetailsProps,
   SignInProps,
   SignUpProps,
   UserProfileProps,
@@ -108,7 +108,11 @@ export type ComponentControls = {
   ) => void;
   openDrawer: <T extends 'checkout' | 'planDetails'>(
     drawer: T,
-    props: T extends 'checkout' ? CheckoutProps : T extends 'planDetails' ? PlanDetailsProps : never,
+    props: T extends 'checkout'
+      ? __internal_CheckoutProps
+      : T extends 'planDetails'
+        ? __internal_PlanDetailsProps
+        : never,
   ) => void;
   closeDrawer: (
     drawer: 'checkout' | 'planDetails',
@@ -150,11 +154,11 @@ interface ComponentsState {
   waitlistModal: null | WaitlistProps;
   checkoutDrawer: {
     open: false;
-    props: null | CheckoutProps;
+    props: null | __internal_CheckoutProps;
   };
   planDetailsDrawer: {
     open: false;
-    props: null | PlanDetailsProps;
+    props: null | __internal_PlanDetailsProps;
   };
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;

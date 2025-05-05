@@ -1,11 +1,11 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
+  __internal_PlanDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
   CommercePlanResource,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
-  PlanDetailsProps,
 } from '@clerk/types';
 import * as React from 'react';
 import { useState } from 'react';
@@ -28,7 +28,7 @@ import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../..
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export const PlanDetails = (props: PlanDetailsProps) => {
+export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
@@ -43,7 +43,7 @@ const PlanDetailsInternal = ({
   onSubscriptionCancel,
   portalRoot,
   planPeriod: _planPeriod = 'month',
-}: PlanDetailsProps) => {
+}: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -91,11 +91,11 @@ const PlanDetailsInternal = ({
       });
   };
 
-  type OpenCheckoutProps = {
+  type Open__internal_CheckoutProps = {
     planPeriod?: CommerceSubscriptionPlanPeriod;
   };
 
-  const openCheckout = (props?: OpenCheckoutProps) => {
+  const openCheckout = (props?: Open__internal_CheckoutProps) => {
     handleClose();
 
     // if the plan doesn't support annual, use monthly
