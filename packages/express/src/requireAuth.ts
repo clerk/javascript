@@ -43,7 +43,7 @@ export const requireAuth = (options: ClerkMiddlewareOptions = {}): RequestHandle
 
       const signInUrl = options.signInUrl || process.env.CLERK_SIGN_IN_URL || '/';
 
-      if (!(request as ExpressRequestWithAuth).auth?.userId) {
+      if (!(request as ExpressRequestWithAuth).auth()?.userId) {
         return response.redirect(signInUrl);
       }
 
