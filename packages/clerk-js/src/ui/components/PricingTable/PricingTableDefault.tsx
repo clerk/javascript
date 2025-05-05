@@ -227,7 +227,7 @@ function Card(props: CardProps) {
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                localizationKey='Starts on May 23, 2025'
+                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
                 colorScheme='secondary'
                 sx={t => ({
                   paddingBlock: t.space.$1x5,
