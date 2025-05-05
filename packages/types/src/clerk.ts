@@ -448,7 +448,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
