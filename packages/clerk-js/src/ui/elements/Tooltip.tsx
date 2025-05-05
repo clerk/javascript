@@ -111,14 +111,14 @@ export const useTooltipContext = () => {
   return context;
 };
 
-export function Tooltip({ children, ...options }: { children: React.ReactNode } & TooltipOptions) {
+function Root({ children, ...options }: { children: React.ReactNode } & TooltipOptions) {
   // This can accept any props as options, e.g. `placement`,
   // or other positioning options.
   const tooltip = useTooltip(options);
   return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
 }
 
-export const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>>(function TooltipTrigger(
+const Trigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>>(function TooltipTrigger(
   { children, ...props },
   propRef,
 ) {
@@ -163,7 +163,7 @@ export const TooltipTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTML
   );
 });
 
-export const TooltipContent = React.forwardRef<
+const Content = React.forwardRef<
   HTMLDivElement,
   React.HTMLProps<HTMLDivElement> & {
     text: string | LocalizationKey;
@@ -207,3 +207,9 @@ export const TooltipContent = React.forwardRef<
     </FloatingPortal>
   );
 });
+
+export const Tooltip = {
+  Root,
+  Trigger,
+  Content,
+};
