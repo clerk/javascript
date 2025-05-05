@@ -191,7 +191,7 @@ describe('SignUpContinue', () => {
         data: [
           {
             code: 'form_identifier_exists',
-            long_message: 'some server error',
+            long_message: 'This username is taken. Please try another.',
             message: 'some server error',
             meta: { param_name: 'username' },
           },
