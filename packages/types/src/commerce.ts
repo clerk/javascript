@@ -148,9 +148,7 @@ export interface __experimental_CommerceCheckoutTotals {
   taxTotal: __experimental_CommerceMoney;
   totalDueNow: __experimental_CommerceMoney;
   proration?: {
-    days: number;
-    ratePerDay: __experimental_CommerceMoney;
-    totalProration: __experimental_CommerceMoney;
+    credit: __experimental_CommerceMoney;
   };
 }
 
@@ -170,6 +168,10 @@ export type __experimental_ConfirmCheckoutParams = WithOptionalOrgType<
   | {
       paymentToken?: string;
       gateway?: __experimental_PaymentGateway;
+    }
+  | {
+      gateway?: __experimental_PaymentGateway;
+      useTestCard?: boolean;
     }
 >;
 export interface __experimental_CommerceCheckoutResource extends ClerkResource {

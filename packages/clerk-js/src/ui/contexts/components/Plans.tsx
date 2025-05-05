@@ -8,11 +8,11 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID, USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import type { __experimental_PlansCtx } from '../../types';
+import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
 const PlansContext = createContext<__experimental_PlansCtx | null>(null);
@@ -32,7 +32,7 @@ export const useSubscriptions = (subscriberType?: __experimental_CommerceSubscri
 export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { __experimental_commerce } = useClerk();
   const { organization } = useOrganization();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
   const {
     data: subscriptions,
@@ -68,11 +68,18 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     revalidateInvoices();
   }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
 
+  const isLoaded = useMemo(() => {
+    if (isSignedIn) {
+      return isLoadingSubscriptions === false && isLoadingPlans === false;
+    }
+    return isLoadingPlans === false;
+  }, [isLoadingPlans, isLoadingSubscriptions, isSignedIn]);
+
   return (
     <PlansContext.Provider
       value={{
         componentName: 'Plans',
-        plans: plans || [],
+        plans: isLoaded ? (plans ?? []) : [],
         subscriptions: subscriptions?.data || [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
@@ -88,6 +95,7 @@ type HandleSelectPlanProps = {
   planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
+  event?: React.MouseEvent<HTMLElement>;
 };
 
 export const usePlansContext = () => {
@@ -110,8 +118,9 @@ export const usePlansContext = () => {
   );
 
   // should the default plan be shown as active
-  const isDefaultPlanImplicitlyActive = useMemo(() => {
-    return ctx.subscriptions.length === 0;
+  const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
+    // are there no subscriptions or are all subscriptions canceled
+    return ctx.subscriptions.length === 0 || !ctx.subscriptions.some(subscription => !subscription.canceledAt);
   }, [ctx.subscriptions]);
 
   const canManageSubscription = useCallback(
@@ -150,7 +159,7 @@ export const usePlansContext = () => {
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.length > 0
             ? localizationKeys('__experimental_commerce.switchPlan')
-            : localizationKeys('__experimental_commerce.getStarted'),
+            : localizationKeys('__experimental_commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
       };
@@ -170,8 +179,10 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted' }: HandleSelectPlanProps) => {
+    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
+
+      const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
@@ -181,12 +192,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       } else {
         // if the plan doesn't support annual, use monthly
@@ -203,12 +209,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
-          portalId:
-            mode === 'modal'
-              ? subscriberType === 'user'
-                ? USER_PROFILE_CARD_SCROLLBOX_ID
-                : ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID
-              : undefined,
+          portalRoot,
         });
       }
     },
@@ -223,7 +224,7 @@ export const usePlansContext = () => {
     ...ctx,
     componentName,
     activeOrUpcomingSubscription,
-    isDefaultPlanImplicitlyActive,
+    isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,
     canManageSubscription,

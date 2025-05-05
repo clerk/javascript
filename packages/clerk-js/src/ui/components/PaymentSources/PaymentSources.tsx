@@ -111,7 +111,12 @@ const PaymentSources = () => {
       title={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.title')}
       centered={false}
       id='profile'
-      sx={{ paddingTop: 0, borderTop: 'none', flex: 1 }}
+      sx={t => ({
+        flex: 1,
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
+      })}
     >
       <Action.Root>
         <ProfileSection.ItemList id='paymentSources'>

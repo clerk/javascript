@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
   __experimental_commerce: {
+    availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
     checkout: {
@@ -33,6 +34,7 @@ export const srRS: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,15 +42,20 @@ export const srRS: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
   backButton: 'Nazad',
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Podrazumevano',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Drugi uređaj koji se predstavlja',
   badge__primary: 'Primarni',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Zahteva akciju',
   badge__startsAt: undefined,
   badge__thisDevice: 'Ovaj uređaj',
@@ -699,6 +706,7 @@ export const srRS: LocalizationResource = {
         cancelButton: undefined,
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
         removeResource: {
           messageLine1: undefined,
           messageLine2: undefined,
@@ -709,7 +717,6 @@ export const srRS: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

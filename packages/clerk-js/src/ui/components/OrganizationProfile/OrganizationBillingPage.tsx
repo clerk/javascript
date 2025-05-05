@@ -1,11 +1,11 @@
 import {
-  __experimental_PricingTableContext,
   InvoicesContextProvider,
   PlansContextProvider,
+  PricingTableContext,
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
-import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -21,7 +21,7 @@ import { useTabState } from '../../hooks/useTabState';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
-import { __experimental_PricingTable } from '../PricingTable';
+import { PricingTable } from '../PricingTable';
 import { SubscriptionsList } from '../Subscriptions';
 
 const orgTabMap = {
@@ -73,41 +73,36 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
             <Tab
               localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
             />
-            <Tab
-              localizationKey={localizationKeys(
-                'userProfile.__experimental_billingPage.start.headerTitle__paymentMethods',
-              )}
-            />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
               {subscriptions.data.length > 0 ? (
-                <>
+                <Flex
+                  sx={{ width: '100%', flexDirection: 'column' }}
+                  gap={4}
+                >
                   <SubscriptionsList />
                   <Button
                     localizationKey='View all plans'
                     hasArrow
                     variant='ghost'
                     onClick={() => navigate('plans')}
-                    sx={t => ({
+                    sx={{
                       width: 'fit-content',
-                      marginTop: t.space.$4,
-                    })}
+                    }}
                   />
-                </>
+                  <__experimental_PaymentSources />
+                </Flex>
               ) : (
-                <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <__experimental_PricingTable />
-                </__experimental_PricingTableContext.Provider>
+                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                  <PricingTable />
+                </PricingTableContext.Provider>
               )}
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <InvoicesContextProvider>
                 <InvoicesList />
               </InvoicesContextProvider>
-            </TabPanel>
-            <TabPanel sx={{ width: '100%' }}>
-              <__experimental_PaymentSources />
             </TabPanel>
           </TabPanels>
         </Tabs>

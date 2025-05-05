@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
   __experimental_commerce: {
+    availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
     checkout: {
@@ -33,6 +34,7 @@ export const skSK: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,15 +42,20 @@ export const skSK: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
   backButton: 'Späť',
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Predvolené',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
   badge__primary: 'Hlavný',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Vyžaduje akciu',
   badge__startsAt: undefined,
   badge__thisDevice: 'Toto zariadenie',
@@ -696,6 +703,7 @@ export const skSK: LocalizationResource = {
         cancelButton: undefined,
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
         removeResource: {
           messageLine1: undefined,
           messageLine2: undefined,
@@ -706,7 +714,6 @@ export const skSK: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

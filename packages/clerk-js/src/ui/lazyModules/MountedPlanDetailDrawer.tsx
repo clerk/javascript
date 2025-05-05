@@ -34,6 +34,7 @@ export function MountedPlanDetailDrawer({
       onOpenChange={onOpenChange}
       componentName={'PlanDetails'}
       portalId={planDetailsDrawer.props.portalId}
+      portalRoot={planDetailsDrawer.props.portalRoot as HTMLElement | null | undefined}
     >
       <PlanDetails
         {...planDetailsDrawer.props}

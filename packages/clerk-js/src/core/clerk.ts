@@ -18,7 +18,6 @@ import type {
   __experimental_CheckoutProps,
   __experimental_CommerceNamespace,
   __experimental_PlanDetailsProps,
-  __experimental_PricingTableProps,
   __internal_ComponentNavigationContext,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -51,6 +50,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PendingSessionResource,
+  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -175,6 +175,7 @@ const defaultOptions: ClerkOptions = {
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
   treatPendingAsSignedOut: true,
+  newSubscriptionRedirectUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -1005,7 +1006,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -1198,7 +1199,7 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     const session = await this.session?.reload();
     if (!session || !this.environment) {
       return;
@@ -1215,7 +1216,7 @@ export class Clerk implements ClerkInterface {
     }
 
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
     this.#setTransitiveState();
 
@@ -1375,6 +1376,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
+  public buildNewSubscriptionRedirectUrl(): string {
+    if (!this.#options.newSubscriptionRedirectUrl) {
+      return this.buildAfterSignInUrl();
+    }
+
+    return this.#options.newSubscriptionRedirectUrl;
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {

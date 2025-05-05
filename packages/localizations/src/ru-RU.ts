@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
   __experimental_commerce: {
+    availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
     checkout: {
@@ -33,6 +34,7 @@ export const ruRU: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,15 +42,20 @@ export const ruRU: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
   backButton: 'Назад',
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__primary: 'Основной',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Требуется действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Это устройство',
@@ -713,6 +720,7 @@ export const ruRU: LocalizationResource = {
         cancelButton: undefined,
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
         removeResource: {
           messageLine1: undefined,
           messageLine2: undefined,
@@ -723,7 +731,6 @@ export const ruRU: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

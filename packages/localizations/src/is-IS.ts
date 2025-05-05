@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
   __experimental_commerce: {
+    availableFeatures: undefined,
     billedAnnually: undefined,
     cancelSubscription: undefined,
     checkout: {
@@ -33,6 +34,7 @@ export const isIS: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,15 +42,20 @@ export const isIS: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
   backButton: 'Til baka',
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Krefst aðgerða',
   badge__startsAt: undefined,
   badge__thisDevice: 'Þetta tæki',
@@ -703,6 +710,7 @@ export const isIS: LocalizationResource = {
         cancelButton: undefined,
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
         removeResource: {
           messageLine1: undefined,
           messageLine2: undefined,
@@ -713,7 +721,6 @@ export const isIS: LocalizationResource = {
       },
       start: {
         headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

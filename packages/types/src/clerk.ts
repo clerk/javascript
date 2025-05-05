@@ -33,6 +33,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -447,7 +448,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -564,6 +565,11 @@ export interface Clerk {
    * Returns the configured afterSignOutUrl of the instance.
    */
   buildAfterSignOutUrl(): string;
+
+  /**
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   */
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -706,10 +712,10 @@ export interface Clerk {
   /**
    * Navigates to the next task or redirects to completion URL.
    * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
    * @experimental
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -814,6 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1560,19 +1567,21 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-type __experimental_PricingTableDefaultProps = {
+type PricingTableDefaultProps = {
   ctaPosition?: 'top' | 'bottom';
   collapseFeatures?: boolean;
+  newSubscriptionRedirectUrl?: string;
 };
 
-type __experimental_PricingTableBaseProps = {
+type PricingTableBaseProps = {
   forOrganizations?: boolean;
   appearance?: PricingTableTheme;
   checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
 };
 
-export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  __experimental_PricingTableDefaultProps;
+type PortalRoot = HTMLElement | null | undefined;
+
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type __experimental_CheckoutProps = {
   appearance?: CheckoutTheme;
@@ -1581,6 +1590,12 @@ export type __experimental_CheckoutProps = {
   subscriberType?: __experimental_CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
 };
 
 export type __experimental_PlanDetailsProps = {
@@ -1590,6 +1605,7 @@ export type __experimental_PlanDetailsProps = {
   planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
 export interface HandleEmailLinkVerificationParams {

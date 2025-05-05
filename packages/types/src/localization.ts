@@ -113,8 +113,12 @@ type _LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
+    alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
     viewFeatures: LocalizationValue;
@@ -690,7 +694,6 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
-        headerTitle__paymentMethods: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
@@ -707,6 +710,7 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+        payWithTestCardButton: LocalizationValue;
       };
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;
