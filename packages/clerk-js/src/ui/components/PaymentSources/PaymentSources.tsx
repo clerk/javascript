@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
+import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
 
@@ -16,12 +16,12 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
-    await __experimental_commerce.addPaymentSource({
+    await commerce.addPaymentSource({
       gateway: 'stripe',
       paymentToken: context.stripeSetupIntent?.payment_method as string,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
@@ -43,7 +43,7 @@ const RemoveScreen = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: __experimental_CommercePaymentSourceResource;
+  paymentSource: CommercePaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -69,22 +69,14 @@ const RemoveScreen = ({
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.removeResource.title')}
-      messageLine1={localizationKeys(
-        'userProfile.__experimental_billingPage.paymentSourcesSection.removeResource.messageLine1',
-        {
-          identifier: ref.current,
-        },
-      )}
-      messageLine2={localizationKeys(
-        'userProfile.__experimental_billingPage.paymentSourcesSection.removeResource.messageLine2',
-      )}
-      successMessage={localizationKeys(
-        'userProfile.__experimental_billingPage.paymentSourcesSection.removeResource.successMessage',
-        {
-          emailAddress: ref.current,
-        },
-      )}
+      title={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.messageLine1', {
+        identifier: ref.current,
+      })}
+      messageLine2={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.messageLine2')}
+      successMessage={localizationKeys('userProfile.billingPage.paymentSourcesSection.removeResource.successMessage', {
+        emailAddress: ref.current,
+      })}
       deleteResource={removePaymentSource}
       onSuccess={close}
       onReset={close}
@@ -93,13 +85,13 @@ const RemoveScreen = ({
 };
 
 const PaymentSources = () => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
 
   const { user } = useUser();
   const { data, revalidate } = useFetch(
-    __experimental_commerce?.getPaymentSources,
+    commerce?.getPaymentSources,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
     `commerce-payment-sources-${user?.id}`,
@@ -108,7 +100,7 @@ const PaymentSources = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.title')}
+      title={localizationKeys('userProfile.billingPage.paymentSourcesSection.title')}
       centered={false}
       id='profile'
       sx={t => ({
@@ -143,7 +135,7 @@ const PaymentSources = () => {
           <Action.Trigger value='add'>
             <ProfileSection.ArrowButton
               id='paymentSources'
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
+              localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')}
             />
           </Action.Trigger>
           <Action.Open value='add'>
@@ -157,13 +149,13 @@ const PaymentSources = () => {
   );
 };
 
-export const __experimental_PaymentSources = PaymentSources;
+export const PaymentSources = PaymentSources;
 
 const PaymentSourceMenu = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: __experimental_CommercePaymentSourceResource;
+  paymentSource: CommercePaymentSourceResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
@@ -173,7 +165,7 @@ const PaymentSourceMenu = ({
 
   const actions = [
     {
-      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__remove'),
+      label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
       isDisabled: paymentSource.isDefault,
@@ -182,7 +174,7 @@ const PaymentSourceMenu = ({
 
   if (!paymentSource.isDefault) {
     actions.unshift({
-      label: localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.actionLabel__default'),
+      label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__default'),
       isDestructive: false,
       onClick: () => {
         paymentSource

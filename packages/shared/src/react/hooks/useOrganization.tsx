@@ -1,7 +1,6 @@
 import type {
-  __experimental_CommerceSubscriptionResource,
-  __experimental_GetSubscriptionsParams,
   ClerkPaginatedResponse,
+  CommerceSubscriptionResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -34,7 +33,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/organizations/verified-domains#enrollment-mode).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
+   * </ul>.
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
@@ -43,7 +42,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`status`: A string that filters the membership requests by the provided status.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
+   * </ul>.
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
@@ -53,7 +52,7 @@ export type UseOrganizationParams = {
    *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/references/javascript/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
+   * </ul>.
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
@@ -62,7 +61,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`status`: A string that filters the invitations by the provided status.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
+   * </ul>.
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
@@ -71,9 +70,9 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`orgId`: A string that filters the subscriptions by the provided organization ID.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>
+   * </ul>.
    */
-  subscriptions?: true | PaginatedHookConfig<__experimental_GetSubscriptionsParams>;
+  subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };
 
 /**
@@ -112,7 +111,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       /**
        * Includes a paginated list of the organization's subscriptions.
        */
-      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: true;
@@ -122,7 +121,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
-      subscriptions: PaginatedResourcesWithDefault<__experimental_CommerceSubscriptionResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: boolean;
@@ -145,7 +144,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
         T['invitations'] extends { infinite: true } ? true : false
       > | null;
       subscriptions: PaginatedResources<
-        __experimental_CommerceSubscriptionResource,
+        CommerceSubscriptionResource,
         T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
@@ -461,13 +460,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   );
 
   const subscriptions = usePagesOrInfinite<
-    __experimental_GetSubscriptionsParams,
-    ClerkPaginatedResponse<__experimental_CommerceSubscriptionResource>
+    GetSubscriptionsParams,
+    ClerkPaginatedResponse<CommerceSubscriptionResource>
   >(
     {
       ...subscriptionsParams,
     },
-    organization?.__experimental_getSubscriptions,
+    organization?.getSubscriptions,
     {
       keepPreviousData: subscriptionsSafeValues.keepPreviousData,
       infinite: subscriptionsSafeValues.infinite,

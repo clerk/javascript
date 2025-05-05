@@ -1,34 +1,29 @@
 import type {
-  __experimental_CommerceInitializedPaymentSourceJSON,
-  __experimental_CommerceInitializedPaymentSourceResource,
-  __experimental_CommercePaymentSourceJSON,
-  __experimental_CommercePaymentSourceResource,
-  __experimental_CommercePaymentSourceStatus,
-  __experimental_MakeDefaultPaymentSourceParams,
-  __experimental_RemovePaymentSourceParams,
+  CommerceInitializedPaymentSourceJSON,
+  CommerceInitializedPaymentSourceResource,
+  CommercePaymentSourceJSON,
+  CommercePaymentSourceResource,
+  CommercePaymentSourceStatus,
   DeletedObjectJSON,
 } from '@clerk/types';
 
 import { BaseResource, DeletedObject } from './internal';
 
-export class __experimental_CommercePaymentSource
-  extends BaseResource
-  implements __experimental_CommercePaymentSourceResource
-{
+export class CommercePaymentSource extends BaseResource implements CommercePaymentSourceResource {
   id!: string;
   last4!: string;
   paymentMethod!: string;
   cardType!: string;
   isDefault!: boolean;
-  status!: __experimental_CommercePaymentSourceStatus;
+  status!: CommercePaymentSourceStatus;
   walletType: string | undefined;
 
-  constructor(data: __experimental_CommercePaymentSourceJSON) {
+  constructor(data: CommercePaymentSourceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommercePaymentSourceJSON | null): this {
+  protected fromJSON(data: CommercePaymentSourceJSON | null): this {
     if (!data) {
       return this;
     }
@@ -44,7 +39,7 @@ export class __experimental_CommercePaymentSource
     return this;
   }
 
-  public async remove(params?: __experimental_RemovePaymentSourceParams) {
+  public async remove(params?: RemovePaymentSourceParams) {
     const { orgId } = params ?? {};
     const json = (
       await BaseResource._fetch({
@@ -58,7 +53,7 @@ export class __experimental_CommercePaymentSource
     return new DeletedObject(json);
   }
 
-  public async makeDefault(params?: __experimental_MakeDefaultPaymentSourceParams) {
+  public async makeDefault(params?: MakeDefaultPaymentSourceParams) {
     const { orgId } = params ?? {};
     await BaseResource._fetch({
       path: orgId
@@ -72,19 +67,16 @@ export class __experimental_CommercePaymentSource
   }
 }
 
-export class __experimental_CommerceInitializedPaymentSource
-  extends BaseResource
-  implements __experimental_CommerceInitializedPaymentSourceResource
-{
+export class CommerceInitializedPaymentSource extends BaseResource implements CommerceInitializedPaymentSourceResource {
   externalClientSecret!: string;
   externalGatewayId!: string;
 
-  constructor(data: __experimental_CommerceInitializedPaymentSourceJSON) {
+  constructor(data: CommerceInitializedPaymentSourceJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceInitializedPaymentSourceJSON | null): this {
+  protected fromJSON(data: CommerceInitializedPaymentSourceJSON | null): this {
     if (!data) {
       return this;
     }

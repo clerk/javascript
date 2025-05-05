@@ -16,10 +16,10 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  __experimental_CommerceNamespace,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionPlanPeriod,
+  CommerceNamespace,
+  CommercePlanResource,
+  CommerceSubscriberType,
+  CommerceSubscriptionPlanPeriod,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -182,7 +182,7 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /** Commerce Object */
-  __experimental_commerce: __experimental_CommerceNamespace;
+  commerce: CommerceNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -211,7 +211,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+  __internal_openCheckout: (props?: CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
@@ -222,7 +222,7 @@ export interface Clerk {
    * Opens the Clerk PlanDetails drawer component in a drawer.
    * @param props Optional subscription details drawer configuration parameters.
    */
-  __internal_openPlanDetails: (props?: __experimental_PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props?: PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
@@ -1576,18 +1576,18 @@ type PricingTableDefaultProps = {
 type PricingTableBaseProps = {
   forOrganizations?: boolean;
   appearance?: PricingTableTheme;
-  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
+  checkoutProps?: Pick<CheckoutProps, 'appearance'>;
 };
 
 type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
-export type __experimental_CheckoutProps = {
+export type CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  subscriberType?: __experimental_CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -1598,11 +1598,11 @@ export type __experimental_CheckoutProps = {
   newSubscriptionRedirectUrl?: string;
 };
 
-export type __experimental_PlanDetailsProps = {
+export type PlanDetailsProps = {
   appearance?: PlanDetailTheme;
-  plan?: __experimental_CommercePlanResource;
-  subscriberType?: __experimental_CommerceSubscriberType;
-  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
+  plan?: CommercePlanResource;
+  subscriberType?: CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;

@@ -1,14 +1,13 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PlanDetailsProps,
   ClerkAPIError,
   ClerkRuntimeError,
+  CommercePlanResource,
+  CommerceSubscriptionPlanPeriod,
+  CommerceSubscriptionResource,
 } from '@clerk/types';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import {
@@ -28,7 +27,7 @@ import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../..
 import { InformationCircle } from '../../icons';
 import { formatDate, handleError } from '../../utils';
 
-export const PlanDetails = (props: __experimental_PlanDetailsProps) => {
+export const PlanDetails = (props: PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
       <PlansContextProvider>
@@ -43,13 +42,13 @@ const PlanDetailsInternal = ({
   onSubscriptionCancel,
   portalRoot,
   planPeriod: _planPeriod = 'month',
-}: __experimental_PlanDetailsProps) => {
+}: PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>(_planPeriod);
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(_planPeriod);
 
   const { setIsOpen } = useDrawerContext();
   const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
@@ -92,7 +91,7 @@ const PlanDetailsInternal = ({
   };
 
   type OpenCheckoutProps = {
-    planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
+    planPeriod?: CommerceSubscriptionPlanPeriod;
   };
 
   const openCheckout = (props?: OpenCheckoutProps) => {
@@ -142,7 +141,7 @@ const PlanDetailsInternal = ({
           <Text
             elementDescriptor={descriptors.planDetailCaption}
             variant={'caption'}
-            localizationKey={localizationKeys('__experimental_commerce.availableFeatures')}
+            localizationKey={localizationKeys('commerce.availableFeatures')}
             colorScheme='secondary'
             sx={t => ({
               padding: t.space.$4,
@@ -227,7 +226,7 @@ const PlanDetailsInternal = ({
                     colorScheme='secondary'
                     textVariant='buttonLarge'
                     onClick={() => openCheckout({ planPeriod: 'annual' })}
-                    localizationKey={localizationKeys('__experimental_commerce.switchToAnnual')}
+                    localizationKey={localizationKeys('commerce.switchToAnnual')}
                   />
                 ) : null}
                 <Button
@@ -236,7 +235,7 @@ const PlanDetailsInternal = ({
                   colorScheme='danger'
                   textVariant='buttonLarge'
                   onClick={() => setShowConfirmation(true)}
-                  localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
+                  localizationKey={localizationKeys('commerce.cancelSubscription')}
                 />
               </Col>
             )
@@ -266,7 +265,7 @@ const PlanDetailsInternal = ({
                     setCancelError(undefined);
                     setShowConfirmation(false);
                   }}
-                  localizationKey={localizationKeys('__experimental_commerce.keepSubscription')}
+                  localizationKey={localizationKeys('commerce.keepSubscription')}
                 />
               )}
               <Button
@@ -280,7 +279,7 @@ const PlanDetailsInternal = ({
                   setShowConfirmation(false);
                   void cancelSubscription();
                 }}
-                localizationKey={localizationKeys('__experimental_commerce.cancelSubscription')}
+                localizationKey={localizationKeys('commerce.cancelSubscription')}
               />
             </>
           }
@@ -323,10 +322,10 @@ const PlanDetailsInternal = ({
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  plan: __experimental_CommercePlanResource;
-  subscription?: __experimental_CommerceSubscriptionResource;
-  planPeriod: __experimental_CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: __experimental_CommerceSubscriptionPlanPeriod) => void;
+  plan: CommercePlanResource;
+  subscription?: CommerceSubscriptionResource;
+  planPeriod: CommerceSubscriptionPlanPeriod;
+  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -451,7 +450,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                 marginInlineEnd: t.space.$1,
               },
             })}
-            localizationKey={localizationKeys('__experimental_commerce.month')}
+            localizationKey={localizationKeys('commerce.month')}
           />
           {plan.annualMonthlyAmount > 0 ? (
             <Box
@@ -493,7 +492,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                     size='sm'
                     aria-hidden
                   />{' '}
-                  <Span localizationKey={localizationKeys('__experimental_commerce.billedAnnually')} />
+                  <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
                 </Text>
               </Box>
             </Box>
@@ -512,7 +511,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           <SegmentedControl.Root
             aria-label='Set pay period'
             value={planPeriod}
-            onChange={value => setPlanPeriod(value as __experimental_CommerceSubscriptionPlanPeriod)}
+            onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
           >
             <SegmentedControl.Button
               value='month'

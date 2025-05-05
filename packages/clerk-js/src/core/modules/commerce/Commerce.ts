@@ -1,33 +1,29 @@
 import type {
-  __experimental_AddPaymentSourceParams,
-  __experimental_CommerceBillingNamespace,
-  __experimental_CommerceInitializedPaymentSourceJSON,
-  __experimental_CommerceNamespace,
-  __experimental_CommercePaymentSourceJSON,
-  __experimental_GetPaymentSourcesParams,
-  __experimental_InitializePaymentSourceParams,
+  AddPaymentSourceParams,
   ClerkPaginatedResponse,
+  CommerceBillingNamespace,
+  CommerceInitializedPaymentSourceJSON,
+  CommerceNamespace,
+  CommercePaymentSourceJSON,
+  GetPaymentSourcesParams,
+  InitializePaymentSourceParams,
 } from '@clerk/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
-import {
-  __experimental_CommerceInitializedPaymentSource,
-  __experimental_CommercePaymentSource,
-  BaseResource,
-} from '../../resources/internal';
-import { __experimental_CommerceBilling } from './CommerceBilling';
+import { BaseResource, CommerceInitializedPaymentSource, CommercePaymentSource } from '../../resources/internal';
+import { CommerceBilling } from './CommerceBilling';
 
-export class __experimental_Commerce implements __experimental_CommerceNamespace {
-  private static _billing: __experimental_CommerceBillingNamespace;
+export class Commerce implements CommerceNamespace {
+  private static _billing: CommerceBillingNamespace;
 
-  get __experimental_billing(): __experimental_CommerceBillingNamespace {
-    if (!__experimental_Commerce._billing) {
-      __experimental_Commerce._billing = new __experimental_CommerceBilling();
+  get billing(): CommerceBillingNamespace {
+    if (!Commerce._billing) {
+      Commerce._billing = new CommerceBilling();
     }
-    return __experimental_Commerce._billing;
+    return Commerce._billing;
   }
 
-  initializePaymentSource = async (params: __experimental_InitializePaymentSourceParams) => {
+  initializePaymentSource = async (params: InitializePaymentSourceParams) => {
     const { orgId, ...rest } = params;
     const json = (
       await BaseResource._fetch({
@@ -37,11 +33,11 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
         method: 'POST',
         body: rest as any,
       })
-    )?.response as unknown as __experimental_CommerceInitializedPaymentSourceJSON;
-    return new __experimental_CommerceInitializedPaymentSource(json);
+    )?.response as unknown as CommerceInitializedPaymentSourceJSON;
+    return new CommerceInitializedPaymentSource(json);
   };
 
-  addPaymentSource = async (params: __experimental_AddPaymentSourceParams) => {
+  addPaymentSource = async (params: AddPaymentSourceParams) => {
     const { orgId, ...rest } = params;
 
     const json = (
@@ -50,11 +46,11 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
         method: 'POST',
         body: rest as any,
       })
-    )?.response as unknown as __experimental_CommercePaymentSourceJSON;
-    return new __experimental_CommercePaymentSource(json);
+    )?.response as unknown as CommercePaymentSourceJSON;
+    return new CommercePaymentSource(json);
   };
 
-  getPaymentSources = async (params: __experimental_GetPaymentSourcesParams) => {
+  getPaymentSources = async (params: GetPaymentSourcesParams) => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
@@ -63,10 +59,10 @@ export class __experimental_Commerce implements __experimental_CommerceNamespace
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
       const { data: paymentSources, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<__experimental_CommercePaymentSourceJSON>;
+        res?.response as unknown as ClerkPaginatedResponse<CommercePaymentSourceJSON>;
       return {
         total_count,
-        data: paymentSources.map(paymentSource => new __experimental_CommercePaymentSource(paymentSource)),
+        data: paymentSources.map(paymentSource => new CommercePaymentSource(paymentSource)),
       };
     });
   };
