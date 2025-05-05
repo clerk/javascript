@@ -72,7 +72,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     <PlansContext.Provider
       value={{
         componentName: 'Plans',
-        plans: plans && subscriptions ? plans : [],
+        plans: plans || [],
         subscriptions: subscriptions?.data || [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
