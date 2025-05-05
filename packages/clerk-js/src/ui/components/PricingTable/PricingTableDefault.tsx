@@ -192,6 +192,10 @@ function Card(props: CardProps) {
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
+              background: common.mergedColorsBackground(
+                colors.setAlpha(t.colors.$colorBackground, 0.3),
+                colors.setAlpha(t.colors.$colorBackground, 0.5),
+              ),
             })}
           >
             {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (

@@ -29,8 +29,8 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
       <AlertIcon
         elementId={descriptors.alert.setId(variant)}
         elementDescriptor={descriptors.alertIcon}
-        variant={variant === 'info' ? 'primary' : variant}
-        colorScheme={variant === 'info' ? 'primary' : variant}
+        variant={variant}
+        colorScheme={variant}
         sx={{ flexShrink: '0' }}
       />
       <Col

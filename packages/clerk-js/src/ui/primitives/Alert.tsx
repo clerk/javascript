@@ -21,6 +21,10 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       info: {
         color: theme.colors.$neutralAlpha150,
         background: theme.colors.$neutralAlpha50,
+        ':hover': {
+          boxShadow: 'none',
+          borderColor: 'inherit',
+        },
       },
       warning: {
         backgroundColor: theme.colors.$warningAlpha100,
