@@ -175,15 +175,15 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   get alternativePhoneCodeFirstFactors(): AlternativePhoneCodeStrategy[] {
-    return ['whatsapp_code'];
-    // if (!this.attributes) {
-    //   return [];
-    // }
-    //
-    // return Object.entries(this.attributes)
-    //   .filter(([name, attr]) => attr.used_for_first_factor && name === 'whatsapp_code')
-    //   .map(([, desc]) => desc.first_factors)
-    //   .flat() as any as AlternativePhoneCodeStrategy[];
+    // return ['whatsapp_code'];
+    if (!this.attributes) {
+      return [];
+    }
+
+    return Object.entries(this.attributes)
+      .filter(([name, attr]) => attr.used_for_first_factor && name === 'whatsapp_code')
+      .map(([, desc]) => desc.first_factors)
+      .flat() as any as AlternativePhoneCodeStrategy[];
   }
 
   public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot | null = null) {
