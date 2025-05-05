@@ -15,12 +15,15 @@ import type { LocalizationResource } from '@clerk/types';
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   __experimental_commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: 'Jährlich abgerechnet',
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,6 +46,7 @@ export const deDE: LocalizationResource = {
     month: 'Monat',
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: undefined,
     viewFeatures: undefined,
