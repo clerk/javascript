@@ -20,7 +20,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
 
   const { plans, handleSelectPlan } = usePlansContext();
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('month');
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('annual');
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
