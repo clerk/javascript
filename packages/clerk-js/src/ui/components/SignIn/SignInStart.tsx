@@ -506,6 +506,7 @@ function SignInStartInternal(): JSX.Element {
                   />
                 </Card.Action>
               )}
+            {!standardFormAttributes.length && <CaptchaElement />}
           </Col>
         </Card.Content>
         <Card.Footer>
