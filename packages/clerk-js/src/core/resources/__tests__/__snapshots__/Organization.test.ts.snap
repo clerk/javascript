@@ -2,7 +2,6 @@
 
 exports[`Organization has the same initial properties 1`] = `
 Organization {
-  "__experimental_getSubscriptions": [Function],
   "addMember": [Function],
   "adminDeleteEnabled": true,
   "createDomain": [Function],
@@ -14,6 +13,7 @@ Organization {
   "getMembershipRequests": [Function],
   "getMemberships": [Function],
   "getRoles": [Function],
+  "getSubscriptions": [Function],
   "hasImage": true,
   "id": "test_id",
   "imageUrl": "https://img.clerk.com/eyJ0eXBlIjoiZGVmYXVsdCIsImlpZCI6Imluc18xbHlXRFppb2JyNjAwQUtVZVFEb1NsckVtb00iLCJyaWQiOiJ1c2VyXzJKbElJQTN2VXNjWXh1N2VUMnhINmFrTGgxOCIsImluaXRpYWxzIjoiREsifQ?width=160",

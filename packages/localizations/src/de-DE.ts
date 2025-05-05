@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
-  __experimental_commerce: {
+  commerce: {
     availableFeatures: undefined,
     billedAnnually: 'Jährlich abgerechnet',
     cancelSubscription: undefined,
@@ -713,7 +713,7 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
-    __experimental_billingPage: {
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

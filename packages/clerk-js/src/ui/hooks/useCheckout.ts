@@ -1,15 +1,15 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
-export const useCheckout = (props: __experimental_CheckoutProps) => {
+export const useCheckout = (props: CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user' } = props;
   const clerk = useClerk();
   const { organization } = useOrganization();
-  const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
+  const [currentCheckout, setCurrentCheckout] = useState<CommerceCheckoutResource | null>(null);
 
   const { user } = useUser();
   const {
@@ -19,7 +19,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     revalidate,
     error: _error,
   } = useFetch(
-    clerk.__experimental_commerce?.__experimental_billing.startCheckout,
+    clerk.commerce?.billing.startCheckout,
     {
       planId,
       planPeriod,
@@ -31,7 +31,7 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
 
   const error = _error as ClerkAPIResponseError | undefined;
 
-  const updateCheckout = useCallback((newCheckout: __experimental_CommerceCheckoutResource) => {
+  const updateCheckout = useCallback((newCheckout: CommerceCheckoutResource) => {
     setCurrentCheckout(newCheckout);
   }, []);
 

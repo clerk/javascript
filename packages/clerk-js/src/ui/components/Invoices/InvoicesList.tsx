@@ -1,4 +1,4 @@
-import type { __experimental_CommerceInvoiceResource, __experimental_CommerceInvoiceStatus } from '@clerk/types';
+import type { CommerceInvoiceResource, CommerceInvoiceStatus } from '@clerk/types';
 import React from 'react';
 
 import { useInvoicesContext } from '../../contexts';
@@ -50,7 +50,7 @@ export const InvoicesList = () => {
   );
 };
 
-const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceResource }) => {
+const InvoicesListRow = ({ invoice }: { invoice: CommerceInvoiceResource }) => {
   const {
     paymentDueOn,
     id,
@@ -58,7 +58,7 @@ const InvoicesListRow = ({ invoice }: { invoice: __experimental_CommerceInvoiceR
     totals: { grandTotal },
   } = invoice;
   const { navigate } = useRouter();
-  const badgeColorSchemeMap: Record<__experimental_CommerceInvoiceStatus, 'success' | 'warning' | 'danger'> = {
+  const badgeColorSchemeMap: Record<CommerceInvoiceStatus, 'success' | 'warning' | 'danger'> = {
     paid: 'success',
     unpaid: 'warning',
     past_due: 'danger',

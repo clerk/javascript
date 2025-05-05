@@ -20,7 +20,7 @@ import {
 import { useTabState } from '../../hooks/useTabState';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
-import { __experimental_PaymentSources } from '../PaymentSources/PaymentSources';
+import { PaymentSources } from '../PaymentSources';
 import { PricingTable } from '../PricingTable';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -51,7 +51,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.__experimental_billingPage.title')}
+            localizationKey={localizationKeys('userProfile.billingPage.title')}
             textVariant='h2'
           />
         </Header.Root>
@@ -66,13 +66,11 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
             <Tab
               localizationKey={
                 subscriptions.data.length > 0
-                  ? localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__plans')
+                  ? localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')
+                  : localizationKeys('userProfile.billingPage.start.headerTitle__plans')
               }
             />
-            <Tab
-              localizationKey={localizationKeys('userProfile.__experimental_billingPage.start.headerTitle__invoices')}
-            />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
@@ -91,7 +89,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       width: 'fit-content',
                     }}
                   />
-                  <__experimental_PaymentSources />
+                  <PaymentSources />
                 </Flex>
               ) : (
                 <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>

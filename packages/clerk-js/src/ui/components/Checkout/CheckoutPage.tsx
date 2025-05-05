@@ -1,8 +1,4 @@
-import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceCheckoutResource,
-  ClerkAPIError,
-} from '@clerk/types';
+import type { CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 
 import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
@@ -12,7 +8,7 @@ import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-export const CheckoutPage = (props: __experimental_CheckoutProps) => {
+export const CheckoutPage = (props: CheckoutProps) => {
   const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
@@ -28,7 +24,7 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
 
-  const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
@@ -77,8 +73,8 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           })}
         >
           <EmailForm
-            title={localizationKeys('__experimental_commerce.checkout.emailForm.title')}
-            subtitle={localizationKeys('__experimental_commerce.checkout.emailForm.subtitle')}
+            title={localizationKeys('commerce.checkout.emailForm.title')}
+            subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
             onSuccess={revalidate}
             onReset={() => setIsOpen(false)}
             disableAutoFocus

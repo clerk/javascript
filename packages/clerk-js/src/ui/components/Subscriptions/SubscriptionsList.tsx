@@ -1,4 +1,4 @@
-import type { __experimental_CommerceSubscriptionResource } from '@clerk/types';
+import type { CommerceSubscriptionResource } from '@clerk/types';
 
 import { usePlansContext } from '../../contexts';
 import {
@@ -23,7 +23,7 @@ export function SubscriptionsList() {
   const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
 
   const handleSelectSubscription = (
-    subscription: __experimental_CommerceSubscriptionResource,
+    subscription: CommerceSubscriptionResource,
     event?: React.MouseEvent<HTMLElement>,
   ) => {
     handleSelectPlan({
@@ -103,7 +103,7 @@ export function SubscriptionsList() {
                       marginInline: t.space.$1,
                     },
                   })}
-                  localizationKey={localizationKeys('__experimental_commerce.month')}
+                  localizationKey={localizationKeys('commerce.month')}
                 />
               </Text>
             </Td>

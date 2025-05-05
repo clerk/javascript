@@ -1,5 +1,5 @@
 import type { AuthConfigResource } from './authConfig';
-import type { __experimental_CommerceSettingsResource } from './commerceSettings';
+import type { CommerceSettingsResource } from './commerceSettings';
 import type { DisplayConfigResource } from './displayConfig';
 import type { OrganizationSettingsResource } from './organizationSettings';
 import type { ClerkResource } from './resource';
@@ -11,7 +11,7 @@ export interface EnvironmentResource extends ClerkResource {
   organizationSettings: OrganizationSettingsResource;
   authConfig: AuthConfigResource;
   displayConfig: DisplayConfigResource;
-  __experimental_commerceSettings: __experimental_CommerceSettingsResource;
+  commerceSettings: CommerceSettingsResource;
   isSingleSession: () => boolean;
   isProduction: () => boolean;
   isDevelopmentOrStaging: () => boolean;
