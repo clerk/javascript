@@ -56,6 +56,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         <Flex
           elementDescriptor={descriptors.switchIndicator}
           as='span'
+          data-checked={checked}
           sx={t => ({
             width: t.sizes.$6,
             height: t.sizes.$4,
