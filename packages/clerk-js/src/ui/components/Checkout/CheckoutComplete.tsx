@@ -22,7 +22,9 @@ export const CheckoutComplete = ({
   const { __experimental_checkoutContinueUrl } = useCheckoutContext();
 
   const handleClose = () => {
-    void router.navigate(__experimental_checkoutContinueUrl);
+    if (__experimental_checkoutContinueUrl) {
+      void router.navigate(__experimental_checkoutContinueUrl);
+    }
     if (setIsOpen) {
       setIsOpen(false);
     }
