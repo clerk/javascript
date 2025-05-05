@@ -287,7 +287,13 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:billing": {
-      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
+      "dependsOn": [
+        "@clerk/testing#build",
+        "@clerk/clerk-js#build",
+        "@clerk/backend#build",
+        "@clerk/nextjs#build",
+        "@clerk/vue#build"
+      ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
