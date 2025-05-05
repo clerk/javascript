@@ -1,6 +1,7 @@
 import type {
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
-  CheckoutProps,
   CommerceInvoiceResource,
   CommercePlanResource,
   CommerceSubscriptionResource,
@@ -10,7 +11,6 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
-  PlanDetailsProps,
   PricingTableProps,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
@@ -48,9 +48,9 @@ export type AvailableComponentProps =
   | OrganizationListProps
   | WaitlistProps
   | PricingTableProps
-  | CheckoutProps
+  | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | PlanDetailsProps;
+  | __internal_PlanDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -117,7 +117,7 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
-export type CheckoutCtx = CheckoutProps & {
+export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
 

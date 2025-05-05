@@ -1,11 +1,11 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
+import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
-export const useCheckout = (props: CheckoutProps) => {
+export const useCheckout = (props: __internal_CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user' } = props;
   const clerk = useClerk();
   const { organization } = useOrganization();

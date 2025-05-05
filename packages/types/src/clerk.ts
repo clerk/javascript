@@ -211,7 +211,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (props?: CheckoutProps) => void;
+  __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
@@ -222,7 +222,7 @@ export interface Clerk {
    * Opens the Clerk PlanDetails drawer component in a drawer.
    * @param props Optional subscription details drawer configuration parameters.
    */
-  __internal_openPlanDetails: (props?: PlanDetailsProps) => void;
+  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
 
   /**
    * Closes the Clerk PlanDetails drawer.
@@ -1576,14 +1576,14 @@ type PricingTableDefaultProps = {
 type PricingTableBaseProps = {
   forOrganizations?: boolean;
   appearance?: PricingTableTheme;
-  checkoutProps?: Pick<CheckoutProps, 'appearance'>;
+  __internal_CheckoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
 type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
-export type CheckoutProps = {
+export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
   planPeriod?: CommerceSubscriptionPlanPeriod;
@@ -1598,7 +1598,7 @@ export type CheckoutProps = {
   newSubscriptionRedirectUrl?: string;
 };
 
-export type PlanDetailsProps = {
+export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
   subscriberType?: CommerceSubscriberType;
