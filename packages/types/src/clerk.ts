@@ -459,6 +459,20 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts tasks component at the target element.
+   * @param targetNode Target node to mount the Tasks component.
+   * @param props configuration parameters.
+   */
+  mountTasks: (targetNode: HTMLDivElement) => void;
+  /**
+   * Unmount tasks component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the Tasks component from.
+   */
+  unmountTasks: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *

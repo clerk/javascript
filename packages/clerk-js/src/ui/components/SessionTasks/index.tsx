@@ -55,7 +55,7 @@ function SessionTasksRoutes(): JSX.Element {
   );
 }
 
-export function __experimental_SessionTasks(): JSX.Element {
+export function __experimental_Tasks(): JSX.Element {
   const clerk = useClerk();
   const { navigate } = useRouter();
   const signInContext = useContext(SignInContext);

@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
-import { __experimental_SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
+import { __experimental_Tasks as LazyTasks } from '../../../ui/lazyModules/components';
 import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import {
@@ -131,7 +131,7 @@ function SignInRoutes(): JSX.Element {
                 <LazySignUpVerifyPhone />
               </Route>
               <Route path='tasks'>
-                <LazySessionTasks />
+                <LazyTasks />
               </Route>
               <Route index>
                 <LazySignUpContinue />
@@ -143,7 +143,7 @@ function SignInRoutes(): JSX.Element {
           </Route>
         )}
         <Route path='tasks'>
-          <LazySessionTasks />
+          <LazyTasks />
         </Route>
         <Route index>
           <SignInStart />
