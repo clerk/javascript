@@ -7,6 +7,8 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
   name!: string;
   amount!: number;
   amountFormatted!: string;
+  annualAmount!: number;
+  annualAmountFormatted!: string;
   annualMonthlyAmount!: number;
   annualMonthlyAmountFormatted!: string;
   currencySymbol!: string;
@@ -35,6 +37,8 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.name = data.name;
     this.amount = data.amount;
     this.amountFormatted = data.amount_formatted;
+    this.annualAmount = data.annual_amount;
+    this.annualAmountFormatted = data.annual_amount_formatted;
     this.annualMonthlyAmount = data.annual_monthly_amount;
     this.annualMonthlyAmountFormatted = data.annual_monthly_amount_formatted;
     this.currencySymbol = data.currency_symbol;

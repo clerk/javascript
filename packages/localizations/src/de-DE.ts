@@ -68,6 +68,7 @@ export const deDE: LocalizationResource = {
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
