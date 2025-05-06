@@ -31,8 +31,20 @@ export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
   );
 };
 
-export const PlansContextProvider = ({ children }: PropsWithChildren) => {
+export const usePlans = (subscriberType?: CommerceSubscriberType) => {
   const { billing } = useClerk();
+
+  return useFetch(
+    billing.getPlans,
+    {
+      subscriberType,
+    },
+    undefined,
+    'commerce-plans',
+  );
+};
+
+export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
@@ -44,11 +56,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     revalidate: revalidateSubscriptions,
   } = useSubscriptions(subscriberType);
 
-  const {
-    data: plans,
-    isLoading: isLoadingPlans,
-    revalidate: revalidatePlans,
-  } = useFetch(billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
+  const { data: plans, isLoading: isLoadingPlans, revalidate: revalidatePlans } = usePlans(subscriberType);
 
   // Revalidates the next time the hooks gets mounted
   const { revalidate: revalidateStatements } = useFetch(
