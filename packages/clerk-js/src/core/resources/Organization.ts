@@ -237,7 +237,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     getSubscriptionsParams?: GetSubscriptionsParams,
   ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {
     return await BaseResource._fetch({
-      path: `/organizations/${this.id}/subscriptions`,
+      path: `/organizations/${this.id}/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(getSubscriptionsParams),
     }).then(res => {
