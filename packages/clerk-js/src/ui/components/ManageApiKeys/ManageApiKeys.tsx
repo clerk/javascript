@@ -1,20 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
-import type { ApiKeyResource } from '@clerk/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-// import { useManageApiKeysContext } from '../../contexts';
+import { Button, Flex, Flow, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import { useFetch } from '../../hooks';
+import { Clipboard, Eye, EyeSlash, Plus } from '../../icons';
 
 export const ManageApiKeys = () => {
   const clerk = useClerk();
-  // const ctx = useManageApiKeysContext();
-  const [apiKeys, setApiKeys] = useState<ApiKeyResource[]>([]);
+  const { data: apiKeys } = useFetch(clerk.getApiKeys, {});
   const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
-
-  useEffect(() => {
-    clerk.getApiKeys().then(apiKeys => {
-      setApiKeys(apiKeys);
-    });
-  }, [clerk]);
 
   const toggleSecret = async (id: string) => {
     setRevealedKeys(prev => {
@@ -31,105 +25,111 @@ export const ManageApiKeys = () => {
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'Inter, sans-serif' }}>
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'separate',
-          borderSpacing: 0,
-          background: '#fff',
-          borderRadius: 12,
-          boxShadow: '0 1px 4px #0001',
-        }}
+    <Flow.Root
+      flow='pricingTable'
+      sx={{
+        width: '100%',
+      }}
+    >
+      <Flex
+        justify='between'
+        align='center'
+        sx={{ marginBottom: 4 }}
       >
-        <thead>
-          <tr style={{ textAlign: 'left', fontSize: 13, color: '#888', borderBottom: '1px solid #eee' }}>
-            <th style={{ padding: '12px 16px' }}>Name</th>
-            <th style={{ padding: '12px 16px' }}>Last used</th>
-            <th style={{ padding: '12px 16px' }}>Key</th>
-            <th style={{ padding: '12px 16px' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {apiKeys.map(apiKey => (
-            <tr
-              key={apiKey.id}
-              style={{ borderBottom: '1px solid #f3f3f3' }}
-            >
-              <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                <div style={{ fontWeight: 500 }}>{apiKey.name}</div>
-                <div style={{ fontSize: 12, color: '#888' }}>
+        <Input
+          placeholder='Search keys...'
+          sx={{ width: 220, fontSize: 14 }}
+        />
+        <Button
+          variant='solid'
+          sx={{
+            borderRadius: 8,
+            fontWeight: 500,
+            fontSize: 15,
+            px: 4,
+            py: 2,
+          }}
+        >
+          + Add new key
+        </Button>
+      </Flex>
+      <Table sx={{ tableLayout: 'fixed' }}>
+        <Thead>
+          <Tr>
+            <Th>Name</Th>
+            <Th>Last used</Th>
+            <Th>Key</Th>
+            <Th>Actions</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {apiKeys?.map(apiKey => (
+            <Tr key={apiKey.id}>
+              <Td>
+                <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
+                <Text
+                  sx={{ fontSize: 12 }}
+                  color='gray.600'
+                >
                   Created at{' '}
-                  {apiKey.createdAt.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' })}
-                </div>
-              </td>
-              <td style={{ padding: '12px 16px', verticalAlign: 'top', fontSize: 14, color: '#444' }}>
-                {/* Placeholder for "Last used" */}
-                3d ago
-              </td>
-              <td style={{ padding: '12px 16px', verticalAlign: 'top', fontFamily: 'monospace', fontSize: 16 }}>
-                <input
+                  {apiKey.createdAt.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: '2-digit',
+                    year: 'numeric',
+                  })}
+                </Text>
+              </Td>
+              <Td>
+                <Text
+                  sx={{ fontSize: 14 }}
+                  color='gray.800'
+                >
+                  {/* Placeholder for "Last used" */}
+                  3d ago
+                </Text>
+              </Td>
+              <Td>
+                <Input
                   type='text'
                   value={revealedKeys[apiKey.id] ?? '•••••••••••••'}
                   readOnly
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    fontFamily: 'monospace',
-                    fontSize: 16,
-                    letterSpacing: 2,
-                    outline: 'none',
-                    padding: 0,
-                    color: '#222',
-                    pointerEvents: 'none',
+                  sx={{
+                    width: 120,
                   }}
                   aria-label='API key (hidden)'
                   tabIndex={-1}
                 />
-                <button
-                  type='button'
-                  style={{ marginLeft: 8, background: 'none', border: 'none', cursor: 'pointer' }}
-                  title='Show key'
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  sx={{ margin: 2 }}
                   onClick={() => void toggleSecret(apiKey.id)}
+                  aria-label={revealedKeys[apiKey.id] ? 'Hide key' : 'Show key'}
                 >
-                  <span
-                    role='img'
-                    aria-label={revealedKeys[apiKey.id] ? 'Hide' : 'Show'}
-                  >
-                    {revealedKeys[apiKey.id] ? '🙈' : '👁️'}
-                  </span>
-                </button>
-                <button
-                  type='button'
-                  style={{ marginLeft: 4, background: 'none', border: 'none', cursor: 'pointer' }}
-                  title='Copy key'
+                  <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  sx={{ margin: 1 }}
+                  aria-label='Copy key'
                 >
-                  <span
-                    role='img'
-                    aria-label='Copy'
-                  >
-                    📋
-                  </span>
-                </button>
-              </td>
-              <td style={{ padding: '12px 16px', verticalAlign: 'top' }}>
-                <button
-                  type='button'
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                  title='More actions'
+                  <Icon icon={Clipboard} />
+                </Button>
+              </Td>
+              <Td>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  aria-label='More actions'
                 >
-                  <span
-                    role='img'
-                    aria-label='More'
-                  >
-                    ⋯
-                  </span>
-                </button>
-              </td>
-            </tr>
+                  <Icon icon={Plus} />
+                </Button>
+              </Td>
+            </Tr>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </Tbody>
+      </Table>
+    </Flow.Root>
   );
 };
