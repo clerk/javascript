@@ -255,7 +255,7 @@ function Card(props: CardProps) {
         ) : (
           <Box
             sx={t => ({
-              backgroundColor: t.colors.$colorBackground,
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
             })}
           />
         )}
