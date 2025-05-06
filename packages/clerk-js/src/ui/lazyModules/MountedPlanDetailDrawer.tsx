@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { __experimental_PlanDetailsProps, Appearance } from '@clerk/types';
+import type { __internal_PlanDetailsProps, Appearance } from '@clerk/types';
 
 import { PlanDetails } from './components';
 import { LazyDrawerRenderer } from './providers';
@@ -13,7 +13,7 @@ export function MountedPlanDetailDrawer({
   onOpenChange: (open: boolean) => void;
   planDetailsDrawer: {
     open: false;
-    props: null | __experimental_PlanDetailsProps;
+    props: null | __internal_PlanDetailsProps;
   };
 }) {
   const { user } = useUser();
@@ -34,6 +34,7 @@ export function MountedPlanDetailDrawer({
       onOpenChange={onOpenChange}
       componentName={'PlanDetails'}
       portalId={planDetailsDrawer.props.portalId}
+      portalRoot={planDetailsDrawer.props.portalRoot as HTMLElement | null | undefined}
     >
       <PlanDetails
         {...planDetailsDrawer.props}

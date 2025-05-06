@@ -1,15 +1,15 @@
-import type { __experimental_PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  __experimental_PricingTableContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
   PlansContextProvider,
+  PricingTableContext,
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
@@ -83,15 +83,11 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider
-          value={(props as __experimental_PricingTableProps).forOrganizations ? 'org' : 'user'}
-        >
+        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'org' : 'user'}>
           <PlansContextProvider>
-            <__experimental_PricingTableContext.Provider
-              value={{ componentName, ...(props as __experimental_PricingTableProps) }}
-            >
+            <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
               {children}
-            </__experimental_PricingTableContext.Provider>
+            </PricingTableContext.Provider>
           </PlansContextProvider>
         </SubscriberTypeContext.Provider>
       );

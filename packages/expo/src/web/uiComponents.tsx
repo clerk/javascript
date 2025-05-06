@@ -1,10 +1,10 @@
 import {
-  __experimental_PricingTable as BasePricingTable,
   CreateOrganization as BaseCreateOrganization,
   GoogleOneTap as BaseGoogleOneTap,
   OrganizationList as BaseOrganizationList,
   OrganizationProfile as BaseOrganizationProfile,
   OrganizationSwitcher as BaseOrganizationSwitcher,
+  PricingTable as BasePricingTable,
   SignIn as BaseSignIn,
   SignInButton as BaseSignInButton,
   SignInWithMetamaskButton as BaseSignInWithMetamaskButton,
@@ -52,4 +52,4 @@ export const SignInWithMetamaskButton: typeof BaseSignInWithMetamaskButton =
   WrapComponent(BaseSignInWithMetamaskButton);
 export const GoogleOneTap: typeof BaseGoogleOneTap = WrapComponent(BaseGoogleOneTap);
 export const Waitlist: typeof BaseWaitlist = WrapComponent(BaseWaitlist);
-export const __experimental_PricingTable: typeof BasePricingTable = WrapComponent(BasePricingTable);
+export const PricingTable: typeof BasePricingTable = WrapComponent(BasePricingTable);

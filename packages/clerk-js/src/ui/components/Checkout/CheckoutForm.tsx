@@ -1,23 +1,25 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommerceMoney,
-  __experimental_CommercePaymentSourceResource,
-  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
+  CommerceCheckoutResource,
+  CommerceMoney,
+  CommercePaymentSourceResource,
+  ConfirmCheckoutParams,
 } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys } from '../../customizables';
-import { Alert, Disclosure, Divider, Drawer, LineItems, Select, SelectButton, SelectOptionList } from '../../elements';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
+import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
+
+type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
@@ -25,10 +27,13 @@ export const CheckoutForm = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
-  const { plan, planPeriod, totals } = checkout;
+  const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
+  const showCredits =
+    totals.totalDueNow.amount > 0 && !!totals.proration?.credit?.amount && totals.proration.credit.amount > 0;
+  const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
     <Drawer.Body>
@@ -42,11 +47,11 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group>
+          <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
-              text={`${plan.currencySymbol} ${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+              text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
@@ -56,26 +61,43 @@ export const CheckoutForm = ({
           >
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Title title='Subtotal' />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
+            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
-          <LineItems.Group variant='tertiary'>
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Tax' />
-            <LineItems.Description text={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
-          </LineItems.Group>
+          {showCredits && (
+            <LineItems.Group variant='tertiary'>
+              {/* TODO(@Commerce): needs localization */}
+              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
+              {/* TODO(@Commerce): needs localization */}
+              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
+              <LineItems.Description
+                text={`- ${totals.proration?.credit.currencySymbol}${totals.proration?.credit.amountFormatted}`}
+              />
+            </LineItems.Group>
+          )}
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title={`Total${totals.totalDueNow ? ' Due Today' : ''}`} />
-            <LineItems.Description
-              text={`${
-                totals.totalDueNow
-                  ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
-                  : `${totals.grandTotal.currencySymbol}${totals.grandTotal.amountFormatted}`
-              }`}
-            />
+            <LineItems.Title title={`Total Due Today`} />
+            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
+
+      {/* TODO(@Commerce): needs localization */}
+      {showDowngradeInfo && (
+        <Box
+          elementDescriptor={descriptors.checkoutFormLineItemsRoot}
+          sx={t => ({
+            paddingBlockStart: t.space.$4,
+            paddingInline: t.space.$4,
+          })}
+        >
+          <Text
+            localizationKey={localizationKeys('commerce.checkout.downgradeNotice')}
+            variant='caption'
+            colorScheme='secondary'
+          />
+        </Box>
+      )}
 
       <CheckoutFormElements
         checkout={checkout}
@@ -89,31 +111,33 @@ const CheckoutFormElements = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { user } = useUser();
   const { organization } = useOrganization();
   const { subscriberType } = useCheckoutContext();
 
-  const { data } = useFetch(
-    __experimental_commerce?.getPaymentSources,
+  const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>('existing');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
+
+  const { data, revalidate: revalidatePaymentSources } = useFetch(
+    commerce?.getPaymentSources,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
     `commerce-payment-sources-${user?.id}`,
   );
-
-  const [openAccountFundsDropDown, setOpenAccountFundsDropDown] = useState(true);
-  const [openAddNewSourceDropDown, setOpenAddNewSourceDropDown] = useState((data?.data.length || 0) === 0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-
   const { data: paymentSources } = data || { data: [] };
 
-  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
+  useEffect(() => {
+    setPaymentMethodSource(paymentSources.length > 0 ? 'existing' : 'new');
+  }, [paymentSources]);
+
+  const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
         ...params,
@@ -141,6 +165,7 @@ const CheckoutFormElements = ({
   };
 
   const onAddPaymentSourceSuccess = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
+    void revalidatePaymentSources();
     await confirmCheckout({
       gateway: 'stripe',
       paymentToken: ctx.stripeSetupIntent?.payment_method as string,
@@ -149,97 +174,110 @@ const CheckoutFormElements = ({
     setIsSubmitting(false);
   };
 
+  const onPayWithTestPaymentSourceSuccess = async () => {
+    try {
+      const newCheckout = await checkout.confirm({
+        gateway: 'stripe',
+        useTestCard: true,
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      });
+      onCheckoutComplete(newCheckout);
+      void revalidatePaymentSources();
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
+  };
+
   return (
     <Col
       elementDescriptor={descriptors.checkoutFormElementsRoot}
-      gap={3}
+      gap={4}
       sx={t => ({ padding: t.space.$4 })}
     >
-      {submitError && (
-        <Alert
-          variant='danger'
-          sx={t => ({
-            animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
-          })}
+      {/* only show if there are payment sources and there is a total due now */}
+      {paymentSources.length > 0 && checkout.totals.totalDueNow.amount > 0 && (
+        <SegmentedControl.Root
+          aria-label='Payment method source'
+          value={paymentMethodSource}
+          onChange={value => setPaymentMethodSource(value as PaymentMethodSource)}
+          size='lg'
+          fullWidth
         >
-          {typeof submitError === 'string' ? submitError : submitError.message}
-        </Alert>
-      )}
-      {paymentSources.length > 0 && (
-        <>
-          <Disclosure.Root
-            open={openAccountFundsDropDown}
-            onOpenChange={setOpenAccountFundsDropDown}
-          >
-            {/* TODO(@Commerce): needs localization */}
-            <Disclosure.Trigger text='Payment Methods' />
-            <Disclosure.Content>
-              <Col gap={3}>
-                <PaymentSourceMethods
-                  checkout={checkout}
-                  paymentSources={paymentSources}
-                  totalDueNow={checkout.totals.totalDueNow}
-                  onPaymentSourceSubmit={onPaymentSourceSubmit}
-                  isSubmitting={isSubmitting}
-                />
-              </Col>
-            </Disclosure.Content>
-          </Disclosure.Root>
-          <Divider />
-        </>
+          <SegmentedControl.Button
+            value='existing'
+            // TODO(@Commerce): needs localization
+            text='Payment Methods'
+          />
+          <SegmentedControl.Button
+            value='new'
+            // TODO(@Commerce): needs localization
+            text='Add payment method'
+          />
+        </SegmentedControl.Root>
       )}
 
-      <Disclosure.Root
-        open={openAddNewSourceDropDown}
-        onOpenChange={setOpenAddNewSourceDropDown}
-      >
-        <Disclosure.Trigger
-          text={localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add')}
+      {paymentMethodSource === 'existing' && (
+        <ExistingPaymentSourceForm
+          checkout={checkout}
+          paymentSources={paymentSources}
+          totalDueNow={checkout.totals.totalDueNow}
+          onPaymentSourceSubmit={onPaymentSourceSubmit}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
         />
-        <Disclosure.Content>
-          <AddPaymentSource
-            checkout={checkout}
-            onSuccess={onAddPaymentSourceSuccess}
-            // @ts-ignore TODO(@COMMERCE): needs localization
-            submitLabel={
-              checkout.totals.totalDueNow.amount > 0
-                ? localizationKeys(
-                    'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                    {
-                      amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                    },
-                  )
-                : 'Subscribe'
-            }
-          />
-        </Disclosure.Content>
-      </Disclosure.Root>
+      )}
+
+      {paymentMethodSource === 'new' && (
+        <AddPaymentSource
+          checkout={checkout}
+          onSuccess={onAddPaymentSourceSuccess}
+          onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
+          // @ts-ignore TODO(@COMMERCE): needs localization
+          submitLabel={
+            checkout.totals.totalDueNow.amount > 0
+              ? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__pay', {
+                  amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                })
+              : 'Subscribe'
+          }
+          submitError={submitError}
+          setSubmitError={setSubmitError}
+          showPayWithTestCardSection
+        />
+      )}
     </Col>
   );
 };
 
-const PaymentSourceMethods = ({
+const ExistingPaymentSourceForm = ({
   checkout,
   totalDueNow,
   paymentSources,
   onPaymentSourceSubmit,
   isSubmitting,
+  submitError,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  totalDueNow: __experimental_CommerceMoney;
-  paymentSources: __experimental_CommercePaymentSourceResource[];
+  checkout: CommerceCheckoutResource;
+  totalDueNow: CommerceMoney;
+  paymentSources: CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
   isSubmitting: boolean;
+  submitError: ClerkRuntimeError | ClerkAPIError | string | undefined;
 }) => {
-  const [selectedPaymentSource, setSelectedPaymentSource] = useState<
-    __experimental_CommercePaymentSourceResource | undefined
-  >(checkout.paymentSource || paymentSources.find(p => p.isDefault));
+  const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    checkout.paymentSource || paymentSources.find(p => p.isDefault),
+  );
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
+      const label =
+        source.paymentMethod !== 'card'
+          ? `${capitalize(source.paymentMethod)}`
+          : `${capitalize(source.cardType)} ⋯ ${source.last4}`;
+
       return {
         value: source.id,
-        label: `${capitalize(source.cardType)} ⋯ ${source.last4}`,
+        label,
       };
     });
   }, [paymentSources]);
@@ -250,41 +288,59 @@ const PaymentSourceMethods = ({
       sx={t => ({
         display: 'flex',
         flexDirection: 'column',
-        rowGap: t.space.$3,
+        rowGap: t.space.$4,
       })}
     >
-      <Select
-        elementId='paymentSource'
-        options={options}
-        value={selectedPaymentSource?.id || null}
-        onChange={option => {
-          const paymentSource = paymentSources.find(source => source.id === option.value);
-          setSelectedPaymentSource(paymentSource);
-        }}
-        portal
-      >
-        {/*Store value inside an input in order to be accessible as form data*/}
+      {checkout.totals.totalDueNow.amount > 0 ? (
+        <Select
+          elementId='paymentSource'
+          options={options}
+          value={selectedPaymentSource?.id || null}
+          onChange={option => {
+            const paymentSource = paymentSources.find(source => source.id === option.value);
+            setSelectedPaymentSource(paymentSource);
+          }}
+          portal
+        >
+          {/*Store value inside an input in order to be accessible as form data*/}
+          <input
+            name='payment_source_id'
+            type='hidden'
+            value={selectedPaymentSource?.id}
+          />
+          <SelectButton
+            icon={ArrowUpDown}
+            sx={t => ({
+              justifyContent: 'space-between',
+              backgroundColor: t.colors.$colorBackground,
+            })}
+          >
+            {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
+          </SelectButton>
+          <SelectOptionList
+            sx={t => ({
+              paddingBlock: t.space.$1,
+              color: t.colors.$colorText,
+            })}
+          />
+        </Select>
+      ) : (
         <input
           name='payment_source_id'
           type='hidden'
           value={selectedPaymentSource?.id}
         />
-        <SelectButton
-          icon={ArrowUpDown}
+      )}
+      {submitError && (
+        <Alert
+          variant='danger'
           sx={t => ({
-            justifyContent: 'space-between',
-            backgroundColor: t.colors.$colorBackground,
+            animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
           })}
         >
-          {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
-        </SelectButton>
-        <SelectOptionList
-          sx={t => ({
-            paddingBlock: t.space.$1,
-            color: t.colors.$colorText,
-          })}
-        />
-      </Select>
+          {typeof submitError === 'string' ? submitError : submitError.message}
+        </Alert>
+      )}
       <Button
         type='submit'
         colorScheme='primary'

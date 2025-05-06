@@ -3,19 +3,19 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 
 import { useFetch } from '../../hooks';
-import type { __experimental_InvoicesCtx } from '../../types';
+import type { InvoicesCtx } from '../../types';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-const InvoicesContext = createContext<__experimental_InvoicesCtx | null>(null);
+const InvoicesContext = createContext<InvoicesCtx | null>(null);
 
 export const InvoicesContextProvider = ({ children }: PropsWithChildren) => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
   const { user } = useUser();
 
   const { data, isLoading, revalidate } = useFetch(
-    __experimental_commerce?.__experimental_billing.getInvoices,
+    commerce?.billing.getInvoices,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
     undefined,
     `commerce-invoices-${user?.id}`,

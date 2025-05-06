@@ -1,7 +1,7 @@
-import { __experimental_PricingTableContext, PlansContextProvider, SubscriberTypeContext } from '../../contexts';
+import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { Header } from '../../elements';
 import { useRouter } from '../../router';
-import { __experimental_PricingTable } from '../PricingTable/PricingTable';
+import { PricingTable } from '../PricingTable/PricingTable';
 
 const PlansPageInternal = () => {
   const { navigate } = useRouter();
@@ -25,9 +25,9 @@ const PlansPageInternal = () => {
         </Header.BackLink>
       </Header.Root>
 
-      <__experimental_PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-        <__experimental_PricingTable />
-      </__experimental_PricingTableContext.Provider>
+      <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+        <PricingTable />
+      </PricingTableContext.Provider>
     </>
   );
 };

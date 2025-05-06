@@ -163,6 +163,7 @@ export type ElementsConfig = {
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
   lineItemsCopyButton: WithOptions;
+  lineItemsDowngradeNotice: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -281,6 +282,11 @@ export type ElementsConfig = {
   segmentedControlRoot: WithOptions;
   segmentedControlButton: WithOptions;
 
+  switchRoot: WithOptions;
+  switchIndicator: WithOptions;
+  switchThumb: WithOptions;
+  switchLabel: WithOptions;
+
   avatarBox: WithOptions;
   avatarImage: WithOptions;
   avatarImageActions: WithOptions;
@@ -369,28 +375,26 @@ export type ElementsConfig = {
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
   pricingTableCardHeader: WithOptions;
-  pricingTableCardAvatarBadgeContainer: WithOptions;
-  pricingTableCardAvatar: WithOptions;
-  pricingTableCardBadgeContainer: WithOptions;
-  pricingTableCardBadge: WithOptions;
+  pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
   pricingTableCardDescription: WithOptions;
+  pricingTableCardFeeContainer: WithOptions;
+  pricingTableCardFee: WithOptions;
+  pricingTableCardFeePeriod: WithOptions;
+  pricingTableCardPeriodToggle: WithOptions;
+  pricingTableCardFeePeriodNotice: WithOptions;
+  pricingTableCardBody: WithOptions;
   pricingTableCardFeatures: WithOptions;
   pricingTableCardFeaturesList: WithOptions<string>;
   pricingTableCardFeaturesListItem: WithOptions<string>;
   pricingTableCardFeaturesListItemContent: WithOptions;
   pricingTableCardFeaturesListItemTitle: WithOptions;
-  pricingTableCardFeaturesListItemDescription: WithOptions;
+  pricingTableCardStatusRow: WithOptions;
+  pricingTableCardStatus: WithOptions;
   pricingTableCardAction: WithOptions;
-  pricingTableCardPeriodToggle: WithOptions;
-  pricingTableCardFeeContainer: WithOptions;
-  pricingTableCardFee: WithOptions;
-  pricingTableCardFeePeriod: WithOptions;
-  pricingTableCardFeePeriodNotice: WithOptions;
-  pricingTableCardFeePeriodNoticeInner: WithOptions;
-  pricingTableCardFeePeriodNoticeLabel: WithOptions;
+  pricingTableCardActionButton: WithOptions;
 
-  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRowGroupHeader: WithOptions;

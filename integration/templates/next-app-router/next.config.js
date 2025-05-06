@@ -6,6 +6,7 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
+  outputFileTracingRoot: '/',
 };
 
 module.exports = nextConfig;

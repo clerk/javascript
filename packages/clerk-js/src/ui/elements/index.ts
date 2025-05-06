@@ -50,6 +50,7 @@ export * from './Section';
 export * from './SegmentedControl';
 export * from './Select';
 export * from './SuccessPage';
+export * from './Switch';
 export * from './Tabs';
 export * from './TagInput';
 export * from './ThreeDotsMenu';
