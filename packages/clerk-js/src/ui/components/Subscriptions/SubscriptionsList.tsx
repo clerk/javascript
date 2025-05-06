@@ -39,6 +39,19 @@ export function SubscriptionsList() {
     });
   };
 
+  const sortedSubscriptions = subscriptions.sort((a, b) => {
+    // alway put active subscriptions first
+    if (a.status === 'active' && b.status !== 'active') {
+      return -1;
+    }
+
+    if (b.status === 'active' && a.status !== 'active') {
+      return 1;
+    }
+
+    return 1;
+  });
+
   return (
     <Table tableHeadVisuallyHidden>
       <Thead>
@@ -49,7 +62,7 @@ export function SubscriptionsList() {
         </Tr>
       </Thead>
       <Tbody>
-        {subscriptions.map(subscription => (
+        {sortedSubscriptions.map(subscription => (
           <Tr key={subscription.id}>
             <Td>
               <Col gap={1}>
