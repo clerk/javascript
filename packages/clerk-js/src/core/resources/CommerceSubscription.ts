@@ -43,7 +43,7 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.periodEnd = data.period_end;
     this.canceledAt = data.canceled_at;
     this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
-    this.credit = data.credit ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
+    this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;
   }
 

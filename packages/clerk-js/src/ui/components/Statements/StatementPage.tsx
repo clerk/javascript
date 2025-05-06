@@ -68,7 +68,7 @@ const StatementPageInternal = () => {
                   <Statement.SectionContentItem key={item.id}>
                     <Statement.SectionContentDetailsHeader
                       title={item.subscription.plan.name}
-                      description={`${item.subscription.plan.currencySymbol}${item.subscription.planPeriod === 'month' ? item.subscription.plan.amountFormatted : item.subscription.plan.annualMonthlyAmountFormatted} / month${item.subscription.planPeriod === 'month' ? '' : ', billed annually'}`}
+                      description={`${item.subscription.amount?.currencySymbol}${item.subscription.amount?.amountFormatted} / ${item.subscription.planPeriod === 'month' ? 'month' : 'year'}`}
                       secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
                       secondaryDescription={``}
                     />
