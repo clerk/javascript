@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
-  __experimental_commerce: {
+  backButton: 'Tillbaka',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Annans imitatörenhet',
+  badge__primary: 'Primär',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Kräver åtgärd',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Den här enheten',
+  badge__unverified: 'Overifierad',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Användarens enhet',
+  badge__you: 'Du',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const svSE: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Tillbaka',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Annans imitatörenhet',
-  badge__primary: 'Primär',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Kräver åtgärd',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Den här enheten',
-  badge__unverified: 'Overifierad',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Användarens enhet',
-  badge__you: 'Du',
   createOrganization: {
     formButtonSubmit: 'Skapa organisation',
     invitePage: {
@@ -154,6 +159,41 @@ export const svSE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatiska förslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Overifierad',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Lägg till domänen för att verifiera. Användare med e-postadresser i denna domän kan gå med i organisationen automatiskt eller begära att få gå med.',
@@ -700,7 +740,23 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopierat!',
+      actionLabel__copy: 'Kopiera alla',
+      actionLabel__download: 'Ladda ner .txt',
+      actionLabel__print: 'Skriv ut',
+      infoText1: 'Backupkoder kommer att aktiveras för detta konto.',
+      infoText2:
+        'Håll backupkoderna hemliga och förvara dem säkert. Du kan generera nya backupkoder om du misstänker att de har komprometterats.',
+      subtitle__codelist: 'Förvara dem säkert och håll dem hemliga.',
+      successMessage:
+        'Backupkoder är nu aktiverade. Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet. Varje kod kan endast användas en gång.',
+      successSubtitle:
+        'Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet.',
+      title: 'Lägg till backupkodverifiering',
+      title__codelist: 'Backupkoder',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -723,26 +779,14 @@ export const svSE: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopierat!',
-      actionLabel__copy: 'Kopiera alla',
-      actionLabel__download: 'Ladda ner .txt',
-      actionLabel__print: 'Skriv ut',
-      infoText1: 'Backupkoder kommer att aktiveras för detta konto.',
-      infoText2:
-        'Håll backupkoderna hemliga och förvara dem säkert. Du kan generera nya backupkoder om du misstänker att de har komprometterats.',
-      subtitle__codelist: 'Förvara dem säkert och håll dem hemliga.',
-      successMessage:
-        'Backupkoder är nu aktiverade. Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet. Varje kod kan endast användas en gång.',
-      successSubtitle:
-        'Du kan använda en av dessa för att logga in på ditt konto om du förlorar åtkomsten till din autentiseringsenhet.',
-      title: 'Lägg till backupkodverifiering',
-      title__codelist: 'Backupkoder',
     },
     connectedAccountPage: {
       formHint: 'Välj en leverantör för att ansluta ditt konto.',

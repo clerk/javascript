@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
-  __experimental_commerce: {
+  backButton: 'Tilbage',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
+  badge__primary: 'Primær',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Kræver handling',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Denne enhed',
+  badge__unverified: 'Ikke verificeret',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Brugerenhed',
+  badge__you: 'Dig',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const daDK: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Tilbage',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Anden enhed som efterligner',
-  badge__primary: 'Primær',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Kræver handling',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Denne enhed',
-  badge__unverified: 'Ikke verificeret',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Brugerenhed',
-  badge__you: 'Dig',
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
     invitePage: {
@@ -154,6 +159,41 @@ export const daDK: LocalizationResource = {
     badge__automaticSuggestion: 'Automatiske forslag',
     badge__manualInvitation: 'Ingen automatisk tilmelding',
     badge__unverified: 'Ikke verificeret',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Tilføj domænet for at verificere. Brugere med e-mailadresser under dette domæne kan automatisk deltage i organisationen eller anmode om at deltage.',
@@ -695,7 +735,23 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopieret!',
+      actionLabel__copy: 'Kopier alle',
+      actionLabel__download: 'Download .txt',
+      actionLabel__print: 'Print',
+      infoText1: 'Backup-koder vil blive aktiveret for denne konto.',
+      infoText2:
+        'Hold backup-koderne hemmelige og gem dem sikkert. Du kan genskabe backup-koder, hvis du har mistanke om, at de er blevet kompromitteret.',
+      subtitle__codelist: 'Opbevar dem sikkert og hold dem hemmelige.',
+      successMessage:
+        'Backup-koder er nu aktiveret. Du kan bruge en af disse til at logge ind på din konto, hvis du mister adgangen til din totrinsbekræftelse. Hver kode kan kun bruges én gang.',
+      successSubtitle:
+        'Du kan bruge en af disse til at logge ind på din konto, hvis du mister adgangen til din totrinsbekræftelse.',
+      title: 'Tilføj bekræftelse af backup-kode',
+      title__codelist: 'Backup-koder',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -718,26 +774,14 @@ export const daDK: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopieret!',
-      actionLabel__copy: 'Kopier alle',
-      actionLabel__download: 'Download .txt',
-      actionLabel__print: 'Print',
-      infoText1: 'Backup-koder vil blive aktiveret for denne konto.',
-      infoText2:
-        'Hold backup-koderne hemmelige og gem dem sikkert. Du kan genskabe backup-koder, hvis du har mistanke om, at de er blevet kompromitteret.',
-      subtitle__codelist: 'Opbevar dem sikkert og hold dem hemmelige.',
-      successMessage:
-        'Backup-koder er nu aktiveret. Du kan bruge en af disse til at logge ind på din konto, hvis du mister adgangen til din totrinsbekræftelse. Hver kode kan kun bruges én gang.',
-      successSubtitle:
-        'Du kan bruge en af disse til at logge ind på din konto, hvis du mister adgangen til din totrinsbekræftelse.',
-      title: 'Tilføj bekræftelse af backup-kode',
-      title__codelist: 'Backup-koder',
     },
     connectedAccountPage: {
       formHint: 'Vælg en udbyder for at forbinde din konto.',

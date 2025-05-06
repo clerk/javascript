@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
-  __experimental_commerce: {
+  backButton: '返回',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: '默認',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: '其他模擬器設備',
+  badge__primary: '主要',
+  badge__renewsAt: undefined,
+  badge__requiresAction: '需要操作',
+  badge__startsAt: undefined,
+  badge__thisDevice: '此設備',
+  badge__unverified: '未驗證',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: '用戶設備',
+  badge__you: '您',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const zhTW: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: '返回',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: '默認',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: '其他模擬器設備',
-  badge__primary: '主要',
-  badge__renewsAt: undefined,
-  badge__requiresAction: '需要操作',
-  badge__startsAt: undefined,
-  badge__thisDevice: '此設備',
-  badge__unverified: '未驗證',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: '用戶設備',
-  badge__you: '您',
   createOrganization: {
     formButtonSubmit: '創建組織',
     invitePage: {
@@ -152,6 +157,41 @@ export const zhTW: LocalizationResource = {
     badge__automaticSuggestion: '自動建議',
     badge__manualInvitation: '不自動註冊',
     badge__unverified: '未經驗證',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle: '新增要驗證的網域。擁有此網域電子郵件地址的使用者可以自動加入該組織或要求加入。',
       title: '新增網域',
@@ -683,7 +723,21 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: '已複製！',
+      actionLabel__copy: '複製全部',
+      actionLabel__download: '下載 .txt',
+      actionLabel__print: '列印',
+      infoText1: '將為此帳戶啟用備份代碼。',
+      infoText2: '保密並安全儲存備份代碼。如果您懷疑它們已經洩露，您可以重新生成備份代碼。',
+      subtitle__codelist: '安全儲存並保守秘密。',
+      successMessage:
+        '現在已啟用備份代碼。如果您失去了驗證設備的訪問權限，您可以使用其中之一登入您的帳戶。每個代碼只能使用一次。',
+      successSubtitle: '如果您失去了驗證設備的訪問權限，您可以使用其中之一登入您的帳戶。',
+      title: '添加備份代碼驗證',
+      title__codelist: '備份代碼',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -706,24 +760,14 @@ export const zhTW: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: '已複製！',
-      actionLabel__copy: '複製全部',
-      actionLabel__download: '下載 .txt',
-      actionLabel__print: '列印',
-      infoText1: '將為此帳戶啟用備份代碼。',
-      infoText2: '保密並安全儲存備份代碼。如果您懷疑它們已經洩露，您可以重新生成備份代碼。',
-      subtitle__codelist: '安全儲存並保守秘密。',
-      successMessage:
-        '現在已啟用備份代碼。如果您失去了驗證設備的訪問權限，您可以使用其中之一登入您的帳戶。每個代碼只能使用一次。',
-      successSubtitle: '如果您失去了驗證設備的訪問權限，您可以使用其中之一登入您的帳戶。',
-      title: '添加備份代碼驗證',
-      title__codelist: '備份代碼',
     },
     connectedAccountPage: {
       formHint: '選擇一個供應商來連接您的帳戶。',

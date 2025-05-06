@@ -1,9 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type {
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  PricingTableProps,
-} from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
@@ -18,12 +14,15 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const subscriberType = useSubscriberTypeContext();
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
+  const { user } = useUser();
+
+  const resource = subscriberType === 'org' ? organization : user;
 
   const { plans, handleSelectPlan } = usePlansContext();
 
-  const [planPeriod, setPlanPeriod] = useState<__experimental_CommerceSubscriptionPlanPeriod>('month');
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('month');
 
-  const selectPlan = (plan: __experimental_CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
+  const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       return clerk.redirectToSignIn();
     }
@@ -31,17 +30,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     handleSelectPlan({ mode, plan, planPeriod, event });
   };
 
-  const { __experimental_commerce } = useClerk();
-
-  const { user } = useUser();
-  useFetch(
-    user ? __experimental_commerce?.getPaymentSources : undefined,
-    {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    },
-    undefined,
-    `commerce-payment-sources-${user?.id}`,
-  );
+  useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);
 
   return (
     <Flow.Root

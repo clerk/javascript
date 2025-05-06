@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
-  __experimental_commerce: {
+  backButton: 'Kembali',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Default',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
+  badge__primary: 'Utama',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Memerlukan tindakan',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Perangkat ini',
+  badge__unverified: 'Belum diverifikasi',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Perangkat pengguna',
+  badge__you: 'Anda',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const idID: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Kembali',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Default',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
-  badge__primary: 'Utama',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Memerlukan tindakan',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Perangkat ini',
-  badge__unverified: 'Belum diverifikasi',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Perangkat pengguna',
-  badge__you: 'Anda',
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {
@@ -154,6 +159,41 @@ export const idID: LocalizationResource = {
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
     badge__unverified: 'Belum diverifikasi',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Tambahkan domain untuk verifikasi. Pengguna dengan alamat email di domain ini dapat bergabung dengan organisasi secara otomatis atau meminta untuk bergabung.',
@@ -707,7 +747,23 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Disalin!',
+      actionLabel__copy: 'Salin semua',
+      actionLabel__download: 'Unduh .txt',
+      actionLabel__print: 'Cetak',
+      infoText1: 'Kode cadangan akan diaktifkan untuk akun ini.',
+      infoText2:
+        'Jaga kerahasiaan kode cadangan dan simpan dengan aman. Anda dapat membuat ulang kode cadangan jika mencurigai telah disusupi.',
+      subtitle__codelist: 'Simpan dengan aman dan jaga kerahasiaannya.',
+      successMessage:
+        'Kode cadangan sekarang diaktifkan. Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi. Setiap kode hanya dapat digunakan sekali.',
+      successSubtitle:
+        'Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi.',
+      title: 'Tambah verifikasi kode cadangan',
+      title__codelist: 'Kode cadangan',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -730,26 +786,14 @@ export const idID: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Disalin!',
-      actionLabel__copy: 'Salin semua',
-      actionLabel__download: 'Unduh .txt',
-      actionLabel__print: 'Cetak',
-      infoText1: 'Kode cadangan akan diaktifkan untuk akun ini.',
-      infoText2:
-        'Jaga kerahasiaan kode cadangan dan simpan dengan aman. Anda dapat membuat ulang kode cadangan jika mencurigai telah disusupi.',
-      subtitle__codelist: 'Simpan dengan aman dan jaga kerahasiaannya.',
-      successMessage:
-        'Kode cadangan sekarang diaktifkan. Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi. Setiap kode hanya dapat digunakan sekali.',
-      successSubtitle:
-        'Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi.',
-      title: 'Tambah verifikasi kode cadangan',
-      title__codelist: 'Kode cadangan',
     },
     connectedAccountPage: {
       formHint: 'Pilih penyedia untuk menghubungkan akun Anda.',

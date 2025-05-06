@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  __experimental_commerce: {
+  backButton: '戻る',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'デフォルト',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: '他の模倣者デバイス',
+  badge__primary: 'プライマリ',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'アクションが必要',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'このデバイス',
+  badge__unverified: '未確認',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'ユーザーデバイス',
+  badge__you: 'あなた',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const jaJP: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: '戻る',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'デフォルト',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: '他の模倣者デバイス',
-  badge__primary: 'プライマリ',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'アクションが必要',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'このデバイス',
-  badge__unverified: '未確認',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'ユーザーデバイス',
-  badge__you: 'あなた',
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {
@@ -154,6 +159,41 @@ export const jaJP: LocalizationResource = {
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'ドメインを追加して検証します。このドメインのメールアドレスを持つユーザーは、自動的に組織に参加するか、参加をリクエストすることができます。',
@@ -697,7 +737,22 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'コピー済み！',
+      actionLabel__copy: 'すべてコピー',
+      actionLabel__download: '.txtでダウンロード',
+      actionLabel__print: '印刷',
+      infoText1: 'このアカウントではバックアップコードが有効になります。',
+      infoText2:
+        'バックアップコードは秘密に保管し、安全に保存してください。疑わしい場合はバックアップコードを再生成することができます。',
+      subtitle__codelist: 'バックアップコードを安全に保管し、秘密にしてください。',
+      successMessage:
+        'バックアップコードが有効になりました。認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。各コードは一度しか使用できません。',
+      successSubtitle: '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
+      title: 'バックアップコードの追加',
+      title__codelist: 'バックアップコード',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -720,25 +775,14 @@ export const jaJP: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'コピー済み！',
-      actionLabel__copy: 'すべてコピー',
-      actionLabel__download: '.txtでダウンロード',
-      actionLabel__print: '印刷',
-      infoText1: 'このアカウントではバックアップコードが有効になります。',
-      infoText2:
-        'バックアップコードは秘密に保管し、安全に保存してください。疑わしい場合はバックアップコードを再生成することができます。',
-      subtitle__codelist: 'バックアップコードを安全に保管し、秘密にしてください。',
-      successMessage:
-        'バックアップコードが有効になりました。認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。各コードは一度しか使用できません。',
-      successSubtitle: '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
-      title: 'バックアップコードの追加',
-      title__codelist: 'バックアップコード',
     },
     connectedAccountPage: {
       formHint: 'アカウントを連携するプロバイダを選択してください。',

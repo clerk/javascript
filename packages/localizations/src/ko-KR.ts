@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
-  __experimental_commerce: {
+  backButton: '돌아가기',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: '기본값',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: '기타 사칭 장치',
+  badge__primary: '기본',
+  badge__renewsAt: undefined,
+  badge__requiresAction: '조치 필요',
+  badge__startsAt: undefined,
+  badge__thisDevice: '이 장치',
+  badge__unverified: '미확인',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: '사용자 장치',
+  badge__you: '당신',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const koKR: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: '돌아가기',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: '기본값',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: '기타 사칭 장치',
-  badge__primary: '기본',
-  badge__renewsAt: undefined,
-  badge__requiresAction: '조치 필요',
-  badge__startsAt: undefined,
-  badge__thisDevice: '이 장치',
-  badge__unverified: '미확인',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: '사용자 장치',
-  badge__you: '당신',
   createOrganization: {
     formButtonSubmit: '조직 만들기',
     invitePage: {
@@ -154,6 +159,41 @@ export const koKR: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -691,7 +731,22 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: '복사 완료!',
+      actionLabel__copy: '전체 복사',
+      actionLabel__download: '.txt 다운로드',
+      actionLabel__print: '인쇄',
+      infoText1: '이 계정에 대해 백업 코드가 활성화됩니다.',
+      infoText2:
+        '백업 코드를 비밀로 유지하고 안전하게 보관하세요. 백업 코드가 손상된 것으로 의심되는 경우 백업 코드를 다시 생성할 수 있습니다.',
+      subtitle__codelist: '안전하게 저장하고 비밀로 유지하세요.',
+      successMessage:
+        '이제 백업 코드가 활성화되었습니다. 인증 장치에 액세스할 수 없는 경우 이 중 하나를 사용하여 계정에 로그인할 수 있습니다. 각 코드는 한 번만 사용할 수 있습니다.',
+      successSubtitle: '인증 장치에 액세스할 수 없는 경우 이 중 하나를 사용하여 계정에 로그인할 수 있습니다.',
+      title: '백업 코드 인증 추가',
+      title__codelist: '백업 코드',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -714,25 +769,14 @@ export const koKR: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: '복사 완료!',
-      actionLabel__copy: '전체 복사',
-      actionLabel__download: '.txt 다운로드',
-      actionLabel__print: '인쇄',
-      infoText1: '이 계정에 대해 백업 코드가 활성화됩니다.',
-      infoText2:
-        '백업 코드를 비밀로 유지하고 안전하게 보관하세요. 백업 코드가 손상된 것으로 의심되는 경우 백업 코드를 다시 생성할 수 있습니다.',
-      subtitle__codelist: '안전하게 저장하고 비밀로 유지하세요.',
-      successMessage:
-        '이제 백업 코드가 활성화되었습니다. 인증 장치에 액세스할 수 없는 경우 이 중 하나를 사용하여 계정에 로그인할 수 있습니다. 각 코드는 한 번만 사용할 수 있습니다.',
-      successSubtitle: '인증 장치에 액세스할 수 없는 경우 이 중 하나를 사용하여 계정에 로그인할 수 있습니다.',
-      title: '백업 코드 인증 추가',
-      title__codelist: '백업 코드',
     },
     connectedAccountPage: {
       formHint: '계정을 연결할 제공자를 선택하세요',

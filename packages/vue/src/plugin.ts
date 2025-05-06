@@ -9,6 +9,12 @@ import { ClerkInjectionKey } from './keys';
 
 export type PluginOptions = LoadClerkJsScriptOptions;
 
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
+};
+
 /**
  * Vue plugin for integrating Clerk.
  *
@@ -28,9 +34,9 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * ```
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
-  install(app, options) {
+  install(app, pluginOptions) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
-    const { initialState } = options;
+    const { initialState } = pluginOptions;
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);
@@ -41,6 +47,11 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       user: undefined,
       organization: undefined,
     });
+
+    const options: LoadClerkJsScriptOptions = {
+      ...pluginOptions,
+      sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
+    };
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code

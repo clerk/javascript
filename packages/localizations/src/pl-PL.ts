@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
-  __experimental_commerce: {
+  backButton: 'Powrót',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Domyślny',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
+  badge__primary: 'Podstawowy',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Wymaga działania',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'To urządzenie',
+  badge__unverified: 'Niezweryfikowany',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Urządzenie użytkownika',
+  badge__you: 'Ty',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const plPL: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Powrót',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Domyślny',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
-  badge__primary: 'Podstawowy',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Wymaga działania',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'To urządzenie',
-  badge__unverified: 'Niezweryfikowany',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Urządzenie użytkownika',
-  badge__you: 'Ty',
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',
     invitePage: {
@@ -154,6 +159,41 @@ export const plPL: LocalizationResource = {
     badge__automaticSuggestion: 'Automatyczne sugestie',
     badge__manualInvitation: 'Brak automatycznej rejestracji',
     badge__unverified: 'Niezweryfikowany',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Dodaj domenę do weryfikacji. Użytkownicy z adresami e-mail w tej domenie mogą dołączyć do organizacji automatycznie lub poprosić o dołączenie.',
@@ -706,7 +746,23 @@ export const plPL: LocalizationResource = {
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Skopiowane!',
+      actionLabel__copy: 'Skopiuj wszystkie',
+      actionLabel__download: 'Pobierz .txt',
+      actionLabel__print: 'Drukuj',
+      infoText1: 'Kody zapasowe zostaną włączone dla tego konta.',
+      infoText2:
+        'Przechowuj kody zapasowe w tajemnicy i bezpiecznie. Możesz wygenerować nowe kody, jeśli podejrzewasz, że zostały skompromitowane.',
+      subtitle__codelist: 'Przechowuj je bezpiecznie i zachowaj w tajemnicy.',
+      successMessage:
+        'Kody zapasowe są teraz włączone. Możesz użyć jednego z tych kodów do zalogowania się na swoje konto, jeśli utracisz dostęp do urządzenia uwierzytelniającego. Każdy kod można użyć tylko raz.',
+      successSubtitle:
+        'Możesz użyć jednego z tych kodów do zalogowania się na swoje konto, jeśli utracisz dostęp do urządzenia uwierzytelniającego.',
+      title: 'Dodaj weryfikację kodem zapasowym',
+      title__codelist: 'Kody zapasowe',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -729,26 +785,14 @@ export const plPL: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Skopiowane!',
-      actionLabel__copy: 'Skopiuj wszystkie',
-      actionLabel__download: 'Pobierz .txt',
-      actionLabel__print: 'Drukuj',
-      infoText1: 'Kody zapasowe zostaną włączone dla tego konta.',
-      infoText2:
-        'Przechowuj kody zapasowe w tajemnicy i bezpiecznie. Możesz wygenerować nowe kody, jeśli podejrzewasz, że zostały skompromitowane.',
-      subtitle__codelist: 'Przechowuj je bezpiecznie i zachowaj w tajemnicy.',
-      successMessage:
-        'Kody zapasowe są teraz włączone. Możesz użyć jednego z tych kodów do zalogowania się na swoje konto, jeśli utracisz dostęp do urządzenia uwierzytelniającego. Każdy kod można użyć tylko raz.',
-      successSubtitle:
-        'Możesz użyć jednego z tych kodów do zalogowania się na swoje konto, jeśli utracisz dostęp do urządzenia uwierzytelniającego.',
-      title: 'Dodaj weryfikację kodem zapasowym',
-      title__codelist: 'Kody zapasowe',
     },
     connectedAccountPage: {
       formHint: 'Wybierz dostawcę, aby połączyć konto.',

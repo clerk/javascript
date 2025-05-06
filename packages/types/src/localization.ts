@@ -89,6 +89,7 @@ type _LocalizationResource = {
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
+  badge__activePlan: LocalizationValue;
   badge__startsAt: LocalizationValue;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
@@ -104,7 +105,7 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  __experimental_commerce: {
+  commerce: {
     month: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
@@ -139,6 +140,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
+      downgradeNotice: LocalizationValue;
     };
   };
   signUp: {
@@ -688,12 +690,16 @@ type _LocalizationResource = {
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
-    __experimental_billingPage: {
+    billingPage: {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
@@ -876,6 +882,41 @@ type _LocalizationResource = {
           headerSubtitle: LocalizationValue;
           primaryButton: LocalizationValue;
         };
+      };
+    };
+    billingPage: {
+      title: LocalizationValue;
+      start: {
+        headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
+        headerTitle__invoices: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
+        payWithTestCardButton: LocalizationValue;
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
+      };
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
       };
     };
   };

@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
-  __experimental_commerce: {
+  backButton: 'Zurück',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: 'Aktueller Plan',
+  badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
+  badge__primary: 'Primär',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Erfordert Handeln',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Dieses Gerät',
+  badge__unverified: 'Unbestätigt',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Benutzergerät',
+  badge__you: 'Du',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: 'Jährlich abgerechnet',
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const deDE: LocalizationResource = {
     month: 'Monat',
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Zurück',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: 'Aktueller Plan',
-  badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
-  badge__primary: 'Primär',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Erfordert Handeln',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Dieses Gerät',
-  badge__unverified: 'Unbestätigt',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Benutzergerät',
-  badge__you: 'Du',
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -156,6 +161,41 @@ export const deDE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',
     badge__unverified: 'Nicht verifiziert',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Fügen Sie die zu überprüfende Domain hinzu. Benutzer mit E-Mail-Adressen von dieser Domain können der Organisation automatisch beitreten oder einen Antrag auf Beitritt stellen.',
@@ -713,7 +753,23 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Kopiert!',
+      actionLabel__copy: 'Kopiere alle',
+      actionLabel__download: 'Laden Sie .txt herunter',
+      actionLabel__print: 'Drucken',
+      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
+      infoText2:
+        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
+      subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
+      successMessage:
+        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
+      successSubtitle:
+        'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
+      title: 'Backup-Code-Verifizierung hinzufügen',
+      title__codelist: 'Sicherungscodes',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -736,26 +792,14 @@ export const deDE: LocalizationResource = {
         headerTitle__plans: 'Pläne',
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: 'Abrechnung & Zahlungen',
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Kopiert!',
-      actionLabel__copy: 'Kopiere alle',
-      actionLabel__download: 'Laden Sie .txt herunter',
-      actionLabel__print: 'Drucken',
-      infoText1: 'Backup-Codes werden für dieses Konto aktiviert.',
-      infoText2:
-        'Halten Sie die Backup-Codes geheim und bewahren Sie sie sicher auf. Sie können Sicherungscodes neu generieren, wenn Sie vermuten, dass sie kompromittiert wurden.',
-      subtitle__codelist: 'Bewahren Sie die Codes sicher auf und halten Sie sie geheim.',
-      successMessage:
-        'Sicherungscodes sind jetzt aktiviert. Sie können eines davon verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren. Jeder Code kann nur einmal verwendet werden.',
-      successSubtitle:
-        'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
-      title: 'Backup-Code-Verifizierung hinzufügen',
-      title__codelist: 'Sicherungscodes',
     },
     connectedAccountPage: {
       formHint: 'Wählen Sie einen Anbieter aus, um Ihr Konto zu verbinden.',

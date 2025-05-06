@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
-  __experimental_commerce: {
+  backButton: 'Terug',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Standaard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
+  badge__primary: 'Primair',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Actie vereist',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Dit apparaat',
+  badge__unverified: 'Ongeverifieerd',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Gebruikersapparaat',
+  badge__you: 'Jij',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const nlBE: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Terug',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'Standaard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Ander impersonatie apparaat',
-  badge__primary: 'Primair',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Actie vereist',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Dit apparaat',
-  badge__unverified: 'Ongeverifieerd',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Gebruikersapparaat',
-  badge__you: 'Jij',
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -153,6 +158,41 @@ export const nlBE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Voeg het domein toe om te verifiëren. Gebruikers met e-mailadressen in dit domein kunnen de organisatie automatisch toegang krijgen of een verzoek om toegang te maken.',
@@ -696,7 +736,23 @@ export const nlBE: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Gekopieerd!',
+      actionLabel__copy: 'Kopieer',
+      actionLabel__download: 'Download .txt',
+      actionLabel__print: 'Print',
+      infoText1: 'Backupcodes zullen voor dit account ingeschakeld zijn.',
+      infoText2:
+        'Houd de backupcodes geheim en bewaar ze veilig. U kunt backupcodes opnieuw genereren als u vermoedt dat ze zijn aangetast.',
+      subtitle__codelist: 'Sla ze veilig op en hou ze geheim.',
+      successMessage:
+        'Backupcodes zijn nu ingeschakeld. U kunt er een van gebruiken om in te loggen op uw account als u geen toegang meer heeft tot uw authenticatieapparaat. Elke code kan maar één keer gebruikt worden.',
+      successSubtitle:
+        'Je kunt één van deze gebruiken om in te loggen op je account als je geen toegang meer hebt tot je authenticatieapparaat.',
+      title: 'Voeg backup code verificatie toe',
+      title__codelist: 'Backup codes',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -719,26 +775,14 @@ export const nlBE: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Gekopieerd!',
-      actionLabel__copy: 'Kopieer',
-      actionLabel__download: 'Download .txt',
-      actionLabel__print: 'Print',
-      infoText1: 'Backupcodes zullen voor dit account ingeschakeld zijn.',
-      infoText2:
-        'Houd de backupcodes geheim en bewaar ze veilig. U kunt backupcodes opnieuw genereren als u vermoedt dat ze zijn aangetast.',
-      subtitle__codelist: 'Sla ze veilig op en hou ze geheim.',
-      successMessage:
-        'Backupcodes zijn nu ingeschakeld. U kunt er een van gebruiken om in te loggen op uw account als u geen toegang meer heeft tot uw authenticatieapparaat. Elke code kan maar één keer gebruikt worden.',
-      successSubtitle:
-        'Je kunt één van deze gebruiken om in te loggen op je account als je geen toegang meer hebt tot je authenticatieapparaat.',
-      title: 'Voeg backup code verificatie toe',
-      title__codelist: 'Backup codes',
     },
     connectedAccountPage: {
       formHint: 'Kies een provider om je account te verbinden.',

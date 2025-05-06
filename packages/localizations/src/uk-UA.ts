@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
-  __experimental_commerce: {
+  backButton: 'Назад',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'За замовчуванням',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
+  badge__primary: 'Основний',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Потребує дії',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Цей пристрій',
+  badge__unverified: 'Неперевірений',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'Пристрій користувача',
+  badge__you: 'Ви',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const ukUA: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: 'Назад',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: 'За замовчуванням',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
-  badge__primary: 'Основний',
-  badge__renewsAt: undefined,
-  badge__requiresAction: 'Потребує дії',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Цей пристрій',
-  badge__unverified: 'Неперевірений',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'Пристрій користувача',
-  badge__you: 'Ви',
   createOrganization: {
     formButtonSubmit: 'Створити організацію',
     invitePage: {
@@ -154,6 +159,41 @@ export const ukUA: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -694,7 +734,23 @@ export const ukUA: LocalizationResource = {
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: 'Скопійовано!',
+      actionLabel__copy: 'Копіювати все',
+      actionLabel__download: 'Завантажити .txt',
+      actionLabel__print: 'Друк',
+      infoText1: 'Резервні коди будуть включені для цього облікового запису.',
+      infoText2:
+        'Зберігайте резервні коди в таємниці та зберігайте їх у безпеці. Ви можете створити нові резервні коди, якщо підозрюєте, що вони були скомпрометовані.',
+      subtitle__codelist: 'Зберігайте їх у безпеці та не повідомляйте нікому.',
+      successMessage:
+        'Резервні коди ввімкнено. Ви можете використовувати один із цих кодів для входу до свого облікового запису, якщо ви втратите доступ до свого аутентифікаційного пристрою. Кожен код може бути використаний тільки один раз.',
+      successSubtitle:
+        'Ви можете використовувати один із цих кодів для входу у свій обліковий запис, якщо ви втратите доступ до свого аутентифікаційного пристрою.',
+      title: 'Додати резервний код підтвердження',
+      title__codelist: 'Резервні коди',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -717,26 +773,14 @@ export const ukUA: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: 'Скопійовано!',
-      actionLabel__copy: 'Копіювати все',
-      actionLabel__download: 'Завантажити .txt',
-      actionLabel__print: 'Друк',
-      infoText1: 'Резервні коди будуть включені для цього облікового запису.',
-      infoText2:
-        'Зберігайте резервні коди в таємниці та зберігайте їх у безпеці. Ви можете створити нові резервні коди, якщо підозрюєте, що вони були скомпрометовані.',
-      subtitle__codelist: 'Зберігайте їх у безпеці та не повідомляйте нікому.',
-      successMessage:
-        'Резервні коди ввімкнено. Ви можете використовувати один із цих кодів для входу до свого облікового запису, якщо ви втратите доступ до свого аутентифікаційного пристрою. Кожен код може бути використаний тільки один раз.',
-      successSubtitle:
-        'Ви можете використовувати один із цих кодів для входу у свій обліковий запис, якщо ви втратите доступ до свого аутентифікаційного пристрою.',
-      title: 'Додати резервний код підтвердження',
-      title__codelist: 'Резервні коди',
     },
     connectedAccountPage: {
       formHint: 'Виберіть провайдера для підключення вашого акаунта.',

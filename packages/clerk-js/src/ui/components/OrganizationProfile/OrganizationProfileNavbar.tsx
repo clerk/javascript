@@ -21,6 +21,24 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_memberships:manage' }),
   );
 
+  const allowBillingRoutes = useProtect(
+    has =>
+      has({
+        permission: 'org:sys_billing:read',
+      }) || has({ permission: 'org:sys_billing:manage' }),
+  );
+
+  const routes = pages.routes
+    .filter(
+      r =>
+        r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
+        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute),
+    )
+    .filter(
+      r =>
+        r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
+        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
+    );
   if (!organization) {
     return null;
   }
@@ -30,11 +48,7 @@ export const OrganizationProfileNavbar = (
       <NavBar
         title={localizationKeys('organizationProfile.navbar.title')}
         description={localizationKeys('organizationProfile.navbar.description')}
-        routes={pages.routes.filter(
-          r =>
-            r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
-            (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute),
-        )}
+        routes={routes}
         contentRef={props.contentRef}
       />
       {props.children}

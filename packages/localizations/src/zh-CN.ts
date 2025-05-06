@@ -14,13 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
-  __experimental_commerce: {
+  backButton: '返回',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: '默认',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: '其他模拟器设备',
+  badge__primary: '主要',
+  badge__renewsAt: undefined,
+  badge__requiresAction: '需要操作',
+  badge__startsAt: undefined,
+  badge__thisDevice: '此设备',
+  badge__unverified: '未验证',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: '用户设备',
+  badge__you: '您',
+  commerce: {
+    alwaysFree: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -43,26 +63,11 @@ export const zhCN: LocalizationResource = {
     month: undefined,
     reSubscribe: undefined,
     seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
   },
-  backButton: '返回',
-  badge__canceledEndsAt: undefined,
-  badge__currentPlan: undefined,
-  badge__default: '默认',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: '其他模拟器设备',
-  badge__primary: '主要',
-  badge__renewsAt: undefined,
-  badge__requiresAction: '需要操作',
-  badge__startsAt: undefined,
-  badge__thisDevice: '此设备',
-  badge__unverified: '未验证',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: '用户设备',
-  badge__you: '您',
   createOrganization: {
     formButtonSubmit: '创建组织',
     invitePage: {
@@ -152,6 +157,41 @@ export const zhCN: LocalizationResource = {
     badge__automaticSuggestion: '自动建议',
     badge__manualInvitation: '无自动注册',
     badge__unverified: '未验证',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle: '添加域名以进行验证。具有此域名电子邮件地址的用户可以自动加入组织或请求加入。',
       title: '添加域名',
@@ -682,7 +722,21 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
-    __experimental_billingPage: {
+    backupCodePage: {
+      actionLabel__copied: '已复制！',
+      actionLabel__copy: '复制全部',
+      actionLabel__download: '下载 .txt',
+      actionLabel__print: '打印',
+      infoText1: '将为此账户启用备份代码。',
+      infoText2: '保密并安全存储备份代码。如果您怀疑它们已经泄露，您可以重新生成备份代码。',
+      subtitle__codelist: '安全存储并保守秘密。',
+      successMessage:
+        '现在已启用备份代码。如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。每个代码只能使用一次。',
+      successSubtitle: '如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。',
+      title: '添加备份代码验证',
+      title__codelist: '备份代码',
+    },
+    billingPage: {
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -705,24 +759,14 @@ export const zhCN: LocalizationResource = {
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
       subscriptionsSection: {
         actionLabel__default: undefined,
       },
       title: undefined,
-    },
-    backupCodePage: {
-      actionLabel__copied: '已复制！',
-      actionLabel__copy: '复制全部',
-      actionLabel__download: '下载 .txt',
-      actionLabel__print: '打印',
-      infoText1: '将为此账户启用备份代码。',
-      infoText2: '保密并安全存储备份代码。如果您怀疑它们已经泄露，您可以重新生成备份代码。',
-      subtitle__codelist: '安全存储并保守秘密。',
-      successMessage:
-        '现在已启用备份代码。如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。每个代码只能使用一次。',
-      successSubtitle: '如果您失去了验证设备的访问权限，您可以使用其中之一登录您的账户。',
-      title: '添加备份代码验证',
-      title__codelist: '备份代码',
     },
     connectedAccountPage: {
       formHint: '选择一个供应商来连接您的账户。',

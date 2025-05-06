@@ -1,16 +1,16 @@
-import type { __experimental_CheckoutProps } from '@clerk/types';
+import type { __internal_CheckoutProps } from '@clerk/types';
 
-import { __experimental_CheckoutContext, SubscriberTypeContext } from '../../contexts';
+import { CheckoutContext, SubscriberTypeContext } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Drawer } from '../../elements';
 import { CheckoutPage } from './CheckoutPage';
 
-export const __experimental_Checkout = (props: __experimental_CheckoutProps) => {
+export const Checkout = (props: __internal_CheckoutProps) => {
   return (
     <Flow.Root flow='checkout'>
       <Flow.Part>
         <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-          <__experimental_CheckoutContext.Provider
+          <CheckoutContext.Provider
             value={{
               componentName: 'Checkout',
               ...props,
@@ -20,7 +20,7 @@ export const __experimental_Checkout = (props: __experimental_CheckoutProps) => 
               <Drawer.Header title='Checkout' />
               <CheckoutPage {...props} />
             </Drawer.Content>
-          </__experimental_CheckoutContext.Provider>
+          </CheckoutContext.Provider>
         </SubscriberTypeContext.Provider>
       </Flow.Part>
     </Flow.Root>
