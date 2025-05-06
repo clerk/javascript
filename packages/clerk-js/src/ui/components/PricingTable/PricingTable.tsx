@@ -23,7 +23,6 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
       const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
-      console.log('upcomingSubscription', upcomingSubscription);
       if (upcomingSubscription) {
         return upcomingSubscription.planPeriod;
       }
