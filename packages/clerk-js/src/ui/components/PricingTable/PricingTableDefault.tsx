@@ -113,6 +113,8 @@ function Card(props: CardProps) {
 
   const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
 
+  const hasFeatures = plan.features.length > 0;
+
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
 
@@ -185,8 +187,8 @@ function Card(props: CardProps) {
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: t.colors.$colorBackground,
-              borderTopWidth: t.borderWidths.$normal,
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
