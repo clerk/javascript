@@ -1067,6 +1067,10 @@ export class Clerk implements ClerkInterface {
     return ApiKey.getAll();
   };
 
+  public getApiKeySecret = async (id: string): Promise<string> => {
+    return ApiKey.getSecret(id);
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
