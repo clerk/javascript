@@ -169,8 +169,8 @@ function Card(props: CardProps) {
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: plan.features.length > 0 ? t.colors.$colorBackground : 'transparent',
-              borderTopWidth: plan.features.length > 0 ? t.borderWidths.$normal : 0,
+              backgroundColor: t.colors.$colorBackground,
+              borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
