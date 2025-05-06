@@ -26,7 +26,7 @@ function includeFreeToSubscriptionsLint(subscriptions: CommerceSubscriptionResou
   const hasUpcomingSubscription = subscriptions.some(sub => sub.status === 'upcoming');
   const freePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
 
-  if (cancelledSubscription && !hasUpcomingSubscription) {
+  if (cancelledSubscription && !hasUpcomingSubscription && freePlan) {
     return [
       ...subscriptions,
       {
@@ -133,17 +133,19 @@ export function SubscriptionsList() {
                 {subscription.planPeriod === 'annual'
                   ? subscription.plan.annualMonthlyAmountFormatted
                   : subscription.plan.amountFormatted}
-                <Span
-                  sx={t => ({
-                    color: t.colors.$colorTextSecondary,
-                    textTransform: 'lowercase',
-                    ':before': {
-                      content: '"/"',
-                      marginInline: t.space.$1,
-                    },
-                  })}
-                  localizationKey={localizationKeys('commerce.month')}
-                />
+                {subscription.plan.amount > 0 && (
+                  <Span
+                    sx={t => ({
+                      color: t.colors.$colorTextSecondary,
+                      textTransform: 'lowercase',
+                      ':before': {
+                        content: '"/"',
+                        marginInline: t.space.$1,
+                      },
+                    })}
+                    localizationKey={localizationKeys('commerce.month')}
+                  />
+                )}
               </Text>
             </Td>
             <Td

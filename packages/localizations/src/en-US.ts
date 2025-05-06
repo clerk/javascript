@@ -321,7 +321,7 @@ export const enUS: LocalizationResource = {
       start: {
         headerTitle__invoices: 'Invoices',
         headerTitle__plans: 'Plans',
-        headerTitle__subscriptions: 'Subscriptions',
+        headerTitle__subscriptions: 'Subscription',
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
