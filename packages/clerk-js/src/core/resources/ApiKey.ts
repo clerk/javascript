@@ -6,20 +6,20 @@ import { BaseResource } from './internal';
 export class ApiKey extends BaseResource implements ApiKeyResource {
   pathRoot = '/api_keys';
 
-  id = '';
-  type = '';
-  name = '';
-  subject = '';
-  scopes: string[] = [];
-  claims: Record<string, any> | null = null;
-  revoked = false;
-  revocationReason: string | null = null;
-  expired = false;
-  expiration: Date | null = null;
-  createdBy: string | null = null;
-  creationReason: string | null = null;
-  createdAt: Date = new Date();
-  updatedAt: Date = new Date();
+  id!: string;
+  type!: string;
+  name!: string;
+  subject!: string;
+  scopes!: string[];
+  claims!: Record<string, any> | null;
+  revoked!: boolean;
+  revocationReason!: string | null;
+  expired!: boolean;
+  expiration!: Date | null;
+  createdBy!: string | null;
+  creationReason!: string | null;
+  createdAt!: Date;
+  updatedAt!: Date;
 
   constructor(data: ApiKeyJSON) {
     super();
@@ -32,7 +32,17 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
     }
 
     this.id = data.id;
+    this.type = data.type;
+    this.name = data.name;
+    this.subject = data.subject;
+    this.scopes = data.scopes;
+    this.claims = data.claims;
+    this.revoked = data.revoked;
+    this.revocationReason = data.revocation_reason;
+    this.expired = data.expired;
     this.expiration = data.expiration ? unixEpochToDate(data.expiration) : null;
+    this.createdBy = data.created_by;
+    this.creationReason = data.creation_reason;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
     return this;
@@ -41,7 +51,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
   static async getAll(): Promise<ApiKeyResource[]> {
     return this.clerk
       .getFapiClient()
-      .request<ApiKeyJSON[]>({
+      .request<{ api_keys: ApiKeyJSON[] }>({
         method: 'GET',
         path: '/api_keys',
         pathPrefix: '',
@@ -51,11 +61,30 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
         headers: {
           Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
         },
+        credentials: 'same-origin',
       })
       .then(res => {
-        const apiKeysJSON = res.payload as unknown as ApiKeyJSON[];
-        return apiKeysJSON.map(json => new ApiKey(json));
+        const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
+        return apiKeysJSON.api_keys.map(json => new ApiKey(json));
       })
       .catch(() => []);
+  }
+
+  static async getSecret(id: string): Promise<string> {
+    return this.clerk
+      .getFapiClient()
+      .request<{ secret: string }>({
+        method: 'GET',
+        path: `/api_keys/${id}/secret`,
+        credentials: 'same-origin',
+        pathPrefix: '',
+        headers: {
+          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
+        },
+      })
+      .then(res => {
+        return (res.payload as any)?.secret ?? '';
+      })
+      .catch(() => '');
   }
 }

@@ -224,8 +224,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     let response: Response;
     const urlStr = requestInit.url.toString();
     const fetchOpts: FapiRequestInit = {
-      ...requestInit,
       credentials: 'include',
+      ...requestInit,
       method: overwrittenRequestMethod,
     };
 
