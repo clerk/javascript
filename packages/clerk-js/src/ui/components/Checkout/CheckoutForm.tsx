@@ -31,8 +31,7 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
-  const showCredits =
-    totals.totalDueNow.amount > 0 && !!totals.proration?.credit?.amount && totals.proration.credit.amount > 0;
+  const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
@@ -69,9 +68,7 @@ export const CheckoutForm = ({
               <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
-              <LineItems.Description
-                text={`- ${totals.proration?.credit.currencySymbol}${totals.proration?.credit.amountFormatted}`}
-              />
+              <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
             </LineItems.Group>
           )}
           <LineItems.Group borderTop>
