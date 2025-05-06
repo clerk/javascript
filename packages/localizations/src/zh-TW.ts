@@ -152,6 +152,11 @@ export const zhTW: LocalizationResource = {
     titleWithoutPersonal: '選擇一個組織',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: '自動邀請',
     badge__automaticSuggestion: '自動建議',
     badge__manualInvitation: '不自動註冊',

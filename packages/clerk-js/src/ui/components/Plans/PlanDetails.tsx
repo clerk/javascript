@@ -10,6 +10,7 @@ import type {
 import * as React from 'react';
 import { useState } from 'react';
 
+import { useProtect } from '../../common';
 import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -55,6 +56,9 @@ const PlanDetailsInternal = ({
   const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
     usePlansContext();
   const subscriberType = useSubscriberTypeContext();
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
 
   if (!plan) {
     return null;
@@ -226,6 +230,7 @@ const PlanDetailsInternal = ({
                     variant='bordered'
                     colorScheme='secondary'
                     textVariant='buttonLarge'
+                    isDisabled={!canManageBilling}
                     onClick={() => openCheckout({ planPeriod: 'annual' })}
                     localizationKey={localizationKeys('commerce.switchToAnnual')}
                   />
@@ -235,6 +240,7 @@ const PlanDetailsInternal = ({
                   variant='bordered'
                   colorScheme='danger'
                   textVariant='buttonLarge'
+                  isDisabled={!canManageBilling}
                   onClick={() => setShowConfirmation(true)}
                   localizationKey={localizationKeys('commerce.cancelSubscription')}
                 />
@@ -262,6 +268,7 @@ const PlanDetailsInternal = ({
                   variant='ghost'
                   size='sm'
                   textVariant='buttonLarge'
+                  isDisabled={!canManageBilling}
                   onClick={() => {
                     setCancelError(undefined);
                     setShowConfirmation(false);
@@ -275,6 +282,7 @@ const PlanDetailsInternal = ({
                 size='sm'
                 textVariant='buttonLarge'
                 isLoading={isSubmitting}
+                isDisabled={!canManageBilling}
                 onClick={() => {
                   setCancelError(undefined);
                   setShowConfirmation(false);

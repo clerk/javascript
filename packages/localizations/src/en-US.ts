@@ -293,6 +293,9 @@ export const enUS: LocalizationResource = {
       title: 'Verify domain',
     },
     billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this account.',
+      },
       subscriptionsListSection: {
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',

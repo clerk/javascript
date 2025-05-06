@@ -154,6 +154,11 @@ export const elGR: LocalizationResource = {
     titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',

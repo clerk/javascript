@@ -153,6 +153,11 @@ export const caES: LocalizationResource = {
     titleWithoutPersonal: 'Trieu una organització',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Invitacions automàtiques',
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',

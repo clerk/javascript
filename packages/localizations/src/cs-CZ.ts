@@ -155,6 +155,11 @@ export const csCZ: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',

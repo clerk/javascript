@@ -914,6 +914,9 @@ type _LocalizationResource = {
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;
       };
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
+      };
     };
   };
   createOrganization: {

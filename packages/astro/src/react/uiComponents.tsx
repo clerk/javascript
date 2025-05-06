@@ -3,6 +3,7 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
@@ -185,3 +186,13 @@ export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistPr
     />
   );
 }, 'Waitlist');
+
+export const PricingTable = withClerk(({ clerk, ...props }: WithClerkProp<PricingTableProps>) => {
+  return (
+    <Portal
+      mount={clerk?.mountPricingTable}
+      unmount={clerk?.unmountPricingTable}
+      props={props}
+    />
+  );
+}, 'PricingTable');

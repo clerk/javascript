@@ -153,6 +153,11 @@ export const nlBE: LocalizationResource = {
     titleWithoutPersonal: 'Kies een organisatie',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatische Uitnodiging',
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',

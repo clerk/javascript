@@ -1,3 +1,4 @@
+import { Protect } from '../../common';
 import {
   InvoicesContextProvider,
   PlansContextProvider,
@@ -7,6 +8,7 @@ import {
 } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
+  Alert,
   Card,
   Header,
   ProfileSection,
@@ -90,6 +92,13 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       paddingTop: t.space.$1,
                     })}
                   >
+                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                      <Alert
+                        variant='info'
+                        colorScheme='info'
+                        title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                      />
+                    </Protect>
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton
                       id='subscriptionsList'
@@ -107,12 +116,23 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       onClick={() => void navigate('plans')}
                     />
                   </ProfileSection.Root>
-                  <PaymentSources />
+                  <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                    <PaymentSources />
+                  </Protect>
                 </Flex>
               ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
+                <>
+                  <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                    <Alert
+                      variant='info'
+                      colorScheme='info'
+                      title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                    />
+                  </Protect>
+                  <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                    <PricingTable />
+                  </PricingTableContext.Provider>
+                </>
               )}
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>

@@ -154,6 +154,11 @@ export const svSE: LocalizationResource = {
     titleWithoutPersonal: 'Välj en organisation',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatiska inbjudningar',
     badge__automaticSuggestion: 'Automatiska förslag',
     badge__manualInvitation: 'Ingen automatisk registrering',

@@ -154,6 +154,11 @@ export const ptBR: LocalizationResource = {
     titleWithoutPersonal: 'Selecione uma organização',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Convites automáticos',
     badge__automaticSuggestion: 'Sugestões automáticas',
     badge__manualInvitation: 'Sem inscrição automática',

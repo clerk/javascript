@@ -154,6 +154,11 @@ export const fiFI: LocalizationResource = {
     titleWithoutPersonal: 'Valitse organisaatio',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automaattiset kutsut',
     badge__automaticSuggestion: 'Automaattiset ehdotukset',
     badge__manualInvitation: 'Ei automaattista liittymistä',

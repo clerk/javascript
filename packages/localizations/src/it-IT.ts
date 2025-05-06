@@ -155,6 +155,11 @@ export const itIT: LocalizationResource = {
     titleWithoutPersonal: 'Scegli un’organizzazione',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Inviti automatici',
     badge__automaticSuggestion: 'Suggerimenti automatici',
     badge__manualInvitation: 'Nessuna iscrizione automatica',

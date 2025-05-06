@@ -153,6 +153,11 @@ export const thTH: LocalizationResource = {
     titleWithoutPersonal: 'เลือกองค์กร',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'คำเชิญอัตโนมัติ',
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',

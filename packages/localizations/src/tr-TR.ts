@@ -153,6 +153,11 @@ export const trTR: LocalizationResource = {
     titleWithoutPersonal: 'Bir organizasyon seçin',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Otomatik davetler',
     badge__automaticSuggestion: 'Otomatik öneriler',
     badge__manualInvitation: 'Davetler',

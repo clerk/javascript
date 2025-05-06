@@ -155,6 +155,11 @@ export const beBY: LocalizationResource = {
     titleWithoutPersonal: 'Выберыце арганізацыю',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',

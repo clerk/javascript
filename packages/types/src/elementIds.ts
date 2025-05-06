@@ -1,4 +1,4 @@
-export type AlertId = 'danger' | 'warning';
+export type AlertId = 'danger' | 'warning' | 'info';
 export type FieldId =
   | 'firstName'
   | 'lastName'
