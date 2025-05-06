@@ -31,11 +31,11 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 import { BaseResource, CommerceSubscription, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';

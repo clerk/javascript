@@ -29,6 +29,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -76,7 +77,6 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-  CommerceBillingNamespace,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
