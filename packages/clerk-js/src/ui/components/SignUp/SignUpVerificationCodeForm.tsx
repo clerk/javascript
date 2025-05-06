@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/types';
+import type { AlternativePhoneCodeProvider, SignUpResource } from '@clerk/types';
 
 import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -21,10 +21,12 @@ type SignInFactorOneCodeFormProps = {
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { afterSignUpUrl } = useSignUpContext();
   const { setActive } = useClerk();
-  const { navigate } = useRouter();
+  const { navigate, currentPath } = useRouter();
+
+  const alternativePhoneCodeProvider = getAlternativePhoneCodeProviderFromPath(currentPath);
 
   const goBack = () => {
-    return navigate('../');
+    return navigate(alternativePhoneCodeProvider ? '../../' : '../');
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
@@ -35,7 +37,9 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
         return completeSignUpFlow({
           signUp: res,
           verifyEmailPath: '../verify-email-address',
-          verifyPhonePath: '../verify-phone-number',
+          verifyPhonePath: alternativePhoneCodeProvider
+            ? `../verify-phone-number/${alternativePhoneCodeProvider}`
+            : '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
@@ -58,4 +62,20 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       onIdentityPreviewEditClicked={goBack}
     />
   );
+};
+
+const getAlternativePhoneCodeProviderFromPath = (currentPath: string): AlternativePhoneCodeProvider | null => {
+  if (!currentPath) {
+    return null;
+  }
+
+  const verifyPhoneRegex = /(?:.*\/)?verify-phone-number(?:\/([^/]+))?$/;
+  const match = currentPath.match(verifyPhoneRegex);
+
+  // If matched and capture group exists (the segment after verify-phone-number)
+  if (match && match[1]) {
+    return match[1] as AlternativePhoneCodeProvider;
+  }
+
+  return null;
 };

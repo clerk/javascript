@@ -1,6 +1,9 @@
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import type { AlternativePhoneCodeProviderData } from '@clerk/types';
+
+import { Button, Col, descriptors, Flex, Image, localizationKeys } from '../../customizables';
 import { Card, Form, Header, LegalCheckbox, useCardState } from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
+import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { FormControlState } from '../../utils';
 import type { Fields } from './signUpFormHelpers';
 
@@ -9,10 +12,14 @@ type SignUpFormProps = {
   fields: Fields;
   formState: Record<Exclude<keyof Fields, 'ticket'>, FormControlState<any>>;
   onUseAnotherMethod: () => void;
+  phoneCodeProvider: AlternativePhoneCodeProviderData;
 };
 
 export const SignUpAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps) => {
-  const { handleSubmit, fields, formState, onUseAnotherMethod } = props;
+  const { handleSubmit, fields, formState, onUseAnotherMethod, phoneCodeProvider } = props;
+  const { providerToDisplayData, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const provider = phoneCodeProvider.name;
+  const strategy = phoneCodeProvider.strategy;
   const card = useCardState();
 
   const shouldShow = (name: keyof typeof fields) => {
@@ -22,9 +29,35 @@ export const SignUpAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps
   return (
     <Card.Root>
       <Card.Content>
-        <Header.Root showLogo>
-          <Header.Title>Sign in to Suno with WhatsApp</Header.Title>
-          <Header.Subtitle>Enter your phone number to get a verification code on WhatsApp.</Header.Subtitle>
+        <Header.Root
+          showLogo
+          showDivider
+        >
+          <Col
+            center
+            sx={t => ({ height: t.sizes.$7 })}
+          >
+            <Image
+              src={providerToDisplayData[phoneCodeProvider.provider]?.iconUrl}
+              alt={`${strategyToDisplayData[strategy].name} logo`}
+              sx={theme => ({
+                width: theme.sizes.$7,
+                height: theme.sizes.$7,
+                maxWidth: '100%',
+                marginBottom: theme.sizes.$6,
+              })}
+            />
+          </Col>
+          <Header.Title
+            localizationKey={localizationKeys('signUp.start.alternativePhoneCodeProvider.title', {
+              provider,
+            })}
+          />
+          <Header.Subtitle
+            localizationKey={localizationKeys('signUp.start.alternativePhoneCodeProvider.subtitle', {
+              provider,
+            })}
+          />
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
         <Flex
@@ -40,7 +73,7 @@ export const SignUpAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps
               <Form.ControlRow elementId='phoneNumber'>
                 <Form.PhoneInput
                   {...formState.phoneNumber.props}
-                  label='WhatsApp phone number'
+                  label={localizationKeys('signUp.start.alternativePhoneCodeProvider.label', { provider })}
                   isRequired
                   isOptional={false}
                   actionLabel={undefined}
@@ -75,9 +108,8 @@ export const SignUpAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps
                 variant='link'
                 colorScheme='neutral'
                 onClick={onUseAnotherMethod}
-              >
-                Use another method
-              </Button>
+                localizationKey={localizationKeys('signUp.start.alternativePhoneCodeProvider.actionLink')}
+              />
             </Col>
           </Form.Root>
         </Flex>

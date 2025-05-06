@@ -27,14 +27,39 @@ export const Divider = (props: DividerProps) => {
   );
 };
 
-const DividerLine = () => {
+export const VerticalDivider = (props: DividerProps) => {
+  const { sx, ...rest } = props;
+  return (
+    <Flex
+      center
+      direction='col'
+      elementDescriptor={descriptors.dividerRow}
+      sx={[
+        t => ({
+          height: t.space.$6,
+        }),
+        sx,
+      ]}
+      {...rest}
+    >
+      <DividerLine vertical />
+    </Flex>
+  );
+};
+
+type DividerLineProps = {
+  vertical?: boolean;
+};
+
+const DividerLine = (props?: DividerLineProps) => {
+  const styles = props?.vertical ? { width: '1px' } : { height: '1px' };
   return (
     <Flex
       elementDescriptor={descriptors.dividerLine}
       sx={t => ({
         flex: '1',
-        height: '1px',
         backgroundColor: t.colors.$neutralAlpha100,
+        ...styles,
       })}
     />
   );

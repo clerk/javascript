@@ -1,5 +1,6 @@
+import { getAlternativePhoneCodeProviderByStrategy } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import type { AlternativePhoneCodeStrategy, SignUpResource } from '@clerk/types';
+import type { AlternativePhoneCodeProviderData, AlternativePhoneCodeStrategy, SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -47,8 +48,8 @@ function SignUpStartInternal(): JSX.Element {
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
-  const [showAlternativePhoneCodeScreen, setShowAlternativePhoneCodeScreen] =
-    React.useState<AlternativePhoneCodeStrategy | null>(null);
+  const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] =
+    React.useState<AlternativePhoneCodeProviderData | null>(null);
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
@@ -260,7 +261,9 @@ function SignUpStartInternal(): JSX.Element {
         completeSignUpFlow({
           signUp: res,
           verifyEmailPath: 'verify-email-address',
-          verifyPhonePath: showAlternativePhoneCodeScreen ? 'verify-phone-number/whatsapp' : 'verify-phone-number',
+          verifyPhonePath: alternativePhoneCodeProvider
+            ? `verify-phone-number/${alternativePhoneCodeProvider.provider}`
+            : 'verify-phone-number',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
           redirectUrl,
@@ -285,10 +288,12 @@ function SignUpStartInternal(): JSX.Element {
   const showAlternativePhoneCodeProviders = !hasTicket && userSettings.alternativePhoneCodeFirstFactors.length > 0;
 
   const onAlternativePhoneCodeUseAnotherMethod = () => {
-    setShowAlternativePhoneCodeScreen(null);
+    setAlternativePhoneCodeProvider(null);
   };
   const onAlternativePhoneCodeProviderClick = (phoneCodeStrategy: AlternativePhoneCodeStrategy) => {
-    setShowAlternativePhoneCodeScreen(phoneCodeStrategy);
+    const provider: AlternativePhoneCodeProviderData | null =
+      getAlternativePhoneCodeProviderByStrategy(phoneCodeStrategy) || null;
+    setAlternativePhoneCodeProvider(provider);
   };
 
   if (mode !== SIGN_UP_MODES.PUBLIC && !hasTicket) {
@@ -297,7 +302,7 @@ function SignUpStartInternal(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
-      {!showAlternativePhoneCodeScreen ? (
+      {!alternativePhoneCodeProvider ? (
         <Card.Root>
           <Card.Content>
             <Header.Root showLogo>
@@ -363,6 +368,7 @@ function SignUpStartInternal(): JSX.Element {
           fields={fields}
           formState={formState}
           onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}
+          phoneCodeProvider={alternativePhoneCodeProvider}
         />
       )}
     </Flow.Part>
