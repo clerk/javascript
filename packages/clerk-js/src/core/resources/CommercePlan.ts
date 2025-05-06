@@ -63,6 +63,8 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
       name: this.name,
       amount: this.amount,
       amount_formatted: this.amountFormatted,
+      annual_amount: this.annualAmount,
+      annual_amount_formatted: this.annualAmountFormatted,
       annual_monthly_amount: this.annualMonthlyAmount,
       annual_monthly_amount_formatted: this.annualMonthlyAmountFormatted,
       currency: this.currency,
