@@ -153,8 +153,8 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
         })}
       >
         <Alert
-          variant='info'
-          colorScheme='info'
+          variant='danger'
+          colorScheme='danger'
         >
           {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
         </Alert>
