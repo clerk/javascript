@@ -28,6 +28,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     }
 
     handleSelectPlan({ mode, plan, planPeriod, event });
+    return;
   };
 
   useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);

@@ -697,6 +697,9 @@ type _LocalizationResource = {
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
       };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
       subscriptionsListSection: {
         title: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
@@ -890,6 +893,9 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
       };
       subscriptionsListSection: {
         title: LocalizationValue;

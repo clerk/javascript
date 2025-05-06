@@ -179,6 +179,9 @@ export const enUS: LocalizationResource = {
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
       },
+      switchPlansSection: {
+        title: 'Switch plans',
+      },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
       },
@@ -775,6 +778,9 @@ export const enUS: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
       },
       title: 'Billing',
     },
