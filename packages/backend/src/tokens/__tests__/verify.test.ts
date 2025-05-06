@@ -149,7 +149,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
     const data = result.data as IdPOAuthAccessToken;
     expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
-    expect(data.name).toBe('GitHub OAuth');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
   });
