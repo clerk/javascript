@@ -51,6 +51,7 @@ export const jaJP: LocalizationResource = {
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
