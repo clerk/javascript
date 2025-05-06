@@ -1,13 +1,17 @@
+import { useClerk } from '@clerk/shared/react';
 import { useEffect } from 'react';
 
-import { useManageApiKeysContext } from '../../contexts';
+// import { useManageApiKeysContext } from '../../contexts';
 
 export const ManageApiKeys = () => {
-  const ctx = useManageApiKeysContext();
+  const clerk = useClerk();
+  // const ctx = useManageApiKeysContext();
 
   useEffect(() => {
-    console.log(ctx);
-  }, [ctx]);
+    clerk.getApiKeys().then(apiKeys => {
+      console.log(apiKeys);
+    });
+  }, [clerk]);
 
   return (
     <div>

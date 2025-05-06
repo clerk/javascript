@@ -19,6 +19,7 @@ import type {
   __internal_ComponentNavigationContext,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
+  ApiKeyResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -134,6 +135,7 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { CommerceBilling } from './modules/commerce';
 import {
+  ApiKey,
   BaseResource,
   Client,
   EmailLinkError,
@@ -1059,6 +1061,10 @@ export class Clerk implements ClerkInterface {
         node,
       }),
     );
+  };
+
+  public getApiKeys = async (): Promise<ApiKeyResource[]> => {
+    return ApiKey.getAll();
   };
 
   /**
