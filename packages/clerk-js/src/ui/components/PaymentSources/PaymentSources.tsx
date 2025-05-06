@@ -102,7 +102,7 @@ export const PaymentSources = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.billingPage.paymentSourcesSection.title')}
       centered={false}
-      id='profile'
+      id='paymentSources'
       sx={t => ({
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,

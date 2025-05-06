@@ -5,10 +5,11 @@ import {
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
+  ProfileSection,
   Tab,
   TabPanel,
   TabPanels,
@@ -18,6 +19,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { Plus } from '../../icons';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
@@ -81,16 +83,30 @@ const BillingPageInternal = withCardStateProvider(() => {
                   sx={{ width: '100%', flexDirection: 'column' }}
                   gap={4}
                 >
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
+                  <ProfileSection.Root
+                    id='subscriptionsList'
+                    title={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')}
+                    centered={false}
                     sx={{
-                      width: 'fit-content',
+                      borderTop: 'none',
+                      paddingTop: 0,
                     }}
-                  />
+                  >
+                    <SubscriptionsList />
+                    <ProfileSection.ArrowButton
+                      id='subscriptionsList'
+                      textLocalizationKey='View all plans'
+                      sx={[
+                        t => ({
+                          justifyContent: 'start',
+                          height: t.sizes.$8,
+                        }),
+                      ]}
+                      leftIcon={Plus}
+                      leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+                      onClick={() => navigate('plans')}
+                    />
+                  </ProfileSection.Root>
                   <PaymentSources />
                 </Flex>
               ) : (
