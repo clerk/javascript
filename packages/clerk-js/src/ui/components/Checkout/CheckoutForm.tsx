@@ -31,8 +31,7 @@ export const CheckoutForm = ({
   onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
-  console.log('CheckoutForm', totals);
-  const showCredits = totals.totalDueNow.amount > 0 && !!totals.credit?.amount && totals.credit.amount > 0;
+  const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
