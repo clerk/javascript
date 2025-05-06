@@ -170,8 +170,8 @@ export const usePlansContext = () => {
             ctx.subscriptions.length > 0
             ? localizationKeys('commerce.switchPlan')
             : localizationKeys('commerce.subscribe'),
-        variant: isCompact || !!subscription ? 'bordered' : 'solid',
-        colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
+        variant: isCompact ? 'bordered' : 'solid',
+        colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
       };
     },
