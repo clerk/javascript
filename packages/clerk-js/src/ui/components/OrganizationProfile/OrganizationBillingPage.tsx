@@ -121,7 +121,10 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                   </Protect>
                 </Flex>
               ) : (
-                <>
+                <Flex
+                  sx={{ width: '100%', flexDirection: 'column' }}
+                  gap={4}
+                >
                   <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
                     <Alert
                       variant='info'
@@ -132,7 +135,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                   <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                     <PricingTable />
                   </PricingTableContext.Provider>
-                </>
+                </Flex>
               )}
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
