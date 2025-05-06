@@ -46,7 +46,7 @@ export const heIL: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
+        title__statementId: undefined,
         title__paymentMethod: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
@@ -181,7 +181,7 @@ export const heIL: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
+        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },
@@ -762,7 +762,7 @@ export const heIL: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
+        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
       },

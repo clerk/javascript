@@ -1,31 +1,31 @@
 import type {
-  __experimental_CommerceMoney,
-  __experimental_CommercePaymentChargeType,
-  __experimental_CommercePaymentJSON,
-  __experimental_CommercePaymentStatus,
-  __experimental_CommerceStatementGroupJSON,
-  __experimental_CommerceStatementJSON,
-  __experimental_CommerceStatementResource,
-  __experimental_CommerceStatementStatus,
-  __experimental_CommerceStatementTotals,
+  CommerceMoney,
+  CommercePaymentChargeType,
+  CommercePaymentJSON,
+  CommercePaymentStatus,
+  CommerceStatementGroupJSON,
+  CommerceStatementJSON,
+  CommerceStatementResource,
+  CommerceStatementStatus,
+  CommerceStatementTotals,
 } from '@clerk/types';
 
 import { commerceMoneyFromJSON, commerceTotalsFromJSON } from '../../utils';
-import { __experimental_CommercePaymentSource, __experimental_CommerceSubscription, BaseResource } from './internal';
+import { BaseResource, CommercePaymentSource, CommerceSubscription } from './internal';
 
-export class __experimental_CommerceStatement extends BaseResource implements __experimental_CommerceStatementResource {
+export class CommerceStatement extends BaseResource implements CommerceStatementResource {
   id!: string;
-  status!: __experimental_CommerceStatementStatus;
+  status!: CommerceStatementStatus;
   timestamp!: number;
-  totals!: __experimental_CommerceStatementTotals;
-  groups!: __experimental_CommerceStatementGroup[];
+  totals!: CommerceStatementTotals;
+  groups!: CommerceStatementGroup[];
 
-  constructor(data: __experimental_CommerceStatementJSON) {
+  constructor(data: CommerceStatementJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceStatementJSON | null): this {
+  protected fromJSON(data: CommerceStatementJSON | null): this {
     if (!data) {
       return this;
     }
@@ -34,53 +34,53 @@ export class __experimental_CommerceStatement extends BaseResource implements __
     this.status = data.status;
     this.timestamp = data.timestamp;
     this.totals = commerceTotalsFromJSON(data.totals);
-    this.groups = data.groups.map(group => new __experimental_CommerceStatementGroup(group));
+    this.groups = data.groups.map(group => new CommerceStatementGroup(group));
     return this;
   }
 }
 
-export class __experimental_CommerceStatementGroup {
+export class CommerceStatementGroup {
   id!: string;
   timestamp!: number;
-  items!: __experimental_CommercePayment[];
+  items!: CommercePayment[];
 
-  constructor(data: __experimental_CommerceStatementGroupJSON) {
+  constructor(data: CommerceStatementGroupJSON) {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommerceStatementGroupJSON | null): this {
+  protected fromJSON(data: CommerceStatementGroupJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.timestamp = data.timestamp;
-    this.items = data.items.map(item => new __experimental_CommercePayment(item));
+    this.items = data.items.map(item => new CommercePayment(item));
     return this;
   }
 }
 
-export class __experimental_CommercePayment {
+export class CommercePayment {
   id!: string;
-  amount!: __experimental_CommerceMoney;
-  paymentSource!: __experimental_CommercePaymentSource;
-  subscription!: __experimental_CommerceSubscription;
-  chargeType!: __experimental_CommercePaymentChargeType;
-  status!: __experimental_CommercePaymentStatus;
+  amount!: CommerceMoney;
+  paymentSource!: CommercePaymentSource;
+  subscription!: CommerceSubscription;
+  chargeType!: CommercePaymentChargeType;
+  status!: CommercePaymentStatus;
 
-  constructor(data: __experimental_CommercePaymentJSON) {
+  constructor(data: CommercePaymentJSON) {
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: __experimental_CommercePaymentJSON | null): this {
+  protected fromJSON(data: CommercePaymentJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.amount = commerceMoneyFromJSON(data.amount);
-    this.paymentSource = new __experimental_CommercePaymentSource(data.payment_source);
-    this.subscription = new __experimental_CommerceSubscription(data.subscription);
+    this.paymentSource = new CommercePaymentSource(data.payment_source);
+    this.subscription = new CommerceSubscription(data.subscription);
     this.chargeType = data.charge_type;
     this.status = data.status;
     return this;

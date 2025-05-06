@@ -115,7 +115,6 @@ export interface CommerceStatementResource extends ClerkResource {
 }
 
 export interface CommerceStatementGroup {
-  totals: CommerceStatementTotals;
   timestamp: number;
   items: CommercePayment[];
 }

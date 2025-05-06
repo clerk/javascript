@@ -653,7 +653,6 @@ export interface CommerceStatementJSON extends ClerkResourceJSON {
 
 export interface CommerceStatementGroupJSON extends ClerkResourceJSON {
   object: 'commerce_statement_group';
-  totals: CommerceStatementTotalsJSON;
   timestamp: number;
   items: CommercePaymentJSON[];
 }
