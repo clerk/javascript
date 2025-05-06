@@ -18,22 +18,26 @@ import { useSubscriberTypeContext } from './SubscriberType';
 const PlansContext = createContext<PlansCtx | null>(null);
 
 export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
-  const { commerce } = useClerk();
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user } = useUser();
+  const resource = subscriberType === 'org' ? organization : user;
+
   return useFetch(
-    user ? commerce?.billing.getSubscriptions : undefined,
+    user ? billing.getSubscriptions : undefined,
     { orgId: subscriberType === 'org' ? organization?.id : undefined },
     undefined,
-    `commerce-subscriptions-${user?.id}`,
+    `commerce-subscriptions-${resource?.id}`,
   );
 };
 
 export const PlansContextProvider = ({ children }: PropsWithChildren) => {
-  const { commerce } = useClerk();
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
+  const resource = subscriberType === 'org' ? organization : user;
+
   const {
     data: subscriptions,
     isLoading: isLoadingSubscriptions,
@@ -44,7 +48,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     data: plans,
     isLoading: isLoadingPlans,
     revalidate: revalidatePlans,
-  } = useFetch(commerce?.billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
+  } = useFetch(billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
 
   // Revalidates the next time the hooks gets mounted
   const { revalidate: revalidateInvoices } = useFetch(
@@ -53,7 +57,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    `commerce-invoices-${user?.id}`,
+    `commerce-invoices-${resource?.id}`,
   );
 
   const revalidate = useCallback(() => {
@@ -102,6 +106,18 @@ export const usePlansContext = () => {
     throw new Error('Clerk: usePlansContext called outside Plans.');
   }
 
+  const canManageBilling = useMemo(() => {
+    if (!clerk.session) {
+      return true;
+    }
+
+    if (clerk?.session?.checkAuthorization({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user') {
+      return true;
+    }
+
+    return false;
+  }, [clerk, subscriberType]);
+
   const { componentName, ...ctx } = context;
 
   // return the active or upcoming subscription for a plan if it exists
@@ -137,7 +153,12 @@ export const usePlansContext = () => {
       plan?: CommercePlanResource;
       subscription?: CommerceSubscriptionResource;
       isCompact?: boolean;
-    }): { localizationKey: LocalizationKey; variant: 'bordered' | 'solid'; colorScheme: 'secondary' | 'primary' } => {
+    }): {
+      localizationKey: LocalizationKey;
+      variant: 'bordered' | 'solid';
+      colorScheme: 'secondary' | 'primary';
+      isDisabled: boolean;
+    } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return {
@@ -151,6 +172,7 @@ export const usePlansContext = () => {
             : localizationKeys('commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
+        isDisabled: !canManageBilling,
       };
     },
     [activeOrUpcomingSubscription],

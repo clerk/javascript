@@ -154,6 +154,11 @@ export const mnMN: LocalizationResource = {
     titleWithoutPersonal: 'Байгууллага сонгоно уу',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Автомат урилга',
     badge__automaticSuggestion: 'Автомат саналууд',
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',

@@ -37,11 +37,12 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     onPayWithTestPaymentSourceSuccess,
     showPayWithTestCardSection,
   } = props;
-  const { commerce } = useClerk();
   const { commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
   const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
+
+  const resource = subscriberType === 'org' ? organization : user;
 
   const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -73,13 +74,12 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     invalidate,
     revalidate: revalidateInitializedPaymentSource,
   } = useFetch(
-    commerce.initializePaymentSource,
+    resource?.initializePaymentSource,
     {
       gateway: 'stripe',
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    `commerce-payment-source-initialize-${user?.id}`,
+    `commerce-payment-source-initialize-${resource?.id}`,
   );
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;

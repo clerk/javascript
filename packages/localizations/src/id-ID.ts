@@ -154,6 +154,11 @@ export const idID: LocalizationResource = {
     titleWithoutPersonal: 'Pilih organisasi',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Undangan otomatis',
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',

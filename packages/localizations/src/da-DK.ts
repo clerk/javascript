@@ -154,6 +154,11 @@ export const daDK: LocalizationResource = {
     titleWithoutPersonal: 'Vælg en organisation',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatiske invitationer',
     badge__automaticSuggestion: 'Automatiske forslag',
     badge__manualInvitation: 'Ingen automatisk tilmelding',

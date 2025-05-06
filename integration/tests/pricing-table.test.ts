@@ -113,7 +113,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
-      await u.po.page.getByRole('button', { name: 'View all plans' }).click();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
       await u.po.pricingTable.waitForMounted();
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });

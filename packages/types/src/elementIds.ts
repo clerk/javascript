@@ -1,4 +1,4 @@
-export type AlertId = 'danger' | 'warning';
+export type AlertId = 'danger' | 'warning' | 'info';
 export type FieldId =
   | 'firstName'
   | 'lastName'
@@ -39,6 +39,7 @@ export type ProfileSectionId =
   | 'organizationDanger'
   | 'organizationDomains'
   | 'manageVerifiedDomains'
+  | 'subscriptionsList'
   | 'paymentSources';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 

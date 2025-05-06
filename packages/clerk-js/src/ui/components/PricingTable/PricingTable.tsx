@@ -14,6 +14,9 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const subscriberType = useSubscriberTypeContext();
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
+  const { user } = useUser();
+
+  const resource = subscriberType === 'org' ? organization : user;
 
   const { plans, handleSelectPlan } = usePlansContext();
 
@@ -27,17 +30,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     handleSelectPlan({ mode, plan, planPeriod, event });
   };
 
-  const { commerce } = useClerk();
-
-  const { user } = useUser();
-  useFetch(
-    user ? commerce?.getPaymentSources : undefined,
-    {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    },
-    undefined,
-    `commerce-payment-sources-${user?.id}`,
-  );
+  useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);
 
   return (
     <Flow.Root

@@ -16,7 +16,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  CommerceNamespace,
+  CommerceBillingNamespace,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
@@ -181,8 +181,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  commerce: CommerceNamespace;
+  /** Billing Object */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 

@@ -155,6 +155,11 @@ export const esMX: LocalizationResource = {
     titleWithoutPersonal: 'Elige una organización',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Invitaciones automaticas',
     badge__automaticSuggestion: 'Sugerencias automaticas',
     badge__manualInvitation: 'Sin inscripciónes automaticas',

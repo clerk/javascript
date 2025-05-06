@@ -29,7 +29,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  CommerceNamespace,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -131,7 +131,7 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
-import { Commerce } from './modules/commerce';
+import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -187,7 +187,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  private static _commerce: CommerceNamespace;
+  private static _billing: CommerceBillingNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -316,11 +316,11 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get commerce(): CommerceNamespace {
-    if (!Clerk._commerce) {
-      Clerk._commerce = new Commerce();
+  get billing(): CommerceBillingNamespace {
+    if (!Clerk._billing) {
+      Clerk._billing = new CommerceBilling();
     }
-    return Clerk._commerce;
+    return Clerk._billing;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {

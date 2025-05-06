@@ -1,6 +1,7 @@
 import type { CommerceSubscriptionResource } from '@clerk/types';
 
-import { usePlansContext } from '../../contexts';
+import { useProtect } from '../../common';
+import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
   Button,
@@ -21,6 +22,10 @@ import { CogFilled, Plans } from '../../icons';
 
 export function SubscriptionsList() {
   const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const subscriberType = useSubscriberTypeContext();
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
 
   const handleSelectSubscription = (
     subscription: CommerceSubscriptionResource,
@@ -118,6 +123,7 @@ export function SubscriptionsList() {
                   onClick={event => handleSelectSubscription(subscription, event)}
                   variant='bordered'
                   colorScheme='secondary'
+                  isDisabled={!canManageBilling}
                   sx={t => ({
                     width: t.sizes.$6,
                     height: t.sizes.$6,

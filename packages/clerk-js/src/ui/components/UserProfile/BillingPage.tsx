@@ -5,10 +5,11 @@ import {
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
+  ProfileSection,
   Tab,
   TabPanel,
   TabPanels,
@@ -18,6 +19,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
+import { ArrowsUpDown } from '../../icons';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
@@ -77,22 +79,38 @@ const BillingPageInternal = withCardStateProvider(() => {
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
               {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  />
+                <>
+                  <ProfileSection.Root
+                    id='subscriptionsList'
+                    title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                    centered={false}
+                    sx={t => ({
+                      borderTop: 'none',
+                      paddingTop: t.space.$1,
+                    })}
+                  >
+                    <SubscriptionsList />
+                    <ProfileSection.ArrowButton
+                      id='subscriptionsList'
+                      textLocalizationKey={localizationKeys(
+                        'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                      )}
+                      sx={[
+                        t => ({
+                          justifyContent: 'start',
+                          height: t.sizes.$8,
+                        }),
+                      ]}
+                      leftIcon={ArrowsUpDown}
+                      leftIconSx={t => ({
+                        width: t.sizes.$4,
+                        height: t.sizes.$4,
+                      })}
+                      onClick={() => void navigate('plans')}
+                    />
+                  </ProfileSection.Root>
                   <PaymentSources />
-                </Flex>
+                </>
               ) : (
                 <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <PricingTable />
