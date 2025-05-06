@@ -94,11 +94,13 @@ export function SubscriptionsList() {
                     />
                   ) : null}
                 </Flex>
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  localizationKey={captionForSubscription(subscription)}
-                />
+                {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
+                  <Text
+                    variant='caption'
+                    colorScheme='secondary'
+                    localizationKey={captionForSubscription(subscription)}
+                  />
+                )}
               </Col>
             </Td>
             <Td
@@ -131,7 +133,7 @@ export function SubscriptionsList() {
                 textAlign: 'right',
               })}
             >
-              {canManageSubscription({ subscription }) && subscription.id && (
+              {canManageSubscription({ subscription }) && subscription.id && !subscription.plan.isDefault && (
                 <Button
                   aria-label='Manage subscription'
                   onClick={event => handleSelectSubscription(subscription, event)}
