@@ -19,7 +19,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { Plus } from '../../icons';
+import { SwitchArrows } from '../../icons';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
@@ -85,7 +85,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                 >
                   <ProfileSection.Root
                     id='subscriptionsList'
-                    title={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')}
+                    title='Subscription'
                     centered={false}
                     sx={{
                       borderTop: 'none',
@@ -95,16 +95,20 @@ const BillingPageInternal = withCardStateProvider(() => {
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton
                       id='subscriptionsList'
-                      textLocalizationKey='View all plans'
+                      textLocalizationKey='Switch plans'
                       sx={[
                         t => ({
                           justifyContent: 'start',
                           height: t.sizes.$8,
                         }),
                       ]}
-                      leftIcon={Plus}
-                      leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-                      onClick={() => navigate('plans')}
+                      leftIcon={SwitchArrows}
+                      leftIconSx={t => ({
+                        width: t.sizes.$4,
+                        height: t.sizes.$4,
+                        transform: 'rotate(90deg)',
+                      })}
+                      onClick={() => void navigate('plans')}
                     />
                   </ProfileSection.Root>
                   <PaymentSources />
