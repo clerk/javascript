@@ -8,9 +8,9 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     waitForMounted: (selector = '.cl-pricingTable-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
-    clickManageSubscription: async () => {
-      await page.getByText('Manage subscription').click();
-    },
+    // clickManageSubscription: async () => {
+    //   await page.getByText('Manage subscription').click();
+    // },
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
