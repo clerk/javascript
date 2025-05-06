@@ -41,8 +41,6 @@ export function useTooltip({
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
-  console.log(isMotionSafe);
-
   const data = useFloating({
     placement,
     open,
