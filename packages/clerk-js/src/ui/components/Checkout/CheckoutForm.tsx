@@ -1,17 +1,17 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommerceMoney,
-  __experimental_CommercePaymentSourceResource,
-  __experimental_ConfirmCheckoutParams,
   ClerkAPIError,
   ClerkRuntimeError,
+  CommerceCheckoutResource,
+  CommerceMoney,
+  CommercePaymentSourceResource,
+  ConfirmCheckoutParams,
 } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, Col, descriptors, Form, localizationKeys, Span } from '../../customizables';
+import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowUpDown } from '../../icons';
@@ -27,8 +27,8 @@ export const CheckoutForm = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits =
@@ -47,18 +47,6 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          {/* TODO(@Commerce): needs localization */}
-          {showDowngradeInfo && (
-            <Span
-              localizationKey={'Your features will remain until the end of your current subscription.'}
-              elementDescriptor={descriptors.lineItemsDowngradeNotice}
-              sx={t => ({
-                fontSize: t.fontSizes.$sm,
-                color: t.colors.$colorTextSecondary,
-              })}
-            />
-          )}
-
           <LineItems.Group borderTop={showDowngradeInfo}>
             <LineItems.Title title={plan.name} />
             {/* TODO(@Commerce): needs localization */}
@@ -67,13 +55,18 @@ export const CheckoutForm = ({
               suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
             />
           </LineItems.Group>
+          <LineItems.Group
+            borderTop
+            variant='tertiary'
+          >
+            {/* TODO(@Commerce): needs localization */}
+            <LineItems.Title title='Subtotal' />
+            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
+          </LineItems.Group>
           {showCredits && (
-            <LineItems.Group>
+            <LineItems.Group variant='tertiary'>
               {/* TODO(@Commerce): needs localization */}
-              <LineItems.Title
-                title={'Credit'}
-                description={'Prorated credit for the remainder of your subscription.'}
-              />
+              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
               {/* TODO(@Commerce): needs localization */}
               {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
               <LineItems.Description
@@ -81,19 +74,6 @@ export const CheckoutForm = ({
               />
             </LineItems.Group>
           )}
-          <LineItems.Group
-            borderTop
-            variant='tertiary'
-          >
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Subtotal' />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol} ${totals.subtotal.amountFormatted}`} />
-          </LineItems.Group>
-          <LineItems.Group variant='tertiary'>
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Tax' />
-            <LineItems.Description text={`${totals.taxTotal.currencySymbol} ${totals.taxTotal.amountFormatted}`} />
-          </LineItems.Group>
           <LineItems.Group borderTop>
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Title title={`Total Due Today`} />
@@ -101,6 +81,23 @@ export const CheckoutForm = ({
           </LineItems.Group>
         </LineItems.Root>
       </Box>
+
+      {/* TODO(@Commerce): needs localization */}
+      {showDowngradeInfo && (
+        <Box
+          elementDescriptor={descriptors.checkoutFormLineItemsRoot}
+          sx={t => ({
+            paddingBlockStart: t.space.$4,
+            paddingInline: t.space.$4,
+          })}
+        >
+          <Text
+            localizationKey={localizationKeys('commerce.checkout.downgradeNotice')}
+            variant='caption'
+            colorScheme='secondary'
+          />
+        </Box>
+      )}
 
       <CheckoutFormElements
         checkout={checkout}
@@ -114,10 +111,10 @@ const CheckoutFormElements = ({
   checkout,
   onCheckoutComplete,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: __experimental_CommerceCheckoutResource) => void;
+  checkout: CommerceCheckoutResource;
+  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
-  const { __experimental_commerce } = useClerk();
+  const { commerce } = useClerk();
   const { user } = useUser();
   const { organization } = useOrganization();
   const { subscriberType } = useCheckoutContext();
@@ -127,7 +124,7 @@ const CheckoutFormElements = ({
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
   const { data, revalidate: revalidatePaymentSources } = useFetch(
-    __experimental_commerce?.getPaymentSources,
+    commerce?.getPaymentSources,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
@@ -140,7 +137,7 @@ const CheckoutFormElements = ({
     setPaymentMethodSource(paymentSources.length > 0 ? 'existing' : 'new');
   }, [paymentSources]);
 
-  const confirmCheckout = async (params: __experimental_ConfirmCheckoutParams) => {
+  const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     try {
       const newCheckout = await checkout.confirm({
         ...params,
@@ -175,6 +172,20 @@ const CheckoutFormElements = ({
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
     setIsSubmitting(false);
+  };
+
+  const onPayWithTestPaymentSourceSuccess = async () => {
+    try {
+      const newCheckout = await checkout.confirm({
+        gateway: 'stripe',
+        useTestCard: true,
+        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      });
+      onCheckoutComplete(newCheckout);
+      void revalidatePaymentSources();
+    } catch (error) {
+      handleError(error, [], setSubmitError);
+    }
   };
 
   return (
@@ -220,19 +231,18 @@ const CheckoutFormElements = ({
         <AddPaymentSource
           checkout={checkout}
           onSuccess={onAddPaymentSourceSuccess}
+          onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
           // @ts-ignore TODO(@COMMERCE): needs localization
           submitLabel={
             checkout.totals.totalDueNow.amount > 0
-              ? localizationKeys(
-                  'userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__pay',
-                  {
-                    amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-                  },
-                )
+              ? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__pay', {
+                  amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+                })
               : 'Subscribe'
           }
           submitError={submitError}
           setSubmitError={setSubmitError}
+          showPayWithTestCardSection
         />
       )}
     </Col>
@@ -247,22 +257,27 @@ const ExistingPaymentSourceForm = ({
   isSubmitting,
   submitError,
 }: {
-  checkout: __experimental_CommerceCheckoutResource;
-  totalDueNow: __experimental_CommerceMoney;
-  paymentSources: __experimental_CommercePaymentSourceResource[];
+  checkout: CommerceCheckoutResource;
+  totalDueNow: CommerceMoney;
+  paymentSources: CommercePaymentSourceResource[];
   onPaymentSourceSubmit: React.FormEventHandler<HTMLFormElement>;
   isSubmitting: boolean;
   submitError: ClerkRuntimeError | ClerkAPIError | string | undefined;
 }) => {
-  const [selectedPaymentSource, setSelectedPaymentSource] = useState<
-    __experimental_CommercePaymentSourceResource | undefined
-  >(checkout.paymentSource || paymentSources.find(p => p.isDefault));
+  const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    checkout.paymentSource || paymentSources.find(p => p.isDefault),
+  );
 
   const options = useMemo(() => {
     return paymentSources.map(source => {
+      const label =
+        source.paymentMethod !== 'card'
+          ? `${capitalize(source.paymentMethod)}`
+          : `${capitalize(source.cardType)} ⋯ ${source.last4}`;
+
       return {
         value: source.id,
-        label: `${capitalize(source.cardType)} ⋯ ${source.last4}`,
+        label,
       };
     });
   }, [paymentSources]);

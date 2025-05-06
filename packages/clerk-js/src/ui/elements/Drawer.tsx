@@ -313,11 +313,11 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
  * Drawer.Body
  * -----------------------------------------------------------------------------------------------*/
 
-interface BodyProps {
+interface BodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => {
+const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }, ref) => {
   return (
     <Box
       ref={ref}
@@ -329,6 +329,7 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
         overflowY: 'auto',
         overflowX: 'hidden',
       }}
+      {...props}
     >
       {children}
     </Box>
@@ -339,12 +340,12 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
  * Drawer.Footer
  * -----------------------------------------------------------------------------------------------*/
 
-interface FooterProps {
+interface FooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ...props }, ref) => {
   return (
     <Box
       ref={ref}
@@ -367,6 +368,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, 
         }),
         sx,
       ]}
+      {...props}
     >
       {children}
     </Box>

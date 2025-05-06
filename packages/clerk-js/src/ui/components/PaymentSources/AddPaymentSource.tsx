@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_CommerceCheckoutResource, ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError, CommerceCheckoutResource } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { Appearance as StripeAppearance, SetupIntent, Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
-import { Box, descriptors, Flex, localizationKeys, Spinner, Text, useAppearance } from '../../customizables';
+import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text, useAppearance } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, LineItems, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
@@ -16,18 +16,29 @@ import { handleError, normalizeColorString } from '../../utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
-  checkout?: __experimental_CommerceCheckoutResource;
+  checkout?: CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
   submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
   resetStripeElements?: () => void;
+  onPayWithTestPaymentSourceSuccess?: () => void;
+  showPayWithTestCardSection?: boolean;
 };
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
-  const { checkout, submitLabel, onSuccess, cancelAction, submitError, setSubmitError } = props;
-  const { __experimental_commerce } = useClerk();
-  const { __experimental_commerceSettings } = useEnvironment();
+  const {
+    checkout,
+    submitLabel,
+    onSuccess,
+    cancelAction,
+    submitError,
+    setSubmitError,
+    onPayWithTestPaymentSourceSuccess,
+    showPayWithTestCardSection,
+  } = props;
+  const { commerce } = useClerk();
+  const { commerceSettings } = useEnvironment();
   const { organization } = useOrganization();
   const { user } = useUser();
   const subscriberType = useSubscriberTypeContext();
@@ -62,7 +73,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     invalidate,
     revalidate: revalidateInitializedPaymentSource,
   } = useFetch(
-    __experimental_commerce.initializePaymentSource,
+    commerce.initializePaymentSource,
     {
       gateway: 'stripe',
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
@@ -74,7 +85,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
 
-  const stripePublishableKey = __experimental_commerceSettings.billing.stripePublishableKey;
+  const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
   useEffect(() => {
     if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
@@ -91,7 +102,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         setStripe(stripeInstance);
       });
     }
-  }, [externalGatewayId, externalClientSecret, stripePublishableKey, __experimental_commerceSettings]);
+  }, [externalGatewayId, externalClientSecret, stripePublishableKey, commerceSettings]);
 
   // invalidate the initialized payment source when the component unmounts
   useEffect(() => {
@@ -137,6 +148,8 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         submitError={submitError}
         setSubmitError={setSubmitError}
         resetStripeElements={resetStripeElements}
+        onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
+        showPayWithTestCardSection={showPayWithTestCardSection}
       />
     </Elements>
   );
@@ -151,6 +164,8 @@ const AddPaymentSourceForm = withCardStateProvider(
     submitError,
     setSubmitError,
     resetStripeElements,
+    onPayWithTestPaymentSourceSuccess,
+    showPayWithTestCardSection,
   }: AddPaymentSourceProps) => {
     const clerk = useClerk();
     const stripe = useStripe();
@@ -201,13 +216,9 @@ const AddPaymentSourceForm = withCardStateProvider(
 
     return (
       <FormContainer
-        headerTitle={
-          !checkout ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.add') : undefined
-        }
+        headerTitle={!checkout ? localizationKeys('userProfile.billingPage.paymentSourcesSection.add') : undefined}
         headerSubtitle={
-          !checkout
-            ? localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.addSubtitle')
-            : undefined
+          !checkout ? localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle') : undefined
         }
       >
         <Form.Root
@@ -218,68 +229,72 @@ const AddPaymentSourceForm = withCardStateProvider(
             rowGap: t.space.$3,
           })}
         >
-          {clerk.instanceType === 'development' && (
-            <Box
-              sx={t => ({
-                background: t.colors.$neutralAlpha50,
-                padding: t.space.$2x5,
-                borderRadius: t.radii.$md,
-                borderWidth: t.borderWidths.$normal,
-                borderStyle: t.borderStyles.$solid,
-                borderColor: t.colors.$neutralAlpha100,
-                display: 'flex',
-                flexDirection: 'column',
-                rowGap: t.space.$2,
-                position: 'relative',
-              })}
-            >
+          {showPayWithTestCardSection ? (
+            <PayWithTestPaymentSource onCheckoutComplete={onPayWithTestPaymentSourceSuccess} />
+          ) : (
+            clerk.instanceType === 'development' && (
               <Box
                 sx={t => ({
-                  position: 'absolute',
-                  inset: 0,
-                  background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-                  maskImage: `linear-gradient(transparent 20%, black)`,
-                  pointerEvents: 'none',
-                })}
-              />
-              <Box
-                sx={{
+                  background: t.colors.$neutralAlpha50,
+                  padding: t.space.$2x5,
+                  borderRadius: t.radii.$md,
+                  borderWidth: t.borderWidths.$normal,
+                  borderStyle: t.borderStyles.$solid,
+                  borderColor: t.colors.$neutralAlpha100,
                   display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'space-between',
-                }}
+                  flexDirection: 'column',
+                  rowGap: t.space.$2,
+                  position: 'relative',
+                })}
               >
-                <Text
-                  variant='caption'
-                  colorScheme='body'
-                >
-                  Test card information
-                </Text>
-                <Text
-                  variant='caption'
+                <Box
                   sx={t => ({
-                    color: t.colors.$warning500,
-                    fontWeight: t.fontWeights.$semibold,
+                    position: 'absolute',
+                    inset: 0,
+                    background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
+                    maskImage: `linear-gradient(transparent 20%, black)`,
+                    pointerEvents: 'none',
                   })}
+                />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'space-between',
+                  }}
                 >
-                  Development mode
-                </Text>
+                  <Text
+                    variant='caption'
+                    colorScheme='body'
+                  >
+                    Test card information
+                  </Text>
+                  <Text
+                    variant='caption'
+                    sx={t => ({
+                      color: t.colors.$warning500,
+                      fontWeight: t.fontWeights.$semibold,
+                    })}
+                  >
+                    Development mode
+                  </Text>
+                </Box>
+                <LineItems.Root>
+                  <LineItems.Group variant='tertiary'>
+                    <LineItems.Title title={'Card number'} />
+                    <LineItems.Description text={'4242 4242 4242 4242'} />
+                  </LineItems.Group>
+                  <LineItems.Group variant='tertiary'>
+                    <LineItems.Title title={'Expiration date'} />
+                    <LineItems.Description text={'11/44'} />
+                  </LineItems.Group>
+                  <LineItems.Group variant='tertiary'>
+                    <LineItems.Title title={'CVC, ZIP'} />
+                    <LineItems.Description text={'Any numbers'} />
+                  </LineItems.Group>
+                </LineItems.Root>
               </Box>
-              <LineItems.Root>
-                <LineItems.Group variant='tertiary'>
-                  <LineItems.Title title={'Card number'} />
-                  <LineItems.Description text={'4242 4242 4242 4242'} />
-                </LineItems.Group>
-                <LineItems.Group variant='tertiary'>
-                  <LineItems.Title title={'Expiration date'} />
-                  <LineItems.Description text={'11/44'} />
-                </LineItems.Group>
-                <LineItems.Group variant='tertiary'>
-                  <LineItems.Title title={'CVC, ZIP'} />
-                  <LineItems.Description text={'Any numbers'} />
-                </LineItems.Group>
-              </LineItems.Root>
-            </Box>
+            )
           )}
           <PaymentElement
             options={{
@@ -315,8 +330,7 @@ const AddPaymentSourceForm = withCardStateProvider(
           )}
           <FormButtons
             submitLabel={
-              submitLabel ??
-              localizationKeys('userProfile.__experimental_billingPage.paymentSourcesSection.formButtonPrimary__add')
+              submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
             }
             onReset={cancelAction}
             hideReset={!cancelAction}
@@ -324,6 +338,77 @@ const AddPaymentSourceForm = withCardStateProvider(
           />
         </Form.Root>
       </FormContainer>
+    );
+  },
+);
+
+const PayWithTestPaymentSource = withCardStateProvider(
+  ({ onCheckoutComplete }: { onCheckoutComplete?: () => void }) => {
+    const clerk = useClerk();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const onPaymentSourceSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+
+      onCheckoutComplete?.();
+    };
+
+    if (clerk.instanceType !== 'development') {
+      return null;
+    }
+
+    return (
+      <Box
+        sx={t => ({
+          background: t.colors.$neutralAlpha50,
+          padding: t.space.$2x5,
+          borderRadius: t.radii.$md,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$neutralAlpha100,
+          display: 'flex',
+          flexDirection: 'column',
+          rowGap: t.space.$2,
+          position: 'relative',
+        })}
+      >
+        <Box
+          sx={t => ({
+            position: 'absolute',
+            inset: 0,
+            background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
+            maskImage: `linear-gradient(transparent 20%, black)`,
+            pointerEvents: 'none',
+          })}
+        />
+        <Flex
+          sx={t => ({
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            rowGap: t.space.$2,
+          })}
+        >
+          <Text
+            sx={t => ({
+              color: t.colors.$warning500,
+              fontWeight: t.fontWeights.$semibold,
+            })}
+          >
+            Development mode
+          </Text>
+          <Button
+            type='button'
+            block
+            variant='bordered'
+            localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.payWithTestCardButton')}
+            colorScheme='secondary'
+            isLoading={isSubmitting}
+            onClick={onPaymentSourceSubmit}
+          />
+        </Flex>
+      </Box>
     );
   },
 );

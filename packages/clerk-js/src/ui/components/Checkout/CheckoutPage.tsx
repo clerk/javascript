@@ -1,24 +1,30 @@
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 
-import { Alert, Box, localizationKeys, Spinner } from '../../customizables';
+import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
 import { Drawer, useDrawerContext } from '../../elements';
-import { useCheckout } from '../../hooks';
+import { useCheckout, usePrefersReducedMotion } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-export const CheckoutPage = (props: __experimental_CheckoutProps) => {
+export const CheckoutPage = (props: __internal_CheckoutProps) => {
+  const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
-  const { checkout, isLoading, invalidate, revalidate, updateCheckout, isMissingPayerEmail } = useCheckout({
+  const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
     planId,
     planPeriod,
     subscriberType,
   });
 
-  const onCheckoutComplete = (newCheckout: __experimental_CommerceCheckoutResource) => {
+  const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
+
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
     updateCheckout(newCheckout);
     onSubscriptionComplete?.();
@@ -42,7 +48,12 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
 
   if (checkout) {
     if (checkout?.status === 'completed') {
-      return <CheckoutComplete checkout={checkout} />;
+      return (
+        <CheckoutComplete
+          checkout={checkout}
+          isMotionSafe={isMotionSafe}
+        />
+      );
     }
 
     return (
@@ -62,8 +73,8 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
           })}
         >
           <EmailForm
-            title={localizationKeys('__experimental_commerce.checkout.emailForm.title')}
-            subtitle={localizationKeys('__experimental_commerce.checkout.emailForm.subtitle')}
+            title={localizationKeys('commerce.checkout.emailForm.title')}
+            subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
             onSuccess={revalidate}
             onReset={() => setIsOpen(false)}
             disableAutoFocus
@@ -74,16 +85,20 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
   }
 
   return (
-    <>
-      {/* TODO(@COMMERCE): needs localization */}
-      <Alert
-        colorScheme='danger'
-        sx={{
-          margin: 'auto',
-        }}
+    <Drawer.Body>
+      <Flex
+        align={'center'}
+        justify={'center'}
+        sx={t => ({
+          height: '100%',
+          padding: t.space.$4,
+          fontSize: t.fontSizes.$md,
+        })}
       >
-        There was a problem, please try again later.
-      </Alert>
-    </>
+        <Alert colorScheme='danger'>
+          {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
+        </Alert>
+      </Flex>
+    </Drawer.Body>
   );
 };
