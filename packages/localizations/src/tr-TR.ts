@@ -155,7 +155,7 @@ export const trTR: LocalizationResource = {
   organizationProfile: {
     billingPage: {
       alerts: {
-        noPemissionsToManageBilling: undefined,
+        noPermissionsToManageBilling: undefined,
       },
     },
     badge__automaticInvitation: 'Otomatik davetler',

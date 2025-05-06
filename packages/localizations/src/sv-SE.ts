@@ -156,7 +156,7 @@ export const svSE: LocalizationResource = {
   organizationProfile: {
     billingPage: {
       alerts: {
-        noPemissionsToManageBilling: undefined,
+        noPermissionsToManageBilling: undefined,
       },
     },
     badge__automaticInvitation: 'Automatiska inbjudningar',

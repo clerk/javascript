@@ -156,7 +156,7 @@ export const plPL: LocalizationResource = {
   organizationProfile: {
     billingPage: {
       alerts: {
-        noPemissionsToManageBilling: undefined,
+        noPermissionsToManageBilling: undefined,
       },
     },
     badge__automaticInvitation: 'Automatyczne zaproszenia',

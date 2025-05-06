@@ -156,7 +156,7 @@ export const elGR: LocalizationResource = {
   organizationProfile: {
     billingPage: {
       alerts: {
-        noPemissionsToManageBilling: undefined,
+        noPermissionsToManageBilling: undefined,
       },
     },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',

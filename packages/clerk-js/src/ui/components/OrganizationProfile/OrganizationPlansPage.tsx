@@ -36,7 +36,7 @@ const OrganizationPlansPageInternal = () => {
           <Alert
             variant='info'
             colorScheme='info'
-            title={localizationKeys('organizationProfile.billingPage.alerts.noPemissionsToManageBilling')}
+            title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
           />
         </Protect>
         <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>

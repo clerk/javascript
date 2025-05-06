@@ -158,7 +158,7 @@ export const deDE: LocalizationResource = {
   organizationProfile: {
     billingPage: {
       alerts: {
-        noPemissionsToManageBilling: undefined,
+        noPermissionsToManageBilling: undefined,
       },
     },
     badge__automaticInvitation: 'Automatische Einladungen',

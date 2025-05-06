@@ -143,11 +143,6 @@ export const enUS: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPemissionsToManageBilling: 'You do not have permissions to manage billing for this account.',
-      },
-    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -296,6 +291,42 @@ export const enUS: LocalizationResource = {
       subtitle: 'The domain {{domainName}} needs to be verified via email.',
       subtitleVerificationCodeScreen: 'A verification code was sent to {{emailAddress}}. Enter the code to continue.',
       title: 'Verify domain',
+    },
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this account.',
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__plans: 'Plans',
+        headerTitle__subscriptions: 'Subscriptions',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      title: 'Billing',
     },
   },
   organizationSwitcher: {
@@ -714,6 +745,10 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      subscriptionsListSection: {
+        title: 'Subscription',
+        actionLabel__switchPlan: 'Switch plans',
+      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
