@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   backButton: 'Retour',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Défaut',
@@ -155,15 +156,45 @@ export const frFR: LocalizationResource = {
     titleWithoutPersonal: 'Choisissez une organisation',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Invitations automatiques',
     badge__automaticSuggestion: 'Suggestions automatiques',
     badge__manualInvitation: "Pas d'inscription automatique",
     badge__unverified: 'Non vérifié',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Ajoutez le domaine pour le vérifier. Les utilisateurs possédant une adresses e-mail sur ce domaine peuvent rejoindre l'organisation automatiquement ou faire une demande pour y adhérer.",
@@ -750,6 +781,10 @@ export const frFR: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

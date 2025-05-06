@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   backButton: 'Zurück',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
@@ -156,15 +157,45 @@ export const deDE: LocalizationResource = {
     titleWithoutPersonal: 'Organisation auswählen',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Automatische Einladungen',
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',
     badge__unverified: 'Nicht verifiziert',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Fügen Sie die zu überprüfende Domain hinzu. Benutzer mit E-Mail-Adressen von dieser Domain können der Organisation automatisch beitreten oder einen Antrag auf Beitritt stellen.',
@@ -760,6 +791,10 @@ export const deDE: LocalizationResource = {
         headerTitle__invoices: 'Rechnungen',
         headerTitle__plans: 'Pläne',
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
   backButton: 'Буцах',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Анхдагч',
@@ -154,15 +155,45 @@ export const mnMN: LocalizationResource = {
     titleWithoutPersonal: 'Байгууллага сонгоно уу',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Автомат урилга',
     badge__automaticSuggestion: 'Автомат саналууд',
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',
     badge__unverified: 'Баталгаажаагүй',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Баталгаажуулахын тулд домэйн нэмнэ үү. Энэ домэйны имэйл хаягтай хэрэглэгчид байгууллагад автоматаар нэгдэх эсвэл элсэх хүсэлт гаргах боломжтой.',
@@ -745,6 +776,10 @@ export const mnMN: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

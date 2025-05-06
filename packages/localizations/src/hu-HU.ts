@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   backButton: 'Vissza',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Alapértelmezett',
@@ -153,15 +154,45 @@ export const huHU: LocalizationResource = {
     titleWithoutPersonal: 'Válassz egy szervezetet',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Automatikus meghívások',
     badge__automaticSuggestion: 'Automatikus javaslatok',
     badge__manualInvitation: 'Nincs automatikus felvétel',
     badge__unverified: 'Nincs visszaigazolva',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add meg a visszaigazolandó domain nevét. Minden email cím erről a tartományjól automatikusan tud csatlakozni a szervezethez.',
@@ -745,6 +776,10 @@ export const huHU: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

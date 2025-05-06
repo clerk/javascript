@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
   backButton: 'กลับ',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
@@ -153,15 +154,45 @@ export const thTH: LocalizationResource = {
     titleWithoutPersonal: 'เลือกองค์กร',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'คำเชิญอัตโนมัติ',
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
@@ -742,6 +773,10 @@ export const thTH: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

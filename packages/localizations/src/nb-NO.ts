@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
   backButton: 'Tilbake',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -154,15 +155,45 @@ export const nbNO: LocalizationResource = {
     titleWithoutPersonal: 'Velg en organiasjon',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Automatisk invitasjon',
     badge__automaticSuggestion: 'Automatisk forslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Uverifisert',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Legg til domenet som skal verifiseres. Brukere med e-postadresser på dette domenet kan automatisk bli med i organisasjonen eller be om å få bli med.',
@@ -744,6 +775,10 @@ export const nbNO: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
