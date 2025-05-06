@@ -1,8 +1,17 @@
 import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 
-import { Alert, Box, Flex, localizationKeys, Spinner, useAppearance, useLocalizations } from '../../customizables';
-import { Drawer, useDrawerContext } from '../../elements';
+import { usePlans } from '../../contexts';
+import {
+  Box,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  useAppearance,
+  useLocalizations,
+} from '../../customizables';
+import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
 import { useCheckout, usePrefersReducedMotion } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
@@ -15,6 +24,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const { data: plans, isLoading: plansLoading } = usePlans();
 
   const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
     planId,
@@ -23,6 +33,8 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   });
 
   const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
+
+  const plan = plans?.find(p => p.id === planId);
 
   const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
     invalidate(); // invalidate the initial checkout on complete
@@ -36,7 +48,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
     }
   }, [isOpen]);
 
-  if (isLoading) {
+  if (isLoading || plansLoading) {
     return (
       <Spinner
         sx={{
@@ -84,6 +96,51 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
     );
   }
 
+  const error = errors?.[0];
+  if (error?.code === 'invalid_plan_change' && plan) {
+    return (
+      <Drawer.Body>
+        <Flex
+          gap={4}
+          direction='col'
+        >
+          <Box
+            elementDescriptor={descriptors.checkoutFormLineItemsRoot}
+            sx={t => ({
+              padding: t.space.$4,
+              borderBottomWidth: t.borderWidths.$normal,
+              borderBottomStyle: t.borderStyles.$solid,
+              borderBottomColor: t.colors.$neutralAlpha100,
+            })}
+          >
+            <LineItems.Root>
+              <LineItems.Group>
+                <LineItems.Title
+                  title={plan.name}
+                  description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+                />
+                {/* TODO(@Commerce): needs localization */}
+                <LineItems.Description
+                  prefix={planPeriod === 'annual' ? 'x12' : undefined}
+                  text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+                  suffix={localizationKeys('commerce.checkout.perMonth')}
+                />
+              </LineItems.Group>
+            </LineItems.Root>
+          </Box>
+          <Box sx={t => ({ padding: t.space.$4 })}>
+            {/* TODO(@Commerce): needs localization */}
+            <Alert
+              variant='info'
+              colorScheme='info'
+              title={`You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.`}
+            />
+          </Box>
+        </Flex>
+      </Drawer.Body>
+    );
+  }
+
   return (
     <Drawer.Body>
       <Flex
@@ -95,7 +152,10 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
           fontSize: t.fontSizes.$md,
         })}
       >
-        <Alert colorScheme='danger'>
+        <Alert
+          variant='info'
+          colorScheme='info'
+        >
           {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
         </Alert>
       </Flex>
