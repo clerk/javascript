@@ -35,7 +35,7 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
-        title__invoiceId: 'Invoice ID',
+        title__statementId: 'Statement ID',
         title__paymentMethod: 'Payment method',
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
@@ -173,7 +173,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__invoices: 'Invoices',
+        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscriptions',
       },
@@ -767,7 +767,7 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__invoices: 'Invoices',
+        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
         headerTitle__subscriptions: 'Subscription',
       },

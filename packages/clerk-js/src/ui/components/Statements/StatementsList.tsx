@@ -1,34 +1,20 @@
-import type { CommerceInvoiceResource, CommerceInvoiceStatus } from '@clerk/types';
+import type { CommerceStatementResource } from '@clerk/types';
 import React from 'react';
 
-import { useInvoicesContext } from '../../contexts';
+import { useStatementsContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
-import {
-  Badge,
-  Col,
-  descriptors,
-  Flex,
-  Link,
-  Spinner,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from '../../customizables';
+import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Pagination } from '../../elements';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
 /* -------------------------------------------------------------------------------------------------
- * InvoicesList
+ * StatementsList
  * -----------------------------------------------------------------------------------------------*/
 
-export const InvoicesList = () => {
-  const { invoices, isLoading, totalCount } = useInvoicesContext();
+export const StatementsList = () => {
+  const { statements, isLoading, totalCount } = useStatementsContext();
 
   return (
     <DataTable
@@ -38,33 +24,27 @@ export const InvoicesList = () => {
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
-      emptyStateLocalizationKey='No invoices to display'
-      headers={['Date/Invoice', 'Status', 'Total']}
-      rows={invoices.map(i => (
-        <InvoicesListRow
+      emptyStateLocalizationKey='No statements to display'
+      headers={['Date', 'Amount']}
+      rows={statements.map(i => (
+        <StatementsListRow
           key={i.id}
-          invoice={i}
+          statement={i}
         />
       ))}
     />
   );
 };
 
-const InvoicesListRow = ({ invoice }: { invoice: CommerceInvoiceResource }) => {
+const StatementsListRow = ({ statement }: { statement: CommerceStatementResource }) => {
   const {
-    paymentDueOn,
+    timestamp,
     id,
-    status,
     totals: { grandTotal },
-  } = invoice;
+  } = statement;
   const { navigate } = useRouter();
-  const badgeColorSchemeMap: Record<CommerceInvoiceStatus, 'success' | 'warning' | 'danger'> = {
-    paid: 'success',
-    unpaid: 'warning',
-    past_due: 'danger',
-  };
   const handleClick = () => {
-    void navigate(`invoice/${id}`);
+    void navigate(`statement/${id}`);
   };
   return (
     <DataTableRow onClick={handleClick}>
@@ -74,29 +54,16 @@ const InvoicesListRow = ({ invoice }: { invoice: CommerceInvoiceResource }) => {
         }}
       >
         <Text variant='subtitle'>
-          <Link onClick={handleClick}>{new Date(paymentDueOn).toLocaleDateString()}</Link>
+          {new Date(timestamp).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
         </Text>
         <Text
           colorScheme='secondary'
+          variant='caption'
           truncate
-          sx={t => ({ marginTop: t.space.$0x5, textTransform: 'uppercase' })}
+          sx={t => ({ marginTop: t.space.$0x5 })}
         >
           {truncateWithEndVisible(id)}
         </Text>
-      </Td>
-      <Td
-        sx={{
-          cursor: 'pointer',
-        }}
-      >
-        <Badge
-          colorScheme={badgeColorSchemeMap[status]}
-          sx={{
-            textTransform: 'capitalize',
-          }}
-        >
-          {status}
-        </Badge>
       </Td>
       <Td
         sx={{
@@ -158,6 +125,7 @@ const DataTable = (props: DataTableProps) => {
                   elementDescriptor={descriptors.tableHead}
                   key={index}
                   localizationKey={h}
+                  sx={{ width: index === 0 ? 'auto' : '25%' }}
                 />
               ))}
             </Tr>

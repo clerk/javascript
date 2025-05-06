@@ -51,7 +51,7 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
     this.avatarUrl = data.avatar_url;
-    this.features = data.features.map(feature => new CommerceFeature(feature));
+    this.features = (data.features || []).map(feature => new CommerceFeature(feature));
 
     return this;
   }

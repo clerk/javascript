@@ -1,5 +1,6 @@
 import type {
   CancelSubscriptionParams,
+  CommerceMoney,
   CommerceSubscriptionJSON,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
@@ -7,6 +8,7 @@ import type {
   DeletedObjectJSON,
 } from '@clerk/types';
 
+import { commerceMoneyFromJSON } from '../../utils';
 import { BaseResource, CommercePlan, DeletedObject } from './internal';
 
 export class CommerceSubscription extends BaseResource implements CommerceSubscriptionResource {
@@ -18,6 +20,10 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
   periodStart!: number;
   periodEnd!: number;
   canceledAt!: number | null;
+  amount?: CommerceMoney;
+  credit?: {
+    amount: CommerceMoney;
+  };
   constructor(data: CommerceSubscriptionJSON) {
     super();
     this.fromJSON(data);
@@ -36,6 +42,8 @@ export class CommerceSubscription extends BaseResource implements CommerceSubscr
     this.periodStart = data.period_start;
     this.periodEnd = data.period_end;
     this.canceledAt = data.canceled_at;
+    this.amount = data.amount ? commerceMoneyFromJSON(data.amount) : undefined;
+    this.credit = data.credit && data.credit.amount ? { amount: commerceMoneyFromJSON(data.credit.amount) } : undefined;
     return this;
   }
 

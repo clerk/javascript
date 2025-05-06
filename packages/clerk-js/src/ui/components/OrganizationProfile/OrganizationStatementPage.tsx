@@ -1,10 +1,10 @@
 import { SubscriberTypeContext } from '../../contexts';
-import { InvoicePage } from '../Invoices';
+import { StatementPage } from '../Statements';
 
-export const OrganizationInvoicePage = () => {
+export const OrganizationStatementPage = () => {
   return (
     <SubscriberTypeContext.Provider value='org'>
-      <InvoicePage />
+      <StatementPage />
     </SubscriberTypeContext.Provider>
   );
 };
