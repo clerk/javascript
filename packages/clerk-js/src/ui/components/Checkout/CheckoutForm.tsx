@@ -14,7 +14,7 @@ import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
 import { useFetch } from '../../hooks';
-import { ArrowUpDown } from '../../icons';
+import { ChevronUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
@@ -309,7 +309,7 @@ const ExistingPaymentSourceForm = ({
             value={selectedPaymentSource?.id}
           />
           <SelectButton
-            icon={ArrowUpDown}
+            icon={ChevronUpDown}
             sx={t => ({
               justifyContent: 'space-between',
               backgroundColor: t.colors.$colorBackground,

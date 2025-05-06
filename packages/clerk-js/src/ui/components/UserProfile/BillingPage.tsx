@@ -82,7 +82,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                 <>
                   <ProfileSection.Root
                     id='subscriptionsList'
-                    title='Subscription'
+                    title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
                     centered={false}
                     sx={t => ({
                       borderTop: 'none',
@@ -92,7 +92,9 @@ const BillingPageInternal = withCardStateProvider(() => {
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton
                       id='subscriptionsList'
-                      textLocalizationKey='Switch plans'
+                      textLocalizationKey={localizationKeys(
+                        'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                      )}
                       sx={[
                         t => ({
                           justifyContent: 'start',

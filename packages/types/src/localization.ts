@@ -696,6 +696,10 @@ type _LocalizationResource = {
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__invoices: LocalizationValue;
       };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
       paymentSourcesSection: {
         title: LocalizationValue;
         add: LocalizationValue;
@@ -877,6 +881,38 @@ type _LocalizationResource = {
           headerSubtitle: LocalizationValue;
           primaryButton: LocalizationValue;
         };
+      };
+    };
+    billingPage: {
+      title: LocalizationValue;
+      start: {
+        headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
+        headerTitle__invoices: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
+        payWithTestCardButton: LocalizationValue;
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
       };
     };
   };

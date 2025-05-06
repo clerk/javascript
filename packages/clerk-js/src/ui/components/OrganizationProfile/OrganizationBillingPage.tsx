@@ -53,7 +53,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.billingPage.title')}
+            localizationKey={localizationKeys('organizationProfile.billingPage.title')}
             textVariant='h2'
           />
         </Header.Root>
@@ -68,11 +68,11 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
             <Tab
               localizationKey={
                 subscriptions.data.length > 0
-                  ? localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('userProfile.billingPage.start.headerTitle__plans')
+                  ? localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')
+                  : localizationKeys('organizationProfile.billingPage.start.headerTitle__plans')
               }
             />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
+            <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__invoices')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
@@ -83,7 +83,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                 >
                   <ProfileSection.Root
                     id='subscriptionsList'
-                    title='Subscription'
+                    title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
                     centered={false}
                     sx={t => ({
                       borderTop: 'none',
@@ -93,7 +93,9 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton
                       id='subscriptionsList'
-                      textLocalizationKey='Switch plans'
+                      textLocalizationKey={localizationKeys(
+                        'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                      )}
                       sx={[
                         t => ({
                           justifyContent: 'start',

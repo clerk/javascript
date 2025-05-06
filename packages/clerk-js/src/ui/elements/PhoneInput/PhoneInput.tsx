@@ -3,7 +3,7 @@ import React, { forwardRef, memo, useEffect, useMemo, useRef } from 'react';
 
 import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
-import { ArrowUpDown, Check } from '../../icons';
+import { Check, ChevronUpDown } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
 import type { FeedbackType } from '../../utils';
 import { mergeRefs } from '../../utils';
@@ -128,7 +128,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           })}
           hoverAsFocus
           isDisabled={rest.isDisabled}
-          icon={ArrowUpDown}
+          icon={ChevronUpDown}
           iconSx={t => ({
             color: rest.isDisabled ? t.colors.$neutralAlpha300 : t.colors.$neutralAlpha500,
           })}
