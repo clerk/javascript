@@ -57,6 +57,7 @@ export const enUS: LocalizationResource = {
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
+    year: 'Year',
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',

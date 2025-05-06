@@ -44,6 +44,8 @@ export interface CommercePlanResource extends ClerkResource {
   name: string;
   amount: number;
   amountFormatted: string;
+  annualAmount: number;
+  annualAmountFormatted: string;
   annualMonthlyAmount: number;
   annualMonthlyAmountFormatted: string;
   currencySymbol: string;

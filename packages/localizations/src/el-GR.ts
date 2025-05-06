@@ -68,6 +68,7 @@ export const elGR: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
