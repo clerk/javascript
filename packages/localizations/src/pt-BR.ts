@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
   backButton: 'Voltar',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Padrão',
@@ -154,15 +155,45 @@ export const ptBR: LocalizationResource = {
     titleWithoutPersonal: 'Selecione uma organização',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Convites automáticos',
     badge__automaticSuggestion: 'Sugestões automáticas',
     badge__manualInvitation: 'Sem inscrição automática',
     badge__unverified: 'Não verificado',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Adicione o domínio para verificar. Usuários com endereços de e-mail neste domínio podem se juntar à organização automaticamente ou solicitar participação.',
@@ -749,6 +780,10 @@ export const ptBR: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   backButton: 'Enrere',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Per defecte',
@@ -153,15 +154,45 @@ export const caES: LocalizationResource = {
     titleWithoutPersonal: 'Trieu una organització',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Invitacions automàtiques',
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
     badge__unverified: 'No verificat',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Afegeix el domini per verificar. Els usuaris amb adreces de correu electrònic en aquest domini poden unir-se a l'organització automàticament o sol·licitar unir-se.",
@@ -745,6 +776,10 @@ export const caES: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

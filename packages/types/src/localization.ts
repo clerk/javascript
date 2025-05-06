@@ -89,6 +89,7 @@ type _LocalizationResource = {
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
+  badge__activePlan: LocalizationValue;
   badge__startsAt: LocalizationValue;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;

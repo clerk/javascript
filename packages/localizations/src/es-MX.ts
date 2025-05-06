@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
   backButton: 'Atrás',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Por defecto',
@@ -155,15 +156,45 @@ export const esMX: LocalizationResource = {
     titleWithoutPersonal: 'Elige una organización',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Invitaciones automaticas',
     badge__automaticSuggestion: 'Sugerencias automaticas',
     badge__manualInvitation: 'Sin inscripciónes automaticas',
     badge__unverified: 'No verificado',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Añada el email para verificar. Los usuarios con direcciones de correo electrónico en este dominio pueden unirse a la organización aquí o pedir unirse.',
@@ -748,6 +779,10 @@ export const esMX: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

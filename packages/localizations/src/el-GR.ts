@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   backButton: 'Πίσω',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
@@ -154,15 +155,45 @@ export const elGR: LocalizationResource = {
     titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
     badge__unverified: 'Μη επαληθευμένο',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Προσθέστε τον τομέα για επαλήθευση. Χρήστες με διευθύνσεις email σε αυτόν τον τομέα μπορούν να συμμετάσχουν στον οργανισμό αυτόματα ή να αιτηθούν συμμετοχή.',
@@ -750,6 +781,10 @@ export const elGR: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

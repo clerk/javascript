@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
   backButton: 'חזור',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ברירת מחדל',
@@ -153,15 +154,45 @@ export const heIL: LocalizationResource = {
     titleWithoutPersonal: 'בחר ארגון',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'הזמנות אוטומטיות',
     badge__automaticSuggestion: 'הצעות אוטומטיות',
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
     badge__unverified: 'לא מאומת',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'הוסף את הדומיין לאימות. משתמשים עם כתובות אימייל תחת דומיין זה יכולים להצטרף לארגון באופן אוטומטי או לבקש להצטרף.',
@@ -733,6 +764,10 @@ export const heIL: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

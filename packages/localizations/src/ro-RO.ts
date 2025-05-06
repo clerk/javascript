@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   backButton: 'Înapoi',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Implicit',
@@ -155,15 +156,45 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Selectați o organizație',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
     badge__unverified: 'Nedeclarat',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Adăugați domeniul de verificat. Utilizatorii cu adrese de e-mail la acest domeniu se pot alătura organizației în mod automat sau pot solicita să se alăture.',
@@ -748,6 +779,10 @@ export const roRO: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

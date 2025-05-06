@@ -673,11 +673,7 @@ export interface CommerceCheckoutTotalsJSON {
   subtotal: CommerceMoneyJSON;
   tax_total: CommerceMoneyJSON;
   total_due_now: CommerceMoneyJSON;
-  proration?: {
-    days: number;
-    rate_per_day: CommerceMoneyJSON;
-    total_proration: CommerceMoneyJSON;
-  };
+  credit: CommerceMoneyJSON;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
