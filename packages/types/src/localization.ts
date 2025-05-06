@@ -142,6 +142,7 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       downgradeNotice: LocalizationValue;
+      perMonth: LocalizationValue;
     };
   };
   signUp: {

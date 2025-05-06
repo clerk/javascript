@@ -40,6 +40,7 @@ export const enUS: LocalizationResource = {
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
+      perMonth: 'per month',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },
