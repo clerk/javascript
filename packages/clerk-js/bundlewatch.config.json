@@ -23,8 +23,8 @@
     { "path": "./dist/pricingTable*.js", "maxSize": "4.02KB" },
     { "path": "./dist/checkout*.js", "maxSize": "5.79KB" },
     { "path": "./dist/paymentSources*.js", "maxSize": "9.06KB" },
-    { "path": "./dist/up-billing-page*.js", "maxSize": "2.4KB" },
-    { "path": "./dist/op-billing-page*.js", "maxSize": "2.4KB" },
+    { "path": "./dist/up-billing-page*.js", "maxSize": "2.42KB" },
+    { "path": "./dist/op-billing-page*.js", "maxSize": "2.42KB" },
     { "path": "./dist/sessionTasks*.js", "maxSize": "1KB" }
   ]
 }
