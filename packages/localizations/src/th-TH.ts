@@ -14,12 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  __experimental_commerce: {
+  backButton: 'กลับ',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'ค่าเริ่มต้น',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
+  badge__primary: 'หลัก',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'ต้องการการดำเนินการ',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'อุปกรณ์นี้',
+  badge__unverified: 'ยังไม่ได้ตรวจสอบ',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: 'อุปกรณ์ผู้ใช้',
+  badge__you: 'คุณ',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -33,6 +54,7 @@ export const thTH: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,22 +62,12 @@ export const thTH: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
-  backButton: 'กลับ',
-  badge__currentPlan: undefined,
-  badge__default: 'ค่าเริ่มต้น',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
-  badge__primary: 'หลัก',
-  badge__requiresAction: 'ต้องการการดำเนินการ',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'อุปกรณ์นี้',
-  badge__unverified: 'ยังไม่ได้ตรวจสอบ',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: 'อุปกรณ์ผู้ใช้',
-  badge__you: 'คุณ',
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -146,6 +158,41 @@ export const thTH: LocalizationResource = {
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
@@ -689,34 +736,6 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -731,6 +750,38 @@ export const thTH: LocalizationResource = {
         'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
       title: 'เพิ่มการยืนยันรหัสสำรอง',
       title__codelist: 'รหัสสำรอง',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'เลือกผู้ให้บริการเพื่อเชื่อมต่อบัญชีของคุณ',

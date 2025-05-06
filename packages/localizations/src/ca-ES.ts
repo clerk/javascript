@@ -14,12 +14,33 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
-  __experimental_commerce: {
+  backButton: 'Enrere',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: undefined,
+  badge__default: 'Per defecte',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
+  badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
+  badge__primary: 'Principal',
+  badge__renewsAt: undefined,
+  badge__requiresAction: 'Requereix acció',
+  badge__startsAt: undefined,
+  badge__thisDevice: 'Aquest dispositiu',
+  badge__unverified: 'No verificat',
+  badge__upcomingPlan: undefined,
+  badge__userDevice: "Dispositiu de l'usuari",
+  badge__you: 'Tu',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
     billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
       emailForm: {
         subtitle: undefined,
         title: undefined,
@@ -33,6 +54,7 @@ export const caES: LocalizationResource = {
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
     keepSubscription: undefined,
@@ -40,22 +62,12 @@ export const caES: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
     switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
   },
-  backButton: 'Enrere',
-  badge__currentPlan: undefined,
-  badge__default: 'Per defecte',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
-  badge__otherImpersonatorDevice: 'Un altre dispositiu impostor',
-  badge__primary: 'Principal',
-  badge__requiresAction: 'Requereix acció',
-  badge__startsAt: undefined,
-  badge__thisDevice: 'Aquest dispositiu',
-  badge__unverified: 'No verificat',
-  badge__upcomingPlan: undefined,
-  badge__userDevice: "Dispositiu de l'usuari",
-  badge__you: 'Tu',
   createOrganization: {
     formButtonSubmit: 'Crea organització',
     invitePage: {
@@ -146,6 +158,41 @@ export const caES: LocalizationResource = {
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
     badge__unverified: 'No verificat',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Afegeix el domini per verificar. Els usuaris amb adreces de correu electrònic en aquest domini poden unir-se a l'organització automàticament o sol·licitar unir-se.",
@@ -691,34 +738,6 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
@@ -734,6 +753,38 @@ export const caES: LocalizationResource = {
         "Pots utilitzar un d'aquests per iniciar sessió al teu compte, si perds l'accés al teu dispositiu d'autenticació.",
       title: 'Afegeix verificació amb codi de seguretat',
       title__codelist: 'Codis de seguretat',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selecciona un proveïdor per connectar el teu compte.',

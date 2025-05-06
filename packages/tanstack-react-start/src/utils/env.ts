@@ -21,6 +21,6 @@ export const getPublicEnvVariables = (context?: H3EventContext) => {
     telemetryDebug: isTruthy(getValue('CLERK_TELEMETRY_DEBUG')),
     afterSignInUrl: getValue('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getValue('CLERK_AFTER_SIGN_UP_URL'),
-    __experimental_checkoutContinueUrl: getValue('CLERK_CHECKOUT_CONTINUE_URL'),
+    newSubscriptionRedirectUrl: getValue('CLERK_CHECKOUT_CONTINUE_URL'),
   } as const;
 };

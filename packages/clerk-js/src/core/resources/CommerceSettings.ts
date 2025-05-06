@@ -1,32 +1,24 @@
-import type {
-  __experimental_CommerceSettingsJSON,
-  __experimental_CommerceSettingsJSONSnapshot,
-  __experimental_CommerceSettingsResource,
-} from '@clerk/types';
+import type { CommerceSettingsJSON, CommerceSettingsJSONSnapshot, CommerceSettingsResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
 /**
  * @internal
  */
-export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
-  billing: __experimental_CommerceSettingsResource['billing'] = {
+export class CommerceSettings extends BaseResource implements CommerceSettingsResource {
+  billing: CommerceSettingsResource['billing'] = {
     stripePublishableKey: '',
     enabled: false,
     hasPaidUserPlans: false,
     hasPaidOrgPlans: false,
   };
 
-  public constructor(
-    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null = null,
-  ) {
+  public constructor(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(
-    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null,
-  ): this {
+  protected fromJSON(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -40,7 +32,7 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
     return this;
   }
 
-  public __internal_toSnapshot(): __experimental_CommerceSettingsJSONSnapshot {
+  public __internal_toSnapshot(): CommerceSettingsJSONSnapshot {
     return {
       billing: {
         stripe_publishable_key: this.billing.stripePublishableKey,
@@ -48,6 +40,6 @@ export class __experimental_CommerceSettings extends BaseResource implements __e
         has_paid_user_plans: this.billing.hasPaidUserPlans,
         has_paid_org_plans: this.billing.hasPaidOrgPlans,
       },
-    } as unknown as __experimental_CommerceSettingsJSONSnapshot;
+    } as unknown as CommerceSettingsJSONSnapshot;
   }
 }

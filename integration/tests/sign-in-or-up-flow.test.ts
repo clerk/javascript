@@ -142,7 +142,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.continue();
       await u.po.signIn.setPassword('wrong-password');
       await u.po.signIn.continue();
-      await expect(u.page.getByText(/password you entered is incorrect/i)).toBeVisible();
+      await expect(u.page.getByText(/password is incorrect/i)).toBeVisible();
 
       await u.po.expect.toBeSignedOut();
     });
@@ -156,7 +156,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('sign-
       await u.po.signIn.setPassword('wrong-password');
       await u.po.signIn.continue();
 
-      await expect(u.page.getByText(/password you entered is incorrect/i)).toBeVisible();
+      await expect(u.page.getByText(/password is incorrect/i)).toBeVisible();
 
       await u.po.signIn.getUseAnotherMethodLink().click();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
