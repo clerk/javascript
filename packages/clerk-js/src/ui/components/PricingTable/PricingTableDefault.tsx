@@ -1,4 +1,4 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -97,7 +97,6 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
-  const { isSignedIn } = useUser();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
@@ -107,7 +106,7 @@ function Card(props: CardProps) {
 
   const {
     buttonPropsForPlan,
-    isDefaultPlanImplicitlyActiveOrUpcoming,
+    // isDefaultPlanImplicitlyActiveOrUpcoming,
     upcomingSubscriptionsExist,
     activeOrUpcomingSubscription,
     subscriptions,
@@ -125,20 +124,19 @@ function Card(props: CardProps) {
   };
 
   const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
   const hasFeatures = plan.features.length > 0;
-  const isPlanActive =
-    subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0);
-  const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
-  const shouldShowFooterAction = !plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming;
+  const isPlanActive = subscription?.status === 'active';
+  const showStatusRow = !!subscription;
+  const shouldShowFooterAction = true; // !plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming;
 
-  const shouldShowFooter = React.useMemo(() => {
-    return (
-      !plan.isDefault ||
-      !isDefaultPlanImplicitlyActiveOrUpcoming ||
-      (isImplicitlyActiveOrUpcoming && subscriptions.length > 0)
-    );
-  }, [isDefaultPlanImplicitlyActiveOrUpcoming, isImplicitlyActiveOrUpcoming, plan.isDefault, subscriptions.length]);
+  const shouldShowFooter = true;
+  // const shouldShowFooter = React.useMemo(() => {
+  //   return (
+  //     !plan.isDefault ||
+  //     !isDefaultPlanImplicitlyActiveOrUpcoming ||
+  //     (isImplicitlyActiveOrUpcoming && subscriptions.length > 0)
+  //   );
+  // }, [isDefaultPlanImplicitlyActiveOrUpcoming, isImplicitlyActiveOrUpcoming, plan.isDefault, subscriptions.length]);
 
   const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
 
