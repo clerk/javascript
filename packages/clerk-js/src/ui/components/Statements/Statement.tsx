@@ -18,7 +18,7 @@ function Root({ children }: { children: React.ReactNode }) {
         borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
         borderRadius: t.radii.$lg,
-        overflow: 'hidden',
+        overflow: 'clip',
       })}
     >
       {children}
