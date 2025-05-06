@@ -127,16 +127,14 @@ function Card(props: CardProps) {
   const hasFeatures = plan.features.length > 0;
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
-  const shouldShowFooterAction = true; // !plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming;
 
-  const shouldShowFooter = true;
-  // const shouldShowFooter = React.useMemo(() => {
-  //   return (
-  //     !plan.isDefault ||
-  //     !isDefaultPlanImplicitlyActiveOrUpcoming ||
-  //     (isImplicitlyActiveOrUpcoming && subscriptions.length > 0)
-  //   );
-  // }, [isDefaultPlanImplicitlyActiveOrUpcoming, isImplicitlyActiveOrUpcoming, plan.isDefault, subscriptions.length]);
+  const shouldShowFooter =
+    !subscription ||
+    subscription?.status === 'upcoming' ||
+    subscription?.canceledAt ||
+    (planPeriod !== subscription?.planPeriod && !plan.isDefault);
+  const shouldShowFooterNotice =
+    subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
 
   const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
 
@@ -149,7 +147,7 @@ function Card(props: CardProps) {
         display: 'grid',
         gap: 0,
         gridTemplateRows: 'subgrid',
-        gridRow: 'span 4',
+        gridRow: 'span 5',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -188,8 +186,9 @@ function Card(props: CardProps) {
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gridTemplateRows: 'subgrid',
+          gridRow: 'span 2',
           gap: 0,
         }}
       >
@@ -197,6 +196,7 @@ function Card(props: CardProps) {
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
+              // gridRow: shouldShowFooter ? 'auto' : 'span 2',
               display: 'flex',
               flexDirection: 'column',
               flex: '1',
@@ -216,34 +216,20 @@ function Card(props: CardProps) {
           </Box>
         ) : null}
 
-        {shouldShowFooter && (
+        {shouldShowFooter ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
               marginTop: 'auto',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              borderTopWidth: planPeriodSameAsSelectedPlanPeriod && !hasFeatures ? 0 : t.borderWidths.$normal,
+              borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
               background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {shouldShowFooterAction ? (
-              <Button
-                elementDescriptor={descriptors.pricingTableCardFooterButton}
-                block
-                sx={{
-                  visibility:
-                    !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod ? 'hidden' : undefined,
-                }}
-                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
-                onClick={event => {
-                  onSelect(plan, event);
-                }}
-              />
-            ) : subscriptions.length > 0 ? (
+            {shouldShowFooterNotice ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
@@ -254,8 +240,24 @@ function Card(props: CardProps) {
                   textAlign: 'center',
                 })}
               />
-            ) : null}
+            ) : (
+              <Button
+                elementDescriptor={descriptors.pricingTableCardFooterButton}
+                block
+                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                onClick={event => {
+                  onSelect(plan, event);
+                }}
+              />
+            )}
           </Box>
+        ) : (
+          <Box
+            sx={t => ({
+              backgroundColor: t.colors.$colorBackground,
+            })}
+          />
         )}
       </Box>
     </Box>
