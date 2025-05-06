@@ -202,7 +202,9 @@ function Card(props: CardProps) {
           </Box>
         ) : null}
 
-        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming || isImplicitlyActiveOrUpcoming) && (
+        {(!plan.isDefault ||
+          !isDefaultPlanImplicitlyActiveOrUpcoming ||
+          (isImplicitlyActiveOrUpcoming && plan.isDefault && subscriptions.length > 0)) && (
           <Box
             elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
@@ -225,7 +227,7 @@ function Card(props: CardProps) {
                   onSelect(plan, event);
                 }}
               />
-            ) : (
+            ) : subscriptions.length > 0 ? (
               <Text
                 elementDescriptor={descriptors.pricingTableCardFooterNotice}
                 variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
@@ -236,7 +238,7 @@ function Card(props: CardProps) {
                   textAlign: 'center',
                 })}
               />
-            )}
+            ) : null}
           </Box>
         )}
       </Box>
