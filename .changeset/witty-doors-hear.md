@@ -4,18 +4,20 @@
 '@clerk/types': minor
 ---
 
-Expose stable commerce stable apis under `Clerk.commerce`
+Expose Clerk Billing APIs.
 
 ## Render the pricing table component
 - `Clerk.mountPricingTable`
 - `Clerk.unmountPricingTable`
 
-## Commerce namespace
-- `Clerk.commerce.initializePaymentSource()`
-- `Clerk.commerce.addPaymentSource()`
-- `Clerk.commerce.getPaymentSources()`
-- `Clerk.commerce.billing`
-  - `Clerk.commerce.billing.getPlans()`
-  - `Clerk.commerce.billing.getSubscriptions()`
-  - `Clerk.commerce.billing.getInvoices()`
-  - `Clerk.commerce.billing.startCheckout()`
+## Manage payment methods
+- `Clerk.[user|organization].initializePaymentSource()`
+- `Clerk.[user|organization].addPaymentSource()`
+- `Clerk.[user|organization].getPaymentSources()`
+
+## Billing namespace
+- `Clerk.billing`
+  - `Clerk.billing.getPlans()`
+  - `Clerk.billing.getSubscriptions()`
+  - `Clerk.billing.getInvoices()`
+  - `Clerk.billing.startCheckout()`
