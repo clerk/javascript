@@ -85,10 +85,10 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                     id='subscriptionsList'
                     title='Subscription'
                     centered={false}
-                    sx={{
+                    sx={t => ({
                       borderTop: 'none',
-                      paddingTop: 0,
-                    }}
+                      paddingTop: t.space.$1,
+                    })}
                   >
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton

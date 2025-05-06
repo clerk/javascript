@@ -5,7 +5,7 @@ import {
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -79,18 +79,15 @@ const BillingPageInternal = withCardStateProvider(() => {
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
               {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
+                <>
                   <ProfileSection.Root
                     id='subscriptionsList'
                     title='Subscription'
                     centered={false}
-                    sx={{
+                    sx={t => ({
                       borderTop: 'none',
-                      paddingTop: 0,
-                    }}
+                      paddingTop: t.space.$1,
+                    })}
                   >
                     <SubscriptionsList />
                     <ProfileSection.ArrowButton
@@ -111,7 +108,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                     />
                   </ProfileSection.Root>
                   <PaymentSources />
-                </Flex>
+                </>
               ) : (
                 <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
                   <PricingTable />
