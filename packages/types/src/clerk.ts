@@ -759,6 +759,13 @@ export interface Clerk {
    * Retrieves all API keys for the current user.
    */
   getApiKeys: () => Promise<ApiKeyResource[]>;
+
+  /**
+   * Retrieves the secret for a given API key ID.
+   * @param id - The ID of the API key to retrieve the secret for.
+   * @returns The secret for the given API key ID.
+   */
+  getApiKeySecret: (id: string) => Promise<string>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
