@@ -5,14 +5,6 @@ import type { ClerkResource } from './resource';
 type WithOptionalOrgType<T> = T & {
   orgId?: string;
 };
-export interface CommerceNamespace {
-  billing: CommerceBillingNamespace;
-  getPaymentSources: (
-    params: GetPaymentSourcesParams,
-  ) => Promise<ClerkPaginatedResponse<CommercePaymentSourceResource>>;
-  initializePaymentSource: (params: InitializePaymentSourceParams) => Promise<CommerceInitializedPaymentSourceResource>;
-  addPaymentSource: (params: AddPaymentSourceParams) => Promise<CommercePaymentSourceResource>;
-}
 
 export interface CommerceBillingNamespace {
   getPlans: () => Promise<CommercePlanResource[]>;
@@ -24,6 +16,16 @@ export interface CommerceBillingNamespace {
 export type CommerceSubscriberType = 'org' | 'user';
 export type CommerceSubscriptionStatus = 'active' | 'ended' | 'upcoming';
 export type CommerceSubscriptionPlanPeriod = 'month' | 'annual';
+
+export interface CommercePaymentSourceMethods {
+  initializePaymentSource: (
+    params: Exclude<InitializePaymentSourceParams, 'orgId'>,
+  ) => Promise<CommerceInitializedPaymentSourceResource>;
+  addPaymentSource: (params: Exclude<AddPaymentSourceParams, 'orgId'>) => Promise<CommercePaymentSourceResource>;
+  getPaymentSources: (
+    params: Exclude<GetPaymentSourcesParams, 'orgId'>,
+  ) => Promise<ClerkPaginatedResponse<CommercePaymentSourceResource>>;
+}
 
 export interface CommerceProductResource extends ClerkResource {
   id: string;

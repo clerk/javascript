@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
   ClerkRuntimeError,
@@ -114,22 +114,18 @@ const CheckoutFormElements = ({
   checkout: CommerceCheckoutResource;
   onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
-  const { commerce } = useClerk();
-  const { user } = useUser();
   const { organization } = useOrganization();
-  const { subscriberType } = useCheckoutContext();
+  const { subscriber, subscriberType } = useCheckoutContext();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>('existing');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
   const { data, revalidate: revalidatePaymentSources } = useFetch(
-    commerce?.getPaymentSources,
-    {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    },
+    subscriber().getPaymentSources,
+    {},
     undefined,
-    `commerce-payment-sources-${user?.id}`,
+    `commerce-payment-sources-${subscriber().id}`,
   );
   const { data: paymentSources } = data || { data: [] };
 

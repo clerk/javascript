@@ -19,7 +19,7 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
     revalidate,
     error: _error,
   } = useFetch(
-    clerk.commerce?.billing.startCheckout,
+    clerk.billing?.startCheckout,
     {
       planId,
       planPeriod,

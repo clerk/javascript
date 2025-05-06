@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useRef } from 'react';
@@ -16,15 +16,14 @@ import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
-  const { commerce } = useClerk();
+  const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
-    await commerce.addPaymentSource({
+    const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+    await resource?.addPaymentSource({
       gateway: 'stripe',
       paymentToken: context.stripeSetupIntent?.payment_method as string,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
     onSuccess();
     close();
@@ -85,16 +84,16 @@ const RemoveScreen = ({
 };
 
 export const PaymentSources = () => {
-  const { commerce } = useClerk();
-  const { organization } = useOrganization();
+  const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
 
-  const { user } = useUser();
+  const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+
   const { data, revalidate } = useFetch(
-    commerce?.getPaymentSources,
-    { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
+    resource?.getPaymentSources,
+    {},
     undefined,
-    `commerce-payment-sources-${user?.id}`,
+    `commerce-payment-sources-${resource?.id}`,
   );
   const { data: paymentSources } = data || { data: [] };
 

@@ -31,6 +31,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 import { BaseResource, CommerceSubscription, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -280,6 +281,27 @@ export class Organization extends BaseResource implements OrganizationResource {
       body,
       headers,
     }).then(res => new Organization(res?.response as OrganizationJSON));
+  };
+
+  initializePaymentSource: typeof initializePaymentSource = params => {
+    return initializePaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  addPaymentSource: typeof addPaymentSource = params => {
+    return addPaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  getPaymentSources: typeof getPaymentSources = params => {
+    return getPaymentSources({
+      ...params,
+      orgId: this.id,
+    });
   };
 
   protected fromJSON(data: OrganizationJSON | OrganizationJSONSnapshot | null): this {
