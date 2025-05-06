@@ -308,9 +308,7 @@ void (async () => {
       });
     },
     '/pricing-table': () => {
-      Clerk.mountPricingTable(app, {
-        forOrganizations: true,
-      });
+      Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
