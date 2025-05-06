@@ -119,7 +119,6 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
                   title={plan.name}
                   description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
                 />
-                {/* TODO(@Commerce): needs localization */}
                 <LineItems.Description
                   prefix={planPeriod === 'annual' ? 'x12' : undefined}
                   text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
