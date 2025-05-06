@@ -89,6 +89,7 @@ export async function authenticateRequest(
     authenticateContext,
     { organizationSyncOptions: options.organizationSyncOptions },
     organizationMatcher,
+    options.apiClient?.handshakePayloads,
   );
 
   async function refreshToken(

@@ -1,3 +1,4 @@
+import type { HandshakePayloadAPI } from '../api/endpoints';
 import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
@@ -87,15 +88,18 @@ export class HandshakeService {
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
+  private readonly handshakePayloadApi?: HandshakePayloadAPI;
 
   constructor(
     authenticateContext: AuthenticateContext,
     options: { organizationSyncOptions?: OrganizationSyncOptions },
     organizationMatcher: OrganizationMatcher,
+    handshakePayloadApi?: HandshakePayloadAPI,
   ) {
     this.authenticateContext = authenticateContext;
     this.options = options;
     this.organizationMatcher = organizationMatcher;
+    this.handshakePayloadApi = handshakePayloadApi;
     this.redirectLoopCounter = 0;
   }
 
@@ -175,8 +179,16 @@ export class HandshakeService {
     const cookiesToSet: string[] = [];
 
     if (this.authenticateContext.handshakeNonce) {
-      // TODO: implement handshake nonce handling, fetch handshake payload with nonce
-      console.warn('Clerk: Handshake nonce is not implemented yet.');
+      if (!this.handshakePayloadApi) {
+        console.error('Clerk: HandshakeService: handshakePayloadApi is not available, cannot process handshake nonce.');
+      } else {
+        const handshakePayload = await this.handshakePayloadApi.getHandshakePayload({
+          nonce: this.authenticateContext.handshakeNonce,
+        });
+        if (handshakePayload) {
+          console.log('Clerk: Handshake payload by nonce:', handshakePayload.payload);
+        }
+      }
     }
     if (this.authenticateContext.handshakeToken) {
       const handshakePayload = await verifyHandshakeToken(

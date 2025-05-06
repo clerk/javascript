@@ -7,6 +7,7 @@ export * from './BlocklistIdentifierApi';
 export * from './ClientApi';
 export * from './DomainApi';
 export * from './EmailAddressApi';
+export * from './HandshakePayloadApi';
 export * from './InstanceApi';
 export * from './InvitationApi';
 export * from './JwksApi';
