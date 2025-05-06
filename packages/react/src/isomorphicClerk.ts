@@ -97,7 +97,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | 'commerce'
+  | 'billing'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
