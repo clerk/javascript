@@ -1,6 +1,6 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -15,12 +15,33 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
   const { user } = useUser();
+  const { subscriptions } = usePlansContext();
+  const { plans, handleSelectPlan } = usePlansContext();
 
   const resource = subscriberType === 'org' ? organization : user;
 
-  const { plans, handleSelectPlan } = usePlansContext();
+  const defaultPlanPeriod = useMemo(() => {
+    if (isCompact) {
+      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      console.log('upcomingSubscription', upcomingSubscription);
+      if (upcomingSubscription) {
+        return upcomingSubscription.planPeriod;
+      }
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('annual');
+      const activeSubscription = subscriptions?.find(sub => !sub.canceledAt && sub.status === 'active');
+      if (activeSubscription) {
+        return activeSubscription.planPeriod;
+      }
+    }
+
+    return 'annual';
+  }, [isCompact, subscriptions]);
+
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+
+  useEffect(() => {
+    setPlanPeriod(defaultPlanPeriod);
+  }, [defaultPlanPeriod]);
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
