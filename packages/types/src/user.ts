@@ -1,5 +1,5 @@
 import type { BackupCodeResource } from './backupCode';
-import { CommercePaymentSourceMethods } from './commerce';
+import type { CommercePaymentSourceMethods } from './commerce';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
