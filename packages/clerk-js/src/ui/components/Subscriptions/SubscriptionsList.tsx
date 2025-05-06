@@ -110,7 +110,7 @@ export function SubscriptionsList() {
                       colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                       localizationKey={
                         subscription.status === 'active'
-                          ? localizationKeys('badge__currentPlan')
+                          ? localizationKeys('badge__activePlan')
                           : localizationKeys('badge__upcomingPlan')
                       }
                     />
