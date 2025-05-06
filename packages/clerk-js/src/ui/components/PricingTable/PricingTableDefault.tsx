@@ -104,7 +104,7 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
+  const { buttonPropsForPlan, activeOrUpcomingSubscription, hasMultipleSubscriptionsForPlan } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -118,6 +118,7 @@ function Card(props: CardProps) {
   };
 
   const subscription = activeOrUpcomingSubscription(plan);
+  const multipleSubscriptionsForPlan = hasMultipleSubscriptionsForPlan(plan);
   const hasFeatures = plan.features.length > 0;
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
@@ -125,12 +126,10 @@ function Card(props: CardProps) {
   const shouldShowFooter =
     !subscription ||
     subscription?.status === 'upcoming' ||
-    subscription?.canceledAt ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault);
+    (subscription?.canceledAt && !multipleSubscriptionsForPlan) ||
+    (planPeriod !== subscription?.planPeriod && !plan.isDefault && !multipleSubscriptionsForPlan);
   const shouldShowFooterNotice =
     subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
-
-  const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
 
   return (
     <Box
@@ -219,7 +218,6 @@ function Card(props: CardProps) {
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >

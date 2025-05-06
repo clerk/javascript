@@ -23,7 +23,12 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
       const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
-      if (upcomingSubscription) {
+      const hasEndingSubscriptionOfSamePlan = subscriptions?.find(
+        sub => sub.canceledAt && sub.status === 'active' && sub.plan.id === upcomingSubscription?.plan.id,
+      );
+
+      // the exception to this is if there is an upcoming subscription AND an active subscription for the SAME plan, default to the active subscription's period
+      if (upcomingSubscription && !hasEndingSubscriptionOfSamePlan) {
         return upcomingSubscription.planPeriod;
       }
 

@@ -169,7 +169,16 @@ export const usePlansContext = () => {
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
     (plan: CommercePlanResource) => {
-      return ctx.subscriptions.find(subscription => subscription.plan.id === plan.id);
+      const matchingSubscriptions = ctx.subscriptions.filter(subscription => subscription.plan.id === plan.id);
+      const activeSubscription = matchingSubscriptions.find(subscription => subscription.status === 'active');
+      return activeSubscription || matchingSubscriptions[0];
+    },
+    [ctx.subscriptions],
+  );
+
+  const hasMultipleSubscriptionsForPlan = useCallback(
+    (plan: CommercePlanResource) => {
+      return ctx.subscriptions.filter(subscription => subscription.plan.id === plan.id).length > 1;
     },
     [ctx.subscriptions],
   );
@@ -182,14 +191,6 @@ export const usePlansContext = () => {
     },
     [activeOrUpcomingSubscription],
   );
-
-  // should the default plan be shown as active
-  const upcomingSubscriptionsExist = useMemo(() => {
-    return (
-      ctx.subscriptions.some(subscription => subscription.status === 'upcoming') ||
-      isDefaultPlanImplicitlyActiveOrUpcoming
-    );
-  }, [ctx.subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
 
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
@@ -225,7 +226,7 @@ export const usePlansContext = () => {
                 : localizationKeys('commerce.switchToAnnual')
               : localizationKeys('commerce.manageSubscription')
           : // If there are no active or grace period subscriptions, show the get started button
-            ctx.subscriptions.length > 0
+            ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0
             ? localizationKeys('commerce.switchPlan')
             : localizationKeys('commerce.subscribe'),
         variant: isCompact ? 'bordered' : 'solid',
@@ -253,7 +254,7 @@ export const usePlansContext = () => {
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
           subscriberType,
@@ -293,12 +294,12 @@ export const usePlansContext = () => {
     ...ctx,
     componentName,
     activeOrUpcomingSubscription,
+    hasMultipleSubscriptionsForPlan,
     isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
-    upcomingSubscriptionsExist,
     defaultFreePlan,
   };
 };
