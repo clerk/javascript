@@ -125,13 +125,11 @@ function Root({ children, ...options }: { children: React.ReactNode } & TooltipO
 }
 
 type TriggerProps = React.HTMLProps<HTMLElement> & {
-  // Inspiration from React Aria's TooltipTrigger - https://react-spectrum.adobe.com/react-aria/Tooltip.html#tooltiptrigger
-  isDisabled?: boolean;
   sx?: ThemableCssProp;
 };
 
 const Trigger = React.forwardRef<HTMLElement, TriggerProps>(function TooltipTrigger(
-  { children, sx, isDisabled = false, ...props },
+  { children, sx, ...props },
   propRef,
 ) {
   const context = useTooltipContext();
@@ -142,11 +140,7 @@ const Trigger = React.forwardRef<HTMLElement, TriggerProps>(function TooltipTrig
     return null;
   }
 
-  if (isDisabled) {
-    return children;
-  }
-
-  // If the child is disabled, wrap it in a span to handle hover events
+  // If the child is disabled, wrap it in a span to handle focus events
   if (children.props.isDisabled || children.props.disabled) {
     return (
       <Span
@@ -186,10 +180,9 @@ const Content = React.forwardRef<
   HTMLDivElement,
   React.HTMLProps<HTMLDivElement> & {
     text: string | LocalizationKey;
-    tooltipSx?: ThemableCssProp;
-    contentSx?: ThemableCssProp;
+    sx?: ThemableCssProp;
   }
->(function TooltipContent({ style, text, tooltipSx, contentSx, ...props }, propRef) {
+>(function TooltipContent({ style, text, sx, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
@@ -204,7 +197,6 @@ const Content = React.forwardRef<
           ...context.floatingStyles,
           ...style,
         }}
-        sx={tooltipSx}
         {...context.getFloatingProps(props)}
       >
         <Box
@@ -218,7 +210,7 @@ const Content = React.forwardRef<
               backgroundColor: t.colors.$primary500,
               maxWidth: t.sizes.$60,
             }),
-            contentSx,
+            sx,
           ]}
         >
           <Text
