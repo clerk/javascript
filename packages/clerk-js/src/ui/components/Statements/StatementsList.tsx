@@ -1,4 +1,4 @@
-import type { __experimental_CommerceStatementResource } from '@clerk/types';
+import type { CommerceStatementResource } from '@clerk/types';
 import React from 'react';
 
 import { useStatementsContext } from '../../contexts';
@@ -36,14 +36,13 @@ export const StatementsList = () => {
   );
 };
 
-const StatementsListRow = ({ statement }: { statement: __experimental_CommerceStatementResource }) => {
+const StatementsListRow = ({ statement }: { statement: CommerceStatementResource }) => {
   const {
     timestamp,
     id,
     totals: { grandTotal },
   } = statement;
   const { navigate } = useRouter();
-
   const handleClick = () => {
     void navigate(`statement/${id}`);
   };

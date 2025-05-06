@@ -14,40 +14,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
-  __experimental_commerce: {
-    availableFeatures: undefined,
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__statementId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    defaultFreePlanActive: undefined,
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    seeAllFeatures: undefined,
-    switchPlan: undefined,
-    switchToAnnual: undefined,
-    viewFeatures: undefined,
-  },
   backButton: 'Terug',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standaard',
@@ -63,6 +31,44 @@ export const nlNL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
     invitePage: {
@@ -153,6 +159,41 @@ export const nlNL: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Voeg het domein toe om te verifiëren. Gebruikers met e-mailadressen in dit domein kunnen de organisatie automatisch toegang krijgen of een verzoek om toegang te maken.',
@@ -696,33 +737,6 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__statements: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -738,6 +752,38 @@ export const nlNL: LocalizationResource = {
         'Je kunt één van deze gebruiken om in te loggen op je account als je geen toegang meer hebt tot je authenticatieapparaat.',
       title: 'Voeg backup code verificatie toe',
       title__codelist: 'Backup codes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Kies een provider om je account te verbinden.',

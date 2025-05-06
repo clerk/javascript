@@ -1,3 +1,4 @@
+import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
@@ -10,7 +11,7 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/vue', linkPackage('vue'))
+  .addDependency('@clerk/vue', constants.E2E_CLERK_VERSION || linkPackage('vue'))
   .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 export const vue = {

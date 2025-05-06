@@ -17,7 +17,7 @@ const OrganizationBillingPage = lazy(() =>
 
 export const OrganizationProfileRoutes = () => {
   const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
-  const { __experimental_commerceSettings } = useEnvironment();
+  const { commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -60,28 +60,34 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        {__experimental_commerceSettings.billing.enabled && __experimental_commerceSettings.billing.hasPaidOrgPlans && (
-          <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
-            <Switch>
-              <Route index>
-                <Suspense fallback={''}>
-                  <OrganizationBillingPage />
-                </Suspense>
-              </Route>
-              <Route path='plans'>
-                {/* TODO(@commerce): Should this be lazy loaded ? */}
-                <Suspense fallback={''}>
-                  <OrganizationPlansPage />
-                </Suspense>
-              </Route>
-              <Route path='statement/:statementId'>
-                {/* TODO(@commerce): Should this be lazy loaded ? */}
-                <Suspense fallback={''}>
-                  <OrganizationStatementPage />
-                </Suspense>
-              </Route>
-            </Switch>
-          </Route>
+        {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidOrgPlans && (
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
+            }
+          >
+            <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationBillingPage />
+                  </Suspense>
+                </Route>
+                <Route path='plans'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationPlansPage />
+                  </Suspense>
+                </Route>
+                <Route path='statement/:statementId'>
+                  {/* TODO(@commerce): Should this be lazy loaded ? */}
+                  <Suspense fallback={''}>
+                    <OrganizationStatementPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         )}
       </Route>
     </Switch>

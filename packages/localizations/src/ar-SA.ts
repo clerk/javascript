@@ -14,40 +14,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
-  __experimental_commerce: {
-    availableFeatures: undefined,
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__statementId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    defaultFreePlanActive: undefined,
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    seeAllFeatures: undefined,
-    switchPlan: undefined,
-    switchToAnnual: undefined,
-    viewFeatures: undefined,
-  },
   backButton: 'الرجوع',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'الأفتراضي',
@@ -63,6 +31,44 @@ export const arSA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'أنشاء منظمة',
     invitePage: {
@@ -154,6 +160,41 @@ export const arSA: LocalizationResource = {
     badge__automaticSuggestion: 'أقتراحات تلقائية',
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
     badge__unverified: 'لم يتم التحقق منها',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'أضف النطاق للتحقق. المستخدمين الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الأنضمام.',
@@ -695,33 +736,6 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__statements: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -737,6 +751,38 @@ export const arSA: LocalizationResource = {
         'يمكنك أستعمال واحدة من هذه الرموز لتسجيل الدخول إلى حسابك, اذا فقدت الوصول إلى جهاز المصادقة الخاص بك',
       title: 'إضافة التحقق عن طريق الرموز الأحتياطية',
       title__codelist: 'رموز النسخ الأحتياطي',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'أختر موفر خدمة لتوصيل حسابك',

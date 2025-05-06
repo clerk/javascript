@@ -14,40 +14,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
-  __experimental_commerce: {
-    availableFeatures: undefined,
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__statementId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    defaultFreePlanActive: undefined,
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    seeAllFeatures: undefined,
-    switchPlan: undefined,
-    switchToAnnual: undefined,
-    viewFeatures: undefined,
-  },
   backButton: 'Retour',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Défaut',
@@ -63,6 +31,44 @@ export const frFR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Créer l’organisation',
     invitePage: {
@@ -155,6 +161,41 @@ export const frFR: LocalizationResource = {
     badge__automaticSuggestion: 'Suggestions automatiques',
     badge__manualInvitation: "Pas d'inscription automatique",
     badge__unverified: 'Non vérifié',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Ajoutez le domaine pour le vérifier. Les utilisateurs possédant une adresses e-mail sur ce domaine peuvent rejoindre l'organisation automatiquement ou faire une demande pour y adhérer.",
@@ -703,33 +744,6 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__statements: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -745,6 +759,38 @@ export const frFR: LocalizationResource = {
         "Vous pouvez utiliser l'un d'entre eux pour vous connecter à votre compte, si vous perdez l'accès à votre dispositif d'authentification.",
       title: 'Ajouter la vérification du code de récupération',
       title__codelist: 'Codes de récupération',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Sélectionnez un fournisseur pour connecter votre compte.',

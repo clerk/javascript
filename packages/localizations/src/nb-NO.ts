@@ -14,40 +14,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
-  __experimental_commerce: {
-    availableFeatures: undefined,
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__statementId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    defaultFreePlanActive: undefined,
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    seeAllFeatures: undefined,
-    switchPlan: undefined,
-    switchToAnnual: undefined,
-    viewFeatures: undefined,
-  },
   backButton: 'Tilbake',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -63,6 +31,44 @@ export const nbNO: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brukerens enhet',
   badge__you: 'Du',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Opprett organisasjon',
     invitePage: {
@@ -154,6 +160,41 @@ export const nbNO: LocalizationResource = {
     badge__automaticSuggestion: 'Automatisk forslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Uverifisert',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Legg til domenet som skal verifiseres. Brukere med e-postadresser på dette domenet kan automatisk bli med i organisasjonen eller be om å få bli med.',
@@ -697,33 +738,6 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__statements: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -739,6 +753,38 @@ export const nbNO: LocalizationResource = {
         'Du kan bruke en av disse til å logge inn på kontoen din hvis du mister tilgangen til autentiseringsenheten.',
       title: 'Legg til sikkerhetskopieringskodeverifisering',
       title__codelist: 'Sikkerhetskoder',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Velg en tilbyder for å koble til kontoen din.',

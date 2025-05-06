@@ -1,4 +1,5 @@
 import { $clerk } from '../stores/internal';
+import type { InternalUIComponentId } from '../types';
 
 /**
  * Loop through any Astro component that has requested to mount a UI component and mount it with its respective props.
@@ -14,7 +15,8 @@ const mountAllClerkAstroJSComponents = () => {
     'sign-up': 'mountSignUp',
     'google-one-tap': 'openGoogleOneTap',
     waitlist: 'mountWaitlist',
-  } as const;
+    'pricing-table': 'mountPricingTable',
+  } as const satisfies Record<InternalUIComponentId, string>;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {
     const elementsOfCategory = document.querySelectorAll(`[data-clerk-id^="clerk-${category}"]`);

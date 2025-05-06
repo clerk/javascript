@@ -14,40 +14,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
-  __experimental_commerce: {
-    availableFeatures: undefined,
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__statementId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    defaultFreePlanActive: undefined,
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    seeAllFeatures: undefined,
-    switchPlan: undefined,
-    switchToAnnual: undefined,
-    viewFeatures: undefined,
-  },
   backButton: 'Nazad',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Podrazumevano',
@@ -63,6 +31,44 @@ export const srRS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__invoiceId: undefined,
+        title__paymentMethod: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    viewFeatures: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Kreiraj organizaciju',
     invitePage: {
@@ -153,6 +159,41 @@ export const srRS: LocalizationResource = {
     badge__automaticSuggestion: 'Automatski predlozi',
     badge__manualInvitation: 'Bez automatskog uključivanja',
     badge__unverified: 'Nepotvrđen',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Dodajte domen za verifikaciju. Korisnici sa e-mail adresama na ovom domenu mogu se automatski pridružiti organizaciji ili zatražiti pridruživanje.',
@@ -697,33 +738,6 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__statements: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -739,6 +753,38 @@ export const srRS: LocalizationResource = {
         'Možeš koristiti jedan od ovih kodova za prijavu na svoj nalog, ako izgubiš pristup svom uređaju za autentifikaciju.',
       title: 'Dodaj verifikaciju rezervnim kodom',
       title__codelist: 'Rezervni kodovi',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Izaberi provajdera da povežeš svoj nalog.',

@@ -2,42 +2,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  __experimental_commerce: {
-    availableFeatures: 'Available features',
-    billedAnnually: 'Billed annually',
-    cancelSubscription: 'Cancel subscription',
-    checkout: {
-      description__paymentSuccessful: 'Your new subscription is all set.',
-      description__subscriptionSuccessful: 'Your new subscription is all set.',
-      emailForm: {
-        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
-        title: 'Add an email address',
-      },
-      lineItems: {
-        title__statementId: 'Statement ID',
-        title__paymentMethod: 'Payment method',
-        title__subscriptionBegins: 'Subscription begins',
-        title__totalPaid: 'Total paid',
-      },
-      title__paymentSuccessful: 'Payment was successful!',
-      title__subscriptionSuccessful: 'Success!',
-    },
-    defaultFreePlanActive: "You're currently on the Free plan",
-    free: 'Free',
-    getStarted: 'Get started',
-    keepSubscription: 'Keep subscription',
-    manage: 'Manage',
-    manageSubscription: 'Manage subscription',
-    month: 'Month',
-    reSubscribe: 'Re-subscribe',
-    seeAllFeatures: 'See all features',
-    switchPlan: 'Switch to this plan',
-    switchToAnnual: 'Switch to annual',
-    viewFeatures: 'View features',
-  },
   backButton: 'Back',
+  badge__activePlan: 'Active',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
-  badge__currentPlan: 'Current Plan',
+  badge__currentPlan: 'Current plan',
   badge__default: 'Default',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
@@ -51,6 +19,45 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  commerce: {
+    alwaysFree: 'Always free',
+    availableFeatures: 'Available features',
+    billedAnnually: 'Billed annually',
+    billedMonthlyOnly: 'Only billed monthly',
+    cancelSubscription: 'Cancel subscription',
+    checkout: {
+      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__subscriptionSuccessful: 'Your new subscription is all set.',
+      downgradeNotice:
+        'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+      emailForm: {
+        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+        title: 'Add an email address',
+      },
+      lineItems: {
+        title__invoiceId: 'Invoice ID',
+        title__paymentMethod: 'Payment method',
+        title__subscriptionBegins: 'Subscription begins',
+        title__totalPaid: 'Total paid',
+      },
+      perMonth: 'per month',
+      title__paymentSuccessful: 'Payment was successful!',
+      title__subscriptionSuccessful: 'Success!',
+    },
+    defaultFreePlanActive: "You're currently on the Free plan",
+    free: 'Free',
+    getStarted: 'Get started',
+    keepSubscription: 'Keep subscription',
+    manage: 'Manage',
+    manageSubscription: 'Manage subscription',
+    month: 'Month',
+    reSubscribe: 'Resubscribe',
+    seeAllFeatures: 'See all features',
+    subscribe: 'Subscribe',
+    switchPlan: 'Switch to this plan',
+    switchToAnnual: 'Switch to annual',
+    viewFeatures: 'View features',
+  },
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -142,6 +149,42 @@ export const enUS: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this account.',
+      },
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__plans: 'Plans',
+        headerTitle__subscriptions: 'Subscriptions',
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      title: 'Billing',
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -687,34 +730,6 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: 'Make default',
-        actionLabel__remove: 'Remove',
-        add: 'Add new payment method',
-        addSubtitle: 'Add a new payment method to your account.',
-        cancelButton: 'Cancel',
-        formButtonPrimary__add: 'Add Payment Method',
-        formButtonPrimary__pay: 'Pay {{amount}}',
-        removeResource: {
-          messageLine1: '{{identifier}} will be removed from this account.',
-          messageLine2:
-            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
-          title: 'Remove payment method',
-        },
-        title: 'Payment methods',
-      },
-      start: {
-        headerTitle__plans: 'Plans',
-        headerTitle__subscriptions: 'Subscriptions',
-        headerTitle__statements: 'Statements',
-      },
-      subscriptionsSection: {
-        actionLabel__default: 'Manage',
-      },
-      title: 'Billing & Payments',
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -730,6 +745,39 @@ export const enUS: LocalizationResource = {
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__invoices: 'Invoices',
+        headerTitle__plans: 'Plans',
+        headerTitle__subscriptions: 'Subscription',
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      title: 'Billing',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',

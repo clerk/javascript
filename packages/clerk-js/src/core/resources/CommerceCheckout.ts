@@ -1,41 +1,41 @@
 import { retry } from '@clerk/shared/retry';
 import type {
-  __experimental_CommerceCheckoutJSON,
-  __experimental_CommerceCheckoutResource,
-  __experimental_CommerceCheckoutTotals,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_ConfirmCheckoutParams,
+  CommerceCheckoutJSON,
+  CommerceCheckoutResource,
+  CommerceCheckoutTotals,
+  CommerceSubscriptionPlanPeriod,
+  ConfirmCheckoutParams,
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
 import {
-  __experimental_CommercePaymentSource,
-  __experimental_CommercePlan,
-  __experimental_CommerceSubscription,
   BaseResource,
+  CommercePaymentSource,
+  CommercePlan,
+  CommerceSubscription,
   isClerkAPIResponseError,
 } from './internal';
 
-export class __experimental_CommerceCheckout extends BaseResource implements __experimental_CommerceCheckoutResource {
+export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
   statement_id!: string;
-  paymentSource?: __experimental_CommercePaymentSource;
-  plan!: __experimental_CommercePlan;
-  planPeriod!: __experimental_CommerceSubscriptionPlanPeriod;
+  paymentSource?: CommercePaymentSource;
+  plan!: CommercePlan;
+  planPeriod!: CommerceSubscriptionPlanPeriod;
   status!: string;
-  subscription?: __experimental_CommerceSubscription;
-  totals!: __experimental_CommerceCheckoutTotals;
+  subscription?: CommerceSubscription;
+  totals!: CommerceCheckoutTotals;
   isImmediatePlanChange!: boolean;
 
-  constructor(data: __experimental_CommerceCheckoutJSON, orgId?: string) {
+  constructor(data: CommerceCheckoutJSON, orgId?: string) {
     super();
     this.fromJSON(data);
     this.pathRoot = orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`;
   }
 
-  protected fromJSON(data: __experimental_CommerceCheckoutJSON | null): this {
+  protected fromJSON(data: CommerceCheckoutJSON | null): this {
     if (!data) {
       return this;
     }
@@ -44,19 +44,17 @@ export class __experimental_CommerceCheckout extends BaseResource implements __e
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
     this.statement_id = data.statement_id;
-    this.paymentSource = data.payment_source
-      ? new __experimental_CommercePaymentSource(data.payment_source)
-      : undefined;
-    this.plan = new __experimental_CommercePlan(data.plan);
+    this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
+    this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
-    this.subscription = data.subscription ? new __experimental_CommerceSubscription(data.subscription) : undefined;
+    this.subscription = data.subscription ? new CommerceSubscription(data.subscription) : undefined;
     this.totals = commerceTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;
   }
 
-  confirm = (params: __experimental_ConfirmCheckoutParams): Promise<this> => {
+  confirm = (params: ConfirmCheckoutParams): Promise<this> => {
     const { orgId, ...rest } = params;
 
     // Retry confirmation in case of a 500 error

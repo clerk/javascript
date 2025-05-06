@@ -45,8 +45,8 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     overrides.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context) || '';
   const afterSignInUrl = overrides.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
   const afterSignUpUrl = overrides.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
-  const checkoutContinueUrl =
-    overrides.checkoutContinueUrl || getEnvVariable('CLERK_CHECKOUT_CONTINUE_URL', context) || '';
+  const newSubscriptionRedirectUrl =
+    overrides.newSubscriptionRedirectUrl || getEnvVariable('CLERK_CHECKOUT_CONTINUE_URL', context) || '';
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -83,6 +83,6 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     signUpForceRedirectUrl,
     signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl,
-    checkoutContinueUrl,
+    newSubscriptionRedirectUrl,
   };
 };
