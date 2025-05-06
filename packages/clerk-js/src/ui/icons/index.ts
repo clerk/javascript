@@ -9,7 +9,7 @@ export { default as ApplePay } from './apple-pay.svg';
 export { default as ArrowLeftIcon } from './arrow-left.svg';
 export { default as ArrowRightButtonIcon } from './arrow-right-button.svg';
 export { default as ArrowRightIcon } from './arrow-right.svg';
-export { default as ArrowUpDown } from './arrow-up-down.svg';
+export { default as ArrowsUpDown } from './arrows-up-down.svg';
 export { default as AuthApp } from './auth-app.svg';
 export { default as Billing } from './billing.svg';
 export { default as Block } from './block.svg';

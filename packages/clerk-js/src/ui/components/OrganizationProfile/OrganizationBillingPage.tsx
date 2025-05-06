@@ -19,7 +19,7 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { Plus } from '../../icons';
+import { ArrowsUpDown } from '../../icons';
 import { useRouter } from '../../router';
 import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
@@ -100,7 +100,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                           height: t.sizes.$8,
                         }),
                       ]}
-                      leftIcon={Plus}
+                      leftIcon={ArrowsUpDown}
                       leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
                       onClick={() => void navigate('plans')}
                     />
