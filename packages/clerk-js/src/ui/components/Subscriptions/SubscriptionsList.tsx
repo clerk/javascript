@@ -1,4 +1,4 @@
-import type { CommerceSubscriptionResource } from '@clerk/types';
+import type { CommercePlanResource, CommerceSubscriptionResource } from '@clerk/types';
 
 import { useProtect } from '../../common';
 import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
@@ -20,13 +20,32 @@ import {
 } from '../../customizables';
 import { CogFilled, Plans } from '../../icons';
 
+// TODO(commerce): This will probably need to handled by FAPI
+function includeFreeToSubscriptionsLint(subscriptions: CommerceSubscriptionResource[], plans: CommercePlanResource[]) {
+  const cancelledSubscription = subscriptions.find(sub => sub.canceledAt && sub.status === 'active');
+  const hasUpcomingSubscription = subscriptions.some(sub => sub.status === 'upcoming');
+  const freePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
+
+  if (cancelledSubscription && !hasUpcomingSubscription && freePlan) {
+    return [
+      ...subscriptions,
+      {
+        plan: freePlan,
+        periodStart: cancelledSubscription.periodEnd,
+        status: 'upcoming',
+      } as CommerceSubscriptionResource,
+    ];
+  }
+
+  return subscriptions;
+}
+
 export function SubscriptionsList() {
-  const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { subscriptions, plans, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
-
   const handleSelectSubscription = (
     subscription: CommerceSubscriptionResource,
     event?: React.MouseEvent<HTMLElement>,
@@ -39,6 +58,21 @@ export function SubscriptionsList() {
     });
   };
 
+  const subscriptionsWithUpcomingFreePlan = includeFreeToSubscriptionsLint(subscriptions, plans);
+
+  const sortedSubscriptions = subscriptionsWithUpcomingFreePlan.sort((a, b) => {
+    // alway put active subscriptions first
+    if (a.status === 'active' && b.status !== 'active') {
+      return -1;
+    }
+
+    if (b.status === 'active' && a.status !== 'active') {
+      return 1;
+    }
+
+    return 1;
+  });
+
   return (
     <Table tableHeadVisuallyHidden>
       <Thead>
@@ -49,7 +83,7 @@ export function SubscriptionsList() {
         </Tr>
       </Thead>
       <Tbody>
-        {subscriptions.map(subscription => (
+        {sortedSubscriptions.map(subscription => (
           <Tr key={subscription.id}>
             <Td>
               <Col gap={1}>
@@ -71,12 +105,12 @@ export function SubscriptionsList() {
                   >
                     {subscription.plan.name}
                   </Text>
-                  {subscriptions.length > 1 || !!subscription.canceledAt ? (
+                  {sortedSubscriptions.length > 1 || !!subscription.canceledAt ? (
                     <Badge
                       colorScheme={subscription.status === 'active' ? 'secondary' : 'primary'}
                       localizationKey={
                         subscription.status === 'active'
-                          ? localizationKeys('badge__currentPlan')
+                          ? localizationKeys('badge__activePlan')
                           : localizationKeys('badge__upcomingPlan')
                       }
                     />
@@ -99,17 +133,19 @@ export function SubscriptionsList() {
                 {subscription.planPeriod === 'annual'
                   ? subscription.plan.annualMonthlyAmountFormatted
                   : subscription.plan.amountFormatted}
-                <Span
-                  sx={t => ({
-                    color: t.colors.$colorTextSecondary,
-                    textTransform: 'lowercase',
-                    ':before': {
-                      content: '"/"',
-                      marginInline: t.space.$1,
-                    },
-                  })}
-                  localizationKey={localizationKeys('commerce.month')}
-                />
+                {subscription.plan.amount > 0 && (
+                  <Span
+                    sx={t => ({
+                      color: t.colors.$colorTextSecondary,
+                      textTransform: 'lowercase',
+                      ':before': {
+                        content: '"/"',
+                        marginInline: t.space.$1,
+                      },
+                    })}
+                    localizationKey={localizationKeys('commerce.month')}
+                  />
+                )}
               </Text>
             </Td>
             <Td
@@ -117,7 +153,7 @@ export function SubscriptionsList() {
                 textAlign: 'right',
               })}
             >
-              {canManageSubscription({ subscription }) && (
+              {canManageSubscription({ subscription }) && subscription.id && (
                 <Button
                   aria-label='Manage subscription'
                   onClick={event => handleSelectSubscription(subscription, event)}
