@@ -90,7 +90,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
         ? false
         : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
-  const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
+  const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
     try {
       if (isWeb3Strategy(strategy)) {
@@ -108,11 +108,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     }
   };
 
-  const onSocialButtonClick = (strategy: OAuthStrategy | Web3Strategy | AlternativePhoneCodeStrategy) => () => {
+  const onSocialButtonClick = (strategy: OAuthStrategy | Web3Strategy | AlternativePhoneCodeStrategy) => async () => {
     if (isPhoneCodeStrategy(strategy)) {
-      void alternativePhoneCodeCallback(strategy);
+      alternativePhoneCodeCallback(strategy);
     } else {
-      void startOauth(strategy);
+      await startOauth(strategy);
     }
   };
 
