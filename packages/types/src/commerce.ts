@@ -141,9 +141,7 @@ export interface CommerceCheckoutTotals {
   grandTotal: CommerceMoney;
   taxTotal: CommerceMoney;
   totalDueNow: CommerceMoney;
-  proration?: {
-    credit: CommerceMoney;
-  };
+  credit: CommerceMoney;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

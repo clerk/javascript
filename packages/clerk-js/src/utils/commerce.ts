@@ -26,12 +26,9 @@ export const commerceTotalsFromJSON = <T extends CommerceInvoiceTotalsJSON | Com
     // @ts-ignore
     totals['totalDueNow'] = commerceMoneyFromJSON(data.total_due_now);
   }
-  if ('proration' in data) {
+  if ('credit' in data || 'proration' in data) {
     // @ts-ignore
-    totals['proration'] = {
-      // @ts-ignore
-      credit: commerceMoneyFromJSON(data.proration.credit),
-    };
+    totals['credit'] = commerceMoneyFromJSON(data.proration.credit || data.credit);
   }
 
   return totals as T extends { total_due_now: CommerceMoneyJSON } ? CommerceCheckoutTotals : CommerceInvoiceTotals;
