@@ -1,21 +1,12 @@
 ---
+import { generateSafeId } from '@clerk/astro/internal';
+import type { InternalUIComponentId } from '../../types';
+
 interface Props {
   [key: string]: unknown;
   id?: string;
-  component:
-    | 'sign-in'
-    | 'sign-up'
-    | 'organization-list'
-    | 'organization-profile'
-    | 'organization-switcher'
-    | 'user-button'
-    | 'user-profile'
-    | 'google-one-tap'
-    | 'waitlist'
-    | 'pricing-table';
+  component: InternalUIComponentId
 }
-
-import { generateSafeId } from '@clerk/astro/internal';
 
 const { component, id, ...props } = Astro.props;
 
