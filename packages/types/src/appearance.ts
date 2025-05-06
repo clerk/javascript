@@ -226,6 +226,7 @@ export type ElementsConfig = {
   otpCodeFieldErrorText: WithOptions;
 
   dividerRow: WithOptions;
+  dividerColumn: WithOptions;
   dividerText: WithOptions;
   dividerLine: WithOptions;
 

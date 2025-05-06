@@ -33,7 +33,7 @@ export const VerticalDivider = (props: DividerProps) => {
     <Flex
       center
       direction='col'
-      elementDescriptor={descriptors.dividerRow}
+      elementDescriptor={descriptors.dividerColumn}
       sx={[
         t => ({
           height: t.space.$6,
