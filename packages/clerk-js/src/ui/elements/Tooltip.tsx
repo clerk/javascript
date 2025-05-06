@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { Box, descriptors, type LocalizationKey, Span, Text, useAppearance } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
+import type { ThemableCssProp } from '../styledSystem';
 
 interface TooltipOptions {
   initialOpen?: boolean;
@@ -123,8 +124,14 @@ function Root({ children, ...options }: { children: React.ReactNode } & TooltipO
   return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
 }
 
-const Trigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>>(function TooltipTrigger(
-  { children, ...props },
+type TriggerProps = React.HTMLProps<HTMLElement> & {
+  // Inspiration from React Aria's TooltipTrigger - https://react-spectrum.adobe.com/react-aria/Tooltip.html#tooltiptrigger
+  isDisabled?: boolean;
+  sx?: ThemableCssProp;
+};
+
+const Trigger = React.forwardRef<HTMLElement, TriggerProps>(function TooltipTrigger(
+  { children, sx, isDisabled = false, ...props },
   propRef,
 ) {
   const context = useTooltipContext();
@@ -133,6 +140,10 @@ const Trigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>>(func
 
   if (!React.isValidElement(children)) {
     return null;
+  }
+
+  if (isDisabled) {
+    return children;
   }
 
   // If the child is disabled, wrap it in a span to handle hover events
@@ -144,12 +155,15 @@ const Trigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement>>(func
           ...props,
         })}
         data-state={context.open ? 'open' : 'closed'}
-        sx={{
-          width: 'fit-content',
-          display: 'inline-block',
-          cursor: 'not-allowed',
-          outline: 'none',
-        }}
+        sx={[
+          {
+            width: 'fit-content',
+            display: 'inline-block',
+            cursor: 'not-allowed',
+            outline: 'none',
+          },
+          sx,
+        ]}
         tabIndex={0}
       >
         {children}
@@ -172,8 +186,10 @@ const Content = React.forwardRef<
   HTMLDivElement,
   React.HTMLProps<HTMLDivElement> & {
     text: string | LocalizationKey;
+    tooltipSx?: ThemableCssProp;
+    contentSx?: ThemableCssProp;
   }
->(function TooltipContent({ style, text, ...props }, propRef) {
+>(function TooltipContent({ style, text, tooltipSx, contentSx, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
@@ -188,18 +204,22 @@ const Content = React.forwardRef<
           ...context.floatingStyles,
           ...style,
         }}
+        sx={tooltipSx}
         {...context.getFloatingProps(props)}
       >
         <Box
           elementDescriptor={descriptors.tooltipContent}
           style={context.transitionStyles}
-          sx={t => ({
-            paddingBlock: t.space.$1,
-            paddingInline: t.space.$1x5,
-            borderRadius: t.radii.$md,
-            backgroundColor: t.colors.$primary500,
-            maxWidth: t.sizes.$60,
-          })}
+          sx={[
+            t => ({
+              paddingBlock: t.space.$1,
+              paddingInline: t.space.$1x5,
+              borderRadius: t.radii.$md,
+              backgroundColor: t.colors.$primary500,
+              maxWidth: t.sizes.$60,
+            }),
+            contentSx,
+          ]}
         >
           <Text
             elementDescriptor={descriptors.tooltipText}
