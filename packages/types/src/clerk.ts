@@ -1,3 +1,4 @@
+import type { ApiKeyResource } from './apiKey';
 import type {
   Appearance,
   CheckoutTheme,
@@ -753,6 +754,11 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * Retrieves all API keys for the current user.
+   */
+  getApiKeys: () => Promise<ApiKeyResource[]>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1638,7 +1644,9 @@ type PortalRoot = HTMLElement | null | undefined;
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type ManageApiKeysProps = {
-  [key: string]: unknown;
+  type?: string;
+  subject: string;
+  claims?: string;
   appearance?: ManageApiKeysTheme;
 };
 
