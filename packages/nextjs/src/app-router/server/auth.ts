@@ -1,13 +1,23 @@
-import type { RedirectFun, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
-import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
+import type {
+  AuthenticatedMachineObject,
+  AuthenticateRequestOptions,
+  RedirectFun,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+  UnauthenticatedMachineObject,
+} from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
 import { createAsyncGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import { getAuthKeyFromRequest, getHeader } from '../../server/headers-utils';
+import { unauthorized } from '../../server/nextErrors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
+import type { InferAuthObjectFromToken, InferAuthObjectFromTokenArray } from '../../server/types';
 import { decryptClerkRequestData } from '../../server/utils';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { buildRequestLike } from './utils';
@@ -15,7 +25,7 @@ import { buildRequestLike } from './utils';
 /**
  * `Auth` object of the currently active user and the `redirectToSignIn()` method.
  */
-type Auth = (SignedInAuthObject | SignedOutAuthObject) & {
+type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
   /**
    * The `auth()` helper returns the `redirectToSignIn()` method, which you can use to redirect the user to the sign-in page.
    *
@@ -24,7 +34,7 @@ type Auth = (SignedInAuthObject | SignedOutAuthObject) & {
    * > [!NOTE]
    * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
-  redirectToSignIn: RedirectFun<ReturnType<typeof redirect>>;
+  redirectToSignIn: RedirectFun<TRedirect>;
 
   /**
    * The `auth()` helper returns the `redirectToSignUp()` method, which you can use to redirect the user to the sign-up page.
@@ -34,11 +44,44 @@ type Auth = (SignedInAuthObject | SignedOutAuthObject) & {
    * > [!NOTE]
    * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
    */
-  redirectToSignUp: RedirectFun<ReturnType<typeof redirect>>;
+  redirectToSignUp: RedirectFun<TRedirect>;
 };
 
-export interface AuthFn {
-  (): Promise<Auth>;
+// Machine token auth objects
+type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
+  tokenType: T;
+};
+
+export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+
+export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: ['session_token', 'api_key'] })
+   */
+  <T extends TokenType[]>(
+    options: AuthOptions & { acceptsToken: T },
+  ): Promise<InferAuthObjectFromTokenArray<T, SessionAuth<TRedirect>, MachineAuth<T[number]>>>;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'session_token' })
+   */
+  <T extends TokenType>(
+    options: AuthOptions & { acceptsToken: T },
+  ): Promise<InferAuthObjectFromToken<T, SessionAuth<TRedirect>, MachineAuth<T>>>;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'any' })
+   */
+  (options: AuthOptions & { acceptsToken: 'any' }): Promise<AuthObject>;
+
+  /**
+   * @example
+   * const authObject = await auth()
+   */
+  (): Promise<SessionAuth<TRedirect>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
@@ -68,7 +111,7 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = (async () => {
+export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -89,6 +132,9 @@ export const auth: AuthFn = (async () => {
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
+    options: {
+      acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
+    },
   })(request);
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
@@ -110,8 +156,7 @@ export const auth: AuthFn = (async () => {
         publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
         signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
         signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
-        // TODO: Handle machine auth object
-        sessionStatus: authObject.tokenType === 'session_token' ? authObject.sessionStatus : null,
+        sessionStatus: authObject.tokenType === TokenType.SessionToken ? authObject.sessionStatus : null,
       }),
       returnBackUrl === null ? '' : returnBackUrl || clerkUrl?.toString(),
     ] as const;
@@ -147,6 +192,7 @@ auth.protect = async (...args: any[]) => {
     redirectToSignIn: authObject.redirectToSignIn,
     notFound,
     redirect,
+    unauthorized,
   });
 
   return protect(...args);
