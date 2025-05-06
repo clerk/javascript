@@ -68,6 +68,7 @@ export const plPL: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Utwórz organizację',

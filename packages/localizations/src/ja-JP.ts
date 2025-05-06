@@ -68,6 +68,7 @@ export const jaJP: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: '組織を作成する',

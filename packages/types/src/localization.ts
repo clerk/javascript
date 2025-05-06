@@ -107,6 +107,7 @@ type _LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   commerce: {
     month: LocalizationValue;
+    year: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;

@@ -68,6 +68,7 @@ export const daDK: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',

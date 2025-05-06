@@ -68,6 +68,7 @@ export const heIL: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'צור ארגון',

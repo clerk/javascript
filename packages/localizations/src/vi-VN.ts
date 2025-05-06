@@ -68,6 +68,7 @@ export const viVN: LocalizationResource = {
     switchPlan: undefined,
     switchToAnnual: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
