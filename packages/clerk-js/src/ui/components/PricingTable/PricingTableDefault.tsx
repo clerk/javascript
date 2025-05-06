@@ -105,15 +105,13 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const { buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming, activeOrUpcomingSubscription, subscriptions } =
-    usePlansContext();
-
-  const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
-
-  const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
-
-  const hasFeatures = plan.features.length > 0;
+  const {
+    buttonPropsForPlan,
+    isDefaultPlanImplicitlyActiveOrUpcoming,
+    upcomingSubscriptionsExist,
+    activeOrUpcomingSubscription,
+    subscriptions,
+  } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -125,6 +123,24 @@ function Card(props: CardProps) {
       portalRoot,
     });
   };
+
+  const subscription = activeOrUpcomingSubscription(plan);
+  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
+  const hasFeatures = plan.features.length > 0;
+  const isPlanActive =
+    subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0);
+  const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
+  const shouldShowFooterAction = !plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming;
+
+  const shouldShowFooter = React.useMemo(() => {
+    return (
+      !plan.isDefault ||
+      !isDefaultPlanImplicitlyActiveOrUpcoming ||
+      (isImplicitlyActiveOrUpcoming && subscriptions.length > 0)
+    );
+  }, [isDefaultPlanImplicitlyActiveOrUpcoming, isImplicitlyActiveOrUpcoming, plan.isDefault, subscriptions.length]);
+
+  const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
 
   return (
     <Box
@@ -157,7 +173,7 @@ function Card(props: CardProps) {
         setPlanPeriod={setPlanPeriod}
         badge={
           showStatusRow ? (
-            subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
+            isPlanActive ? (
               <Badge
                 colorScheme='secondary'
                 localizationKey={localizationKeys('badge__activePlan')}
@@ -202,27 +218,29 @@ function Card(props: CardProps) {
           </Box>
         ) : null}
 
-        {(!plan.isDefault ||
-          !isDefaultPlanImplicitlyActiveOrUpcoming ||
-          (isImplicitlyActiveOrUpcoming && plan.isDefault && subscriptions.length > 0)) && (
+        {shouldShowFooter && (
           <Box
             elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
               marginTop: 'auto',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              borderTopWidth: t.borderWidths.$normal,
+              borderTopWidth: planPeriodSameAsSelectedPlanPeriod && !hasFeatures ? 0 : t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: undefined,
+              background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
+            {shouldShowFooterAction ? (
               <Button
                 elementDescriptor={descriptors.pricingTableCardFooterButton}
                 block
+                sx={{
+                  visibility:
+                    !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod ? 'hidden' : undefined,
+                }}
                 textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                {...buttonPropsForPlan({ plan, isCompact })}
+                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
                 onClick={event => {
                   onSelect(plan, event);
                 }}
@@ -461,7 +479,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           variant='link'
           sx={t => ({
             marginBlockStart: 'auto',
-            paddingBlockStart: t.space.$2,
+            paddingBlock: t.space.$1,
             gap: t.space.$1,
           })}
         >

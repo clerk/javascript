@@ -116,6 +116,7 @@ type _LocalizationResource = {
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;

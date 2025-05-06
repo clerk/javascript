@@ -54,6 +54,7 @@ export const enUS: LocalizationResource = {
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
+    switchToMonthly: 'Switch to monthly',
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
   },

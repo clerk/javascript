@@ -143,16 +143,26 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscription],
   );
 
+  // should the default plan be shown as active
+  const upcomingSubscriptionsExist = useMemo(() => {
+    return (
+      ctx.subscriptions.some(subscription => subscription.status === 'upcoming') ||
+      isDefaultPlanImplicitlyActiveOrUpcoming
+    );
+  }, [ctx.subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
       plan,
       subscription: sub,
       isCompact = false,
+      selectedPlanPeriod = 'annual',
     }: {
       plan?: CommercePlanResource;
       subscription?: CommerceSubscriptionResource;
       isCompact?: boolean;
+      selectedPlanPeriod?: CommerceSubscriptionPlanPeriod;
     }): {
       localizationKey: LocalizationKey;
       variant: 'bordered' | 'solid';
@@ -160,12 +170,20 @@ export const usePlansContext = () => {
       isDisabled: boolean;
     } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+      let _selectedPlanPeriod = selectedPlanPeriod;
+      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+        _selectedPlanPeriod = 'month';
+      }
 
       return {
         localizationKey: subscription
           ? subscription.canceledAt
             ? localizationKeys('commerce.reSubscribe')
-            : localizationKeys('commerce.manageSubscription')
+            : selectedPlanPeriod !== subscription.planPeriod
+              ? selectedPlanPeriod === 'month'
+                ? localizationKeys('commerce.switchToMonthly')
+                : localizationKeys('commerce.switchToAnnual')
+              : localizationKeys('commerce.manageSubscription')
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.length > 0
             ? localizationKeys('commerce.switchPlan')
@@ -240,6 +258,7 @@ export const usePlansContext = () => {
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
+    upcomingSubscriptionsExist,
     defaultFreePlan,
   };
 };
