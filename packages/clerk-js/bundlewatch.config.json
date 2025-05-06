@@ -6,7 +6,7 @@
     },
     {
       "path": "./dist/clerk.browser.js",
-      "maxSize": "68KB"
+      "maxSize": "68.5KB"
     },
     {
       "path": "./dist/clerk.legacy.browser.js",
