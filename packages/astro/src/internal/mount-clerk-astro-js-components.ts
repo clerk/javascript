@@ -14,7 +14,7 @@ const mountAllClerkAstroJSComponents = () => {
     'sign-up': 'mountSignUp',
     'google-one-tap': 'openGoogleOneTap',
     waitlist: 'mountWaitlist',
-    PricingTable: 'mountPricingTable',
+    'pricing-table': 'mountPricingTable',
   } as const;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {

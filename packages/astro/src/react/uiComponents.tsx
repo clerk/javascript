@@ -187,7 +187,7 @@ export const Waitlist = withClerk(({ clerk, ...props }: WithClerkProp<WaitlistPr
   );
 }, 'Waitlist');
 
-export const Experimental_PricingTable = withClerk(({ clerk, ...props }: WithClerkProp<PricingTableProps>) => {
+export const PricingTable = withClerk(({ clerk, ...props }: WithClerkProp<PricingTableProps>) => {
   return (
     <Portal
       mount={clerk?.mountPricingTable}
