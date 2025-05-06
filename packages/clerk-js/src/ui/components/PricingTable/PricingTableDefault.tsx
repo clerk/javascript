@@ -104,13 +104,7 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const {
-    buttonPropsForPlan,
-    // isDefaultPlanImplicitlyActiveOrUpcoming,
-    upcomingSubscriptionsExist,
-    activeOrUpcomingSubscription,
-    subscriptions,
-  } = usePlansContext();
+  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);

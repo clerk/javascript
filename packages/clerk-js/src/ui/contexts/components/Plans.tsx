@@ -111,7 +111,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
       value={{
         componentName: 'Plans',
         plans: isLoaded ? (plans ?? []) : [],
-        subscriptions,
+        subscriptions: isLoaded ? subscriptions : [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
       }}
