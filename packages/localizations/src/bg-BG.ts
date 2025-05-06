@@ -153,6 +153,11 @@ export const bgBG: LocalizationResource = {
     titleWithoutPersonal: 'Изберете организация',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Автоматични покани',
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',

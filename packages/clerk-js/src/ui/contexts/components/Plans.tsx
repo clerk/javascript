@@ -102,6 +102,18 @@ export const usePlansContext = () => {
     throw new Error('Clerk: usePlansContext called outside Plans.');
   }
 
+  const canManageBilling = useMemo(() => {
+    if (!clerk.session) {
+      return true;
+    }
+
+    if (clerk?.session?.checkAuthorization({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user') {
+      return true;
+    }
+
+    return false;
+  }, [clerk, subscriberType]);
+
   const { componentName, ...ctx } = context;
 
   // return the active or upcoming subscription for a plan if it exists
@@ -137,7 +149,12 @@ export const usePlansContext = () => {
       plan?: CommercePlanResource;
       subscription?: CommerceSubscriptionResource;
       isCompact?: boolean;
-    }): { localizationKey: LocalizationKey; variant: 'bordered' | 'solid'; colorScheme: 'secondary' | 'primary' } => {
+    }): {
+      localizationKey: LocalizationKey;
+      variant: 'bordered' | 'solid';
+      colorScheme: 'secondary' | 'primary';
+      isDisabled: boolean;
+    } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return {
@@ -151,6 +168,7 @@ export const usePlansContext = () => {
             : localizationKeys('commerce.subscribe'),
         variant: isCompact || !!subscription ? 'bordered' : 'solid',
         colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
+        isDisabled: !canManageBilling,
       };
     },
     [activeOrUpcomingSubscription],

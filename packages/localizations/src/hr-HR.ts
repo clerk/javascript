@@ -153,6 +153,11 @@ export const hrHR: LocalizationResource = {
     titleWithoutPersonal: 'Odaberite organizaciju',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski prijedlozi',
     badge__manualInvitation: 'Bez automatskog učlanjenja',

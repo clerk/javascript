@@ -152,6 +152,11 @@ export const zhCN: LocalizationResource = {
     titleWithoutPersonal: '选择一个组织',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: '自动邀请',
     badge__automaticSuggestion: '自动建议',
     badge__manualInvitation: '无自动注册',

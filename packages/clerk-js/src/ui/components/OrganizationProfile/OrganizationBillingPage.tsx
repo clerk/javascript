@@ -1,3 +1,4 @@
+import { Protect } from '../../common';
 import {
   InvoicesContextProvider,
   PlansContextProvider,
@@ -7,6 +8,7 @@ import {
 } from '../../contexts';
 import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
+  Alert,
   Card,
   Header,
   Tab,
@@ -74,28 +76,48 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  />
-                  <PaymentSources />
-                </Flex>
-              ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
-              )}
+              <Flex
+                sx={{ width: '100%', flexDirection: 'column' }}
+                gap={4}
+              >
+                {subscriptions.data.length > 0 ? (
+                  <>
+                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                      <Alert
+                        variant='info'
+                        colorScheme='info'
+                        title={localizationKeys('organizationProfile.billingPage.alerts.noPemissionsToManageBilling')}
+                      />
+                    </Protect>
+                    <SubscriptionsList />
+                    <Button
+                      localizationKey='View all plans'
+                      hasArrow
+                      variant='ghost'
+                      onClick={() => navigate('plans')}
+                      sx={{
+                        width: 'fit-content',
+                      }}
+                    />
+                    <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                      <PaymentSources />
+                    </Protect>
+                  </>
+                ) : (
+                  <>
+                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
+                      <Alert
+                        variant='info'
+                        colorScheme='info'
+                        title={localizationKeys('organizationProfile.billingPage.alerts.noPemissionsToManageBilling')}
+                      />
+                    </Protect>
+                    <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
+                      <PricingTable />
+                    </PricingTableContext.Provider>
+                  </>
+                )}
+              </Flex>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <InvoicesContextProvider>

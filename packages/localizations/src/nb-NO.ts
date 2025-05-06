@@ -154,6 +154,11 @@ export const nbNO: LocalizationResource = {
     titleWithoutPersonal: 'Velg en organiasjon',
   },
   organizationProfile: {
+    billingPage: {
+      alerts: {
+        noPemissionsToManageBilling: undefined,
+      },
+    },
     badge__automaticInvitation: 'Automatisk invitasjon',
     badge__automaticSuggestion: 'Automatisk forslag',
     badge__manualInvitation: 'Ingen automatisk registrering',
