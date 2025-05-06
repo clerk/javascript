@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
   backButton: '戻る',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'デフォルト',
@@ -154,15 +155,45 @@ export const jaJP: LocalizationResource = {
     titleWithoutPersonal: '組織を選択',
   },
   organizationProfile: {
-    billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
-    },
     badge__automaticInvitation: '自動招待',
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
+    billingPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__invoices: undefined,
+        headerTitle__plans: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'ドメインを追加して検証します。このドメインのメールアドレスを持つユーザーは、自動的に組織に参加するか、参加をリクエストすることができます。',
@@ -743,6 +774,10 @@ export const jaJP: LocalizationResource = {
         headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,

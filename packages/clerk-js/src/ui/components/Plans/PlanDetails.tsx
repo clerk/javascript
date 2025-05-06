@@ -12,21 +12,8 @@ import { useState } from 'react';
 
 import { useProtect } from '../../common';
 import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
-import {
-  Badge,
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Heading,
-  Icon,
-  localizationKeys,
-  Span,
-  Text,
-} from '../../customizables';
-import { Alert, Avatar, Drawer, SegmentedControl, useDrawerContext } from '../../elements';
-import { InformationCircle } from '../../icons';
+import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
+import { Alert, Avatar, Drawer, Switch, useDrawerContext } from '../../elements';
 import { formatDate, handleError } from '../../utils';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
@@ -382,46 +369,48 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           })}
         />
       ) : null}
-      {showBadge ? (
-        <Box
-          elementDescriptor={descriptors.planDetailBadgeContainer}
-          sx={t => ({
-            marginBlockEnd: t.space.$3,
-          })}
-        >
-          {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-            <Badge
-              elementDescriptor={descriptors.planDetailBadge}
-              localizationKey={localizationKeys('badge__currentPlan')}
-              colorScheme={'secondary'}
-            />
-          ) : (
-            <Badge
-              elementDescriptor={descriptors.planDetailBadge}
-              localizationKey={localizationKeys('badge__upcomingPlan')}
-              colorScheme={'primary'}
-            />
-          )}
-        </Box>
-      ) : null}
-
       <Box
         sx={t => ({
           paddingRight: t.space.$10,
         })}
       >
-        <Heading
-          elementDescriptor={descriptors.planDetailTitle}
-          as='h2'
-          textVariant='h2'
+        <Flex
+          gap={2}
+          align='center'
         >
-          {plan.name}
-        </Heading>
+          <Heading
+            elementDescriptor={descriptors.planDetailTitle}
+            as='h2'
+            textVariant='h2'
+          >
+            {plan.name}
+          </Heading>
+          {showBadge ? (
+            <Flex elementDescriptor={descriptors.planDetailBadgeContainer}>
+              {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
+                <Badge
+                  elementDescriptor={descriptors.planDetailBadge}
+                  localizationKey={localizationKeys('badge__activePlan')}
+                  colorScheme={'secondary'}
+                />
+              ) : (
+                <Badge
+                  elementDescriptor={descriptors.planDetailBadge}
+                  localizationKey={localizationKeys('badge__upcomingPlan')}
+                  colorScheme={'primary'}
+                />
+              )}
+            </Flex>
+          ) : null}
+        </Flex>
         {plan.description ? (
           <Text
             elementDescriptor={descriptors.planDetailDescription}
             variant='subtitle'
             colorScheme='secondary'
+            sx={t => ({
+              marginTop: t.space.$1,
+            })}
           >
             {plan.description}
           </Text>
@@ -461,51 +450,6 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             })}
             localizationKey={localizationKeys('commerce.month')}
           />
-          {plan.annualMonthlyAmount > 0 ? (
-            <Box
-              elementDescriptor={descriptors.planDetailFeePeriodNotice}
-              sx={[
-                _ => ({
-                  width: '100%',
-                  display: 'grid',
-                  gridTemplateRows:
-                    (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? '1fr' : '0fr',
-                }),
-              ]}
-              // @ts-ignore - Needed until React 19 support
-              inert={
-                (subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual' ? 'true' : undefined
-              }
-            >
-              <Box
-                elementDescriptor={descriptors.planDetailFeePeriodNoticeInner}
-                sx={{
-                  overflow: 'hidden',
-                  minHeight: 0,
-                }}
-              >
-                <Text
-                  elementDescriptor={descriptors.planDetailFeePeriodNoticeLabel}
-                  variant='caption'
-                  colorScheme='secondary'
-                  sx={t => ({
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    columnGap: t.space.$1,
-                  })}
-                >
-                  <Icon
-                    icon={InformationCircle}
-                    colorScheme='neutral'
-                    size='sm'
-                    aria-hidden
-                  />{' '}
-                  <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
-                </Text>
-              </Box>
-            </Box>
-          ) : null}
         </>
       </Flex>
 
@@ -517,22 +461,11 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             marginTop: t.space.$3,
           })}
         >
-          <SegmentedControl.Root
-            aria-label='Set pay period'
-            value={planPeriod}
-            onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
-          >
-            <SegmentedControl.Button
-              value='month'
-              // TODO(@Commerce): needs localization
-              text='Monthly'
-            />
-            <SegmentedControl.Button
-              value='annual'
-              // TODO(@Commerce): needs localization
-              text='Annually'
-            />
-          </SegmentedControl.Root>
+          <Switch
+            isChecked={planPeriod === 'annual'}
+            onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
+            label={localizationKeys('commerce.billedAnnually')}
+          />
         </Box>
       ) : null}
 
