@@ -1,6 +1,7 @@
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
+import type { CommerceFeatureJSONSnapshot, CommercePlanJSONSnapshot } from './snapshots';
 
 type WithOptionalOrgType<T> = T & {
   orgId?: string;
@@ -59,6 +60,7 @@ export interface CommercePlanResource extends ClerkResource {
   slug: string;
   avatarUrl: string;
   features: CommerceFeatureResource[];
+  __internal_toSnapshot: () => CommercePlanJSONSnapshot;
 }
 
 export interface CommerceFeatureResource extends ClerkResource {
@@ -67,6 +69,7 @@ export interface CommerceFeatureResource extends ClerkResource {
   description: string;
   slug: string;
   avatarUrl: string;
+  __internal_toSnapshot: () => CommerceFeatureJSONSnapshot;
 }
 
 export type CommercePaymentSourceStatus = 'active' | 'expired' | 'disconnected';

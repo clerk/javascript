@@ -1,7 +1,6 @@
 import { Protect } from '../../common';
 import {
   PlansContextProvider,
-  PricingTableContext,
   StatementsContextProvider,
   SubscriberTypeContext,
   useSubscriptions,
@@ -24,7 +23,6 @@ import { useTabState } from '../../hooks/useTabState';
 import { ArrowsUpDown } from '../../icons';
 import { useRouter } from '../../router';
 import { PaymentSources } from '../PaymentSources';
-import { PricingTable } from '../PricingTable';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -68,62 +66,24 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
         >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab
-              localizationKey={
-                subscriptions.data.length > 0
-                  ? localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('organizationProfile.billingPage.start.headerTitle__plans')
-              }
+              localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')}
             />
             <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <ProfileSection.Root
-                    id='subscriptionsList'
-                    title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
-                    centered={false}
-                    sx={t => ({
-                      borderTop: 'none',
-                      paddingTop: t.space.$1,
-                    })}
-                  >
-                    <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
-                      <Alert
-                        variant='info'
-                        colorScheme='info'
-                        title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
-                      />
-                    </Protect>
-                    <SubscriptionsList />
-                    <ProfileSection.ArrowButton
-                      id='subscriptionsList'
-                      textLocalizationKey={localizationKeys(
-                        'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
-                      )}
-                      sx={[
-                        t => ({
-                          justifyContent: 'start',
-                          height: t.sizes.$8,
-                        }),
-                      ]}
-                      leftIcon={ArrowsUpDown}
-                      leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-                      onClick={() => void navigate('plans')}
-                    />
-                  </ProfileSection.Root>
-                  <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
-                    <PaymentSources />
-                  </Protect>
-                </Flex>
-              ) : (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
+              <Flex
+                sx={{ width: '100%', flexDirection: 'column' }}
+                gap={4}
+              >
+                <ProfileSection.Root
+                  id='subscriptionsList'
+                  title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
+                  centered={false}
+                  sx={t => ({
+                    borderTop: 'none',
+                    paddingTop: t.space.$1,
+                  })}
                 >
                   <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
                     <Alert
@@ -132,11 +92,27 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                       title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
                     />
                   </Protect>
-                  <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                    <PricingTable />
-                  </PricingTableContext.Provider>
-                </Flex>
-              )}
+                  <SubscriptionsList />
+                  <ProfileSection.ArrowButton
+                    id='subscriptionsList'
+                    textLocalizationKey={localizationKeys(
+                      'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                    )}
+                    sx={[
+                      t => ({
+                        justifyContent: 'start',
+                        height: t.sizes.$8,
+                      }),
+                    ]}
+                    leftIcon={ArrowsUpDown}
+                    leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+                    onClick={() => void navigate('plans')}
+                  />
+                </ProfileSection.Root>
+                <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                  <PaymentSources />
+                </Protect>
+              </Flex>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <StatementsContextProvider>

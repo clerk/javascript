@@ -55,6 +55,7 @@ export const enUS: LocalizationResource = {
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
+    switchToMonthly: 'Switch to monthly',
     switchToAnnual: 'Switch to annual',
     viewFeatures: 'View features',
     year: 'Year',
@@ -180,6 +181,9 @@ export const enUS: LocalizationResource = {
       subscriptionsListSection: {
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
@@ -777,6 +781,9 @@ export const enUS: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
       },
       title: 'Billing',
     },

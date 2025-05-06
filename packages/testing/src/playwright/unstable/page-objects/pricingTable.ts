@@ -8,9 +8,9 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     waitForMounted: (selector = '.cl-pricingTable-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
-    clickManageSubscription: async () => {
-      await page.getByText('Manage subscription').click();
-    },
+    // clickManageSubscription: async () => {
+    //   await page.getByText('Manage subscription').click();
+    // },
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
@@ -19,7 +19,7 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
         shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
 
       await page
-        .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardAction`)
+        .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`)
         .getByRole('button', {
           name: targetButtonName,
         })

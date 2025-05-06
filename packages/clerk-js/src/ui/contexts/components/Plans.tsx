@@ -8,6 +8,7 @@ import type {
 import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
+import { CommerceSubscription } from '../../../core/resources/internal';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -51,12 +52,43 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const resource = subscriberType === 'org' ? organization : user;
 
   const {
-    data: subscriptions,
+    data: _subscriptions,
     isLoading: isLoadingSubscriptions,
     revalidate: revalidateSubscriptions,
   } = useSubscriptions(subscriberType);
 
   const { data: plans, isLoading: isLoadingPlans, revalidate: revalidatePlans } = usePlans(subscriberType);
+
+  const subscriptions = useMemo(() => {
+    if (!_subscriptions) {
+      return [];
+    }
+    const defaultFreePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
+
+    // are we signed in, is there a default free plan, and should it be shown as active or upcoming? then add an implicit subscription
+    if (
+      isSignedIn &&
+      defaultFreePlan &&
+      (_subscriptions.data.length === 0 || !_subscriptions.data.some(subscription => !subscription.canceledAt))
+    ) {
+      const canceledSubscription = _subscriptions.data.find(subscription => subscription.canceledAt);
+      return [
+        ..._subscriptions.data,
+        new CommerceSubscription({
+          object: 'commerce_subscription',
+          id: '__implicit_default_plan_subscription__',
+          payment_source_id: '',
+          plan: defaultFreePlan.__internal_toSnapshot(),
+          plan_period: 'month',
+          canceled_at: null,
+          status: _subscriptions.data.length === 0 ? 'active' : 'upcoming',
+          period_start: canceledSubscription?.periodEnd || 0,
+          period_end: 0,
+        }),
+      ];
+    }
+    return _subscriptions.data;
+  }, [_subscriptions, plans, isSignedIn]);
 
   // Revalidates the next time the hooks gets mounted
   const { revalidate: revalidateStatements } = useFetch(
@@ -87,7 +119,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
       value={{
         componentName: 'Plans',
         plans: isLoaded ? (plans ?? []) : [],
-        subscriptions: subscriptions?.data || [],
+        subscriptions: isLoaded ? subscriptions : [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
       }}
@@ -128,6 +160,12 @@ export const usePlansContext = () => {
 
   const { componentName, ...ctx } = context;
 
+  // should the default plan be shown as active
+  const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
+    // are there no subscriptions or are all subscriptions canceled
+    return ctx.subscriptions.length === 0 || !ctx.subscriptions.some(subscription => !subscription.canceledAt);
+  }, [ctx.subscriptions]);
+
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
     (plan: CommercePlanResource) => {
@@ -135,12 +173,6 @@ export const usePlansContext = () => {
     },
     [ctx.subscriptions],
   );
-
-  // should the default plan be shown as active
-  const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
-    // are there no subscriptions or are all subscriptions canceled
-    return ctx.subscriptions.length === 0 || !ctx.subscriptions.some(subscription => !subscription.canceledAt);
-  }, [ctx.subscriptions]);
 
   const canManageSubscription = useCallback(
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
@@ -151,16 +183,26 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscription],
   );
 
+  // should the default plan be shown as active
+  const upcomingSubscriptionsExist = useMemo(() => {
+    return (
+      ctx.subscriptions.some(subscription => subscription.status === 'upcoming') ||
+      isDefaultPlanImplicitlyActiveOrUpcoming
+    );
+  }, [ctx.subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
+
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
     ({
       plan,
       subscription: sub,
       isCompact = false,
+      selectedPlanPeriod = 'annual',
     }: {
       plan?: CommercePlanResource;
       subscription?: CommerceSubscriptionResource;
       isCompact?: boolean;
+      selectedPlanPeriod?: CommerceSubscriptionPlanPeriod;
     }): {
       localizationKey: LocalizationKey;
       variant: 'bordered' | 'solid';
@@ -168,18 +210,26 @@ export const usePlansContext = () => {
       isDisabled: boolean;
     } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+      let _selectedPlanPeriod = selectedPlanPeriod;
+      if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
+        _selectedPlanPeriod = 'month';
+      }
 
       return {
         localizationKey: subscription
           ? subscription.canceledAt
             ? localizationKeys('commerce.reSubscribe')
-            : localizationKeys('commerce.manageSubscription')
+            : selectedPlanPeriod !== subscription.planPeriod
+              ? selectedPlanPeriod === 'month'
+                ? localizationKeys('commerce.switchToMonthly')
+                : localizationKeys('commerce.switchToAnnual')
+              : localizationKeys('commerce.manageSubscription')
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.length > 0
             ? localizationKeys('commerce.switchPlan')
             : localizationKeys('commerce.subscribe'),
-        variant: isCompact || !!subscription ? 'bordered' : 'solid',
-        colorScheme: isCompact || !!subscription ? 'secondary' : 'primary',
+        variant: isCompact ? 'bordered' : 'solid',
+        colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
       };
     },
@@ -248,6 +298,7 @@ export const usePlansContext = () => {
     buttonPropsForPlan,
     canManageSubscription,
     captionForSubscription,
+    upcomingSubscriptionsExist,
     defaultFreePlan,
   };
 };

@@ -117,6 +117,7 @@ type _LocalizationResource = {
     reSubscribe: LocalizationValue;
     subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
@@ -699,6 +700,9 @@ type _LocalizationResource = {
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
       };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
       subscriptionsListSection: {
         title: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
@@ -892,6 +896,9 @@ type _LocalizationResource = {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
         headerTitle__statements: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
       };
       subscriptionsListSection: {
         title: LocalizationValue;

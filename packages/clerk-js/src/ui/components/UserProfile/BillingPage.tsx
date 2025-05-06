@@ -1,6 +1,5 @@
 import {
   PlansContextProvider,
-  PricingTableContext,
   StatementsContextProvider,
   SubscriberTypeContext,
   useSubscriptions,
@@ -22,7 +21,6 @@ import { useTabState } from '../../hooks/useTabState';
 import { ArrowsUpDown } from '../../icons';
 import { useRouter } from '../../router';
 import { PaymentSources } from '../PaymentSources';
-import { PricingTable } from '../PricingTable';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -67,55 +65,43 @@ const BillingPageInternal = withCardStateProvider(() => {
           onChange={handleTabChange}
         >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
-            <Tab
-              localizationKey={
-                subscriptions.data.length > 0
-                  ? localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('userProfile.billingPage.start.headerTitle__plans')
-              }
-            />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-              {subscriptions.data.length > 0 ? (
-                <>
-                  <ProfileSection.Root
+              <>
+                <ProfileSection.Root
+                  id='subscriptionsList'
+                  title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                  centered={false}
+                  sx={t => ({
+                    borderTop: 'none',
+                    paddingTop: t.space.$1,
+                  })}
+                >
+                  <SubscriptionsList />
+                  <ProfileSection.ArrowButton
                     id='subscriptionsList'
-                    title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
-                    centered={false}
-                    sx={t => ({
-                      borderTop: 'none',
-                      paddingTop: t.space.$1,
+                    textLocalizationKey={localizationKeys(
+                      'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                    )}
+                    sx={[
+                      t => ({
+                        justifyContent: 'start',
+                        height: t.sizes.$8,
+                      }),
+                    ]}
+                    leftIcon={ArrowsUpDown}
+                    leftIconSx={t => ({
+                      width: t.sizes.$4,
+                      height: t.sizes.$4,
                     })}
-                  >
-                    <SubscriptionsList />
-                    <ProfileSection.ArrowButton
-                      id='subscriptionsList'
-                      textLocalizationKey={localizationKeys(
-                        'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
-                      )}
-                      sx={[
-                        t => ({
-                          justifyContent: 'start',
-                          height: t.sizes.$8,
-                        }),
-                      ]}
-                      leftIcon={ArrowsUpDown}
-                      leftIconSx={t => ({
-                        width: t.sizes.$4,
-                        height: t.sizes.$4,
-                      })}
-                      onClick={() => void navigate('plans')}
-                    />
-                  </ProfileSection.Root>
-                  <PaymentSources />
-                </>
-              ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
-              )}
+                    onClick={() => void navigate('plans')}
+                  />
+                </ProfileSection.Root>
+                <PaymentSources />
+              </>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <StatementsContextProvider>

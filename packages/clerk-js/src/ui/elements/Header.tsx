@@ -78,6 +78,7 @@ const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element 
           display: 'inline-flex',
           alignItems: 'center',
           gap: t.space.$2,
+          width: 'fit-content',
           '&:hover': {
             textDecoration: 'none',
           },
