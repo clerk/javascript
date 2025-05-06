@@ -84,6 +84,12 @@ const StatementPageInternal = () => {
                         valueTruncated
                         valueCopyable
                       />
+                      {item.subscription.credit && item.subscription.credit.amount.amount > 0 ? (
+                        <Statement.SectionContentDetailsListItem
+                          label='Prorated credit for partial usage of previous subscription '
+                          value={`(${item.subscription.credit.amount.currencySymbol}${item.subscription.credit.amount.amountFormatted})`}
+                        />
+                      ) : null}
                     </Statement.SectionContentDetailsList>
                   </Statement.SectionContentItem>
                 ))}

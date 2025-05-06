@@ -671,6 +671,10 @@ export interface __experimental_CommercePaymentJSON extends ClerkResourceJSON {
 export interface __experimental_CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
+  amount: __experimental_CommerceMoneyJSON;
+  credit: {
+    amount: __experimental_CommerceMoneyJSON;
+  };
   payment_source_id: string;
   plan: __experimental_CommercePlanJSON;
   plan_period: __experimental_CommerceSubscriptionPlanPeriod;

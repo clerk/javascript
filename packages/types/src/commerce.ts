@@ -150,6 +150,10 @@ export interface __experimental_CommerceSubscriptionResource extends ClerkResour
   periodStart: number;
   periodEnd: number;
   canceledAt: number | null;
+  amount?: __experimental_CommerceMoney;
+  credit?: {
+    amount: __experimental_CommerceMoney;
+  };
   cancel: (params: __experimental_CancelSubscriptionParams) => Promise<DeletedObjectResource>;
 }
 
