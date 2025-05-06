@@ -571,7 +571,9 @@ describe('clerkMiddleware(params)', () => {
       })(req, {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(401);
-      expect(resp?.headers.get('WWW-Authenticate')).toBeTruthy();
+      expect(resp?.headers.get('WWW-Authenticate')).toBe(
+        'Bearer resource_metadata="https://clerk.included.katydid-92.lcl.dev/.well-known/oauth-protected-resource"',
+      );
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
