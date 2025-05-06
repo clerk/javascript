@@ -217,38 +217,46 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <Flex
+      <div
         ref={mergedRefs}
-        elementDescriptor={descriptors.drawerContent}
         {...getFloatingProps()}
-        style={transitionStyles}
-        direction='col'
-        sx={t => ({
-          // Apply the conditional right offset + the spread of the
-          // box shadow to ensure it is fully offscreen before unmounting
-          '--transform-offset':
-            strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
-          willChange: 'transform',
+        style={{
           position: strategy,
-          insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
-          insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
-          outline: 0,
-          width: t.sizes.$100,
-          backgroundColor: t.colors.$colorBackground,
-          borderStartStartRadius: t.radii.$xl,
-          borderEndStartRadius: t.radii.$xl,
-          borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-          borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$neutralAlpha100,
-          boxShadow: t.shadows.$cardBoxShadow,
-          overflow: 'hidden',
-          zIndex: t.zIndices.$modal,
-        })}
+          insetBlock: 0,
+          insetInlineEnd: 0,
+        }}
       >
-        {children}
-      </Flex>
+        <Flex
+          elementDescriptor={descriptors.drawerContent}
+          style={transitionStyles}
+          direction='col'
+          sx={t => ({
+            // Apply the conditional right offset + the spread of the
+            // box shadow to ensure it is fully offscreen before unmounting
+            '--transform-offset':
+              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+            willChange: 'transform',
+            position: strategy,
+            insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
+            insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
+            outline: 0,
+            width: t.sizes.$100,
+            backgroundColor: t.colors.$colorBackground,
+            borderStartStartRadius: t.radii.$xl,
+            borderEndStartRadius: t.radii.$xl,
+            borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha100,
+            boxShadow: t.shadows.$cardBoxShadow,
+            overflow: 'hidden',
+            zIndex: t.zIndices.$modal,
+          })}
+        >
+          {children}
+        </Flex>
+      </div>
     </FloatingFocusManager>
   );
 });
