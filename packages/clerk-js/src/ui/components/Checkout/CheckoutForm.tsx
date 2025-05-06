@@ -335,7 +335,11 @@ const ExistingPaymentSourceForm = ({
             animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
           })}
         >
-          {typeof submitError === 'string' ? submitError : submitError.message}
+          {typeof submitError === 'string'
+            ? submitError
+            : 'longMessage' in submitError
+              ? submitError.longMessage || submitError.message
+              : submitError.message}
         </Alert>
       )}
       <Button
