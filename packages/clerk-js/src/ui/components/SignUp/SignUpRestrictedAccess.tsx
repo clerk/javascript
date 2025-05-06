@@ -41,7 +41,6 @@ export const SignUpRestrictedAccess = () => {
               width: t.sizes.$10,
               height: t.sizes.$10,
             })}
-            colorScheme='danger'
           />
           <Header.Title localizationKey={localizationKeys('signUp.restrictedAccess.title')} />
           <Header.Subtitle localizationKey={subtitle} />
