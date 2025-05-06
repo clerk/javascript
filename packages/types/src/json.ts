@@ -3,8 +3,10 @@
  */
 
 import type {
-  CommerceInvoiceStatus,
+  CommercePaymentChargeType,
   CommercePaymentSourceStatus,
+  CommercePaymentStatus,
+  CommerceStatementStatus,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionStatus,
 } from './commerce';
@@ -599,6 +601,8 @@ export interface CommercePlanJSON extends ClerkResourceJSON {
   name: string;
   amount: number;
   amount_formatted: string;
+  annual_amount: number;
+  annual_amount_formatted: string;
   annual_monthly_amount: number;
   annual_monthly_amount_formatted: string;
   currency_symbol: string;
@@ -640,18 +644,38 @@ export interface CommerceInitializedPaymentSourceJSON extends ClerkResourceJSON 
   external_gateway_id: string;
 }
 
-export interface CommerceInvoiceJSON extends ClerkResourceJSON {
-  object: 'commerce_invoice';
+export interface CommerceStatementJSON extends ClerkResourceJSON {
+  object: 'commerce_statement';
   id: string;
-  paid_on: number;
-  payment_due_on: number;
-  status: CommerceInvoiceStatus;
-  totals: CommerceInvoiceTotalsJSON;
+  status: CommerceStatementStatus;
+  timestamp: number;
+  groups: CommerceStatementGroupJSON[];
+  totals: CommerceStatementTotalsJSON;
+}
+
+export interface CommerceStatementGroupJSON extends ClerkResourceJSON {
+  object: 'commerce_statement_group';
+  timestamp: number;
+  items: CommercePaymentJSON[];
+}
+
+export interface CommercePaymentJSON extends ClerkResourceJSON {
+  object: 'commerce_payment';
+  id: string;
+  amount: CommerceMoneyJSON;
+  payment_source: CommercePaymentSourceJSON;
+  subscription: CommerceSubscriptionJSON;
+  charge_type: CommercePaymentChargeType;
+  status: CommercePaymentStatus;
 }
 
 export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
+  amount: CommerceMoneyJSON;
+  credit: {
+    amount: CommerceMoneyJSON;
+  };
   payment_source_id: string;
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;
@@ -677,14 +701,14 @@ export interface CommerceCheckoutTotalsJSON {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CommerceInvoiceTotalsJSON extends Omit<CommerceCheckoutTotalsJSON, 'total_due_now'> {}
+export interface CommerceStatementTotalsJSON extends Omit<CommerceCheckoutTotalsJSON, 'total_due_now'> {}
 
 export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   object: 'commerce_checkout';
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  invoice_id: string;
+  statement_id: string;
   payment_source?: CommercePaymentSourceJSON;
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;

@@ -107,6 +107,7 @@ type _LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   commerce: {
     month: LocalizationValue;
+    year: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -134,7 +135,7 @@ type _LocalizationResource = {
       lineItems: {
         title__totalPaid: LocalizationValue;
         title__paymentMethod: LocalizationValue;
-        title__invoiceId: LocalizationValue;
+        title__statementId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
       emailForm: {
@@ -697,7 +698,7 @@ type _LocalizationResource = {
       start: {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
-        headerTitle__invoices: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
       };
       switchPlansSection: {
         title: LocalizationValue;
@@ -894,7 +895,7 @@ type _LocalizationResource = {
       start: {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
-        headerTitle__invoices: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
       };
       switchPlansSection: {
         title: LocalizationValue;

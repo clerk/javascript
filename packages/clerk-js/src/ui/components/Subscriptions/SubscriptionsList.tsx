@@ -111,9 +111,9 @@ export function SubscriptionsList() {
               <Text variant='subtitle'>
                 {subscription.plan.currencySymbol}
                 {subscription.planPeriod === 'annual'
-                  ? subscription.plan.annualMonthlyAmountFormatted
+                  ? subscription.plan.annualAmountFormatted
                   : subscription.plan.amountFormatted}
-                {subscription.plan.amount > 0 && (
+                {(subscription.plan.amount > 0 || subscription.plan.annualAmount > 0) && (
                   <Span
                     sx={t => ({
                       color: t.colors.$colorTextSecondary,
@@ -123,7 +123,11 @@ export function SubscriptionsList() {
                         marginInline: t.space.$1,
                       },
                     })}
-                    localizationKey={localizationKeys('commerce.month')}
+                    localizationKey={
+                      subscription.planPeriod === 'annual'
+                        ? localizationKeys('commerce.year')
+                        : localizationKeys('commerce.month')
+                    }
                   />
                 )}
               </Text>

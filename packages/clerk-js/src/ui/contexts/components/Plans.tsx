@@ -32,8 +32,20 @@ export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
   );
 };
 
-export const PlansContextProvider = ({ children }: PropsWithChildren) => {
+export const usePlans = (subscriberType?: CommerceSubscriberType) => {
   const { billing } = useClerk();
+
+  return useFetch(
+    billing.getPlans,
+    {
+      subscriberType,
+    },
+    undefined,
+    'commerce-plans',
+  );
+};
+
+export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
@@ -45,11 +57,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     revalidate: revalidateSubscriptions,
   } = useSubscriptions(subscriberType);
 
-  const {
-    data: plans,
-    isLoading: isLoadingPlans,
-    revalidate: revalidatePlans,
-  } = useFetch(billing.getPlans, { subscriberType }, undefined, 'commerce-plans');
+  const { data: plans, isLoading: isLoadingPlans, revalidate: revalidatePlans } = usePlans(subscriberType);
 
   const subscriptions = useMemo(() => {
     if (!_subscriptions) {
@@ -83,21 +91,21 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   }, [_subscriptions, plans, isSignedIn]);
 
   // Revalidates the next time the hooks gets mounted
-  const { revalidate: revalidateInvoices } = useFetch(
+  const { revalidate: revalidateStatements } = useFetch(
     undefined,
     {
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
     undefined,
-    `commerce-invoices-${resource?.id}`,
+    `commerce-statements-${resource?.id}`,
   );
 
   const revalidate = useCallback(() => {
     // Revalidate the plans and subscriptions
     revalidateSubscriptions();
     revalidatePlans();
-    revalidateInvoices();
-  }, [revalidateInvoices, revalidatePlans, revalidateSubscriptions]);
+    revalidateStatements();
+  }, [revalidateStatements, revalidatePlans, revalidateSubscriptions]);
 
   const isLoaded = useMemo(() => {
     if (isSignedIn) {

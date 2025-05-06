@@ -46,7 +46,7 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group borderTop={showDowngradeInfo}>
+          <LineItems.Group>
             <LineItems.Title
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
@@ -335,7 +335,11 @@ const ExistingPaymentSourceForm = ({
             animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
           })}
         >
-          {typeof submitError === 'string' ? submitError : submitError.message}
+          {typeof submitError === 'string'
+            ? submitError
+            : 'longMessage' in submitError
+              ? submitError.longMessage || submitError.message
+              : submitError.message}
         </Alert>
       )}
       <Button

@@ -20,7 +20,7 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  invoice_id!: string;
+  statement_id!: string;
   paymentSource?: CommercePaymentSource;
   plan!: CommercePlan;
   planPeriod!: CommerceSubscriptionPlanPeriod;
@@ -43,7 +43,7 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.invoice_id = data.invoice_id;
+    this.statement_id = data.statement_id;
     this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
     this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;

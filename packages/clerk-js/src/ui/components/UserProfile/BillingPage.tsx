@@ -1,4 +1,9 @@
-import { InvoicesContextProvider, PlansContextProvider, SubscriberTypeContext, useSubscriptions } from '../../contexts';
+import {
+  PlansContextProvider,
+  StatementsContextProvider,
+  SubscriberTypeContext,
+  useSubscriptions,
+} from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -15,13 +20,13 @@ import {
 import { useTabState } from '../../hooks/useTabState';
 import { ArrowsUpDown } from '../../icons';
 import { useRouter } from '../../router';
-import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
+import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const tabMap = {
   0: 'plans',
-  1: 'invoices',
+  1: 'statements',
   2: 'payment-methods',
 } as const;
 
@@ -61,7 +66,7 @@ const BillingPageInternal = withCardStateProvider(() => {
         >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
@@ -99,9 +104,9 @@ const BillingPageInternal = withCardStateProvider(() => {
               </>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <InvoicesContextProvider>
-                <InvoicesList />
-              </InvoicesContextProvider>
+              <StatementsContextProvider>
+                <StatementsList />
+              </StatementsContextProvider>
             </TabPanel>
           </TabPanels>
         </Tabs>
