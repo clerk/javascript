@@ -5,22 +5,21 @@ import { descriptors, Flex, Text } from '../customizables';
 import { common } from '../styledSystem';
 
 interface SwitchProps {
-  checked?: boolean;
+  isChecked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
-  disabled?: boolean;
-  'aria-label'?: string;
-  label?: string | LocalizationKey;
+  isDisabled?: boolean;
+  label: string | LocalizationKey;
 }
 
 export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
-  ({ checked: controlledChecked, defaultChecked, onChange, disabled = false, label }, ref) => {
+  ({ isChecked: controlledChecked, defaultChecked, onChange, isDisabled = false, label }, ref) => {
     const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
     const isControlled = controlledChecked !== undefined;
     const checked = isControlled ? controlledChecked : internalChecked;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (disabled) return;
+      if (isDisabled) return;
       if (!isControlled) {
         setInternalChecked(e.target.checked);
       }
@@ -45,7 +44,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         <input
           type='checkbox'
           role='switch'
-          disabled={disabled}
+          disabled={isDisabled}
           defaultChecked={defaultChecked}
           checked={checked}
           onChange={handleChange}
@@ -65,8 +64,8 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             backgroundColor: checked ? t.colors.$primary500 : t.colors.$neutralAlpha150,
             borderRadius: 999,
             transition: 'background-color 0.2s',
-            opacity: disabled ? 0.6 : 1,
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            opacity: isDisabled ? 0.6 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
             outline: 'none',
             boxSizing: 'border-box',
             boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.06) inset',
@@ -89,19 +88,17 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
             })}
           />
         </Flex>
-        {label && (
-          <Text
-            as='span'
-            variant='caption'
-            colorScheme='secondary'
-            localizationKey={label}
-            sx={t => ({
-              paddingInlineStart: t.sizes.$2,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              userSelect: 'none',
-            })}
-          />
-        )}
+        <Text
+          as='span'
+          variant='caption'
+          colorScheme='secondary'
+          localizationKey={label}
+          sx={t => ({
+            paddingInlineStart: t.sizes.$2,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+            userSelect: 'none',
+          })}
+        />
       </Flex>
     );
   },
