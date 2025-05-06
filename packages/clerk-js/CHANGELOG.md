@@ -1,5 +1,89 @@
 # Change Log
 
+## 5.64.0
+
+### Minor Changes
+
+- Mark commerce apis as stable ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Expose Clerk Billing APIs. ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ## Render the pricing table component
+
+  - `Clerk.mountPricingTable`
+  - `Clerk.unmountPricingTable`
+
+  ## Manage payment methods
+
+  - `Clerk.[user|organization].initializePaymentSource()`
+  - `Clerk.[user|organization].addPaymentSource()`
+  - `Clerk.[user|organization].getPaymentSources()`
+
+  ## Billing namespace
+
+  - `Clerk.billing`
+    - `Clerk.billing.getPlans()`
+    - `Clerk.billing.getSubscriptions()`
+    - `Clerk.billing.getInvoices()`
+    - `Clerk.billing.startCheckout()`
+
+### Patch Changes
+
+- Move `credit` at the top-level and remove `proration` property ([#5849](https://github.com/clerk/javascript/pull/5849)) by [@octoper](https://github.com/octoper)
+
+- Add support for switching to the free plan ([#5810](https://github.com/clerk/javascript/pull/5810)) by [@aeliox](https://github.com/aeliox)
+
+- Only allow members with `org:sys_billing:manage` to manage billing for an Organization ([#5835](https://github.com/clerk/javascript/pull/5835)) by [@octoper](https://github.com/octoper)
+
+- Replace Toggle component with Switch component in active subscription drawer ([#5853](https://github.com/clerk/javascript/pull/5853)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Introduce `<Tooltip />` primitive ([#5841](https://github.com/clerk/javascript/pull/5841)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Move `<__experimental_PaymentSources />` component under `Billing` -> `Subscriptions` tab and delete `Payment methods` tab ([#5825](https://github.com/clerk/javascript/pull/5825)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Rename ` __experimental_nextTask` to `__experimental_navigateToTask` ([#5715](https://github.com/clerk/javascript/pull/5715)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix interactive turnstile layout issue on SSO callback. ([#5783](https://github.com/clerk/javascript/pull/5783)) by [@anagstef](https://github.com/anagstef)
+
+- Introduce `checkoutContinueUrl` option. ([#5807](https://github.com/clerk/javascript/pull/5807)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Show a localized message for all errors returned from the backend if the user tries to perform an invalid plan change. ([#5805](https://github.com/clerk/javascript/pull/5805)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Always revalidate when checkout drawer opens ([#5798](https://github.com/clerk/javascript/pull/5798)) by [@octoper](https://github.com/octoper)
+
+- Adjusts the layout of the `PricingTable` plan cards ([#5824](https://github.com/clerk/javascript/pull/5824)) by [@aeliox](https://github.com/aeliox)
+
+- Add entry animations to CheckoutComplete component to smooth our the transition between checking out to successful state. ([#5802](https://github.com/clerk/javascript/pull/5802)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Allow switching from an existing monthly subscription to an annual subscription for the same plan ([#5811](https://github.com/clerk/javascript/pull/5811)) by [@aeliox](https://github.com/aeliox)
+
+- Rename CheckoutProps and PlanDetailsProps to **internal_CheckoutProps and **internal_PlanDetailsProps ([#5838](https://github.com/clerk/javascript/pull/5838)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix turnstile language fallback warning on captcha modal. ([#5827](https://github.com/clerk/javascript/pull/5827)) by [@anagstef](https://github.com/anagstef)
+
+- Update SubscriptionsList UI to be rendered within ProfileSections within UserProfile and OrganizationProfile. ([#5847](https://github.com/clerk/javascript/pull/5847)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adjusts the order and layout of the checkout form's line items ([#5804](https://github.com/clerk/javascript/pull/5804)) by [@aeliox](https://github.com/aeliox)
+
+- Display generic payment icon in payment source row when payment method is not card ([#5851](https://github.com/clerk/javascript/pull/5851)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Sort subscriptions and add free plan to subsciption list if it's upcoming ([#5854](https://github.com/clerk/javascript/pull/5854)) by [@octoper](https://github.com/octoper)
+
+- Update checkout downgrade notice placement and text. ([#5837](https://github.com/clerk/javascript/pull/5837)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename \_\_experimental_checkoutContinueUrl to checkoutContinueUrl ([#5826](https://github.com/clerk/javascript/pull/5826)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add `Pay with test card` button on `<AddPaymentSource />` component in dev instance ([#5831](https://github.com/clerk/javascript/pull/5831)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Update internal Switch component to require a label. ([#5845](https://github.com/clerk/javascript/pull/5845)) by [@LekoArts](https://github.com/LekoArts)
+
+- Replace \_\_experimental_PricingTable with PricingTable ([#5828](https://github.com/clerk/javascript/pull/5828)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`db0138f`](https://github.com/clerk/javascript/commit/db0138f3f72aea8cb68a5684a90123f733848f63), [`aa97231`](https://github.com/clerk/javascript/commit/aa97231962e3f472a46135e376159c6ddcf1157b), [`c792f37`](https://github.com/clerk/javascript/commit/c792f37129fd6475d5af95146e9ef0f1c8eff730), [`3bf08a9`](https://github.com/clerk/javascript/commit/3bf08a9e0a9e65496edac5fc3bb22ad7b561df26), [`a7c45b3`](https://github.com/clerk/javascript/commit/a7c45b39d27d81cef49afdbbeac2dff1dea7a426), [`74cf3b2`](https://github.com/clerk/javascript/commit/74cf3b28cdf622a942aaf99caabfba74b7e856fd), [`037b113`](https://github.com/clerk/javascript/commit/037b113aaedd53d4647d88f1659eb9c14cf6f275), [`c15a412`](https://github.com/clerk/javascript/commit/c15a412169058e2304a51c9e92ffaa7f6bb2a898), [`7726a03`](https://github.com/clerk/javascript/commit/7726a03a7fec4d292b6de2587b84ed4371984c23), [`ed10566`](https://github.com/clerk/javascript/commit/ed1056637624eec5bfd50333407c1e63e34c193b), [`b846a9a`](https://github.com/clerk/javascript/commit/b846a9ab96db6b1d8344a4b693051618865508a8), [`e66c800`](https://github.com/clerk/javascript/commit/e66c8002b82b2902f77e852e16482f5cfb062d2c), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed), [`b9d90da`](https://github.com/clerk/javascript/commit/b9d90da2397338dcebda3266b8c8330ab412a266), [`9c41091`](https://github.com/clerk/javascript/commit/9c41091eb795bce8ffeeeca0264ae841fe07b426), [`29462b4`](https://github.com/clerk/javascript/commit/29462b433eb411ce614e4768e5844cacd00c1975), [`322c43f`](https://github.com/clerk/javascript/commit/322c43f6807a932c3cfaaef1b587b472c80180d2), [`17397f9`](https://github.com/clerk/javascript/commit/17397f95b715bd4fefd7f63c1d351abcf1c8ee16), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed)]:
+  - @clerk/types@4.57.0
+  - @clerk/localizations@3.15.0
+  - @clerk/shared@3.8.0
+
 ## 5.63.5
 
 ### Patch Changes
