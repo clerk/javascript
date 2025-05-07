@@ -240,15 +240,24 @@ function Card(props: CardProps) {
                 })}
               />
             ) : (
-              <Button
-                elementDescriptor={descriptors.pricingTableCardFooterButton}
-                block
-                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
-                onClick={event => {
-                  onSelect(plan, event);
-                }}
-              />
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {!canManageBilling && (
+                  <Tooltip.Content
+                    text={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                  />
+                )}
+              </Tooltip.Root>
             )}
           </Box>
         ) : (
