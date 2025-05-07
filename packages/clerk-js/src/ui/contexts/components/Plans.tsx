@@ -215,7 +215,7 @@ export const usePlansContext = () => {
         _selectedPlanPeriod = 'month';
       }
 
-      const isEligibleForSwitchToAnnual = plan?.annualMonthlyAmount > 0;
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
 
       return {
         localizationKey: subscription
