@@ -2637,6 +2637,7 @@ export class Clerk implements ClerkInterface {
       // in the meantime, we're removing it here to keep the URL clean
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
+      removeClerkQueryParam('__clerk_handshake_nonce');
       removeClerkQueryParam('__clerk_help');
     } catch {
       // ignore

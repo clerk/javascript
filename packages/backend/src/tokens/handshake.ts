@@ -191,8 +191,7 @@ export class HandshakeService {
         }
       }
       cookiesToSet.push(`${constants.Cookies.HandshakeNonce}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
-    }
-    if (this.authenticateContext.handshakeToken) {
+    } else if (this.authenticateContext.handshakeToken) {
       const handshakePayload = await verifyHandshakeToken(
         this.authenticateContext.handshakeToken,
         this.authenticateContext,
@@ -209,6 +208,10 @@ export class HandshakeService {
     });
 
     if (this.authenticateContext.instanceType === 'development') {
+      console.log(
+        'HandshakeService: this.authenticateContext.instanceType === "development"',
+        this.authenticateContext.clerkUrl,
+      );
       const newUrl = new URL(this.authenticateContext.clerkUrl);
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
@@ -217,11 +220,13 @@ export class HandshakeService {
     }
 
     if (sessionToken === '') {
+      console.log('HandshakeService: missing session token', this.authenticateContext);
       return signedOut(this.authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, this.authenticateContext);
     if (data) {
+      console.log('HandshakeService: signed in VERIFY TOKEN', data);
       return signedIn(this.authenticateContext, data, headers, sessionToken);
     }
 
