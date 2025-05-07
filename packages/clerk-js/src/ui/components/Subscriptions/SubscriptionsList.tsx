@@ -1,4 +1,4 @@
-import type { CommercePlanResource, CommerceSubscriptionResource } from '@clerk/types';
+import type { CommerceSubscriptionResource } from '@clerk/types';
 
 import { useProtect } from '../../common';
 import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
@@ -20,28 +20,8 @@ import {
 } from '../../customizables';
 import { CogFilled, Plans } from '../../icons';
 
-// TODO(commerce): This will probably need to handled by FAPI
-function includeFreeToSubscriptionsLint(subscriptions: CommerceSubscriptionResource[], plans: CommercePlanResource[]) {
-  const cancelledSubscription = subscriptions.find(sub => sub.canceledAt && sub.status === 'active');
-  const hasUpcomingSubscription = subscriptions.some(sub => sub.status === 'upcoming');
-  const freePlan = plans?.find(plan => plan.hasBaseFee === false && plan.amount === 0);
-
-  if (cancelledSubscription && !hasUpcomingSubscription && freePlan) {
-    return [
-      ...subscriptions,
-      {
-        plan: freePlan,
-        periodStart: cancelledSubscription.periodEnd,
-        status: 'upcoming',
-      } as CommerceSubscriptionResource,
-    ];
-  }
-
-  return subscriptions;
-}
-
 export function SubscriptionsList() {
-  const { subscriptions, plans, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
@@ -58,9 +38,7 @@ export function SubscriptionsList() {
     });
   };
 
-  const subscriptionsWithUpcomingFreePlan = includeFreeToSubscriptionsLint(subscriptions, plans);
-
-  const sortedSubscriptions = subscriptionsWithUpcomingFreePlan.sort((a, b) => {
+  const sortedSubscriptions = subscriptions.sort((a, b) => {
     // alway put active subscriptions first
     if (a.status === 'active' && b.status !== 'active') {
       return -1;
@@ -116,11 +94,13 @@ export function SubscriptionsList() {
                     />
                   ) : null}
                 </Flex>
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                  localizationKey={captionForSubscription(subscription)}
-                />
+                {(!subscription.plan.isDefault || subscription.status === 'upcoming') && (
+                  <Text
+                    variant='caption'
+                    colorScheme='secondary'
+                    localizationKey={captionForSubscription(subscription)}
+                  />
+                )}
               </Col>
             </Td>
             <Td
@@ -131,9 +111,9 @@ export function SubscriptionsList() {
               <Text variant='subtitle'>
                 {subscription.plan.currencySymbol}
                 {subscription.planPeriod === 'annual'
-                  ? subscription.plan.annualMonthlyAmountFormatted
+                  ? subscription.plan.annualAmountFormatted
                   : subscription.plan.amountFormatted}
-                {subscription.plan.amount > 0 && (
+                {(subscription.plan.amount > 0 || subscription.plan.annualAmount > 0) && (
                   <Span
                     sx={t => ({
                       color: t.colors.$colorTextSecondary,
@@ -143,7 +123,11 @@ export function SubscriptionsList() {
                         marginInline: t.space.$1,
                       },
                     })}
-                    localizationKey={localizationKeys('commerce.month')}
+                    localizationKey={
+                      subscription.planPeriod === 'annual'
+                        ? localizationKeys('commerce.year')
+                        : localizationKeys('commerce.month')
+                    }
                   />
                 )}
               </Text>
@@ -153,7 +137,7 @@ export function SubscriptionsList() {
                 textAlign: 'right',
               })}
             >
-              {canManageSubscription({ subscription }) && subscription.id && (
+              {canManageSubscription({ subscription }) && subscription.id && !subscription.plan.isDefault && (
                 <Button
                   aria-label='Manage subscription'
                   onClick={event => handleSelectSubscription(subscription, event)}

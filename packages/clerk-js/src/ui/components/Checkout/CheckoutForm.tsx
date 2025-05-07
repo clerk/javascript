@@ -46,12 +46,16 @@ export const CheckoutForm = ({
         })}
       >
         <LineItems.Root>
-          <LineItems.Group borderTop={showDowngradeInfo}>
-            <LineItems.Title title={plan.name} />
+          <LineItems.Group>
+            <LineItems.Title
+              title={plan.name}
+              description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+            />
             {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
+              prefix={planPeriod === 'annual' ? 'x12' : undefined}
               text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
-              suffix={`per month${planPeriod === 'annual' ? ', times 12 months' : ''}`}
+              suffix={localizationKeys('commerce.checkout.perMonth')}
             />
           </LineItems.Group>
           <LineItems.Group
@@ -331,7 +335,11 @@ const ExistingPaymentSourceForm = ({
             animation: `${animations.textInBig} ${t.transitionDuration.$slow}`,
           })}
         >
-          {typeof submitError === 'string' ? submitError : submitError.message}
+          {typeof submitError === 'string'
+            ? submitError
+            : 'longMessage' in submitError
+              ? submitError.longMessage || submitError.message
+              : submitError.message}
         </Alert>
       )}
       <Button

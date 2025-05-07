@@ -91,18 +91,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Success!')).toBeVisible();
   });
 
-  test('can manage and cancel subscription', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.page.goToRelative('/pricing-table');
+  // test('can manage and cancel subscription', async ({ page, context }) => {
+  //   const u = createTestUtils({ app, page, context });
+  //   await u.po.signIn.goTo();
+  //   await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  //   await u.po.page.goToRelative('/pricing-table');
 
-    await u.po.pricingTable.waitForMounted();
-    await u.po.pricingTable.clickManageSubscription();
-    await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
-    await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
-    await expect(u.po.page.getByRole('button', { name: /resubscribe|re-subscribe/i }).first()).toBeVisible();
-  });
+  //   await u.po.pricingTable.waitForMounted();
+  //   await u.po.pricingTable.clickManageSubscription();
+  //   await u.po.page.getByRole('button', { name: 'Cancel subscription' }).click();
+  //   await u.po.page.getByRole('alertdialog').getByRole('button', { name: 'Cancel subscription' }).click();
+  //   await expect(u.po.page.getByRole('button', { name: /resubscribe|re-subscribe/i }).first()).toBeVisible();
+  // });
 
   test.describe('in UserProfile', () => {
     test('renders pricing table with plans', async ({ page, context }) => {

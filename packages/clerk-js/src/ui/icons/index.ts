@@ -55,6 +55,7 @@ export { default as Plus } from './plus.svg';
 export { default as Print } from './print.svg';
 export { default as QuestionMark } from './question-mark.svg';
 export { default as RequestAuthIcon } from './request-auth.svg';
+export { default as RotateLeftRight } from './rotate-left-right.svg';
 export { default as Selector } from './selector.svg';
 export { default as SignOut } from './signout.svg';
 export { default as SignOutDouble } from './signout-double.svg';

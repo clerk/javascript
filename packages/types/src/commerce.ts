@@ -1,6 +1,7 @@
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
+import type { CommerceFeatureJSONSnapshot, CommercePlanJSONSnapshot } from './snapshots';
 
 type WithOptionalOrgType<T> = T & {
   orgId?: string;
@@ -9,7 +10,7 @@ type WithOptionalOrgType<T> = T & {
 export interface CommerceBillingNamespace {
   getPlans: () => Promise<CommercePlanResource[]>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
-  getInvoices: (params: GetInvoicesParams) => Promise<ClerkPaginatedResponse<CommerceInvoiceResource>>;
+  getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
 }
 
@@ -44,6 +45,8 @@ export interface CommercePlanResource extends ClerkResource {
   name: string;
   amount: number;
   amountFormatted: string;
+  annualAmount: number;
+  annualAmountFormatted: string;
   annualMonthlyAmount: number;
   annualMonthlyAmountFormatted: string;
   currencySymbol: string;
@@ -57,6 +60,7 @@ export interface CommercePlanResource extends ClerkResource {
   slug: string;
   avatarUrl: string;
   features: CommerceFeatureResource[];
+  __internal_toSnapshot: () => CommercePlanJSONSnapshot;
 }
 
 export interface CommerceFeatureResource extends ClerkResource {
@@ -65,6 +69,7 @@ export interface CommerceFeatureResource extends ClerkResource {
   description: string;
   slug: string;
   avatarUrl: string;
+  __internal_toSnapshot: () => CommerceFeatureJSONSnapshot;
 }
 
 export type CommercePaymentSourceStatus = 'active' | 'expired' | 'disconnected';
@@ -102,16 +107,33 @@ export interface CommerceInitializedPaymentSourceResource extends ClerkResource 
   externalGatewayId: string;
 }
 
-export type GetInvoicesParams = WithOptionalOrgType<ClerkPaginationParams>;
+export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
-export type CommerceInvoiceStatus = 'paid' | 'unpaid' | 'past_due';
+export type CommerceStatementStatus = 'open' | 'closed';
 
-export interface CommerceInvoiceResource extends ClerkResource {
+export interface CommerceStatementResource extends ClerkResource {
   id: string;
-  totals: CommerceInvoiceTotals;
-  paymentDueOn: number;
-  paidOn: number;
-  status: CommerceInvoiceStatus;
+  totals: CommerceStatementTotals;
+  status: CommerceStatementStatus;
+  timestamp: number;
+  groups: CommerceStatementGroup[];
+}
+
+export interface CommerceStatementGroup {
+  timestamp: number;
+  items: CommercePayment[];
+}
+
+export type CommercePaymentChargeType = 'checkout' | 'recurring';
+export type CommercePaymentStatus = 'pending' | 'paid' | 'failed';
+
+export interface CommercePayment {
+  id: string;
+  amount: CommerceMoney;
+  paymentSource: CommercePaymentSourceResource;
+  subscription: CommerceSubscriptionResource;
+  chargeType: CommercePaymentChargeType;
+  status: CommercePaymentStatus;
 }
 
 export type GetSubscriptionsParams = WithOptionalOrgType<ClerkPaginationParams>;
@@ -126,6 +148,10 @@ export interface CommerceSubscriptionResource extends ClerkResource {
   periodStart: number;
   periodEnd: number;
   canceledAt: number | null;
+  amount?: CommerceMoney;
+  credit?: {
+    amount: CommerceMoney;
+  };
   cancel: (params: CancelSubscriptionParams) => Promise<DeletedObjectResource>;
 }
 
@@ -145,7 +171,7 @@ export interface CommerceCheckoutTotals {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CommerceInvoiceTotals extends Omit<CommerceCheckoutTotals, 'totalDueNow'> {}
+export interface CommerceStatementTotals extends Omit<CommerceCheckoutTotals, 'totalDueNow'> {}
 
 export type CreateCheckoutParams = WithOptionalOrgType<{
   planId: string;
@@ -169,7 +195,7 @@ export interface CommerceCheckoutResource extends ClerkResource {
   id: string;
   externalClientSecret: string;
   externalGatewayId: string;
-  invoice_id: string;
+  statement_id: string;
   paymentSource?: CommercePaymentSourceResource;
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;

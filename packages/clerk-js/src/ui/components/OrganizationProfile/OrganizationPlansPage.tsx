@@ -22,7 +22,7 @@ const OrganizationPlansPageInternal = () => {
       >
         <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
           <Header.Title
-            localizationKey='Available Plans'
+            localizationKey={localizationKeys('organizationProfile.billingPage.switchPlansSection.title')}
             textVariant='h2'
           />
         </Header.BackLink>

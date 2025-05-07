@@ -324,7 +324,7 @@ export function PricingTableMatrix({
                           onClick={event => {
                             onSelect(plan, event);
                           }}
-                          {...buttonPropsForPlan({ plan })}
+                          {...buttonPropsForPlan({ plan, selectedPlanPeriod: planPeriod })}
                           colorScheme={highlight ? 'primary' : 'secondary'}
                         />
                       </Box>
