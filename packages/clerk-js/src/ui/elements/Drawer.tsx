@@ -92,6 +92,7 @@ function Root({
     onOpenChange,
     transform: false,
     strategy,
+    placement: 'right',
     ...floatingProps,
   });
 
@@ -223,7 +224,8 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
         style={{
           position: strategy,
           insetBlock: 0,
-          insetInlineEnd: 0,
+          insetInline: 0,
+          pointerEvents: 'none',
         }}
       >
         <Flex
@@ -241,18 +243,19 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
             outline: 0,
             width: t.sizes.$100,
-            maxWidth: '85vw',
+            maxWidth: strategy === 'fixed' ? `calc(100% - ${t.space.$6})` : '100%',
             backgroundColor: t.colors.$colorBackground,
-            borderStartStartRadius: t.radii.$xl,
-            borderEndStartRadius: t.radii.$xl,
-            borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-            borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderStartStartRadius: t.radii.$lg,
+            borderEndStartRadius: t.radii.$lg,
+            borderEndEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
+            borderStartEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$neutralAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
             zIndex: t.zIndices.$modal,
+            pointerEvents: 'auto',
           })}
         >
           {children}
@@ -290,8 +293,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
           borderBlockEndColor: t.colors.$neutralAlpha100,
-          borderStartStartRadius: t.radii.$xl,
-          borderStartEndRadius: t.radii.$xl,
+          borderStartStartRadius: t.radii.$lg,
+          borderStartEndRadius: t.radii.$lg,
           paddingBlock: title ? t.space.$3 : undefined,
           paddingInline: title ? t.space.$4 : undefined,
         }),
