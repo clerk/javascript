@@ -1,4 +1,4 @@
-import type { ApiKeyJSON, ApiKeyResource, CreateApiKeyParams } from '@clerk/types';
+import type { ApiKeyJSON, ApiKeyResource, CreateApiKeyParams, GetApiKeysParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -48,7 +48,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
     return this;
   }
 
-  static async getAll(params?: { subject?: string }): Promise<ApiKeyResource[]> {
+  static async getAll(params?: GetApiKeysParams): Promise<ApiKeyResource[]> {
     return this.clerk
       .getFapiClient()
       .request<{ api_keys: ApiKeyJSON[] }>({
