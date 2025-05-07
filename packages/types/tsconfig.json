@@ -13,7 +13,8 @@
     "resolveJsonModule": true,
     "sourceMap": false,
     "strict": true,
-    "types": []
+    "types": [],
+    "isolatedDeclarations": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]
