@@ -87,4 +87,35 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
       })
       .catch(() => '');
   }
+
+  static async create(name: string): Promise<ApiKeyResource> {
+    return this.clerk
+      .getFapiClient()
+      .request<ApiKeyJSON>({
+        method: 'POST',
+        path: '/api_keys',
+        pathPrefix: '',
+        search: {
+          subject: this.clerk.user?.id ?? '',
+        },
+        headers: {
+          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          type: 'api_key',
+          name,
+          subject: this.clerk.user?.id ?? '',
+          claims: null,
+          scopes: [],
+          creation_reason: null,
+          seconds_until_expiration: null,
+        }),
+      })
+      .then(res => {
+        const apiKeysJSON = res.payload as unknown as ApiKeyJSON;
+        return new ApiKey(apiKeysJSON);
+      });
+  }
 }
