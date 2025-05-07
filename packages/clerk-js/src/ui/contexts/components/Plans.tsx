@@ -217,27 +217,44 @@ export const usePlansContext = () => {
 
       const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
 
+      const getLocalizationKey = () => {
+        // Handle subscription cases
+        if (subscription) {
+          if (subscription.canceledAt) {
+            return localizationKeys('commerce.reSubscribe');
+          }
+
+          if (selectedPlanPeriod !== subscription.planPeriod) {
+            if (selectedPlanPeriod === 'month') {
+              return localizationKeys('commerce.switchToMonthly');
+            }
+
+            if (isEligibleForSwitchToAnnual) {
+              return localizationKeys('commerce.switchToAnnual');
+            }
+
+            return localizationKeys('commerce.manageSubscription');
+          }
+
+          return localizationKeys('commerce.manageSubscription');
+        }
+
+        // Handle non-subscription cases
+        const hasNonDefaultSubscriptions =
+          ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
+        return hasNonDefaultSubscriptions
+          ? localizationKeys('commerce.switchPlan')
+          : localizationKeys('commerce.subscribe');
+      };
+
       return {
-        localizationKey: subscription
-          ? subscription.canceledAt
-            ? localizationKeys('commerce.reSubscribe')
-            : selectedPlanPeriod !== subscription.planPeriod
-              ? selectedPlanPeriod === 'month'
-                ? localizationKeys('commerce.switchToMonthly')
-                : isEligibleForSwitchToAnnual
-                  ? localizationKeys('commerce.switchToAnnual')
-                  : localizationKeys('commerce.manageSubscription')
-              : localizationKeys('commerce.manageSubscription')
-          : // If there are no active or grace period subscriptions, show the get started button
-            ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0
-            ? localizationKeys('commerce.switchPlan')
-            : localizationKeys('commerce.subscribe'),
+        localizationKey: getLocalizationKey(),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscription],
+    [activeOrUpcomingSubscription, ctx.subscriptions, canManageBilling],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
