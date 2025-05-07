@@ -7,6 +7,7 @@ import type {
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
+  ApiKeyResource,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -17,6 +18,7 @@ import type {
   ClerkStatus,
   ClientResource,
   CommerceBillingNamespace,
+  CreateApiKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -26,6 +28,7 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
+  ManageApiKeysProps,
   NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -131,6 +134,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountManageApiKeysNodes = new Map<HTMLDivElement, ManageApiKeysProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -609,6 +613,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
+    this.premountManageApiKeysNodes.forEach((props, node) => {
+      clerkjs.mountManageApiKeys(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -1050,6 +1058,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  mountManageApiKeys = (node: HTMLDivElement, props?: ManageApiKeysProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountManageApiKeys(node, props);
+    } else {
+      this.premountManageApiKeysNodes.set(node, props);
+    }
+  };
+
+  unmountManageApiKeys = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountManageApiKeys(node);
+    } else {
+      this.premountManageApiKeysNodes.delete(node);
+    }
+  };
+
   addListener = (listener: ListenerCallback): UnsubscribeCallback => {
     if (this.clerkjs) {
       return this.clerkjs.addListener(listener);
@@ -1283,6 +1307,33 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<WaitlistResource>;
     } else {
       this.premountMethodCalls.set('joinWaitlist', callback);
+    }
+  };
+
+  getApiKeys = async (): Promise<ApiKeyResource[] | void> => {
+    const callback = () => this.clerkjs?.getApiKeys();
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<ApiKeyResource[]>;
+    } else {
+      this.premountMethodCalls.set('getApiKeys', callback);
+    }
+  };
+
+  getApiKeySecret = async (apiKeyId: string): Promise<string | void> => {
+    const callback = () => this.clerkjs?.getApiKeySecret(apiKeyId);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<string>;
+    } else {
+      this.premountMethodCalls.set('getApiKeySecret', callback);
+    }
+  };
+
+  createApiKey = async (params: CreateApiKeyParams): Promise<ApiKeyResource | void> => {
+    const callback = () => this.clerkjs?.createApiKey(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<ApiKeyResource>;
+    } else {
+      this.premountMethodCalls.set('createApiKey', callback);
     }
   };
 
