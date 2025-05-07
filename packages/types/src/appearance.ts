@@ -347,6 +347,7 @@ export type ElementsConfig = {
   userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
+  userPreviewMainIdentifierText: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;
 
   organizationPreview: WithOptions<OrganizationPreviewId>;
