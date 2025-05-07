@@ -769,6 +769,11 @@ export interface Clerk {
    * Creates a new API key.
    */
   createApiKey: (params: CreateApiKeyParams) => Promise<ApiKeyResource>;
+
+  /**
+   * Revokes a given API key by ID.
+   */
+  revokeApiKey: (params: RevokeApiKeyParams) => Promise<ApiKeyResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1670,6 +1675,11 @@ export type CreateApiKeyParams = {
   claims?: string | Record<string, any>;
   scopes?: string[];
   creationReason?: string;
+};
+
+export type RevokeApiKeyParams = {
+  apiKeyID: string;
+  revocationReason?: string;
 };
 
 export type __internal_CheckoutProps = {

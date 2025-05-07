@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useManageApiKeysContext } from '../../contexts';
 import { Button, Flex, Flow, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { useClipboard, useFetch } from '../../hooks';
-import { Clipboard, Eye, EyeSlash, Plus } from '../../icons';
+import { Clipboard, Eye, EyeSlash, Trash } from '../../icons';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 
 const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
@@ -62,6 +62,11 @@ export const ManageApiKeys = () => {
     } finally {
       setCreating(false);
     }
+  };
+
+  const revokeApiKey = async (apiKeyID: string) => {
+    await clerk.revokeApiKey({ apiKeyID, revocationReason: 'Revoked by user' });
+    revalidate();
   };
 
   return (
@@ -157,9 +162,10 @@ export const ManageApiKeys = () => {
                 <Button
                   variant='ghost'
                   size='sm'
-                  aria-label='More actions'
+                  aria-label='Revoke key'
+                  onClick={() => void revokeApiKey(apiKey.id)}
                 >
-                  <Icon icon={Plus} />
+                  <Icon icon={Trash} />
                 </Button>
               </Td>
             </Tr>

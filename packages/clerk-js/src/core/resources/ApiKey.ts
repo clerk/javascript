@@ -1,4 +1,10 @@
-import type { ApiKeyJSON, ApiKeyResource, CreateApiKeyParams, GetApiKeysParams } from '@clerk/types';
+import type {
+  ApiKeyJSON,
+  ApiKeyResource,
+  CreateApiKeyParams,
+  GetApiKeysParams,
+  RevokeApiKeyParams,
+} from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -104,6 +110,26 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
           ...params,
           type: params.type ?? 'api_key',
           subject: params.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
+        }),
+      })
+    )?.response as ApiKeyJSON;
+
+    return new ApiKey(json);
+  }
+
+  static async revoke(params: RevokeApiKeyParams): Promise<ApiKeyResource> {
+    const json = (
+      await BaseResource._fetch<ApiKeyJSON>({
+        path: `/api_keys/${params.apiKeyID}/revoke`,
+        method: 'POST',
+        pathPrefix: '',
+        headers: {
+          Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          revocation_reason: params.revocationReason,
         }),
       })
     )?.response as ApiKeyJSON;

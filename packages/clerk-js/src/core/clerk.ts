@@ -61,6 +61,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
+  RevokeApiKeyParams,
   SDKMetadata,
   SetActiveParams,
   SignedInSessionResource,
@@ -1075,6 +1076,10 @@ export class Clerk implements ClerkInterface {
 
   public createApiKey = async (params: CreateApiKeyParams): Promise<ApiKeyResource> => {
     return ApiKey.create(params);
+  };
+
+  public revokeApiKey = async (params: RevokeApiKeyParams): Promise<ApiKeyResource> => {
+    return ApiKey.revoke(params);
   };
 
   /**
