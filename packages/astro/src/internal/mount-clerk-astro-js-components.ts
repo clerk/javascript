@@ -6,6 +6,7 @@ import type { InternalUIComponentId } from '../types';
  */
 const mountAllClerkAstroJSComponents = () => {
   const mountFns = {
+    'create-organization': 'mountCreateOrganization',
     'organization-list': 'mountOrganizationList',
     'organization-profile': 'mountOrganizationProfile',
     'organization-switcher': 'mountOrganizationSwitcher',
@@ -21,9 +22,8 @@ const mountAllClerkAstroJSComponents = () => {
   Object.entries(mountFns).forEach(([category, mountFn]) => {
     const elementsOfCategory = document.querySelectorAll(`[data-clerk-id^="clerk-${category}"]`);
     elementsOfCategory.forEach(el => {
-      const clerkId = el.getAttribute('data-clerk-id');
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const props = window.__astro_clerk_component_props?.get(category)?.get(clerkId!);
+      const clerkId = el.getAttribute('data-clerk-id') as string;
+      const props = window.__astro_clerk_component_props?.get(category)?.get(clerkId);
       if (el) {
         $clerk.get()?.[mountFn](el as HTMLDivElement, props);
       }

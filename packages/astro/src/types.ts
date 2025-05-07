@@ -87,6 +87,7 @@ export type ButtonProps<Tag> = {
 export type InternalUIComponentId =
   | 'sign-in'
   | 'sign-up'
+  | 'create-organization'
   | 'organization-list'
   | 'organization-profile'
   | 'organization-switcher'
