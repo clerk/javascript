@@ -6,6 +6,7 @@ import {
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
 } from '@clerk/shared/webauthn';
 import type {
+  AlternativePhoneCodeConfig,
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithPasskeyParams,
@@ -121,6 +122,12 @@ export class SignIn extends BaseResource implements SignInResource {
           phoneNumberId: factor.phoneNumberId,
           default: factor.default,
         } as PhoneCodeConfig;
+        break;
+      case 'whatsapp_code':
+        config = {
+          phoneNumberId: factor.phoneNumberId,
+          default: factor.default,
+        } as AlternativePhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;

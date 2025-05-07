@@ -197,8 +197,6 @@ type _LocalizationResource = {
       resendButton: LocalizationValue;
     };
     alternativePhoneCodeProvider: {
-      formSubtitle: LocalizationValue;
-      formTitle: LocalizationValue;
       resendButton: LocalizationValue;
       subtitle: LocalizationValue;
       title: LocalizationValue;
@@ -326,6 +324,12 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;

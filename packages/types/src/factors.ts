@@ -1,5 +1,6 @@
 import type { PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
 import type {
+  AlternativePhoneCodeStrategy,
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -31,6 +32,14 @@ export type EmailLinkFactor = {
 
 export type PhoneCodeFactor = {
   strategy: PhoneCodeStrategy;
+  phoneNumberId: string;
+  safeIdentifier: string;
+  primary?: boolean;
+  default?: boolean;
+};
+
+export type AlternativePhoneCodeFactor = {
+  strategy: AlternativePhoneCodeStrategy;
   phoneNumberId: string;
   safeIdentifier: string;
   primary?: boolean;
@@ -95,6 +104,7 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
   redirectUrl: string;
 };
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
+export type AlternativePhoneCodeConfig = Omit<AlternativePhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
 
 export type PassKeyConfig = PasskeyFactor;
@@ -127,6 +137,11 @@ export type EmailCodeAttempt = {
 
 export type PhoneCodeAttempt = {
   strategy: PhoneCodeStrategy;
+  code: string;
+};
+
+export type AlternativePhoneCodeAttempt = {
+  strategy: AlternativePhoneCodeStrategy;
   code: string;
 };
 

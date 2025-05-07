@@ -1,6 +1,11 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
+import type {
+  AlternativePhoneCodeFactor,
+  EmailCodeFactor,
+  PhoneCodeFactor,
+  ResetPasswordCodeFactor,
+} from '@clerk/types';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
@@ -16,7 +21,7 @@ export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor | AlternativePhoneCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };

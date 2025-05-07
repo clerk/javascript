@@ -78,7 +78,14 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-const localStrategies: SignInStrategy[] = ['passkey', 'email_code', 'password', 'phone_code', 'email_link'];
+const localStrategies: SignInStrategy[] = [
+  'passkey',
+  'email_code',
+  'password',
+  'phone_code',
+  'whatsapp_code',
+  'email_link',
+];
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
   if (!factor) {
@@ -111,6 +118,7 @@ export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
 const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
+
 export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
   if (identifier.type === 'tel') {
     return 'phoneNumber';

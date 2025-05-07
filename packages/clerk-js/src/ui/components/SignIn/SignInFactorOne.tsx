@@ -159,6 +159,23 @@ function SignInFactorOneInternal(): JSX.Element {
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          cardTitle={localizationKeys('signIn.phoneCode.title')}
+          cardSubtitle={localizationKeys('signIn.phoneCode.subtitle')}
+          inputLabel={localizationKeys('signIn.phoneCode.formTitle')}
+          resendButton={localizationKeys('signIn.phoneCode.resendButton')}
+        />
+      );
+    case 'whatsapp_code':
+      return (
+        <SignInFactorOnePhoneCodeCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          cardTitle={localizationKeys('signIn.alternativePhoneCodeProvider.title', { provider: 'WhatsApp' })}
+          cardSubtitle={localizationKeys('signIn.alternativePhoneCodeProvider.subtitle')}
+          inputLabel={localizationKeys('signIn.alternativePhoneCodeProvider.formTitle')}
+          resendButton={localizationKeys('signIn.alternativePhoneCodeProvider.resendButton')}
         />
       );
     case 'email_link':

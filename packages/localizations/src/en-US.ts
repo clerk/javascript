@@ -514,6 +514,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your phone',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your {{provider}}',
+    },
     phoneCodeMfa: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",

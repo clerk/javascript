@@ -1,4 +1,7 @@
 import type {
+  AlternativePhoneCodeAttempt,
+  AlternativePhoneCodeConfig,
+  AlternativePhoneCodeFactor,
   BackupCodeAttempt,
   BackupCodeFactor,
   EmailCodeAttempt,
@@ -51,6 +54,7 @@ import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
 import type {
+  AlternativePhoneCodeStrategy,
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -142,6 +146,7 @@ export type SignInFirstFactor =
   | EmailCodeFactor
   | EmailLinkFactor
   | PhoneCodeFactor
+  | AlternativePhoneCodeFactor
   | PasswordFactor
   | PasskeyFactor
   | ResetPasswordPhoneCodeFactor
@@ -166,6 +171,7 @@ export type PrepareFirstFactorParams =
   | EmailCodeConfig
   | EmailLinkConfig
   | PhoneCodeConfig
+  | AlternativePhoneCodeConfig
   | Web3SignatureConfig
   | PassKeyConfig
   | ResetPasswordPhoneCodeFactorConfig
@@ -178,14 +184,19 @@ export type AttemptFirstFactorParams =
   | PasskeyAttempt
   | EmailCodeAttempt
   | PhoneCodeAttempt
+  | AlternativePhoneCodeAttempt
   | PasswordAttempt
   | Web3Attempt
   | ResetPasswordPhoneCodeAttempt
   | ResetPasswordEmailCodeAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | AlternativePhoneCodeConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type AttemptSecondFactorParams =
+  | PhoneCodeAttempt
+  | AlternativePhoneCodeAttempt
+  | TOTPAttempt
+  | BackupCodeAttempt;
 
 export type SignInCreateParams = (
   | {
@@ -213,6 +224,7 @@ export type SignInCreateParams = (
   | {
       strategy:
         | PhoneCodeStrategy
+        | AlternativePhoneCodeStrategy
         | EmailCodeStrategy
         | Web3Strategy
         | ResetPasswordEmailCodeStrategy
@@ -249,6 +261,7 @@ export type SignInStrategy =
   | ResetPasswordPhoneCodeStrategy
   | ResetPasswordEmailCodeStrategy
   | PhoneCodeStrategy
+  | AlternativePhoneCodeStrategy
   | EmailCodeStrategy
   | EmailLinkStrategy
   | TicketStrategy
