@@ -1,4 +1,5 @@
 import type { ClerkPaginationRequest } from '@clerk/types';
+import type { HandshakePayload } from '../resources/HandshakePayload';
 
 import { joinPaths } from '../../util/path';
 import type { Client } from '../resources/Client';
@@ -6,6 +7,10 @@ import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/clients';
+
+type GetHandshakePayloadParams = {
+  nonce: string;
+};
 
 export class ClientAPI extends AbstractAPI {
   public async getClientList(params: ClerkPaginationRequest = {}) {
@@ -29,6 +34,17 @@ export class ClientAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
       bodyParams: { token },
+    });
+  }
+
+  public async getHandshakePayload(queryParams: GetHandshakePayloadParams) {
+    const { nonce } = queryParams;
+    console.log('Clerk: ClientAPI: getHandshakePayload:', nonce);
+
+    return this.request<HandshakePayload>({
+      method: 'GET',
+      path: '/clients/handshake_payload',
+      queryParams,
     });
   }
 }
