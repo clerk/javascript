@@ -766,6 +766,13 @@ export interface Clerk {
    * @returns The secret for the given API key ID.
    */
   getApiKeySecret: (id: string) => Promise<string>;
+
+  /**
+   * Creates a new API key.
+   * @param name - The name of the API key.
+   * @returns The created API key.
+   */
+  createApiKey: (name: string) => Promise<ApiKeyResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
