@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.64.2
+
+### Patch Changes
+
+- Fix PricingTable logic for plan button text. ([#5869](https://github.com/clerk/javascript/pull/5869)) by [@brkalow](https://github.com/brkalow)
+
 ## 5.64.1
 
 ### Patch Changes
