@@ -104,7 +104,7 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const { buttonPropsForPlan, activeOrUpcomingSubscription, hasMultipleSubscriptionsForPlan } = usePlansContext();
+  const { buttonPropsForPlan, activeOrUpcomingSubscription } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -118,19 +118,38 @@ function Card(props: CardProps) {
   };
 
   const subscription = activeOrUpcomingSubscription(plan);
-  // const multipleSubscriptionsForPlan = hasMultipleSubscriptionsForPlan(plan);
   const hasFeatures = plan.features.length > 0;
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
-  const isEligibleForSwitchToAnnual = plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
 
-  const shouldShowFooter =
-    !subscription ||
-    subscription?.status === 'upcoming' ||
-    subscription?.canceledAt ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault && isEligibleForSwitchToAnnual);
-  const shouldShowFooterNotice =
-    subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
+  // Explicit footer and notice logic based on all plan/subscription states
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
+
+  if (!subscription) {
+    // No subscription for this plan
+    shouldShowFooter = true; // "Subscribe" or "Switch to this plan"
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true; // "Starts on [date]"
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true; // "Resubscribe"
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      // Switching between annual/monthly
+      shouldShowFooter = true; // "Switch to monthly"/"Switch to annual"
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    // Fallback for other statuses
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
 
   return (
     <Box
