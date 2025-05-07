@@ -121,12 +121,13 @@ function Card(props: CardProps) {
   const hasFeatures = plan.features.length > 0;
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
+  const isEligibleForSwitchToAnnual = plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
 
   const shouldShowFooter =
     !subscription ||
     subscription?.status === 'upcoming' ||
     subscription?.canceledAt ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault);
+    (planPeriod !== subscription?.planPeriod && !plan.isDefault && isEligibleForSwitchToAnnual);
   const shouldShowFooterNotice =
     subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
 
