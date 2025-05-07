@@ -241,6 +241,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
             outline: 0,
             width: t.sizes.$100,
+            maxWidth: '85vw',
             backgroundColor: t.colors.$colorBackground,
             borderStartStartRadius: t.radii.$xl,
             borderEndStartRadius: t.radii.$xl,
