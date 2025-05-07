@@ -3,9 +3,25 @@ import { useState } from 'react';
 
 import { useManageApiKeysContext } from '../../contexts';
 import { Button, Flex, Flow, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { useFetch } from '../../hooks';
+import { useClipboard, useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash, Plus } from '../../icons';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
+
+const CopyButton = ({ text }: { text: string }) => {
+  const { onCopy, hasCopied } = useClipboard(text);
+
+  return (
+    <Button
+      variant='ghost'
+      onClick={onCopy}
+      size='sm'
+      sx={{ margin: 1 }}
+      aria-label={hasCopied ? 'Copied' : 'Copy key'}
+    >
+      <Icon icon={Clipboard} />
+    </Button>
+  );
+};
 
 export const ManageApiKeys = () => {
   const clerk = useClerk();
@@ -60,7 +76,7 @@ export const ManageApiKeys = () => {
           variant='solid'
           onClick={() => setShowCreateForm(true)}
         >
-          + Add new key
+          Add new key
         </Button>
       </Flex>
 
@@ -127,14 +143,7 @@ export const ManageApiKeys = () => {
                 >
                   <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
                 </Button>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  sx={{ margin: 1 }}
-                  aria-label='Copy key'
-                >
-                  <Icon icon={Clipboard} />
-                </Button>
+                <CopyButton text={revealedKeys[apiKey.id] ?? ''} />
               </Td>
               <Td>
                 <Button
