@@ -118,16 +118,17 @@ function Card(props: CardProps) {
   };
 
   const subscription = activeOrUpcomingSubscription(plan);
-  const multipleSubscriptionsForPlan = hasMultipleSubscriptionsForPlan(plan);
+  // const multipleSubscriptionsForPlan = hasMultipleSubscriptionsForPlan(plan);
   const hasFeatures = plan.features.length > 0;
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
+  const isEligibleForSwitchToAnnual = plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
 
   const shouldShowFooter =
     !subscription ||
     subscription?.status === 'upcoming' ||
-    (subscription?.canceledAt && !multipleSubscriptionsForPlan) ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault && !multipleSubscriptionsForPlan);
+    subscription?.canceledAt ||
+    (planPeriod !== subscription?.planPeriod && !plan.isDefault && isEligibleForSwitchToAnnual);
   const shouldShowFooterNotice =
     subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
 

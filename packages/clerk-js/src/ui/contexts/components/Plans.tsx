@@ -216,6 +216,8 @@ export const usePlansContext = () => {
         _selectedPlanPeriod = 'month';
       }
 
+      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
+
       return {
         localizationKey: subscription
           ? subscription.canceledAt
@@ -223,7 +225,9 @@ export const usePlansContext = () => {
             : selectedPlanPeriod !== subscription.planPeriod
               ? selectedPlanPeriod === 'month'
                 ? localizationKeys('commerce.switchToMonthly')
-                : localizationKeys('commerce.switchToAnnual')
+                : isEligibleForSwitchToAnnual
+                  ? localizationKeys('commerce.switchToAnnual')
+                  : localizationKeys('commerce.manageSubscription')
               : localizationKeys('commerce.manageSubscription')
           : // If there are no active or grace period subscriptions, show the get started button
             ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0

@@ -7,7 +7,6 @@ import {
 } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
-  Alert,
   Card,
   Header,
   ProfileSection,
@@ -85,13 +84,6 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                     paddingTop: t.space.$1,
                   })}
                 >
-                  <Protect condition={has => !has({ permission: 'org:sys_billing:manage' })}>
-                    <Alert
-                      variant='info'
-                      colorScheme='info'
-                      title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
-                    />
-                  </Protect>
                   <SubscriptionsList />
                   <ProfileSection.ArrowButton
                     id='subscriptionsList'
