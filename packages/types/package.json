@@ -24,16 +24,14 @@
   "license": "MIT",
   "author": "Clerk",
   "main": "dist/index.js",
-  "module": "dist/esm/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup --env.NODE_ENV production",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
-    "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16",
     "publish:local": "pnpm yalc push --replace  --sig"
