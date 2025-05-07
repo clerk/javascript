@@ -272,7 +272,7 @@ export function getOAuthProviderData({
  *
  * @hidden
  */
-export function sortedOAuthProviders(sortingArray: OAuthStrategy[]) {
+export function sortedOAuthProviders(sortingArray: OAuthStrategy[]): OAuthProviderData[] {
   return OAUTH_PROVIDERS.slice().sort((a, b) => {
     let aPos = sortingArray.indexOf(a.strategy);
     if (aPos == -1) {
