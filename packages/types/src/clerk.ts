@@ -756,23 +756,19 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
-   * Retrieves all API keys for the current user.
+   * Retrieves all API keys for the current user or organization.
    */
-  getApiKeys: () => Promise<ApiKeyResource[]>;
+  getApiKeys: (params?: { subject?: string }) => Promise<ApiKeyResource[]>;
 
   /**
    * Retrieves the secret for a given API key ID.
-   * @param id - The ID of the API key to retrieve the secret for.
-   * @returns The secret for the given API key ID.
    */
-  getApiKeySecret: (id: string) => Promise<string>;
+  getApiKeySecret: (apiKeyID: string) => Promise<string>;
 
   /**
    * Creates a new API key.
-   * @param name - The name of the API key.
-   * @returns The created API key.
    */
-  createApiKey: (name: string) => Promise<ApiKeyResource>;
+  createApiKey: (params: CreateApiKeyParams) => Promise<ApiKeyResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1658,10 +1654,18 @@ type PortalRoot = HTMLElement | null | undefined;
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type ManageApiKeysProps = {
-  type?: string;
-  subject: string;
-  claims?: string;
+  type?: 'api_key';
+  subject?: string;
   appearance?: ManageApiKeysTheme;
+};
+
+export type CreateApiKeyParams = {
+  type?: 'api_key';
+  name: string;
+  subject?: string;
+  claims?: string | Record<string, any>;
+  scopes?: string[];
+  creationReason?: string;
 };
 
 export type __internal_CheckoutProps = {
