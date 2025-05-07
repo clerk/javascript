@@ -7,13 +7,21 @@ import { useClipboard, useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash, Plus } from '../../icons';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 
-const CopyButton = ({ text }: { text: string }) => {
+const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
+  const clerk = useClerk();
+  const [text, setText] = useState('');
   const { onCopy, hasCopied } = useClipboard(text);
+
+  const fetchSecret = async () => {
+    const secret = await clerk.getApiKeySecret(apiKeyID);
+    setText(secret);
+    onCopy();
+  };
 
   return (
     <Button
       variant='ghost'
-      onClick={onCopy}
+      onClick={() => void fetchSecret()}
       size='sm'
       sx={{ margin: 1 }}
       aria-label={hasCopied ? 'Copied' : 'Copy key'}
@@ -143,7 +151,7 @@ export const ManageApiKeys = () => {
                 >
                   <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
                 </Button>
-                <CopyButton text={revealedKeys[apiKey.id] ?? ''} />
+                <CopyButton apiKeyID={apiKey.id} />
               </Td>
               <Td>
                 <Button
