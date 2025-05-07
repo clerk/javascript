@@ -2,6 +2,7 @@ import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   CreateOrganizationProps,
   GoogleOneTapProps,
+  ManageApiKeysProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -599,4 +600,32 @@ export const PricingTable = withClerk(
     );
   },
   { component: 'PricingTable', renderWhileLoading: true },
+);
+
+export const ManageApiKeys = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<ManageApiKeysProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountManageApiKeys}
+            unmount={clerk.unmountManageApiKeys}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'ManageApiKeys', renderWhileLoading: true },
 );
