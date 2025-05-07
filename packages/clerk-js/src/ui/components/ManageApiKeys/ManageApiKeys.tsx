@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { useManageApiKeysContext } from '../../contexts';
 import { Button, Flex, Flow, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash, Plus } from '../../icons';
@@ -8,9 +9,10 @@ import { CreateApiKeyForm } from './CreateApiKeyForm';
 
 export const ManageApiKeys = () => {
   const clerk = useClerk();
-  const { data: apiKeys, revalidate } = useFetch(clerk.getApiKeys, {});
+  const ctx = useManageApiKeysContext();
+  const { data: apiKeys, revalidate } = useFetch(() => clerk.getApiKeys({ subject: ctx.subject }), {});
   const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [creating, setCreating] = useState(false);
 
   const toggleSecret = async (id: string) => {
@@ -30,8 +32,8 @@ export const ManageApiKeys = () => {
   const handleCreate = async (name: string) => {
     setCreating(true);
     try {
-      await clerk.createApiKey(name);
-      setShowAddForm(false);
+      await clerk.createApiKey({ name });
+      setShowCreateForm(false);
       revalidate();
     } finally {
       setCreating(false);
@@ -56,16 +58,16 @@ export const ManageApiKeys = () => {
         />
         <Button
           variant='solid'
-          onClick={() => setShowAddForm(true)}
+          onClick={() => setShowCreateForm(true)}
         >
           + Add new key
         </Button>
       </Flex>
 
-      {showAddForm && (
+      {showCreateForm && (
         <CreateApiKeyForm
           onCreate={name => void handleCreate(name)}
-          onCancel={() => setShowAddForm(false)}
+          onCancel={() => setShowCreateForm(false)}
           loading={creating}
         />
       )}
