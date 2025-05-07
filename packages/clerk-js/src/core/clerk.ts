@@ -31,6 +31,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   CommerceBillingNamespace,
+  CreateApiKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -1067,12 +1068,12 @@ export class Clerk implements ClerkInterface {
     return ApiKey.getAll();
   };
 
-  public getApiKeySecret = async (id: string): Promise<string> => {
-    return ApiKey.getSecret(id);
+  public getApiKeySecret = async (apiKeyID: string): Promise<string> => {
+    return ApiKey.getSecret(apiKeyID);
   };
 
-  public createApiKey = async (name: string): Promise<ApiKeyResource> => {
-    return ApiKey.create(name);
+  public createApiKey = async (params: CreateApiKeyParams): Promise<ApiKeyResource> => {
+    return ApiKey.create(params);
   };
 
   /**

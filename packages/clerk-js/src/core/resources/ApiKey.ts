@@ -1,4 +1,4 @@
-import type { ApiKeyJSON, ApiKeyResource } from '@clerk/types';
+import type { ApiKeyJSON, ApiKeyResource, CreateApiKeyParams } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -48,7 +48,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
     return this;
   }
 
-  static async getAll(): Promise<ApiKeyResource[]> {
+  static async getAll(params?: { subject?: string }): Promise<ApiKeyResource[]> {
     return this.clerk
       .getFapiClient()
       .request<{ api_keys: ApiKeyJSON[] }>({
@@ -56,7 +56,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
         path: '/api_keys',
         pathPrefix: '',
         search: {
-          subject: this.clerk.user?.id ?? '',
+          subject: params?.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
         },
         headers: {
           Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
@@ -83,39 +83,31 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
         },
       })
       .then(res => {
-        return (res.payload as any)?.secret ?? '';
+        const { secret } = res.payload as unknown as { secret: string };
+        return secret;
       })
       .catch(() => '');
   }
 
-  static async create(name: string): Promise<ApiKeyResource> {
-    return this.clerk
-      .getFapiClient()
-      .request<ApiKeyJSON>({
-        method: 'POST',
+  static async create(params: CreateApiKeyParams): Promise<ApiKeyResource> {
+    const json = (
+      await BaseResource._fetch<ApiKeyJSON>({
         path: '/api_keys',
+        method: 'POST',
         pathPrefix: '',
-        search: {
-          subject: this.clerk.user?.id ?? '',
-        },
         headers: {
           Authorization: `Bearer ${await this.clerk.session?.getToken()}`,
           'Content-Type': 'application/json',
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-          type: 'api_key',
-          name,
-          subject: this.clerk.user?.id ?? '',
-          claims: null,
-          scopes: [],
-          creation_reason: null,
-          seconds_until_expiration: null,
+          ...params,
+          type: params.type ?? 'api_key',
+          subject: params.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
         }),
       })
-      .then(res => {
-        const apiKeysJSON = res.payload as unknown as ApiKeyJSON;
-        return new ApiKey(apiKeysJSON);
-      });
+    )?.response as ApiKeyJSON;
+
+    return new ApiKey(json);
   }
 }
