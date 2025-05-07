@@ -39,6 +39,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GetApiKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -1064,8 +1065,8 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public getApiKeys = async (): Promise<ApiKeyResource[]> => {
-    return ApiKey.getAll();
+  public getApiKeys = async (params?: GetApiKeysParams): Promise<ApiKeyResource[]> => {
+    return ApiKey.getAll(params);
   };
 
   public getApiKeySecret = async (apiKeyID: string): Promise<string> => {

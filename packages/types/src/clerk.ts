@@ -1646,6 +1646,10 @@ export type ManageApiKeysProps = {
   appearance?: ManageApiKeysTheme;
 };
 
+export type GetApiKeysParams = {
+  subject?: string;
+};
+
 export type CreateApiKeyParams = {
   type?: 'api_key';
   name: string;

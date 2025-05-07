@@ -22,6 +22,7 @@ import type {
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  GetApiKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -1310,8 +1311,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  getApiKeys = async (): Promise<ApiKeyResource[] | void> => {
-    const callback = () => this.clerkjs?.getApiKeys();
+  getApiKeys = async (params?: GetApiKeysParams): Promise<ApiKeyResource[] | void> => {
+    const callback = () => this.clerkjs?.getApiKeys(params);
     if (this.clerkjs && this.loaded) {
       return callback() as Promise<ApiKeyResource[]>;
     } else {
