@@ -122,31 +122,27 @@ function Card(props: CardProps) {
   const isPlanActive = subscription?.status === 'active';
   const showStatusRow = !!subscription;
 
-  // Explicit footer and notice logic based on all plan/subscription states
   let shouldShowFooter = false;
   let shouldShowFooterNotice = false;
 
   if (!subscription) {
-    // No subscription for this plan
-    shouldShowFooter = true; // "Subscribe" or "Switch to this plan"
+    shouldShowFooter = true;
     shouldShowFooterNotice = false;
   } else if (subscription.status === 'upcoming') {
     shouldShowFooter = true;
-    shouldShowFooterNotice = true; // "Starts on [date]"
+    shouldShowFooterNotice = true;
   } else if (subscription.status === 'active') {
     if (subscription.canceledAt) {
-      shouldShowFooter = true; // "Resubscribe"
+      shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
-      // Switching between annual/monthly
-      shouldShowFooter = true; // "Switch to monthly"/"Switch to annual"
+      shouldShowFooter = true;
       shouldShowFooterNotice = false;
     } else {
       shouldShowFooter = false;
       shouldShowFooterNotice = false;
     }
   } else {
-    // Fallback for other statuses
     shouldShowFooter = false;
     shouldShowFooterNotice = false;
   }
