@@ -1,3 +1,5 @@
+import type { Clerk } from '@clerk/types';
+
 import { $clerk } from '../stores/internal';
 import type { InternalUIComponentId } from '../types';
 
@@ -17,7 +19,7 @@ const mountAllClerkAstroJSComponents = () => {
     'google-one-tap': 'openGoogleOneTap',
     waitlist: 'mountWaitlist',
     'pricing-table': 'mountPricingTable',
-  } as const satisfies Record<InternalUIComponentId, string>;
+  } as const satisfies Record<InternalUIComponentId, keyof Clerk>;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {
     const elementsOfCategory = document.querySelectorAll(`[data-clerk-id^="clerk-${category}"]`);
