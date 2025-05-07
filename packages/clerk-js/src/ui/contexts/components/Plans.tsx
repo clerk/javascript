@@ -208,6 +208,7 @@ export const usePlansContext = () => {
       variant: 'bordered' | 'solid';
       colorScheme: 'secondary' | 'primary';
       isDisabled: boolean;
+      disabled: boolean;
     } => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
@@ -235,9 +236,10 @@ export const usePlansContext = () => {
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
+        disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscription],
+    [activeOrUpcomingSubscription, canManageBilling, ctx.subscriptions],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {

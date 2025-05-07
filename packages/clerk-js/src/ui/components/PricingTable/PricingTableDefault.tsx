@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -98,6 +98,7 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
+  const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
@@ -108,6 +109,7 @@ function Card(props: CardProps) {
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
+
   const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
@@ -252,7 +254,7 @@ function Card(props: CardProps) {
                     }}
                   />
                 </Tooltip.Trigger>
-                {!canManageBilling && (
+                {isSignedIn && !canManageBilling && (
                   <Tooltip.Content
                     text={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
                   />
