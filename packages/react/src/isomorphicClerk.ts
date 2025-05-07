@@ -37,6 +37,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
+  RevokeApiKeyParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -1335,6 +1336,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<ApiKeyResource>;
     } else {
       this.premountMethodCalls.set('createApiKey', callback);
+    }
+  };
+
+  revokeApiKey = async (params: RevokeApiKeyParams): Promise<ApiKeyResource | void> => {
+    const callback = () => this.clerkjs?.revokeApiKey(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<ApiKeyResource>;
+    } else {
+      this.premountMethodCalls.set('revokeApiKey', callback);
     }
   };
 
