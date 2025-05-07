@@ -102,9 +102,6 @@ export const PaymentSources = () => {
       if (a.isDefault && !b.isDefault) {
         return -1;
       }
-      if (!a.isDefault && b.isDefault) {
-        return 1;
-      }
       return 1;
     });
   }, [paymentSources]);
