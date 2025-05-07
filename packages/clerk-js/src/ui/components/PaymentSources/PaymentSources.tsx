@@ -97,14 +97,10 @@ export const PaymentSources = () => {
   );
   const { data: paymentSources } = data || { data: [] };
 
-  const sortedPaymentSources = useMemo(() => {
-    return paymentSources.sort((a, b) => {
-      if (a.isDefault && !b.isDefault) {
-        return -1;
-      }
-      return 1;
-    });
-  }, [paymentSources]);
+  const sortedPaymentSources = useMemo(
+    () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
+    [paymentSources],
+  );
 
   return (
     <ProfileSection.Root
