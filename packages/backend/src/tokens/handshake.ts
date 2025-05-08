@@ -1,4 +1,3 @@
-import type { ClientAPI } from '../api/endpoints/ClientApi';
 import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
@@ -88,18 +87,15 @@ export class HandshakeService {
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
-  private readonly clientApi?: ClientAPI;
 
   constructor(
     authenticateContext: AuthenticateContext,
     options: { organizationSyncOptions?: OrganizationSyncOptions },
     organizationMatcher: OrganizationMatcher,
-    clientApi?: ClientAPI,
   ) {
     this.authenticateContext = authenticateContext;
     this.options = options;
     this.organizationMatcher = organizationMatcher;
-    this.clientApi = clientApi;
     this.redirectLoopCounter = 0;
   }
 
@@ -180,7 +176,7 @@ export class HandshakeService {
 
     if (this.authenticateContext.handshakeNonce) {
       try {
-        const handshakePayload = await this.clientApi?.getHandshakePayload({
+        const handshakePayload = await this.authenticateContext.apiClient?.clients.getHandshakePayload({
           nonce: this.authenticateContext.handshakeNonce,
         });
         if (handshakePayload) {
