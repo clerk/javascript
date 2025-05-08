@@ -46,8 +46,8 @@ export const isIS: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const isIS: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -162,9 +163,6 @@ export const isIS: LocalizationResource = {
     badge__manualInvitation: 'Engin sjálfvirk skráning',
     badge__unverified: 'Óstaðfest',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -183,8 +181,8 @@ export const isIS: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -193,6 +191,9 @@ export const isIS: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -258,6 +259,12 @@ export const isIS: LocalizationResource = {
       general: 'Almennt',
       members: 'Meðlimir',
       title: 'Samtök',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -778,8 +785,8 @@ export const isIS: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -788,6 +795,9 @@ export const isIS: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -936,6 +946,9 @@ export const isIS: LocalizationResource = {
       title: 'Bæta við símanúmeri',
       verifySubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á {{identifier}}',
       verifyTitle: 'Staðfesta símanúmer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Mælt stærð 1:1, allt að 10MB.',

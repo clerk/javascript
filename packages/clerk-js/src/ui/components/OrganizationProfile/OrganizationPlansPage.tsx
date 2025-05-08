@@ -22,7 +22,7 @@ const OrganizationPlansPageInternal = () => {
       >
         <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.billingPage.switchPlansSection.title')}
+            localizationKey={localizationKeys('organizationProfile.plansPage.title')}
             textVariant='h2'
           />
         </Header.BackLink>
@@ -36,7 +36,7 @@ const OrganizationPlansPageInternal = () => {
           <Alert
             variant='info'
             colorScheme='info'
-            title={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+            title={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
           />
         </Protect>
         <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>

@@ -35,8 +35,8 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
-        title__statementId: 'Statement ID',
         title__paymentMethod: 'Payment method',
+        title__statementId: 'Statement ID',
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
@@ -55,8 +55,8 @@ export const enUS: LocalizationResource = {
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
-    switchToMonthly: 'Switch to monthly',
     switchToAnnual: 'Switch to annual',
+    switchToMonthly: 'Switch to monthly',
     viewFeatures: 'View features',
     year: 'Year',
   },
@@ -152,9 +152,6 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
-      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
@@ -174,19 +171,19 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscriptions',
       },
       subscriptionsListSection: {
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
       },
-      switchPlansSection: {
-        title: 'Switch plans',
-      },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
       },
       title: 'Billing',
     },
@@ -252,6 +249,12 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      },
+      title: 'Plans',
     },
     profilePage: {
       dangerSection: {
@@ -771,8 +774,8 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',
       },
       subscriptionsListSection: {
@@ -930,6 +933,9 @@ export const enUS: LocalizationResource = {
       title: 'Add phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: 'Plans',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

@@ -46,8 +46,8 @@ export const frFR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const frFR: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -163,9 +164,6 @@ export const frFR: LocalizationResource = {
     badge__manualInvitation: "Pas d'inscription automatique",
     badge__unverified: 'Non vérifié',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -184,8 +182,8 @@ export const frFR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -194,6 +192,9 @@ export const frFR: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -259,6 +260,12 @@ export const frFR: LocalizationResource = {
       general: 'Général',
       members: 'Membres',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -780,8 +787,8 @@ export const frFR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -790,6 +797,9 @@ export const frFR: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -937,6 +947,9 @@ export const frFR: LocalizationResource = {
       title: 'Ajouter un numéro de téléphone',
       verifySubtitle: 'Saisissez le code de vérification envoyé à {{identifier}}',
       verifyTitle: 'Vérification du numéro de téléphone',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',
