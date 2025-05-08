@@ -1,7 +1,14 @@
+import { getAlternativePhoneCodeProviderByStrategy } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { ClerkAPIError, SignInCreateParams, SignInResource } from '@clerk/types';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type {
+  AlternativePhoneCodeProviderData,
+  AlternativePhoneCodeStrategy,
+  ClerkAPIError,
+  SignInCreateParams,
+  SignInResource,
+} from '@clerk/types';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -32,6 +39,7 @@ import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
+import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { getSignUpAttributeFromIdentifier } from './utils';
 
@@ -102,6 +110,7 @@ function SignInStartInternal(): JSX.Element {
   const standardFormAttributes = userSettings.enabledFirstFactorIdentifiers;
   const web3FirstFactors = userSettings.web3FirstFactors;
   const authenticatableSocialStrategies = userSettings.authenticatableSocialStrategies;
+  const alternativePhoneCodeFirstFactors = userSettings.alternativePhoneCodeFirstFactors;
   const passwordBasedInstance = userSettings.instanceIsPasswordBased;
   const { currentIdentifier, nextIdentifier } = getIdentifierControlDisplayValues(
     identifierAttributes,
@@ -112,6 +121,20 @@ function SignInStartInternal(): JSX.Element {
     label: localizationKeys('formFieldLabel__password'),
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
+
+  const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] =
+    React.useState<AlternativePhoneCodeProviderData | null>(null);
+
+  const showAlternativePhoneCodeProviders = userSettings.alternativePhoneCodeFirstFactors.length > 0;
+
+  const onAlternativePhoneCodeUseAnotherMethod = () => {
+    setAlternativePhoneCodeProvider(null);
+  };
+  const onAlternativePhoneCodeProviderClick = (phoneCodeStrategy: AlternativePhoneCodeStrategy) => {
+    const provider: AlternativePhoneCodeProviderData | null =
+      getAlternativePhoneCodeProviderByStrategy(phoneCodeStrategy) || null;
+    setAlternativePhoneCodeProvider(provider);
+  };
 
   const ctxInitialValues = ctx.initialValues || {};
   const initialValues: Record<SignInStartIdentifier, string | undefined> = useMemo(
@@ -124,7 +147,8 @@ function SignInStartInternal(): JSX.Element {
     [ctx.initialValues],
   );
 
-  const hasSocialOrWeb3Buttons = !!authenticatableSocialStrategies.length || !!web3FirstFactors.length;
+  const hasSocialOrWeb3Buttons =
+    !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeFirstFactors.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
@@ -437,99 +461,111 @@ function SignInStartInternal(): JSX.Element {
   const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title
-              localizationKey={
-                isCombinedFlow ? localizationKeys('signIn.start.titleCombined') : localizationKeys('signIn.start.title')
-              }
-            />
-            <Header.Subtitle
-              localizationKey={
-                isCombinedFlow
-                  ? localizationKeys('signIn.start.subtitleCombined')
-                  : localizationKeys('signIn.start.subtitle')
-              }
-              sx={{
-                '&:empty': {
-                  display: 'none',
-                },
-              }}
-            />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <SocialButtonsReversibleContainerWithDivider>
-              {hasSocialOrWeb3Buttons && (
-                <SignInSocialButtons
-                  enableWeb3Providers
-                  enableOAuthProviders
-                  enableAlternativePhoneCodeProviders
-                />
-              )}
-              {standardFormAttributes.length ? (
-                <Form.Root
-                  onSubmit={handleFirstPartySubmit}
-                  gap={8}
-                >
-                  <Col gap={6}>
-                    <Form.ControlRow elementId={identifierField.id}>
-                      <DynamicField
-                        actionLabel={nextIdentifier?.action}
-                        onActionClicked={switchToNextIdentifier}
-                        {...identifierFieldProps}
-                        autoFocus={shouldAutofocus}
-                        autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
-                      />
-                    </Form.ControlRow>
-                    <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
-                  </Col>
-                  <Col center>
-                    <CaptchaElement />
-                    <Form.SubmitButton hasArrow />
-                  </Col>
-                </Form.Root>
-              ) : null}
-            </SocialButtonsReversibleContainerWithDivider>
-            {!standardFormAttributes.length && <CaptchaElement />}
-            {userSettings.attributes.passkey?.enabled &&
-              userSettings.passkeySettings.show_sign_in_button &&
-              isWebSupported && (
-                <Card.Action elementId={'usePasskey'}>
-                  <Card.ActionLink
-                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+      {!alternativePhoneCodeProvider ? (
+        <Card.Root>
+          <Card.Content>
+            <Header.Root showLogo>
+              <Header.Title
+                localizationKey={
+                  isCombinedFlow
+                    ? localizationKeys('signIn.start.titleCombined')
+                    : localizationKeys('signIn.start.title')
+                }
+              />
+              <Header.Subtitle
+                localizationKey={
+                  isCombinedFlow
+                    ? localizationKeys('signIn.start.subtitleCombined')
+                    : localizationKeys('signIn.start.subtitle')
+                }
+                sx={{
+                  '&:empty': {
+                    display: 'none',
+                  },
+                }}
+              />
+            </Header.Root>
+            <Card.Alert>{card.error}</Card.Alert>
+            {/*TODO: extract main in its own component */}
+            <Col
+              elementDescriptor={descriptors.main}
+              gap={6}
+            >
+              <SocialButtonsReversibleContainerWithDivider>
+                {hasSocialOrWeb3Buttons && (
+                  <SignInSocialButtons
+                    enableWeb3Providers
+                    enableOAuthProviders
+                    enableAlternativePhoneCodeProviders={showAlternativePhoneCodeProviders}
+                    onAlternativePhoneCodeProviderClick={onAlternativePhoneCodeProviderClick}
                   />
-                </Card.Action>
-              )}
-          </Col>
-        </Card.Content>
-        <Card.Footer>
-          {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
-            <Card.Action elementId='signIn'>
-              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-              <Card.ActionLink
-                localizationKey={localizationKeys('signIn.start.actionLink')}
-                to={clerk.buildUrlWithAuth(signUpUrl)}
-              />
-            </Card.Action>
-          )}
-          {userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST && (
-            <Card.Action elementId='signIn'>
-              <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText__join_waitlist')} />
-              <Card.ActionLink
-                localizationKey={localizationKeys('signIn.start.actionLink__join_waitlist')}
-                to={clerk.buildUrlWithAuth(waitlistUrl)}
-              />
-            </Card.Action>
-          )}
-        </Card.Footer>
-      </Card.Root>
+                )}
+                {standardFormAttributes.length ? (
+                  <Form.Root
+                    onSubmit={handleFirstPartySubmit}
+                    gap={8}
+                  >
+                    <Col gap={6}>
+                      <Form.ControlRow elementId={identifierField.id}>
+                        <DynamicField
+                          actionLabel={nextIdentifier?.action}
+                          onActionClicked={switchToNextIdentifier}
+                          {...identifierFieldProps}
+                          autoFocus={shouldAutofocus}
+                          autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                        />
+                      </Form.ControlRow>
+                      <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                    </Col>
+                    <Col center>
+                      <CaptchaElement />
+                      <Form.SubmitButton hasArrow />
+                    </Col>
+                  </Form.Root>
+                ) : null}
+              </SocialButtonsReversibleContainerWithDivider>
+              {!standardFormAttributes.length && <CaptchaElement />}
+              {userSettings.attributes.passkey?.enabled &&
+                userSettings.passkeySettings.show_sign_in_button &&
+                isWebSupported && (
+                  <Card.Action elementId={'usePasskey'}>
+                    <Card.ActionLink
+                      localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                    />
+                  </Card.Action>
+                )}
+            </Col>
+          </Card.Content>
+          <Card.Footer>
+            {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
+              <Card.Action elementId='signIn'>
+                <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+                <Card.ActionLink
+                  localizationKey={localizationKeys('signIn.start.actionLink')}
+                  to={clerk.buildUrlWithAuth(signUpUrl)}
+                />
+              </Card.Action>
+            )}
+            {userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST && (
+              <Card.Action elementId='signIn'>
+                <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText__join_waitlist')} />
+                <Card.ActionLink
+                  localizationKey={localizationKeys('signIn.start.actionLink__join_waitlist')}
+                  to={clerk.buildUrlWithAuth(waitlistUrl)}
+                />
+              </Card.Action>
+            )}
+          </Card.Footer>
+        </Card.Root>
+      ) : (
+        <SignInAlternativePhoneCodePhoneNumberCard
+          handleSubmit={handleFirstPartySubmit}
+          phoneNumberFormState={phoneIdentifierField}
+          onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}
+          phoneCodeProvider={alternativePhoneCodeProvider}
+        />
+      )}
     </Flow.Part>
   );
 }

@@ -243,6 +243,12 @@ type _LocalizationResource = {
       actionLink__use_passkey: LocalizationValue;
       actionText__join_waitlist: LocalizationValue;
       actionLink__join_waitlist: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     password: {
       title: LocalizationValue;

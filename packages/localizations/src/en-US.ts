@@ -549,6 +549,12 @@ export const enUS: LocalizationResource = {
       subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
+      alternativePhoneCodeProvider: {
+        actionLink: 'Use another method',
+        label: '{{provider}} phone number',
+        subtitle: 'Enter your phone number to get a verification code on {{provider}}.',
+        title: 'Sign in to {{applicationName}} with {{provider}}',
+      },
     },
     totpMfa: {
       formTitle: 'Verification code',
