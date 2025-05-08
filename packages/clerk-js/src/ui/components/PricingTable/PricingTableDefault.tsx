@@ -193,7 +193,7 @@ function Card(props: CardProps) {
           gap: 0,
         }}
       >
-        {!collapseFeatures ? (
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
