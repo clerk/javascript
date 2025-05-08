@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'กลับ',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

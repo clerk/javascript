@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: '돌아가기',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

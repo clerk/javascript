@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Späť',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

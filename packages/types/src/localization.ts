@@ -1039,6 +1039,13 @@ type _LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  apiKey: {
+    apiKeyPage: {
+      title: LocalizationValue;
+      verifyTitle: LocalizationValue;
+      formHint: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &

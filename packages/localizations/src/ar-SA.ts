@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'الرجوع',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

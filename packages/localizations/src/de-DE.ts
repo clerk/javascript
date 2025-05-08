@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Zurück',
   badge__activePlan: 'Aktiv',
   badge__canceledEndsAt: "Storniert • Endet am {{ date | shortDate('de-DE') }}",

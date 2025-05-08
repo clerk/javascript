@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Înapoi',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

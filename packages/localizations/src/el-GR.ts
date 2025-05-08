@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Πίσω',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

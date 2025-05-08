@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'חזור',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
