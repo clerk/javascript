@@ -312,7 +312,7 @@ export type ElementsConfig = {
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
-  organizationSwitcherTrigger: WithOptions<never, 'open'>;
+  organizationSwitcherTrigger: WithOptions<'personal' | 'organization', 'open'>;
   organizationSwitcherTriggerIcon: WithOptions<never, 'open'>;
   organizationSwitcherPopoverRootBox: WithOptions;
   organizationSwitcherPopoverCard: WithOptions;
@@ -323,7 +323,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
-  organizationSwitcherPreviewButton: WithOptions;
+  organizationSwitcherPreviewButton: WithOptions<'personal' | 'organization'>;
   organizationSwitcherInvitationAcceptButton: WithOptions;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
