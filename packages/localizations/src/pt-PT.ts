@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Voltar',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

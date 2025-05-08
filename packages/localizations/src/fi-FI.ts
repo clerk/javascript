@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Takaisin',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

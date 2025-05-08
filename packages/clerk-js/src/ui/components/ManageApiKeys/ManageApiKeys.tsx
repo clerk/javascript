@@ -2,9 +2,11 @@ import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useManageApiKeysContext } from '../../contexts';
-import { Button, Flex, Flow, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import { Box, Button, Flex, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import { InputWithIcon, Pagination } from '../../elements';
 import { useClipboard, useFetch } from '../../hooks';
-import { Clipboard, Eye, EyeSlash, Trash } from '../../icons';
+import { Clipboard, Eye, EyeSlash, MagnifyingGlass, Trash } from '../../icons';
+import { InternalThemeProvider } from '../../styledSystem';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 
 const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
@@ -37,7 +39,13 @@ export const ManageApiKeys = () => {
   const { data: apiKeys, revalidate } = useFetch(() => clerk.getApiKeys({ subject: ctx.subject }), {});
   const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = ctx.perPage ?? 5;
+  const itemCount = apiKeys?.length ?? 0;
+  const pageCount = Math.max(1, Math.ceil(itemCount / itemsPerPage));
+  const startingRow = itemCount > 0 ? (page - 1) * itemsPerPage + 1 : 0;
+  const endingRow = Math.min(page * itemsPerPage, itemCount);
+  const paginatedApiKeys = apiKeys?.slice(startingRow - 1, endingRow) ?? [];
 
   const toggleSecret = async (id: string) => {
     setRevealedKeys(prev => {
@@ -53,16 +61,14 @@ export const ManageApiKeys = () => {
     }
   };
 
-  const handleCreate = async (params: { name: string; scopes?: string[]; expiration?: string }) => {
-    console.log('params', params);
-    setCreating(true);
-    try {
-      // await clerk.createApiKey(params);
-      setShowCreateForm(false);
-      revalidate();
-    } finally {
-      setCreating(false);
-    }
+  const handleCreate = async (params: { name: string; description?: string; expiration?: number }) => {
+    await clerk.createApiKey({
+      name: params.name,
+      creationReason: params.description,
+      secondsUntilExpiration: params.expiration,
+    });
+    setShowCreateForm(false);
+    revalidate();
   };
 
   const revokeApiKey = async (apiKeyID: string) => {
@@ -71,21 +77,18 @@ export const ManageApiKeys = () => {
   };
 
   return (
-    <Flow.Root
-      flow='pricingTable'
-      sx={{
-        width: '100%',
-      }}
-    >
+    <InternalThemeProvider>
       <Flex
         justify='between'
         align='center'
-        sx={{ marginBottom: 4 }}
+        sx={{ marginBottom: 12 }}
       >
-        <Input
-          placeholder='Search keys...'
-          sx={{ width: 220, fontSize: 14 }}
-        />
+        <Box>
+          <InputWithIcon
+            placeholder='Search keys'
+            leftIcon={<Icon icon={MagnifyingGlass} />}
+          />
+        </Box>
         <Button
           variant='solid'
           onClick={() => setShowCreateForm(true)}
@@ -98,7 +101,6 @@ export const ManageApiKeys = () => {
         <CreateApiKeyForm
           onCreate={params => void handleCreate(params)}
           onCancel={() => setShowCreateForm(false)}
-          loading={creating}
         />
       )}
 
@@ -112,7 +114,7 @@ export const ManageApiKeys = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {apiKeys?.map(apiKey => (
+          {paginatedApiKeys.map(apiKey => (
             <Tr key={apiKey.id}>
               <Td>
                 <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
@@ -173,6 +175,18 @@ export const ManageApiKeys = () => {
           ))}
         </Tbody>
       </Table>
-    </Flow.Root>
+
+      <Pagination
+        count={pageCount}
+        page={page}
+        onChange={setPage}
+        siblingCount={1}
+        rowInfo={{
+          allRowsCount: itemCount,
+          startingRow,
+          endingRow,
+        }}
+      />
+    </InternalThemeProvider>
   );
 };

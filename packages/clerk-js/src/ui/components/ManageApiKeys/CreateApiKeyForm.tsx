@@ -1,120 +1,73 @@
 import React, { useState } from 'react';
 
-import { Box, Button, Flex, Input, Text } from '../../customizables';
-import { Select } from '../../elements';
+import { Button, Flex, localizationKeys } from '../../customizables';
+import { Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
+import { useFormControl } from '../../utils';
 
 interface CreateApiKeyFormProps {
-  onCreate: (params: { name: string; description?: string; expiration?: string }) => void;
+  onCreate: (params: { name: string; description?: string; expiration?: number }) => void;
   onCancel: () => void;
   loading?: boolean;
 }
 
-const DURATIONS = [
-  { label: 'Never', value: '' },
-  { label: '30 days', value: '30d' },
-  { label: '90 days', value: '90d' },
-  // { label: 'Custom', value: 'custom' },
-];
-
-export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, onCancel, loading }) => {
-  const [name, setName] = useState('');
+export const CreateApiKeyForm = withCardStateProvider(({ onCreate, onCancel }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [expiration, setExpiration] = useState('');
-  const [description, setDescription] = useState('');
+
+  const nameField = useFormControl('name', '', {
+    type: 'text',
+    label: 'Name',
+    placeholder: 'Enter your secret key name',
+    isRequired: true,
+  });
+
+  const descriptionField = useFormControl('description', '', {
+    type: 'text',
+    label: 'Description',
+    placeholder: 'Enter a description for your API key',
+    isRequired: false,
+  });
+
+  const canSubmit = nameField.value.length > 1;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onCreate({
-      name,
-      description: showAdvanced ? description : undefined,
-      expiration: showAdvanced ? expiration : undefined,
+      name: nameField.value,
+      description: descriptionField.value || undefined,
+      expiration: undefined,
     });
   };
 
   return (
-    <Box
-      as='form'
-      onSubmit={handleSubmit}
-      sx={{ mb: 4, p: 4, border: '1px solid', borderColor: 'gray.200', borderRadius: 'md', bg: 'white' }}
+    <FormContainer
+      headerTitle={localizationKeys('apiKey.apiKeyPage.title')}
+      headerSubtitle={localizationKeys('apiKey.apiKeyPage.formHint')}
     >
-      <Flex
-        direction='col'
-        gap={3}
-      >
-        <label htmlFor='name'>
-          <Text
-            as='span'
-            sx={{ mb: 1, display: 'block' }}
-          >
-            Name
-          </Text>
-          <Input
-            id='name'
-            placeholder='API key name'
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-          />
-        </label>
-        <Button
-          variant='ghost'
-          type='button'
-          onClick={() => setShowAdvanced(v => !v)}
-          sx={{ alignSelf: 'flex-start', fontSize: 14 }}
-        >
-          {showAdvanced ? 'Hide advanced settings' : 'Advanced settings'}
-        </Button>
+      <Form.Root onSubmit={handleSubmit}>
+        <Form.ControlRow elementId={nameField.id}>
+          <Form.PlainInput {...nameField.props} />
+        </Form.ControlRow>
         {showAdvanced && (
-          <>
-            <Box>
-              <Text
-                as='span'
-                sx={{ mb: 1, display: 'block' }}
-              >
-                Description
-              </Text>
-              <Input
-                id='description'
-                placeholder='API key description'
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                required
-              />
-            </Box>
-            <Box>
-              <Text
-                as='span'
-                sx={{ mb: 1, display: 'block' }}
-              >
-                Expiration
-              </Text>
-              <Select
-                options={DURATIONS}
-                value={expiration}
-                onChange={option => setExpiration(option.value || '')}
-                placeholder='Select expiration'
-              />
-            </Box>
-          </>
+          <Form.ControlRow elementId={descriptionField.id}>
+            <Form.PlainInput {...descriptionField.props} />
+          </Form.ControlRow>
         )}
-        <Flex gap={2}>
+        <Flex
+          justify='between'
+          align='center'
+        >
           <Button
-            type='submit'
-            variant='solid'
-            isLoading={loading}
-            disabled={!name}
+            variant='outline'
+            onClick={() => setShowAdvanced(prev => !prev)}
           >
-            Create
+            {showAdvanced ? 'Hide' : 'Show'} advanced settings
           </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
+          <FormButtons
+            isDisabled={!canSubmit}
+            onReset={onCancel}
+          />
         </Flex>
-      </Flex>
-    </Box>
+      </Form.Root>
+    </FormContainer>
   );
-};
+});
