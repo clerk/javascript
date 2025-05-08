@@ -163,9 +163,6 @@ export const isIS: LocalizationResource = {
     badge__manualInvitation: 'Engin sjálfvirk skráning',
     badge__unverified: 'Óstaðfest',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

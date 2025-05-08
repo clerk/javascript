@@ -163,9 +163,6 @@ export const svSE: LocalizationResource = {
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Overifierad',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

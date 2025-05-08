@@ -163,9 +163,6 @@ export const esES: LocalizationResource = {
     badge__manualInvitation: 'Sin inscripción automática',
     badge__unverified: 'No verificado',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

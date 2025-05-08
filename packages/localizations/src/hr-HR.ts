@@ -162,9 +162,6 @@ export const hrHR: LocalizationResource = {
     badge__manualInvitation: 'Bez automatskog učlanjenja',
     badge__unverified: 'Nepotvrđeno',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

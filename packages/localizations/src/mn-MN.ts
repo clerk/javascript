@@ -163,9 +163,6 @@ export const mnMN: LocalizationResource = {
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',
     badge__unverified: 'Баталгаажаагүй',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

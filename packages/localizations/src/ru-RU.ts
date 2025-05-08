@@ -166,9 +166,6 @@ export const ruRU: LocalizationResource = {
     badge__manualInvitation: 'Нет автоматической регистрации',
     badge__unverified: 'Неверифицированный',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

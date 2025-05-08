@@ -163,9 +163,6 @@ export const plPL: LocalizationResource = {
     badge__manualInvitation: 'Brak automatycznej rejestracji',
     badge__unverified: 'Niezweryfikowany',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

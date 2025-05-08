@@ -163,9 +163,6 @@ export const jaJP: LocalizationResource = {
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

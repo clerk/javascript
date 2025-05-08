@@ -162,9 +162,6 @@ export const bgBG: LocalizationResource = {
     badge__manualInvitation: 'Няма автоматично включване',
     badge__unverified: 'Неверифициран',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

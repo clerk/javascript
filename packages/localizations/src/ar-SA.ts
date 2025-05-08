@@ -163,9 +163,6 @@ export const arSA: LocalizationResource = {
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
     badge__unverified: 'لم يتم التحقق منها',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

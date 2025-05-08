@@ -162,9 +162,6 @@ export const trTR: LocalizationResource = {
     badge__manualInvitation: 'Davetler',
     badge__unverified: 'Doğrulanmamış',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

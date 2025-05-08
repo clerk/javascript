@@ -163,9 +163,6 @@ export const idID: LocalizationResource = {
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
     badge__unverified: 'Belum diverifikasi',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

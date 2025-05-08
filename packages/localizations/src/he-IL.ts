@@ -162,9 +162,6 @@ export const heIL: LocalizationResource = {
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
     badge__unverified: 'לא מאומת',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

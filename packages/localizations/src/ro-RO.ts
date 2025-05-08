@@ -164,9 +164,6 @@ export const roRO: LocalizationResource = {
     badge__manualInvitation: 'Fără înscriere automată',
     badge__unverified: 'Nedeclarat',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

@@ -161,9 +161,6 @@ export const zhCN: LocalizationResource = {
     badge__manualInvitation: '无自动注册',
     badge__unverified: '未验证',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

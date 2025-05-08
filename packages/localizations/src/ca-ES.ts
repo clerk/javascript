@@ -162,9 +162,6 @@ export const caES: LocalizationResource = {
     badge__manualInvitation: 'Sense inscripció automàtica',
     badge__unverified: 'No verificat',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

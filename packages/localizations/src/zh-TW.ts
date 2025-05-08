@@ -161,9 +161,6 @@ export const zhTW: LocalizationResource = {
     badge__manualInvitation: '不自動註冊',
     badge__unverified: '未經驗證',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,

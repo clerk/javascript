@@ -163,9 +163,6 @@ export const daDK: LocalizationResource = {
     badge__manualInvitation: 'Ingen automatisk tilmelding',
     badge__unverified: 'Ikke verificeret',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
