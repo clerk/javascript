@@ -758,7 +758,7 @@ export interface Clerk {
   /**
    * Retrieves all API keys for the current user or organization.
    */
-  getApiKeys: (params?: { subject?: string }) => Promise<ApiKeyResource[]>;
+  getApiKeys: (params?: GetApiKeysParams) => Promise<ApiKeyResource[]>;
 
   /**
    * Retrieves the secret for a given API key ID.
@@ -1648,6 +1648,8 @@ export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps
 export type ManageApiKeysProps = {
   type?: 'api_key';
   subject?: string;
+  perPage?: number;
+  showSecretByDefault?: boolean;
   appearance?: ManageApiKeysTheme;
 };
 
@@ -1659,8 +1661,7 @@ export type CreateApiKeyParams = {
   type?: 'api_key';
   name: string;
   subject?: string;
-  claims?: string | Record<string, any>;
-  scopes?: string[];
+  secondsUntilExpiration?: number;
   creationReason?: string;
 };
 

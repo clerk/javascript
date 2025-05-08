@@ -1066,22 +1066,6 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public getApiKeys = async (params?: GetApiKeysParams): Promise<ApiKeyResource[]> => {
-    return ApiKey.getAll(params);
-  };
-
-  public getApiKeySecret = async (apiKeyID: string): Promise<string> => {
-    return ApiKey.getSecret(apiKeyID);
-  };
-
-  public createApiKey = async (params: CreateApiKeyParams): Promise<ApiKeyResource> => {
-    return ApiKey.create(params);
-  };
-
-  public revokeApiKey = async (params: RevokeApiKeyParams): Promise<ApiKeyResource> => {
-    return ApiKey.revoke(params);
-  };
-
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -2071,6 +2055,14 @@ export class Clerk implements ClerkInterface {
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
   }
+
+  public getApiKeys = (params?: GetApiKeysParams): Promise<ApiKeyResource[]> => ApiKey.getAll(params);
+
+  public getApiKeySecret = (apiKeyID: string): Promise<string> => ApiKey.getSecret(apiKeyID);
+
+  public createApiKey = (params: CreateApiKeyParams): Promise<ApiKeyResource> => ApiKey.create(params);
+
+  public revokeApiKey = (params: RevokeApiKeyParams): Promise<ApiKeyResource> => ApiKey.revoke(params);
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
