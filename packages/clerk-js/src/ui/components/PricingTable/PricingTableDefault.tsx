@@ -256,7 +256,7 @@ function Card(props: CardProps) {
                 </Tooltip.Trigger>
                 {isSignedIn && !canManageBilling && (
                   <Tooltip.Content
-                    text={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
                   />
                 )}
               </Tooltip.Root>

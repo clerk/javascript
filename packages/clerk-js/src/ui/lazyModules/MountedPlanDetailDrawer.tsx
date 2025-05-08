@@ -28,7 +28,7 @@ export function MountedPlanDetailDrawer({
       key={user?.id}
       globalAppearance={appearance}
       appearanceKey={'planDetails' as any}
-      componentAppearance={{}}
+      componentAppearance={planDetailsDrawer.props.appearance || {}}
       flowName={'planDetails'}
       open={planDetailsDrawer.open}
       onOpenChange={onOpenChange}
@@ -40,6 +40,7 @@ export function MountedPlanDetailDrawer({
         {...planDetailsDrawer.props}
         subscriberType={planDetailsDrawer.props.subscriberType || 'user'}
         onSubscriptionCancel={planDetailsDrawer.props.onSubscriptionCancel || (() => {})}
+        appearance={planDetailsDrawer.props.appearance}
       />
     </LazyDrawerRenderer>
   );
