@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Kembali',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

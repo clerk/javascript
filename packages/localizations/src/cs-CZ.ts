@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Zpět',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

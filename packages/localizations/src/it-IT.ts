@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Indietro',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

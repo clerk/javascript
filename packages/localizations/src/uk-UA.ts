@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Назад',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tilbage',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

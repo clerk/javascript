@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Буцах',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

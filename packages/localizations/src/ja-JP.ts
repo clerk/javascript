@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: '戻る',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
