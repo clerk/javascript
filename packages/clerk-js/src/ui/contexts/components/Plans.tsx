@@ -174,6 +174,42 @@ export const usePlansContext = () => {
     [ctx.subscriptions],
   );
 
+  // returns all subscriptions for a plan that are active or upcoming
+  const activeAndUpcomingSubscriptions = useCallback(
+    (plan: CommercePlanResource) => {
+      return ctx.subscriptions
+        .filter(subscription => subscription.plan.id === plan.id)
+        .filter(subscription => subscription.status === 'active' || subscription.status === 'upcoming');
+    },
+    [ctx.subscriptions],
+  );
+
+  // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
+  const activeOrUpcomingSubscriptionWithPlanPeriod = useCallback(
+    (plan: CommercePlanResource, planPeriod: CommerceSubscriptionPlanPeriod = 'month') => {
+      const plansSubscriptions = activeAndUpcomingSubscriptions(plan);
+      // Handle multiple subscriptions for the same plan
+      if (plansSubscriptions.length > 1) {
+        const subscriptionBaseOnPanPeriod = plansSubscriptions.find(subscription => {
+          return subscription.planPeriod === planPeriod;
+        });
+
+        if (subscriptionBaseOnPanPeriod) {
+          return subscriptionBaseOnPanPeriod;
+        }
+
+        return plansSubscriptions[0];
+      }
+
+      if (plansSubscriptions.length === 1) {
+        return plansSubscriptions[0];
+      }
+
+      return undefined;
+    },
+    [activeAndUpcomingSubscriptions],
+  );
+
   const canManageSubscription = useCallback(
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
@@ -210,7 +246,8 @@ export const usePlansContext = () => {
       isDisabled: boolean;
       disabled: boolean;
     } => {
-      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+      const subscription =
+        sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
       if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
         _selectedPlanPeriod = 'month';
@@ -221,8 +258,8 @@ export const usePlansContext = () => {
       const getLocalizationKey = () => {
         // Handle subscription cases
         if (subscription) {
-          if (selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
-            if (selectedPlanPeriod === 'month') {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
+            if (_selectedPlanPeriod === 'month') {
               return localizationKeys('commerce.switchToMonthly');
             }
 
@@ -235,8 +272,8 @@ export const usePlansContext = () => {
             return localizationKeys('commerce.reSubscribe');
           }
 
-          if (selectedPlanPeriod !== subscription.planPeriod) {
-            if (selectedPlanPeriod === 'month') {
+          if (_selectedPlanPeriod !== subscription.planPeriod) {
+            if (_selectedPlanPeriod === 'month') {
               return localizationKeys('commerce.switchToMonthly');
             }
 
@@ -266,7 +303,7 @@ export const usePlansContext = () => {
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscription, canManageBilling, ctx.subscriptions],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, ctx.subscriptions],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
@@ -282,7 +319,7 @@ export const usePlansContext = () => {
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
     ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
-      const subscription = activeOrUpcomingSubscription(plan);
+      const subscription = activeOrUpcomingSubscriptionWithPlanPeriod(plan, planPeriod);
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
@@ -326,6 +363,8 @@ export const usePlansContext = () => {
     ...ctx,
     componentName,
     activeOrUpcomingSubscription,
+    activeAndUpcomingSubscriptions,
+    activeOrUpcomingSubscriptionBasedOnPlanPeriod: activeOrUpcomingSubscriptionWithPlanPeriod,
     isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,

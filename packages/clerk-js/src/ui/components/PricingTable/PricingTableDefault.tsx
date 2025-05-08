@@ -109,8 +109,8 @@ function Card(props: CardProps) {
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
-
-  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
+  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscriptionBasedOnPlanPeriod } =
+    usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -123,9 +123,12 @@ function Card(props: CardProps) {
     });
   };
 
-  const subscription = activeOrUpcomingSubscription(plan);
-  const hasFeatures = plan.features.length > 0;
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
   const isPlanActive = subscription?.status === 'active';
+  const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
   const isEligibleForSwitch = planPeriod !== subscription?.planPeriod && !plan.isDefault;
   const isEligibleForSwitchToAnnual = isEligibleForSwitch && plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
