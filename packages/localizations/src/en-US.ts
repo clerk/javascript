@@ -190,6 +190,12 @@ export const enUS: LocalizationResource = {
       },
       title: 'Billing',
     },
+    plansPage: {
+      title: 'Plans',
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      },
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -786,6 +792,9 @@ export const enUS: LocalizationResource = {
         title: 'Switch plans',
       },
       title: 'Billing',
+    },
+    plansPage: {
+      title: 'Plans',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',

@@ -20,7 +20,7 @@ const PlansPageInternal = () => {
       >
         <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.billingPage.switchPlansSection.title')}
+            localizationKey={localizationKeys('userProfile.plansPage.title')}
             textVariant='h2'
           />
         </Header.BackLink>
