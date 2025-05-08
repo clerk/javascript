@@ -28,7 +28,7 @@ export function MountedCheckoutDrawer({
       key={user?.id}
       globalAppearance={appearance}
       appearanceKey={'checkout' as any}
-      componentAppearance={{}}
+      componentAppearance={checkoutDrawer.props.appearance || {}}
       flowName={'checkout'}
       open={checkoutDrawer.open}
       onOpenChange={onOpenChange}
@@ -43,6 +43,7 @@ export function MountedCheckoutDrawer({
           subscriberType={checkoutDrawer.props.subscriberType}
           onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
           portalRoot={checkoutDrawer.props.portalRoot}
+          appearance={checkoutDrawer.props.appearance}
         />
       )}
     </LazyDrawerRenderer>

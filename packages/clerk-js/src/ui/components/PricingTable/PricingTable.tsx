@@ -50,7 +50,13 @@ const PricingTableRoot = (props: PricingTableProps) => {
       return clerk.redirectToSignIn();
     }
 
-    handleSelectPlan({ mode, plan, planPeriod, event });
+    handleSelectPlan({
+      mode,
+      plan,
+      planPeriod,
+      event,
+      appearance: props.checkoutProps?.appearance,
+    });
     return;
   };
 

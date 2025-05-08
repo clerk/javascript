@@ -1576,7 +1576,7 @@ type PricingTableDefaultProps = {
 type PricingTableBaseProps = {
   forOrganizations?: boolean;
   appearance?: PricingTableTheme;
-  __internal_CheckoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
 type PortalRoot = HTMLElement | null | undefined;
