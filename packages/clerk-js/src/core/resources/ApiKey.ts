@@ -107,9 +107,10 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
         },
         credentials: 'same-origin',
         body: JSON.stringify({
-          ...params,
           type: params.type ?? 'api_key',
           subject: params.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
+          creation_reason: params.creationReason,
+          seconds_until_expiration: params.secondsUntilExpiration,
         }),
       })
     )?.response as ApiKeyJSON;
