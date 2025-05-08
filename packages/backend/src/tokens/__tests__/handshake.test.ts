@@ -212,9 +212,10 @@ describe('HandshakeService', () => {
       const result = await handshakeService.resolveHandshake();
 
       expect(result).toEqual(
-        signedIn(
-          mockAuthenticateContext,
-          {
+        signedIn({
+          tokenType: 'session_token',
+          authenticateContext: mockAuthenticateContext,
+          sessionClaims: {
             sub: 'user_123',
             __raw: 'raw-token',
             iss: 'issuer',
@@ -231,9 +232,9 @@ describe('HandshakeService', () => {
             org_slug: undefined,
             org_role: undefined,
           },
-          expect.any(Headers),
-          'session-token',
-        ),
+          token: 'session-token',
+          headers: expect.any(Headers),
+        }),
       );
     });
 
@@ -246,7 +247,12 @@ describe('HandshakeService', () => {
       const result = await handshakeService.resolveHandshake();
 
       expect(result).toEqual(
-        signedOut(mockAuthenticateContext, AuthErrorReason.SessionTokenMissing, '', expect.any(Headers)),
+        signedOut({
+          tokenType: 'session_token',
+          authenticateContext: mockAuthenticateContext,
+          reason: AuthErrorReason.SessionTokenMissing,
+          message: '',
+        }),
       );
     });
 
@@ -317,9 +323,10 @@ describe('HandshakeService', () => {
       const result = await handshakeService.resolveHandshake();
 
       expect(result).toEqual(
-        signedIn(
-          mockAuthenticateContext,
-          {
+        signedIn({
+          tokenType: 'session_token',
+          authenticateContext: mockAuthenticateContext,
+          sessionClaims: {
             sub: 'user_123',
             __raw: 'raw-token',
             iss: 'issuer',
@@ -336,9 +343,9 @@ describe('HandshakeService', () => {
             org_slug: undefined,
             org_role: undefined,
           },
-          expect.any(Headers),
-          'session-token',
-        ),
+          token: 'session-token',
+          headers: expect.any(Headers),
+        }),
       );
     });
   });

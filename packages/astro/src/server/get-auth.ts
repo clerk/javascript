@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { APIContext } from 'astro';
@@ -6,7 +6,7 @@ import type { APIContext } from 'astro';
 import { getSafeEnv } from './get-safe-env';
 import { getAuthKeyFromRequest } from './utils';
 
-export type GetAuthReturn = AuthObject;
+export type GetAuthReturn = SignedInAuthObject | SignedOutAuthObject;
 
 export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: string }) => {
   return (req: Request, locals: APIContext['locals'], opts?: { secretKey?: string }): GetAuthReturn => {

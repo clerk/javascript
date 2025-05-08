@@ -1,5 +1,18 @@
 import type { AuthObject } from '@clerk/backend';
-import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
+import {
+  authenticatedMachineObject,
+  AuthStatus,
+  constants,
+  getMachineTokenType,
+  isMachineToken,
+  isTokenTypeAccepted,
+  signedInAuthObject,
+  signedOutAuthObject,
+  TokenType,
+  unauthenticatedMachineObject,
+  verifyMachineAuthToken,
+} from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
@@ -8,14 +21,16 @@ import { getAuthKeyFromRequest, getHeader } from '../headers-utils';
 import type { RequestLike } from '../types';
 import { assertTokenSignature, decryptClerkRequestData } from '../utils';
 
-/**
- * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
- * to auth data for a given request.
- */
-export function getAuthDataFromRequest(
+export type GetAuthDataFromRequestOptions = {
+  secretKey?: string;
+  logger?: LoggerNoCommit;
+  acceptsToken?: AuthenticateRequestOptions['acceptsToken'];
+};
+
+export const getAuthDataFromRequestSync = (
   req: RequestLike,
-  opts: { secretKey?: string; logger?: LoggerNoCommit } = {},
-): AuthObject {
+  opts: GetAuthDataFromRequestOptions = {},
+): SignedInAuthObject | SignedOutAuthObject => {
   const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
   const authToken = getAuthKeyFromRequest(req, 'AuthToken');
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
@@ -37,21 +52,60 @@ export function getAuthDataFromRequest(
     authReason,
   };
 
-  opts.logger?.debug('auth options', options);
-
-  let authObject;
-  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
-    authObject = signedOutAuthObject(options);
-  } else {
-    assertTokenSignature(authToken as string, options.secretKey, authSignature);
-
-    const jwt = decodeJwt(authToken as string);
-
-    opts.logger?.debug('jwt', jwt.raw);
-
-    // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+  // Only accept session tokens in the synchronous version.
+  // Machine tokens are not supported in this function. Any machine token input will result in a signed-out state.
+  if (!isTokenTypeAccepted(TokenType.SessionToken, opts.acceptsToken || TokenType.SessionToken)) {
+    return signedOutAuthObject(options);
   }
 
-  return authObject;
-}
+  if (!authStatus || authStatus !== AuthStatus.SignedIn) {
+    return signedOutAuthObject(options);
+  }
+
+  assertTokenSignature(authToken as string, options.secretKey, authSignature);
+  const jwt = decodeJwt(authToken as string);
+  opts.logger?.debug('jwt', jwt.raw);
+
+  // @ts-expect-error -- Restrict parameter type of options to only list what's needed
+  return signedInAuthObject(options, jwt.raw.text, jwt.payload);
+};
+
+/**
+ * Note: We intentionally avoid using interface/function overloads here since these functions
+ * are used internally. The complex type overloads are more valuable at the public API level
+ * (like in auth.protect(), auth()) where users interact directly with the types.
+ *
+ * Given a request object, builds an auth object from the request data. Used in server-side environments to get access
+ * to auth data for a given request.
+ */
+export const getAuthDataFromRequestAsync = async (
+  req: RequestLike,
+  opts: GetAuthDataFromRequestOptions = {},
+): Promise<AuthObject> => {
+  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
+  const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
+
+  if (bearerToken && isMachineToken(bearerToken)) {
+    const tokenType = getMachineTokenType(bearerToken);
+
+    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
+      return unauthenticatedMachineObject(tokenType);
+    }
+
+    const options = {
+      secretKey: opts?.secretKey || SECRET_KEY,
+      publishableKey: PUBLISHABLE_KEY,
+      apiUrl: API_URL,
+    };
+
+    // TODO: Cache the result of verifyMachineAuthToken
+    const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
+    if (errors) {
+      return unauthenticatedMachineObject(tokenType);
+    }
+
+    return authenticatedMachineObject(tokenType, bearerToken, data);
+  }
+
+  return getAuthDataFromRequestSync(req, opts);
+};

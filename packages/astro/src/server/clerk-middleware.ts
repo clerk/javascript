@@ -1,5 +1,12 @@
-import type { AuthObject, ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
+import type { ClerkClient } from '@clerk/backend';
+import type {
+  AuthenticateRequestOptions,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
@@ -27,7 +34,7 @@ const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
 };
 
-type ClerkMiddlewareAuthObject = AuthObject & {
+type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignIn: (opts?: { returnBackUrl?: URL | string | null }) => Response;
 };
 

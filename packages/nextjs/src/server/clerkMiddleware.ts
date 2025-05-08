@@ -1,11 +1,29 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+  SignedInAuthObject,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  isTokenTypeAccepted,
+  signedOutAuthObject,
+  TokenType,
+  unauthenticatedMachineObject,
+} from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import type { AuthFn } from '../app-router/server/auth';
+import type { GetAuthOptions } from '../server/createGetAuth';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { canUseKeyless } from '../utils/feature-flags';
@@ -18,11 +36,13 @@ import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } fr
 import {
   isNextjsNotFoundError,
   isNextjsRedirectError,
+  isNextjsUnauthorizedError,
   isRedirectToSignInError,
   isRedirectToSignUpError,
   nextjsRedirectError,
   redirectToSignInError,
   redirectToSignUpError,
+  unauthorized,
 } from './nextErrors';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -35,16 +55,17 @@ import {
   setRequestHeadersOnNextResponse,
 } from './utils';
 
-export type ClerkMiddlewareAuthObject = AuthObject & {
+export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignIn: RedirectFun<Response>;
   redirectToSignUp: RedirectFun<Response>;
 };
 
-export interface ClerkMiddlewareAuth {
-  (): Promise<ClerkMiddlewareAuthObject>;
+/**
+ * @deprecated Use `ClerkMiddlewareSessionAuthObject` instead.
+ */
+export type ClerkMiddlewareAuthObject = ClerkMiddlewareSessionAuthObject;
 
-  protect: AuthProtect;
-}
+export type ClerkMiddlewareAuth = AuthFn<Response>;
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
@@ -52,11 +73,13 @@ type ClerkMiddlewareHandler = (
   event: NextMiddlewareEvtParam,
 ) => NextMiddlewareReturn;
 
+type AuthenticateAnyRequestOptions = Omit<AuthenticateRequestOptions, 'acceptsToken'>;
+
 /**
  * The `clerkMiddleware()` function accepts an optional object. The following options are available.
  * @interface
  */
-export interface ClerkMiddlewareOptions extends AuthenticateRequestOptions {
+export interface ClerkMiddlewareOptions extends AuthenticateAnyRequestOptions {
   /**
    * If true, additional debug information will be logged to the console.
    */
@@ -182,11 +205,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
-        redirectToSignIn,
-        redirectToSignUp,
-      });
-      const authHandler = () => Promise.resolve(authObjWithMethods);
+      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -331,12 +350,16 @@ export const createAuthenticateRequestOptions = (
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),
+    // TODO: Leaving the acceptsToken as 'any' opens up the possibility of
+    // an economic attack. We should revisit this and only verify a token
+    // when auth() or auth.protect() is invoked.
+    acceptsToken: 'any',
   };
 };
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
-): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
+): ClerkMiddlewareSessionAuthObject['redirectToSignIn'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
     redirectToSignInError(url, opts.returnBackUrl);
@@ -345,7 +368,7 @@ const createMiddlewareRedirectToSignIn = (
 
 const createMiddlewareRedirectToSignUp = (
   clerkRequest: ClerkRequest,
-): ClerkMiddlewareAuthObject['redirectToSignUp'] => {
+): ClerkMiddlewareSessionAuthObject['redirectToSignUp'] => {
   return (opts = {}) => {
     const url = clerkRequest.clerkUrl.toString();
     redirectToSignUpError(url, opts.returnBackUrl);
@@ -365,8 +388,59 @@ const createMiddlewareProtect = (
         redirectUrl: url,
       });
 
-    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
+    return createProtect({
+      request: clerkRequest,
+      redirect,
+      notFound,
+      unauthorized,
+      authObject,
+      redirectToSignIn,
+    })(params, options);
   }) as unknown as Promise<AuthProtect>;
+};
+
+/**
+ * Modifies the auth object based on the token type.
+ * - For session tokens: adds redirect functions to the auth object
+ * - For machine tokens: validates token type and returns appropriate auth object
+ */
+const createMiddlewareAuthHandler = (
+  authObject: AuthObject,
+  redirectToSignIn: RedirectFun<Response>,
+  redirectToSignUp: RedirectFun<Response>,
+): ClerkMiddlewareAuth => {
+  const authObjWithMethods = Object.assign(
+    authObject,
+    authObject.tokenType === TokenType.SessionToken
+      ? {
+          redirectToSignIn,
+          redirectToSignUp,
+        }
+      : {},
+  );
+
+  const authHandler = async (options?: GetAuthOptions) => {
+    const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
+
+    if (acceptsToken === 'any') {
+      return authObjWithMethods;
+    }
+
+    if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
+      if (authObject.tokenType === TokenType.SessionToken) {
+        return {
+          ...signedOutAuthObject(),
+          redirectToSignIn,
+          redirectToSignUp,
+        };
+      }
+      return unauthenticatedMachineObject(authObject.tokenType);
+    }
+
+    return authObjWithMethods;
+  };
+
+  return authHandler as ClerkMiddlewareAuth;
 };
 
 // Handle errors thrown by protect() and redirectToSignIn() calls,
@@ -382,6 +456,27 @@ const handleControlFlowErrors = (
   nextRequest: NextRequest,
   requestState: RequestState,
 ): Response => {
+  if (isNextjsUnauthorizedError(e)) {
+    const response = NextResponse.next({ status: 401 });
+
+    // RequestState.toAuth() returns a session_token type by default.
+    // We need to cast it to the correct type to check for OAuth tokens.
+    const authObject = (requestState as RequestState<TokenType>).toAuth();
+    if (authObject && authObject.tokenType === TokenType.OAuthToken) {
+      // Following MCP spec, we return WWW-Authenticate header on 401 responses
+      // to enable OAuth 2.0 authorization server discovery (RFC9728).
+      // See https://modelcontextprotocol.io/specification/draft/basic/authorization#2-3-1-authorization-server-location
+      const publishableKey = parsePublishableKey(requestState.publishableKey);
+      return setHeader(
+        response,
+        'WWW-Authenticate',
+        `Bearer resource_metadata="https://${publishableKey?.frontendApi}/.well-known/oauth-protected-resource"`,
+      );
+    }
+
+    return response;
+  }
+
   if (isNextjsNotFoundError(e)) {
     // Rewrite to a bogus URL to force not found error
     return setHeader(

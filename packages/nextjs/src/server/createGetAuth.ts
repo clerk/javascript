@@ -1,14 +1,22 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants } from '@clerk/backend/internal';
+import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
+import {
+  getAuthDataFromRequestAsync as getAuthDataFromRequestAsyncOriginal,
+  getAuthDataFromRequestSync as getAuthDataFromRequestSyncOriginal,
+} from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
+
+export type GetAuthOptions = {
+  acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
+};
 
 /**
  * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
@@ -17,9 +25,11 @@ import { assertAuthStatus } from './utils';
 export const createAsyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
@@ -45,30 +55,41 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      return getAuthDataFromRequest(req, { ...opts, logger });
+      const getAuthDataFromRequestAsync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestAsyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      };
+
+      return getAuthDataFromRequestAsync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 
 /**
  * Previous known as `createGetAuth`. We needed to create a sync and async variant in order to allow for improvements
  * that required dynamic imports (using `require` would not work).
- * It powers the synchronous top-level api `getAuh()`.
+ * It powers the synchronous top-level api `getAuth()`.
  */
 export const createSyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
+  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
+  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }): AuthObject => {
+    return (req: RequestLike, opts?: { secretKey?: string }): SignedInAuthObject | SignedOutAuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
 
       assertAuthStatus(req, noAuthStatusMessage);
-      return getAuthDataFromRequest(req, { ...opts, logger });
+
+      const getAuthDataFromRequestSync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestSyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      };
+
+      return getAuthDataFromRequestSync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
     };
   });
 
