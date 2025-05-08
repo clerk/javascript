@@ -46,8 +46,8 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const deDE: LocalizationResource = {
     subscribe: undefined,
     switchPlan: 'Zu diesem Plan wechseln',
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -185,8 +186,8 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -195,6 +196,9 @@ export const deDE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -260,6 +264,12 @@ export const deDE: LocalizationResource = {
       general: 'Allgemein',
       members: 'Mitglieder',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -790,8 +800,8 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: 'Rechnungen',
         headerTitle__plans: 'Pläne',
+        headerTitle__statements: 'Rechnungen',
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -800,6 +810,9 @@ export const deDE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: 'Abrechnung & Zahlungen',
     },
@@ -948,6 +961,9 @@ export const deDE: LocalizationResource = {
       title: 'Telefonnummer hinzufügen',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch, welches kleiner als 10 MB ist',

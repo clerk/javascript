@@ -35,8 +35,8 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
-        title__statementId: 'Statement ID',
         title__paymentMethod: 'Payment method',
+        title__statementId: 'Statement ID',
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
@@ -55,8 +55,8 @@ export const enUS: LocalizationResource = {
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
     switchPlan: 'Switch to this plan',
-    switchToMonthly: 'Switch to monthly',
     switchToAnnual: 'Switch to annual',
+    switchToMonthly: 'Switch to monthly',
     viewFeatures: 'View features',
     year: 'Year',
   },
@@ -174,27 +174,21 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscriptions',
       },
       subscriptionsListSection: {
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
       },
-      switchPlansSection: {
-        title: 'Switch plans',
-      },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
       },
-      title: 'Billing',
-    },
-    plansPage: {
-      title: 'Plans',
-      alerts: {
-        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      switchPlansSection: {
+        title: 'Switch plans',
       },
+      title: 'Billing',
     },
     createDomainPage: {
       subtitle:
@@ -258,6 +252,12 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      },
+      title: 'Plans',
     },
     profilePage: {
       dangerSection: {
@@ -777,8 +777,8 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__statements: 'Statements',
         headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
         headerTitle__subscriptions: 'Subscription',
       },
       subscriptionsListSection: {
@@ -792,9 +792,6 @@ export const enUS: LocalizationResource = {
         title: 'Switch plans',
       },
       title: 'Billing',
-    },
-    plansPage: {
-      title: 'Plans',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
@@ -939,6 +936,9 @@ export const enUS: LocalizationResource = {
       title: 'Add phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: 'Plans',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',
