@@ -53,10 +53,11 @@ export const ManageApiKeys = () => {
     }
   };
 
-  const handleCreate = async (name: string) => {
+  const handleCreate = async (params: { name: string; scopes?: string[]; expiration?: string }) => {
+    console.log('params', params);
     setCreating(true);
     try {
-      await clerk.createApiKey({ name });
+      // await clerk.createApiKey(params);
       setShowCreateForm(false);
       revalidate();
     } finally {
@@ -95,7 +96,7 @@ export const ManageApiKeys = () => {
 
       {showCreateForm && (
         <CreateApiKeyForm
-          onCreate={name => void handleCreate(name)}
+          onCreate={params => void handleCreate(params)}
           onCancel={() => setShowCreateForm(false)}
           loading={creating}
         />
