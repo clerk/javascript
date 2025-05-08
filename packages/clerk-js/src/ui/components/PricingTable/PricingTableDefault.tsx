@@ -1,7 +1,8 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
+import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -17,7 +18,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch } from '../../elements';
+import { Switch, Tooltip } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
@@ -97,12 +98,17 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
+  const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
+
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
 
   const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
 
@@ -236,15 +242,24 @@ function Card(props: CardProps) {
                 })}
               />
             ) : (
-              <Button
-                elementDescriptor={descriptors.pricingTableCardFooterButton}
-                block
-                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
-                onClick={event => {
-                  onSelect(plan, event);
-                }}
-              />
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {isSignedIn && !canManageBilling && (
+                  <Tooltip.Content
+                    text={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                  />
+                )}
+              </Tooltip.Root>
             )}
           </Box>
         ) : (
