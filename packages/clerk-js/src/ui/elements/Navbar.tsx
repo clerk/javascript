@@ -290,7 +290,10 @@ const NavButton = (props: NavButtonProps) => {
         elementDescriptor={iconElementDescriptor}
         elementId={iconElementId}
         icon={icon}
-        sx={{ opacity: isActive ? 1 : 0.7 }}
+        sx={{
+          opacity: isActive ? 1 : 0.7,
+          transform: 'translateZ(0)',
+        }}
       />
       {children}
     </Button>
