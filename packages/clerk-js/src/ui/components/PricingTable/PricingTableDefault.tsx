@@ -109,8 +109,7 @@ function Card(props: CardProps) {
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
-  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscriptionBasedOnPlanPeriod } =
-    usePlansContext();
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -130,21 +129,31 @@ function Card(props: CardProps) {
   const isPlanActive = subscription?.status === 'active';
   const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
-  const isEligibleForSwitch = planPeriod !== subscription?.planPeriod && !plan.isDefault;
-  const isEligibleForSwitchToAnnual = isEligibleForSwitch && plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
-  const isEligibleForSwitchToMonthly = isEligibleForSwitch && planPeriod === 'month';
 
-  const shouldShowFooter =
-    !subscription ||
-    subscription?.status === 'upcoming' ||
-    subscription?.canceledAt ||
-    isEligibleForSwitchToAnnual ||
-    isEligibleForSwitchToMonthly;
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
 
-  const shouldShowFooterNotice =
-    subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
-
-  const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
+  if (!subscription) {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true;
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
 
   return (
     <Box
@@ -233,7 +242,6 @@ function Card(props: CardProps) {
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
