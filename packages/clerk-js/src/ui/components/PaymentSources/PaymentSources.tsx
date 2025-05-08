@@ -1,7 +1,7 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { Fragment, useRef } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
 import { useSubscriberTypeContext } from '../../contexts';
@@ -97,6 +97,11 @@ export const PaymentSources = () => {
   );
   const { data: paymentSources } = data || { data: [] };
 
+  const sortedPaymentSources = useMemo(
+    () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
+    [paymentSources],
+  );
+
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.billingPage.paymentSourcesSection.title')}
@@ -111,7 +116,7 @@ export const PaymentSources = () => {
     >
       <Action.Root>
         <ProfileSection.ItemList id='paymentSources'>
-          {paymentSources.map(paymentSource => (
+          {sortedPaymentSources.map(paymentSource => (
             <Fragment key={paymentSource.id}>
               <ProfileSection.Item id='paymentSources'>
                 <PaymentSourceRow paymentSource={paymentSource} />

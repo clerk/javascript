@@ -153,6 +153,8 @@ export const UserPreview = (props: UserPreviewProps) => {
         >
           {previewTitle && (
             <Text
+              elementDescriptor={descriptors.userPreviewMainIdentifierText}
+              elementId={descriptors.userPreviewMainIdentifierText.setId(elementId)}
               as='span'
               truncate
               sx={{ fontWeight: 'inherit' }}
@@ -160,7 +162,6 @@ export const UserPreview = (props: UserPreviewProps) => {
               {previewTitle}
             </Text>
           )}
-
           {badge}
         </Text>
 
