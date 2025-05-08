@@ -152,9 +152,6 @@ export const enUS: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
-      },
       paymentSourcesSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
