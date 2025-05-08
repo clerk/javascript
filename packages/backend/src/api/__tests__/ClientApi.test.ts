@@ -12,36 +12,30 @@ describe('ClientAPI', () => {
 
   describe('getHandshakePayload', () => {
     it('successfully fetches the handshake payload with a valid nonce', async () => {
-      // Mock response data
       const mockHandshakePayload = {
         directives: ['directive1', 'directive2'],
       };
 
-      // Set up mock server response
       server.use(
         http.get(
           'https://api.clerk.test/v1/clients/handshake_payload',
           validateHeaders(({ request }) => {
             const url = new URL(request.url);
-            // Verify that the nonce was properly passed as a query parameter
             expect(url.searchParams.get('nonce')).toBe('test-nonce-123');
             return HttpResponse.json(mockHandshakePayload);
           }),
         ),
       );
 
-      // Call the method being tested
       const response = await apiClient.clients.getHandshakePayload({
         nonce: 'test-nonce-123',
       });
 
-      // Verify the response
       expect(response.directives).toEqual(['directive1', 'directive2']);
       expect(response.directives.length).toBe(2);
     });
 
     it('handles error responses correctly', async () => {
-      // Mock error response
       const mockErrorPayload = {
         code: 'invalid_nonce',
         message: 'Invalid nonce provided',
@@ -50,7 +44,6 @@ describe('ClientAPI', () => {
       };
       const traceId = 'trace_id_handshake';
 
-      // Set up mock server error response
       server.use(
         http.get(
           'https://api.clerk.test/v1/clients/handshake_payload',
@@ -63,10 +56,8 @@ describe('ClientAPI', () => {
         ),
       );
 
-      // Call the method and catch the error
       const errResponse = await apiClient.clients.getHandshakePayload({ nonce: 'invalid-nonce' }).catch(err => err);
 
-      // Verify error handling
       expect(errResponse.clerkTraceId).toBe(traceId);
       expect(errResponse.status).toBe(400);
       expect(errResponse.errors[0].code).toBe('invalid_nonce');
@@ -76,7 +67,6 @@ describe('ClientAPI', () => {
     });
 
     it('requires a nonce parameter', async () => {
-      // Set up mock server response for missing nonce parameter
       server.use(
         http.get(
           'https://api.clerk.test/v1/clients/handshake_payload',
@@ -101,7 +91,6 @@ describe('ClientAPI', () => {
       // @ts-expect-error Testing invalid input
       const errResponse = await apiClient.clients.getHandshakePayload({}).catch(err => err);
 
-      // Verify error handling
       expect(errResponse.status).toBe(400);
       expect(errResponse.errors[0].code).toBe('missing_parameter');
     });
