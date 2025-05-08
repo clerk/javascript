@@ -1,6 +1,6 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -15,12 +15,35 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
   const { user } = useUser();
+  const { subscriptions } = usePlansContext();
+  const { plans, handleSelectPlan } = usePlansContext();
 
   const resource = subscriberType === 'org' ? organization : user;
 
-  const { plans, handleSelectPlan } = usePlansContext();
+  const defaultPlanPeriod = useMemo(() => {
+    if (isCompact) {
+      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      if (upcomingSubscription) {
+        return upcomingSubscription.planPeriod;
+      }
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('month');
+      // don't pay attention to the default plan
+      const activeSubscription = subscriptions?.find(
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
+      );
+      if (activeSubscription) {
+        return activeSubscription.planPeriod;
+      }
+    }
+
+    return 'annual';
+  }, [isCompact, subscriptions]);
+
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+
+  useEffect(() => {
+    setPlanPeriod(defaultPlanPeriod);
+  }, [defaultPlanPeriod]);
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
@@ -28,6 +51,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     }
 
     handleSelectPlan({ mode, plan, planPeriod, event });
+    return;
   };
 
   useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);

@@ -222,6 +222,17 @@ const PlanDetailsInternal = ({
                     localizationKey={localizationKeys('commerce.switchToAnnual')}
                   />
                 ) : null}
+                {!!subscription && subscription.planPeriod === 'annual' ? (
+                  <Button
+                    block
+                    variant='bordered'
+                    colorScheme='secondary'
+                    textVariant='buttonLarge'
+                    isDisabled={!canManageBilling}
+                    onClick={() => openCheckout({ planPeriod: 'month' })}
+                    localizationKey={localizationKeys('commerce.switchToMonthly')}
+                  />
+                ) : null}
                 <Button
                   block
                   variant='bordered'

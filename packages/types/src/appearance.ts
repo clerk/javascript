@@ -312,7 +312,7 @@ export type ElementsConfig = {
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
-  organizationSwitcherTrigger: WithOptions<never, 'open'>;
+  organizationSwitcherTrigger: WithOptions<'personal' | 'organization', 'open'>;
   organizationSwitcherTriggerIcon: WithOptions<never, 'open'>;
   organizationSwitcherPopoverRootBox: WithOptions;
   organizationSwitcherPopoverCard: WithOptions;
@@ -323,7 +323,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
-  organizationSwitcherPreviewButton: WithOptions;
+  organizationSwitcherPreviewButton: WithOptions<'personal' | 'organization'>;
   organizationSwitcherInvitationAcceptButton: WithOptions;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
@@ -347,6 +347,7 @@ export type ElementsConfig = {
   userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
+  userPreviewMainIdentifierText: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;
 
   organizationPreview: WithOptions<OrganizationPreviewId>;
@@ -391,8 +392,9 @@ export type ElementsConfig = {
   pricingTableCardFeaturesListItemTitle: WithOptions;
   pricingTableCardStatusRow: WithOptions;
   pricingTableCardStatus: WithOptions;
-  pricingTableCardAction: WithOptions;
-  pricingTableCardActionButton: WithOptions;
+  pricingTableCardFooter: WithOptions;
+  pricingTableCardFooterButton: WithOptions;
+  pricingTableCardFooterNotice: WithOptions;
 
   pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;

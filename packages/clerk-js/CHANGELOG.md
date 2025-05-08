@@ -1,5 +1,46 @@
 # Change Log
 
+## 5.64.2
+
+### Patch Changes
+
+- Fix PricingTable logic for plan button text. ([#5869](https://github.com/clerk/javascript/pull/5869)) by [@brkalow](https://github.com/brkalow)
+
+## 5.64.1
+
+### Patch Changes
+
+- Update Organization subscription API endpoints to include the `/commerce/` path segment. ([#5855](https://github.com/clerk/javascript/pull/5855)) by [@brkalow](https://github.com/brkalow)
+
+- Update PricingTable badge and status messaging. ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure statements ui is scrollable ([#5866](https://github.com/clerk/javascript/pull/5866)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Added a gap between no-permissions notice and pricing table in `<OrganizationProfile/>` billing page ([#5861](https://github.com/clerk/javascript/pull/5861)) by [@octoper](https://github.com/octoper)
+
+- Fix drawer positioning issues experienced in safari ([#5859](https://github.com/clerk/javascript/pull/5859)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `ArrowsUpDown` stroke fill to user `currentColor` ([#5860](https://github.com/clerk/javascript/pull/5860)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `invalid_plan_change` error with custom UI ([#5867](https://github.com/clerk/javascript/pull/5867)) by [@octoper](https://github.com/octoper)
+
+- Add new Billing Statements UI to User and Org Profile ([#5850](https://github.com/clerk/javascript/pull/5850)) by [@aeliox](https://github.com/aeliox)
+
+- Remove top border in `CheckoutForm` ([#5864](https://github.com/clerk/javascript/pull/5864)) by [@octoper](https://github.com/octoper)
+
+- Render long message for `submitError` within `CheckoutForm` ([#5862](https://github.com/clerk/javascript/pull/5862)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Show annual amount in the subscriptions list if the subscription has annual plan period ([#5863](https://github.com/clerk/javascript/pull/5863)) by [@octoper](https://github.com/octoper)
+
+- Update `PricingTable` plan card UI ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update `<Checkout />` line items to include `x12` prefix when plan is annual ([#5857](https://github.com/clerk/javascript/pull/5857)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`36fb43f`](https://github.com/clerk/javascript/commit/36fb43f8b35866bdc20680fac58020f036d30d1f), [`e5ac444`](https://github.com/clerk/javascript/commit/e5ac4447f52bb6887ad686feab308fe9daf76e33), [`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`d227805`](https://github.com/clerk/javascript/commit/d22780599a5e29545a3d8309cc411c2e8659beac)]:
+  - @clerk/localizations@3.15.1
+  - @clerk/types@4.57.1
+  - @clerk/shared@3.8.1
+
 ## 5.64.0
 
 ### Minor Changes

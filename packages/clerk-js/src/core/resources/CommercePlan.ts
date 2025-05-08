@@ -1,4 +1,4 @@
-import type { CommercePlanJSON, CommercePlanResource } from '@clerk/types';
+import type { CommercePlanJSON, CommercePlanJSONSnapshot, CommercePlanResource } from '@clerk/types';
 
 import { BaseResource, CommerceFeature } from './internal';
 
@@ -54,5 +54,30 @@ export class CommercePlan extends BaseResource implements CommercePlanResource {
     this.features = (data.features || []).map(feature => new CommerceFeature(feature));
 
     return this;
+  }
+
+  public __internal_toSnapshot(): CommercePlanJSONSnapshot {
+    return {
+      object: 'commerce_plan',
+      id: this.id,
+      name: this.name,
+      amount: this.amount,
+      amount_formatted: this.amountFormatted,
+      annual_amount: this.annualAmount,
+      annual_amount_formatted: this.annualAmountFormatted,
+      annual_monthly_amount: this.annualMonthlyAmount,
+      annual_monthly_amount_formatted: this.annualMonthlyAmountFormatted,
+      currency: this.currency,
+      currency_symbol: this.currencySymbol,
+      description: this.description,
+      is_default: this.isDefault,
+      is_recurring: this.isRecurring,
+      has_base_fee: this.hasBaseFee,
+      payer_type: this.payerType,
+      publicly_visible: this.publiclyVisible,
+      slug: this.slug,
+      avatar_url: this.avatarUrl,
+      features: this.features.map(feature => feature.__internal_toSnapshot()),
+    };
   }
 }
