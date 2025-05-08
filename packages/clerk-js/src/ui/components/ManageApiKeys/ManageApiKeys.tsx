@@ -2,11 +2,26 @@ import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useManageApiKeysContext } from '../../contexts';
-import { Box, Button, Flex, Icon, Input, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
-import { InputWithIcon, Pagination } from '../../elements';
+import {
+  Box,
+  Button,
+  Col,
+  Flex,
+  Flow,
+  Icon,
+  Input,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '../../customizables';
+import { Card, InputWithIcon, Pagination, ThreeDotsMenu, withCardStateProvider } from '../../elements';
 import { useClipboard, useFetch } from '../../hooks';
-import { Clipboard, Eye, EyeSlash, MagnifyingGlass, Trash } from '../../icons';
-import { InternalThemeProvider } from '../../styledSystem';
+import { Clipboard, Eye, EyeSlash, MagnifyingGlass } from '../../icons';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 
 const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
@@ -33,19 +48,32 @@ const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
   );
 };
 
-export const ManageApiKeys = () => {
+export const ManageApiKeys = withCardStateProvider(() => {
   const clerk = useClerk();
   const ctx = useManageApiKeysContext();
-  const { data: apiKeys, revalidate } = useFetch(() => clerk.getApiKeys({ subject: ctx.subject }), {});
+  const {
+    data: apiKeys,
+    isLoading,
+    revalidate,
+  } = useFetch(
+    () => clerk.getApiKeys({ subject: ctx.subject }),
+    { subject: ctx.subject },
+    {},
+    `api-key-subject-${ctx.subject}`,
+  );
   const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
   const itemsPerPage = ctx.perPage ?? 5;
-  const itemCount = apiKeys?.length ?? 0;
+
+  const filteredApiKeys = (apiKeys ?? []).filter(key => key.name.toLowerCase().includes(search.toLowerCase()));
+
+  const itemCount = filteredApiKeys.length;
   const pageCount = Math.max(1, Math.ceil(itemCount / itemsPerPage));
   const startingRow = itemCount > 0 ? (page - 1) * itemsPerPage + 1 : 0;
   const endingRow = Math.min(page * itemsPerPage, itemCount);
-  const paginatedApiKeys = apiKeys?.slice(startingRow - 1, endingRow) ?? [];
+  const paginatedApiKeys = filteredApiKeys.slice(startingRow - 1, endingRow);
 
   const toggleSecret = async (id: string) => {
     setRevealedKeys(prev => {
@@ -77,116 +105,151 @@ export const ManageApiKeys = () => {
   };
 
   return (
-    <InternalThemeProvider>
-      <Flex
-        justify='between'
-        align='center'
-        sx={{ marginBottom: 12 }}
-      >
-        <Box>
-          <InputWithIcon
-            placeholder='Search keys'
-            leftIcon={<Icon icon={MagnifyingGlass} />}
-          />
-        </Box>
-        <Button
-          variant='solid'
-          onClick={() => setShowCreateForm(true)}
-        >
-          Add new key
-        </Button>
-      </Flex>
-
-      {showCreateForm && (
-        <CreateApiKeyForm
-          onCreate={params => void handleCreate(params)}
-          onCancel={() => setShowCreateForm(false)}
-        />
-      )}
-
-      <Table sx={{ tableLayout: 'fixed' }}>
-        <Thead>
-          <Tr>
-            <Th>Name</Th>
-            <Th>Last used</Th>
-            <Th>Key</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {paginatedApiKeys.map(apiKey => (
-            <Tr key={apiKey.id}>
-              <Td>
-                <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
-                <Text
-                  sx={{ fontSize: 12 }}
-                  color='gray.600'
-                >
-                  Created at{' '}
-                  {apiKey.createdAt.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: '2-digit',
-                    year: 'numeric',
-                  })}
-                </Text>
-              </Td>
-              <Td>
-                <Text
-                  sx={{ fontSize: 14 }}
-                  color='gray.800'
-                >
-                  {/* Placeholder for "Last used" */}
-                  3d ago
-                </Text>
-              </Td>
-              <Td>
-                <Input
-                  type='text'
-                  value={revealedKeys[apiKey.id] ?? '•••••••••••••'}
-                  readOnly
-                  sx={{
-                    width: 120,
+    <Flow.Root flow='apiKey'>
+      <Card.Root sx={{ width: '100%' }}>
+        <Card.Content sx={{ textAlign: 'left' }}>
+          <Col gap={4}>
+            <Flex
+              justify='between'
+              align='center'
+            >
+              <Box>
+                <InputWithIcon
+                  placeholder='Search keys'
+                  leftIcon={<Icon icon={MagnifyingGlass} />}
+                  value={search}
+                  onChange={e => {
+                    setSearch(e.target.value);
+                    setPage(1);
                   }}
-                  aria-label='API key (hidden)'
-                  tabIndex={-1}
                 />
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  sx={{ margin: 2 }}
-                  onClick={() => void toggleSecret(apiKey.id)}
-                  aria-label={revealedKeys[apiKey.id] ? 'Hide key' : 'Show key'}
-                >
-                  <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
-                </Button>
-                <CopyButton apiKeyID={apiKey.id} />
-              </Td>
-              <Td>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  aria-label='Revoke key'
-                  onClick={() => void revokeApiKey(apiKey.id)}
-                >
-                  <Icon icon={Trash} />
-                </Button>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+              </Box>
+              <Button
+                variant='solid'
+                onClick={() => setShowCreateForm(true)}
+              >
+                Add new key
+              </Button>
+            </Flex>
 
-      <Pagination
-        count={pageCount}
-        page={page}
-        onChange={setPage}
-        siblingCount={1}
-        rowInfo={{
-          allRowsCount: itemCount,
-          startingRow,
-          endingRow,
-        }}
-      />
-    </InternalThemeProvider>
+            {showCreateForm && (
+              <CreateApiKeyForm
+                onCreate={params => void handleCreate(params)}
+                onCancel={() => setShowCreateForm(false)}
+              />
+            )}
+
+            <Table sx={{ tableLayout: 'fixed' }}>
+              <Thead>
+                <Tr>
+                  <Th>Name</Th>
+                  <Th>Last used</Th>
+                  <Th>Key</Th>
+                  <Th>Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {isLoading ? (
+                  <Tr>
+                    <Td colSpan={4}>
+                      <Spinner
+                        colorScheme='primary'
+                        sx={{ margin: 'auto', display: 'block' }}
+                      />
+                    </Td>
+                  </Tr>
+                ) : (
+                  paginatedApiKeys.map(apiKey => (
+                    <Tr key={apiKey.id}>
+                      <Td>
+                        <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
+                        <Text
+                          sx={{ fontSize: 12 }}
+                          color='gray.600'
+                        >
+                          Created at{' '}
+                          {apiKey.createdAt.toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text
+                          sx={{ fontSize: 14 }}
+                          color='gray.800'
+                        >
+                          3d ago
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Flex
+                          direction='row'
+                          gap={1}
+                        >
+                          <Flex
+                            center
+                            sx={{
+                              width: '100%',
+                              position: 'relative',
+                            }}
+                          >
+                            <Input
+                              type={revealedKeys[apiKey.id] ? 'text' : 'password'}
+                              value={revealedKeys[apiKey.id] ?? '•••••••••••••••••••••••••'}
+                              readOnly
+                              aria-label='API key (hidden)'
+                              tabIndex={-1}
+                            />
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              sx={{ position: 'absolute', right: 0 }}
+                              onClick={() => void toggleSecret(apiKey.id)}
+                              aria-label={revealedKeys[apiKey.id] ? 'Hide key' : 'Show key'}
+                            >
+                              <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
+                            </Button>
+                          </Flex>
+
+                          <CopyButton apiKeyID={apiKey.id} />
+                        </Flex>
+                      </Td>
+                      <Td>
+                        <ThreeDotsMenu
+                          actions={[
+                            {
+                              // @ts-expect-error: Add to locales
+                              label: 'Revoke',
+                              isDestructive: true,
+                              onClick: () => void revokeApiKey(apiKey.id),
+                              isDisabled: false,
+                            },
+                          ]}
+                          elementId={'member'}
+                        />
+                      </Td>
+                    </Tr>
+                  ))
+                )}
+              </Tbody>
+            </Table>
+
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={setPage}
+              siblingCount={1}
+              rowInfo={{
+                allRowsCount: itemCount,
+                startingRow,
+                endingRow,
+              }}
+            />
+          </Col>
+        </Card.Content>
+      </Card.Root>
+    </Flow.Root>
   );
-};
+});

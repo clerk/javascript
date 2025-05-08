@@ -17,7 +17,8 @@ type FlowMetadata = {
     | 'waitlist'
     | 'checkout'
     | 'planDetails'
-    | 'pricingTable';
+    | 'pricingTable'
+    | 'apiKey';
   part?:
     | 'start'
     | 'emailCode'

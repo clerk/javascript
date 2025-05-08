@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, Flex, localizationKeys } from '../../customizables';
-import { Form, FormButtons, FormContainer, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer } from '../../elements';
 import { useFormControl } from '../../utils';
 
 interface CreateApiKeyFormProps {
@@ -10,7 +10,7 @@ interface CreateApiKeyFormProps {
   loading?: boolean;
 }
 
-export const CreateApiKeyForm = withCardStateProvider(({ onCreate, onCancel }: CreateApiKeyFormProps) => {
+export const CreateApiKeyForm = ({ onCreate, onCancel }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const nameField = useFormControl('name', '', {
@@ -52,6 +52,7 @@ export const CreateApiKeyForm = withCardStateProvider(({ onCreate, onCancel }: C
             <Form.PlainInput {...descriptionField.props} />
           </Form.ControlRow>
         )}
+        {/* TODO: Add Expiration column */}
         <Flex
           justify='between'
           align='center'
@@ -70,4 +71,4 @@ export const CreateApiKeyForm = withCardStateProvider(({ onCreate, onCancel }: C
       </Form.Root>
     </FormContainer>
   );
-});
+};
