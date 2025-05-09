@@ -15,6 +15,12 @@ const BillingPage = lazy(() =>
   })),
 );
 
+const ApiKeysPage = lazy(() =>
+  import(/* webpackChunkName: "up-api-key-page"*/ './ApiKeysPage').then(module => ({
+    default: module.ApiKeysPage,
+  })),
+);
+
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
   const { commerceSettings } = useEnvironment();
@@ -22,6 +28,7 @@ export const UserProfileRoutes = () => {
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const isBillingPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING;
+  const isApiKeysPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isAccountPageRoot && !isSecurityPageRoot && index === 0;
@@ -80,6 +87,13 @@ export const UserProfileRoutes = () => {
             </Switch>
           </Route>
         )}
+        <Route path={isApiKeysPageRoot ? undefined : 'api-keys'}>
+          <Switch>
+            <Route index>
+              <ApiKeysPage />
+            </Route>
+          </Switch>
+        </Route>
       </Route>
     </Switch>
   );
