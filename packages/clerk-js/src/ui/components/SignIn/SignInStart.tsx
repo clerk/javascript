@@ -342,7 +342,9 @@ function SignInStartInternal(): JSX.Element {
             await authenticateWithEnterpriseSSO();
             break;
           }
-          return navigate('factor-one');
+          return navigate(
+            alternativePhoneCodeProvider ? `factor-one/${alternativePhoneCodeProvider.channel}` : 'factor-one',
+          );
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
