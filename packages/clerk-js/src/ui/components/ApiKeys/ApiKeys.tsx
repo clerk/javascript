@@ -23,7 +23,7 @@ import { Card, InputWithIcon, Pagination, ThreeDotsMenu, withCardStateProvider }
 import { Action } from '../../elements/Action';
 import { useClipboard, useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash, MagnifyingGlass } from '../../icons';
-import { CreateApiKeyForm } from './CreateApiKeyForm';
+import { CreateApiKeyForm, Expiration } from './CreateApiKeyForm';
 
 const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
   const clerk = useClerk();
@@ -48,6 +48,28 @@ const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
     </Button>
   );
 };
+
+function getTimeLeftInSeconds(expirationOption: Expiration) {
+  if (expirationOption === 'never') {
+    return;
+  }
+
+  const now = new Date();
+  const future = new Date(now);
+
+  if (expirationOption === '30d') {
+    future.setDate(future.getDate() + 30);
+  } else if (expirationOption === '90d') {
+    future.setDate(future.getDate() + 90);
+  } else {
+    throw new Error('TODO: Improve time handling');
+  }
+
+  const diffInMs = future.getTime() - now.getTime();
+  const diffInSecs = Math.floor(diffInMs / 1000);
+
+  return diffInSecs;
+}
 
 export const ApiKeys = withCardStateProvider(() => {
   const clerk = useClerk();
@@ -87,13 +109,13 @@ export const ApiKeys = withCardStateProvider(() => {
   const handleCreate = async (params: {
     name: string;
     description?: string;
-    expiration?: number;
+    expiration: Expiration;
     closeFn: () => void;
   }) => {
     await clerk.createApiKey({
       name: params.name,
       creationReason: params.description,
-      secondsUntilExpiration: params.expiration,
+      secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
     });
     params.closeFn();
     revalidate();
@@ -230,8 +252,8 @@ export const ApiKeys = withCardStateProvider(() => {
                         <ThreeDotsMenu
                           actions={[
                             {
-                              // @ts-expect-error: Add to locales
-                              label: 'Revoke',
+                              // @ts-expect-error: TODO: Add locales
+                              label: 'Revoke key',
                               isDestructive: true,
                               onClick: () => void revokeApiKey(apiKey.id),
                               isDisabled: false,
