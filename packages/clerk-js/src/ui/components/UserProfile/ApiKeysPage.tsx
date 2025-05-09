@@ -1,26 +1,13 @@
 import { useUser } from '@clerk/shared/react';
 
-import { ApiKeysContext, useApiKeysContext } from '../../contexts';
+import { ApiKeysContext } from '../../contexts';
 import { Col } from '../../customizables';
 import { Header } from '../../elements';
-import { ApiKeysInternal, CopyButton } from '../ApiKeys';
-import { useApiKeys } from '../ApiKeys/shared';
-
-function APIKeysPageInternal() {
-  const ctx = useApiKeysContext();
-  const { user } = useUser();
-  const apiKeys = useApiKeys(user?.id ?? '', ctx.perPage);
-  return (
-    <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
-      <ApiKeysInternal
-        {...apiKeys}
-        CopyButton={CopyButton}
-      />
-    </ApiKeysContext.Provider>
-  );
-}
+import { ApiKeysInternal } from '../ApiKeys';
 
 export const ApiKeysPage = () => {
+  const { user } = useUser();
+
   return (
     <Col gap={4}>
       <Header.Root>
@@ -31,7 +18,7 @@ export const ApiKeysPage = () => {
         />
       </Header.Root>
       <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
-        <APIKeysPageInternal />
+        <ApiKeysInternal subject={user?.id ?? ''} />
       </ApiKeysContext.Provider>
     </Col>
   );
