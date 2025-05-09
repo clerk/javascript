@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 
-import { Button, Flex, localizationKeys } from '../../customizables';
-import { Form, FormButtons, FormContainer } from '../../elements';
+import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFormControl } from '../../utils';
 
 interface CreateApiKeyFormProps {
-  onCreate: (params: { name: string; description?: string; expiration?: number; closeFn: () => void }) => void;
+  onCreate: (params: { name: string; description?: string; expiration: Expiration; closeFn: () => void }) => void;
 }
+
+export type Expiration = 'never' | '30d' | '90d' | 'custom';
 
 export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { close } = useActionContext();
+  const [expiration, setExpiration] = useState<Expiration>('never');
+  const createApiKeyFormId = React.useId();
+  const segmentedControlId = `${createApiKeyFormId}-segmented-control`;
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -34,7 +39,7 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
     onCreate({
       name: nameField.value,
       description: descriptionField.value || undefined,
-      expiration: undefined,
+      expiration,
       closeFn: close,
     });
   };
@@ -49,11 +54,44 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
           <Form.PlainInput {...nameField.props} />
         </Form.ControlRow>
         {showAdvanced && (
-          <Form.ControlRow elementId={descriptionField.id}>
-            <Form.PlainInput {...descriptionField.props} />
-          </Form.ControlRow>
+          <>
+            <Form.ControlRow elementId={descriptionField.id}>
+              <Form.PlainInput {...descriptionField.props} />
+            </Form.ControlRow>
+            <Col gap={2}>
+              <Text
+                id={segmentedControlId}
+                sx={{ fontWeight: 500 }}
+              >
+                Expiration
+              </Text>
+              <SegmentedControl.Root
+                aria-label='Expiration'
+                aria-labelledby={segmentedControlId}
+                value={expiration}
+                onChange={value => setExpiration(value as Expiration)}
+                fullWidth
+              >
+                <SegmentedControl.Button
+                  value='never'
+                  text='Never'
+                />
+                <SegmentedControl.Button
+                  value='30d'
+                  text='30 days'
+                />
+                <SegmentedControl.Button
+                  value='90d'
+                  text='90 days'
+                />
+                <SegmentedControl.Button
+                  value='custom'
+                  text='Custom'
+                />
+              </SegmentedControl.Root>
+            </Col>
+          </>
         )}
-        {/* TODO: Add Expiration column */}
         <Flex
           justify='between'
           align='center'
