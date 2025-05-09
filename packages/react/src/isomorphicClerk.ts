@@ -8,6 +8,7 @@ import type {
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   ApiKeyResource,
+  ApiKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -29,7 +30,6 @@ import type {
   JoinWaitlistParams,
   ListenerCallback,
   LoadedClerk,
-  ManageApiKeysProps,
   NextTaskParams,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -136,7 +136,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountManageApiKeysNodes = new Map<HTMLDivElement, ManageApiKeysProps | undefined>();
+  private premountApiKeysNodes = new Map<HTMLDivElement, ApiKeysProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -615,8 +615,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-    this.premountManageApiKeysNodes.forEach((props, node) => {
-      clerkjs.mountManageApiKeys(node, props);
+    this.premountApiKeysNodes.forEach((props, node) => {
+      clerkjs.mountApiKeys(node, props);
     });
 
     /**
@@ -1060,19 +1060,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountManageApiKeys = (node: HTMLDivElement, props?: ManageApiKeysProps): void => {
+  mountApiKeys = (node: HTMLDivElement, props?: ApiKeysProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountManageApiKeys(node, props);
+      this.clerkjs.mountApiKeys(node, props);
     } else {
-      this.premountManageApiKeysNodes.set(node, props);
+      this.premountApiKeysNodes.set(node, props);
     }
   };
 
-  unmountManageApiKeys = (node: HTMLDivElement): void => {
+  unmountApiKeys = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountManageApiKeys(node);
+      this.clerkjs.unmountApiKeys(node);
     } else {
-      this.premountManageApiKeysNodes.delete(node);
+      this.premountApiKeysNodes.delete(node);
     }
   };
 

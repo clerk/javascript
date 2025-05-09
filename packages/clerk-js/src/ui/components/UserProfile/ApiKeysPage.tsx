@@ -1,10 +1,10 @@
-import { ManageApiKeysContext } from '../../contexts';
-import { ManageApiKeys } from '../ManageApiKeys';
+import { ApiKeysContext } from '../../contexts';
+import { ApiKeys } from '../ApiKeys';
 
 export const ApiKeysPage = () => {
   return (
-    <ManageApiKeysContext.Provider value={{ componentName: 'ManageApiKeys' }}>
-      <ManageApiKeys />
-    </ManageApiKeysContext.Provider>
+    <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
+      <ApiKeys />
+    </ApiKeysContext.Provider>
   );
 };

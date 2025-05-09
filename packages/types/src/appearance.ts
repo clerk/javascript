@@ -899,7 +899,7 @@ export type Appearance<T = Theme> = T &
      */
     checkout?: T;
     /**
-     * Theme overrides that only apply to the `<ManageApiKeys />` component
+     * Theme overrides that only apply to the `<ApiKeys />` component
      */
-    manageApiKeys?: T;
+    apiKeys?: T;
   };
