@@ -1,37 +1,24 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { ApiKeysContext, useApiKeysContext } from '../../contexts';
+import { ApiKeysContext } from '../../contexts';
 import { Col } from '../../customizables';
 import { Header } from '../../elements';
-import { ApiKeysInternal, CopyButton } from '../ApiKeys';
-import { useApiKeys } from '../ApiKeys/shared';
-
-function APIKeysPageInternal() {
-  const ctx = useApiKeysContext();
-  const { organization } = useOrganization();
-  const apiKeys = useApiKeys(organization?.id ?? '', ctx.perPage);
-  return (
-    <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
-      <ApiKeysInternal
-        {...apiKeys}
-        CopyButton={CopyButton}
-      />
-    </ApiKeysContext.Provider>
-  );
-}
+import { ApiKeysInternal } from '../ApiKeys';
 
 export const OrganizationApiKeysPage = () => {
+  const { organization } = useOrganization();
+
   return (
     <Col gap={4}>
       <Header.Root>
-        {/* TODO: Add localization key */}
         <Header.Title
+          // TODO: Add localization key
           localizationKey='API Keys'
           textVariant='h2'
         />
       </Header.Root>
       <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
-        <APIKeysPageInternal />
+        <ApiKeysInternal subject={organization?.id ?? ''} />
       </ApiKeysContext.Provider>
     </Col>
   );

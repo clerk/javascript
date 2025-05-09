@@ -22,14 +22,13 @@ function getTimeLeftInSeconds(expirationOption: Expiration) {
   return diffInSecs;
 }
 
-export function useApiKeys(subject: string, perPage: number = 5) {
+export function useApiKeys({ subject, perPage = 5 }: { subject: string; perPage?: number }) {
   const clerk = useClerk();
   const {
     data: apiKeys,
     isLoading,
     revalidate,
   } = useFetch(clerk.getApiKeys, { subject }, undefined, `api-key-source-${subject}`);
-  const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const itemsPerPage = perPage;
@@ -40,19 +39,6 @@ export function useApiKeys(subject: string, perPage: number = 5) {
   const startingRow = itemCount > 0 ? (page - 1) * itemsPerPage + 1 : 0;
   const endingRow = Math.min(page * itemsPerPage, itemCount);
   const paginatedApiKeys = filteredApiKeys.slice(startingRow - 1, endingRow);
-
-  const toggleSecret = async (id: string) => {
-    setRevealedKeys(prev => {
-      if (prev[id]) {
-        return { ...prev, [id]: null };
-      }
-      return prev;
-    });
-    if (!revealedKeys[id]) {
-      const secret = await clerk.getApiKeySecret(id);
-      setRevealedKeys(prev => ({ ...prev, [id]: secret }));
-    }
-  };
 
   const handleCreate = async (params: {
     name: string;
@@ -78,8 +64,6 @@ export function useApiKeys(subject: string, perPage: number = 5) {
   return {
     apiKeys: paginatedApiKeys,
     isLoading: isLoading ?? false,
-    revealedKeys,
-    toggleSecret,
     revokeApiKey,
     search,
     setSearch,
