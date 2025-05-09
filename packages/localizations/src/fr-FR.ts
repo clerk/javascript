@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Retour',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

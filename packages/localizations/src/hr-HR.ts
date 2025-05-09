@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Natrag',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

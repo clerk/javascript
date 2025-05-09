@@ -1,4 +1,6 @@
+import type { ApiKeyResource } from './apiKey';
 import type {
+  ApiKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
@@ -459,6 +461,21 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the ApiKeys component.
+   * @param props Configuration parameters.
+   */
+  mountApiKeys: (targetNode: HTMLDivElement, props?: ApiKeysProps) => void;
+
+  /**
+   * Unmount a api keys component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ApiKeys component from.
+   */
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
    * Allows to hook up at different steps in the sign up, sign in processes.
    *
@@ -737,6 +754,26 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * Retrieves all API keys for the current user or organization.
+   */
+  getApiKeys: (params?: GetApiKeysParams) => Promise<ApiKeyResource[]>;
+
+  /**
+   * Retrieves the secret for a given API key ID.
+   */
+  getApiKeySecret: (apiKeyID: string) => Promise<string>;
+
+  /**
+   * Creates a new API key.
+   */
+  createApiKey: (params: CreateApiKeyParams) => Promise<ApiKeyResource>;
+
+  /**
+   * Revokes a given API key by ID.
+   */
+  revokeApiKey: (params: RevokeApiKeyParams) => Promise<ApiKeyResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1607,6 +1644,31 @@ type PricingTableBaseProps = {
 type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type ApiKeysProps = {
+  type?: 'api_key';
+  subject?: string;
+  perPage?: number;
+  showSecretByDefault?: boolean;
+  appearance?: ApiKeysTheme;
+};
+
+export type GetApiKeysParams = {
+  subject?: string;
+};
+
+export type CreateApiKeyParams = {
+  type?: 'api_key';
+  name: string;
+  subject?: string;
+  secondsUntilExpiration?: number;
+  creationReason?: string;
+};
+
+export type RevokeApiKeyParams = {
+  apiKeyID: string;
+  revocationReason?: string;
+};
 
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;

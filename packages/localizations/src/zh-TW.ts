@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: '返回',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

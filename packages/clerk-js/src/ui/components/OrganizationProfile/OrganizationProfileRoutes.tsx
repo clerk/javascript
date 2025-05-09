@@ -15,8 +15,15 @@ const OrganizationBillingPage = lazy(() =>
   })),
 );
 
+const OrganizationApiKeysPage = lazy(() =>
+  import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
+    default: module.OrganizationApiKeysPage,
+  })),
+);
+
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot } =
+    useOrganizationProfileContext();
   const { commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
@@ -89,6 +96,15 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         )}
+        <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+          <Switch>
+            <Route index>
+              <Suspense fallback={''}>
+                <OrganizationApiKeysPage />
+              </Suspense>
+            </Route>
+          </Switch>
+        </Route>
       </Route>
     </Switch>
   );

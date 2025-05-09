@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Quay lại',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

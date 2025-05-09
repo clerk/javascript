@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tilbake',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

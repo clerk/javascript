@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Atrás',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

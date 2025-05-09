@@ -1,8 +1,9 @@
-import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { ApiKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
+  ApiKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OrganizationListContext,
@@ -90,6 +91,12 @@ export function ComponentContextProvider({
             </PricingTableContext.Provider>
           </PlansContextProvider>
         </SubscriberTypeContext.Provider>
+      );
+    case 'ApiKeys':
+      return (
+        <ApiKeysContext.Provider value={{ componentName, ...(props as ApiKeysProps) }}>
+          {children}
+        </ApiKeysContext.Provider>
       );
 
     default:

@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Vissza',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

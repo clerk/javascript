@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Tillbaka',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

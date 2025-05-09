@@ -42,3 +42,4 @@ export * from './UserOrganizationInvitation';
 export * from './Verification';
 export * from './Web3Wallet';
 export * from './Waitlist';
+export * from './ApiKey';

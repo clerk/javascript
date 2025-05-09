@@ -1,5 +1,6 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
+  ApiKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -599,4 +600,32 @@ export const PricingTable = withClerk(
     );
   },
   { component: 'PricingTable', renderWhileLoading: true },
+);
+
+export const ApiKeys = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<ApiKeysProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountApiKeys}
+            unmount={clerk.unmountApiKeys}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'ApiKeys', renderWhileLoading: true },
 );

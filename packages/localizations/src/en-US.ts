@@ -2,6 +2,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  apiKey: {
+    apiKeyPage: {
+      formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
+      title: 'Add new API key',
+    },
+  },
   backButton: 'Back',
   badge__activePlan: 'Active',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",

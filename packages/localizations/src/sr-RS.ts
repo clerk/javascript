@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Nazad',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,

@@ -2,6 +2,7 @@ import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
+  ApiKeysProps,
   CommercePlanResource,
   CommerceStatementResource,
   CommerceSubscriptionResource,
@@ -50,7 +51,8 @@ export type AvailableComponentProps =
   | PricingTableProps
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __internal_PlanDetailsProps;
+  | __internal_PlanDetailsProps
+  | ApiKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -117,6 +119,11 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
+export type ApiKeysCtx = ApiKeysProps & {
+  componentName: 'ApiKeys';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
@@ -160,5 +167,7 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | PricingTableCtx
-  | CheckoutCtx;
+  | CheckoutCtx
+  | ApiKeysCtx;
+
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

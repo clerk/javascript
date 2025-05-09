@@ -14,6 +14,12 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  apiKey: {
+    apiKeyPage: {
+      formHint: undefined,
+      title: undefined,
+    },
+  },
   backButton: 'Til baka',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
