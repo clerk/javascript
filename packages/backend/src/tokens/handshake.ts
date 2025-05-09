@@ -162,16 +162,10 @@ export class HandshakeService {
   }
 
   /**
-   * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
-   * @returns Promise resolving to either a SignedInState or SignedOutState
-   * @throws Error if handshake verification fails or if there are issues with the session token
+   * Gets handshake payload from either a nonce or a token
+   * @returns Promise resolving to string array of cookie directives
    */
-  async resolveHandshake(): Promise<SignedInState | SignedOutState> {
-    const headers = new Headers({
-      'Access-Control-Allow-Origin': 'null',
-      'Access-Control-Allow-Credentials': 'true',
-    });
-
+  public async getHandshakePayload(): Promise<string[]> {
     const cookiesToSet: string[] = [];
 
     if (this.authenticateContext.handshakeNonce) {
@@ -186,12 +180,34 @@ export class HandshakeService {
         console.error('Clerk: HandshakeService: error getting handshake payload:', error);
       }
     } else if (this.authenticateContext.handshakeToken) {
-      const handshakePayload = await verifyHandshakeToken(
-        this.authenticateContext.handshakeToken,
-        this.authenticateContext,
-      );
-      cookiesToSet.push(...handshakePayload.handshake);
+      try {
+        const handshakePayload = await verifyHandshakeToken(
+          this.authenticateContext.handshakeToken,
+          this.authenticateContext,
+        );
+        if (handshakePayload && Array.isArray(handshakePayload.handshake)) {
+          cookiesToSet.push(...handshakePayload.handshake);
+        }
+      } catch (error) {
+        console.error('Clerk: HandshakeService: error verifying handshake token:', error);
+      }
     }
+
+    return cookiesToSet;
+  }
+
+  /**
+   * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
+   * @returns Promise resolving to either a SignedInState or SignedOutState
+   * @throws Error if handshake verification fails or if there are issues with the session token
+   */
+  async resolveHandshake(): Promise<SignedInState | SignedOutState> {
+    const headers = new Headers({
+      'Access-Control-Allow-Origin': 'null',
+      'Access-Control-Allow-Credentials': 'true',
+    });
+
+    const cookiesToSet = await this.getHandshakePayload();
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
