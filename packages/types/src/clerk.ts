@@ -1,9 +1,9 @@
 import type { ApiKeyResource } from './apiKey';
 import type {
+  ApiKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
-  ManageApiKeysTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
@@ -461,19 +461,19 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mount a manage api keys component at the target element.
-   * @param targetNode Target to mount the ManageApiKeys component.
+   * Mount a api keys component at the target element.
+   * @param targetNode Target to mount the ApiKeys component.
    * @param props Configuration parameters.
    */
-  mountManageApiKeys: (targetNode: HTMLDivElement, props?: ManageApiKeysProps) => void;
+  mountApiKeys: (targetNode: HTMLDivElement, props?: ApiKeysProps) => void;
 
   /**
-   * Unmount a manage api keys component from the target element.
+   * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the ManageApiKeys component from.
+   * @param targetNode Target node to unmount the ApiKeys component from.
    */
-  unmountManageApiKeys: (targetNode: HTMLDivElement) => void;
+  unmountApiKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1658,12 +1658,12 @@ type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
-export type ManageApiKeysProps = {
+export type ApiKeysProps = {
   type?: 'api_key';
   subject?: string;
   perPage?: number;
   showSecretByDefault?: boolean;
-  appearance?: ManageApiKeysTheme;
+  appearance?: ApiKeysTheme;
 };
 
 export type GetApiKeysParams = {

@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 
-import { useManageApiKeysContext } from '../../contexts';
+import { useApiKeysContext } from '../../contexts';
 import {
   Box,
   Button,
@@ -49,9 +49,9 @@ const CopyButton = ({ apiKeyID }: { apiKeyID: string }) => {
   );
 };
 
-export const ManageApiKeys = withCardStateProvider(() => {
+export const ApiKeys = withCardStateProvider(() => {
   const clerk = useClerk();
-  const ctx = useManageApiKeysContext();
+  const ctx = useApiKeysContext();
   const {
     data: apiKeys,
     isLoading,

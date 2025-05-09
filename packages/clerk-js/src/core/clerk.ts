@@ -20,6 +20,7 @@ import type {
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   ApiKeyResource,
+  ApiKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -46,7 +47,6 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
-  ManageApiKeysProps,
   NavigateOptions,
   NextTaskParams,
   OrganizationListProps,
@@ -1043,21 +1043,21 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public mountManageApiKeys = (node: HTMLDivElement, props?: ManageApiKeysProps): void => {
+  public mountApiKeys = (node: HTMLDivElement, props?: ApiKeysProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'ManageApiKeys' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'ApiKeys' }).then(controls =>
       controls.mountComponent({
-        name: 'ManageApiKeys',
-        appearanceKey: 'manageApiKeys',
+        name: 'ApiKeys',
+        appearanceKey: 'apiKeys',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('ManageApiKeys', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('ApiKeys', props));
   };
 
-  public unmountManageApiKeys = (node: HTMLDivElement): void => {
+  public unmountApiKeys = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
