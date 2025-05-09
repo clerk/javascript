@@ -90,7 +90,9 @@ export const UserProfileRoutes = () => {
         <Route path={isApiKeysPageRoot ? undefined : 'api-keys'}>
           <Switch>
             <Route index>
-              <ApiKeysPage />
+              <Suspense fallback={''}>
+                <ApiKeysPage />
+              </Suspense>
             </Route>
           </Switch>
         </Route>

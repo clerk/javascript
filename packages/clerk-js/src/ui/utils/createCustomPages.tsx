@@ -305,6 +305,12 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
       icon: Users,
       path: 'organization-members',
     },
+    {
+      name: 'API keys',
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
+      icon: InformationCircle,
+      path: 'organization-api-keys',
+    },
   ];
   if (commerce) {
     INITIAL_ROUTES.push({
