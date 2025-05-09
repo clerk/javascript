@@ -180,16 +180,12 @@ export class HandshakeService {
         console.error('Clerk: HandshakeService: error getting handshake payload:', error);
       }
     } else if (this.authenticateContext.handshakeToken) {
-      try {
-        const handshakePayload = await verifyHandshakeToken(
-          this.authenticateContext.handshakeToken,
-          this.authenticateContext,
-        );
-        if (handshakePayload && Array.isArray(handshakePayload.handshake)) {
-          cookiesToSet.push(...handshakePayload.handshake);
-        }
-      } catch (error) {
-        console.error('Clerk: HandshakeService: error verifying handshake token:', error);
+      const handshakePayload = await verifyHandshakeToken(
+        this.authenticateContext.handshakeToken,
+        this.authenticateContext,
+      );
+      if (handshakePayload && Array.isArray(handshakePayload.handshake)) {
+        cookiesToSet.push(...handshakePayload.handshake);
       }
     }
 
