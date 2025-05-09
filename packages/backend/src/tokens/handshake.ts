@@ -162,10 +162,10 @@ export class HandshakeService {
   }
 
   /**
-   * Gets handshake payload from either a nonce or a token
+   * Gets cookies from either a handshake nonce or a handshake token
    * @returns Promise resolving to string array of cookie directives
    */
-  public async getHandshakePayload(): Promise<string[]> {
+  public async getCookiesFromHandshake(): Promise<string[]> {
     const cookiesToSet: string[] = [];
 
     if (this.authenticateContext.handshakeNonce) {
@@ -203,7 +203,7 @@ export class HandshakeService {
       'Access-Control-Allow-Credentials': 'true',
     });
 
-    const cookiesToSet = await this.getHandshakePayload();
+    const cookiesToSet = await this.getCookiesFromHandshake();
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {

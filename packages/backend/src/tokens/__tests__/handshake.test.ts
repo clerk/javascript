@@ -237,7 +237,7 @@ describe('HandshakeService', () => {
         },
       } as any;
 
-      const result = await handshakeService.getHandshakePayload();
+      const result = await handshakeService.getCookiesFromHandshake();
 
       expect(result).toEqual(mockDirectives);
       expect(getHandshakePayloadMock).toHaveBeenCalledWith({
@@ -258,7 +258,7 @@ describe('HandshakeService', () => {
 
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await handshakeService.getHandshakePayload();
+      const result = await handshakeService.getCookiesFromHandshake();
 
       expect(result).toEqual([]);
       expect(consoleSpy).toHaveBeenCalledWith('Clerk: HandshakeService: error getting handshake payload:', mockError);
@@ -272,7 +272,7 @@ describe('HandshakeService', () => {
       mockAuthenticateContext.handshakeNonce = undefined;
       mockAuthenticateContext.handshakeToken = undefined;
 
-      const result = await handshakeService.getHandshakePayload();
+      const result = await handshakeService.getCookiesFromHandshake();
 
       expect(result).toEqual([]);
     });
@@ -283,7 +283,7 @@ describe('HandshakeService', () => {
 
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const result = await handshakeService.getHandshakePayload();
+      const result = await handshakeService.getCookiesFromHandshake();
 
       expect(result).toEqual([]);
 
