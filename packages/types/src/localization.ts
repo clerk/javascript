@@ -156,6 +156,12 @@ type _LocalizationResource = {
       actionLink: LocalizationValue;
       actionLink__use_phone: LocalizationValue;
       actionLink__use_email: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     emailLink: {
       title: LocalizationValue;
@@ -192,6 +198,13 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formSubtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     continue: {
       title: LocalizationValue;

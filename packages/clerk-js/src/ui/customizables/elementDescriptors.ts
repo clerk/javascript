@@ -101,6 +101,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formResendCodeLink',
 
   'dividerRow',
+  'dividerColumn',
   'dividerText',
   'dividerLine',
 

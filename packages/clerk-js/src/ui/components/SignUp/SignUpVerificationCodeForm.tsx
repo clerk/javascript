@@ -1,5 +1,6 @@
+import { getAlternativePhoneCodeProviderName } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/types';
+import type { PhoneCodeChannel, SignUpResource } from '@clerk/types';
 
 import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -16,6 +17,7 @@ type SignInFactorOneCodeFormProps = {
   prepare: () => Promise<SignUpResource | void> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
   safeIdentifier?: string | undefined | null;
+  channel?: PhoneCodeChannel;
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
@@ -23,8 +25,10 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
   const { setActive } = useClerk();
   const { navigate } = useRouter();
 
+  const alternativePhoneCodeProvider = getAlternativePhoneCodeProviderName(props?.channel);
+
   const goBack = () => {
-    return navigate('../');
+    return navigate(alternativePhoneCodeProvider ? '../../' : '../');
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
@@ -35,7 +39,9 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
         return completeSignUpFlow({
           signUp: res,
           verifyEmailPath: '../verify-email-address',
-          verifyPhonePath: '../verify-phone-number',
+          verifyPhonePath: alternativePhoneCodeProvider
+            ? `../verify-phone-number/${alternativePhoneCodeProvider.channel}`
+            : '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
