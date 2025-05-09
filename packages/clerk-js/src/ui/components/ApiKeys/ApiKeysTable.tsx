@@ -1,23 +1,17 @@
-import React from 'react';
+import type { ApiKeyResource } from '@clerk/types';
 
 import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
-import { Eye, EyeSlash } from '../../icons';
+import { Clipboard, Eye } from '../../icons';
 
 export const ApiKeysTable = ({
-  apiKeys,
+  rows,
   isLoading,
-  revealedKeys,
-  toggleSecret,
-  revokeApiKey,
-  CopyButton,
+  onRevoke,
 }: {
-  apiKeys: any[];
+  rows: ApiKeyResource[];
   isLoading: boolean;
-  revealedKeys: Record<string, string | null>;
-  toggleSecret: (id: string) => void;
-  revokeApiKey: (id: string) => void;
-  CopyButton: React.ComponentType<{ apiKeyID: string }>;
+  onRevoke: (id: string) => void;
 }) => {
   return (
     <Table sx={{ tableLayout: 'fixed' }}>
@@ -40,7 +34,7 @@ export const ApiKeysTable = ({
             </Td>
           </Tr>
         ) : (
-          apiKeys.map(apiKey => (
+          rows.map(apiKey => (
             <Tr key={apiKey.id}>
               <Td>
                 <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
@@ -77,8 +71,8 @@ export const ApiKeysTable = ({
                     }}
                   >
                     <Input
-                      type={revealedKeys[apiKey.id] ? 'text' : 'password'}
-                      value={revealedKeys[apiKey.id] ?? '•••••••••••••••••••••••••'}
+                      type='password'
+                      value='•••••••••••••••••••••••••'
                       readOnly
                       aria-label='API key (hidden)'
                       tabIndex={-1}
@@ -87,13 +81,21 @@ export const ApiKeysTable = ({
                       variant='ghost'
                       size='sm'
                       sx={{ position: 'absolute', right: 0 }}
-                      onClick={() => void toggleSecret(apiKey.id)}
-                      aria-label={revealedKeys[apiKey.id] ? 'Hide key' : 'Show key'}
+                      aria-label={'Show key'}
                     >
-                      <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} />
+                      {/* <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} /> */}
+                      <Icon icon={Eye} />
                     </Button>
                   </Flex>
-                  <CopyButton apiKeyID={apiKey.id} />
+                  {/* <CopyButton apiKeyID={apiKey.id} /> */}
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    sx={{ margin: 1 }}
+                    aria-label={'Copy key'}
+                  >
+                    <Icon icon={Clipboard} />
+                  </Button>
                 </Flex>
               </Td>
               <Td>
@@ -103,7 +105,7 @@ export const ApiKeysTable = ({
                       // @ts-expect-error: TODO: Add locales
                       label: 'Revoke key',
                       isDestructive: true,
-                      onClick: () => void revokeApiKey(apiKey.id),
+                      onClick: () => onRevoke(apiKey.id),
                       isDisabled: false,
                     },
                   ]}
