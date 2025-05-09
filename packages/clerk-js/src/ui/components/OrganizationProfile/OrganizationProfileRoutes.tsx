@@ -67,13 +67,6 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Switch>
         </Route>
-        <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
-          <Switch>
-            <Route index>
-              <OrganizationApiKeysPage />
-            </Route>
-          </Switch>
-        </Route>
         {commerceSettings.billing.enabled && commerceSettings.billing.hasPaidOrgPlans && (
           <Protect
             condition={has =>
@@ -103,6 +96,15 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         )}
+        <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+          <Switch>
+            <Route index>
+              <Suspense fallback={''}>
+                <OrganizationApiKeysPage />
+              </Suspense>
+            </Route>
+          </Switch>
+        </Route>
       </Route>
     </Switch>
   );
