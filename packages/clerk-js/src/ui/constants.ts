@@ -9,6 +9,7 @@ export const ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID = {
   GENERAL: 'general',
   MEMBERS: 'members',
   BILLING: 'billing',
+  API_KEYS: 'apiKeys',
 };
 
 export const USER_BUTTON_ITEM_ID = {

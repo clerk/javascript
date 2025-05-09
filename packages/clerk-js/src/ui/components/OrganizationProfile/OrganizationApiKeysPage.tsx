@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 
 import { ApiKeysContext, useApiKeysContext } from '../../contexts';
 import { Col } from '../../customizables';
@@ -8,8 +8,8 @@ import { useApiKeys } from '../ApiKeys/shared';
 
 function APIKeysPageInternal() {
   const ctx = useApiKeysContext();
-  const { user } = useUser();
-  const apiKeys = useApiKeys(user?.id ?? '', ctx.perPage);
+  const { organization } = useOrganization();
+  const apiKeys = useApiKeys(organization?.id ?? '', ctx.perPage);
   return (
     <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
       <ApiKeysInternal
@@ -20,12 +20,12 @@ function APIKeysPageInternal() {
   );
 }
 
-export const ApiKeysPage = () => {
+export const OrganizationApiKeysPage = () => {
   return (
     <Col gap={4}>
       <Header.Root>
+        {/* TODO: Add localization key */}
         <Header.Title
-          // TODO: Add localization key
           localizationKey='API Keys'
           textVariant='h2'
         />
