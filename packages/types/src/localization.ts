@@ -248,6 +248,12 @@ type _LocalizationResource = {
       actionLink__use_passkey: LocalizationValue;
       actionText__join_waitlist: LocalizationValue;
       actionLink__join_waitlist: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     password: {
       title: LocalizationValue;
@@ -329,6 +335,12 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;

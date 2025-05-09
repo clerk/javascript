@@ -120,6 +120,7 @@ export class SignIn extends BaseResource implements SignInResource {
         config = {
           phoneNumberId: factor.phoneNumberId,
           default: factor.default,
+          channel: factor.channel,
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
