@@ -9,6 +9,12 @@ import { ClerkInjectionKey } from './keys';
 
 export type PluginOptions = LoadClerkJsScriptOptions;
 
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
+};
+
 /**
  * Vue plugin for integrating Clerk.
  *
@@ -27,10 +33,10 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * app.mount('#app')
  * ```
  */
-export const clerkPlugin: Plugin = {
-  install(app, options: PluginOptions) {
+export const clerkPlugin: Plugin<[PluginOptions]> = {
+  install(app, pluginOptions) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
-    const { initialState } = options;
+    const { initialState } = pluginOptions;
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);
@@ -41,6 +47,11 @@ export const clerkPlugin: Plugin = {
       user: undefined,
       organization: undefined,
     });
+
+    const options: LoadClerkJsScriptOptions = {
+      ...pluginOptions,
+      sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
+    };
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code
@@ -68,8 +79,9 @@ export const clerkPlugin: Plugin = {
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));
 
     const authCtx = computed(() => {
-      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions } = derivedState.value;
-      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions };
+      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions, sessionStatus, sessionClaims } =
+        derivedState.value;
+      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, sessionStatus, sessionClaims };
     });
     const clientCtx = computed(() => resources.value.client);
     const userCtx = computed(() => derivedState.value.user);
@@ -83,6 +95,8 @@ export const clerkPlugin: Plugin = {
       sessionCtx,
       userCtx,
       organizationCtx,
+      treatPendingAsSignedOut:
+        options.treatPendingAsSignedOut ?? clerk.value?.__internal_getOption?.('treatPendingAsSignedOut'),
     });
   },
 };

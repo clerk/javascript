@@ -25,6 +25,7 @@ interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
   clerkTraceId?: string;
+  retryAfter?: number;
 }
 
 // For a comprehensive Metamask error list, please see
@@ -61,6 +62,10 @@ export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError 
  */
 export function isClerkRuntimeError(err: any): err is ClerkRuntimeError {
   return 'clerkRuntimeError' in err;
+}
+
+export function isReverificationCancelledError(err: any) {
+  return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
 }
 
 export function isMetamaskError(err: any): err is MetamaskError {
@@ -115,10 +120,11 @@ export class ClerkAPIResponseError extends Error {
   status: number;
   message: string;
   clerkTraceId?: string;
+  retryAfter?: number;
 
   errors: ClerkAPIError[];
 
-  constructor(message: string, { data, status, clerkTraceId }: ClerkAPIResponseOptions) {
+  constructor(message: string, { data, status, clerkTraceId, retryAfter }: ClerkAPIResponseOptions) {
     super(message);
 
     Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
@@ -126,6 +132,7 @@ export class ClerkAPIResponseError extends Error {
     this.status = status;
     this.message = message;
     this.clerkTraceId = clerkTraceId;
+    this.retryAfter = retryAfter;
     this.clerkError = true;
     this.errors = parseErrors(data);
   }
@@ -157,7 +164,6 @@ export class ClerkRuntimeError extends Error {
    * The error message.
    *
    * @type {string}
-   * @memberof ClerkRuntimeError
    */
   message: string;
 
@@ -165,7 +171,6 @@ export class ClerkRuntimeError extends Error {
    * A unique code identifying the error, can be used for localization.
    *
    * @type {string}
-   * @memberof ClerkRuntimeError
    */
   code: string;
 
@@ -188,7 +193,6 @@ export class ClerkRuntimeError extends Error {
    * Returns a string representation of the error.
    *
    * @returns {string} A formatted string with the error name and message.
-   * @memberof ClerkRuntimeError
    */
   public toString = () => {
     return `[${this.name}]\nMessage:${this.message}`;
@@ -211,7 +215,7 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
 }
 
 /**
- * @deprecated Please use `EmailLinkErrorCodeStatus` instead.
+ * @deprecated Use `EmailLinkErrorCodeStatus` instead.
  *
  * @hidden
  */

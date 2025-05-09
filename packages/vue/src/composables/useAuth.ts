@@ -1,4 +1,12 @@
-import type { CheckAuthorizationWithCustomPermissions, Clerk, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
+import { resolveAuthState } from '@clerk/shared/authorization';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  Clerk,
+  GetToken,
+  PendingSessionOptions,
+  SignOut,
+  UseAuthReturn,
+} from '@clerk/types';
 import { computed, type ShallowRef, watch } from 'vue';
 
 import { errorThrower } from '../errors/errorThrower';
@@ -48,7 +56,7 @@ function createSignOut(clerk: ShallowRef<Clerk | null>) {
   };
 }
 
-type UseAuth = () => ToComputedRefs<UseAuthReturn>;
+type UseAuth = (options?: PendingSessionOptions) => ToComputedRefs<UseAuthReturn>;
 
 /**
  * Returns the current auth state, the user and session ids and the `getToken`
@@ -72,14 +80,14 @@ type UseAuth = () => ToComputedRefs<UseAuthReturn>;
  *   </div>
  * </template>
  */
-export const useAuth: UseAuth = () => {
-  const { clerk, authCtx } = useClerkContext();
+export const useAuth: UseAuth = (options = {}) => {
+  const { clerk, authCtx, ...contextOptions } = useClerkContext();
 
   const getToken: GetToken = createGetToken(clerk);
   const signOut: SignOut = createSignOut(clerk);
 
   const result = computed<UseAuthReturn>(() => {
-    const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = authCtx.value;
+    const { userId, orgId, orgRole, orgPermissions } = authCtx.value;
 
     const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
       if (!params?.permission && !params?.role) {
@@ -100,71 +108,23 @@ export const useAuth: UseAuth = () => {
       return false;
     };
 
-    if (sessionId === undefined && userId === undefined) {
-      return {
-        isLoaded: false,
-        isSignedIn: undefined,
-        sessionId,
-        userId,
-        actor: undefined,
-        orgId: undefined,
-        orgRole: undefined,
-        orgSlug: undefined,
-        has: undefined,
-        signOut,
+    const payload = resolveAuthState({
+      authObject: {
+        ...authCtx.value,
         getToken,
-      };
-    }
-
-    if (sessionId === null && userId === null) {
-      return {
-        isLoaded: true,
-        isSignedIn: false,
-        sessionId,
-        userId,
-        actor: null,
-        orgId: null,
-        orgRole: null,
-        orgSlug: null,
-        has: () => false,
         signOut,
-        getToken,
-      };
-    }
-
-    if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-      return {
-        isLoaded: true,
-        isSignedIn: true,
-        sessionId,
-        userId,
-        actor: actor || null,
-        orgId,
-        orgRole,
-        orgSlug: orgSlug || null,
         has,
-        signOut,
-        getToken,
-      };
+      },
+      options: {
+        treatPendingAsSignedOut: options.treatPendingAsSignedOut ?? contextOptions.treatPendingAsSignedOut,
+      },
+    });
+
+    if (!payload) {
+      return errorThrower.throw(invalidStateError);
     }
 
-    if (!!sessionId && !!userId && !orgId) {
-      return {
-        isLoaded: true,
-        isSignedIn: true,
-        sessionId,
-        userId,
-        actor: actor || null,
-        orgId: null,
-        orgRole: null,
-        orgSlug: null,
-        has: () => false,
-        signOut,
-        getToken,
-      };
-    }
-
-    return errorThrower.throw(invalidStateError);
+    return payload;
   });
 
   return toComputedRefs(result);

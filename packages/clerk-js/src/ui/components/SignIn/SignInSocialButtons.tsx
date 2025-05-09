@@ -8,7 +8,7 @@ import { useCardState } from '../../elements/contexts';
 import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
-import { handleError, web3CallbackErrorHandler } from '../../utils';
+import { handleError, originPrefersPopup, web3CallbackErrorHandler } from '../../utils';
 
 export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const clerk = useClerk();
@@ -19,11 +19,30 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const signIn = useCoreSignIn();
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
+  const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
 
   return (
     <SocialButtons
       {...props}
+      idleAfterDelay={!shouldUsePopup}
       oauthCallback={strategy => {
+        if (shouldUsePopup) {
+          // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
+          // opened within async functions. The `signInWithPopup` method handles setting the URL of the popup.
+          const popup = window.open('about:blank', '', 'width=600,height=800');
+          // Unfortunately, there's no good way to detect when the popup is closed, so we simply poll and check if it's closed.
+          const interval = setInterval(() => {
+            if (!popup || popup.closed) {
+              clearInterval(interval);
+              card.setIdle();
+            }
+          }, 500);
+
+          return signIn
+            .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup })
+            .catch(err => handleError(err, [], card.setError));
+        }
+
         return signIn
           .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
           .catch(err => handleError(err, [], card.setError));
@@ -35,6 +54,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
             strategy,
+            secondFactorUrl: 'factor-two',
           })
           .catch(err => web3CallbackErrorHandler(err, card.setError));
       }}

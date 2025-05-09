@@ -22,6 +22,7 @@ type AcceptedResource =
 function clientChanged(prev: ClientResource, next: ClientResource): boolean {
   return (
     prev.id !== next.id ||
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     prev.updatedAt!.getTime() < next.updatedAt!.getTime() ||
     prev.sessions.length !== next.sessions.length
   );
@@ -31,7 +32,8 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
   return (
     prev.id !== next.id ||
     prev.updatedAt.getTime() < next.updatedAt.getTime() ||
-    sessionFVAChanged(prev, next) ||
+    // TODO: Optimize this to once JWT v2 formatting is out.
+    prev.lastActiveToken?.jwt?.claims?.__raw !== next.lastActiveToken?.jwt?.claims?.__raw ||
     sessionUserMembershipPermissionsChanged(prev, next) ||
     sessionUserChanged(prev, next)
   );
@@ -39,6 +41,7 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
 
 function userChanged(prev: UserResource, next: UserResource): boolean {
   return (
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     prev.id !== next.id || prev.updatedAt!.getTime() < next.updatedAt!.getTime() || userMembershipsChanged(next, prev)
   );
 }
@@ -49,15 +52,6 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
     prev.organizationMemberships.length !== next.organizationMemberships.length ||
     prev.organizationMemberships[0]?.updatedAt !== next.organizationMemberships[0]?.updatedAt
   );
-}
-
-function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolean {
-  const prevFVA = prev.factorVerificationAge;
-  const nextFVA = next.factorVerificationAge;
-  if (prevFVA !== null && nextFVA !== null) {
-    return prevFVA[0] !== nextFVA[0] || prevFVA[1] !== nextFVA[1];
-  }
-  return prevFVA !== nextFVA;
 }
 
 function sessionUserChanged(prev: SessionResource, next: SessionResource): boolean {
@@ -80,10 +74,7 @@ function sessionUserMembershipPermissionsChanged(prev: SessionResource, next: Se
     mem => mem.organization.id === prev.lastActiveOrganizationId,
   );
 
-  return (
-    prevActiveMembership?.role !== nextActiveMembership?.role ||
-    prevActiveMembership?.permissions?.length !== nextActiveMembership?.permissions?.length
-  );
+  return prevActiveMembership?.permissions?.length !== nextActiveMembership?.permissions?.length;
 }
 
 // TODO: Decide if this belongs in the resources

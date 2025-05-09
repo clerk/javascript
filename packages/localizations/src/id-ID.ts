@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Kembali',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Default',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Perangkat impersonator lain',
   badge__primary: 'Utama',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Memerlukan tindakan',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Perangkat ini',
   badge__unverified: 'Belum diverifikasi',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Perangkat pengguna',
   badge__you: 'Anda',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
     invitePage: {
@@ -123,6 +162,41 @@ export const idID: LocalizationResource = {
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
     badge__unverified: 'Belum diverifikasi',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Tambahkan domain untuk verifikasi. Pengguna dengan alamat email di domain ini dapat bergabung dengan organisasi secara otomatis atau meminta untuk bergabung.',
@@ -180,10 +254,17 @@ export const idID: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Kelola organisasi Anda.',
       general: 'Umum',
       members: 'Anggota',
       title: 'Organisasi',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -580,7 +661,7 @@ export const idID: LocalizationResource = {
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',
@@ -602,7 +683,8 @@ export const idID: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
     organization_domain_blocked: 'Ini adalah domain penyedia email yang diblokir. Silakan gunakan yang lain.',
     organization_domain_common: 'Ini adalah domain penyedia email umum. Silakan gunakan yang lain.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -625,6 +707,7 @@ export const idID: LocalizationResource = {
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
+    session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
@@ -673,14 +756,6 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
@@ -696,6 +771,41 @@ export const idID: LocalizationResource = {
         'Anda dapat menggunakan salah satu dari ini untuk masuk ke akun Anda, jika kehilangan akses ke perangkat autentikasi.',
       title: 'Tambah verifikasi kode cadangan',
       title__codelist: 'Kode cadangan',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Pilih penyedia untuk menghubungkan akun Anda.',
@@ -832,6 +942,9 @@ export const idID: LocalizationResource = {
       title: 'Tambah nomor telepon',
       verifySubtitle: 'Masukkan kode verifikasi yang dikirim ke {{identifier}}',
       verifyTitle: 'Verifikasi nomor telepon',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ukuran yang disarankan 1:1, hingga 10MB.',

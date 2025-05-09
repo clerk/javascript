@@ -17,7 +17,7 @@ import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
 import { getInitialValuesFromQueryParams } from '../utils';
 
-export type SignUpContextType = SignUpCtx & {
+export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQueryString;
   signInUrl: string;
@@ -31,7 +31,6 @@ export type SignUpContextType = SignUpCtx & {
   isCombinedFlow: boolean;
   emailLinkRedirectUrl: string;
   ssoCallbackUrl: string;
-  withSessionTasks: boolean;
 };
 
 export const SignUpContext = createContext<SignUpCtx | null>(null);
@@ -66,12 +65,15 @@ export const useSignUpContext = (): SignUpContextType => {
     options,
     {
       ...ctx,
-      signUpFallbackRedirectUrl: ctx.fallbackRedirectUrl,
-      signUpForceRedirectUrl: ctx.forceRedirectUrl,
+      signUpFallbackRedirectUrl: ctx.signUpFallbackRedirectUrl || ctx.fallbackRedirectUrl,
+      signUpForceRedirectUrl: ctx.signUpForceRedirectUrl || ctx.forceRedirectUrl,
     },
     queryParams,
     mode,
   );
+
+  delete ctx.fallbackRedirectUrl;
+  delete ctx.forceRedirectUrl;
 
   const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
   const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
@@ -123,6 +125,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
   return {
     ...ctx,
+    oauthFlow: ctx.oauthFlow || 'auto',
     componentName,
     signInUrl,
     signUpUrl,
@@ -138,6 +141,5 @@ export const useSignUpContext = (): SignUpContextType => {
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,
     isCombinedFlow,
-    withSessionTasks: !!options.experimental?.withSessionTasks,
   };
 };

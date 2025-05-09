@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'กลับ',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
   badge__primary: 'หลัก',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'ต้องการการดำเนินการ',
+  badge__startsAt: undefined,
   badge__thisDevice: 'อุปกรณ์นี้',
   badge__unverified: 'ยังไม่ได้ตรวจสอบ',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
     invitePage: {
@@ -122,6 +161,41 @@ export const thTH: LocalizationResource = {
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
@@ -179,10 +253,17 @@ export const thTH: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'จัดการองค์กรของคุณ',
       general: 'ทั่วไป',
       members: 'สมาชิก',
       title: 'องค์กร',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -593,7 +674,8 @@ export const thTH: LocalizationResource = {
       'ชื่อผู้ใช้ของคุณมีอักขระที่ไม่ถูกต้อง โปรดใช้เฉพาะตัวอักษร ตัวเลข และขีดล่างเท่านั้น',
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
     identification_deletion_failed: 'คุณไม่สามารถลบรูปแบบการยืนยันตัวตนสุดท้ายของคุณได้',
-    not_allowed_access: 'คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้ โปรดติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่านี่เป็นข้อผิดพลาด',
+    not_allowed_access:
+      'ไม่อนุญาตให้ใช้ที่อยู่อีเมลหรือหมายเลขโทรศัพท์ในการลงทะเบียน สาเหตุอาจเกิดจากการใช้เครื่องหมาย "+" "=" "#" หรือ "." ในที่อยู่อีเมลของคุณ การใช้โดเมนที่เชื่อมต่อกับบริการอีเมลชั่วคราว หรือการถูกบล็อกโดยชัดเจน หากคุณเชื่อว่านี่คือข้อผิดพลาด โปรดติดต่อฝ่ายสนับสนุน',
     organization_domain_blocked: 'นี่เป็นโดเมนผู้ให้บริการอีเมลที่ถูกบล็อก โปรดใช้โดเมนอื่น',
     organization_domain_common: 'นี่เป็นโดเมนผู้ให้บริการอีเมลทั่วไป โปรดใช้โดเมนอื่น',
     organization_domain_exists_for_enterprise_connection: 'โดเมนนี้ถูกใช้สำหรับ SSO ขององค์กรของคุณแล้ว',
@@ -614,6 +696,7 @@ export const thTH: LocalizationResource = {
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
     phone_number_exists: 'หมายเลขโทรศัพท์นี้ถูกใช้แล้ว โปรดลองหมายเลขอื่น',
+    session_exists: 'คุณเข้าสู่ระบบอยู่แล้ว',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้งานได้ แต่ควรจะแข็งแกร่งกว่านี้ ลองเพิ่มอักขระเพิ่มเติม',
@@ -662,14 +745,6 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -684,6 +759,41 @@ export const thTH: LocalizationResource = {
         'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
       title: 'เพิ่มการยืนยันรหัสสำรอง',
       title__codelist: 'รหัสสำรอง',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'เลือกผู้ให้บริการเพื่อเชื่อมต่อบัญชีของคุณ',
@@ -824,6 +934,9 @@ export const thTH: LocalizationResource = {
       title: 'เพิ่มหมายเลขโทรศัพท์',
       verifySubtitle: 'ป้อนรหัสยืนยันที่ถูกส่งไปยัง {{identifier}}',
       verifyTitle: 'ยืนยันหมายเลขโทรศัพท์',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'แนะนำสัดส่วน 1:1 และ สูงสุด 10MB',

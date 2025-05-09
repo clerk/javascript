@@ -92,8 +92,17 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
+    // This will retry the getToken call if it fails with a non-4xx error
+    // We're going to trigger 8 retries in the span of ~3 minutes,
+    // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
     return retry(() => this._getToken(options), {
-      shouldRetry: (error: unknown, currentIteration: number) => !is4xxError(error) && currentIteration < 4,
+      factor: 1.55,
+      initialDelay: 3 * 1000,
+      maxDelayBetweenRetries: 50 * 1_000,
+      jitter: false,
+      shouldRetry: (error, iterationsCount) => {
+        return !is4xxError(error) && iterationsCount <= 8;
+      },
     });
   };
 
@@ -106,6 +115,8 @@ export class Session extends BaseResource implements SessionResource {
       orgId: activeMembership?.id,
       orgRole: activeMembership?.role,
       orgPermissions: activeMembership?.permissions,
+      features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
+      plans: (this.lastActiveToken?.jwt?.claims.pla as string) || '',
     })(params);
   };
 
@@ -342,7 +353,7 @@ export class Session extends BaseResource implements SessionResource {
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
-        eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
+        eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
@@ -357,7 +368,13 @@ export class Session extends BaseResource implements SessionResource {
 
     return tokenResolver.then(token => {
       if (shouldDispatchTokenUpdate) {
-        eventBus.dispatch(events.TokenUpdate, { token });
+        eventBus.emit(events.TokenUpdate, { token });
+
+        if (token.jwt) {
+          this.lastActiveToken = token;
+          // Emits the updated session with the new token to the state listeners
+          eventBus.emit(events.SessionTokenResolved, null);
+        }
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;

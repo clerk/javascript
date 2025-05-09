@@ -104,8 +104,9 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       })
     : window.location.href;
 
-  const [createExternalAccount] = useReverification(() =>
+  const createExternalAccount = useReverification(() =>
     user?.createExternalAccount({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       strategy: account.verification!.strategy as OAuthStrategy,
       redirectUrl,
       additionalScopes,
@@ -140,6 +141,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
       }
 
       if (response) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
       }
     } catch (err) {

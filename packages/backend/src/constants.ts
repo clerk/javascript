@@ -3,7 +3,7 @@ export const API_VERSION = 'v1';
 
 export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
-export const SUPPORTED_BAPI_VERSION = '2024-10-01';
+export const SUPPORTED_BAPI_VERSION = '2025-04-10';
 
 const Attributes = {
   AuthToken: '__clerkAuthToken',
@@ -21,6 +21,7 @@ const Cookies = {
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
   RedirectCount: '__clerk_redirect_count',
+  HandshakeNonce: '__clerk_handshake_nonce',
 } as const;
 
 const QueryParameters = {
@@ -33,32 +34,37 @@ const QueryParameters = {
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
   HandshakeReason: '__clerk_hs_reason',
+  HandshakeNonce: Cookies.HandshakeNonce,
 } as const;
 
 const Headers = {
-  AuthToken: 'x-clerk-auth-token',
+  Accept: 'accept',
+  AuthMessage: 'x-clerk-auth-message',
+  Authorization: 'authorization',
+  AuthReason: 'x-clerk-auth-reason',
   AuthSignature: 'x-clerk-auth-signature',
   AuthStatus: 'x-clerk-auth-status',
-  AuthReason: 'x-clerk-auth-reason',
-  AuthMessage: 'x-clerk-auth-message',
-  ClerkUrl: 'x-clerk-clerk-url',
-  EnableDebug: 'x-clerk-debug',
-  ClerkRequestData: 'x-clerk-request-data',
+  AuthToken: 'x-clerk-auth-token',
+  CacheControl: 'cache-control',
   ClerkRedirectTo: 'x-clerk-redirect-to',
+  ClerkRequestData: 'x-clerk-request-data',
+  ClerkUrl: 'x-clerk-clerk-url',
   CloudFrontForwardedProto: 'cloudfront-forwarded-proto',
-  Authorization: 'authorization',
+  ContentType: 'content-type',
+  ContentSecurityPolicy: 'content-security-policy',
+  ContentSecurityPolicyReportOnly: 'content-security-policy-report-only',
+  EnableDebug: 'x-clerk-debug',
+  ForwardedHost: 'x-forwarded-host',
   ForwardedPort: 'x-forwarded-port',
   ForwardedProto: 'x-forwarded-proto',
-  ForwardedHost: 'x-forwarded-host',
-  Accept: 'accept',
-  Referrer: 'referer',
-  UserAgent: 'user-agent',
-  Origin: 'origin',
   Host: 'host',
-  ContentType: 'content-type',
-  SecFetchDest: 'sec-fetch-dest',
   Location: 'location',
-  CacheControl: 'cache-control',
+  Nonce: 'x-nonce',
+  Origin: 'origin',
+  Referrer: 'referer',
+  SecFetchDest: 'sec-fetch-dest',
+  UserAgent: 'user-agent',
+  ReportingEndpoints: 'reporting-endpoints',
 } as const;
 
 const ContentTypes = {

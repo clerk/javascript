@@ -140,7 +140,8 @@ export type SignInRouterSnapshot = MachineSnapshot<
   SignInRouterStateValue,
   SignInRouterTags,
   SignInRouterOuptut,
-  any // TMeta - Introduced in XState 5.12.x
+  any, // TMeta - Introduced in XState 5.12.x
+  any // TConfig - Required in newer XState versions
 >;
 
 // ---------------------------------- Machine Type ---------------------------------- //
@@ -158,7 +159,8 @@ export type TSignInRouterParentMachine = StateMachine<
   any, // input
   SignInRouterOuptut, // output
   any, // emitted
-  any // meta
+  any, // meta
+  any // config
 >;
 
 // ---------------------------------- Machine Actor Ref ---------------------------------- //

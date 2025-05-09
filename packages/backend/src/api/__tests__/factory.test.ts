@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import jwksJson from '../../fixtures/jwks.json';
 import userJson from '../../fixtures/user.json';
 import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
@@ -152,6 +153,38 @@ describe('api.client', () => {
     expect(errResponse.clerkTraceId).toBe('mock_cf_ray');
   });
 
+  it('executes a failed backend API request and includes Retry-After header', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json({ errors: [] }, { status: 429, headers: { 'retry-after': '123' } });
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(429);
+    expect(errResponse.retryAfter).toBe(123);
+  });
+
+  it('executes a failed backend API request and ignores invalid Retry-After header', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json({ errors: [] }, { status: 429, headers: { 'retry-after': 'abc' } });
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(429);
+    expect(errResponse.retryAfter).toBe(undefined);
+  });
+
   it('executes a successful backend API request to delete a domain', async () => {
     const DOMAIN_ID = 'dmn_123';
     server.use(
@@ -242,5 +275,31 @@ describe('api.client', () => {
     expect(data[0].provider).toBe('oauth_google');
     expect(data[0].token).toBe('<token>');
     expect(data[0].scopes).toEqual(['email', 'profile']);
+  });
+
+  describe('JWKS', () => {
+    it('executes a successful backend API request for a single resource and returns the raw response', async () => {
+      server.use(
+        http.get(
+          `https://api.clerk.test/v1/jwks`,
+          validateHeaders(() => {
+            return HttpResponse.json(jwksJson);
+          }),
+        ),
+      );
+
+      const response = await apiClient.jwks.getJwks();
+      const key = response.keys?.[0];
+
+      expect(key).toBeDefined();
+      expect(key?.kid).toBe('ins_1234');
+      expect(key?.alg).toBe('RS256');
+      expect(key?.kty).toBe('RSA');
+      expect(key?.use).toBe('sig');
+      expect(key?.e).toBe('BQGF');
+      expect(key?.n).toBe(
+        'xV3jihnMy4sr5jJ4S66YTc6FxnFsVy3weiyJFYOAdo515AZMrpMMdraAiVmnXZfolZpv7CcnsnG290cg-XfGRNk-Jil_tJt2SLGtiT9LtWT_iev4zN8veRGzTaOb6C-Qb6T_8xsjP_sp0a92zyNgyc4UxR-acMmOqxjkHmx1q0U1fCom83WI59Yu5VmvLM4MA-1sLkmAE1bTzp4ie-_xu9anwsS3H97MONGtildB4nAG0L-lj7tReNHoYLkciEKCqqUMoK-o6JN29OKozpqiI4dVv0oityWw2ygf6eR5qrKZZjrjbAMt_emXBFGQ5Y1QSsriJoRoykGcdbXaU7S_QV',
+      );
+    });
   });
 });

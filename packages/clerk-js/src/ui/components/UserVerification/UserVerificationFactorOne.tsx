@@ -1,5 +1,5 @@
-import type { SignInFactor } from '@clerk/types';
-import React, { useEffect } from 'react';
+import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
+import React, { useEffect, useMemo } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
@@ -10,6 +10,7 @@ import { AlternativeMethods } from './AlternativeMethods';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
+import { sortByPrimaryFactor } from './utils';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
@@ -28,15 +29,29 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
+  'password',
+  'email_code',
+  'phone_code',
+  'passkey',
+] as const;
+
 export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
   const { navigate } = useRouter();
 
   const lastPreparedFactorKeyRef = React.useRef('');
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const sessionVerification = data!;
 
-  const availableFactors = sessionVerification.supportedFirstFactors;
+  const availableFactors = useMemo(() => {
+    return (
+      sessionVerification.supportedFirstFactors
+        ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        ?.sort(sortByPrimaryFactor) || null
+    );
+  }, [sessionVerification.supportedFirstFactors]);
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
 
   const [{ currentFactor }, setFactor] = React.useState<{

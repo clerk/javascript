@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.12.6",
+  "version": "6.19.1",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -44,13 +44,19 @@
       "types": "./dist/types/internal.d.ts",
       "import": "./dist/esm/internal.js",
       "require": "./dist/cjs/internal.js"
+    },
+    "./webhooks": {
+      "types": "./dist/types/webhooks.d.ts",
+      "import": "./dist/esm/webhooks.js",
+      "require": "./dist/cjs/webhooks.js"
     }
   },
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "server",
-    "errors"
+    "errors",
+    "webhooks"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
@@ -58,7 +64,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
-    "lint": "eslint src/",
+    "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace --sig",
@@ -75,10 +81,10 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "^14.2.24"
+    "next": "14.2.28"
   },
   "peerDependencies": {
-    "next": "^13.5.4 || ^14.0.3 || ^15.0.0",
+    "next": "^13.5.7 || ^14.2.25 || ^15.2.3",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },

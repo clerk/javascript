@@ -1,6 +1,7 @@
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants } from '@clerk/backend/internal';
-import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { deprecated } from '@clerk/shared/deprecated';
+import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 
@@ -80,18 +81,15 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   return eventHandler(async event => {
     const clerkRequest = toWebRequest(event);
 
-    clerkClient(event).telemetry.record(
-      eventMethodCalled('clerkMiddleware', {
-        handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
-      }),
-    );
-
     const requestState = await clerkClient(event).authenticateRequest(clerkRequest, options);
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
+      handleNetlifyCacheInDevInstance({
+        locationHeader,
+        requestStateHeaders: requestState.headers,
+        publishableKey: requestState.publishableKey,
+      });
       // Trigger a handshake redirect
       return new Response(null, { status: 307, headers: requestState.headers });
     }
@@ -107,7 +105,17 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
     }
 
     const authObject = requestState.toAuth();
-    event.context.auth = authObject;
+    const authHandler = () => authObject;
+
+    const auth = new Proxy(Object.assign(authHandler, authObject), {
+      get(target, prop: string, receiver) {
+        deprecated('event.context.auth', 'Use `event.context.auth()` as a function instead.');
+
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+
+    event.context.auth = auth;
     // Internal serializable state that will be passed to the client
     event.context.__clerk_initial_state = createInitialState(authObject);
 

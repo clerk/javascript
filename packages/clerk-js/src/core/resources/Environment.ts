@@ -1,6 +1,6 @@
 import type {
-  __experimental_CommerceSettingsResource,
   AuthConfigResource,
+  CommerceSettingsResource,
   DisplayConfigResource,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
@@ -9,7 +9,8 @@ import type {
   UserSettingsResource,
 } from '@clerk/types';
 
-import { __experimental_CommerceSettings, AuthConfig, BaseResource, DisplayConfig, UserSettings } from './internal';
+import { eventBus, events } from '../../core/events';
+import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {
@@ -21,7 +22,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
   pathRoot = '/environment';
   userSettings: UserSettingsResource = new UserSettings();
   organizationSettings: OrganizationSettingsResource = new OrganizationSettings();
-  __experimental_commerceSettings: __experimental_CommerceSettingsResource = new __experimental_CommerceSettings();
+  commerceSettings: CommerceSettingsResource = new CommerceSettings();
 
   public static getInstance(): Environment {
     if (!Environment.instance) {
@@ -47,13 +48,18 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.maintenanceMode = this.withDefault(data.maintenance_mode, this.maintenanceMode);
     this.organizationSettings = new OrganizationSettings(data.organization_settings);
     this.userSettings = new UserSettings(data.user_settings);
-    this.__experimental_commerceSettings = new __experimental_CommerceSettings(data.commerce_settings);
+    this.commerceSettings = new CommerceSettings(data.commerce_settings);
 
     return this;
   }
 
   fetch({ touch, fetchMaxTries }: { touch: boolean; fetchMaxTries?: number } = { touch: false }): Promise<Environment> {
-    return touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
+    const promise = touch ? this._basePatch({}) : this._baseGet({ fetchMaxTries });
+
+    return promise.then(data => {
+      eventBus.emit(events.EnvironmentUpdate, null);
+      return data;
+    });
   }
 
   isDevelopmentOrStaging = (): boolean => {
@@ -81,7 +87,7 @@ export class Environment extends BaseResource implements EnvironmentResource {
       maintenance_mode: this.maintenanceMode,
       organization_settings: this.organizationSettings.__internal_toSnapshot(),
       user_settings: this.userSettings.__internal_toSnapshot(),
-      commerce_settings: this.__experimental_commerceSettings.__internal_toSnapshot(),
+      commerce_settings: this.commerceSettings.__internal_toSnapshot(),
     };
   }
 }

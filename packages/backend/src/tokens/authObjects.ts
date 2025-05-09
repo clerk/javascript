@@ -1,12 +1,11 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
-  ActClaim,
   CheckAuthorizationFromSessionClaims,
   JwtPayload,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
+  SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
@@ -26,21 +25,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 /**
  * @internal
  */
-export type SignedInAuthObject = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  actor: ActClaim | undefined;
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  /**
-   * Factor Verification Age
-   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
-   * [fistFactorAge, secondFactorAge]
-   */
-  factorVerificationAge: [firstFactorAge: number, secondFactorAge: number] | null;
+export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -52,6 +37,7 @@ export type SignedInAuthObject = {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
+  sessionStatus: null;
   actor: null;
   userId: null;
   orgId: null;
@@ -91,30 +77,19 @@ export function signedInAuthObject(
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
-  const {
-    act: actor,
-    sid: sessionId,
-    org_id: orgId,
-    org_role: orgRole,
-    org_slug: orgSlug,
-    org_permissions: orgPermissions,
-    sub: userId,
-    fva,
-  } = sessionClaims;
+  const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
+    __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
     sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
-
-  // fva can be undefined for instances that have not opt-in
-  const factorVerificationAge = fva ?? null;
-
   return {
     actor,
     sessionClaims,
     sessionId,
+    sessionStatus,
     userId,
     orgId,
     orgRole,
@@ -122,7 +97,15 @@ export function signedInAuthObject(
     orgPermissions,
     factorVerificationAge,
     getToken,
-    has: createCheckAuthorization({ orgId, orgRole, orgPermissions, userId, factorVerificationAge }),
+    has: createCheckAuthorization({
+      orgId,
+      orgRole,
+      orgPermissions,
+      userId,
+      factorVerificationAge,
+      features: (sessionClaims.fea as string) || '',
+      plans: (sessionClaims.pla as string) || '',
+    }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -134,6 +117,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
   return {
     sessionClaims: null,
     sessionId: null,
+    sessionStatus: null,
     userId: null,
     actor: null,
     orgId: null,

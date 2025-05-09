@@ -5,9 +5,11 @@ import type {
   ClientResource,
   CustomMenuItem,
   CustomPage,
+  JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   OrganizationResource,
+  SessionStatusClaim,
   SignedInSessionResource,
   UserResource,
   Without,
@@ -20,6 +22,8 @@ export interface VueClerkInjectionKeyType {
     userId: string | null | undefined;
     sessionId: string | null | undefined;
     actor: ActClaim | null | undefined;
+    sessionStatus: SessionStatusClaim | null | undefined;
+    sessionClaims: JwtPayload | null | undefined;
     orgId: string | null | undefined;
     orgRole: OrganizationCustomRoleKey | null | undefined;
     orgSlug: string | null | undefined;
@@ -29,6 +33,7 @@ export interface VueClerkInjectionKeyType {
   sessionCtx: ComputedRef<SignedInSessionResource | null | undefined>;
   userCtx: ComputedRef<UserResource | null | undefined>;
   organizationCtx: ComputedRef<OrganizationResource | null | undefined>;
+  treatPendingAsSignedOut?: boolean;
 }
 
 // Copied from `@clerk/clerk-react`

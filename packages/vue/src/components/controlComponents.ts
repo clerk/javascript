@@ -4,6 +4,7 @@ import type {
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  PendingSessionOptions,
   RedirectOptions,
 } from '@clerk/types';
 import { defineComponent } from 'vue';
@@ -13,14 +14,14 @@ import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
 import { useClerkLoaded } from '../utils/useClerkLoaded';
 
-export const SignedIn = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value ? slots.default?.() : null);
 });
 
-export const SignedOut = defineComponent((_, { slots }) => {
-  const { userId } = useAuth();
+export const SignedOut = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
+  const { userId } = useAuth({ treatPendingAsSignedOut });
 
   return () => (userId.value === null ? slots.default?.() : null);
 });
@@ -62,7 +63,7 @@ export const RedirectToSignUp = defineComponent((props: RedirectOptions) => {
 });
 
 /**
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-user-profile) instead.
  */
 export const RedirectToUserProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -74,7 +75,7 @@ export const RedirectToUserProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-organization-profile) instead.
  */
 export const RedirectToOrganizationProfile = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -86,7 +87,7 @@ export const RedirectToOrganizationProfile = defineComponent(() => {
 });
 
 /**
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead, will be removed in the next major version.
+ * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/references/javascript/clerk/redirect-methods#redirect-to-create-organization) instead.
  */
 export const RedirectToCreateOrganization = defineComponent(() => {
   useClerkLoaded(clerk => {
@@ -105,7 +106,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps =
+export type ProtectProps = (
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -125,10 +126,12 @@ export type ProtectProps =
       condition?: never;
       role?: never;
       permission?: never;
-    };
+    }
+) &
+  PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
-  const { isLoaded, has, userId } = useAuth();
+  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   return () => {
     /**
@@ -149,6 +152,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
      * Check against the results of `has` called inside the callback
      */
     if (typeof props.condition === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (props.condition(has.value!)) {
         return slots.default?.();
       }

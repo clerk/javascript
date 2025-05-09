@@ -17,16 +17,20 @@ export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | Han
 });
 
 export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
-  const { handleRedirectCallback } = useClerk();
+  const { handleRedirectCallback, __internal_setActiveInProgress } = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
 
   React.useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
-    handleRedirectCallback({ ...props }, navigate).catch(e => {
-      handleError(e, [], card.setError);
-      timeoutId = setTimeout(() => void navigate('../'), 4000);
-    });
+    if (__internal_setActiveInProgress !== true) {
+      const intent = new URLSearchParams(window.location.search).get('intent');
+      const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
+      handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {
+        handleError(e, [], card.setError);
+        timeoutId = setTimeout(() => void navigate('../'), 4000);
+      });
+    }
 
     return () => clearTimeout(timeoutId);
   }, [handleError, handleRedirectCallback]);

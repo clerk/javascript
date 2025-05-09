@@ -66,3 +66,4 @@ export const Dd = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.D
 export const Dt = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Dt)));
 
 export const Span = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.Span)));
+export const Hr = makeCustomizable(sanitizeDomProps(Primitives.Hr));

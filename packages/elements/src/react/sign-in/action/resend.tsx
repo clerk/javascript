@@ -25,11 +25,14 @@ const SIGN_IN_RESEND_NAME = 'SignInResend';
  * Resend verification codes during the sign-in process.
  * This component must be used within the <Step name="verifications">.
  *
- * @note This component is not intended to be used directly. Instead, use the <Action resend> component.
+ * > [!NOTE]
+ * > This component is not intended to be used directly. Instead, use the `<Action resend>` component.
  *
  * @example
+ * ```tsx
  * import { Action } from '@clerk/elements/sign-in';
  * <Action resend fallback={({ resendableAfter }) => <p>Resendable in: {resendableAfter}s</p>}>Resend</Action>;
+ * ```
  */
 export const SignInResend = React.forwardRef<SignInResendElement, SignInResendProps>(
   ({ asChild, fallback, ...rest }, forwardedRef) => {

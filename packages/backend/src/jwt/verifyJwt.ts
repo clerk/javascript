@@ -17,7 +17,7 @@ import {
 import { importKey } from './cryptoKeys';
 import type { JwtReturnType } from './types';
 
-const DEFAULT_CLOCK_SKEW_IN_SECONDS = 5 * 1000;
+const DEFAULT_CLOCK_SKEW_IN_MS = 5 * 1000;
 
 export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Promise<JwtReturnType<boolean, Error>> {
   const { header, signature, raw } = jwt;
@@ -76,6 +76,7 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
   const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
   const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
+
   const signature = base64url.parse(rawSignature, { loose: true });
 
   const data = {
@@ -93,6 +94,9 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   return { data };
 }
 
+/**
+ * @inline
+ */
 export type VerifyJwtOptions = {
   /**
    * A string or list of [audiences](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3). If passed, it is checked against the `aud` claim in the token.
@@ -102,12 +106,13 @@ export type VerifyJwtOptions = {
    * An allowlist of origins to verify against, to protect your application from the subdomain cookie leaking attack.
    * @example
    * ```ts
-   * authorizedParties: ['http://localhost:3000', 'https://example.com']
+   * ['http://localhost:3000', 'https://example.com']
    * ```
    */
   authorizedParties?: string[];
   /**
-   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token. Defaults to 5000 ms (5 seconds).
+   * Specifies the allowed time difference (in milliseconds) between the Clerk server (which generates the token) and the clock of the user's application server when validating a token.
+   * @default 5000
    */
   clockSkewInMs?: number;
   /**
@@ -121,7 +126,7 @@ export async function verifyJwt(
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
   const { audience, authorizedParties, clockSkewInMs, key } = options;
-  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_SECONDS;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
 
   const { data: decoded, errors } = decodeJwt(token);
   if (errors) {

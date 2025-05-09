@@ -1,4 +1,4 @@
-export type AlertId = 'danger' | 'warning';
+export type AlertId = 'danger' | 'warning' | 'info';
 export type FieldId =
   | 'firstName'
   | 'lastName'
@@ -38,8 +38,10 @@ export type ProfileSectionId =
   | 'organizationProfile'
   | 'organizationDanger'
   | 'organizationDomains'
-  | 'manageVerifiedDomains';
-export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers';
+  | 'manageVerifiedDomains'
+  | 'subscriptionsList'
+  | 'paymentSources';
+export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =
@@ -51,4 +53,4 @@ export type OrganizationPreviewId =
 export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey' | 'waitlist';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
-export type SelectId = 'countryCode' | 'role';
+export type SelectId = 'countryCode' | 'role' | 'paymentSource';

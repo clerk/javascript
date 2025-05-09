@@ -144,6 +144,19 @@ const withSessionTasks = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
+const withBillingStaging = base
+  .clone()
+  .setId('withBillingStaging')
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+
+const withBilling = base
+  .clone()
+  .setId('withBilling')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing').pk);
+
 export const envs = {
   base,
   withKeyless,
@@ -165,4 +178,6 @@ export const envs = {
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpwithRestrictedModeFlow,
   withSessionTasks,
+  withBillingStaging,
+  withBilling,
 } as const;

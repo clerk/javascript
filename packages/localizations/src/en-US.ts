@@ -2,24 +2,64 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  __experimental_commerce: {
-    billedAnnually: 'Billed annually',
-    free: 'Free',
-    getStarted: 'Get started',
-    manageMembership: 'Manage membership',
-    month: 'Month',
-    switchPlan: 'Switch to this plan',
-  },
   backButton: 'Back',
-  badge__currentPlan: 'Current Plan',
+  badge__activePlan: 'Active',
+  badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
+  badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
+  badge__expired: 'Expired',
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
+  badge__renewsAt: "Renews {{ date | shortDate('en-US') }}",
   badge__requiresAction: 'Requires action',
+  badge__startsAt: "Starts {{ date | shortDate('en-US') }}",
   badge__thisDevice: 'This device',
   badge__unverified: 'Unverified',
+  badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
+  commerce: {
+    alwaysFree: 'Always free',
+    availableFeatures: 'Available features',
+    billedAnnually: 'Billed annually',
+    billedMonthlyOnly: 'Only billed monthly',
+    cancelSubscription: 'Cancel subscription',
+    checkout: {
+      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__subscriptionSuccessful: 'Your new subscription is all set.',
+      downgradeNotice:
+        'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+      emailForm: {
+        subtitle: 'Before you can complete your purchase you must add an email address where receipts will be sent.',
+        title: 'Add an email address',
+      },
+      lineItems: {
+        title__paymentMethod: 'Payment method',
+        title__statementId: 'Statement ID',
+        title__subscriptionBegins: 'Subscription begins',
+        title__totalPaid: 'Total paid',
+      },
+      perMonth: 'per month',
+      title__paymentSuccessful: 'Payment was successful!',
+      title__subscriptionSuccessful: 'Success!',
+    },
+    defaultFreePlanActive: "You're currently on the Free plan",
+    free: 'Free',
+    getStarted: 'Get started',
+    keepSubscription: 'Keep subscription',
+    manage: 'Manage',
+    manageSubscription: 'Manage subscription',
+    month: 'Month',
+    reSubscribe: 'Resubscribe',
+    seeAllFeatures: 'See all features',
+    subscribe: 'Subscribe',
+    switchPlan: 'Switch to this plan',
+    switchToAnnual: 'Switch to annual',
+    switchToMonthly: 'Switch to monthly',
+    viewFeatures: 'View features',
+    year: 'Year',
+  },
   createOrganization: {
     formButtonSubmit: 'Create organization',
     invitePage: {
@@ -111,6 +151,42 @@ export const enUS: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
+        headerTitle__subscriptions: 'Subscriptions',
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
+      },
+      title: 'Billing',
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -168,10 +244,17 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
+      billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      },
+      title: 'Plans',
     },
     profilePage: {
       dangerSection: {
@@ -311,7 +394,7 @@ export const enUS: LocalizationResource = {
     },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue',
+      subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
     phoneCode: {
@@ -557,46 +640,40 @@ export const enUS: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
-    captcha_invalid:
-      'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
+    captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
-    form_identifier_exists__email_address: 'This email address is taken. Please try another.',
-    form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
-    form_identifier_exists__username: 'This username is taken. Please try another.',
-    form_identifier_not_found: 'No account found with this identifier. Please check and try again.',
-    form_param_format_invalid: 'The value entered is in an invalid format. Please check and correct it.',
-    form_param_format_invalid__email_address: 'Email address must be a valid email address.',
-    form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
-    form_param_max_length_exceeded__first_name: 'First name should not exceed 256 characters.',
-    form_param_max_length_exceeded__last_name: 'Last name should not exceed 256 characters.',
-    form_param_max_length_exceeded__name: 'Name should not exceed 256 characters.',
-    form_param_nil: 'This field is required and cannot be empty.',
-    form_param_value_invalid: 'The value entered is invalid. Please correct it.',
-    form_password_incorrect: 'The password you entered is incorrect. Please try again.',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
+    form_identifier_not_found: undefined,
+    form_param_format_invalid: undefined,
+    form_param_format_invalid__email_address: undefined,
+    form_param_format_invalid__phone_number: undefined,
+    form_param_max_length_exceeded__first_name: undefined,
+    form_param_max_length_exceeded__last_name: undefined,
+    form_param_max_length_exceeded__name: undefined,
+    form_param_nil: undefined,
+    form_param_value_invalid: undefined,
+    form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
-    form_password_size_in_bytes_exceeded:
-      'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
-    form_password_validation_failed: 'Incorrect Password',
-    form_username_invalid_character:
-      'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
+    form_password_size_in_bytes_exceeded: undefined,
+    form_password_validation_failed: undefined,
+    form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
-    identification_deletion_failed: 'You cannot delete your last identification.',
-    not_allowed_access:
-      'You do not have permission to access this page. Please contact support if you believe this is an error.',
-    organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',
-    organization_domain_common: 'This is a common email provider domain. Please use a different one.',
-    organization_domain_exists_for_enterprise_connection: 'This domain is already used for your organization’s SSO',
-    organization_membership_quota_exceeded:
-      'You have reached your limit of organization memberships, including outstanding invitations.',
-    organization_minimum_permissions_needed:
-      'There has to be at least one organization member with the minimum required permissions.',
+    identification_deletion_failed: undefined,
+    not_allowed_access: undefined,
+    organization_domain_blocked: undefined,
+    organization_domain_common: undefined,
+    organization_domain_exists_for_enterprise_connection: undefined,
+    organization_membership_quota_exceeded: undefined,
+    organization_minimum_permissions_needed: undefined,
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
@@ -611,7 +688,8 @@ export const enUS: LocalizationResource = {
       requireUppercase: 'an uppercase letter',
       sentencePrefix: 'Your password must contain',
     },
-    phone_number_exists: 'This phone number is taken. Please try another.',
+    phone_number_exists: undefined,
+    session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
@@ -660,14 +738,6 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: 'Invoices',
-        headerTitle__paymentSources: 'Payment Sources',
-        headerTitle__plans: 'Plans',
-      },
-      title: 'Billing & Payments',
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -683,6 +753,42 @@ export const enUS: LocalizationResource = {
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
+        headerTitle__subscriptions: 'Subscription',
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
+      },
+      title: 'Billing',
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
@@ -827,6 +933,9 @@ export const enUS: LocalizationResource = {
       title: 'Add phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: 'Plans',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

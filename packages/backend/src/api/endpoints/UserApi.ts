@@ -1,9 +1,15 @@
-import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
-import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
+import type {
+  DeletedObject,
+  OauthAccessToken,
+  OrganizationInvitation,
+  OrganizationMembership,
+  User,
+} from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
@@ -58,7 +64,9 @@ type PasswordHasher =
   | 'phpass'
   | 'scrypt_firebase'
   | 'scrypt_werkzeug'
-  | 'sha256';
+  | 'sha256'
+  | 'md5_phpass'
+  | 'ldap_ssha';
 
 type UserPasswordHashingParams = {
   passwordDigest: string;
@@ -110,6 +118,11 @@ type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   userId: string;
 }>;
 
+type GetOrganizationInvitationListParams = ClerkPaginationRequest<{
+  userId: string;
+  status?: OrganizationInvitationStatus;
+}>;
+
 type VerifyPasswordParams = {
   userId: string;
   password: string;
@@ -118,6 +131,25 @@ type VerifyPasswordParams = {
 type VerifyTOTPParams = {
   userId: string;
   code: string;
+};
+
+type DeleteUserPasskeyParams = {
+  userId: string;
+  passkeyIdentificationId: string;
+};
+
+type DeleteWeb3WalletParams = {
+  userId: string;
+  web3WalletIdentificationId: string;
+};
+
+type DeleteUserExternalAccountParams = {
+  userId: string;
+  externalAccountId: string;
+};
+
+type UserID = {
+  userId: string;
 };
 
 export class UserAPI extends AbstractAPI {
@@ -202,7 +234,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** @deprecated Please use getUserOauthAccessToken without the `oauth_` provider prefix . */
+  /** @deprecated Use `getUserOauthAccessToken` without the `oauth_` provider prefix . */
   public async getUserOauthAccessToken(
     userId: string,
     provider: `oauth_${OAuthProvider}`,
@@ -232,7 +264,7 @@ export class UserAPI extends AbstractAPI {
 
   public async disableUserMFA(userId: string) {
     this.requireId(userId);
-    return this.request<User>({
+    return this.request<UserID>({
       method: 'DELETE',
       path: joinPaths(basePath, userId, 'mfa'),
     });
@@ -246,6 +278,17 @@ export class UserAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, userId, 'organization_memberships'),
       queryParams: { limit, offset },
+    });
+  }
+
+  public async getOrganizationInvitationList(params: GetOrganizationInvitationListParams) {
+    const { userId, ...queryParams } = params;
+    this.requireId(userId);
+
+    return this.request<PaginatedResourceResponse<OrganizationInvitation[]>>({
+      method: 'GET',
+      path: joinPaths(basePath, userId, 'organization_invitations'),
+      queryParams,
     });
   }
 
@@ -308,6 +351,49 @@ export class UserAPI extends AbstractAPI {
     return this.request<User>({
       method: 'DELETE',
       path: joinPaths(basePath, userId, 'profile_image'),
+    });
+  }
+
+  public async deleteUserPasskey(params: DeleteUserPasskeyParams) {
+    this.requireId(params.userId);
+    this.requireId(params.passkeyIdentificationId);
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, params.userId, 'passkeys', params.passkeyIdentificationId),
+    });
+  }
+
+  public async deleteUserWeb3Wallet(params: DeleteWeb3WalletParams) {
+    this.requireId(params.userId);
+    this.requireId(params.web3WalletIdentificationId);
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, params.userId, 'web3_wallets', params.web3WalletIdentificationId),
+    });
+  }
+
+  public async deleteUserExternalAccount(params: DeleteUserExternalAccountParams) {
+    this.requireId(params.userId);
+    this.requireId(params.externalAccountId);
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, params.userId, 'external_accounts', params.externalAccountId),
+    });
+  }
+
+  public async deleteUserBackupCodes(userId: string) {
+    this.requireId(userId);
+    return this.request<UserID>({
+      method: 'DELETE',
+      path: joinPaths(basePath, userId, 'backup_code'),
+    });
+  }
+
+  public async deleteUserTOTP(userId: string) {
+    this.requireId(userId);
+    return this.request<UserID>({
+      method: 'DELETE',
+      path: joinPaths(basePath, userId, 'totp'),
     });
   }
 }

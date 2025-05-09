@@ -1,0 +1,72 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`errors public exports > should not change unexpectedly 1`] = `
+[
+  "EmailLinkErrorCode",
+  "EmailLinkErrorCodeStatus",
+  "isClerkAPIResponseError",
+  "isEmailLinkError",
+  "isKnownError",
+  "isMetamaskError",
+  "isReverificationCancelledError",
+]
+`;
+
+exports[`root public exports > should not change unexpectedly 1`] = `
+[
+  "AuthenticateWithRedirectCallback",
+  "ClerkDegraded",
+  "ClerkFailed",
+  "ClerkLoaded",
+  "ClerkLoading",
+  "ClerkProvider",
+  "CreateOrganization",
+  "GoogleOneTap",
+  "OrganizationList",
+  "OrganizationProfile",
+  "OrganizationSwitcher",
+  "PricingTable",
+  "Protect",
+  "RedirectToCreateOrganization",
+  "RedirectToOrganizationProfile",
+  "RedirectToSignIn",
+  "RedirectToSignUp",
+  "RedirectToUserProfile",
+  "SignIn",
+  "SignInButton",
+  "SignInWithMetamaskButton",
+  "SignOutButton",
+  "SignUp",
+  "SignUpButton",
+  "SignedIn",
+  "SignedOut",
+  "UserButton",
+  "UserProfile",
+  "Waitlist",
+  "useAuth",
+  "useClerk",
+  "useEmailLink",
+  "useOrganization",
+  "useOrganizationList",
+  "useReverification",
+  "useSession",
+  "useSessionList",
+  "useSignIn",
+  "useSignUp",
+  "useUser",
+]
+`;
+
+exports[`server public exports > should not change unexpectedly 1`] = `
+[
+  "clerkClient",
+  "createClerkHandler",
+  "getAuth",
+]
+`;
+
+exports[`webhooks public exports > should not change unexpectedly 1`] = `
+[
+  "verifyWebhook",
+]
+`;

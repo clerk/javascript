@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Atrás',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Por defecto',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
   badge__primary: 'Primario',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Requiere acción',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Este dispositivo',
   badge__unverified: 'No confirmado',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
     invitePage: {
@@ -63,7 +102,7 @@ export const esMX: LocalizationResource = {
     'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
-  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress: 'Ingresa tu correo electrónico',
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses:
     'Ingrese o pegue una o más direcciones de correo electrónico, separadas por espacios o comas',
@@ -73,7 +112,7 @@ export const esMX: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
   formFieldInputPlaceholder__organizationSlug: undefined,
-  formFieldInputPlaceholder__password: undefined,
+  formFieldInputPlaceholder__password: 'Ingresa tu contraseña',
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automaticas para este dominio',
@@ -124,6 +163,41 @@ export const esMX: LocalizationResource = {
     badge__automaticSuggestion: 'Sugerencias automaticas',
     badge__manualInvitation: 'Sin inscripciónes automaticas',
     badge__unverified: 'No verificado',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Añada el email para verificar. Los usuarios con direcciones de correo electrónico en este dominio pueden unirse a la organización aquí o pedir unirse.',
@@ -181,10 +255,17 @@ export const esMX: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Gestiona tu organización.',
       general: 'General',
       members: 'Miembros',
       title: 'Organización',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -577,7 +658,7 @@ export const esMX: LocalizationResource = {
     form_identifier_exists__email_address: 'La dirección de correo ya existe.',
     form_identifier_exists__phone_number: 'El número de teléfono ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
-    form_identifier_not_found: 'No se encontró, puede estar mal escrito.',
+    form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'La dirección de correo debe ser válida.',
     form_param_format_invalid__phone_number: 'El número de teléfono debe ser en un formato válido internacional.',
@@ -598,7 +679,8 @@ export const esMX: LocalizationResource = {
     form_username_invalid_character: 'Carácter inválido.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
-    not_allowed_access: 'No tienes permiso para acceder a este recurso.',
+    not_allowed_access:
+      "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -619,6 +701,7 @@ export const esMX: LocalizationResource = {
       sentencePrefix: 'Tu contraseña debe contener',
     },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, trata con otro.',
+    session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero puede ser más segura. Prueba añadiendo más caracteres.',
@@ -667,14 +750,6 @@ export const esMX: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -690,6 +765,41 @@ export const esMX: LocalizationResource = {
         'Puede usar uno de estos para iniciar sesión en su cuenta, si pierde el acceso a su dispositivo de autenticación.',
       title: 'Agregar verificación de código de respaldo',
       title__codelist: 'Códigos de respaldo',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Seleccione un proveedor para conectar su cuenta.',
@@ -837,6 +947,9 @@ export const esMX: LocalizationResource = {
       verifySubtitle: 'Ingrese el código de verificación enviado a {{identifier}}',
       verifyTitle: 'Verificar número de teléfono',
     },
+    plansPage: {
+      title: undefined,
+    },
     profilePage: {
       fileDropAreaHint: 'Cargue una imagen JPG, PNG, GIF o WEBP de menos de 10 MB',
       imageFormDestructiveActionSubtitle: 'Eliminar la imagen',
@@ -953,16 +1066,16 @@ export const esMX: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Acceder',
+      actionText: 'Cuentas con acceso?',
+      formButton: 'Unete a la lista de espera',
+      subtitle: 'Ingresa tu correo electrónico y te avisaremos cuando tu lugar esté listo',
+      title: 'Unete a la lista de espera',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Serás redirigido pronto...',
+      subtitle: 'Nos pondremos en contacto contigo cuando tu lugar esté listo',
+      title: 'Gracias por unirte a la lista de espera!',
     },
   },
 } as const;

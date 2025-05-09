@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Înapoi',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Implicit',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
   badge__primary: 'Principală',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Necesită acțiune',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Acest dispozitiv',
   badge__unverified: 'Nedeclarat',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispozitiv de utilizator',
   badge__you: 'Tu',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Creați o organizație',
     invitePage: {
@@ -124,6 +163,41 @@ export const roRO: LocalizationResource = {
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
     badge__unverified: 'Nedeclarat',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Adăugați domeniul de verificat. Utilizatorii cu adrese de e-mail la acest domeniu se pot alătura organizației în mod automat sau pot solicita să se alăture.',
@@ -181,10 +255,17 @@ export const roRO: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -575,7 +656,7 @@ export const roRO: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
+    form_identifier_not_found: 'Nu am putut găsi un cont cu aceste detalii.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Adresa de e-mail trebuie să fie o adresă de e-mail validă.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -596,7 +677,8 @@ export const roRO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
     identification_deletion_failed: 'Nu vă puteți șterge ultima identificare.',
-    not_allowed_access: undefined,
+    not_allowed_access:
+      "Adresa de e-mail sau numărul de telefon nu este permis pentru înregistrare. Acest lucru poate fi datorat utilizării '+', '=', '#' sau '.' în adresa dvs. de e-mail, utilizării unui domeniu asociat cu un serviciu de e-mail temporar sau unei excluziuni explicite.",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -617,6 +699,7 @@ export const roRO: LocalizationResource = {
       sentencePrefix: 'Parola dvs. trebuie să conțină',
     },
     phone_number_exists: 'Acest număr de telefon este ocupat. Vă rugăm să încercați altul.',
+    session_exists: 'Sunteți deja conectat.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger:
@@ -667,14 +750,6 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -690,6 +765,41 @@ export const roRO: LocalizationResource = {
         'Puteți utiliza unul dintre acestea pentru a vă conecta la contul dvs., dacă pierdeți accesul la dispozitivul de autentificare.',
       title: 'Adăugați verificarea codului de rezervă',
       title__codelist: 'Coduri de rezervă',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Selectați un furnizor pentru a vă conecta contul.',
@@ -837,6 +947,9 @@ export const roRO: LocalizationResource = {
       title: 'Adăugați numărul de telefon',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Încărcați o imagine JPG, PNG, GIF sau WEBP mai mică de 10 MB',

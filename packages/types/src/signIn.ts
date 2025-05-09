@@ -47,7 +47,7 @@ import type {
   VerificationJSON,
 } from './json';
 import type { ValidatePasswordCallbacks } from './passwords';
-import type { AuthenticateWithRedirectParams } from './redirects';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
 import type { SignInJSONSnapshot } from './snapshots';
 import type {
@@ -79,7 +79,7 @@ export interface SignInResource extends ClerkResource {
    */
   status: SignInStatus | null;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
@@ -104,6 +104,8 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithRedirect: (params: AuthenticateWithRedirectParams) => Promise<void>;
 
+  authenticateWithPopup: (params: AuthenticateWithPopupParams) => Promise<void>;
+
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
@@ -117,6 +119,9 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
+  /**
+   * @internal
+   */
   __internal_toSnapshot: () => SignInJSONSnapshot;
 }
 
@@ -259,7 +264,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   id: string;
   status: SignInStatus;
   /**
-   * @deprecated This attribute will be removed in the next major version
+   * @deprecated This attribute will be removed in the next major version.
    */
   supported_identifiers: SignInIdentifier[];
   identifier: string;

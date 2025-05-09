@@ -21,3 +21,15 @@ export const noOrganizationExists: ComponentGuard = clerk => {
 export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => {
   return !environment?.organizationSettings.enabled;
 };
+
+export const disabledBillingFeature: ComponentGuard = (_, environment) => {
+  return !environment?.commerceSettings.billing.enabled;
+};
+
+export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
+  return environment?.commerceSettings.billing.hasPaidOrgPlans || false;
+};
+
+export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
+  return environment?.commerceSettings.billing.hasPaidUserPlans || false;
+};

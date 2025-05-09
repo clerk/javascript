@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 export type State<Data = any, Error = any> = {
   data: Data | null;
@@ -38,15 +38,16 @@ export const useCache = <K = any, V = any>(
   serializer = serialize,
 ): {
   getCache: () => State<V> | undefined;
-  setCache: (state: State<V>) => void;
+  setCache: (state: State<V> | ((params: State<V>) => State<V>)) => void;
   clearCache: () => void;
   subscribeCache: (callback: () => void) => () => void;
 } => {
   const serializedKey = serializer(key);
   const get = useCallback(() => requestCache.get(serializedKey), [serializedKey]);
   const set = useCallback(
-    (data: State) => {
-      requestCache.set(serializedKey, data);
+    (data: State | ((params: State) => State)) => {
+      // @ts-ignore
+      requestCache.set(serializedKey, typeof data === 'function' ? data(get()) : data);
       subscribers.forEach(callback => callback());
     },
     [serializedKey],
@@ -79,6 +80,7 @@ export const useCache = <K = any, V = any>(
  * @param fetcher If fetcher is undefined no action will be performed
  * @param params
  * @param options
+ * @param resourceId
  */
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
@@ -88,8 +90,11 @@ export const useFetch = <K, T>(
     onSuccess?: (data: T) => void;
     staleTime?: number;
   },
+  resourceId?: string,
 ) => {
-  const { subscribeCache, getCache, setCache, clearCache } = useCache<K, T>(params);
+  const cacheKey = { resourceId, params };
+  const { subscribeCache, getCache, setCache, clearCache } = useCache<typeof cacheKey, T>(cacheKey);
+  const [revalidationCounter, setRevalidationCounter] = useState(0);
 
   const staleTime = options?.staleTime ?? 1000 * 60 * 2; //cache for 2 minutes by default
   const throttleTime = options?.throttleTime || 0;
@@ -100,6 +105,14 @@ export const useFetch = <K, T>(
   }
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
+
+  const revalidate = useCallback(() => {
+    setCache(d => ({
+      ...d,
+      cachedAt: 0,
+    }));
+    setRevalidationCounter(prev => prev + 1);
+  }, [setCache]);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
@@ -119,6 +132,7 @@ export const useFetch = <K, T>(
       isValidating: true,
       error: null,
     });
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fetcherRef.current!(params)
       .then(result => {
         if (typeof result !== 'undefined') {
@@ -138,20 +152,21 @@ export const useFetch = <K, T>(
           }, waitTime);
         }
       })
-      .catch(() => {
+      .catch((e: Error) => {
         setCache({
           data: getCache()?.data ?? null,
           isLoading: false,
           isValidating: false,
-          error: true,
+          error: e,
           cachedAt: Date.now(),
         });
       });
-  }, [serialize(params), setCache, getCache]);
+  }, [serialize(params), setCache, getCache, revalidationCounter]);
 
   return {
     ...cached,
     setCache,
     invalidate: clearCache,
+    revalidate,
   };
 };

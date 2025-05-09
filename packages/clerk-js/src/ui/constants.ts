@@ -7,6 +7,7 @@ export const USER_PROFILE_NAVBAR_ROUTE_ID = {
 export const ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID = {
   GENERAL: 'general',
   MEMBERS: 'members',
+  BILLING: 'billing',
 };
 
 export const USER_BUTTON_ITEM_ID = {
@@ -14,4 +15,5 @@ export const USER_BUTTON_ITEM_ID = {
   SIGN_OUT: 'signOut',
 };
 
-export const PROFILE_CARD_SCROLLBOX_ID = 'clerk-profileCardScrollBox';
+export const USER_PROFILE_CARD_SCROLLBOX_ID = 'clerk-profileCardScrollBox';
+export const ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID = 'clerk-organizationProfileScrollBox';

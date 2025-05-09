@@ -5,7 +5,7 @@ export type LocalizationValue = string;
 
 /**
  * A type containing all the possible localization keys the prebuilt Clerk components support.
- * Users aiming to customise a few strings can also peak at the `data-localization-key` attribute by inspecting
+ * Users aiming to customize a few strings can also peak at the `data-localization-key` attribute by inspecting
  * the DOM and updating the corresponding key.
  * Users aiming to completely localize the components by providing a complete translation can use
  * the default english resource object from {@link https://github.com/clerk/javascript Clerk's open source repo}
@@ -88,6 +88,13 @@ type _LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
+  badge__upcomingPlan: LocalizationValue;
+  badge__activePlan: LocalizationValue;
+  badge__startsAt: LocalizationValue;
+  badge__endsAt: LocalizationValue;
+  badge__expired: LocalizationValue;
+  badge__canceledEndsAt: LocalizationValue;
+  badge__renewsAt: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -98,14 +105,46 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  __experimental_commerce: {
+  commerce: {
     month: LocalizationValue;
+    year: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
-    manageMembership: LocalizationValue;
+    manage: LocalizationValue;
+    manageSubscription: LocalizationValue;
+    cancelSubscription: LocalizationValue;
+    keepSubscription: LocalizationValue;
+    reSubscribe: LocalizationValue;
+    subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToMonthly: LocalizationValue;
+    switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
+    alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
+    defaultFreePlanActive: LocalizationValue;
+    viewFeatures: LocalizationValue;
+    seeAllFeatures: LocalizationValue;
+    availableFeatures: LocalizationValue;
+    checkout: {
+      title__paymentSuccessful: LocalizationValue;
+      title__subscriptionSuccessful: LocalizationValue;
+      description__paymentSuccessful: LocalizationValue;
+      description__subscriptionSuccessful: LocalizationValue;
+      lineItems: {
+        title__totalPaid: LocalizationValue;
+        title__paymentMethod: LocalizationValue;
+        title__statementId: LocalizationValue;
+        title__subscriptionBegins: LocalizationValue;
+      };
+      emailForm: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      downgradeNotice: LocalizationValue;
+      perMonth: LocalizationValue;
+    };
   };
   signUp: {
     start: {
@@ -432,11 +471,11 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         /**
-         * @deprecated UserProfile now only uses `actionLabel__connectionFailed`.
+         * @deprecated Use `actionLabel__connectionFailed` instead.
          */
         actionLabel__reauthorize: LocalizationValue;
         /**
-         * @deprecated UserProfile now uses `subtitle__disconnected`.
+         * @deprecated Use `subtitle__disconnected` instead.
          */
         subtitle__reauthorize: LocalizationValue;
         subtitle__disconnected: LocalizationValue;
@@ -509,7 +548,7 @@ type _LocalizationResource = {
       formHint: LocalizationValue;
       emailCode: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -519,7 +558,7 @@ type _LocalizationResource = {
       };
       emailLink: {
         /**
-         * @deprecated UserProfile now only uses `emailAddressPage.formHint`.
+         * @deprecated Use `emailAddressPage.formHint` instead.
          */
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -654,12 +693,45 @@ type _LocalizationResource = {
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
-    __experimental_billingPage: {
+    billingPage: {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;
-        headerTitle__invoices: LocalizationValue;
-        headerTitle__paymentSources: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
+        payWithTestCardButton: LocalizationValue;
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
+      };
+    };
+    plansPage: {
+      title: LocalizationValue;
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
       };
     };
   };
@@ -688,6 +760,7 @@ type _LocalizationResource = {
       description: LocalizationValue;
       general: LocalizationValue;
       members: LocalizationValue;
+      billing: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
@@ -823,6 +896,47 @@ type _LocalizationResource = {
         };
       };
     };
+    billingPage: {
+      title: LocalizationValue;
+      start: {
+        headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
+        payWithTestCardButton: LocalizationValue;
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
+      };
+    };
+    plansPage: {
+      title: LocalizationValue;
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
+      };
+    };
   };
   createOrganization: {
     title: LocalizationValue;
@@ -910,6 +1024,7 @@ type UnstableErrors = WithParamName<{
     requireUppercase: LocalizationValue;
     requireSpecialCharacter: LocalizationValue;
   };
+  session_exists: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;

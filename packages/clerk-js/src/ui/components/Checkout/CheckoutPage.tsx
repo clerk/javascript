@@ -1,41 +1,54 @@
-import type { __experimental_CheckoutProps } from '@clerk/types';
-import type { Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
+import { useEffect } from 'react';
 
-import { useEnvironment } from '../../contexts';
-import { Alert, Spinner } from '../../customizables';
-import { useCheckout } from '../../hooks';
+import { usePlans } from '../../contexts';
+import {
+  Box,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  useAppearance,
+  useLocalizations,
+} from '../../customizables';
+import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
+import { useCheckout, usePrefersReducedMotion } from '../../hooks';
+import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
 
-export const CheckoutPage = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod } = props;
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-  const { __experimental_commerceSettings } = useEnvironment();
+export const CheckoutPage = (props: __internal_CheckoutProps) => {
+  const { translateError } = useLocalizations();
+  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
+  const { setIsOpen, isOpen } = useDrawerContext();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+  const { data: plans, isLoading: plansLoading } = usePlans();
 
-  const { checkout, updateCheckout, isLoading } = useCheckout({
+  const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
     planId,
     planPeriod,
+    subscriberType,
   });
 
-  useEffect(() => {
-    if (
-      !stripePromiseRef.current &&
-      checkout?.externalGatewayId &&
-      __experimental_commerceSettings.stripePublishableKey
-    ) {
-      stripePromiseRef.current = loadStripe(__experimental_commerceSettings.stripePublishableKey, {
-        stripeAccount: checkout.externalGatewayId,
-      });
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [checkout?.externalGatewayId, __experimental_commerceSettings]);
+  const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
 
-  if (isLoading) {
+  const plan = plans?.find(p => p.id === planId);
+
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
+    invalidate(); // invalidate the initial checkout on complete
+    updateCheckout(newCheckout);
+    onSubscriptionComplete?.();
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      revalidate();
+    }
+  }, [isOpen]);
+
+  if (isLoading || plansLoading) {
     return (
       <Spinner
         sx={{
@@ -45,31 +58,106 @@ export const CheckoutPage = (props: __experimental_CheckoutProps) => {
     );
   }
 
-  if (!checkout) {
+  if (checkout) {
+    if (checkout?.status === 'completed') {
+      return (
+        <CheckoutComplete
+          checkout={checkout}
+          isMotionSafe={isMotionSafe}
+        />
+      );
+    }
+
     return (
-      <>
-        {/* TODO(@COMMERCE): needs localization */}
-        <Alert
-          colorScheme='danger'
-          sx={{
-            margin: 'auto',
-          }}
-        >
-          There was a problem, please try again later.
-        </Alert>
-      </>
+      <CheckoutForm
+        checkout={checkout}
+        onCheckoutComplete={onCheckoutComplete}
+      />
     );
   }
 
-  if (checkout?.status === 'completed') {
-    return <CheckoutComplete checkout={checkout} />;
+  if (isMissingPayerEmail) {
+    return (
+      <Drawer.Body>
+        <Box
+          sx={t => ({
+            padding: t.space.$4,
+          })}
+        >
+          <EmailForm
+            title={localizationKeys('commerce.checkout.emailForm.title')}
+            subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
+            onSuccess={revalidate}
+            onReset={() => setIsOpen(false)}
+            disableAutoFocus
+          />
+        </Box>
+      </Drawer.Body>
+    );
+  }
+
+  const error = errors?.[0];
+  if (error?.code === 'invalid_plan_change' && plan) {
+    return (
+      <Drawer.Body>
+        <Flex
+          gap={4}
+          direction='col'
+        >
+          <Box
+            elementDescriptor={descriptors.checkoutFormLineItemsRoot}
+            sx={t => ({
+              padding: t.space.$4,
+              borderBottomWidth: t.borderWidths.$normal,
+              borderBottomStyle: t.borderStyles.$solid,
+              borderBottomColor: t.colors.$neutralAlpha100,
+            })}
+          >
+            <LineItems.Root>
+              <LineItems.Group>
+                <LineItems.Title
+                  title={plan.name}
+                  description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+                />
+                <LineItems.Description
+                  prefix={planPeriod === 'annual' ? 'x12' : undefined}
+                  text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
+                  suffix={localizationKeys('commerce.checkout.perMonth')}
+                />
+              </LineItems.Group>
+            </LineItems.Root>
+          </Box>
+          <Box sx={t => ({ padding: t.space.$4 })}>
+            {/* TODO(@Commerce): needs localization */}
+            <Alert
+              variant='info'
+              colorScheme='info'
+              title={`You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.`}
+            />
+          </Box>
+        </Flex>
+      </Drawer.Body>
+    );
   }
 
   return (
-    <CheckoutForm
-      stripe={stripe}
-      checkout={checkout}
-      onCheckoutComplete={updateCheckout}
-    />
+    <Drawer.Body>
+      <Flex
+        align={'center'}
+        justify={'center'}
+        sx={t => ({
+          height: '100%',
+          padding: t.space.$4,
+          fontSize: t.fontSizes.$md,
+        })}
+      >
+        <Alert
+          variant='danger'
+          colorScheme='danger'
+        >
+          {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
+        </Alert>
+      </Flex>
+    </Drawer.Body>
   );
 };

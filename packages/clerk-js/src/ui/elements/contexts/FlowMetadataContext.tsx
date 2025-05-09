@@ -15,7 +15,9 @@ type FlowMetadata = {
     | 'oneTap'
     | 'blankCaptcha'
     | 'waitlist'
-    | 'checkout';
+    | 'checkout'
+    | 'planDetails'
+    | 'pricingTable';
   part?:
     | 'start'
     | 'emailCode'
@@ -33,6 +35,7 @@ type FlowMetadata = {
     | 'passwordPwnedMethods'
     | 'havingTrouble'
     | 'ssoCallback'
+    | 'popupCallback'
     | 'popover'
     | 'complete'
     | 'accountSwitcher';

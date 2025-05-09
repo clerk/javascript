@@ -26,13 +26,27 @@ import type {
 import type { SessionJSONSnapshot } from './snapshots';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
+import type { Autocomplete } from './utils';
+
+/**
+ * @inline
+ */
+export type PendingSessionOptions = {
+  /**
+   * A boolean that indicates whether pending sessions are considered as signed out or not.
+   * @default true
+   */
+  treatPendingAsSignedOut?: boolean;
+};
 
 type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSystemPermissionPrefix}${string}`
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
+/** @inline */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
+/** @inline */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
@@ -44,12 +58,28 @@ export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      feature?: never;
+      plan?: never;
     }
   | {
       role?: never;
       permission: OrganizationCustomPermissionKey;
+      feature?: never;
+      plan?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
+    }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
@@ -58,15 +88,28 @@ type CheckAuthorizationParams = WithReverification<
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      feature?: never;
+      plan?: never;
     }
   | {
       role?: never;
       permission: OrganizationPermissionKey;
+      feature?: never;
+      plan?: never;
     }
   | {
       role?: never;
       permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
     }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 /**
@@ -82,12 +125,28 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      feature?: never;
+      plan?: never;
     }
   | {
       role?: never;
       permission: DisallowSystemPermissions<P>;
+      feature?: never;
+      plan?: never;
     }
-  | { role?: never; permission?: never }
+  | {
+      role?: never;
+      permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
+    }
+  | {
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
 
 /**
@@ -235,6 +294,9 @@ export type GetTokenOptions = {
   leewayInSeconds?: number;
   skipCache?: boolean;
 };
+/**
+ * @inline
+ */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
 export type SessionVerifyCreateParams = {

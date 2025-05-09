@@ -9,6 +9,7 @@ import { nuxt } from './nuxt';
 import { react } from './react';
 import { reactRouter } from './react-router';
 import { tanstack } from './tanstack';
+import { vue } from './vue';
 
 export const appConfigs = {
   envs,
@@ -21,6 +22,7 @@ export const appConfigs = {
   astro,
   tanstack,
   nuxt,
+  vue,
   reactRouter,
   secrets: {
     instanceKeys,

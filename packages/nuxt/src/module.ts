@@ -11,7 +11,8 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace'> & {
+export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
+  publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
    * register the middleware manually in your application.
@@ -25,7 +26,7 @@ export type ModuleOptions = Omit<LoadClerkJsScriptOptions, 'routerPush' | 'route
    * import { clerkMiddleware } from '@clerk/nuxt/server'
    *
    * export default clerkMiddleware((event) => {
-   *   console.log('auth', event.context.auth)
+   *   console.log('auth', event.context.auth())
    * })
    * ```
    */
@@ -73,6 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
       clerk: {
         secretKey: undefined,
         jwtKey: undefined,
+        webhookSigningSecret: undefined,
       },
     });
 
@@ -98,14 +100,18 @@ export default defineNuxtModule<ModuleOptions>({
       });
     }
 
-    // Adds TS support for `event.context.auth` in event handlers
+    // Adds TS support for `event.context.auth()` in event handlers
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
         getContents: () => `import type { AuthObject } from '@clerk/backend';
           declare module 'h3' {
+            type AuthObjectHandler = AuthObject & {
+              (): AuthObject;
+            }
+
             interface H3EventContext {
-              auth: AuthObject;
+              auth: AuthObjectHandler;
             }
           }
         `,
@@ -156,6 +162,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
+      'PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

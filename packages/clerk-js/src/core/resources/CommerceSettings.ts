@@ -1,37 +1,45 @@
-import type {
-  __experimental_CommerceSettingsJSON,
-  __experimental_CommerceSettingsJSONSnapshot,
-  __experimental_CommerceSettingsResource,
-} from '@clerk/types';
+import type { CommerceSettingsJSON, CommerceSettingsJSONSnapshot, CommerceSettingsResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
 /**
  * @internal
  */
-export class __experimental_CommerceSettings extends BaseResource implements __experimental_CommerceSettingsResource {
-  stripePublishableKey: string = '';
+export class CommerceSettings extends BaseResource implements CommerceSettingsResource {
+  billing: CommerceSettingsResource['billing'] = {
+    stripePublishableKey: '',
+    enabled: false,
+    hasPaidUserPlans: false,
+    hasPaidOrgPlans: false,
+  };
 
-  public constructor(
-    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null = null,
-  ) {
+  public constructor(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(
-    data: __experimental_CommerceSettingsJSON | __experimental_CommerceSettingsJSONSnapshot | null,
-  ): this {
+  protected fromJSON(data: CommerceSettingsJSON | CommerceSettingsJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
-    this.stripePublishableKey = data.stripe_publishable_key;
+
+    // TODO(@commerce): Remove `?.` once we launch.
+    this.billing.stripePublishableKey = data?.billing?.stripe_publishable_key || '';
+    this.billing.enabled = data?.billing?.enabled || false;
+    this.billing.hasPaidUserPlans = data?.billing?.has_paid_user_plans || false;
+    this.billing.hasPaidOrgPlans = data?.billing?.has_paid_org_plans || false;
+
     return this;
   }
 
-  public __internal_toSnapshot(): __experimental_CommerceSettingsJSONSnapshot {
+  public __internal_toSnapshot(): CommerceSettingsJSONSnapshot {
     return {
-      stripe_publishable_key: this.stripePublishableKey,
-    } as unknown as __experimental_CommerceSettingsJSONSnapshot;
+      billing: {
+        stripe_publishable_key: this.billing.stripePublishableKey,
+        enabled: this.billing.enabled,
+        has_paid_user_plans: this.billing.hasPaidUserPlans,
+        has_paid_org_plans: this.billing.hasPaidOrgPlans,
+      },
+    } as unknown as CommerceSettingsJSONSnapshot;
   }
 }

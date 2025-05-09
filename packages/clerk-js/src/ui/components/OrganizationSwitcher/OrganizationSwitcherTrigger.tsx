@@ -30,6 +30,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     return (
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
+        elementId={descriptors.organizationSwitcherTrigger.setId(organization ? 'organization' : 'personal')}
         variant='ghost'
         colorScheme='neutral'
         hoverAsFocus

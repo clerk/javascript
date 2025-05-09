@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Zurück',
-  badge__currentPlan: undefined,
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
+  badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Erfordert Handeln',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Dieses Gerät',
   badge__unverified: 'Unbestätigt',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: 'Jährlich abgerechnet',
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: 'Kostenlos',
+    getStarted: 'Jetzt starten',
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: 'Mitgliedschaft verwalten',
+    month: 'Monat',
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: 'Zu diesem Plan wechseln',
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -63,16 +102,16 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
   formFieldInputPlaceholder__emailAddress: 'E-Mail-Adresse eingeben',
   formFieldInputPlaceholder__emailAddress_username: 'E-Mail-Adresse oder Benutzername eingeben',
-  formFieldInputPlaceholder__emailAddresses: undefined,
+  formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
   formFieldInputPlaceholder__firstName: 'Vorname eingeben',
   formFieldInputPlaceholder__lastName: 'Nachname eingeben',
   formFieldInputPlaceholder__organizationDomain: 'Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationDomainEmailAddress: 'E-Mail-Adresse der Organisations-Domain eingeben',
   formFieldInputPlaceholder__organizationName: 'Name der Organisation eingeben',
-  formFieldInputPlaceholder__organizationSlug: undefined,
+  formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
@@ -125,6 +164,41 @@ export const deDE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',
     badge__unverified: 'Nicht verifiziert',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Fügen Sie die zu überprüfende Domain hinzu. Benutzer mit E-Mail-Adressen von dieser Domain können der Organisation automatisch beitreten oder einen Antrag auf Beitritt stellen.',
@@ -141,7 +215,7 @@ export const deDE: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'Einladen',
-      action__search: undefined,
+      action__search: 'Suchen',
       activeMembersTab: {
         menuAction__remove: 'Mitglied entfernen',
         tableHeader__actions: 'Aktionen',
@@ -182,10 +256,17 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
       members: 'Mitglieder',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -290,7 +371,7 @@ export const deDE: LocalizationResource = {
       actionText: 'Verwenden Sie eine alternative Verifizierungsmethode',
       blockButton__backupCode: 'Mit Backup-Code verifizieren',
       blockButton__emailCode: 'Mit E-Mail-Code verifizieren',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'Verwenden Sie Ihren Passkey',
       blockButton__password: 'Mit Passwort verifizieren',
       blockButton__phoneCode: 'Mit SMS-Code verifizieren',
       blockButton__totp: 'Mit TOTP verifizieren',
@@ -318,9 +399,10 @@ export const deDE: LocalizationResource = {
       title: 'Keine verfügbaren Methoden',
     },
     passkey: {
-      blockButton__passkey: undefined,
-      subtitle: undefined,
-      title: undefined,
+      blockButton__passkey: 'Verwenden Sie Ihren Passkey',
+      subtitle:
+        'Die Verwendung Ihres Passkeys bestätigt Ihre Identität. Ihr Gerät kann nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen.',
+      title: 'Verwenden Sie Ihren Passkey',
     },
     password: {
       actionLink: 'Passwort zurücksetzen',
@@ -482,7 +564,7 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Einloggen',
-      titleCombined: undefined,
+      titleCombined: 'Weiter zu {{applicationName}}',
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
@@ -568,7 +650,7 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:
@@ -579,7 +661,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
-    form_identifier_not_found: 'Die eingegebene Kennung wurde nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.',
+    form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',
@@ -602,12 +684,16 @@ export const deDE: LocalizationResource = {
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
-    not_allowed_access: undefined,
-    organization_domain_blocked: undefined,
-    organization_domain_common: undefined,
-    organization_domain_exists_for_enterprise_connection: undefined,
-    organization_membership_quota_exceeded: undefined,
-    organization_minimum_permissions_needed: undefined,
+    not_allowed_access:
+      "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
+    organization_domain_blocked: 'Diese E-Mail-Provider-Domain ist gesperrt. Bitte verwenden Sie eine andere.',
+    organization_domain_common: 'Dies ist eine gängige E-Mail-Provider-Domain. Bitte verwenden Sie eine andere.',
+    organization_domain_exists_for_enterprise_connection:
+      'Diese Domain wird bereits für das SSO Ihrer Organisation verwendet',
+    organization_membership_quota_exceeded:
+      'Sie haben Ihr Limit an Organisationsmitgliedschaften einschließlich ausstehender Einladungen erreicht.',
+    organization_minimum_permissions_needed:
+      'Es muss mindestens ein Organisationsmitglied mit den erforderlichen Mindestberechtigungen geben.',
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported:
@@ -625,7 +711,9 @@ export const deDE: LocalizationResource = {
       sentencePrefix: 'Das Passwort muss',
     },
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    web3_missing_identifier: undefined,
+    session_exists: 'Sie sind bereits angemeldet.',
+    web3_missing_identifier:
+      'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -674,14 +762,6 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -697,6 +777,41 @@ export const deDE: LocalizationResource = {
         'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
       title: 'Backup-Code-Verifizierung hinzufügen',
       title__codelist: 'Sicherungscodes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: 'Pläne',
+        headerTitle__statements: 'Rechnungen',
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: 'Abrechnung & Zahlungen',
     },
     connectedAccountPage: {
       formHint: 'Wählen Sie einen Anbieter aus, um Ihr Konto zu verbinden.',
@@ -735,10 +850,10 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       enterpriseSSOLink: {
-        formButton: undefined,
-        formSubtitle: undefined,
+        formButton: 'Klicken Sie zum Anmelden',
+        formSubtitle: 'Schließen Sie die Anmeldung mit {{identifier}} ab',
       },
-      formHint: undefined,
+      formHint: 'Sie müssen diese E-Mail-Adresse verifizieren, bevor sie Ihrem Konto hinzugefügt werden kann.',
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser E-Mail-Adresse anmelden.',
@@ -807,7 +922,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
-      billing: undefined,
+      billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
       title: 'Benutzerkonto',
@@ -843,6 +958,9 @@ export const deDE: LocalizationResource = {
       title: 'Telefonnummer hinzufügen',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch, welches kleiner als 10 MB ist',
@@ -907,7 +1025,7 @@ export const deDE: LocalizationResource = {
       passkeysSection: {
         menuAction__destructive: 'Entfernen',
         menuAction__rename: 'Umbenennen',
-        primaryButton: undefined,
+        primaryButton: 'Passkey hinzufügen',
         title: 'Passkeys',
       },
       passwordSection: {
@@ -934,7 +1052,7 @@ export const deDE: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Wallet entfernen',
-        detailsAction__nonPrimary: undefined,
+        detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
       },
@@ -955,7 +1073,7 @@ export const deDE: LocalizationResource = {
       subtitle__unavailableWallets: 'Es sind keine Web3-Wallets verfügbar.',
       successMessage: 'Die Brieftasche wurde Ihrem Konto hinzugefügt.',
       title: 'Web3-Wallet hinzufügen',
-      web3WalletButtonsBlockButton: undefined,
+      web3WalletButtonsBlockButton: '{{provider|titleize}}',
     },
   },
   waitlist: {

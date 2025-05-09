@@ -2,12 +2,15 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CommerceSubscriptionJSON,
+  CommerceSubscriptionResource,
   CreateOrganizationParams,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
+  GetSubscriptionsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -28,7 +31,8 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
+import { BaseResource, CommerceSubscription, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -229,6 +233,24 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
+  getSubscriptions = async (
+    getSubscriptionsParams?: GetSubscriptionsParams,
+  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>> => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/commerce/subscriptions`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getSubscriptionsParams),
+    }).then(res => {
+      const { data: subscriptions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionJSON>;
+
+      return {
+        total_count,
+        data: subscriptions.map(subscription => new CommerceSubscription(subscription)),
+      };
+    });
+  };
+
   destroy = async (): Promise<void> => {
     return this._baseDelete();
   };
@@ -259,6 +281,27 @@ export class Organization extends BaseResource implements OrganizationResource {
       body,
       headers,
     }).then(res => new Organization(res?.response as OrganizationJSON));
+  };
+
+  initializePaymentSource: typeof initializePaymentSource = params => {
+    return initializePaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  addPaymentSource: typeof addPaymentSource = params => {
+    return addPaymentSource({
+      ...params,
+      orgId: this.id,
+    });
+  };
+
+  getPaymentSources: typeof getPaymentSources = params => {
+    return getPaymentSources({
+      ...params,
+      orgId: this.id,
+    });
   };
 
   protected fromJSON(data: OrganizationJSON | OrganizationJSONSnapshot | null): this {

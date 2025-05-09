@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { TokenVerificationErrorReason } from '../../errors';
 import {
@@ -13,14 +13,9 @@ import {
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
-import {
-  authenticateRequest,
-  computeOrganizationSyncTargetMatchers,
-  getOrganizationSyncTarget,
-  type OrganizationSyncTarget,
-  RefreshTokenErrorReason,
-} from '../request';
-import type { AuthenticateRequestOptions, OrganizationSyncOptions } from '../types';
+import { OrganizationMatcher } from '../organizationMatcher';
+import { authenticateRequest, RefreshTokenErrorReason } from '../request';
+import type { AuthenticateRequestOptions } from '../types';
 
 const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
@@ -231,6 +226,7 @@ const mockRequest = (headers = {}, requestUrl = 'http://clerk.com/path') => {
 };
 
 /* An otherwise bare state on a request. */
+// @ts-expect-error - Testing
 const mockOptions = (options?) => {
   return {
     secretKey: 'deadbeef',
@@ -249,10 +245,12 @@ const mockOptions = (options?) => {
   } satisfies AuthenticateRequestOptions;
 };
 
+// @ts-expect-error - Testing
 const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
   return mockRequest({ authorization: `Bearer ${mockJwt}`, ...headers }, requestUrl);
 };
 
+// @ts-expect-error - Testing
 const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   const cookieStr = Object.entries(cookies)
     .map(([k, v]) => `${k}=${v}`)
@@ -261,20 +259,8 @@ const mockRequestWithCookies = (headers?, cookies = {}, requestUrl?) => {
   return mockRequest({ cookie: cookieStr, ...headers }, requestUrl);
 };
 
-// Tests both getOrganizationSyncTarget and the organizationSyncOptions usage patterns
-// that are recommended for typical use.
-describe('tokens.getOrganizationSyncTarget(url,options)', _ => {
-  type testCase = {
-    name: string;
-    // When the customer app specifies these orgSyncOptions to middleware...
-    whenOrgSyncOptions: OrganizationSyncOptions | undefined;
-    // And the path arrives at this URL path...
-    whenAppRequestPath: string;
-    // A handshake should (or should not) occur:
-    thenExpectActivationEntity: OrganizationSyncTarget | null;
-  };
-
-  const testCases: testCase[] = [
+describe('getOrganizationSyncTarget', () => {
+  it.each([
     {
       name: 'none activates nothing',
       whenOrgSyncOptions: undefined,
@@ -426,16 +412,10 @@ describe('tokens.getOrganizationSyncTarget(url,options)', _ => {
         organizationSlug: 'org_bar',
       },
     },
-  ];
-
-  test.each(testCases)('$name', ({ name, whenOrgSyncOptions, whenAppRequestPath, thenExpectActivationEntity }) => {
-    if (!name) {
-      return;
-    }
-
-    const path = new URL(`http://localhost:3000${whenAppRequestPath}`);
-    const matchers = computeOrganizationSyncTargetMatchers(whenOrgSyncOptions);
-    const toActivate = getOrganizationSyncTarget(path, whenOrgSyncOptions, matchers);
+  ])('$name', ({ whenOrgSyncOptions, whenAppRequestPath, thenExpectActivationEntity }) => {
+    const path = new URL(`http://localhost:3000${whenAppRequestPath || ''}`);
+    const matcher = new OrganizationMatcher(whenOrgSyncOptions);
+    const toActivate = matcher.findTarget(path);
     expect(toActivate).toEqual(thenExpectActivationEntity);
   });
 });

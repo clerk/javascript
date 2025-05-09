@@ -52,6 +52,7 @@ export interface ConnectionProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 export function Connection({ asChild, name, ...rest }: ConnectionProps) {
   const signInRef = SignInRouterCtx.useActorRef(true);
   const signUpRef = SignUpRouterCtx.useActorRef(true);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const provider = useThirdPartyProvider((signInRef || signUpRef)!, name);
 
   if (!provider) {

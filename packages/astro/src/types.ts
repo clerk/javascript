@@ -73,8 +73,8 @@ export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCr
 
 export type ButtonProps<Tag> = {
   /**
-   * @deprecated The 'as' prop is deprecated and will be removed in a future version.
-   * Use the default slot with the 'asChild' prop instead.
+   * @deprecated The `'as'` prop will be removed in a future version.
+   * Use the default slot with the `'asChild'` prop instead.
    * @example
    * <SignInButton asChild>
    *   <button>Sign in</button>
@@ -83,3 +83,16 @@ export type ButtonProps<Tag> = {
   as: Tag;
   asChild?: boolean;
 };
+
+export type InternalUIComponentId =
+  | 'sign-in'
+  | 'sign-up'
+  | 'create-organization'
+  | 'organization-list'
+  | 'organization-profile'
+  | 'organization-switcher'
+  | 'user-button'
+  | 'user-profile'
+  | 'google-one-tap'
+  | 'waitlist'
+  | 'pricing-table';

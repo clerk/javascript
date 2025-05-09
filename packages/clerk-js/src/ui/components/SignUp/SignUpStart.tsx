@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -176,6 +177,8 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
           case ERROR_CODES.CAPTCHA_INVALID:
+          case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
+          case ERROR_CODES.FRAUD_ACTION_BLOCKED:
             card.setError(error);
             break;
           default:
@@ -242,8 +245,14 @@ function SignUpStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    return signUp
-      .upsert(buildRequest(fieldsToSubmit))
+    let signUpAttempt: Promise<SignUpResource>;
+    if (!fields.ticket) {
+      signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
+    } else {
+      signUpAttempt = signUp.upsert(buildRequest(fieldsToSubmit));
+    }
+
+    return signUpAttempt
       .then(res =>
         completeSignUpFlow({
           signUp: res,

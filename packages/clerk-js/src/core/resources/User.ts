@@ -36,6 +36,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -243,7 +244,7 @@ export class User extends BaseResource implements UserResource {
 
   delete = (): Promise<void> => {
     return this._baseDelete({ path: '/me' }).then(res => {
-      eventBus.dispatch(events.UserSignOut, null);
+      eventBus.emit(events.UserSignOut, null);
       return res;
     });
   };
@@ -288,6 +289,18 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as DeletedObjectJSON;
 
     return new DeletedObject(json);
+  };
+
+  initializePaymentSource: typeof initializePaymentSource = params => {
+    return initializePaymentSource(params);
+  };
+
+  addPaymentSource: typeof addPaymentSource = params => {
+    return addPaymentSource(params);
+  };
+
+  getPaymentSources: typeof getPaymentSources = params => {
+    return getPaymentSources(params);
   };
 
   get verifiedExternalAccounts() {

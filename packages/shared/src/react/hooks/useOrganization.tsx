@@ -1,9 +1,11 @@
 import type {
   ClerkPaginatedResponse,
+  CommerceSubscriptionResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMembersParams,
+  GetSubscriptionsParams,
   OrganizationDomainResource,
   OrganizationInvitationResource,
   OrganizationMembershipRequestResource,
@@ -27,40 +29,51 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
  */
 export type UseOrganizationParams = {
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
-   *
-   * - `enrollmentMode`: A string that filters the domains by the provided enrollment mode.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/organizations/verified-domains#enrollment-mode).</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>.
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
-   * If set to `true`, all default properties will be used. Otherwise, accepts an object with the following optional properties:
-   *
-   * - `status`: A string that filters the membership requests by the provided status.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * If set to `true`, all default properties will be used.<br />
+   * Otherwise, accepts an object with the following optional properties:
+   * <ul>
+   *  <li>`status`: A string that filters the membership requests by the provided status.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>.
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
-   *
-   * - `role`: An array of [`OrganizationCustomRoleKey`](/docs/references/javascript/types/organization-custom-role-key).
-   * - `query`: A string that filters the memberships by the provided string.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/references/javascript/types/organization-custom-role-key).</li>
+   *  <li>`query`: A string that filters the memberships by the provided string.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>.
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
-   * If set to `true`, all default properties will be used.
-   *
+   * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
-   *
-   * - `status`: A string that filters the invitations by the provided status.
-   * - Any of the properties described in [Shared properties](#shared-properties).
+   * <ul>
+   *  <li>`status`: A string that filters the invitations by the provided status.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>.
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
+  /**
+   * If set to `true`, all default properties will be used.<br />
+   * Otherwise, accepts an object with the following optional properties:
+   * <ul>
+   *  <li>`orgId`: A string that filters the subscriptions by the provided organization ID.</li>
+   *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
+   * </ul>.
+   */
+  subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };
 
 /**
@@ -96,6 +109,10 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        * Includes a paginated list of the organization's invitations.
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
+      /**
+       * Includes a paginated list of the organization's subscriptions.
+       */
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: true;
@@ -105,6 +122,7 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
+      subscriptions: PaginatedResourcesWithDefault<CommerceSubscriptionResource>;
     }
   | {
       isLoaded: boolean;
@@ -125,6 +143,10 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
       invitations: PaginatedResources<
         OrganizationInvitationResource,
         T['invitations'] extends { infinite: true } ? true : false
+      > | null;
+      subscriptions: PaginatedResources<
+        CommerceSubscriptionResource,
+        T['subscriptions'] extends { infinite: true } ? true : false
       > | null;
     };
 
@@ -275,6 +297,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
+    subscriptions: subscriptionsListParams,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
@@ -311,6 +334,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     initialPage: 1,
     pageSize: 10,
     status: ['pending'],
+    keepPreviousData: false,
+    infinite: false,
+  });
+
+  const subscriptionsSafeValues = useWithSafeValues(subscriptionsListParams, {
+    initialPage: 1,
+    pageSize: 10,
     keepPreviousData: false,
     infinite: false,
   });
@@ -354,6 +384,15 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
           initialPage: invitationsSafeValues.initialPage,
           pageSize: invitationsSafeValues.pageSize,
           status: invitationsSafeValues.status,
+        };
+
+  const subscriptionsParams =
+    typeof subscriptionsListParams === 'undefined'
+      ? undefined
+      : {
+          initialPage: subscriptionsSafeValues.initialPage,
+          pageSize: subscriptionsSafeValues.pageSize,
+          orgId: organization?.id,
         };
 
   const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
@@ -421,6 +460,25 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     },
   );
 
+  const subscriptions = usePagesOrInfinite<
+    GetSubscriptionsParams,
+    ClerkPaginatedResponse<CommerceSubscriptionResource>
+  >(
+    {
+      ...subscriptionsParams,
+    },
+    organization?.getSubscriptions,
+    {
+      keepPreviousData: subscriptionsSafeValues.keepPreviousData,
+      infinite: subscriptionsSafeValues.infinite,
+      enabled: !!subscriptionsParams,
+    },
+    {
+      type: 'subscriptions',
+      organizationId: organization?.id,
+    },
+  );
+
   if (organization === undefined) {
     return {
       isLoaded: false,
@@ -430,6 +488,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
+      subscriptions: undefinedPaginatedResource,
     };
   }
 
@@ -442,6 +501,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: null,
       memberships: null,
       invitations: null,
+      subscriptions: null,
     };
   }
 
@@ -455,16 +515,19 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       membershipRequests: undefinedPaginatedResource,
       memberships: undefinedPaginatedResource,
       invitations: undefinedPaginatedResource,
+      subscriptions: undefinedPaginatedResource,
     };
   }
 
   return {
     isLoaded: clerk.loaded,
     organization,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     membership: getCurrentOrganizationMembership(session!.user.organizationMemberships, organization.id), // your membership in the current org
     domains,
     membershipRequests,
     memberships,
     invitations,
+    subscriptions,
   };
 }

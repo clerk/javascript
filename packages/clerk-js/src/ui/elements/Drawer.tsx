@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react/index';
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -20,7 +20,7 @@ import { usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
-import { common, InternalThemeProvider } from '../styledSystem';
+import { common } from '../styledSystem';
 import { colors } from '../utils';
 import { IconButton } from './IconButton';
 
@@ -92,6 +92,7 @@ function Root({
     onOpenChange,
     transform: false,
     strategy,
+    placement: 'right',
     ...floatingProps,
   });
 
@@ -102,21 +103,19 @@ function Root({
   ]);
 
   return (
-    <InternalThemeProvider>
-      <DrawerContext.Provider
-        value={{
-          isOpen: open,
-          setIsOpen: onOpenChange,
-          strategy,
-          portalProps: portalProps || {},
-          refs,
-          context,
-          getFloatingProps,
-        }}
-      >
-        {children}
-      </DrawerContext.Provider>
-    </InternalThemeProvider>
+    <DrawerContext.Provider
+      value={{
+        isOpen: open,
+        setIsOpen: onOpenChange,
+        strategy,
+        portalProps: portalProps || {},
+        refs,
+        context,
+        getFloatingProps,
+      }}
+    >
+      <FloatingPortal {...portalProps}>{children}</FloatingPortal>
+    </DrawerContext.Provider>
   );
 }
 
@@ -196,7 +195,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const { strategy, portalProps, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, refs, context, getFloatingProps } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -213,17 +212,24 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   if (!isMounted) return null;
 
   return (
-    <FloatingPortal {...portalProps}>
-      <FloatingFocusManager
-        context={context}
-        modal
-        outsideElementsInert
-        initialFocus={refs.floating}
+    <FloatingFocusManager
+      context={context}
+      modal
+      outsideElementsInert
+      initialFocus={refs.floating}
+    >
+      <div
+        ref={mergedRefs}
+        {...getFloatingProps()}
+        style={{
+          position: strategy,
+          insetBlock: 0,
+          insetInline: 0,
+          pointerEvents: 'none',
+        }}
       >
         <Flex
-          ref={mergedRefs}
           elementDescriptor={descriptors.drawerContent}
-          {...getFloatingProps()}
           style={transitionStyles}
           direction='col'
           sx={t => ({
@@ -237,27 +243,29 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             insetInlineEnd: strategy === 'fixed' ? t.space.$3 : 0,
             outline: 0,
             width: t.sizes.$100,
+            maxWidth: strategy === 'fixed' ? `calc(100% - ${t.space.$6})` : '100%',
             backgroundColor: t.colors.$colorBackground,
-            borderStartStartRadius: t.radii.$xl,
-            borderEndStartRadius: t.radii.$xl,
-            borderEndEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
-            borderStartEndRadius: strategy === 'fixed' ? t.radii.$xl : 0,
+            borderStartStartRadius: t.radii.$lg,
+            borderEndStartRadius: t.radii.$lg,
+            borderEndEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
+            borderStartEndRadius: strategy === 'fixed' ? t.radii.$lg : 0,
             borderWidth: t.borderWidths.$normal,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$neutralAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
             zIndex: t.zIndices.$modal,
+            pointerEvents: 'auto',
           })}
         >
           {children}
         </Flex>
-      </FloatingFocusManager>
-    </FloatingPortal>
+      </div>
+    </FloatingFocusManager>
   );
 });
 
-Overlay.displayName = 'Drawer.Content';
+Content.displayName = 'Drawer.Content';
 
 /* -------------------------------------------------------------------------------------------------
  * Drawer.Header
@@ -285,8 +293,8 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
           borderBlockEndWidth: t.borderWidths.$normal,
           borderBlockEndStyle: t.borderStyles.$solid,
           borderBlockEndColor: t.colors.$neutralAlpha100,
-          borderStartStartRadius: t.radii.$xl,
-          borderStartEndRadius: t.radii.$xl,
+          borderStartStartRadius: t.radii.$lg,
+          borderStartEndRadius: t.radii.$lg,
           paddingBlock: title ? t.space.$3 : undefined,
           paddingInline: title ? t.space.$4 : undefined,
         }),
@@ -317,11 +325,11 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(({ title, children,
  * Drawer.Body
  * -----------------------------------------------------------------------------------------------*/
 
-interface BodyProps {
+interface BodyProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => {
+const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children, ...props }, ref) => {
   return (
     <Box
       ref={ref}
@@ -333,6 +341,7 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
         overflowY: 'auto',
         overflowX: 'hidden',
       }}
+      {...props}
     >
       {children}
     </Box>
@@ -343,12 +352,12 @@ const Body = React.forwardRef<HTMLDivElement, BodyProps>(({ children }, ref) => 
  * Drawer.Footer
  * -----------------------------------------------------------------------------------------------*/
 
-interface FooterProps {
+interface FooterProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   sx?: ThemableCssProp;
 }
 
-const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, ref) => {
+const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx, ...props }, ref) => {
   return (
     <Box
       ref={ref}
@@ -371,6 +380,7 @@ const Footer = React.forwardRef<HTMLDivElement, FooterProps>(({ children, sx }, 
         }),
         sx,
       ]}
+      {...props}
     >
       {children}
     </Box>

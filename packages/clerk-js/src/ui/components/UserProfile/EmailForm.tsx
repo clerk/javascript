@@ -4,9 +4,10 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import type { LocalizationKey } from '../../localization';
+import { localizationKeys } from '../../localization';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 import { VerifyWithEnterpriseConnection } from './VerifyWithEnterpriseConnection';
@@ -14,14 +15,17 @@ import { VerifyWithLink } from './VerifyWithLink';
 
 type EmailFormProps = FormProps & {
   emailId?: string;
+  title?: LocalizationKey;
+  subtitle?: LocalizationKey;
+  disableAutoFocus?: boolean;
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
-  const { emailId: id, onSuccess, onReset } = props;
+  const { emailId: id, onSuccess, onReset, disableAutoFocus = false } = props;
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
 
-  const [createEmailAddress] = useReverification((email: string) => user?.createEmailAddress({ email }));
+  const createEmailAddress = useReverification((email: string) => user?.createEmailAddress({ email }));
 
   const emailAddressRef = React.useRef<EmailAddressResource | undefined>(user?.emailAddresses.find(a => a.id === id));
   const strategy = getEmailAddressVerificationStrategy(emailAddressRef.current, environment);
@@ -57,14 +61,14 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <FormContainer
-        headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
-        headerSubtitle={localizationKeys('userProfile.emailAddressPage.formHint')}
+        headerTitle={props.title || localizationKeys('userProfile.emailAddressPage.title')}
+        headerSubtitle={props.subtitle || localizationKeys('userProfile.emailAddressPage.formHint')}
       >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
               {...emailField.props}
-              autoFocus
+              autoFocus={!disableAutoFocus}
             />
           </Form.ControlRow>
           <FormButtons

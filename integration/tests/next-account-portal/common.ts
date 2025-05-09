@@ -16,7 +16,7 @@ type TestParams = {
 };
 
 export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
   // Begin in localhost
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
@@ -79,7 +79,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
 };
 
 export const testSignUp = async ({ app, page, context }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
   const tempUser = u.services.users.createFakeUser({ fictionalEmail: true });
 
   // Begin in localhost
@@ -148,7 +148,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
 };
 
 export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context });
+  const u = createTestUtils({ app, page, context, useTestingToken: false });
 
   // Begin in localhost
   await u.page.goToAppHome();
@@ -159,8 +159,12 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
   await u.page.getByRole('button', { name: /Sign in/i }).click();
   await u.po.signIn.waitForMounted();
 
-  // Sign in with email and password
-  await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+  // Sign in with email and password. If we wait for the session, we will miss the initial redirect back to localhost.
+  await u.po.signIn.signInWithEmailAndInstantPassword({
+    email: fakeUser.email,
+    password: fakeUser.password,
+    waitForSession: false,
+  });
 
   // Navigate back to localhost
   const response = await page.waitForResponse(

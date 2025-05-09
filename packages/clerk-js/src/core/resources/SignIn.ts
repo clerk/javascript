@@ -9,6 +9,7 @@ import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithPasskeyParams,
+  AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
@@ -48,6 +49,7 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
+import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -224,7 +226,10 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+  private authenticateWithRedirectOrPopup = async (
+    params: AuthenticateWithRedirectParams,
+    navigateCallback: (url: URL | string) => void,
+  ): Promise<void> => {
     const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
 
     const { firstFactorVerification } =
@@ -244,10 +249,24 @@ export class SignIn extends BaseResource implements SignInResource {
     const { status, externalVerificationRedirectURL } = firstFactorVerification;
 
     if (status === 'unverified' && externalVerificationRedirectURL) {
-      windowNavigate(externalVerificationRedirectURL);
+      navigateCallback(externalVerificationRedirectURL);
     } else {
       clerkInvalidFAPIResponse(status, SignIn.fapiClient.buildEmailAddress('support'));
     }
+  };
+
+  public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
+    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+  };
+
+  public authenticateWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
+    const { popup } = params || {};
+    if (!popup) {
+      clerkMissingOptionError('popup');
+    }
+    return _authenticateWithPopup(SignIn.clerk, 'signIn', this.authenticateWithRedirectOrPopup, params, url => {
+      popup.location.href = url.toString();
+    });
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {

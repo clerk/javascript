@@ -26,6 +26,9 @@ export type CamelToSnake<T> = T extends `${infer C0}${infer R}`
       }
     : T;
 
+/**
+ * @internal
+ */
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
@@ -92,6 +95,7 @@ export type Serializable<T> = {
 /**
  * Enables autocompletion for a union type, while keeping the ability to use any string
  * or type of `T`
+ * @internal
  */
 export type Autocomplete<U extends T, T = string> = U | (T & Record<never, never>);
 

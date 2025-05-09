@@ -7,8 +7,12 @@ import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
-import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
-import { buildSSOCallbackURL } from '../../common/redirects';
+import {
+  buildSSOCallbackURL,
+  getIdentifierControlDisplayValues,
+  groupIdentifiers,
+  withRedirectToAfterSignIn,
+} from '../../common';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import {
@@ -20,6 +24,7 @@ import {
   useCardState,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
@@ -241,6 +246,9 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
           case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
           case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+          case ERROR_CODES.CAPTCHA_INVALID:
+          case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
+          case ERROR_CODES.FRAUD_ACTION_BLOCKED:
             card.setError(error);
             break;
           default:
@@ -361,6 +369,7 @@ function SignInStartInternal(): JSX.Element {
     if (instantPasswordError) {
       await signInWithFields(identifierField);
     } else if (alreadySignedInError) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
       await clerk.setActive({ session: sid, redirectUrl: afterSignInUrl });
     } else if (isCombinedFlow && accountDoesNotExistError) {
@@ -479,10 +488,14 @@ function SignInStartInternal(): JSX.Element {
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
                   </Col>
-                  <Form.SubmitButton hasArrow />
+                  <Col center>
+                    <CaptchaElement />
+                    <Form.SubmitButton hasArrow />
+                  </Col>
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
+            {!standardFormAttributes.length && <CaptchaElement />}
             {userSettings.attributes.passkey?.enabled &&
               userSettings.passkeySettings.show_sign_in_button &&
               isWebSupported && (

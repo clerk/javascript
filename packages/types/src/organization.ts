@@ -1,3 +1,4 @@
+import type { CommercePaymentSourceMethods, CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -27,7 +28,14 @@ declare global {
   }
 }
 
-export interface OrganizationResource extends ClerkResource {
+/**
+ * The `Organization` object holds information about an organization, as well as methods for managing it.
+ *
+ * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/organizations/overview#enable-organizations-in-your-application).
+ *
+ * @interface
+ */
+export interface OrganizationResource extends ClerkResource, CommercePaymentSourceMethods {
   id: string;
   name: string;
   slug: string | null;
@@ -48,6 +56,7 @@ export interface OrganizationResource extends ClerkResource {
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>>;
+  getSubscriptions: (params?: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;

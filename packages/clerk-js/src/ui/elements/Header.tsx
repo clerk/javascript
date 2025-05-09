@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Col, descriptors, Heading, Text, useAppearance } from '../customizables';
+import { Col, descriptors, Heading, Icon, Link, Text, useAppearance } from '../customizables';
+import { ArrowLeftIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 
@@ -67,8 +68,37 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
   );
 });
 
+const BackLink = React.memo((props: PropsOfComponent<typeof Link>): JSX.Element => {
+  const { sx, children, ...rest } = props;
+  return (
+    <Link
+      elementDescriptor={descriptors.headerBackLink}
+      sx={t => [
+        {
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: t.space.$2,
+          width: 'fit-content',
+          '&:hover': {
+            textDecoration: 'none',
+          },
+        },
+        sx,
+      ]}
+      {...rest}
+    >
+      <Icon
+        icon={ArrowLeftIcon}
+        sx={t => ({ color: t.colors.$colorText })}
+      />
+      {children}
+    </Link>
+  );
+});
+
 export const Header = {
   Root,
   Title,
   Subtitle,
+  BackLink,
 };

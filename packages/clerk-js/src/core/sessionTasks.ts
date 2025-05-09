@@ -1,4 +1,9 @@
-import type { ClerkOptions, EnvironmentResource, SessionTask } from '@clerk/types';
+import type {
+  __internal_ComponentNavigationContext,
+  ClerkOptions,
+  EnvironmentResource,
+  SessionTask,
+} from '@clerk/types';
 
 import { buildURL } from '../utils';
 
@@ -7,15 +12,7 @@ export const SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
 } as const;
 
 interface NavigateToTaskOptions {
-  componentNavigationContext: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  } | null;
+  componentNavigationContext: __internal_ComponentNavigationContext | null;
   globalNavigate: (to: string) => Promise<unknown>;
   options: ClerkOptions;
   environment: EnvironmentResource;
@@ -27,13 +24,13 @@ interface NavigateToTaskOptions {
  * @internal
  */
 export function navigateToTask(
-  task: SessionTask,
+  routeKey: keyof typeof SESSION_TASK_ROUTE_BY_KEY,
   { componentNavigationContext, globalNavigate, options, environment }: NavigateToTaskOptions,
 ) {
-  const taskRoute = `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`;
+  const taskRoute = `/tasks/${SESSION_TASK_ROUTE_BY_KEY[routeKey]}`;
 
   if (componentNavigationContext) {
-    return componentNavigationContext.navigate(`/${componentNavigationContext.basePath + taskRoute}`);
+    return componentNavigationContext.navigate(componentNavigationContext.indexPath + taskRoute);
   }
 
   const signInUrl = options['signInUrl'] || environment.displayConfig.signInUrl;

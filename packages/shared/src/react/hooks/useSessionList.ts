@@ -5,6 +5,11 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientCont
 /**
  * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/references/javascript/session) objects that have been registered on the client device.
  *
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
+ *
+ * @function
+ *
  * @example
  * ### Get a list of sessions
  *

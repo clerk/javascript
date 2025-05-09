@@ -2,21 +2,21 @@ import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy } from './strat
 
 export type AfterSignOutUrl = {
   /**
-   * Full URL or path to navigate after successful sign out.
+   * Full URL or path to navigate to after successful sign out.
    */
   afterSignOutUrl?: string | null;
 };
 
 export type AfterMultiSessionSingleSignOutUrl = {
   /**
-   * Full URL or path to navigate after signing out the current user is complete.
-   * This option applies to multi-session applications.
+   * The full URL or path to navigate to after signing out the current user is complete.
+   * This option applies to [multi-session applications](https://clerk.com/docs/authentication/configuration/session-options#multi-session-applications).
    */
   afterMultiSessionSingleSignOutUrl?: string | null;
 };
 
 /**
- * @deprecated This is deprecated and will be removed in a future release.
+ * @deprecated This will be removed in a future release.
  */
 export type LegacyRedirectProps = {
   /**
@@ -45,14 +45,14 @@ export type RedirectOptions = SignInForceRedirectUrl &
 
 export type AuthenticateWithRedirectParams = {
   /**
-   * Full URL or path to the route that will complete the OAuth or SAML flow.
+   * The full URL or path to the route that will complete the OAuth or SAML flow.
    * Typically, this will be a simple `/sso-callback` route that calls `Clerk.handleRedirectCallback`
    * or mounts the <AuthenticateWithRedirectCallback /> component.
    */
   redirectUrl: string;
 
   /**
-   * Full URL or path to navigate after the OAuth or SAML flow completes.
+   * The full URL or path to navigate to after the OAuth or SAML flow completes.
    */
   redirectUrlComplete: string;
 
@@ -83,37 +83,48 @@ export type AuthenticateWithRedirectParams = {
   legalAccepted?: boolean;
 };
 
+export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
+
 export type RedirectUrlProp = {
   /**
-   * Full URL or path to navigate after a successful action.
+   * Full URL or path to navigate to after a successful action.
    */
   redirectUrl?: string | null;
 };
 
 export type SignUpForceRedirectUrl = {
   /**
-   * If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * This URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signUpForceRedirectUrl?: string | null;
 };
 
 export type SignUpFallbackRedirectUrl = {
   /**
-   * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * @default '/'
    */
   signUpFallbackRedirectUrl?: string | null;
 };
 
 export type SignInFallbackRedirectUrl = {
   /**
-   * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. Defaults to `/`. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * @default '/'
    */
   signInFallbackRedirectUrl?: string | null;
 };
 
 export type SignInForceRedirectUrl = {
   /**
-   * If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * This URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInForceRedirectUrl?: string | null;
+};
+
+export type NewSubscriptionRedirectUrl = {
+  /**
+   * The URL to navigate to after the user completes the checkout and clicks the "Continue" button.
+   */
+  newSubscriptionRedirectUrl?: string | null;
 };

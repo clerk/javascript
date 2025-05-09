@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Назад',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
   badge__primary: 'Основен',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Изисква действие',
+  badge__startsAt: undefined,
   badge__thisDevice: 'Това устройство',
   badge__unverified: 'Непотвърден',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {
@@ -122,6 +161,41 @@ export const bgBG: LocalizationResource = {
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',
     badge__unverified: 'Неверифициран',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Добавете домейн за верификация. Потребителите с имейл адреси на този домейн могат да се присъединят към организацията автоматично или да заявят да се присъединят.',
@@ -179,10 +253,17 @@ export const bgBG: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: 'Управление на вашата организация.',
       general: 'Общи',
       members: 'Членове',
       title: 'Организация',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -321,7 +402,7 @@ export const bgBG: LocalizationResource = {
     },
     password: {
       actionLink: 'Use another method',
-      subtitle: 'Enter your password to continue using "{{applicationName}}"',
+      subtitle: 'Enter your current password to continue using "{{applicationName}}"',
       title: 'Enter your password',
     },
     phoneCode: {
@@ -591,7 +672,8 @@ export const bgBG: LocalizationResource = {
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
-    not_allowed_access: 'Нямате необходимите разрешения за достъп.',
+    not_allowed_access:
+      'Имейл адресът или телефонният номер не са разрешени за регистрация. Това може да се дължи на използването на „+“, „=“, „#“ или „.“ във вашия имейл адрес, като използвате домейн, свързан с временна имейл услуга, или сте изрично блокирани. Ако смятате, че това е грешка, моля, свържете се с поддръжката.',
     organization_domain_blocked: 'Доменът на организацията е блокиран.',
     organization_domain_common: 'Доменът на организацията е твърде общ.',
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -612,6 +694,7 @@ export const bgBG: LocalizationResource = {
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
+    session_exists: 'Вече сте влезнали.',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',
@@ -660,14 +743,6 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -683,6 +758,41 @@ export const bgBG: LocalizationResource = {
         'Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване.',
       title: 'Добавяне на резервен код за потвърждение',
       title__codelist: 'Резервни кодове',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Изберете доставчик, за да свържете вашия профил.',
@@ -828,6 +938,9 @@ export const bgBG: LocalizationResource = {
       title: 'Добави телефонен номер',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Препоръчителен размер 1:1, до 10MB.',

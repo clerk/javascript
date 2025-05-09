@@ -13,6 +13,7 @@ Please note we have a [code of conduct](https://github.com/clerk/javascript/blob
     - [Setting up your local environment](#setting-up-your-local-environment)
     - [Documenting your changes](#documenting-your-changes)
     - [Writing tests](#writing-tests)
+    - [Authoring Typedoc information](#authoring-typedoc-information)
   - [Opening a Pull Request](#opening-a-pull-request)
     - [Changesets](#changesets)
     - [Commit messages](#commit-messages)
@@ -97,6 +98,71 @@ Updating documentation is an important part of the contribution process. If you 
 
 To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
 
+There are some styleguide decisions you should follow when authoring JSDoc comments:
+
+- In addition to the description, also annotate the parameters and return types (if applicable)
+- Provide one or more `@example` if you're documenting a function
+  - Use `###` (h3) headings and a description for each example
+- When using links, make sure that they are **absolute** links (e.g. `[Clerk docs](https://clerk.com/docs)`).
+- Provide a `@default` annotation when describing an optional property that will receive a default value
+- Follow the `clerk-docs` styleguides on [code blocks](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#code-blocks), [callouts](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#callouts)
+
+Here's an example of an excellent documented function that showcases the different styleguide instructions:
+
+````ts
+type FnParameters = {
+  /**
+   * Input to the function with a lengthy and good description.
+   */
+  input: string | Array<string>;
+  /**
+   * Optional parameter with a default value.
+   * @default false
+   */
+  isOffline?: boolean;
+};
+
+type FnReturn = Array<string>;
+
+/**
+ * Some long description goes here.
+ *
+ * > [!NOTE]
+ * > This is a note that will be rendered in the documentation.
+ *
+ * @example
+ * ### Example 1
+ *
+ * This shows how to use the function with a single string input.
+ *
+ * ```tsx
+ * const result = exampleFunction({ input: 'example' });
+ * console.log(result); // Output: ['example']
+ * ```
+ *
+ * @example
+ * ### Example 2
+ *
+ * This shows how to use the function with an array of strings as input.
+ *
+ * ```tsx
+ * const result = exampleFunction({ input: ['example1', 'example2'] });
+ * console.log(result); // Output: ['example1', 'example2']
+ * ```
+ */
+export function exampleFunction({ input, isOffline = false }: FnParameters): FnReturn {
+  if (isOffline) {
+    return [];
+  }
+
+  if (Array.isArray(input)) {
+    return input;
+  }
+
+  return [input];
+}
+````
+
 ### Writing tests
 
 When changing functionality or adding completely new code it's highly recommended to add/edit tests to verify the new behavior.
@@ -109,6 +175,16 @@ Inside the repository you'll find two types of tests:
 While changing a file inside a package, check if e.g. a `<name>.test.ts` file or a test inside a `__tests__` folder exists. If you add a completely new file, please add a unit test for it.
 
 If your change can't only be tested by unit tests, you should add/edit an integration test. You can find all necessary information about this in the [integration tests README](../integration/README.md).
+
+### Authoring Typedoc information
+
+As explained in [documenting your changes](#documenting-your-changes), we use JSDoc to annotate our public API surface. We then use [Typedoc](https://typedoc.org/) to autogenerate docs from these comments.
+
+Locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typdoc/docs`.
+
+These files are pushed to [clerk/generated-typedoc](https://github.com/clerk/generated-typedoc) and then used on Clerk's docs. In the docs you can access the files by using a `<Typedoc src="path/to/file" />` component.
+
+So if you find a typo that's inside a Typedoc file, you'll need to edit the source file, [open a PR](#opening-a-pull-request), and get it merged to `main`. You can preview your changes with the aforementioned `pnpm typedoc:generate` command.
 
 ## Opening a Pull Request
 

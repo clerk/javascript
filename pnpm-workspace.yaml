@@ -6,8 +6,8 @@ catalogs:
   react:
     react: 18.3.1
     react-dom: 18.3.1
-    '@types/react': 18.3.12
-    '@types/react-dom': 18.3.1
+    '@types/react': 18.3.20
+    '@types/react-dom': 18.3.6
 
   # Can be referenced through "catalog:peer-react"
   peer-react:
@@ -18,5 +18,5 @@ catalogs:
   repo:
     tslib: 2.8.1
     tsup: 8.4.0
-    typescript: 5.8.2
+    typescript: 5.8.3
     zx: 8.4.1

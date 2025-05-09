@@ -1,7 +1,8 @@
 import { useOrganizationList, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
+import { SessionTasksContext } from '../../contexts/components/SessionTasks';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
@@ -111,6 +112,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
   const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
+  const sessionTasksContext = useContext(SessionTasksContext);
   return (
     <>
       {!isCreateOrganizationFlow && (
@@ -125,6 +127,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
         >
           <CreateOrganizationForm
             flow='organizationList'
+            onComplete={sessionTasksContext?.nextTask}
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>

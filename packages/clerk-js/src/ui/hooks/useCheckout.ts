@@ -1,18 +1,39 @@
-import { useClerk } from '@clerk/shared/react';
-import type { __experimental_CheckoutProps, __experimental_CommerceCheckoutResource } from '@clerk/types';
+import type { ClerkAPIResponseError } from '@clerk/shared/error';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useFetch } from './useFetch';
 
-export const useCheckout = (props: __experimental_CheckoutProps) => {
-  const { planId, planPeriod } = props;
-  const { __experimental_commerce } = useClerk();
-  const [currentCheckout, setCurrentCheckout] = useState<__experimental_CommerceCheckoutResource | null>(null);
+export const useCheckout = (props: __internal_CheckoutProps) => {
+  const { planId, planPeriod, subscriberType = 'user' } = props;
+  const clerk = useClerk();
+  const { organization } = useOrganization();
+  const [currentCheckout, setCurrentCheckout] = useState<CommerceCheckoutResource | null>(null);
 
-  const { data: initialCheckout, isLoading } = useFetch(__experimental_commerce?.__experimental_billing.startCheckout, {
-    planId,
-    planPeriod,
-  });
+  const { user } = useUser();
+  const {
+    data: initialCheckout,
+    isLoading,
+    invalidate,
+    revalidate,
+    error: _error,
+  } = useFetch(
+    clerk.billing?.startCheckout,
+    {
+      planId,
+      planPeriod,
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    },
+    undefined,
+    `commerce-checkout-${user?.id}`,
+  );
+
+  const error = _error as ClerkAPIResponseError | undefined;
+
+  const updateCheckout = useCallback((newCheckout: CommerceCheckoutResource) => {
+    setCurrentCheckout(newCheckout);
+  }, []);
 
   useEffect(() => {
     if (initialCheckout && !currentCheckout) {
@@ -20,13 +41,12 @@ export const useCheckout = (props: __experimental_CheckoutProps) => {
     }
   }, [initialCheckout, currentCheckout]);
 
-  const updateCheckout = useCallback((newCheckout: __experimental_CommerceCheckoutResource) => {
-    setCurrentCheckout(newCheckout);
-  }, []);
-
   return {
     checkout: currentCheckout || initialCheckout,
     updateCheckout,
     isLoading,
+    invalidate,
+    revalidate,
+    errors: error?.errors,
   };
 };

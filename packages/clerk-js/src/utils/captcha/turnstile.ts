@@ -134,11 +134,15 @@ async function loadCaptchaFromCloudflareURL() {
 }
 
 function getCaptchaAttibutesFromElemenet(element: HTMLElement): CaptchaAttributes {
-  const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
-  const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
-  const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
+  try {
+    const theme = (element.getAttribute('data-cl-theme') as RenderOptions['theme']) || undefined;
+    const language = (element.getAttribute('data-cl-language') as RenderOptions['language']) || undefined;
+    const size = (element.getAttribute('data-cl-size') as RenderOptions['size']) || undefined;
 
-  return { theme, language, size };
+    return { theme, language, size };
+  } catch {
+    return { theme: undefined, language: undefined, size: undefined };
+  }
 }
 
 /*
@@ -164,6 +168,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   let widgetContainerQuerySelector: string | undefined;
   // The backend uses this to determine which Turnstile site-key was used in order to verify the token
   let captchaWidgetType: CaptchaWidgetType = null;
+  let captchaTypeUsed: 'invisible' | 'modal' | 'smart' = 'invisible';
 
   // modal
   if (modalContainerQuerySelector && modalWrapperQuerySelector) {
@@ -172,7 +177,16 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     // but we won't show the modal as it will never escalate to interactive mode
     captchaWidgetType = widgetType;
     widgetContainerQuerySelector = modalContainerQuerySelector;
-    await openModal?.();
+    captchaTypeUsed = 'modal';
+    try {
+      await openModal?.();
+    } catch {
+      // When a client is captcha_block the first attempt to open the modal will fail with 'ClerkJS components are not ready yet.'
+      // This happens consistently in the first attempt, because in clerk.#loadInStandardBrowser we first await for the `/client` response
+      // and then we run initComponents to initialize the components.
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw { captchaError: 'modal_component_not_ready' };
+    }
     const modalContainderEl = await waitForElement(modalContainerQuerySelector);
     if (modalContainderEl) {
       const { theme, language, size } = getCaptchaAttibutesFromElemenet(modalContainderEl);
@@ -186,6 +200,7 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
   if (!widgetContainerQuerySelector && widgetType === 'smart') {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
+      captchaTypeUsed = 'smart';
       captchaWidgetType = 'smart';
       widgetContainerQuerySelector = `#${CAPTCHA_ELEMENT_ID}`;
       visibleDiv.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
@@ -202,12 +217,13 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
 
   // invisible widget for which we create the container automatically
   if (!widgetContainerQuerySelector) {
+    captchaTypeUsed = 'invisible';
     turnstileSiteKey = invisibleSiteKey;
     captchaWidgetType = 'invisible';
     widgetContainerQuerySelector = `.${CAPTCHA_INVISIBLE_CLASSNAME}`;
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
-    div.style.maxHeight = '0'; // This is to prevent the layout shift when the render method is called
+    div.style.display = 'none'; // This is to prevent the layout shift when the render method is called
     document.body.appendChild(div);
   }
 
@@ -291,16 +307,22 @@ export const getTurnstileToken = async (opts: CaptchaOptions) => {
     };
   } finally {
     // cleanup
-    closeModal?.();
-    const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
-    if (invisibleWidget) {
-      document.body.removeChild(invisibleWidget);
+    if (captchaTypeUsed === 'modal') {
+      closeModal?.();
     }
-    const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
-    if (visibleWidget) {
-      visibleWidget.style.maxHeight = '0';
-      visibleWidget.style.minHeight = 'unset';
-      visibleWidget.style.marginBottom = 'unset';
+    if (captchaTypeUsed === 'invisible') {
+      const invisibleWidget = document.querySelector(`.${CAPTCHA_INVISIBLE_CLASSNAME}`);
+      if (invisibleWidget) {
+        document.body.removeChild(invisibleWidget);
+      }
+    }
+    if (captchaTypeUsed === 'smart') {
+      const visibleWidget = document.getElementById(CAPTCHA_ELEMENT_ID);
+      if (visibleWidget) {
+        visibleWidget.style.maxHeight = '0';
+        visibleWidget.style.minHeight = 'unset';
+        visibleWidget.style.marginBottom = 'unset';
+      }
     }
   }
 

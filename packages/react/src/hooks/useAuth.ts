@@ -1,5 +1,13 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
-import type { CheckAuthorizationWithCustomPermissions, GetToken, SignOut, UseAuthReturn } from '@clerk/types';
+import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  GetToken,
+  JwtPayload,
+  PendingSessionOptions,
+  SignOut,
+  UseAuthReturn,
+} from '@clerk/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -10,14 +18,28 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { createGetToken, createSignOut } from './utils';
 
 /**
+ * @inline
+ */
+type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
+
+/**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
- * @param [initialAuthState] - An object containing the initial authentication state. If not provided, the hook will attempt to derive the state from the context.
+ * > [!NOTE]
+ * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/references/backend/types/auth-object).
+ *
+ * <If sdk="nextjs">
+ * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
+ * </If>
+ *
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
+ *
+ * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ *
+ * @function
  *
  * @example
- *
- * > [!NOTE]
- * > For frameworks like Next.js that support multiple ways of rendering its content, it might be preferable to use the [`auth()`](https://clerk.com/docs/references/nextjs/auth) helper instead of `useAuth()`. This depends on if you want to use React Server Components, SSR, or client-side rendering. Learn more in the [rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) guide. If you only want to access data on the client-side, `useAuth()` is sufficient.
  *
  * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
  *
@@ -70,8 +92,11 @@ import { createGetToken, createSignOut } from './utils';
  * </Tab>
  * </Tabs>
  */
-export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
+export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
+
+  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
+  const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
   let authContext = authContextFromHook;
@@ -80,24 +105,23 @@ export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } = authContext;
   const isomorphicClerk = useIsomorphicClerkContext();
-
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
-  return useDerivedAuth({
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    getToken,
-    signOut,
-    orgPermissions,
-    factorVerificationAge,
-  });
+  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
+
+  return useDerivedAuth(
+    {
+      ...authContext,
+      getToken,
+      signOut,
+    },
+    {
+      treatPendingAsSignedOut:
+        treatPendingAsSignedOut ?? isomorphicClerk.__internal_getOption?.('treatPendingAsSignedOut'),
+    },
+  );
 };
 
 /**
@@ -126,20 +150,12 @@ export const useAuth = (initialAuthState: any = {}): UseAuthReturn => {
  * } = useDerivedAuth(authObject);
  * ```
  */
-export function useDerivedAuth(authObject: any): UseAuthReturn {
-  const {
-    sessionId,
-    userId,
-    actor,
-    orgId,
-    orgSlug,
-    orgRole,
-    has,
-    signOut,
-    getToken,
-    orgPermissions,
-    factorVerificationAge,
-  } = authObject ?? {};
+export function useDerivedAuth(
+  authObject: any,
+  { treatPendingAsSignedOut = true }: PendingSessionOptions = {},
+): UseAuthReturn {
+  const { userId, orgId, orgRole, has, signOut, getToken, orgPermissions, factorVerificationAge, sessionClaims } =
+    authObject ?? {};
 
   const derivedHas = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -152,74 +168,28 @@ export function useDerivedAuth(authObject: any): UseAuthReturn {
         orgRole,
         orgPermissions,
         factorVerificationAge,
+        features: ((sessionClaims as JwtPayload | undefined)?.fea as string) || '',
+        plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
-    [userId, factorVerificationAge, orgId, orgRole, orgPermissions],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
   );
 
-  if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: undefined,
-      orgId: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      has: undefined,
-      signOut,
+  const payload = resolveAuthState({
+    authObject: {
+      ...authObject,
       getToken,
-    };
-  }
-
-  if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
       signOut,
-      getToken,
-    };
-  }
-
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId,
-      orgRole,
-      orgSlug: orgSlug || null,
       has: derivedHas,
-      signOut,
-      getToken,
-    };
+    },
+    options: {
+      treatPendingAsSignedOut,
+    },
+  });
+
+  if (!payload) {
+    return errorThrower.throw(invalidStateError);
   }
 
-  if (!!sessionId && !!userId && !orgId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: derivedHas,
-      signOut,
-      getToken,
-    };
-  }
-
-  return errorThrower.throw(invalidStateError);
+  return payload;
 }

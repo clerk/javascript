@@ -15,8 +15,14 @@ export default defineNuxtPlugin(nuxtApp => {
     initialState.value = nuxtApp.ssrContext?.event.context.__clerk_initial_state;
   }
 
+  const runtimeConfig = useRuntimeConfig();
   nuxtApp.vueApp.use(clerkPlugin, {
-    ...(useRuntimeConfig().public.clerk ?? {}),
+    ...(runtimeConfig.public.clerk ?? {}),
+    sdkMetadata: {
+      name: PACKAGE_NAME,
+      version: PACKAGE_VERSION,
+      environment: process.env.NODE_ENV,
+    },
     routerPush: (to: string) => navigateTo(to),
     routerReplace: (to: string) => navigateTo(to, { replace: true }),
     initialState: initialState.value,

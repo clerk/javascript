@@ -5,6 +5,7 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PlanDetailTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
@@ -14,7 +15,12 @@ import type {
   WaitlistTheme,
 } from './appearance';
 import type { ClientResource } from './client';
-import type { __experimental_CommerceNamespace } from './commerce';
+import type {
+  CommerceBillingNamespace,
+  CommercePlanResource,
+  CommerceSubscriberType,
+  CommerceSubscriptionPlanPeriod,
+} from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -27,6 +33,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -34,7 +41,7 @@ import type {
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
 } from './redirects';
-import type { SignedInSessionResource } from './session';
+import type { PendingSessionOptions, SignedInSessionResource } from './session';
 import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
@@ -76,7 +83,7 @@ export type SignOutOptions = {
    */
   sessionId?: string;
   /**
-   * Specify a redirect URL to navigate after sign out is complete.
+   * Specify a redirect URL to navigate to after sign out is complete.
    */
   redirectUrl?: string;
 };
@@ -89,6 +96,19 @@ export interface SignOut {
 
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
+
+type ClerkEvent = keyof ClerkEventPayload;
+type EventHandler<E extends ClerkEvent> = (payload: ClerkEventPayload[E]) => void;
+export type ClerkEventPayload = {
+  status: ClerkStatus;
+};
+type OnEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>, opt?: { notify: boolean }) => void;
+type OffEventListener = <E extends ClerkEvent>(event: E, handler: EventHandler<E>) => void;
+
+/**
+ * @inline
+ */
+export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
 
 /**
  * Main Clerk SDK object.
@@ -109,6 +129,15 @@ export interface Clerk {
    * If true the bootstrapping of Clerk.load() has completed successfully.
    */
   loaded: boolean;
+
+  /**
+   * Describes the state the clerk singleton operates in:
+   * - `"error"`: Clerk failed to initialize.
+   * - `"loading"`: Clerk is still attempting to load.
+   * - `"ready"`: Clerk singleton is fully operational.
+   * - `"degraded"`: Clerk singleton is partially operational.
+   */
+  status: ClerkStatus;
 
   /**
    * @internal
@@ -152,8 +181,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  __experimental_commerce: __experimental_CommerceNamespace;
+  /** Billing Object */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -179,7 +208,28 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
-   * Opens the Clerk UserVerification component in a modal.
+   * Opens the Clerk Checkout component in a drawer.
+   * @param props Optional checkout configuration parameters.
+   */
+  __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
+
+  /**
+   * Closes the Clerk Checkout drawer.
+   */
+  __internal_closeCheckout: () => void;
+
+  /**
+   * Opens the Clerk PlanDetails drawer component in a drawer.
+   * @param props Optional subscription details drawer configuration parameters.
+   */
+  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
+
+  /**
+   * Closes the Clerk PlanDetails drawer.
+   */
+  __internal_closePlanDetails: () => void;
+
+  /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
@@ -398,7 +448,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -406,7 +456,7 @@ export interface Clerk {
    *
    * @param targetNode Target node to unmount the PricingTable component from.
    */
-  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+  unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -423,6 +473,22 @@ export interface Clerk {
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
+   * Registers an event handler for a specific Clerk event.
+   * @param event - The event name to subscribe to
+   * @param handler - The callback function to execute when the event is dispatched
+   * @param opt - Optional configuration object
+   * @param opt.notify - If true and the event was previously dispatched, handler will be called immediately with the latest payload
+   */
+  on: OnEventListener;
+
+  /**
+   * Removes an event handler for a specific Clerk event.
+   * @param event - The event name to unsubscribe from
+   * @param handler - The callback function to remove
+   */
+  off: OffEventListener;
+
+  /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
    * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
    * @internal
@@ -434,15 +500,7 @@ export interface Clerk {
    * be triggered from `Clerk` methods
    * @internal
    */
-  __internal_setComponentNavigationContext: (context: {
-    navigate: (
-      to: string,
-      options?: {
-        searchParams?: URLSearchParams;
-      },
-    ) => Promise<unknown>;
-    basePath: string;
-  }) => () => void;
+  __internal_setComponentNavigationContext: (context: __internal_ComponentNavigationContext) => () => void;
 
   /**
    * Set the active session and organization explicitly.
@@ -507,6 +565,11 @@ export interface Clerk {
    * Returns the configured afterSignOutUrl of the instance.
    */
   buildAfterSignOutUrl(): string;
+
+  /**
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   */
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -647,6 +710,14 @@ export interface Clerk {
   joinWaitlist: (params: JoinWaitlistParams) => Promise<WaitlistResource>;
 
   /**
+   * Navigates to the next task or redirects to completion URL.
+   * If the current session has pending tasks, it navigates to the next task.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
+   * @experimental
+   */
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
+
+  /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
    * @internal
@@ -660,6 +731,12 @@ export interface Clerk {
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
+
+  /**
+   * Internal flag indicating whether a `setActive` call is in progress. Used to prevent navigations from being
+   * initiated outside of the Clerk class.
+   */
+  __internal_setActiveInProgress: boolean;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -677,32 +754,36 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     signUpUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if identifier verification is required.
      */
     firstFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if 2FA is enabled.
      */
     secondFactorUrl?: string;
     /**
-     * Full URL or path to navigate during sign in,
+     * Full URL or path to navigate to during sign in,
      * if the user is required to reset their password.
      */
     resetPasswordUrl?: string;
     /**
-     * Full URL or path to navigate after an incomplete sign up.
+     * Full URL or path to navigate to after an incomplete sign up.
      */
     continueSignUpUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting email verification.
+     * Full URL or path to navigate to after requesting email verification.
      */
     verifyEmailAddressUrl?: string | null;
     /**
-     * Full URL or path to navigate after requesting phone verification.
+     * Full URL or path to navigate to after requesting phone verification.
      */
     verifyPhoneNumberUrl?: string | null;
+    /**
+     * The underlying resource to optionally reload before processing an OAuth callback.
+     */
+    reloadResource?: 'signIn' | 'signUp';
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
@@ -733,20 +814,22 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-export type ClerkOptions = ClerkOptionsNavigation &
+export type ClerkOptions = PendingSessionOptions &
+  ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -759,7 +842,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -813,7 +896,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
     experimental?: Autocomplete<
       {
         /**
-         * Persist the Clerk client to match the user's device with a client. Defaults to `true`.
+         * Persist the Clerk client to match the user's device with a client.
+         * @default true
          */
         persistClient: boolean;
         /**
@@ -821,8 +905,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
-        // `experimental.withSessionTasks` will be removed soon in favor of checking via environment response
-        withSessionTasks: boolean;
       },
       Record<string, any>
     >;
@@ -959,7 +1041,7 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated in favor of `redirectUrl`.
+   * @deprecated Use `redirectUrl` instead.
    *
    * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
    */
@@ -982,14 +1064,14 @@ export type RoutingOptions =
 
 export type SignInProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign in.
+   * Full URL or path to navigate to after successful sign in.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -1031,6 +1113,10 @@ export type SignInProps = RoutingOptions & {
    * Enable sign-in-or-up flow for `<SignIn />` component instance.
    */
   withSignUp?: boolean;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1076,6 +1162,27 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
+export type __internal_ComponentNavigationContext = {
+  /**
+   * The `navigate` reference within the component router context
+   */
+  navigate: (
+    to: string,
+    options?: {
+      searchParams?: URLSearchParams;
+    },
+  ) => Promise<unknown>;
+  /**
+   * This path represents the root route for a specific component type and is used
+   * for internal routing and navigation.
+   *
+   * @example
+   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
+   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
+   */
+  indexPath: string;
+};
+
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
@@ -1102,14 +1209,14 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
 
 export type SignUpProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign up.
+   * Full URL or path to navigate to after successful sign up.
    * This value is used when no other redirect props, environment variables or search params are present.
    * @default undefined
    */
@@ -1143,6 +1250,10 @@ export type SignUpProps = RoutingOptions & {
    * Used to fill the "Join waitlist" link in the SignUp component.
    */
   waitlistUrl?: string;
+  /**
+   * Control whether OAuth flows use redirects or popups.
+   */
+  oauthFlow?: 'auto' | 'redirect' | 'popup';
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1197,7 +1308,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
@@ -1255,23 +1366,23 @@ export type UserButtonProps = UserButtonProfileMode & {
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
-   * Full URL or path to navigate after sign out is complete
-   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
+   * Full URL or path to navigate to after sign out is complete
+   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterSignOutUrl?: string;
   /**
-   * Full URL or path to navigate after signing out the current user is complete.
+   * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
-   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
+   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**
-   * Full URL or path to navigate on "Add another account" action.
+   * Full URL or path to navigate to on "Add another account" action.
    * Multi-session mode only.
    */
   signInUrl?: string;
   /**
-   * Full URL or path to navigate after successful account change.
+   * Full URL or path to navigate to after successful account change.
    * Multi-session mode only.
    */
   afterSwitchSessionUrl?: string;
@@ -1333,20 +1444,20 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     hidePersonal?: boolean;
     /**
-     * Full URL or path to navigate after a successful organization switch.
+     * Full URL or path to navigate to after a successful organization switch.
      * @default undefined
-     * @deprecated use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`
+     * @deprecated Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`.
      */
     afterSwitchOrganizationUrl?: string;
     /**
-     * Full URL or path to navigate after creating a new organization.
+     * Full URL or path to navigate to after creating a new organization.
      * @default undefined
      */
     afterCreateOrganizationUrl?:
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful organization selection.
+     * Full URL or path to navigate to after a successful organization selection.
      * Accepts a function that returns URL or path
      * @default undefined`
      */
@@ -1354,7 +1465,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate after a successful selection of personal workspace.
+     * Full URL or path to navigate to after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
      * @default undefined
      */
@@ -1390,14 +1501,14 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
-   * Full URL or path to navigate after creating a new organization.
+   * Full URL or path to navigate to after creating a new organization.
    * @default undefined
    */
   afterCreateOrganizationUrl?:
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Full URL or path to navigate after a successful organization selection.
+   * Full URL or path to navigate to after a successful organization selection.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1425,7 +1536,7 @@ export type OrganizationListProps = {
    */
   hidePersonal?: boolean;
   /**
-   * Full URL or path to navigate after a successful selection of personal workspace.
+   * Full URL or path to navigate to after a successful selection of personal workspace.
    * Accepts a function that returns URL or path
    * @default undefined`
    */
@@ -1439,7 +1550,7 @@ export type OrganizationListProps = {
 
 export type WaitlistProps = {
   /**
-   * Full URL or path to navigate after join waitlist.
+   * Full URL or path to navigate to after join waitlist.
    */
   afterJoinWaitlistUrl?: string;
   /**
@@ -1456,28 +1567,80 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-export type __experimental_PricingTableProps = {
-  appearance?: PricingTableTheme;
+type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
-  layout?: 'default' | 'matrix';
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
 };
 
-export type __experimental_CheckoutProps = {
+type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
+  forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: PricingTableTheme;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
+};
+
+type PortalRoot = HTMLElement | null | undefined;
+
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: string;
-  checkoutId?: string;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommerceSubscriberType;
+  onSubscriptionComplete?: () => void;
+  portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+};
+
+export type __internal_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: CommercePlanResource;
+  subscriberType?: CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  onSubscriptionCancel?: () => void;
+  portalId?: string;
+  portalRoot?: PortalRoot;
 };
 
 export interface HandleEmailLinkVerificationParams {
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on completed sign up or sign in on the same device.
    */
   redirectUrlComplete?: string;
   /**
-   * Full URL or path to navigate after successful magic link verification
+   * Full URL or path to navigate to after successful magic link verification
    * on the same device, but not completed sign in or sign up.
    */
   redirectUrl?: string;
@@ -1508,6 +1671,7 @@ export type SignInButtonProps = ButtonProps<SignInProps> &
     | 'signUpFallbackRedirectUrl'
     | 'initialValues'
     | 'withSignUp'
+    | 'oauthFlow'
   >;
 
 export type SignUpButtonProps = {
@@ -1520,6 +1684,7 @@ export type SignUpButtonProps = {
     | 'signInForceRedirectUrl'
     | 'signInFallbackRedirectUrl'
     | 'initialValues'
+    | 'oauthFlow'
   >;
 
 export type CreateOrganizationInvitationParams = {
@@ -1533,10 +1698,16 @@ export type CreateBulkOrganizationInvitationParams = {
 };
 
 /**
- * @inline
+ * @interface
  */
 export interface CreateOrganizationParams {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug?: string;
 }
 
@@ -1547,6 +1718,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   unsafeMetadata?: SignUpUnsafeMetadata;
   strategy: Web3Strategy;
   legalAccepted?: boolean;
+  secondFactorUrl?: string;
 }
 
 export type JoinWaitlistParams = {
@@ -1580,6 +1752,14 @@ export interface AuthenticateWithOKXWalletParams {
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
   legalAccepted?: boolean;
+}
+
+export interface NextTaskParams {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   * @default undefined
+   */
+  redirectUrlComplete?: string;
 }
 
 export interface LoadedClerk extends Clerk {

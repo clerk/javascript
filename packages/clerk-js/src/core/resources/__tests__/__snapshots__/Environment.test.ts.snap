@@ -10,7 +10,12 @@ exports[`Environment __internal_toSnapshot() 1`] = `
     "single_session_mode": true,
   },
   "commerce_settings": {
-    "stripe_publishable_key": "",
+    "billing": {
+      "enabled": false,
+      "has_paid_org_plans": false,
+      "has_paid_user_plans": false,
+      "stripe_publishable_key": "",
+    },
   },
   "display_config": {
     "after_create_organization_url": "",
@@ -270,15 +275,20 @@ exports[`Environment __internal_toSnapshot() 1`] = `
 
 exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
-  "__experimental_commerceSettings": __experimental_CommerceSettings {
-    "pathRoot": "",
-    "stripePublishableKey": "",
-  },
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
     "reverification": false,
     "singleSessionMode": false,
+  },
+  "commerceSettings": CommerceSettings {
+    "billing": {
+      "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
+      "stripePublishableKey": "",
+    },
+    "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
     "afterCreateOrganizationUrl": "",
@@ -496,15 +506,20 @@ Environment {
 
 exports[`Environment has the same initial properties 1`] = `
 Environment {
-  "__experimental_commerceSettings": __experimental_CommerceSettings {
-    "pathRoot": "",
-    "stripePublishableKey": "",
-  },
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
     "reverification": true,
     "singleSessionMode": true,
+  },
+  "commerceSettings": CommerceSettings {
+    "billing": {
+      "enabled": false,
+      "hasPaidOrgPlans": false,
+      "hasPaidUserPlans": false,
+      "stripePublishableKey": "",
+    },
+    "pathRoot": "",
   },
   "displayConfig": DisplayConfig {
     "afterCreateOrganizationUrl": "",

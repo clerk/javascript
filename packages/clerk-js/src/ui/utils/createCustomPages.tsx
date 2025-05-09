@@ -1,6 +1,6 @@
-import type { CustomPage, LoadedClerk } from '@clerk/types';
+import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
 
-import { isValidUrl } from '../../utils';
+import { disabledBillingFeature, hasPaidOrgPlans, hasPaidUserPlans, isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
 import { CreditCard, Organization, TickShield, User, Users } from '../icons';
@@ -48,7 +48,11 @@ type CreateCustomPagesParams = {
   excludedPathsFromDuplicateWarning: string[];
 };
 
-export const createUserProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+export const createUserProfileCustomPages = (
+  customPages: CustomPage[],
+  clerk: LoadedClerk,
+  environment?: EnvironmentResource,
+) => {
   return createCustomPages(
     {
       customPages,
@@ -57,10 +61,15 @@ export const createUserProfileCustomPages = (customPages: CustomPage[], clerk: L
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    environment,
   );
 };
 
-export const createOrganizationProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+export const createOrganizationProfileCustomPages = (
+  customPages: CustomPage[],
+  clerk: LoadedClerk,
+  environment?: EnvironmentResource,
+) => {
   return createCustomPages(
     {
       customPages,
@@ -69,15 +78,21 @@ export const createOrganizationProfileCustomPages = (customPages: CustomPage[], 
       excludedPathsFromDuplicateWarning: [],
     },
     clerk,
+    environment,
+    true,
   );
 };
 
 const createCustomPages = (
   { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
   clerk: LoadedClerk,
+  environment?: EnvironmentResource,
+  organization?: boolean,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
-    commerce: clerk.sdkMetadata?.environment === 'test' ? false : clerk.__internal_getOption('experimental')?.commerce,
+    commerce:
+      !disabledBillingFeature(clerk, environment) &&
+      (organization ? hasPaidOrgPlans(clerk, environment) : hasPaidUserPlans(clerk, environment)),
   });
 
   if (isDevelopmentSDK(clerk)) {
@@ -286,15 +301,12 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
     },
   ];
   if (commerce) {
-    // TODO(@COMMERCE) Uncomment when OrgProfile is ready
-    // INITIAL_ROUTES.push(
-    //   {
-    //     name: localizationKeys('userProfile.navbar.billing'),
-    //     id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
-    //     icon: CreditCard,
-    //     path: 'billing',
-    //   },
-    // );
+    INITIAL_ROUTES.push({
+      name: localizationKeys('organizationProfile.navbar.billing'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+      icon: CreditCard,
+      path: 'organization-billing',
+    });
   }
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {

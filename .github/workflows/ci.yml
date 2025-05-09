@@ -59,7 +59,7 @@ jobs:
 
       - name: Deduplicate lockfile
         run: pnpm dedupe
-  
+
       - name: Check for changed lockfile
         run: |
           if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
@@ -141,14 +141,23 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Run tests
+      - name: Run tests in packages
         run: |
           if [ "${{ matrix.node-version }}" == "18" ]; then
             echo "Running tests on Node 18 only for packages with LTS support."
-            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
+            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-react-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
           else
             echo "Running tests for all packages on Node 22."
             pnpm turbo test $TURBO_ARGS
+          fi
+        env:
+          NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Run Typedoc tests
+        run: |
+          # Only run Typedoc tests for one matrix version
+          if [ "${{ matrix.node-version }}" == "22" ]; then
+            pnpm test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -171,7 +180,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [ 'generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-start', 'tanstack-router', 'vue', 'nuxt', 'react-router']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'localhost', 'sessions', 'astro', 'expo-web', 'tanstack-react-start', 'tanstack-react-router', 'vue', 'nuxt', 'react-router', 'billing']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'

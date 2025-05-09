@@ -28,7 +28,7 @@ describe('UserVerificationFactorOne', () => {
 
     await waitFor(() => {
       getByText('Verification required');
-      getByText('Enter your password to continue');
+      getByText('Enter your current password to continue');
       getByLabelText(/^password/i);
     });
   });

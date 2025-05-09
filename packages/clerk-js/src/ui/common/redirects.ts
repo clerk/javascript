@@ -45,7 +45,7 @@ export function buildSessionTaskRedirectUrl({
     routing,
     baseUrl,
     path,
-    endpoint: `/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
+    endpoint: `/tasks/${SESSION_TASK_ROUTE_BY_KEY[task.key]}`,
     authQueryString: null,
   });
 }
@@ -55,6 +55,12 @@ export function buildSSOCallbackURL(
   baseUrl: string | undefined = '',
 ): string {
   const { routing, authQueryString, path } = ctx;
+  // If the context contains an SSO callback URL, use it instead of building a new one, as it likely contains the
+  // combined flow path. However, if the routing is virtual, the callback URL from context will not have factored in
+  // baseUrl, so we fallback to buildRedirectUrl instead.
+  if (ctx.ssoCallbackUrl && ctx.isCombinedFlow && routing !== 'virtual') {
+    return ctx.ssoCallbackUrl;
+  }
   return buildRedirectUrl({
     routing,
     baseUrl,

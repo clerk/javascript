@@ -1,21 +1,20 @@
+import { resolveAuthState } from '@clerk/shared/authorization';
+import { deriveState } from '@clerk/shared/deriveState';
 import type {
-  ActClaim,
   CheckAuthorizationWithCustomPermissions,
   Clerk,
   GetToken,
-  OrganizationCustomRoleKey,
+  PendingSessionOptions,
   SignOut,
+  UseAuthReturn,
 } from '@clerk/types';
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore } from '../stores/external';
+import { $authStore, $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
-
-type CheckAuthorizationSignedOut = undefined;
-type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
  * @internal
@@ -24,6 +23,7 @@ const clerkLoaded = () => {
   return new Promise<Clerk>(resolve => {
     $csrState.subscribe(({ isLoaded }) => {
       if (isLoaded) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         resolve($clerk.get()!);
       }
     });
@@ -53,61 +53,7 @@ const createSignOut = () => {
   };
 };
 
-type UseAuthReturn =
-  | {
-      isLoaded: false;
-      isSignedIn: undefined;
-      userId: undefined;
-      sessionId: undefined;
-      actor: undefined;
-      orgId: undefined;
-      orgRole: undefined;
-      orgSlug: undefined;
-      has: CheckAuthorizationSignedOut;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: false;
-      userId: null;
-      sessionId: null;
-      actor: null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActClaim | null;
-      orgId: null;
-      orgRole: null;
-      orgSlug: null;
-      has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
-    }
-  | {
-      isLoaded: true;
-      isSignedIn: true;
-      userId: string;
-      sessionId: string;
-      actor: ActClaim | null;
-      orgId: string;
-      orgRole: OrganizationCustomRoleKey;
-      orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
-    };
-
-type UseAuth = () => UseAuthReturn;
+type UseAuth = (options?: PendingSessionOptions) => UseAuthReturn;
 
 /**
  * Returns the current auth state, the user and session ids and the `getToken`
@@ -137,11 +83,14 @@ type UseAuth = () => UseAuthReturn;
  *   return <div>...</div>
  * }
  */
-export const useAuth: UseAuth = () => {
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useStore($authStore);
+export const useAuth: UseAuth = ({ treatPendingAsSignedOut } = {}) => {
+  const authContext = useAuthStore();
+  const clerkContext = useStore($clerkStore);
 
   const getToken: GetToken = useCallback(createGetToken(), []);
   const signOut: SignOut = useCallback(createSignOut(), []);
+
+  const { userId, orgId, orgRole, orgPermissions } = authContext;
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
@@ -168,81 +117,41 @@ export const useAuth: UseAuth = () => {
     [orgId, orgRole, userId, orgPermissions],
   );
 
-  if (sessionId === undefined && userId === undefined) {
-    return {
-      isLoaded: false,
-      isSignedIn: undefined,
-      sessionId,
-      userId,
-      actor: undefined,
-      orgId: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      has: undefined,
-      signOut,
+  const payload = resolveAuthState({
+    authObject: {
+      ...authContext,
       getToken,
-    };
-  }
-
-  if (sessionId === null && userId === null) {
-    return {
-      isLoaded: true,
-      isSignedIn: false,
-      sessionId,
-      userId,
-      actor: null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
       signOut,
-      getToken,
-    };
-  }
-
-  if (!!sessionId && !!userId && !!orgId && !!orgRole) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId,
-      orgRole,
-      orgSlug: orgSlug || null,
       has,
-      signOut,
-      getToken,
-    };
+    },
+    options: {
+      treatPendingAsSignedOut:
+        // Fallback from option provided via SSR / CSR contexts
+        treatPendingAsSignedOut ??
+        clerkContext?.__internal_getOption?.('treatPendingAsSignedOut') ??
+        import.meta.env.PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT,
+    },
+  });
+
+  if (!payload) {
+    throw new Error('Invalid state. Feel free to submit a bug or reach out to support');
   }
 
-  if (!!sessionId && !!userId && !orgId) {
-    return {
-      isLoaded: true,
-      isSignedIn: true,
-      sessionId,
-      userId,
-      actor: actor || null,
-      orgId: null,
-      orgRole: null,
-      orgSlug: null,
-      has: () => false,
-      signOut,
-      getToken,
-    };
-  }
-
-  throw new Error('Invalid state. Feel free to submit a bug or reach out to support');
+  return payload;
 };
+
+function useStore<T extends Store, SV extends StoreValue<T>>(store: T, getServerSnapshot?: () => SV): SV {
+  const get = store.get.bind(store);
+  return useSyncExternalStore<SV>(store.listen, get, getServerSnapshot || get);
+}
 
 /**
  * This implementation of `useStore` is an alternative solution to the hook exported by nanostores
  * Reference: https://github.com/nanostores/react/blob/main/index.js
  */
-function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
-  const get = store.get.bind(store);
-
-  return useSyncExternalStore<SV>(store.listen, get, () => {
+function useAuthStore() {
+  const get = $authStore.get.bind($authStore);
+  return useStore($authStore, () => {
     // Per react docs
     /**
      * optional getServerSnapshot:
@@ -256,7 +165,17 @@ function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
      * When this runs on the server we want to grab the content from the async-local-storage.
      */
     if (typeof window === 'undefined') {
-      return authAsyncStorage.getStore();
+      return deriveState(
+        false,
+        {
+          user: null,
+          session: null,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          client: null!,
+          organization: null,
+        },
+        authAsyncStorage.getStore() as any,
+      );
     }
 
     /**

@@ -11,7 +11,6 @@ export interface ClientResource extends ClerkResource {
   signIn: SignInResource;
   isNew: () => boolean;
   create: () => Promise<ClientResource>;
-  sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   destroy: () => Promise<void>;
   removeSessions: () => Promise<ClientResource>;
   clearCache: () => void;
@@ -22,9 +21,10 @@ export interface ClientResource extends ClerkResource {
   cookieExpiresAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+  __internal_sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   __internal_toSnapshot: () => ClientJSONSnapshot;
   /**
-   * @deprecated Use `signedInSessions` instead
+   * @deprecated Use `signedInSessions` instead.
    */
   activeSessions: ActiveSessionResource[];
 }

@@ -1,9 +1,12 @@
+import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
+import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
-import { is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import { noop } from '@clerk/shared/utils';
 import type { Clerk, InstanceType } from '@clerk/types';
 
-import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
+import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
@@ -40,9 +43,14 @@ export class AuthCookieService {
   private activeOrgCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
 
-  public static async create(clerk: Clerk, fapiClient: FapiClient, instanceType: InstanceType) {
+  public static async create(
+    clerk: Clerk,
+    fapiClient: FapiClient,
+    instanceType: InstanceType,
+    clerkEventBus: ReturnType<typeof createClerkEventBus>,
+  ) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
-    const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType);
+    const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType, clerkEventBus);
     await service.setup();
     return service;
   }
@@ -52,6 +60,7 @@ export class AuthCookieService {
     fapiClient: FapiClient,
     cookieSuffix: string,
     private instanceType: InstanceType,
+    private clerkEventBus: ReturnType<typeof createClerkEventBus>,
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
@@ -109,11 +118,18 @@ export class AuthCookieService {
     this.devBrowser.clear();
   }
 
-  private startPollingForToken() {
+  public startPollingForToken() {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
+      this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+  }
+
+  public stopPollingForToken() {
+    if (this.poller) {
+      this.poller.stopPollingForSessionToken();
+      this.poller = null;
+    }
   }
 
   private refreshTokenOnFocus() {
@@ -173,16 +189,24 @@ export class AuthCookieService {
   }
 
   private handleGetTokenError(e: any) {
-    //throw if not a clerk error
-    if (!isClerkAPIResponseError(e)) {
-      clerkCoreErrorTokenRefreshFailed(e.message || e);
+    //early return if not a clerk api error (aka fapi error) and not a network error
+    if (!isClerkAPIResponseError(e) && !isClerkRuntimeError(e) && !isNetworkError(e)) {
+      return;
     }
 
     //sign user out if a 4XX error
     if (is4xxError(e)) {
-      void this.clerk.handleUnauthenticated();
+      void this.clerk.handleUnauthenticated().catch(noop);
       return;
     }
+
+    // The poller failed to fetch a fresh session token, update status to `degraded`.
+    this.clerkEventBus.emit(clerkEvents.Status, 'degraded');
+
+    // --------
+    // Treat any other error as a noop
+    // TODO(debug-logs): Once debug logs is available log this error.
+    // --------
   }
 
   /**

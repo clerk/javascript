@@ -14,24 +14,63 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    free: undefined,
-    getStarted: undefined,
-    manageMembership: undefined,
-    month: undefined,
-    switchPlan: undefined,
-  },
   backButton: '戻る',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'デフォルト',
+  badge__endsAt: undefined,
+  badge__expired: undefined,
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
   badge__primary: 'プライマリ',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'アクションが必要',
+  badge__startsAt: undefined,
   badge__thisDevice: 'このデバイス',
   badge__unverified: '未確認',
+  badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
+  commerce: {
+    alwaysFree: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
     invitePage: {
@@ -123,6 +162,41 @@ export const jaJP: LocalizationResource = {
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'ドメインを追加して検証します。このドメインのメールアドレスを持つユーザーは、自動的に組織に参加するか、参加をリクエストすることができます。',
@@ -179,10 +253,17 @@ export const jaJP: LocalizationResource = {
       },
     },
     navbar: {
+      billing: undefined,
       description: '組織を管理します。',
       general: '一般',
       members: 'メンバー',
       title: '組織',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -573,7 +654,7 @@ export const jaJP: LocalizationResource = {
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
-    form_identifier_not_found: '識別子が見つかりません。',
+    form_identifier_not_found: 'これらの詳細に一致するアカウントは見つかりませんでした。',
     form_param_format_invalid: 'パラメータ形式が無効です。',
     form_param_format_invalid__email_address: 'メールアドレスは有効なメールアドレスである必要があります。',
     form_param_format_invalid__phone_number: '電話番号は有効な国際形式である必要があります',
@@ -594,7 +675,8 @@ export const jaJP: LocalizationResource = {
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
-    not_allowed_access: 'アクセスが許可されていません。',
+    not_allowed_access:
+      "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -615,6 +697,7 @@ export const jaJP: LocalizationResource = {
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
     phone_number_exists: 'この電話番号は既に使用されています。別の電話番号を試してください。',
+    session_exists: 'すでにサインインしています。',
     web3_missing_identifier: undefined,
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',
@@ -663,14 +746,6 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
-    __experimental_billingPage: {
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentSources: undefined,
-        headerTitle__plans: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -685,6 +760,41 @@ export const jaJP: LocalizationResource = {
       successSubtitle: '認証デバイスにアクセスできない場合、これらのいずれかを使用してアカウントにサインインできます。',
       title: 'バックアップコードの追加',
       title__codelist: 'バックアップコード',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'アカウントを連携するプロバイダを選択してください。',
@@ -825,6 +935,9 @@ export const jaJP: LocalizationResource = {
       title: '電話番号の追加',
       verifySubtitle: '{{identifier}}に送信された検証コードを入力してください',
       verifyTitle: '電話番号の確認',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: '10MB未満のJPG、PNG、GIF、またはWEBP画像をアップロードしてください',
