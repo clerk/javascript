@@ -2,7 +2,23 @@ import type { ApiKeyResource } from '@clerk/types';
 
 import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
+import { useClipboard } from '../../hooks';
 import { Clipboard, Eye } from '../../icons';
+
+const CopyButton = ({ text }: { text: string }) => {
+  const { onCopy } = useClipboard(text);
+  return (
+    <Button
+      variant='ghost'
+      size='sm'
+      sx={{ margin: 1 }}
+      aria-label={'Copy key'}
+      onClick={onCopy}
+    >
+      <Icon icon={Clipboard} />
+    </Button>
+  );
+};
 
 export const ApiKeysTable = ({
   rows,
@@ -87,15 +103,7 @@ export const ApiKeysTable = ({
                       <Icon icon={Eye} />
                     </Button>
                   </Flex>
-                  {/* <CopyButton apiKeyID={apiKey.id} /> */}
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    sx={{ margin: 1 }}
-                    aria-label={'Copy key'}
-                  >
-                    <Icon icon={Clipboard} />
-                  </Button>
+                  <CopyButton text='•••••••••••••••••••••••••' />
                 </Flex>
               </Td>
               <Td>
