@@ -1,8 +1,8 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
+  ApiKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
-  ManageApiKeysProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -602,8 +602,8 @@ export const PricingTable = withClerk(
   { component: 'PricingTable', renderWhileLoading: true },
 );
 
-export const ManageApiKeys = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<ManageApiKeysProps & FallbackProp>) => {
+export const ApiKeys = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<ApiKeysProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
@@ -617,8 +617,8 @@ export const ManageApiKeys = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountManageApiKeys}
-            unmount={clerk.unmountManageApiKeys}
+            mount={clerk.mountApiKeys}
+            unmount={clerk.unmountApiKeys}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}
@@ -627,5 +627,5 @@ export const ManageApiKeys = withClerk(
       </>
     );
   },
-  { component: 'ManageApiKeys', renderWhileLoading: true },
+  { component: 'ApiKeys', renderWhileLoading: true },
 );

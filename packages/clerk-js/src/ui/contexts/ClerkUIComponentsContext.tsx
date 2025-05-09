@@ -1,11 +1,11 @@
-import type { ManageApiKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { ApiKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
+  ApiKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
-  ManageApiKeysContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
@@ -92,11 +92,11 @@ export function ComponentContextProvider({
           </PlansContextProvider>
         </SubscriberTypeContext.Provider>
       );
-    case 'ManageApiKeys':
+    case 'ApiKeys':
       return (
-        <ManageApiKeysContext.Provider value={{ componentName, ...(props as ManageApiKeysProps) }}>
+        <ApiKeysContext.Provider value={{ componentName, ...(props as ApiKeysProps) }}>
           {children}
-        </ManageApiKeysContext.Provider>
+        </ApiKeysContext.Provider>
       );
 
     default:

@@ -2,12 +2,12 @@ import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
+  ApiKeysProps,
   CommercePlanResource,
   CommerceStatementResource,
   CommerceSubscriptionResource,
   CreateOrganizationProps,
   GoogleOneTapProps,
-  ManageApiKeysProps,
   NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -52,7 +52,7 @@ export type AvailableComponentProps =
   | __internal_CheckoutProps
   | __internal_UserVerificationProps
   | __internal_PlanDetailsProps
-  | ManageApiKeysProps;
+  | ApiKeysProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -119,8 +119,8 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
-export type ManageApiKeysCtx = ManageApiKeysProps & {
-  componentName: 'ManageApiKeys';
+export type ApiKeysCtx = ApiKeysProps & {
+  componentName: 'ApiKeys';
   mode?: ComponentMode;
 };
 
@@ -168,6 +168,6 @@ export type AvailableComponentCtx =
   | WaitlistCtx
   | PricingTableCtx
   | CheckoutCtx
-  | ManageApiKeysCtx;
+  | ApiKeysCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
