@@ -20,6 +20,7 @@ import {
   Tr,
 } from '../../customizables';
 import { Card, InputWithIcon, Pagination, ThreeDotsMenu, withCardStateProvider } from '../../elements';
+import { Action } from '../../elements/Action';
 import { useClipboard, useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash, MagnifyingGlass } from '../../icons';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
@@ -55,14 +56,8 @@ export const ManageApiKeys = withCardStateProvider(() => {
     data: apiKeys,
     isLoading,
     revalidate,
-  } = useFetch(
-    () => clerk.getApiKeys({ subject: ctx.subject }),
-    { subject: ctx.subject },
-    {},
-    `api-key-subject-${ctx.subject}`,
-  );
+  } = useFetch(clerk.getApiKeys, { subject: ctx.subject }, undefined, `api-key-source-${ctx.subject}`);
   const [revealedKeys, setRevealedKeys] = useState<Record<string, string | null>>({});
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const itemsPerPage = ctx.perPage ?? 5;
@@ -89,18 +84,24 @@ export const ManageApiKeys = withCardStateProvider(() => {
     }
   };
 
-  const handleCreate = async (params: { name: string; description?: string; expiration?: number }) => {
+  const handleCreate = async (params: {
+    name: string;
+    description?: string;
+    expiration?: number;
+    closeFn: () => void;
+  }) => {
     await clerk.createApiKey({
       name: params.name,
       creationReason: params.description,
       secondsUntilExpiration: params.expiration,
     });
-    setShowCreateForm(false);
+    params.closeFn();
     revalidate();
   };
 
   const revokeApiKey = async (apiKeyID: string) => {
     await clerk.revokeApiKey({ apiKeyID, revocationReason: 'Revoked by user' });
+    setPage(1);
     revalidate();
   };
 
@@ -109,35 +110,44 @@ export const ManageApiKeys = withCardStateProvider(() => {
       <Card.Root sx={{ width: '100%' }}>
         <Card.Content sx={{ textAlign: 'left' }}>
           <Col gap={4}>
-            <Flex
-              justify='between'
-              align='center'
-            >
-              <Box>
-                <InputWithIcon
-                  placeholder='Search keys'
-                  leftIcon={<Icon icon={MagnifyingGlass} />}
-                  value={search}
-                  onChange={e => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                />
-              </Box>
-              <Button
-                variant='solid'
-                onClick={() => setShowCreateForm(true)}
+            <Action.Root>
+              <Flex
+                justify='between'
+                align='center'
               >
-                Add new key
-              </Button>
-            </Flex>
+                <Box>
+                  <InputWithIcon
+                    placeholder='Search keys'
+                    leftIcon={<Icon icon={MagnifyingGlass} />}
+                    value={search}
+                    onChange={e => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                  />
+                </Box>
+                <Action.Trigger value='add'>
+                  <Button variant='solid'>Add new key</Button>
+                </Action.Trigger>
+              </Flex>
 
-            {showCreateForm && (
-              <CreateApiKeyForm
-                onCreate={params => void handleCreate(params)}
-                onCancel={() => setShowCreateForm(false)}
-              />
-            )}
+              <Action.Open value='add'>
+                <Flex
+                  sx={t => ({
+                    paddingTop: t.space.$6,
+                    paddingBottom: t.space.$6,
+                  })}
+                >
+                  <Action.Card
+                    sx={{
+                      width: '100%',
+                    }}
+                  >
+                    <CreateApiKeyForm onCreate={params => void handleCreate(params)} />
+                  </Action.Card>
+                </Flex>
+              </Action.Open>
+            </Action.Root>
 
             <Table sx={{ tableLayout: 'fixed' }}>
               <Thead>
@@ -236,17 +246,19 @@ export const ManageApiKeys = withCardStateProvider(() => {
               </Tbody>
             </Table>
 
-            <Pagination
-              count={pageCount}
-              page={page}
-              onChange={setPage}
-              siblingCount={1}
-              rowInfo={{
-                allRowsCount: itemCount,
-                startingRow,
-                endingRow,
-              }}
-            />
+            {itemCount > 5 && (
+              <Pagination
+                count={pageCount}
+                page={page}
+                onChange={setPage}
+                siblingCount={1}
+                rowInfo={{
+                  allRowsCount: itemCount,
+                  startingRow,
+                  endingRow,
+                }}
+              />
+            )}
           </Col>
         </Card.Content>
       </Card.Root>
