@@ -1,4 +1,4 @@
-import { getAlternativePhoneCodeProviderName } from '@clerk/shared/alternativePhoneCode';
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
@@ -46,7 +46,7 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
 };
 
 const isPhoneCodeChannel = (val: string): val is PhoneCodeChannel => {
-  return !!getAlternativePhoneCodeProviderName(val);
+  return !!getAlternativePhoneCodeProviderData(val);
 };
 
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
@@ -59,7 +59,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     enableAlternativePhoneCodeProviders = true,
     idleAfterDelay = true,
   } = props;
-  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeStrategies } =
+  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
@@ -67,7 +67,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
-    ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeStrategies : []),
+    ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
   ];
 
   if (!strategies.length) {

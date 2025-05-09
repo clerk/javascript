@@ -7,7 +7,7 @@ export const ALTERNATIVE_PHONE_CODE_PROVIDERS: PhoneCodeChannelData[] = [
   },
 ];
 
-export const getAlternativePhoneCodeProviderName = (channel?: string): PhoneCodeChannelData | null => {
+export const getAlternativePhoneCodeProviderData = (channel?: string): PhoneCodeChannelData | null => {
   if (!channel) {
     return null;
   }

@@ -1,4 +1,4 @@
-import { getAlternativePhoneCodeProviderName } from '@clerk/shared/alternativePhoneCode';
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, SignUpResource } from '@clerk/types';
 
@@ -25,7 +25,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
   const { setActive } = useClerk();
   const { navigate } = useRouter();
 
-  const alternativePhoneCodeProvider = getAlternativePhoneCodeProviderName(props?.channel);
+  const alternativePhoneCodeProvider = getAlternativePhoneCodeProviderData(props?.channel);
 
   const goBack = () => {
     return navigate(alternativePhoneCodeProvider ? '../../' : '../');

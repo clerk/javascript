@@ -38,7 +38,7 @@ const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries([
   ...[...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { strategy: p.strategy, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
-  [...ALTERNATIVE_PHONE_CODE_PROVIDERS].map(p => {
+  ...[...ALTERNATIVE_PHONE_CODE_PROVIDERS].map(p => {
     return [p.channel, { strategy: p.channel, name: p.name, iconUrl: iconImageUrl(p.channel) }];
   }),
 ]) as ThirdPartyProviderToDataMap;
@@ -47,7 +47,7 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries([
   ...[...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.strategy, { id: p.provider, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
-  [...ALTERNATIVE_PHONE_CODE_PROVIDERS].map(p => {
+  ...[...ALTERNATIVE_PHONE_CODE_PROVIDERS].map(p => {
     return [p.channel, { id: p.channel, name: p.name, iconUrl: iconImageUrl(p.channel) }];
   }),
 ]) as ThirdPartyStrategyToDataMap;
@@ -113,17 +113,17 @@ export const useEnabledThirdPartyProviders = () => {
   // Filter out any Web3 strategies that are not yet known, they are not included in our types.
   const knownWeb3Strategies = web3FirstFactors.filter(s => web3Strategies.includes(s));
 
-  const knownAlternativePhoneCodeStrategies = alternativePhoneCodeChannels.filter(s => phoneCodeChannels.includes(s));
+  const knownAlternativePhoneCodeChannels = alternativePhoneCodeChannels.filter(s => phoneCodeChannels.includes(s));
 
   return {
     strategies: [
       ...knownSocialProviderStrategies,
       ...knownWeb3Strategies,
       ...customSocialProviderStrategies,
-      ...knownAlternativePhoneCodeStrategies,
+      ...knownAlternativePhoneCodeChannels,
     ],
     web3Strategies: knownWeb3Strategies,
-    alternativePhoneCodeStrategies: knownAlternativePhoneCodeStrategies,
+    alternativePhoneCodeChannels: knownAlternativePhoneCodeChannels,
     authenticatableOauthStrategies,
     strategyToDisplayData: strategyToDisplayData,
     providerToDisplayData: providerToDisplayData,

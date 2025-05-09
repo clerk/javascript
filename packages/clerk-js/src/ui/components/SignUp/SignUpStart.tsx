@@ -1,4 +1,4 @@
-import { getAlternativePhoneCodeProviderName } from '@clerk/shared/alternativePhoneCode';
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
 import React from 'react';
@@ -293,7 +293,7 @@ function SignUpStartInternal(): JSX.Element {
   };
   const onAlternativePhoneCodeProviderClick = (phoneCodeChannel: PhoneCodeChannel) => {
     const phoneCodeProvider: PhoneCodeChannelData | null =
-      getAlternativePhoneCodeProviderName(phoneCodeChannel) || null;
+      getAlternativePhoneCodeProviderData(phoneCodeChannel) || null;
     setAlternativePhoneCodeProvider(phoneCodeProvider);
   };
 
