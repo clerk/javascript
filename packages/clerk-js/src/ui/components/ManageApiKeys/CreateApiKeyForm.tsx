@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 
 import { Button, Flex, localizationKeys } from '../../customizables';
 import { Form, FormButtons, FormContainer } from '../../elements';
+import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFormControl } from '../../utils';
 
 interface CreateApiKeyFormProps {
-  onCreate: (params: { name: string; description?: string; expiration?: number }) => void;
-  onCancel: () => void;
-  loading?: boolean;
+  onCreate: (params: { name: string; description?: string; expiration?: number; closeFn: () => void }) => void;
 }
 
-export const CreateApiKeyForm = ({ onCreate, onCancel }: CreateApiKeyFormProps) => {
+export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const { close } = useActionContext();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -35,6 +35,7 @@ export const CreateApiKeyForm = ({ onCreate, onCancel }: CreateApiKeyFormProps) 
       name: nameField.value,
       description: descriptionField.value || undefined,
       expiration: undefined,
+      closeFn: close,
     });
   };
 
@@ -65,7 +66,7 @@ export const CreateApiKeyForm = ({ onCreate, onCancel }: CreateApiKeyFormProps) 
           </Button>
           <FormButtons
             isDisabled={!canSubmit}
-            onReset={onCancel}
+            onReset={close}
           />
         </Flex>
       </Form.Root>
