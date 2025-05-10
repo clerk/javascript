@@ -26,7 +26,7 @@ export const enUS: LocalizationResource = {
     billedMonthlyOnly: 'Only billed monthly',
     cancelSubscription: 'Cancel subscription',
     checkout: {
-      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
