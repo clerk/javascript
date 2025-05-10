@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import { AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';
@@ -9,7 +10,11 @@ import { getAuthKeyFromRequest } from './utils';
 export type GetAuthReturn = AuthObject;
 
 export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: string }) => {
-  return (req: Request, locals: APIContext['locals'], opts?: { secretKey?: string }): GetAuthReturn => {
+  return (
+    req: Request,
+    locals: APIContext['locals'],
+    { treatPendingAsSignedOut = true, ...opts }: { secretKey?: string } & PendingSessionOptions = {},
+  ): GetAuthReturn => {
     // When the auth status is set, we trust that the middleware has already run
     // Then, we don't have to re-verify the JWT here,
     // we can just strip out the claims manually.
@@ -37,7 +42,13 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
 
     const jwt = decodeJwt(authToken as string);
     // @ts-expect-error - TODO: Align types
-    return signedInAuthObject(options, jwt.raw.text, jwt.payload);
+    const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+
+    if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+      return signedOutAuthObject(options);
+    }
+
+    return authObject;
   };
 };
 
