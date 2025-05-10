@@ -2,6 +2,7 @@ import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
+import type { PendingSessionOptions } from '@clerk/types';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -41,7 +42,7 @@ export type ClerkMiddlewareAuthObject = AuthObject & {
 };
 
 export interface ClerkMiddlewareAuth {
-  (): Promise<ClerkMiddlewareAuthObject>;
+  (opts?: PendingSessionOptions): Promise<ClerkMiddlewareAuthObject>;
 
   protect: AuthProtect;
 }
@@ -182,11 +183,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, {
-        redirectToSignIn,
-        redirectToSignUp,
-      });
-      const authHandler = () => Promise.resolve(authObjWithMethods);
+      const authHandler = (opts?: PendingSessionOptions) => {
+        const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(requestState.toAuth(opts), {
+          redirectToSignIn,
+          redirectToSignUp,
+        });
+
+        return Promise.resolve(authObjWithMethods);
+      };
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
