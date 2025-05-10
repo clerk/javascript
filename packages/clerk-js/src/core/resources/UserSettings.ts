@@ -5,6 +5,7 @@ import type {
   OAuthStrategy,
   PasskeySettingsData,
   PasswordSettingsData,
+  PhoneCodeChannel,
   SamlSettings,
   SignInData,
   SignUpData,
@@ -171,6 +172,17 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       .filter(([name, attr]) => attr.used_for_first_factor && name.startsWith('web3'))
       .map(([, desc]) => desc.first_factors)
       .flat() as any as Web3Strategy[];
+  }
+
+  get alternativePhoneCodeChannels(): PhoneCodeChannel[] {
+    if (!this.attributes) {
+      return [];
+    }
+
+    return Object.entries(this.attributes)
+      .filter(([name, attr]) => attr.used_for_first_factor && name === 'phone_number')
+      .map(([, desc]) => desc?.channels?.filter(factor => factor !== 'sms') || [])
+      .flat() as any as PhoneCodeChannel[];
   }
 
   public constructor(data: UserSettingsJSON | UserSettingsJSONSnapshot | null = null) {

@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { PhoneCodeChannel, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToAfterSignIn } from '../../common';
@@ -31,13 +31,26 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   return key;
 };
 
+const getAlternativePhoneCodeChannel = (
+  currentPath: string,
+  alternativePhoneCodeChannels: PhoneCodeChannel[],
+): PhoneCodeChannel | undefined => {
+  return alternativePhoneCodeChannels.find(channel => currentPath.includes(`factor-one/${channel}`));
+};
+
 function SignInFactorOneInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const { userSettings } = useEnvironment();
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
   const { supportedFirstFactors } = useCoreSignIn();
+  const { currentPath } = router;
+  const alternativePhoneCodeChannel = getAlternativePhoneCodeChannel(
+    currentPath,
+    userSettings.alternativePhoneCodeChannels,
+  );
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -68,7 +81,7 @@ function SignInFactorOneInternal(): JSX.Element {
     // clicks a social button but then navigates back to sign in.
     // SignIn status resets to 'needs_identifier'
     if (signIn.status === 'needs_identifier' || signIn.status === null) {
-      void router.navigate('../');
+      void router.navigate(alternativePhoneCodeChannel ? '../../' : '../');
     }
   }, []);
 
@@ -157,7 +170,7 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePhoneCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
+          factor={{ ...currentFactor, channel: alternativePhoneCodeChannel }}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );

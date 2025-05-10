@@ -121,7 +121,8 @@
     "jwtPayloadParser",
     "eventBus",
     "netlifyCacheHandler",
-    "clerkEventBus"
+    "clerkEventBus",
+    "phoneCodeChannel"
   ],
   "scripts": {
     "build": "tsup",

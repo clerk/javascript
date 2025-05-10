@@ -39,8 +39,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
 
+  const isAlternativePhoneCode = props.factor.strategy === 'phone_code' && props.factor.channel;
+
   const goBack = () => {
-    return navigate('../');
+    return navigate(isAlternativePhoneCode ? '../../' : '../');
   };
 
   const prepare = () => {
@@ -82,9 +84,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
           case 'complete':
             return setActive({ session: res.createdSessionId, redirectUrl: afterSignInUrl });
           case 'needs_second_factor':
-            return navigate('../factor-two');
+            return navigate(isAlternativePhoneCode ? '../../factor-two' : '../factor-two');
           case 'needs_new_password':
-            return navigate('../reset-password');
+            return navigate(isAlternativePhoneCode ? '../../reset-password' : '../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

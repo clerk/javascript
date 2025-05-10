@@ -215,6 +215,7 @@ function SignUpContinueInternal() {
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={false}
+                  enableAlternativePhoneCodeProviders={false}
                   continueSignUp
                 />
               )}

@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
+
 import type { FirstNameAttribute, LastNameAttribute, LegalAcceptedAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
@@ -130,6 +132,7 @@ export type PrepareVerificationParams =
     }
   | {
       strategy: PhoneCodeStrategy;
+      channel?: PhoneCodeChannel;
     }
   | {
       strategy: Web3Strategy;
