@@ -131,6 +131,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
+  private premountTasksNodes = new Map<HTMLDivElement, undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -1047,6 +1048,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
+    }
+  };
+
+  mountTasks = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTasks(node);
+    } else {
+      this.premountTasksNodes.set(node, undefined);
+    }
+  };
+
+  unmountTasks = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTasks(node);
+    } else {
+      this.premountTasksNodes.delete(node);
     }
   };
 
