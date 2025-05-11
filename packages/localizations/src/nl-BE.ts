@@ -46,8 +46,8 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const nlBE: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -161,9 +162,6 @@ export const nlBE: LocalizationResource = {
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -182,8 +180,8 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -192,6 +190,9 @@ export const nlBE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -257,6 +258,12 @@ export const nlBE: LocalizationResource = {
       general: 'Algemeen',
       members: 'Leden',
       title: 'Organisatie',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -773,8 +780,8 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -783,6 +790,9 @@ export const nlBE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -928,6 +938,9 @@ export const nlBE: LocalizationResource = {
       title: 'Telefoonnummer toevoegen',
       verifySubtitle: 'Voer de verificatiecode in die verstuurd is naar {{phoneNumber}}',
       verifyTitle: 'Verifieer telefoonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Upload een JPG, PNG, GIF, of WEBP afbeelding kleiner dan 10 MB',

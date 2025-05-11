@@ -46,8 +46,8 @@ export const svSE: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const svSE: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -162,9 +163,6 @@ export const svSE: LocalizationResource = {
     badge__manualInvitation: 'Ingen automatisk registrering',
     badge__unverified: 'Overifierad',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -183,8 +181,8 @@ export const svSE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -193,6 +191,9 @@ export const svSE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -257,6 +258,12 @@ export const svSE: LocalizationResource = {
       general: 'Allmänna inställningar',
       members: 'Medlemar',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -777,8 +784,8 @@ export const svSE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -787,6 +794,9 @@ export const svSE: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -932,6 +942,9 @@ export const svSE: LocalizationResource = {
       title: 'Lägg till telefonnummer',
       verifySubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
       verifyTitle: 'Verifiera telefonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',

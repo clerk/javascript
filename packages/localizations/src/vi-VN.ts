@@ -46,8 +46,8 @@ export const viVN: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const viVN: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -162,9 +163,6 @@ export const viVN: LocalizationResource = {
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -183,8 +181,8 @@ export const viVN: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -193,6 +191,9 @@ export const viVN: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -257,6 +258,12 @@ export const viVN: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -772,8 +779,8 @@ export const viVN: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -782,6 +789,9 @@ export const viVN: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -927,6 +937,9 @@ export const viVN: LocalizationResource = {
       title: 'Thêm số điện thoại',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Tải lên ảnh JPG, PNG, GIF, hoặc WEBP có dung lượng nhỏ hơn 10 MB',

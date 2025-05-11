@@ -1,5 +1,6 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type {
+  Appearance,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
@@ -135,6 +136,7 @@ type HandleSelectPlanProps = {
   onSubscriptionChange?: () => void;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
+  appearance?: Appearance;
 };
 
 export const usePlansContext = () => {
@@ -316,8 +318,8 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event }: HandleSelectPlanProps) => {
-      const subscription = activeOrUpcomingSubscriptionWithPlanPeriod(plan, planPeriod);
+    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event, appearance }: HandleSelectPlanProps) => {
+      const subscription = activeOrUpcomingSubscription(plan);
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
@@ -329,6 +331,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
+          appearance,
           portalRoot,
         });
       } else {
@@ -346,6 +349,7 @@ export const usePlansContext = () => {
             ctx.revalidate();
             onSubscriptionChange?.();
           },
+          appearance,
           portalRoot,
         });
       }

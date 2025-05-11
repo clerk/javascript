@@ -209,7 +209,7 @@ function Card(props: CardProps) {
           gap: 0,
         }}
       >
-        {!collapseFeatures ? (
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
@@ -271,7 +271,7 @@ function Card(props: CardProps) {
                 </Tooltip.Trigger>
                 {isSignedIn && !canManageBilling && (
                   <Tooltip.Content
-                    text={localizationKeys('organizationProfile.billingPage.alerts.noPermissionsToManageBilling')}
+                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
                   />
                 )}
               </Tooltip.Root>

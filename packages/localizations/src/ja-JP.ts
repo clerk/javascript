@@ -46,8 +46,8 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__statementId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
@@ -67,6 +67,7 @@ export const jaJP: LocalizationResource = {
     subscribe: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
     viewFeatures: undefined,
     year: undefined,
   },
@@ -162,9 +163,6 @@ export const jaJP: LocalizationResource = {
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
     billingPage: {
-      alerts: {
-        noPermissionsToManageBilling: undefined,
-      },
       paymentSourcesSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
@@ -183,8 +181,8 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -193,6 +191,9 @@ export const jaJP: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -257,6 +258,12 @@ export const jaJP: LocalizationResource = {
       general: '一般',
       members: 'メンバー',
       title: '組織',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -773,8 +780,8 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__statements: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
@@ -783,6 +790,9 @@ export const jaJP: LocalizationResource = {
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -925,6 +935,9 @@ export const jaJP: LocalizationResource = {
       title: '電話番号の追加',
       verifySubtitle: '{{identifier}}に送信された検証コードを入力してください',
       verifyTitle: '電話番号の確認',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: '10MB未満のJPG、PNG、GIF、またはWEBP画像をアップロードしてください',
