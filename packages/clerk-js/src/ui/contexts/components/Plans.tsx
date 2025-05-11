@@ -177,9 +177,7 @@ export const usePlansContext = () => {
   // returns all subscriptions for a plan that are active or upcoming
   const activeAndUpcomingSubscriptions = useCallback(
     (plan: CommercePlanResource) => {
-      return ctx.subscriptions
-        .filter(subscription => subscription.plan.id === plan.id)
-        .filter(subscription => subscription.status === 'active' || subscription.status === 'upcoming');
+      return ctx.subscriptions.filter(subscription => subscription.plan.id === plan.id);
     },
     [ctx.subscriptions],
   );
@@ -323,7 +321,7 @@ export const usePlansContext = () => {
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
           subscriberType,
