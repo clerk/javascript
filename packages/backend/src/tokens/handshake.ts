@@ -163,6 +163,37 @@ export class HandshakeService {
   }
 
   /**
+   * Gets cookies from either a handshake nonce or a handshake token
+   * @returns Promise resolving to string array of cookie directives
+   */
+  public async getCookiesFromHandshake(): Promise<string[]> {
+    const cookiesToSet: string[] = [];
+
+    if (this.authenticateContext.handshakeNonce) {
+      try {
+        const handshakePayload = await this.authenticateContext.apiClient?.clients.getHandshakePayload({
+          nonce: this.authenticateContext.handshakeNonce,
+        });
+        if (handshakePayload) {
+          cookiesToSet.push(...handshakePayload.directives);
+        }
+      } catch (error) {
+        console.error('Clerk: HandshakeService: error getting handshake payload:', error);
+      }
+    } else if (this.authenticateContext.handshakeToken) {
+      const handshakePayload = await verifyHandshakeToken(
+        this.authenticateContext.handshakeToken,
+        this.authenticateContext,
+      );
+      if (handshakePayload && Array.isArray(handshakePayload.handshake)) {
+        cookiesToSet.push(...handshakePayload.handshake);
+      }
+    }
+
+    return cookiesToSet;
+  }
+
+  /**
    * Resolves a handshake request by verifying the handshake token and setting appropriate cookies
    * @returns Promise resolving to either a SignedInState or SignedOutState
    * @throws Error if handshake verification fails or if there are issues with the session token
@@ -173,19 +204,7 @@ export class HandshakeService {
       'Access-Control-Allow-Credentials': 'true',
     });
 
-    const cookiesToSet: string[] = [];
-
-    if (this.authenticateContext.handshakeNonce) {
-      // TODO: implement handshake nonce handling, fetch handshake payload with nonce
-      console.warn('Clerk: Handshake nonce is not implemented yet.');
-    }
-    if (this.authenticateContext.handshakeToken) {
-      const handshakePayload = await verifyHandshakeToken(
-        this.authenticateContext.handshakeToken,
-        this.authenticateContext,
-      );
-      cookiesToSet.push(...handshakePayload.handshake);
-    }
+    const cookiesToSet = await this.getCookiesFromHandshake();
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {

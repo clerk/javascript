@@ -406,7 +406,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
-    if (authenticateContext.handshakeToken) {
+    if (authenticateContext.handshakeNonce || authenticateContext.handshakeToken) {
       try {
         return await handshakeService.resolveHandshake();
       } catch (error) {

@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { constants } from '../../constants';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../../errors';
 import type { AuthenticateContext } from '../authenticateContext';
-import { AuthErrorReason, signedIn, signedOut } from '../authStatus';
 import { HandshakeService } from '../handshake';
 import { OrganizationMatcher } from '../organizationMatcher';
 
@@ -11,9 +10,7 @@ vi.mock('../handshake.js', async importOriginal => {
   const actual: any = await importOriginal();
   return {
     ...actual,
-    verifyHandshakeToken: vi.fn().mockResolvedValue({
-      handshake: ['cookie1=value1', 'session=session-token'],
-    }),
+    verifyHandshakeToken: vi.fn(),
   };
 });
 
@@ -56,6 +53,30 @@ vi.mock('../../jwt/verifyJwt.js', () => ({
     },
     errors: undefined,
   }),
+  hasValidSignature: vi.fn().mockResolvedValue({
+    data: true,
+    errors: undefined,
+  }),
+}));
+
+vi.mock('../keys.js', async importOriginal => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    loadClerkJWKFromRemote: vi.fn().mockResolvedValue({
+      kty: 'RSA',
+      kid: 'test-kid',
+      use: 'sig',
+      alg: 'RS256',
+      n: 'test-n',
+      e: 'AQAB',
+    }),
+  };
+});
+
+vi.mock('../../jwt/assertions.js', () => ({
+  assertHeaderAlgorithm: vi.fn(),
+  assertHeaderType: vi.fn(),
 }));
 
 describe('HandshakeService', () => {
@@ -76,6 +97,8 @@ describe('HandshakeService', () => {
       usesSuffixedCookies: () => true,
       secFetchDest: 'document',
       accept: 'text/html',
+      apiUrl: 'https://api.clerk.dev',
+      secretKey: 'test-secret-key',
     } as AuthenticateContext;
 
     mockOrganizationMatcher = new OrganizationMatcher({
@@ -154,202 +177,6 @@ describe('HandshakeService', () => {
     });
   });
 
-  describe.skip('resolveHandshake', () => {
-    it('should resolve handshake with valid token', async () => {
-      const mockJwt = {
-        header: {
-          typ: 'JWT',
-          alg: 'RS256',
-          kid: 'test-kid',
-        },
-        payload: {
-          sub: 'user_123',
-          __raw: 'raw-token',
-          iss: 'issuer',
-          sid: 'session-id',
-          nbf: 1234567890,
-          exp: 1234567890,
-          iat: 1234567890,
-          v: 2 as const,
-          fea: undefined,
-          pla: undefined,
-          o: undefined,
-          org_permissions: undefined,
-          org_id: undefined,
-          org_slug: undefined,
-          org_role: undefined,
-        },
-        signature: new Uint8Array([1, 2, 3]),
-        raw: {
-          header: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9',
-          payload: 'eyJzdWIiOiJ1c2VyXzEyMyJ9',
-          signature: 'signature',
-          text: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.signature',
-        },
-      };
-      const mockHandshakePayload = {
-        handshake: ['cookie1=value1', 'session=session-token'],
-      };
-
-      const mockVerifyToken = vi.mocked(await import('../handshake.js')).verifyHandshakeToken;
-      mockVerifyToken.mockResolvedValue(mockHandshakePayload);
-
-      const mockVerifyTokenResult = vi.mocked(await import('../verify.js')).verifyToken;
-      mockVerifyTokenResult.mockResolvedValue({
-        data: mockJwt.payload,
-        errors: undefined,
-      });
-
-      const mockDecodeJwt = vi.mocked(await import('../../jwt/verifyJwt.js')).decodeJwt;
-      mockDecodeJwt.mockReturnValue({
-        data: mockJwt,
-        errors: undefined,
-      });
-
-      vi.mocked(await import('../handshake.js')).verifyHandshakeToken.mockResolvedValue(mockHandshakePayload);
-
-      mockAuthenticateContext.handshakeToken = 'any-token';
-      const result = await handshakeService.resolveHandshake();
-
-      expect(result).toEqual(
-        signedIn({
-          tokenType: 'session_token',
-          authenticateContext: mockAuthenticateContext,
-          sessionClaims: {
-            sub: 'user_123',
-            __raw: 'raw-token',
-            iss: 'issuer',
-            sid: 'session-id',
-            nbf: 1234567890,
-            exp: 1234567890,
-            iat: 1234567890,
-            v: 2 as const,
-            fea: undefined,
-            pla: undefined,
-            o: undefined,
-            org_permissions: undefined,
-            org_id: undefined,
-            org_slug: undefined,
-            org_role: undefined,
-          },
-          token: 'session-token',
-          headers: expect.any(Headers),
-        }),
-      );
-    });
-
-    it('should handle missing session token', async () => {
-      const mockHandshakePayload = { handshake: ['cookie1=value1'] };
-      const mockVerifyToken = vi.mocked(await import('../handshake.js')).verifyHandshakeToken;
-      mockVerifyToken.mockResolvedValue(mockHandshakePayload);
-
-      mockAuthenticateContext.handshakeToken = 'valid-token';
-      const result = await handshakeService.resolveHandshake();
-
-      expect(result).toEqual(
-        signedOut({
-          tokenType: 'session_token',
-          authenticateContext: mockAuthenticateContext,
-          reason: AuthErrorReason.SessionTokenMissing,
-          message: '',
-        }),
-      );
-    });
-
-    it('should handle development mode clock skew', async () => {
-      mockAuthenticateContext.instanceType = 'development';
-
-      const mockJwt = {
-        header: {
-          typ: 'JWT',
-          alg: 'RS256',
-          kid: 'test-kid',
-        },
-        payload: {
-          sub: 'user_123',
-          __raw: 'raw-token',
-          iss: 'issuer',
-          sid: 'session-id',
-          nbf: 1234567890,
-          exp: 1234567890,
-          iat: 1234567890,
-          v: 2 as const,
-          fea: undefined,
-          pla: undefined,
-          o: undefined,
-          org_permissions: undefined,
-          org_id: undefined,
-          org_slug: undefined,
-          org_role: undefined,
-        },
-        signature: new Uint8Array([1, 2, 3]),
-        raw: {
-          header: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9',
-          payload: 'eyJzdWIiOiJ1c2VyXzEyMyJ9',
-          signature: 'signature',
-          text: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.signature',
-        },
-      };
-      const mockHandshakePayload = {
-        handshake: ['cookie1=value1', 'session=session-token'],
-      };
-
-      const mockVerifyToken = vi.mocked(await import('../handshake.js')).verifyHandshakeToken;
-      mockVerifyToken.mockResolvedValue(mockHandshakePayload);
-
-      const mockVerifyTokenResult = vi.mocked(await import('../verify.js')).verifyToken;
-      mockVerifyTokenResult
-        .mockRejectedValueOnce(
-          new TokenVerificationError({
-            reason: TokenVerificationErrorReason.TokenExpired,
-            message: 'Token expired',
-          }),
-        )
-        .mockResolvedValueOnce({
-          data: mockJwt.payload,
-          errors: undefined,
-        });
-
-      const mockDecodeJwt = vi.mocked(await import('../../jwt/verifyJwt.js')).decodeJwt;
-      mockDecodeJwt.mockReturnValue({
-        data: mockJwt,
-        errors: undefined,
-      });
-
-      // Mock verifyHandshakeToken to return our mock data directly
-      vi.mocked(await import('../handshake.js')).verifyHandshakeToken.mockResolvedValue(mockHandshakePayload);
-
-      mockAuthenticateContext.handshakeToken = 'any-token';
-      const result = await handshakeService.resolveHandshake();
-
-      expect(result).toEqual(
-        signedIn({
-          tokenType: 'session_token',
-          authenticateContext: mockAuthenticateContext,
-          sessionClaims: {
-            sub: 'user_123',
-            __raw: 'raw-token',
-            iss: 'issuer',
-            sid: 'session-id',
-            nbf: 1234567890,
-            exp: 1234567890,
-            iat: 1234567890,
-            v: 2 as const,
-            fea: undefined,
-            pla: undefined,
-            o: undefined,
-            org_permissions: undefined,
-            org_id: undefined,
-            org_slug: undefined,
-            org_role: undefined,
-          },
-          token: 'session-token',
-          headers: expect.any(Headers),
-        }),
-      );
-    });
-  });
-
   describe('handleTokenVerificationErrorInDevelopment', () => {
     it('should throw specific error for invalid signature', () => {
       const error = new TokenVerificationError({
@@ -393,6 +220,74 @@ describe('HandshakeService', () => {
 
       expect(result).toBe(false);
       expect(headers.get('Set-Cookie')).toContain('__clerk_redirect_count=1');
+    });
+  });
+
+  describe('getHandshakePayload', () => {
+    it('should return cookies from handshakeNonce when available', async () => {
+      const mockDirectives = ['cookie1=value1', 'cookie2=value2'];
+      const getHandshakePayloadMock = vi.fn().mockResolvedValue({
+        directives: mockDirectives,
+      });
+
+      mockAuthenticateContext.handshakeNonce = 'test-nonce';
+      mockAuthenticateContext.apiClient = {
+        clients: {
+          getHandshakePayload: getHandshakePayloadMock,
+        },
+      } as any;
+
+      const result = await handshakeService.getCookiesFromHandshake();
+
+      expect(result).toEqual(mockDirectives);
+      expect(getHandshakePayloadMock).toHaveBeenCalledWith({
+        nonce: 'test-nonce',
+      });
+    });
+
+    it('should handle API errors when getting handshake payload with nonce', async () => {
+      const mockError = new Error('API error');
+      const getHandshakePayloadMock = vi.fn().mockRejectedValue(mockError);
+
+      mockAuthenticateContext.handshakeNonce = 'test-nonce';
+      mockAuthenticateContext.apiClient = {
+        clients: {
+          getHandshakePayload: getHandshakePayloadMock,
+        },
+      } as any;
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await handshakeService.getCookiesFromHandshake();
+
+      expect(result).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalledWith('Clerk: HandshakeService: error getting handshake payload:', mockError);
+
+      consoleSpy.mockRestore();
+    });
+
+    it.todo('should return cookies from handshakeToken when nonce is not available');
+
+    it('should return empty array when neither handshakeNonce nor handshakeToken is available', async () => {
+      mockAuthenticateContext.handshakeNonce = undefined;
+      mockAuthenticateContext.handshakeToken = undefined;
+
+      const result = await handshakeService.getCookiesFromHandshake();
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle token verification errors gracefully', async () => {
+      mockAuthenticateContext.handshakeNonce = undefined;
+      mockAuthenticateContext.handshakeToken = 'test-token';
+
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await handshakeService.getCookiesFromHandshake();
+
+      expect(result).toEqual([]);
+
+      spy.mockRestore();
     });
   });
 });

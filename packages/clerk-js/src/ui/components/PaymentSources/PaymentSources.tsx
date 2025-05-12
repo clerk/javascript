@@ -6,7 +6,7 @@ import { Fragment, useMemo, useRef } from 'react';
 import { RemoveResourceForm } from '../../common';
 import { useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
+import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
@@ -83,24 +83,28 @@ const RemoveScreen = ({
   );
 };
 
-export const PaymentSources = () => {
+export const PaymentSources = withCardStateProvider(() => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
 
   const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
 
-  const { data, revalidate } = useFetch(
+  const { data, revalidate, isLoading } = useFetch(
     resource?.getPaymentSources,
     {},
     undefined,
     `commerce-payment-sources-${resource?.id}`,
   );
-  const { data: paymentSources } = data || { data: [] };
+  const { data: paymentSources = [] } = data || {};
 
   const sortedPaymentSources = useMemo(
     () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
     [paymentSources],
   );
+
+  if (!resource) {
+    return null;
+  }
 
   return (
     <ProfileSection.Root
@@ -115,43 +119,52 @@ export const PaymentSources = () => {
       })}
     >
       <Action.Root>
-        <ProfileSection.ItemList id='paymentSources'>
-          {sortedPaymentSources.map(paymentSource => (
-            <Fragment key={paymentSource.id}>
-              <ProfileSection.Item id='paymentSources'>
-                <PaymentSourceRow paymentSource={paymentSource} />
-                <PaymentSourceMenu
-                  paymentSource={paymentSource}
-                  revalidate={revalidate}
-                />
-              </ProfileSection.Item>
+        <ProfileSection.ItemList
+          id='paymentSources'
+          disableAnimation
+        >
+          {isLoading ? (
+            <FullHeightLoader />
+          ) : (
+            <>
+              {sortedPaymentSources.map(paymentSource => (
+                <Fragment key={paymentSource.id}>
+                  <ProfileSection.Item id='paymentSources'>
+                    <PaymentSourceRow paymentSource={paymentSource} />
+                    <PaymentSourceMenu
+                      paymentSource={paymentSource}
+                      revalidate={revalidate}
+                    />
+                  </ProfileSection.Item>
 
-              <Action.Open value={`remove-${paymentSource.id}`}>
-                <Action.Card variant='destructive'>
-                  <RemoveScreen
-                    paymentSource={paymentSource}
-                    revalidate={revalidate}
-                  />
+                  <Action.Open value={`remove-${paymentSource.id}`}>
+                    <Action.Card variant='destructive'>
+                      <RemoveScreen
+                        paymentSource={paymentSource}
+                        revalidate={revalidate}
+                      />
+                    </Action.Card>
+                  </Action.Open>
+                </Fragment>
+              ))}
+              <Action.Trigger value='add'>
+                <ProfileSection.ArrowButton
+                  id='paymentSources'
+                  localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')}
+                />
+              </Action.Trigger>
+              <Action.Open value='add'>
+                <Action.Card>
+                  <AddScreen onSuccess={revalidate} />
                 </Action.Card>
               </Action.Open>
-            </Fragment>
-          ))}
-          <Action.Trigger value='add'>
-            <ProfileSection.ArrowButton
-              id='paymentSources'
-              localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')}
-            />
-          </Action.Trigger>
-          <Action.Open value='add'>
-            <Action.Card>
-              <AddScreen onSuccess={revalidate} />
-            </Action.Card>
-          </Action.Open>
+            </>
+          )}
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );
-};
+});
 
 const PaymentSourceMenu = ({
   paymentSource,

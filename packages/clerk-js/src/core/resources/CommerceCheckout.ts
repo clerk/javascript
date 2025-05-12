@@ -8,13 +8,7 @@ import type {
 } from '@clerk/types';
 
 import { commerceTotalsFromJSON } from '../../utils';
-import {
-  BaseResource,
-  CommercePaymentSource,
-  CommercePlan,
-  CommerceSubscription,
-  isClerkAPIResponseError,
-} from './internal';
+import { BaseResource, CommercePaymentSource, CommercePlan, isClerkAPIResponseError } from './internal';
 
 export class CommerceCheckout extends BaseResource implements CommerceCheckoutResource {
   id!: string;
@@ -24,8 +18,8 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
   paymentSource?: CommercePaymentSource;
   plan!: CommercePlan;
   planPeriod!: CommerceSubscriptionPlanPeriod;
+  planPeriodStart!: number | undefined;
   status!: string;
-  subscription?: CommerceSubscription;
   totals!: CommerceCheckoutTotals;
   isImmediatePlanChange!: boolean;
 
@@ -47,8 +41,8 @@ export class CommerceCheckout extends BaseResource implements CommerceCheckoutRe
     this.paymentSource = data.payment_source ? new CommercePaymentSource(data.payment_source) : undefined;
     this.plan = new CommercePlan(data.plan);
     this.planPeriod = data.plan_period;
+    this.planPeriodStart = data.plan_period_start;
     this.status = data.status;
-    this.subscription = data.subscription ? new CommerceSubscription(data.subscription) : undefined;
     this.totals = commerceTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
     return this;

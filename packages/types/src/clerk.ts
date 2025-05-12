@@ -1568,15 +1568,40 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
   newSubscriptionRedirectUrl?: string;
 };
 
 type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
   forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: PricingTableTheme;
-  __internal_CheckoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
 type PortalRoot = HTMLElement | null | undefined;

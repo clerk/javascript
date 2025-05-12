@@ -8,7 +8,7 @@ import type {
   ConfirmCheckoutParams,
 } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
@@ -118,7 +118,6 @@ const CheckoutFormElements = ({
   const { organization } = useOrganization();
   const { subscriber, subscriberType } = useCheckoutContext();
 
-  const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>('existing');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
@@ -130,9 +129,9 @@ const CheckoutFormElements = ({
   );
   const { data: paymentSources } = data || { data: [] };
 
-  useEffect(() => {
-    setPaymentMethodSource(paymentSources.length > 0 ? 'existing' : 'new');
-  }, [paymentSources]);
+  const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
+    paymentSources.length > 0 ? 'existing' : 'new',
+  );
 
   const confirmCheckout = async (params: ConfirmCheckoutParams) => {
     try {

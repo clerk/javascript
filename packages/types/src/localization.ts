@@ -728,6 +728,12 @@ type _LocalizationResource = {
         actionLabel__default: LocalizationValue;
       };
     };
+    plansPage: {
+      title: LocalizationValue;
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
+      };
+    };
   };
   userButton: {
     action__manageAccount: LocalizationValue;
@@ -924,6 +930,9 @@ type _LocalizationResource = {
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;
       };
+    };
+    plansPage: {
+      title: LocalizationValue;
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
       };

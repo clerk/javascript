@@ -1,7 +1,8 @@
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
+import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
   Badge,
@@ -17,7 +18,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch } from '../../elements';
+import { Switch, Tooltip } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
@@ -97,6 +98,7 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
+  const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
@@ -104,7 +106,10 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -117,21 +122,38 @@ function Card(props: CardProps) {
     });
   };
 
-  const subscription = activeOrUpcomingSubscription(plan);
-  const hasFeatures = plan.features.length > 0;
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
   const isPlanActive = subscription?.status === 'active';
+  const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
-  const isEligibleForSwitchToAnnual = plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
 
-  const shouldShowFooter =
-    !subscription ||
-    subscription?.status === 'upcoming' ||
-    subscription?.canceledAt ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault && isEligibleForSwitchToAnnual);
-  const shouldShowFooterNotice =
-    subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
 
-  const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
+  if (!subscription) {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true;
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
 
   return (
     <Box
@@ -187,7 +209,7 @@ function Card(props: CardProps) {
           gap: 0,
         }}
       >
-        {!collapseFeatures ? (
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
@@ -220,7 +242,6 @@ function Card(props: CardProps) {
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
@@ -236,15 +257,24 @@ function Card(props: CardProps) {
                 })}
               />
             ) : (
-              <Button
-                elementDescriptor={descriptors.pricingTableCardFooterButton}
-                block
-                textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-                {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
-                onClick={event => {
-                  onSelect(plan, event);
-                }}
-              />
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {isSignedIn && !canManageBilling && (
+                  <Tooltip.Content
+                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
+                  />
+                )}
+              </Tooltip.Root>
             )}
           </Box>
         ) : (
