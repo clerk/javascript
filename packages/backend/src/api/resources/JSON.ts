@@ -571,7 +571,6 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string | null;
   nonce?: string | null;
   message?: string | null;
-  channel?: string;
 }
 
 export interface WaitlistEntryJSON extends ClerkResourceJSON {
