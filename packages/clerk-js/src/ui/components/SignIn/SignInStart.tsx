@@ -220,9 +220,7 @@ function SignInStartInternal(): JSX.Element {
       .then(res => {
         switch (res.status) {
           case 'needs_first_factor':
-            return navigate(
-              alternativePhoneCodeProvider ? `factor-one/${alternativePhoneCodeProvider.channel}` : 'factor-one',
-            );
+            return navigate('factor-one');
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
@@ -327,6 +325,25 @@ function SignInStartInternal(): JSX.Element {
   };
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
+    if (alternativePhoneCodeProvider) {
+      const noop = () => {};
+      fields.push({
+        id: 'strategy',
+        value: 'phone_code',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+      fields.push({
+        id: 'channel',
+        value: alternativePhoneCodeProvider?.channel,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+    }
     try {
       const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
 
@@ -342,9 +359,7 @@ function SignInStartInternal(): JSX.Element {
             await authenticateWithEnterpriseSSO();
             break;
           }
-          return navigate(
-            alternativePhoneCodeProvider ? `factor-one/${alternativePhoneCodeProvider.channel}` : 'factor-one',
-          );
+          return navigate('factor-one');
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':

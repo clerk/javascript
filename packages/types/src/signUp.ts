@@ -214,6 +214,5 @@ export interface SignUpVerificationsResource {
 export interface SignUpVerificationResource extends VerificationResource {
   supportedStrategies: string[];
   nextAction: string;
-  channel?: PhoneCodeChannel;
   __internal_toSnapshot: () => SignUpVerificationJSONSnapshot;
 }

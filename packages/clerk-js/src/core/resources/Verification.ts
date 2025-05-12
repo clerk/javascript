@@ -33,6 +33,7 @@ export class Verification extends BaseResource implements VerificationResource {
   expireAt: Date | null = null;
   error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
+  channel?: PhoneCodeChannel;
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
@@ -58,6 +59,7 @@ export class Verification extends BaseResource implements VerificationResource {
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at || undefined);
       this.error = data.error ? parseError(data.error) : null;
+      this.channel = data.channel || undefined;
     }
     return this;
   }
@@ -134,14 +136,12 @@ export class SignUpVerifications implements SignUpVerificationsResource {
 export class SignUpVerification extends Verification {
   nextAction: string;
   supportedStrategies: string[];
-  channel?: PhoneCodeChannel;
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
     if (data) {
       this.nextAction = data.next_action;
       this.supportedStrategies = data.supported_strategies;
-      this.channel = data.channel;
     } else {
       this.nextAction = '';
       this.supportedStrategies = [];
@@ -153,7 +153,6 @@ export class SignUpVerification extends Verification {
       ...super.__internal_toSnapshot(),
       next_action: this.nextAction,
       supported_strategies: this.supportedStrategies,
-      channel: this.channel,
     };
   }
 }

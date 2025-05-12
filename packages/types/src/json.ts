@@ -316,6 +316,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string;
   attempts: number;
   expire_at: number;
+  channel?: PhoneCodeChannel;
   error: ClerkAPIErrorJSON;
 }
 
