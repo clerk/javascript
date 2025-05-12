@@ -1,8 +1,9 @@
-import { type ClerkOptions, createClerkClient } from '@clerk/backend';
+import type { ClerkClient, ClerkOptions } from '@clerk/backend';
+import { createClerkClient } from '@clerk/backend';
 
 import { commonEnvs } from './constants';
 
-const clerkClient = (options?: ClerkOptions) => {
+const clerkClient = (options?: ClerkOptions): ClerkClient => {
   const commonEnv = commonEnvs();
   return createClerkClient({
     secretKey: commonEnv.SECRET_KEY,
