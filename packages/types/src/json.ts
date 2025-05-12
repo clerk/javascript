@@ -715,8 +715,8 @@ export interface CommerceCheckoutJSON extends ClerkResourceJSON {
   payment_source?: CommercePaymentSourceJSON;
   plan: CommercePlanJSON;
   plan_period: CommerceSubscriptionPlanPeriod;
+  plan_period_start?: number;
   status: string;
-  subscription?: CommerceSubscriptionJSON;
   totals: CommerceCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
 }

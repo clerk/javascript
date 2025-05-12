@@ -1,5 +1,67 @@
 # @clerk/vue
 
+## 1.8.0
+
+### Minor Changes
+
+- Introduce feature or plan based authorization ([#5890](https://github.com/clerk/javascript/pull/5890)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ## `useAuth()`
+
+  ### Plan
+
+  ```ts
+  const { has } = useAuth();
+  has.value({ plan: 'my-plan' });
+  ```
+
+  ### Feature
+
+  ```ts
+  const { has } = useAuth();
+  has.value({ feature: 'my-feature' });
+  ```
+
+  ### Scoped per user or per org
+
+  ```ts
+  const { has } = useAuth();
+
+  has.value({ feature: 'org:my-feature' });
+  has.value({ feature: 'user:my-feature' });
+  has.value({ plan: 'user:my-plan' });
+  has.value({ plan: 'org:my-plan' });
+  ```
+
+  ## `<Protect />`
+
+  ### Plan
+
+  ```html
+  <Protect plan="my-plan" />
+  ```
+
+  ### Feature
+
+  ```html
+  <Protect feature="my-feature" />
+  ```
+
+  ### Scoped per user or per org
+
+  ```html
+  <Protect feature="org:my-feature" />
+  <Protect feature="user:my-feature" />
+  <Protect plan="org:my-plan" />
+  <Protect plan="user:my-plan" />
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`0f5145e`](https://github.com/clerk/javascript/commit/0f5145e164f3d3d5faf57e58162b05e7110d2403), [`afdfd18`](https://github.com/clerk/javascript/commit/afdfd18d645608dec37e52a291a91ba5f42dcbe7), [`b7c51ba`](https://github.com/clerk/javascript/commit/b7c51baac6df1129b468274c9a7f63ca303f16ce), [`437b53b`](https://github.com/clerk/javascript/commit/437b53b67e281d076b5b3f927e11c1d64666d154), [`5217155`](https://github.com/clerk/javascript/commit/52171554250c5c58f4f497b6d3c7416e79ac77da)]:
+  - @clerk/types@4.58.0
+  - @clerk/shared@3.8.2
+
 ## 1.7.2
 
 ### Patch Changes
