@@ -372,13 +372,23 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.closeDrawer = name => {
-      setState(s => ({
-        ...s,
-        [`${name}Drawer`]: {
-          ...s[`${name}Drawer`],
-          open: false,
-        },
-      }));
+      setState(s => {
+        const currentItem = s[`${name}Drawer`];
+
+        // @ts-expect-error
+        if (currentItem?.props?.onClose) {
+          // @ts-expect-error
+          currentItem.props.onClose();
+        }
+
+        return {
+          ...s,
+          [`${name}Drawer`]: {
+            ...s[`${name}Drawer`],
+            open: false,
+          },
+        };
+      });
     };
 
     componentsControls.prefetch = component => {

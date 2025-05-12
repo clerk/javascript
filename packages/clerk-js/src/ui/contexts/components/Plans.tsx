@@ -7,9 +7,10 @@ import type {
   CommerceSubscriptionResource,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import { CommerceSubscription } from '../../../core/resources/internal';
+import { useRouter } from '../../../ui/router';
 import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -51,6 +52,7 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
   const resource = subscriberType === 'org' ? organization : user;
+  const [props, setProps] = useState<any | null>(null);
 
   const {
     data: _subscriptions,
@@ -123,6 +125,8 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
         subscriptions: isLoaded ? subscriptions : [],
         isLoading: isLoadingSubscriptions || isLoadingPlans || false,
         revalidate,
+        setProps,
+        props,
       }}
     >
       {children}
@@ -143,6 +147,7 @@ export const usePlansContext = () => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const context = useContext(PlansContext);
+  const router = useRouter();
 
   if (!context || context.componentName !== 'Plans') {
     throw new Error('Clerk: usePlansContext called outside Plans.');
@@ -160,7 +165,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { componentName, ...ctx } = context;
+  const { componentName, props, setProps, ...ctx } = context;
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
@@ -324,37 +329,69 @@ export const usePlansContext = () => {
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
-        clerk.__internal_openPlanDetails({
-          plan,
-          subscriberType,
-          onSubscriptionCancel: () => {
-            ctx.revalidate();
-            onSubscriptionChange?.();
-          },
-          appearance,
-          portalRoot,
-        });
+        // setProps({
+        //   plan,
+        //   subscriberType,
+        //   onSubscriptionCancel: () => {
+        //     ctx.revalidate();
+        //     onSubscriptionChange?.();
+        //   },
+        //   appearance,
+        //   portalRoot,
+        // });
+        // clerk.__internal_openPlanDetails({
+        //   plan,
+        //   subscriberType,
+        //   onSubscriptionCancel: () => {
+        //     ctx.revalidate();
+        //     onSubscriptionChange?.();
+        //   },
+        //   appearance,
+        //   portalRoot,
+        // });
       } else {
+        console.log('planPeriod', planPeriod);
         // if the plan doesn't support annual, use monthly
         let _planPeriod = planPeriod;
         if (planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
           _planPeriod = 'month';
         }
 
-        clerk.__internal_openCheckout({
-          planId: plan.id,
-          planPeriod: _planPeriod,
-          subscriberType: subscriberType,
-          onSubscriptionComplete: () => {
-            ctx.revalidate();
-            onSubscriptionChange?.();
-          },
-          appearance,
-          portalRoot,
+        // setProps({
+        //   planId: plan.id,
+        //   planPeriod: _planPeriod,
+        //   subscriberType: subscriberType,
+        //   onSubscriptionComplete: () => {
+        //     ctx.revalidate();
+        //     onSubscriptionChange?.();
+        //   },
+        //   onClose: () => {
+        //     const currentPath = router.currentPath;
+        //     void router.navigate(currentPath, { searchParams: undefined });
+        //   },
+        //   appearance,
+        //   portalRoot,
+        // });
+
+        const currentPath = router.currentPath;
+        void router.navigate(currentPath, {
+          searchParams: new URLSearchParams({ planId: plan.id, planPeriod: _planPeriod }),
         });
+
+        // clerk.__internal_openCheckout({
+        //   planId: plan.id,
+        //   planPeriod: _planPeriod,
+        //   subscriberType: subscriberType,
+        //   onSubscriptionComplete: () => {
+        //     ctx.revalidate();
+        //     onSubscriptionChange?.();
+        //   },
+        //   appearance,
+        //   portalRoot,
+        // });
       }
     },
-    [clerk, ctx, activeOrUpcomingSubscription, subscriberType],
+    [clerk, ctx, activeOrUpcomingSubscription, subscriberType, router, setProps],
   );
 
   const defaultFreePlan = useMemo(() => {
@@ -374,5 +411,6 @@ export const usePlansContext = () => {
     captionForSubscription,
     upcomingSubscriptionsExist,
     defaultFreePlan,
+    props,
   };
 };

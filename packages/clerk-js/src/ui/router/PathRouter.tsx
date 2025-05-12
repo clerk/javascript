@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/types';
 import React from 'react';
 
-import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils';
+import { hasUrlInFragment, mergeFragmentIntoUrl } from '../../utils';
 import { BaseRouter } from './BaseRouter';
 
 interface PathRouterProps {
@@ -25,8 +25,13 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     if (!toURL) {
       return;
     }
+
+    // return window.next.router.replace(toURL.toString());
+
+    window.history.pushState(null, '', toURL.toString());
+
     // Only send the path
-    return navigate(stripOrigin(toURL), options);
+    // return navigate(stripOrigin(toURL), options);
   };
 
   const getPath = () => {

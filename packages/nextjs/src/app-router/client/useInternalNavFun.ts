@@ -39,6 +39,13 @@ export const useInternalNavFun = (props: {
             // without affecting how the Next router works.
             const state = ((window as any).next?.version ?? '') < '14.1.0' ? history.state : null;
             windowNav(state, '', to);
+            // console.log('interallll 3');
+            // Works
+            // if (to.includes('?')) {
+            //   setTimeout(() => {
+            //     routerNav(removeBasePath(to));
+            //   }, 0);
+            // }
           } else {
             // If the navigation is external (usually when navigating away from the component but still within the app),
             // we should use the Next.js router to navigate as it will handle updating the URL and also

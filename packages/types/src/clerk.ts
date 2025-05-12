@@ -1621,6 +1621,7 @@ export type __internal_CheckoutProps = {
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
 export type __internal_PlanDetailsProps = {
