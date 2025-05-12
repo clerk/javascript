@@ -12,7 +12,7 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
-export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace'> & {
+export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey'> & {
   publishableKey?: string;
   /**
    * Skip the automatic server middleware registration. When enabled, you'll need to
