@@ -292,6 +292,7 @@ const NavButton = (props: NavButtonProps) => {
         icon={icon}
         sx={{
           opacity: isActive ? 1 : 0.7,
+          // Fixes a bug in Safari where the icon shifts when navigating between routes.
           transform: 'translateZ(0)',
         }}
       />
