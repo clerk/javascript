@@ -208,6 +208,8 @@ function SignUpStartInternal(): JSX.Element {
     setActiveCommIdentifierType(type);
   };
 
+  const alternativePhoneCodeProviderFields: FormControlState[] = [];
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -232,6 +234,10 @@ function SignUpStartInternal(): JSX.Element {
         onChange: noop,
         setError: noop,
       } as any);
+    }
+
+    if (alternativePhoneCodeProviderFields.length) {
+      fieldsToSubmit.push(...alternativePhoneCodeProviderFields);
     }
 
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
@@ -273,6 +279,28 @@ function SignUpStartInternal(): JSX.Element {
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
       .finally(() => card.setIdle());
+  };
+
+  const handleAlternativePhoneCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const noop = () => {};
+    alternativePhoneCodeProviderFields.push({
+      id: 'strategy',
+      value: 'phone_code',
+      clearFeedback: noop,
+      setValue: noop,
+      onChange: noop,
+      setError: noop,
+    } as any);
+    alternativePhoneCodeProviderFields.push({
+      id: 'channel',
+      value: alternativePhoneCodeProvider?.channel,
+      clearFeedback: noop,
+      setValue: noop,
+      onChange: noop,
+      setError: noop,
+    } as any);
+
+    return handleSubmit(e);
   };
 
   if (status.isLoading) {
@@ -365,7 +393,7 @@ function SignUpStartInternal(): JSX.Element {
         </Card.Root>
       ) : (
         <SignUpAlternativePhoneCodePhoneNumberCard
-          handleSubmit={handleSubmit}
+          handleSubmit={handleAlternativePhoneCodeSubmit}
           fields={fields}
           formState={formState}
           onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}
