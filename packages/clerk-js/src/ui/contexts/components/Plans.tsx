@@ -176,6 +176,40 @@ export const usePlansContext = () => {
     [ctx.subscriptions],
   );
 
+  // returns all subscriptions for a plan that are active or upcoming
+  const activeAndUpcomingSubscriptions = useCallback(
+    (plan: CommercePlanResource) => {
+      return ctx.subscriptions.filter(subscription => subscription.plan.id === plan.id);
+    },
+    [ctx.subscriptions],
+  );
+
+  // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
+  const activeOrUpcomingSubscriptionWithPlanPeriod = useCallback(
+    (plan: CommercePlanResource, planPeriod: CommerceSubscriptionPlanPeriod = 'month') => {
+      const plansSubscriptions = activeAndUpcomingSubscriptions(plan);
+      // Handle multiple subscriptions for the same plan
+      if (plansSubscriptions.length > 1) {
+        const subscriptionBaseOnPanPeriod = plansSubscriptions.find(subscription => {
+          return subscription.planPeriod === planPeriod;
+        });
+
+        if (subscriptionBaseOnPanPeriod) {
+          return subscriptionBaseOnPanPeriod;
+        }
+
+        return plansSubscriptions[0];
+      }
+
+      if (plansSubscriptions.length === 1) {
+        return plansSubscriptions[0];
+      }
+
+      return undefined;
+    },
+    [activeAndUpcomingSubscriptions],
+  );
+
   const canManageSubscription = useCallback(
     ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
@@ -212,7 +246,8 @@ export const usePlansContext = () => {
       isDisabled: boolean;
       disabled: boolean;
     } => {
-      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+      const subscription =
+        sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
       if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
         _selectedPlanPeriod = 'month';
@@ -220,28 +255,55 @@ export const usePlansContext = () => {
 
       const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
 
+      const getLocalizationKey = () => {
+        // Handle subscription cases
+        if (subscription) {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
+            if (_selectedPlanPeriod === 'month') {
+              return localizationKeys('commerce.switchToMonthly');
+            }
+
+            if (isEligibleForSwitchToAnnual) {
+              return localizationKeys('commerce.switchToAnnual');
+            }
+          }
+
+          if (subscription.canceledAt) {
+            return localizationKeys('commerce.reSubscribe');
+          }
+
+          if (_selectedPlanPeriod !== subscription.planPeriod) {
+            if (_selectedPlanPeriod === 'month') {
+              return localizationKeys('commerce.switchToMonthly');
+            }
+
+            if (isEligibleForSwitchToAnnual) {
+              return localizationKeys('commerce.switchToAnnual');
+            }
+
+            return localizationKeys('commerce.manageSubscription');
+          }
+
+          return localizationKeys('commerce.manageSubscription');
+        }
+
+        // Handle non-subscription cases
+        const hasNonDefaultSubscriptions =
+          ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
+        return hasNonDefaultSubscriptions
+          ? localizationKeys('commerce.switchPlan')
+          : localizationKeys('commerce.subscribe');
+      };
+
       return {
-        localizationKey: subscription
-          ? subscription.canceledAt
-            ? localizationKeys('commerce.reSubscribe')
-            : selectedPlanPeriod !== subscription.planPeriod
-              ? selectedPlanPeriod === 'month'
-                ? localizationKeys('commerce.switchToMonthly')
-                : isEligibleForSwitchToAnnual
-                  ? localizationKeys('commerce.switchToAnnual')
-                  : localizationKeys('commerce.manageSubscription')
-              : localizationKeys('commerce.manageSubscription')
-          : // If there are no active or grace period subscriptions, show the get started button
-            ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0
-            ? localizationKeys('commerce.switchPlan')
-            : localizationKeys('commerce.subscribe'),
+        localizationKey: getLocalizationKey(),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscription, canManageBilling, ctx.subscriptions],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, ctx.subscriptions],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
@@ -261,7 +323,7 @@ export const usePlansContext = () => {
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
           subscriberType,
@@ -303,6 +365,8 @@ export const usePlansContext = () => {
     ...ctx,
     componentName,
     activeOrUpcomingSubscription,
+    activeAndUpcomingSubscriptions,
+    activeOrUpcomingSubscriptionBasedOnPlanPeriod: activeOrUpcomingSubscriptionWithPlanPeriod,
     isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,
