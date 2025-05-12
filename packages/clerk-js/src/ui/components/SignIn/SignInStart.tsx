@@ -446,6 +446,7 @@ function SignInStartInternal(): JSX.Element {
         redirectUrl,
         redirectUrlComplete,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
+        alternativePhoneCodeProvider,
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);

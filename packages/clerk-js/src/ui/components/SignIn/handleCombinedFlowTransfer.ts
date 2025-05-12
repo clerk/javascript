@@ -1,4 +1,4 @@
-import type { LoadedClerk, SignUpModes, SignUpResource } from '@clerk/types';
+import type { LoadedClerk, PhoneCodeChannelData, PhoneCodeStrategy, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
 import type { RouteContextValue } from '../../router/RouteContext';
@@ -16,6 +16,7 @@ type HandleCombinedFlowTransferProps = {
   redirectUrl?: string;
   redirectUrlComplete?: string;
   passwordEnabled: boolean;
+  alternativePhoneCodeProvider?: PhoneCodeChannelData | null;
 };
 
 /**
@@ -34,6 +35,7 @@ export function handleCombinedFlowTransfer({
   redirectUrl,
   redirectUrlComplete,
   passwordEnabled,
+  alternativePhoneCodeProvider,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -54,6 +56,13 @@ export function handleCombinedFlowTransfer({
     paramsToForward.set('__clerk_ticket', organizationTicket);
   }
 
+  const alternativePhoneCodeProviderParams = alternativePhoneCodeProvider
+    ? {
+        strategy: 'phone_code' as PhoneCodeStrategy,
+        channel: alternativePhoneCodeProvider.channel,
+      }
+    : {};
+
   // Attempt to transfer directly to sign up verification if email or phone was used, there are no optional fields, and password is not enabled. The signUp.create() call will
   // inform us if the instance is eligible for moving directly to verification.
   if (
@@ -64,6 +73,7 @@ export function handleCombinedFlowTransfer({
     return clerk.client.signUp
       .create({
         [identifierAttribute]: identifierValue,
+        ...alternativePhoneCodeProviderParams,
       })
       .then(async res => {
         const completeSignUpFlow = await lazyCompleteSignUpFlow();

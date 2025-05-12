@@ -179,7 +179,13 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy | TicketStrategy | GoogleOneTapStrategy;
+    strategy:
+      | OAuthStrategy
+      | SamlStrategy
+      | EnterpriseSSOStrategy
+      | TicketStrategy
+      | GoogleOneTapStrategy
+      | PhoneCodeStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
@@ -189,6 +195,7 @@ export type SignUpCreateParams = Partial<
     legalAccepted: boolean;
     oidcPrompt: string;
     oidcLoginHint: string;
+    channel: PhoneCodeChannel;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
