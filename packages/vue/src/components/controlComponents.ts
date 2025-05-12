@@ -1,5 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type {
+  Autocomplete,
   CheckAuthorizationWithCustomPermissions,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
@@ -111,21 +112,43 @@ export type ProtectProps = (
       condition?: never;
       role: OrganizationCustomRoleKey;
       permission?: never;
+      feature?: never;
+      plan?: never;
     }
   | {
       condition?: never;
       role?: never;
+      feature?: never;
+      plan?: never;
       permission: OrganizationCustomPermissionKey;
     }
   | {
       condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
       role?: never;
       permission?: never;
+      feature?: never;
+      plan?: never;
     }
   | {
       condition?: never;
       role?: never;
       permission?: never;
+      feature: Autocomplete<`user:${string}` | `org:${string}`>;
+      plan?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan: Autocomplete<`user:${string}` | `org:${string}`>;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan?: never;
     }
 ) &
   PendingSessionOptions;
@@ -160,7 +183,7 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
       return slots.fallback?.();
     }
 
-    if (props.role || props.permission) {
+    if (props.role || props.permission || props.feature || props.plan) {
       if (has.value?.(props)) {
         return slots.default?.();
       }

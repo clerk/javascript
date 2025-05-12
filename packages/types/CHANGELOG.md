@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.58.0
+
+### Minor Changes
+
+- Fix issue where we were not correctly passing the checkoutProps through within the PricingTable component. Removes internal checkoutProps prefix from PricingTableBaseProps. ([#5888](https://github.com/clerk/javascript/pull/5888)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Update profile components plans page heading from `Switch plans` to `Plans` ([#5889](https://github.com/clerk/javascript/pull/5889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add element descriptor to the text element rendered within UserPreview component. ([#5878](https://github.com/clerk/javascript/pull/5878)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add descriptor ids to `UserMembershipList` and `OrganizationSwitcherTrigger` elements to improve styling experience. ([#5881](https://github.com/clerk/javascript/pull/5881)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the "Plan starts at" date when a user downgrades from a paid plan to the free plan ([#5893](https://github.com/clerk/javascript/pull/5893)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.57.1
 
 ### Patch Changes

@@ -199,9 +199,9 @@ export interface CommerceCheckoutResource extends ClerkResource {
   paymentSource?: CommercePaymentSourceResource;
   plan: CommercePlanResource;
   planPeriod: CommerceSubscriptionPlanPeriod;
+  planPeriodStart?: number;
   status: string;
   totals: CommerceCheckoutTotals;
-  subscription?: CommerceSubscriptionResource;
   confirm: (params: ConfirmCheckoutParams) => Promise<CommerceCheckoutResource>;
   isImmediatePlanChange: boolean;
 }

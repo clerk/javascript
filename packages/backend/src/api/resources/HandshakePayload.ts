@@ -1,15 +1,11 @@
 export type HandshakePayloadJSON = {
-  nonce: string;
-  payload: string;
+  directives: string[];
 };
 
 export class HandshakePayload {
-  constructor(
-    readonly nonce: string,
-    readonly payload: string,
-  ) {}
+  constructor(readonly directives: string[]) {}
 
   static fromJSON(data: HandshakePayloadJSON): HandshakePayload {
-    return new HandshakePayload(data.nonce, data.payload);
+    return new HandshakePayload(data.directives);
   }
 }
