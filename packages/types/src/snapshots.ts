@@ -170,7 +170,10 @@ export type SignUpVerificationsJSONSnapshot = Override<
   }
 >;
 
-export type SignUpVerificationJSONSnapshot = Pick<SignUpVerificationJSON, 'next_action' | 'supported_strategies'> &
+export type SignUpVerificationJSONSnapshot = Pick<
+  SignUpVerificationJSON,
+  'next_action' | 'supported_strategies' | 'channel'
+> &
   VerificationJSONSnapshot;
 
 export type TokenJSONSnapshot = TokenJSON;

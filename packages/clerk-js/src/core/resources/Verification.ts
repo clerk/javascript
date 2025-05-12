@@ -2,6 +2,7 @@ import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
   PasskeyVerificationResource,
+  PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
@@ -133,12 +134,14 @@ export class SignUpVerifications implements SignUpVerificationsResource {
 export class SignUpVerification extends Verification {
   nextAction: string;
   supportedStrategies: string[];
+  channel?: PhoneCodeChannel;
 
   constructor(data: SignUpVerificationJSON | SignUpVerificationJSONSnapshot | null) {
     super(data);
     if (data) {
       this.nextAction = data.next_action;
       this.supportedStrategies = data.supported_strategies;
+      this.channel = data.channel;
     } else {
       this.nextAction = '';
       this.supportedStrategies = [];
@@ -150,6 +153,7 @@ export class SignUpVerification extends Verification {
       ...super.__internal_toSnapshot(),
       next_action: this.nextAction,
       supported_strategies: this.supportedStrategies,
+      channel: this.channel,
     };
   }
 }

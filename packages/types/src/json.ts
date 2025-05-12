@@ -20,6 +20,7 @@ import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
@@ -328,6 +329,7 @@ export interface SignUpVerificationsJSON {
 export interface SignUpVerificationJSON extends VerificationJSON {
   next_action: string;
   supported_strategies: string[];
+  channel?: PhoneCodeChannel;
 }
 
 export interface ClerkAPIErrorJSON {

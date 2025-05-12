@@ -4,7 +4,7 @@ import React from 'react';
 
 import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useEnvironment, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { usePreloadTasks } from '../../hooks/usePreloadTasks';
 import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
@@ -13,7 +13,6 @@ import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
-import { SignUpVerifyPhoneWithAlternativeProvider } from './SignUpVerifyPhoneWithAlternativeProvider';
 
 function RedirectToSignUp() {
   const clerk = useClerk();
@@ -27,7 +26,6 @@ function SignUpRoutes(): JSX.Element {
   usePreloadTasks();
 
   const { __internal_setComponentNavigationContext } = useClerk();
-  const { userSettings } = useEnvironment();
   const { navigate, indexPath } = useRouter();
   const signUpContext = useSignUpContext();
 
@@ -48,19 +46,7 @@ function SignUpRoutes(): JSX.Element {
           path='verify-phone-number'
           canActivate={clerk => !!clerk.client.signUp.phoneNumber}
         >
-          {userSettings.alternativePhoneCodeChannels.map(channel => {
-            return (
-              <Route
-                key={channel}
-                path={channel}
-              >
-                <SignUpVerifyPhoneWithAlternativeProvider phoneCodeChannel={channel} />
-              </Route>
-            );
-          })}
-          <Route index>
-            <SignUpVerifyPhone />
-          </Route>
+          <SignUpVerifyPhone />
         </Route>
         <Route path='sso-callback'>
           <SignUpSSOCallback
@@ -92,19 +78,7 @@ function SignUpRoutes(): JSX.Element {
             path='verify-phone-number'
             canActivate={clerk => !!clerk.client.signUp.phoneNumber}
           >
-            {userSettings.alternativePhoneCodeChannels.map(channel => {
-              return (
-                <Route
-                  key={channel}
-                  path={channel}
-                >
-                  <SignUpVerifyPhoneWithAlternativeProvider phoneCodeChannel={channel} />
-                </Route>
-              );
-            })}
-            <Route index>
-              <SignUpVerifyPhone />
-            </Route>
+            <SignUpVerifyPhone />
           </Route>
           <Route index>
             <SignUpContinue />

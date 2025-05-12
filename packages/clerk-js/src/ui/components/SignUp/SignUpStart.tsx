@@ -268,9 +268,7 @@ function SignUpStartInternal(): JSX.Element {
         completeSignUpFlow({
           signUp: res,
           verifyEmailPath: 'verify-email-address',
-          verifyPhonePath: alternativePhoneCodeProvider
-            ? `verify-phone-number/${alternativePhoneCodeProvider.channel}`
-            : 'verify-phone-number',
+          verifyPhonePath: 'verify-phone-number',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
           redirectUrl,
