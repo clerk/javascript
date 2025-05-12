@@ -154,7 +154,7 @@ describe('HandshakeService', () => {
       expect(url.searchParams.get('redirect_url')).toBe('https://example.com/');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toBe('true');
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
-      expect(url.searchParams.get(constants.QueryParameters.SupportsHandshakeNonce)).toBe('true');
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe('nonce');
     });
 
     it('should include dev browser token in development mode', () => {
@@ -168,7 +168,7 @@ describe('HandshakeService', () => {
       const url = new URL(location);
 
       expect(url.searchParams.get(constants.QueryParameters.DevBrowser)).toBe('dev-token');
-      expect(url.searchParams.get(constants.QueryParameters.SupportsHandshakeNonce)).toBe('true');
+      expect(url.searchParams.get(constants.QueryParameters.HandshakeFormat)).toBe('nonce');
     });
 
     it('should throw error if clerkUrl is missing', () => {
