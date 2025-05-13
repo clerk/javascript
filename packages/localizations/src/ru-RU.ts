@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Назад',
   badge__activePlan: undefined,
@@ -141,6 +140,8 @@ export const ruRU: LocalizationResource = {
   formFieldHintText__optional: 'Опционально',
   formFieldHintText__slug:
     'Slug - это человекочитаемый идентификатор, который должен быть уникальным. Он часто используется в URL-адресах.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Удалить учетную запись',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -156,6 +157,9 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код восстановления',
   formFieldLabel__confirmDeletion: 'Подтверждение',

@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Înapoi',
   badge__activePlan: undefined,
@@ -140,6 +139,8 @@ export const roRO: LocalizationResource = {
   formFieldHintText__optional: 'Opțional',
   formFieldHintText__slug:
     'Un slug este un ID lizibil de către om, care trebuie să fie unic. Este adesea utilizat în URL-uri.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -155,6 +156,9 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activați invitațiile automate pentru acest domeniu',
   formFieldLabel__backupCode: 'Cod de rezervă',
   formFieldLabel__confirmDeletion: 'Confirmare',

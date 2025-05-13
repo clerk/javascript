@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Vissza',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const huHU: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'A megerősítő link lejárt. Kérlek kérj egy újat.',
   formFieldHintText__optional: 'Nem kötelező',
   formFieldHintText__slug: 'A slug egy egyedi azonosító, amelyet általában URL-ben használunk.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Fiók törlése',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -153,6 +154,9 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',

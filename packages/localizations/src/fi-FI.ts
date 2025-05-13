@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Takaisin',
   badge__activePlan: undefined,
@@ -140,6 +139,8 @@ export const fiFI: LocalizationResource = {
   formFieldHintText__optional: 'Valinnainen',
   formFieldHintText__slug:
     'Slug on luettava tunniste, joka on oltava yksilöllinen. Sitä käytetään usein URL-osoitteissa.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -154,6 +155,9 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ota automaattiset kutsut käyttöön tälle verkkotunnukselle',
   formFieldLabel__backupCode: 'Varakoodi',
   formFieldLabel__confirmDeletion: 'Vahvistus',

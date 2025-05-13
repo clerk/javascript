@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Retour',
   badge__activePlan: undefined,
@@ -140,6 +139,8 @@ export const frFR: LocalizationResource = {
   formFieldHintText__optional: 'Optionnel',
   formFieldHintText__slug:
     'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Code de sauvegarde',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Supprimer le compte',
   formFieldInputPlaceholder__emailAddress: 'Adresse e-mail',
@@ -155,6 +156,9 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Mot de passe',
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Autoriser les invitations automatiques pour ce domaine',
   formFieldLabel__backupCode: 'Code de récupération',
   formFieldLabel__confirmDeletion: 'Confirmation',

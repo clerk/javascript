@@ -54,6 +54,9 @@ type _LocalizationResource = {
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__apiKeyName: LocalizationValue;
+  formFieldLabel__apiKeyDescription: LocalizationValue;
+  formFieldLabel__apiKeyExpiration: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -68,6 +71,8 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: LocalizationValue;
   formFieldInputPlaceholder__organizationDomainEmailAddress: LocalizationValue;
   formFieldInputPlaceholder__confirmDeletionUserAccount: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyName: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyDescription: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
@@ -1041,11 +1046,9 @@ type _LocalizationResource = {
     };
   };
   apiKey: {
-    apiKeyPage: {
-      title: LocalizationValue;
-      verifyTitle: LocalizationValue;
-      formHint: LocalizationValue;
-    };
+    formTitle: LocalizationValue;
+    formHint: LocalizationValue;
+    menuAction__revoke: LocalizationValue;
   };
 };
 

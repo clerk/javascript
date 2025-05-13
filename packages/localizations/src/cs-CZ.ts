@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Zpět',
   badge__activePlan: undefined,
@@ -140,6 +139,8 @@ export const csCZ: LocalizationResource = {
   formFieldHintText__optional: 'Volitelné',
   formFieldHintText__slug:
     'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadejte záložní kód',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Potvrďte smazání účtu',
   formFieldInputPlaceholder__emailAddress: 'Zadejte vaši emailovou adresu',
@@ -155,6 +156,9 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Záložní kód',
   formFieldLabel__confirmDeletion: 'Potvrzení',

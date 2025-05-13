@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Enrere',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const caES: LocalizationResource = {
   formFieldError__verificationLinkExpired: "L'enllaç de verificació ha caducat. Si us plau, sol·licita un nou enllaç.",
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: "Un slug és un ID llegible per humans que ha de ser únic. Sovint s'utilitza en URL.",
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Codi de seguretat',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar compte',
   formFieldInputPlaceholder__emailAddress: 'exemple@correu.com',
@@ -153,6 +154,9 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Contrasenya',
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activa invitacions automàtiques per a aquest domini',
   formFieldLabel__backupCode: 'Codi de seguretat',
   formFieldLabel__confirmDeletion: 'Confirmació',

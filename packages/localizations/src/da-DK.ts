@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Tilbage',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const daDK: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Bekræftelseslinket er udløbet. Venligst anmod om et nyt link.',
   formFieldHintText__optional: 'Valgfri',
   formFieldHintText__slug: 'En slug er en menneskelig læsbar ID, der skal være unik. Det bruges ofte i URL’er.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Indtast sikkerhedskode',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slet konto',
   formFieldInputPlaceholder__emailAddress: 'Indtast e-mailadresse',
@@ -154,6 +155,9 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Indtast adgangskode',
   formFieldInputPlaceholder__phoneNumber: 'Indtast telefonnummer',
   formFieldInputPlaceholder__username: 'Indtast brugernavn',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktiver automatiske invitationer for dette domæne',
   formFieldLabel__backupCode: 'Sikkerhedskode',
   formFieldLabel__confirmDeletion: 'Bekræftelse',

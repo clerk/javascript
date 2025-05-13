@@ -3,10 +3,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKey: {
-    apiKeyPage: {
-      formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
-      title: 'Add new API key',
-    },
+    formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
+    formTitle: 'Add new API key',
+    menuAction__revoke: 'Revoke',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
@@ -130,6 +129,8 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: 'Enter your secret key description',
+  formFieldInputPlaceholder__apiKeyName: 'Enter your secret key name',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
@@ -144,6 +145,9 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: 'Description',
+  formFieldLabel__apiKeyExpiration: 'Expiration',
+  formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',

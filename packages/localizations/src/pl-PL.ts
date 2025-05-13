@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Powrót',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const plPL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Link weryfikacyjny wygasł. Spróbuj ponownie.',
   formFieldHintText__optional: 'Opcjonalne',
   formFieldHintText__slug: 'Jest to unikalne ID, które jest czytelne dla człowieka, często używane w adresach URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Wprowadź kod zapasowy',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Usuń konto',
   formFieldInputPlaceholder__emailAddress: 'Wprowadź adres email',
@@ -154,6 +155,9 @@ export const plPL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wprowadź swoje hasło',
   formFieldInputPlaceholder__phoneNumber: 'Wprowadź numer telefonu',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Włącz automatyczne zaproszenia dla tej domeny',
   formFieldLabel__backupCode: 'Kod zapasowy',
   formFieldLabel__confirmDeletion: 'Potwierdzenie',

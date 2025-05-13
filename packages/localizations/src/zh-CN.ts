@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: '返回',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const zhCN: LocalizationResource = {
   formFieldError__verificationLinkExpired: '验证链接已过期。请申请新的链接。',
   formFieldHintText__optional: '选填',
   formFieldHintText__slug: 'Slug 是一个人类可读的 ID，它必须是唯一的。它通常用于 URL 中。',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '删除帐户',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -153,6 +154,9 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: '为此域名启用自动邀请',
   formFieldLabel__backupCode: '备用代码',
   formFieldLabel__confirmDeletion: '确认',

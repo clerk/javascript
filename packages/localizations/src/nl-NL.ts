@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Terug',
   badge__activePlan: undefined,
@@ -139,6 +138,8 @@ export const nlNL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'De verificatielink is verlopen. Vraag een nieuwe link aan.',
   formFieldHintText__optional: 'Optioneel',
   formFieldHintText__slug: 'Een slug is een leesbare ID die uniek moet zijn. Het wordt vaak gebruikt in URL’s.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Voer een back-upcode in',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Verwijder account',
   formFieldInputPlaceholder__emailAddress: 'jouw@email.com',
@@ -153,6 +154,9 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
