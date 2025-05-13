@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { ApiKeyResource } from '@clerk/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
@@ -26,10 +26,12 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
   const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled });
   const { onCopy } = useClipboard(apiKeySecret ?? '');
 
-  const handleCopy = () => {
-    setEnabled(true);
-    onCopy();
-  };
+  useEffect(() => {
+    if (enabled && apiKeySecret) {
+      onCopy();
+      setEnabled(false);
+    }
+  }, [enabled, apiKeySecret, onCopy]);
 
   return (
     <Button
@@ -37,7 +39,7 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
       size='sm'
       sx={{ margin: 1 }}
       aria-label={'Copy key'}
-      onClick={handleCopy}
+      onClick={() => setEnabled(true)}
     >
       <Icon icon={Clipboard} />
     </Button>
