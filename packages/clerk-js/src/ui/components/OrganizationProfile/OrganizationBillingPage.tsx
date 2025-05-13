@@ -68,7 +68,15 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              <SubscriptionsList />
+              <SubscriptionsList
+                title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
               <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
                 <PaymentSources />
               </Protect>

@@ -2,6 +2,7 @@ import type { CommerceSubscriptionResource } from '@clerk/types';
 
 import { useProtect } from '../../common';
 import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
+import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
   Button,
@@ -22,7 +23,15 @@ import { ProfileSection } from '../../elements';
 import { ArrowsUpDown, CogFilled, Plans, Plus } from '../../icons';
 import { useRouter } from '../../router';
 
-export function SubscriptionsList() {
+export function SubscriptionsList({
+  title,
+  arrowButtonText,
+  arrowButtonEmptyText,
+}: {
+  title: LocalizationKey;
+  arrowButtonText: LocalizationKey;
+  arrowButtonEmptyText: LocalizationKey;
+}) {
   const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
@@ -57,7 +66,7 @@ export function SubscriptionsList() {
   return (
     <ProfileSection.Root
       id='subscriptionsList'
-      title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+      title={title}
       centered={false}
       sx={t => ({
         borderTop: 'none',
@@ -181,11 +190,7 @@ export function SubscriptionsList() {
 
       <ProfileSection.ArrowButton
         id='subscriptionsList'
-        textLocalizationKey={
-          subscriptions.length > 0
-            ? localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan')
-            : localizationKeys('userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription')
-        }
+        textLocalizationKey={subscriptions.length > 0 ? arrowButtonText : arrowButtonEmptyText}
         sx={[
           t => ({
             justifyContent: 'start',
