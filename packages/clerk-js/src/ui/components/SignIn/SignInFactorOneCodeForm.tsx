@@ -38,6 +38,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const clerk = useClerk();
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
+  const isAlternativePhoneCodeProvider =
+    props.factor.strategy === 'phone_code' ? !!props.factor.channel && props.factor.channel !== 'sms' : false;
 
   const goBack = () => {
     return navigate('../');
@@ -55,7 +57,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   useFetch(
-    shouldAvoidPrepare
+    // If an alternative phone code provider is used, we skip the prepare step
+    // because the verification is already created on the Start screen
+    shouldAvoidPrepare || isAlternativePhoneCodeProvider
       ? undefined
       : () =>
           signIn

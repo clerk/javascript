@@ -14,6 +14,8 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
+  const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
+
   const prepare = () => {
     if (shouldAvoidPrepare) {
       return;
@@ -25,7 +27,9 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
 
   // TODO: Introduce a useMutation to handle mutating requests
   useFetch(
-    shouldAvoidPrepare
+    // If an alternative phone code provider is used, we skip the prepare step
+    // because the verification is already created on the Start screen
+    shouldAvoidPrepare || isAlternativePhoneCodeProvider
       ? undefined
       : () =>
           signUp
@@ -48,7 +52,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   let cardSubtitleKey = localizationKeys('signUp.phoneCode.subtitle');
   let resendButtonKey = localizationKeys('signUp.phoneCode.resendButton');
 
-  if (!!channel && channel !== 'sms') {
+  if (isAlternativePhoneCodeProvider) {
     const provider = getAlternativePhoneCodeProviderData(channel)?.name;
     cardTitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.title', { provider });
     cardSubtitleKey = localizationKeys('signUp.alternativePhoneCodeProvider.subtitle', { provider });
