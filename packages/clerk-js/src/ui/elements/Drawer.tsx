@@ -38,7 +38,7 @@ interface DrawerContext {
   context: ReturnType<typeof useFloating>['context'];
   getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
   portalProps: FloatingPortalProps;
-  direction: 'ltr' | 'rtl';
+  direction: ReturnType<typeof useDirection>;
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
