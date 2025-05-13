@@ -74,6 +74,15 @@ describe('useDirection', () => {
       expect(result.current).toBe('ltr');
     });
 
+    it('returns ltr when element has invalid dir attribute value', () => {
+      const element = document.createElement('div');
+      element.dir = 'test';
+      mockGetComputedStyle.mockReturnValue({ direction: 'ltr' });
+
+      const { result } = renderHook(() => useDirection(element));
+      expect(result.current).toBe('ltr');
+    });
+
     it('uses document.documentElement when no element is provided', () => {
       document.documentElement.dir = 'rtl';
 
