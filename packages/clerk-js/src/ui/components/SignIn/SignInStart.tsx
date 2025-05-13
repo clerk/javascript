@@ -326,6 +326,8 @@ function SignInStartInternal(): JSX.Element {
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     if (alternativePhoneCodeProvider) {
+      // We need to send the alternative phone code provider channel in the sign in request
+      // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
       const noop = () => {};
       fields.push({
         id: 'strategy',

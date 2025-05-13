@@ -15,7 +15,7 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
   let cardSubtitle = localizationKeys('signIn.phoneCode.subtitle');
   let inputLabel = localizationKeys('signIn.phoneCode.formTitle');
   let resendButton = localizationKeys('signIn.phoneCode.resendButton');
-  if (channel) {
+  if (channel && channel !== 'sms') {
     cardTitle = localizationKeys('signIn.alternativePhoneCodeProvider.title', {
       provider: getAlternativePhoneCodeProviderData(channel)?.name,
     });

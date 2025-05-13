@@ -56,6 +56,8 @@ export function handleCombinedFlowTransfer({
     paramsToForward.set('__clerk_ticket', organizationTicket);
   }
 
+  // We need to send the alternative phone code provider channel in the sign up request
+  // together with the phone_code strategy, in order for FAPI to create a Verification.
   const alternativePhoneCodeProviderParams = alternativePhoneCodeProvider
     ? {
         strategy: 'phone_code' as PhoneCodeStrategy,

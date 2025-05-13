@@ -279,6 +279,8 @@ function SignUpStartInternal(): JSX.Element {
       .finally(() => card.setIdle());
   };
 
+  // We need to send the alternative phone code provider channel in the sign up request
+  // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
   const handleAlternativePhoneCodeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const noop = () => {};
     alternativePhoneCodeProviderFields.push({
