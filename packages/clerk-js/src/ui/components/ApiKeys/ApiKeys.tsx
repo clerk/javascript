@@ -1,7 +1,7 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
 
 import { useApiKeysContext } from '../../contexts';
-import { Box, Button, Col, Flex, Flow, Icon } from '../../customizables';
+import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { Card, InputWithIcon, Pagination, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { MagnifyingGlass } from '../../icons';
@@ -24,6 +24,7 @@ export const ApiKeysInternal = ({ subject }: { subject: string }) => {
     endingRow,
     handleCreate,
   } = useApiKeys({ subject });
+  const { t } = useLocalizations();
 
   return (
     <Col gap={4}>
@@ -34,7 +35,7 @@ export const ApiKeysInternal = ({ subject }: { subject: string }) => {
         >
           <Box>
             <InputWithIcon
-              placeholder='Search keys'
+              placeholder={t(localizationKeys('apiKey.action__search'))}
               leftIcon={<Icon icon={MagnifyingGlass} />}
               value={search}
               onChange={e => {
@@ -44,7 +45,10 @@ export const ApiKeysInternal = ({ subject }: { subject: string }) => {
             />
           </Box>
           <Action.Trigger value='add'>
-            <Button variant='solid'>Add new key</Button>
+            <Button
+              variant='solid'
+              localizationKey={localizationKeys('apiKey.action__add')}
+            />
           </Action.Trigger>
         </Flex>
         <Action.Open value='add'>

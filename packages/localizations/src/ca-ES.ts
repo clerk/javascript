@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -195,6 +197,7 @@ export const caES: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },
@@ -797,6 +800,7 @@ export const caES: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },

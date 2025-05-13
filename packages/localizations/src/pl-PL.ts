@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -196,6 +198,7 @@ export const plPL: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },
@@ -805,6 +808,7 @@ export const plPL: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },

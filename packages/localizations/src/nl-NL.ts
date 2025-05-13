@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -195,6 +197,7 @@ export const nlNL: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },
@@ -795,6 +798,7 @@ export const nlNL: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },

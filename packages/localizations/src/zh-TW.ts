@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -194,6 +196,7 @@ export const zhTW: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },
@@ -780,6 +783,7 @@ export const zhTW: LocalizationResource = {
         headerTitle__subscriptions: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         title: undefined,
       },

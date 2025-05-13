@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Col, Flex, localizationKeys, Text } from '../../customizables';
+import { Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFormControl } from '../../utils';
@@ -59,11 +59,13 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
               <Form.PlainInput {...descriptionField.props} />
             </Form.ControlRow>
             <Col gap={2}>
-              <Text
-                id={segmentedControlId}
-                variant='subtitle'
-                localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
-              />
+              <FormLabel htmlFor={segmentedControlId}>
+                <Text
+                  as='span'
+                  variant='subtitle'
+                  localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
+                />
+              </FormLabel>
               <SegmentedControl.Root
                 aria-label='Expiration'
                 aria-labelledby={segmentedControlId}

@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -200,6 +202,7 @@ export const deDE: LocalizationResource = {
         headerTitle__subscriptions: 'Abonnements',
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: 'Plan wechseln',
         title: 'Abonnement',
       },
@@ -816,6 +819,7 @@ export const deDE: LocalizationResource = {
         headerTitle__subscriptions: 'Abonnements',
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: 'Plan wechseln',
         title: 'Abonnement',
       },
