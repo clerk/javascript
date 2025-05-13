@@ -73,9 +73,9 @@ export const ApiKeysTable = ({
       <Thead>
         <Tr>
           <Th>Name</Th>
-          <Th>Last used</Th>
+          <Th sx={{ width: '10%' }}>Last used</Th>
           <Th>Key</Th>
-          <Th>Actions</Th>
+          <Th sx={{ width: '10%' }}>Actions</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -93,10 +93,7 @@ export const ApiKeysTable = ({
             <Tr key={apiKey.id}>
               <Td>
                 <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
-                <Text
-                  sx={{ fontSize: 12 }}
-                  color='gray.600'
-                >
+                <Text sx={{ fontSize: 12 }}>
                   Created at{' '}
                   {apiKey.createdAt.toLocaleDateString(undefined, {
                     month: 'short',
