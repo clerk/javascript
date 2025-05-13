@@ -25,7 +25,6 @@ export const PathRouter = ({ basePath, preservedParams, children }: PathRouterPr
     if (!toURL) {
       return;
     }
-
     // Only send the path
     return navigate(stripOrigin(toURL), options);
   };

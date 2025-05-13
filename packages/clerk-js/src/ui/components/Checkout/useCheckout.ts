@@ -9,7 +9,6 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user' } = props;
   const clerk = useClerk();
   const { organization } = useOrganization();
-
   const [currentCheckout, setCurrentCheckout] = useState<CommerceCheckoutResource | null>(null);
   const { user } = useUser();
   const {

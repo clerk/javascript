@@ -75,7 +75,6 @@ export const BaseRouter = ({
   };
 
   const refresh = React.useCallback((): void => {
-    console.log('----refresh');
     const newPath = getPath();
     const newQueryString = getQueryString();
 
@@ -94,8 +93,6 @@ export const BaseRouter = ({
     if (!toURL) {
       return;
     }
-
-    console.log('baseNavigate', toURL);
 
     const isCrossOrigin = toURL.origin !== window.location.origin;
     const isOutsideOfUIComponent = !toURL.pathname.startsWith('/' + basePath);
