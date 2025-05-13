@@ -39,7 +39,6 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
       name: 'signUp.preparePhoneNumberVerification',
       strategy: 'phone_code',
       number: signUp.phoneNumber,
-      channel,
     },
     {
       staleTime: 100,
