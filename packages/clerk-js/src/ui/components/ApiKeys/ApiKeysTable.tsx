@@ -1,15 +1,35 @@
+import { useClerk } from '@clerk/shared/react';
 import type { ApiKeyResource } from '@clerk/types';
 import { useState } from 'react';
 
-import { useApiKeySecret } from '../../components/ApiKeys/shared';
 import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
-import { useClipboard } from '../../hooks';
+import { useClipboard, useFetch } from '../../hooks';
 import { Clipboard, Eye, EyeSlash } from '../../icons';
 
+const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
+  const clerk = useClerk();
+
+  const getSecret = async (apiKeyID?: string) => {
+    if (!apiKeyID) {
+      return '';
+    }
+    const secret = await clerk.getApiKeySecret(apiKeyID);
+    return secret;
+  };
+
+  return useFetch(getSecret, enabled ? apiKeyID : undefined);
+};
+
 const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
-  const { data: apiKeySecret } = useApiKeySecret(apiKeyID);
+  const [enabled, setEnabled] = useState(false);
+  const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled });
   const { onCopy } = useClipboard(apiKeySecret ?? '');
+
+  const handleCopy = () => {
+    setEnabled(true);
+    onCopy();
+  };
 
   return (
     <Button
@@ -17,7 +37,7 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
       size='sm'
       sx={{ margin: 1 }}
       aria-label={'Copy key'}
-      onClick={onCopy}
+      onClick={handleCopy}
     >
       <Icon icon={Clipboard} />
     </Button>
@@ -26,7 +46,7 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
 
 const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
   const [revealed, setRevealed] = useState(false);
-  const { data: apiKeySecret } = useApiKeySecret(apiKeyID);
+  const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled: revealed });
 
   return (
     <Flex
@@ -103,12 +123,7 @@ export const ApiKeysTable = ({
                 </Text>
               </Td>
               <Td>
-                <Text
-                  sx={{ fontSize: 14 }}
-                  color='gray.800'
-                >
-                  3d ago
-                </Text>
+                <Text>3d ago</Text>
               </Td>
               <Td>
                 <Flex
