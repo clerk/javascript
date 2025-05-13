@@ -2,7 +2,6 @@ import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
-import { useRouter } from '../../../ui/router';
 import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
@@ -34,79 +33,6 @@ interface PricingTableDefaultProps {
   props: PricingTableProps;
 }
 
-export function CheckoutRenderer() {
-  const { queryParams, currentPath, navigate } = useRouter();
-  const clerk = useClerk();
-  const { revalidate } = usePlansContext();
-  const subscriberType = useSubscriberTypeContext();
-
-  const pointOfReference = React.useRef<HTMLDivElement>(null);
-  const { session } = useSession();
-
-  console.log('planId', queryParams.planId);
-  console.log('planPeriod', queryParams.planPeriod);
-
-  const getPortalRoot = React.useCallback(
-    (element: HTMLDivElement) => {
-      console.log('element', element);
-
-      if (element) {
-        const portalRoot = element?.closest(`[data-clerk-profile-scroll-box-root]`) as HTMLElement | undefined;
-        return clerk.__internal_openCheckout({
-          planId: queryParams.planId,
-          planPeriod: queryParams.planPeriod,
-          subscriberType: subscriberType,
-          onSubscriptionComplete: () => {
-            revalidate();
-            // if (session?.id) {
-            //   void clerk.setActive({ session: session.id });
-            // }
-          },
-          onClose: () => {
-            if (session?.id) {
-              void clerk.setActive({ session: session.id });
-            }
-            void navigate(currentPath, { searchParams: undefined });
-          },
-          // appearance,
-          portalRoot,
-        });
-      }
-
-      if (!queryParams.planId || !queryParams.planPeriod) {
-        return clerk.__internal_closeCheckout();
-      }
-    },
-    [subscriberType, queryParams.planId, queryParams.planPeriod, session?.id],
-  );
-
-  // React.useEffect(() => {
-  //   if (queryParams.modal === 'true') {
-  //     if (props && props.planPeriod) {
-  //       clerk.__internal_openCheckout(props);
-  //     } else if (props) {
-  //       clerk.__internal_openPlanDetails(props);
-  //     }
-
-  //     return () => {
-  //       clerk.__internal_closePlanDetails();
-  //       clerk.__internal_closeCheckout();
-  //     };
-  //   }
-  // }, [props, queryParams.modal]);
-
-  if (queryParams.planId && queryParams.planPeriod) {
-    return (
-      <div
-        style={{ display: 'contents' }}
-        ref={getPortalRoot}
-      />
-    );
-  }
-
-  return null;
-}
-
 export function PricingTableDefault({
   plans,
   planPeriod,
@@ -117,7 +43,6 @@ export function PricingTableDefault({
 }: PricingTableDefaultProps) {
   return (
     <InternalThemeProvider>
-      <CheckoutRenderer />
       <Box
         elementDescriptor={descriptors.pricingTable}
         sx={t => ({

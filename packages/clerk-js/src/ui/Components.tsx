@@ -374,13 +374,8 @@ const Components = (props: ComponentsProps) => {
     componentsControls.closeDrawer = name => {
       setState(s => {
         const currentItem = s[`${name}Drawer`];
-
-        // @ts-expect-error
-        if (currentItem?.props?.onClose) {
-          // @ts-expect-error
-          currentItem.props.onClose();
-        }
-
+        // @ts-expect-error `__internal_PlanDetailsProps` does not accept `onClose`
+        currentItem?.props?.onClose?.();
         return {
           ...s,
           [`${name}Drawer`]: {

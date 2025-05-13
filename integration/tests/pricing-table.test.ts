@@ -62,6 +62,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.checkout.fillTestCard();
     await u.po.checkout.clickPayOrSubscribe();
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+    await u.po.checkout.confirmAndContinue();
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (app.name.includes('next')) {
+      // Correctly updates RSCs with the new `pla` claim.
+      await expect(u.po.page.getByText('user in plus')).toBeVisible({
+        timeout: 5_000,
+      });
+    }
   });
 
   test('can upgrade to a new plan with saved card', async ({ page, context }) => {
