@@ -15,6 +15,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   apiKey: {
+    action__add: undefined,
+    action__search: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,

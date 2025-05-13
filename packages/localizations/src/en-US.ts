@@ -3,6 +3,8 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKey: {
+    action__add: 'Add new key',
+    action__search: 'Search keys',
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
     formTitle: 'Add new API key',
     menuAction__revoke: 'Revoke',
