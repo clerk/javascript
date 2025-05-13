@@ -137,6 +137,7 @@ type HandleSelectPlanProps = {
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
   appearance?: Appearance;
+  newSubscriptionRedirectUrl?: string;
 };
 
 export const usePlansContext = () => {
@@ -318,7 +319,15 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event, appearance }: HandleSelectPlanProps) => {
+    ({
+      plan,
+      planPeriod,
+      onSubscriptionChange,
+      mode = 'mounted',
+      event,
+      appearance,
+      newSubscriptionRedirectUrl,
+    }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -351,6 +360,7 @@ export const usePlansContext = () => {
           },
           appearance,
           portalRoot,
+          newSubscriptionRedirectUrl,
         });
       }
     },
