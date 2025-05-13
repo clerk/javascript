@@ -1,12 +1,16 @@
 import type { ApiKeyResource } from '@clerk/types';
+import { useState } from 'react';
 
+import { useApiKeySecret } from '../../components/ApiKeys/shared';
 import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
 import { useClipboard } from '../../hooks';
-import { Clipboard, Eye } from '../../icons';
+import { Clipboard, Eye, EyeSlash } from '../../icons';
 
-const CopyButton = ({ text }: { text: string }) => {
-  const { onCopy } = useClipboard(text);
+const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
+  const { data: apiKeySecret } = useApiKeySecret(apiKeyID);
+  const { onCopy } = useClipboard(apiKeySecret ?? '');
+
   return (
     <Button
       variant='ghost'
@@ -17,6 +21,41 @@ const CopyButton = ({ text }: { text: string }) => {
     >
       <Icon icon={Clipboard} />
     </Button>
+  );
+};
+
+const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
+  const [revealed, setRevealed] = useState(false);
+  const { data: apiKeySecret } = useApiKeySecret(apiKeyID);
+
+  return (
+    <Flex
+      center
+      sx={{
+        width: '100%',
+        position: 'relative',
+      }}
+    >
+      <Input
+        type={revealed ? 'text' : 'password'}
+        value={revealed ? (apiKeySecret ?? '') : '•••••••••••••••••••••••••'}
+        readOnly
+        aria-label='API key (hidden)'
+        tabIndex={-1}
+        sx={t => ({
+          paddingRight: t.sizes.$12,
+        })}
+      />
+      <Button
+        variant='ghost'
+        size='sm'
+        sx={{ position: 'absolute', right: 0 }}
+        aria-label={'Show key'}
+        onClick={() => setRevealed(!revealed)}
+      >
+        <Icon icon={revealed ? EyeSlash : Eye} />
+      </Button>
+    </Flex>
   );
 };
 
@@ -77,33 +116,10 @@ export const ApiKeysTable = ({
               <Td>
                 <Flex
                   direction='row'
-                  gap={1}
+                  gap={2}
                 >
-                  <Flex
-                    center
-                    sx={{
-                      width: '100%',
-                      position: 'relative',
-                    }}
-                  >
-                    <Input
-                      type='password'
-                      value='•••••••••••••••••••••••••'
-                      readOnly
-                      aria-label='API key (hidden)'
-                      tabIndex={-1}
-                    />
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      sx={{ position: 'absolute', right: 0 }}
-                      aria-label={'Show key'}
-                    >
-                      {/* <Icon icon={revealedKeys[apiKey.id] ? EyeSlash : Eye} /> */}
-                      <Icon icon={Eye} />
-                    </Button>
-                  </Flex>
-                  <CopyButton text='•••••••••••••••••••••••••' />
+                  <SecretInputWithToggle apiKeyID={apiKey.id} />
+                  <CopySecretButton apiKeyID={apiKey.id} />
                 </Flex>
               </Td>
               <Td>
