@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'الرجوع',
   badge__activePlan: undefined,
@@ -138,6 +137,8 @@ export const arSA: LocalizationResource = {
   formFieldHintText__optional: 'إختياري',
   formFieldHintText__slug:
     '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -152,6 +153,9 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',

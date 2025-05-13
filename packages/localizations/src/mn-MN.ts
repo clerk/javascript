@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Буцах',
   badge__activePlan: undefined,
@@ -138,6 +137,8 @@ export const mnMN: LocalizationResource = {
   formFieldHintText__optional: 'Сонголтоор',
   formFieldHintText__slug:
     'Slug нь хүн унших боломжтой ID бөгөөд өвөрмөц байх ёстой. Энэ нь ихэвчлэн URL-д ашиглагддаг.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Нөөц код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Бүртгэл устгах',
   formFieldInputPlaceholder__emailAddress: 'Имэйл хаяг',
@@ -152,6 +153,9 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
   formFieldLabel__confirmDeletion: 'Баталгаажуулалт',

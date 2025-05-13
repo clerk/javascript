@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Til baka',
   badge__activePlan: undefined,
@@ -138,6 +137,8 @@ export const isIS: LocalizationResource = {
   formFieldHintText__optional: 'Valfrjálst',
   formFieldHintText__slug:
     'Stubbur (e. slug) er auðlesanlegt auðkenni sem verður að vera einstakt. Það er oft notað í vefslóðum.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eyða aðgangi',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -152,6 +153,9 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Virkja sjálfvirk boð fyrir þetta lén',
   formFieldLabel__backupCode: 'Öryggiskóði',
   formFieldLabel__confirmDeletion: 'Staðfesting',

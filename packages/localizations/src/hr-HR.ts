@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Natrag',
   badge__activePlan: undefined,
@@ -137,6 +136,8 @@ export const hrHR: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifikacijska poveznica je istekla. Molimo zatražite novu poveznicu.',
   formFieldHintText__optional: 'Neobavezno',
   formFieldHintText__slug: 'Slug je čitljiv ID koji mora biti jedinstven. Često se koristi u URL-ovima.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Izbriši račun',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -151,6 +152,9 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovu domenu',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',

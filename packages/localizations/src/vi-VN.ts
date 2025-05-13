@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Quay lại',
   badge__activePlan: undefined,
@@ -137,6 +136,8 @@ export const viVN: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Tùy chọn',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -152,6 +153,9 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Mã sao lưu',
   formFieldLabel__confirmDeletion: 'Confirmation',

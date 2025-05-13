@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: '戻る',
   badge__activePlan: undefined,
@@ -137,6 +136,8 @@ export const jaJP: LocalizationResource = {
   formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
   formFieldHintText__optional: '任意',
   formFieldHintText__slug: 'スラグは人間が読めるユニークなIDです。URLで良く使われます。',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'バックアップコード',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'アカウント削除',
   formFieldInputPlaceholder__emailAddress: 'メールアドレス',
@@ -152,6 +153,9 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__password: 'パスワード',
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'このドメインの自動招待を有効にする',
   formFieldLabel__backupCode: 'バックアップコード',
   formFieldLabel__confirmDeletion: '削除の確認',

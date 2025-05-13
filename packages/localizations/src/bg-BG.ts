@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Назад',
   badge__activePlan: undefined,
@@ -137,6 +136,8 @@ export const bgBG: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Линкът за потвърждение е изтекъл. Моля, заявете нов линк.',
   formFieldHintText__optional: 'По избор',
   formFieldHintText__slug: 'Slug е четим идентификатор, който трябва да бъде уникален. Често се използва в URL адреси.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Въведете резервен код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Изтрий акаунта',
   formFieldInputPlaceholder__emailAddress: 'example@email.com',
@@ -151,6 +152,9 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Парола',
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',

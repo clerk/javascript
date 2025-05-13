@@ -20,15 +20,15 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
 
   const nameField = useFormControl('name', '', {
     type: 'text',
-    label: 'Name',
-    placeholder: 'Enter your secret key name',
+    label: localizationKeys('formFieldLabel__apiKeyName'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyName'),
     isRequired: true,
   });
 
   const descriptionField = useFormControl('description', '', {
     type: 'text',
-    label: 'Description',
-    placeholder: 'Enter a description for your API key',
+    label: localizationKeys('formFieldLabel__apiKeyDescription'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyDescription'),
     isRequired: false,
   });
 
@@ -46,8 +46,8 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('apiKey.apiKeyPage.title')}
-      headerSubtitle={localizationKeys('apiKey.apiKeyPage.formHint')}
+      headerTitle={localizationKeys('apiKey.formTitle')}
+      headerSubtitle={localizationKeys('apiKey.formHint')}
     >
       <Form.Root onSubmit={handleSubmit}>
         <Form.ControlRow elementId={nameField.id}>
@@ -61,10 +61,9 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
             <Col gap={2}>
               <Text
                 id={segmentedControlId}
-                sx={{ fontWeight: 500 }}
-              >
-                Expiration
-              </Text>
+                variant='subtitle'
+                localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
+              />
               <SegmentedControl.Root
                 aria-label='Expiration'
                 aria-labelledby={segmentedControlId}

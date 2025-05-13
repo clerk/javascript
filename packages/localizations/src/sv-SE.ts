@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'Tillbaka',
   badge__activePlan: undefined,
@@ -137,6 +136,8 @@ export const svSE: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',
   formFieldHintText__optional: 'Valfritt',
   formFieldHintText__slug: 'En slug är ett läsbart ID som måste vara unikt. Det används ofta i URL:er.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Ange din reservkod',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Radera konto',
   formFieldInputPlaceholder__emailAddress: 'Ange din e-postadress',
@@ -152,6 +153,9 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ange ditt lösenord',
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktivera automatiska inbjudningar för denna domän',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Radera konto',
