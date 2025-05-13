@@ -117,5 +117,31 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.pricingTable.waitForMounted();
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
+
+    test('can subscribe to a plan and revalidate payment sources', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+
+      await u.po.checkout.confirmAndContinue();
+      await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
+      await u.po.checkout.waitForSubscribeButton();
+
+      await fakeUser.deleteIfExists();
+    });
   });
 });

@@ -171,18 +171,15 @@ const AddPaymentSourceForm = withCardStateProvider(
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
-    const { organization } = useOrganization();
-    const { user } = useUser();
+
     const subscriberType = useSubscriberTypeContext();
 
-    // Revalidates the next time the hooks gets mounted
+    const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
     const { revalidate } = useFetch(
+      resource?.getPaymentSources,
+      {},
       undefined,
-      {
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      },
-      undefined,
-      `commerce-payment-sources-${user?.id}`,
+      `commerce-payment-sources-${resource?.id}`,
     );
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
