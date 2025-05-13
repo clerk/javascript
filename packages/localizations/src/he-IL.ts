@@ -15,10 +15,9 @@ import type { LocalizationResource } from '@clerk/types';
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
   apiKey: {
-    apiKeyPage: {
-      formHint: undefined,
-      title: undefined,
-    },
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
   },
   backButton: 'חזור',
   badge__activePlan: undefined,
@@ -105,6 +104,8 @@ export const heIL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'הקישור לאימות פג תוקף. אנא בקש/י קישור חדש.',
   formFieldHintText__optional: 'אופציונלי',
   formFieldHintText__slug: '(slug) הוא מזהה קריא שמיועד להיות ייחודי. הוא משמש לעיתים קרובות בכתובות URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'מחיקת חשבון',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -119,6 +120,9 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'הפעל הזמנות אוטומטיות לדומיין הזה',
   formFieldLabel__backupCode: 'קוד גיבוי',
   formFieldLabel__confirmDeletion: 'אישור',

@@ -2,10 +2,25 @@ import { useClerk } from '@clerk/shared/react';
 import type { ApiKeyResource } from '@clerk/types';
 import { useEffect, useState } from 'react';
 
-import { Button, Flex, Icon, Input, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
+import {
+  Button,
+  descriptors,
+  Flex,
+  Icon,
+  Input,
+  localizationKeys,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
 import { useClipboard, useFetch } from '../../hooks';
-import { Clipboard, Eye, EyeSlash } from '../../icons';
+import { Check, Copy, Eye, EyeSlash } from '../../icons';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
@@ -24,7 +39,7 @@ const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boo
 const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
   const [enabled, setEnabled] = useState(false);
   const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled });
-  const { onCopy } = useClipboard(apiKeySecret ?? '');
+  const { onCopy, hasCopied } = useClipboard(apiKeySecret ?? '');
 
   useEffect(() => {
     if (enabled && apiKeySecret) {
@@ -36,12 +51,12 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
   return (
     <Button
       variant='ghost'
-      size='sm'
       sx={{ margin: 1 }}
       aria-label={'Copy key'}
       onClick={() => setEnabled(true)}
+      focusRing={false}
     >
-      <Icon icon={Clipboard} />
+      <Icon icon={hasCopied ? Check : Copy} />
     </Button>
   );
 };
@@ -74,6 +89,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         sx={{ position: 'absolute', right: 0 }}
         aria-label={'Show key'}
         onClick={() => setRevealed(!revealed)}
+        focusRing={false}
       >
         <Icon icon={revealed ? EyeSlash : Eye} />
       </Button>
@@ -91,13 +107,13 @@ export const ApiKeysTable = ({
   onRevoke: (id: string) => void;
 }) => {
   return (
-    <Table sx={{ tableLayout: 'fixed' }}>
+    <Table>
       <Thead>
         <Tr>
           <Th>Name</Th>
-          <Th sx={{ width: '10%' }}>Last used</Th>
+          <Th>Last used</Th>
           <Th>Key</Th>
-          <Th sx={{ width: '10%' }}>Actions</Th>
+          <Th>Actions</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -107,6 +123,7 @@ export const ApiKeysTable = ({
               <Spinner
                 colorScheme='primary'
                 sx={{ margin: 'auto', display: 'block' }}
+                elementDescriptor={descriptors.spinner}
               />
             </Td>
           </Tr>
@@ -114,8 +131,11 @@ export const ApiKeysTable = ({
           rows.map(apiKey => (
             <Tr key={apiKey.id}>
               <Td>
-                <Text sx={{ fontWeight: 500 }}>{apiKey.name}</Text>
-                <Text sx={{ fontSize: 12 }}>
+                <Text variant='subtitle'>{apiKey.name}</Text>
+                <Text
+                  variant='caption'
+                  colorScheme='secondary'
+                >
                   Created at{' '}
                   {apiKey.createdAt.toLocaleDateString(undefined, {
                     month: 'short',
@@ -140,14 +160,11 @@ export const ApiKeysTable = ({
                 <ThreeDotsMenu
                   actions={[
                     {
-                      // @ts-expect-error: TODO: Add locales
-                      label: 'Revoke key',
+                      label: localizationKeys('apiKey.menuAction__revoke'),
                       isDestructive: true,
                       onClick: () => onRevoke(apiKey.id),
-                      isDisabled: false,
                     },
                   ]}
-                  elementId={'member'}
                 />
               </Td>
             </Tr>
