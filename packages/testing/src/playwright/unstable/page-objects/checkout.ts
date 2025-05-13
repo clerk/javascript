@@ -31,6 +31,18 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
         .getByRole('button', { name: /subscribe|pay\s\$/i })
         .click();
     },
+    waitForSubscribeButton: async () => {
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^subscribe$/i })
+        .waitFor({ state: 'visible' });
+    },
+    confirmAndContinue: async () => {
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^continue$/i })
+        .click();
+    },
     clickAddPaymentMethod: async () => {
       await page.getByRole('radio', { name: 'Add payment method' }).click();
     },
