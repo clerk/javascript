@@ -360,7 +360,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           sx={t => ({
             position: 'absolute',
             top: t.space.$2,
-            right: t.space.$2,
+            insetInlineEnd: t.space.$2,
           })}
         >
           {closeSlot}
@@ -382,7 +382,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
       ) : null}
       <Box
         sx={t => ({
-          paddingRight: t.space.$10,
+          paddingBlockEnd: t.space.$10,
         })}
       >
         <Flex
