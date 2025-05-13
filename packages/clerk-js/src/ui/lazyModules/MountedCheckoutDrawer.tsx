@@ -44,6 +44,7 @@ export function MountedCheckoutDrawer({
           onSubscriptionComplete={checkoutDrawer.props.onSubscriptionComplete}
           portalRoot={checkoutDrawer.props.portalRoot}
           appearance={checkoutDrawer.props.appearance}
+          newSubscriptionRedirectUrl={checkoutDrawer.props.newSubscriptionRedirectUrl}
         />
       )}
     </LazyDrawerRenderer>

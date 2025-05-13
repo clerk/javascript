@@ -12,10 +12,11 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
-import { useCheckout, usePrefersReducedMotion } from '../../hooks';
+import { usePrefersReducedMotion } from '../../hooks';
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
+import { useCheckout } from './useCheckout';
 
 export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const { translateError } = useLocalizations();

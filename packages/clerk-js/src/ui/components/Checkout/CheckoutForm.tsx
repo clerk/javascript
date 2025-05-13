@@ -140,6 +140,7 @@ const CheckoutFormElements = ({
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
+      void revalidatePaymentSources();
     } catch (error) {
       handleError(error, [], setSubmitError);
     }
@@ -161,7 +162,6 @@ const CheckoutFormElements = ({
   };
 
   const onAddPaymentSourceSuccess = async (ctx: { stripeSetupIntent?: SetupIntent }) => {
-    void revalidatePaymentSources();
     await confirmCheckout({
       gateway: 'stripe',
       paymentToken: ctx.stripeSetupIntent?.payment_method as string,
@@ -177,8 +177,8 @@ const CheckoutFormElements = ({
         useTestCard: true,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
-      onCheckoutComplete(newCheckout);
       void revalidatePaymentSources();
+      onCheckoutComplete(newCheckout);
     } catch (error) {
       handleError(error, [], setSubmitError);
     }

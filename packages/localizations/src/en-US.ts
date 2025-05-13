@@ -186,6 +186,7 @@ export const enUS: LocalizationResource = {
         headerTitle__subscriptions: 'Subscriptions',
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
       },
@@ -789,6 +790,7 @@ export const enUS: LocalizationResource = {
         headerTitle__subscriptions: 'Subscription',
       },
       subscriptionsListSection: {
+        actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         title: 'Subscription',
       },

@@ -1,13 +1,13 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
-import type { Clerk, ClientResource, Resources } from '@clerk/types';
+import type { Clerk, ClientResource, MultiDomainAndOrProxy, Resources, Without } from '@clerk/types';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
 
-export type PluginOptions = LoadClerkJsScriptOptions;
+export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> & MultiDomainAndOrProxy;
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -48,10 +48,10 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       organization: undefined,
     });
 
-    const options: LoadClerkJsScriptOptions = {
+    const options = {
       ...pluginOptions,
       sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
-    };
+    } as LoadClerkJsScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code

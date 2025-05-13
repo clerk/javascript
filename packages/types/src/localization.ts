@@ -710,6 +710,7 @@ type _LocalizationResource = {
       };
       subscriptionsListSection: {
         title: LocalizationValue;
+        actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentSourcesSection: {
@@ -913,6 +914,7 @@ type _LocalizationResource = {
       };
       subscriptionsListSection: {
         title: LocalizationValue;
+        actionLabel__newSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
       };
       paymentSourcesSection: {

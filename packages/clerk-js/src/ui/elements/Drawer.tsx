@@ -16,7 +16,7 @@ import * as React from 'react';
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
-import { usePrefersReducedMotion } from '../hooks';
+import { useDirection, usePrefersReducedMotion } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
@@ -38,6 +38,7 @@ interface DrawerContext {
   context: ReturnType<typeof useFloating>['context'];
   getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
   portalProps: FloatingPortalProps;
+  direction: ReturnType<typeof useDirection>;
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -87,12 +88,14 @@ function Root({
   portalProps,
   dismissProps,
 }: RootProps) {
+  const direction = useDirection();
+
   const { refs, context } = useFloating({
     open,
     onOpenChange,
     transform: false,
     strategy,
-    placement: 'right',
+    placement: direction === 'ltr' ? 'right' : 'left',
     ...floatingProps,
   });
 
@@ -112,6 +115,7 @@ function Root({
         refs,
         context,
         getFloatingProps,
+        direction,
       }}
     >
       <FloatingPortal {...portalProps}>{children}</FloatingPortal>
@@ -195,7 +199,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const { strategy, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, refs, context, getFloatingProps, direction } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -236,7 +240,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             // Apply the conditional right offset + the spread of the
             // box shadow to ensure it is fully offscreen before unmounting
             '--transform-offset':
-              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+              strategy === 'fixed'
+                ? `calc((100% + ${t.space.$3} + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`
+                : `calc((100% + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`,
             willChange: 'transform',
             position: strategy,
             insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
