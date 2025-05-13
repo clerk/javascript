@@ -27,10 +27,7 @@ export const SignInAlternativePhoneCodePhoneNumberCard = (props: SignUpAlternati
           showLogo
           showDivider
         >
-          <Col
-            center
-            sx={t => ({ height: t.sizes.$7 })}
-          >
+          <Col center>
             <Image
               src={providerToDisplayData[channel]?.iconUrl}
               alt={`${strategyToDisplayData[channel].name} logo`}
