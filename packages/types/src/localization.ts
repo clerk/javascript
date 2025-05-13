@@ -1049,6 +1049,8 @@ type _LocalizationResource = {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
     menuAction__revoke: LocalizationValue;
+    action__search: LocalizationValue;
+    action__add: LocalizationValue;
   };
 };
 
