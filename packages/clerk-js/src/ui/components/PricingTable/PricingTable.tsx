@@ -56,6 +56,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
       planPeriod,
       event,
       appearance: props.checkoutProps?.appearance,
+      newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
     });
     return;
   };

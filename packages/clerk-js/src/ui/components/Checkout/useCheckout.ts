@@ -4,7 +4,7 @@ import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/
 import { useCallback, useEffect, useState } from 'react';
 
 import { useCheckoutContext } from '../contexts';
-import { useFetch } from './useFetch';
+import { useFetch } from '../../hooks/useFetch';
 
 export const useCheckout = (props: __internal_CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user' } = props;
