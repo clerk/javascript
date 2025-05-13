@@ -1,4 +1,4 @@
-import { expectTypeOf } from 'expect-type';
+import { expectTypeOf } from 'vitest';
 
 import { reverificationError } from '../../authorization-errors';
 import type { useReverification } from '../hooks/useReverification';
