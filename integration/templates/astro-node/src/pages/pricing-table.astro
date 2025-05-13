@@ -1,10 +1,12 @@
 ---
-import { PricingTable } from "@clerk/astro/components";
-import Layout from "../layouts/Layout.astro";
+import { PricingTable } from '@clerk/astro/components';
+import Layout from '../layouts/Layout.astro';
+
+const newSubscriptionRedirectUrl = Astro.url.searchParams.get('newSubscriptionRedirectUrl');
 ---
 
-<Layout title="Pricing Table">
-  <div class="w-full flex justify-center">
-    <PricingTable />
+<Layout title='Pricing Table'>
+  <div class='w-full flex justify-center'>
+    <PricingTable newSubscriptionRedirectUrl={newSubscriptionRedirectUrl} />
   </div>
 </Layout>
