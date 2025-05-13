@@ -76,3 +76,17 @@ export function useApiKeys({ subject, perPage = 5 }: { subject: string; perPage?
     handleCreate,
   };
 }
+
+export function useApiKeySecret(apiKeyID: string) {
+  const clerk = useClerk();
+
+  async function getApiKeySecret(apiKeyID?: string) {
+    if (apiKeyID) {
+      const secret = await clerk.getApiKeySecret(apiKeyID);
+      return secret;
+    }
+    return '';
+  }
+
+  return useFetch(getApiKeySecret, apiKeyID, undefined, `api-key-secret-source-${apiKeyID}`);
+}
