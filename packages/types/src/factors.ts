@@ -119,6 +119,7 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
   handshakeFormat?: 'nonce' | 'token';
+  oidcPrompt?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {

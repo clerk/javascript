@@ -52,6 +52,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
               continueSignUp,
               unsafeMetadata: ctx.unsafeMetadata,
               legalAccepted: props.legalAccepted,
+              oidcPrompt: ctx.oidcPrompt,
             })
             .catch(err => handleError(err, [], card.setError));
         }
@@ -64,6 +65,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
             strategy,
             unsafeMetadata: ctx.unsafeMetadata,
             legalAccepted: props.legalAccepted,
+            oidcPrompt: ctx.oidcPrompt,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

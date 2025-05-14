@@ -273,6 +273,7 @@ function SignUpStartInternal(): JSX.Element {
           navigate,
           redirectUrl,
           redirectUrlComplete,
+          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))

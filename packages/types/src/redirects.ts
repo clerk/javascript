@@ -86,6 +86,11 @@ export type AuthenticateWithRedirectParams = {
    * Whether to use handshake nonce or handshake token
    */
   handshakeFormat?: 'nonce' | 'token';
+  
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 };
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
