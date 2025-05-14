@@ -225,13 +225,16 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       <Box
         ref={mergedRefs}
         {...getFloatingProps()}
-        sx={{
+        sx={t => ({
           position: strategy,
           insetBlock: 0,
           insetInline: 0,
           pointerEvents: 'none',
           isolation: 'isolate',
-        }}
+          // When drawer is within the profile components, we need to ensure it is above the drawer
+          // renders above the profile close button
+          zIndex: strategy === 'absolute' ? t.zIndices.$modal : undefined,
+        })}
         elementDescriptor={descriptors.drawerRoot}
       >
         <Flex
