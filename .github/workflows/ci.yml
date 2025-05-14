@@ -7,6 +7,9 @@ on:
       - main
       - release/v4
 
+permissions:
+  contents: read            # checkout needs this. All other scopes now default to none.
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -16,7 +19,11 @@ jobs:
   check-permissions:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
+      - name: Skip permission check for same‑repo PRs
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+        run: echo "Permission check not required."
       - name: Get User Permission
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         id: checkAccess
         uses: actions-cool/check-user-permission@v2
         with:
@@ -25,7 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check User Permission
-        if: steps.checkAccess.outputs.require-result == 'false'
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && steps.checkAccess.outputs.require-result == 'false' }}
         run: |
           echo "${{ github.triggering_actor }} does not have permissions on this repo."
           echo "Current permission level is ${{ steps.checkAccess.outputs.user-permission }}"
@@ -35,6 +42,9 @@ jobs:
   formatting-linting:
     needs: [check-permissions]
     name: Formatting, linting & changeset checks
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -113,6 +123,9 @@ jobs:
   unit-tests:
     needs: [check-permissions]
     name: Unit Tests
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
@@ -174,6 +187,9 @@ jobs:
   integration-tests:
     needs: [check-permissions]
     name: Integration Tests
+    permissions:
+      contents: read
+      actions: write   # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
