@@ -137,7 +137,7 @@ jobs:
       matrix:
         include:
           - node-version: 18
-            test-filter: "@clerk/{astro,backend,express,nextjs,clerk-react,shared,remix,tanstack-react-start,elements,vue,nuxt,clerk-expo}"
+            test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
           - node-version: 22
             test-filter: "**"
 
@@ -166,7 +166,7 @@ jobs:
             pnpm turbo test $TURBO_ARGS
           else
             echo "Running LTS subset on Node ${{ matrix.node-version }}."
-            pnpm turbo test $TURBO_ARGS --filter="${{ matrix.test-filter }}"
+            pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
