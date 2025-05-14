@@ -27,7 +27,7 @@ import { handleError, normalizeColorString } from '../../utils';
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
   checkout?: CommerceCheckoutResource;
-  submitLabel?: LocalizationKey | string;
+  submitLabel?: LocalizationKey;
   cancelAction?: () => void;
   submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
@@ -338,10 +338,7 @@ const AddPaymentSourceForm = withCardStateProvider(
           )}
           <FormButtons
             submitLabel={
-              typeof submitLabel === 'string'
-                ? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
-                : (submitLabel ??
-                  localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add'))
+              submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
             }
             onReset={cancelAction}
             hideReset={!cancelAction}
