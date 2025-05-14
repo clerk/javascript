@@ -349,6 +349,9 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             elementDescriptor={descriptors.pricingTableCardDescription}
             variant='subtitle'
             colorScheme='secondary'
+            sx={{
+              justifySelf: 'flex-start',
+            }}
           >
             {plan.description}
           </Text>
@@ -412,6 +415,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
           sx={{
+            justifySelf: 'flex-start',
             alignSelf: 'center',
           }}
         />

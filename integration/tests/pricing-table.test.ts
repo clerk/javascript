@@ -104,6 +104,42 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
   //   await expect(u.po.page.getByRole('button', { name: /resubscribe|re-subscribe/i }).first()).toBeVisible();
   // });
 
+  test.describe('redirects', () => {
+    test('default navigates to afterSignInUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/pricing-table');
+      await u.po.pricingTable.waitForMounted();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Success!')).toBeVisible();
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^continue$/i })
+        .click();
+      await u.page.waitForAppUrl('/');
+    });
+
+    test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/success');
+      await u.po.pricingTable.waitForMounted();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Success!')).toBeVisible();
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^continue$/i })
+        .click();
+      await u.page.waitForAppUrl('/success');
+    });
+  });
+
   test.describe('in UserProfile', () => {
     test('renders pricing table with plans', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
@@ -116,6 +152,32 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
       await u.po.pricingTable.waitForMounted();
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
+    });
+
+    test('can subscribe to a plan and revalidate payment sources', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+
+      await u.po.checkout.confirmAndContinue();
+      await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
+      await u.po.checkout.waitForSubscribeButton();
+
+      await fakeUser.deleteIfExists();
     });
   });
 });
