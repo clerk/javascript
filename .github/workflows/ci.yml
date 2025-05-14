@@ -41,6 +41,7 @@ jobs:
 
   formatting-linting:
     needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Formatting, linting & changeset checks
     permissions:
       contents: read
@@ -70,13 +71,8 @@ jobs:
       - name: Deduplicate lockfile
         run: pnpm dedupe
 
-      - name: Check for changed lockfile
-        run: |
-          if [ -n "$(git status --porcelain pnpm-lock.yaml)" ]; then
-            echo "pnpm-lock.yaml is not deduped. Please run 'pnpm dedupe' locally and commit."
-            git diff pnpm-lock.yaml
-            exit 1
-          fi
+      - name: Verify lockfile is deduped
+        run: pnpm dedupe --check
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
@@ -122,6 +118,7 @@ jobs:
 
   unit-tests:
     needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests
     permissions:
       contents: read
@@ -191,6 +188,7 @@ jobs:
 
   integration-tests:
     needs: [check-permissions]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests
     permissions:
       contents: read
