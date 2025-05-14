@@ -292,6 +292,9 @@ export const enUS: LocalizationResource = {
         headerTitle__requests: 'Requests',
       },
     },
+    apiKeysPage: {
+      title: 'API Keys',
+    },
     navbar: {
       billing: 'Billing',
       description: 'Manage your organization.',
@@ -912,6 +915,9 @@ export const enUS: LocalizationResource = {
       },
       title: 'Add email address',
       verifyTitle: 'Verify email address',
+    },
+    apiKeysPage: {
+      title: 'API Keys',
     },
     formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continue',

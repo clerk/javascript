@@ -7,9 +7,9 @@ import { Action } from '../../elements/Action';
 import { MagnifyingGlass } from '../../icons';
 import { ApiKeysTable } from './ApiKeysTable';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
-import { useApiKeys } from './shared';
+import { useApiKeys } from './useApiKeys';
 
-export const ApiKeysInternal = ({ subject }: { subject: string }) => {
+export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage?: number }) => {
   const {
     apiKeys,
     isLoading,
@@ -23,7 +23,7 @@ export const ApiKeysInternal = ({ subject }: { subject: string }) => {
     startingRow,
     endingRow,
     handleCreate,
-  } = useApiKeys({ subject });
+  } = useApiKeys({ subject, perPage });
   const { t } = useLocalizations();
 
   return (
@@ -86,7 +86,10 @@ export const ApiKeys = withCardStateProvider(() => {
     <Flow.Root flow='apiKey'>
       <Card.Root sx={{ width: '100%' }}>
         <Card.Content sx={{ textAlign: 'left' }}>
-          <ApiKeysInternal subject={ctx.subject ?? organization?.id ?? user?.id ?? ''} />
+          <ApiKeysInternal
+            subject={ctx.subject ?? organization?.id ?? user?.id ?? ''}
+            perPage={ctx.perPage}
+          />
         </Card.Content>
       </Card.Root>
     </Flow.Root>
