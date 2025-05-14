@@ -222,14 +222,15 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <Span
+      <Box
         ref={mergedRefs}
         {...getFloatingProps()}
-        style={{
+        sx={{
           position: strategy,
           insetBlock: 0,
           insetInline: 0,
           pointerEvents: 'none',
+          isolation: 'isolate',
         }}
         elementDescriptor={descriptors.drawerRoot}
       >
@@ -266,7 +267,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
         >
           {children}
         </Flex>
-      </Span>
+      </Box>
     </FloatingFocusManager>
   );
 });
