@@ -640,6 +640,9 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
     };
+    apiKeysPage: {
+      title: LocalizationValue;
+    };
     passkeyScreen: {
       title__rename: LocalizationValue;
       subtitle__rename: LocalizationValue;
@@ -1001,6 +1004,9 @@ type _LocalizationResource = {
       alerts: {
         noPermissionsToManageBilling: LocalizationValue;
       };
+    };
+    apiKeysPage: {
+      title: LocalizationValue;
     };
   };
   createOrganization: {

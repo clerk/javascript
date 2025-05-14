@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 
 import { ApiKeysContext } from '../../contexts';
-import { Col } from '../../customizables';
+import { Col, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
 import { ApiKeysInternal } from '../ApiKeys';
 
@@ -12,8 +12,7 @@ export const ApiKeysPage = () => {
     <Col gap={4}>
       <Header.Root>
         <Header.Title
-          // TODO: Add localization key
-          localizationKey='API Keys'
+          localizationKey={localizationKeys('userProfile.apiKeysPage.title')}
           textVariant='h2'
         />
       </Header.Root>

@@ -23,7 +23,7 @@ function getTimeLeftInSeconds(expirationOption: Expiration) {
   return diffInSecs;
 }
 
-export function useApiKeys({ subject, perPage = 5 }: { subject: string; perPage?: number }) {
+export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?: number }) => {
   const clerk = useClerk();
   const {
     data: apiKeys,
@@ -76,7 +76,7 @@ export function useApiKeys({ subject, perPage = 5 }: { subject: string; perPage?
     endingRow,
     handleCreate,
   };
-}
+};
 
 export const testFakeData = [
   {
