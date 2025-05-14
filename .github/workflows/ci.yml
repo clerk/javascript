@@ -133,8 +133,13 @@ jobs:
       TURBO_SUMMARIZE: false
 
     strategy:
+      fail-fast: true
       matrix:
-        node-version: [18,22]
+        include:
+          - node-version: 18
+            test-filter: "@clerk/{astro,backend,express,nextjs,clerk-react,shared,remix,tanstack-react-start,elements,vue,nuxt,clerk-expo}"
+          - node-version: 22
+            test-filter: "**"
 
     steps:
       - name: Checkout Repo
@@ -156,12 +161,12 @@ jobs:
 
       - name: Run tests in packages
         run: |
-          if [ "${{ matrix.node-version }}" == "18" ]; then
-            echo "Running tests on Node 18 only for packages with LTS support."
-            pnpm turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-react-start" --filter="@clerk/elements" --filter="@clerk/vue" --filter="@clerk/nuxt" --filter="@clerk/clerk-expo"
-          else
-            echo "Running tests for all packages on Node 22."
+          if [ "${{ matrix.test-filter }}" = "**" ]; then
+            echo "Running full test suite on Node ${{ matrix.node-version }}."
             pnpm turbo test $TURBO_ARGS
+          else
+            echo "Running LTS subset on Node ${{ matrix.node-version }}."
+            pnpm turbo test $TURBO_ARGS --filter="${{ matrix.test-filter }}"
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
