@@ -8,7 +8,7 @@ on:
       - release/v4
 
 permissions:
-  contents: read            # checkout needs this. All other scopes now default to none.
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
