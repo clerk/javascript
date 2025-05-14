@@ -24,7 +24,9 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
       planPeriod,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
-    undefined,
+    {
+      staleTime: 0,
+    },
     `commerce-checkout-${user?.id}`,
   );
 
