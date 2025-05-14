@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.9.0
+
+### Minor Changes
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+### Patch Changes
+
+- Updated dependencies [[`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/types@4.58.1
+
 ## 3.8.2
 
 ### Patch Changes

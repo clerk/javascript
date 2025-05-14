@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.15.3
+
+### Patch Changes
+
+- Add "Clerk Billing" related translations to de-DE ([#5892](https://github.com/clerk/javascript/pull/5892)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+- Add signIn related translation to ja-JP ([#5915](https://github.com/clerk/javascript/pull/5915)) by [@shogo-nakano-desu](https://github.com/shogo-nakano-desu)
+
+- Export mnMn localization files ([#5907](https://github.com/clerk/javascript/pull/5907)) by [@tmilewski](https://github.com/tmilewski)
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/types@4.58.1
+
 ## 3.15.2
 
 ### Patch Changes
