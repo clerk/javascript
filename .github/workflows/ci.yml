@@ -160,7 +160,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
-        run: pnpm turbo bundlewatch $TURBO_ARGS --only
+        run: pnpm turbo bundlewatch $TURBO_ARGS
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
@@ -170,13 +170,13 @@ jobs:
           CI_BRANCH_BASE: refs/heads/main
 
       - name: Lint packages using publint
-        run: pnpm turbo lint:publint $TURBO_ARGS --only
+        run: pnpm turbo lint:publint $TURBO_ARGS
 
       - name: Lint types using attw
-        run: pnpm turbo lint:attw $TURBO_ARGS --only
+        run: pnpm turbo lint:attw $TURBO_ARGS
 
       - name: Run lint
-        run: pnpm turbo lint $TURBO_ARGS --only -- --quiet
+        run: pnpm turbo lint $TURBO_ARGS -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
