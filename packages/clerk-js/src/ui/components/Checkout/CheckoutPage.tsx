@@ -20,6 +20,7 @@ import { useCheckout } from './useCheckout';
 
 export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const { translateError } = useLocalizations();
+  const { t } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
   const { setIsOpen, isOpen } = useDrawerContext();
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -129,11 +130,10 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
             </LineItems.Root>
           </Box>
           <Box sx={t => ({ padding: t.space.$4 })}>
-            {/* TODO(@Commerce): needs localization */}
             <Alert
               variant='info'
               colorScheme='info'
-              title={`You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.`}
+              title={localizationKeys('commerce.cannotSubscribeMonthly')}
             />
           </Box>
         </Flex>
@@ -156,7 +156,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
           variant='danger'
           colorScheme='danger'
         >
-          {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
+          {errors ? translateError(errors[0]) : t(localizationKeys('unstable__errors.form_param_value_invalid'))}
         </Alert>
       </Flex>
     </Drawer.Body>

@@ -127,7 +127,39 @@ type _LocalizationResource = {
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
     availableFeatures: LocalizationValue;
+    subtotal: LocalizationValue;
+    creditRemainder: LocalizationValue;
+    totalDueToday: LocalizationValue;
+    paymentMethods: LocalizationValue;
+    addPaymentMethod: LocalizationValue;
+    pay: LocalizationValue;
+    cancelSubscriptionTitle: LocalizationValue;
+    cancelSubscriptionNoCharge: LocalizationValue;
+    cancelSubscriptionAccessUntil: LocalizationValue;
+    popular: LocalizationValue;
+    monthly: LocalizationValue;
+    annually: LocalizationValue;
+    cannotSubscribeMonthly: LocalizationValue;
+    pricingTable: {
+      billingCycle: LocalizationValue;
+      included: LocalizationValue;
+    };
+    paymentSource: {
+      dev: {
+        testCardInfo: LocalizationValue;
+        developmentMode: LocalizationValue;
+        cardNumber: LocalizationValue;
+        expirationDate: LocalizationValue;
+        cvcZip: LocalizationValue;
+        anyNumbers: LocalizationValue;
+      };
+      applePayDescription: {
+        monthly: LocalizationValue;
+        annual: LocalizationValue;
+      };
+    };
     checkout: {
+      title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
