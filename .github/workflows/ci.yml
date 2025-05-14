@@ -21,6 +21,7 @@ jobs:
     defaults:
       run:
         shell: bash
+    name: Check Permissions
     steps:
       - name: Skip permission check for same‑repo PRs
         if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
