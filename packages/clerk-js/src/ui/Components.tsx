@@ -372,13 +372,18 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.closeDrawer = name => {
-      setState(s => ({
-        ...s,
-        [`${name}Drawer`]: {
-          ...s[`${name}Drawer`],
-          open: false,
-        },
-      }));
+      setState(s => {
+        const currentItem = s[`${name}Drawer`];
+        // @ts-expect-error `__internal_PlanDetailsProps` does not accept `onClose`
+        currentItem?.props?.onClose?.();
+        return {
+          ...s,
+          [`${name}Drawer`]: {
+            ...s[`${name}Drawer`],
+            open: false,
+          },
+        };
+      });
     };
 
     componentsControls.prefetch = component => {

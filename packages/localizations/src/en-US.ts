@@ -524,6 +524,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your phone',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your {{provider}}',
+    },
     phoneCodeMfa: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
@@ -553,6 +559,12 @@ export const enUS: LocalizationResource = {
       subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
       titleCombined: 'Continue to {{applicationName}}',
+      alternativePhoneCodeProvider: {
+        actionLink: 'Use another method',
+        label: '{{provider}} phone number',
+        subtitle: 'Enter your phone number to get a verification code on {{provider}}.',
+        title: 'Sign in to {{applicationName}} with {{provider}}',
+      },
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -617,6 +629,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
     },
+    alternativePhoneCodeProvider: {
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'Enter the verification code sent to your {{provider}}',
+      title: 'Verify your {{provider}}',
+    },
     restrictedAccess: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -635,6 +652,12 @@ export const enUS: LocalizationResource = {
       subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
       titleCombined: 'Create your account',
+      alternativePhoneCodeProvider: {
+        actionLink: 'Use another method',
+        label: '{{provider}} phone number',
+        subtitle: 'Enter your phone number to get a verification code on {{provider}}.',
+        title: 'Sign up to {{applicationName}} with {{provider}}',
+      },
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
