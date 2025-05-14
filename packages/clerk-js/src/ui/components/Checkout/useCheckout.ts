@@ -24,7 +24,16 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
       planPeriod,
       ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     },
-    undefined,
+    {
+      // TODO: remove this once we move to useSWR
+      // Some more context:
+      // The checkout is already invalidated on complete, but the way `useFetch` is implemented
+      // there is no way to invalidate the cache by resourceId only (e.g. commerce-checkout-user_xxx),
+      // we can only invalidate the cache by resourceId + params as this is how the cache key is constructed.
+      // With SWR, we will be able to invalidate the cache by the `commerce-checkout-user_xxx` key,
+      // so only invalidation on checkout completion will be needed.
+      staleTime: 0,
+    },
     `commerce-checkout-${user?.id}`,
   );
 
