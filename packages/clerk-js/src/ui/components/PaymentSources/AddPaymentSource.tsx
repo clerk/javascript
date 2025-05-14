@@ -7,7 +7,17 @@ import { useEffect, useRef, useState } from 'react';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
-import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text, useAppearance } from '../../customizables';
+import {
+  Box,
+  Button,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Text,
+  useAppearance,
+  useLocalizations,
+} from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, LineItems, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
@@ -171,6 +181,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
+    const { t } = useLocalizations();
 
     const subscriberType = useSubscriberTypeContext();
 
@@ -264,7 +275,7 @@ const AddPaymentSourceForm = withCardStateProvider(
                     variant='caption'
                     colorScheme='body'
                   >
-                    Test card information
+                    <Text localizationKey={localizationKeys('commerce.paymentSource.dev.testCardInfo')} />
                   </Text>
                   <Text
                     variant='caption'
@@ -273,21 +284,21 @@ const AddPaymentSourceForm = withCardStateProvider(
                       fontWeight: t.fontWeights.$semibold,
                     })}
                   >
-                    Development mode
+                    <Text localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')} />
                   </Text>
                 </Box>
                 <LineItems.Root>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'Card number'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cardNumber')} />
                     <LineItems.Description text={'4242 4242 4242 4242'} />
                   </LineItems.Group>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'Expiration date'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.expirationDate')} />
                     <LineItems.Description text={'11/44'} />
                   </LineItems.Group>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'CVC, ZIP'} />
-                    <LineItems.Description text={'Any numbers'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cvcZip')} />
+                    <LineItems.Description text={t(localizationKeys('commerce.paymentSource.dev.anyNumbers'))} />
                   </LineItems.Group>
                 </LineItems.Root>
               </Box>
@@ -303,7 +314,7 @@ const AddPaymentSourceForm = withCardStateProvider(
               applePay: checkout
                 ? {
                     recurringPaymentRequest: {
-                      paymentDescription: `${checkout.planPeriod === 'month' ? 'Monthly' : 'Annual'} payment`,
+                      paymentDescription: `${t(localizationKeys(checkout.planPeriod === 'month' ? 'commerce.paymentSource.applePayDescription.monthly' : 'commerce.paymentSource.applePayDescription.annual'))}`,
                       managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
                       regularBilling: {
                         amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
@@ -393,7 +404,7 @@ const PayWithTestPaymentSource = withCardStateProvider(
               fontWeight: t.fontWeights.$semibold,
             })}
           >
-            Development mode
+            <Text localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')} />
           </Text>
           <Button
             type='button'

@@ -116,6 +116,7 @@ export type SamlConfig = SamlFactor & {
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  oidcPrompt?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {

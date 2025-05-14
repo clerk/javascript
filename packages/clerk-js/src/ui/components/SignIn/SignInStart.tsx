@@ -387,6 +387,7 @@ function SignInStartInternal(): JSX.Element {
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
+      oidcPrompt: ctx.oidcPrompt,
     });
   };
 
