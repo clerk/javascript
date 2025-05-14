@@ -382,7 +382,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
       ) : null}
       <Box
         sx={t => ({
-          paddingBlockEnd: t.space.$10,
+          paddingInlineEnd: t.space.$10,
         })}
       >
         <Flex
