@@ -42,7 +42,6 @@ export function SubscriptionsList({
     subscription: CommerceSubscriptionResource,
     event?: React.MouseEvent<HTMLElement>,
   ) => {
-    console.log('subscription', subscription.planPeriod);
     handleSelectPlan({
       mode: 'modal', // always modal for now
       plan: subscription.plan,
