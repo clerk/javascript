@@ -21,7 +21,7 @@ import { useCheckout } from './useCheckout';
 export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const { translateError } = useLocalizations();
   const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
-  const { setIsOpen, isOpen } = useDrawerContext();
+  const { setIsOpen } = useDrawerContext();
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
@@ -44,10 +44,8 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      revalidate();
-    }
-  }, [isOpen]);
+    return invalidate;
+  }, []);
 
   if (isLoading || plansLoading) {
     return (
