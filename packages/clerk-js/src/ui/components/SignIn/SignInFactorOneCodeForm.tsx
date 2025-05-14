@@ -113,7 +113,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
-      onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      // if the factor is an alternative phone code provider, we don't want to show the alternative methods
+      // instead we want to go back to the start screen
+      onShowAlternativeMethodsClicked={isAlternativePhoneCodeProvider ? goBack : props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
