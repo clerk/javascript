@@ -37,6 +37,22 @@ const shortDate = (val: Date | string | number, locale?: string) => {
   }
 };
 
+/**
+ * Returns a long date string with the year.
+ */
+const longDate = (val: Date | string | number, locale?: string) => {
+  try {
+    return new Intl.DateTimeFormat(locale || 'en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(normalizeDate(val));
+  } catch (e) {
+    console.warn(e);
+    return '';
+  }
+};
+
 const numeric = (val: Date | number | string, locale?: string) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US').format(normalizeDate(val));
@@ -57,4 +73,5 @@ export const MODIFIERS = {
   numeric,
   link,
   shortDate,
+  longDate,
 } as const;

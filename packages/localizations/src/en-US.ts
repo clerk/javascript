@@ -43,6 +43,7 @@ export const enUS: LocalizationResource = {
       perMonth: 'per month',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
+      title: 'Checkout',
     },
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
@@ -59,6 +60,39 @@ export const enUS: LocalizationResource = {
     switchToMonthly: 'Switch to monthly',
     viewFeatures: 'View features',
     year: 'Year',
+    subtotal: 'Subtotal',
+    creditRemainder: 'Credit for the remainder of your current subscription.',
+    totalDueToday: 'Total Due Today',
+    paymentMethods: 'Payment Methods',
+    addPaymentMethod: 'Add payment method',
+    pay: 'Pay {{amount}}',
+    cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
+    cancelSubscriptionNoCharge: 'You will not be charged for this subscription.',
+    cancelSubscriptionAccessUntil:
+      "You can keep using '{{plan}}' features until {{ date | longDate('en-US') }}, after which you will no longer have access.",
+    popular: 'Popular',
+    monthly: 'Monthly',
+    annually: 'Annually',
+    cannotSubscribeMonthly:
+      'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
+    pricingTable: {
+      billingCycle: 'Billing cycle',
+      included: 'Included',
+    },
+    paymentSource: {
+      dev: {
+        testCardInfo: 'Test card information',
+        developmentMode: 'Development mode',
+        cardNumber: 'Card number',
+        expirationDate: 'Expiration date',
+        cvcZip: 'CVC, ZIP',
+        anyNumbers: 'Any numbers',
+      },
+      applePayDescription: {
+        monthly: 'Monthly payment',
+        annual: 'Annual payment',
+      },
+    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
