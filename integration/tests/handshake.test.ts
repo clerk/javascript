@@ -25,7 +25,6 @@ test.describe('Client handshake @generic', () => {
   });
   // Strip trailing slash
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
-  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
 
   test.beforeAll('setup local Clerk API mock', async () => {
     const env = appConfigs.envs.withEmailCodes
@@ -362,6 +361,7 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Domain': 'example.com',
         'Sec-Fetch-Dest': 'document',
+        'X-Satellite': 'true',
       }),
       redirect: 'manual',
     });
