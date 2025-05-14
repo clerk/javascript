@@ -1,4 +1,5 @@
-import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
@@ -30,11 +31,13 @@ const MAX_STRATEGIES_PER_ROW = 6;
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
   enableWeb3Providers: boolean;
+  enableAlternativePhoneCodeProviders: boolean;
 }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
+  alternativePhoneCodeCallback: (channel: PhoneCodeChannel) => void;
   idleAfterDelay?: boolean;
 };
 
@@ -42,21 +45,29 @@ const isWeb3Strategy = (val: string): val is Web3Strategy => {
   return val.startsWith('web3_');
 };
 
+const isPhoneCodeChannel = (val: string): val is PhoneCodeChannel => {
+  return !!getAlternativePhoneCodeProviderData(val);
+};
+
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const {
     oauthCallback,
     web3Callback,
+    alternativePhoneCodeCallback,
     enableOAuthProviders = true,
     enableWeb3Providers = true,
+    enableAlternativePhoneCodeProviders = true,
     idleAfterDelay = true,
   } = props;
-  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
+    useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
 
   const strategies = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
+    ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
   ];
 
   if (!strategies.length) {
@@ -73,7 +84,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
         ? false
         : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
-  const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
+  const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
     try {
       if (isWeb3Strategy(strategy)) {
@@ -88,6 +99,14 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     if (idleAfterDelay) {
       await sleep(5000);
       card.setIdle();
+    }
+  };
+
+  const onSocialButtonClick = (strategy: OAuthStrategy | Web3Strategy | PhoneCodeChannel) => async () => {
+    if (isPhoneCodeChannel(strategy)) {
+      alternativePhoneCodeCallback(strategy);
+    } else {
+      await startOauth(strategy);
     }
   };
 
@@ -159,7 +178,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               <ButtonElement
                 key={strategy}
                 id={strategyToDisplayData[strategy].id}
-                onClick={startOauth(strategy)}
+                onClick={onSocialButtonClick(strategy)}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 label={label}
@@ -176,7 +195,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
 type SocialButtonProps = PropsOfComponent<typeof Button> & {
   icon: React.ReactElement;
-  id: OAuthProvider | Web3Provider;
+  id: OAuthProvider | Web3Provider | PhoneCodeChannel;
   textLocalizationKey: LocalizationKey | undefined;
   label?: string;
 };

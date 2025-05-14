@@ -1,6 +1,5 @@
-import { expectTypeOf } from 'expect-type';
 import type React from 'react';
-import { describe, test } from 'vitest';
+import { describe, expectTypeOf, test } from 'vitest';
 
 import type { SignUp } from '..';
 
