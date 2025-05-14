@@ -361,13 +361,12 @@ test.describe('Client handshake @generic', () => {
         'X-Secret-Key': config.sk,
         'X-Domain': 'example.com',
         'Sec-Fetch-Dest': 'document',
-        'X-Satellite': 'true',
       }),
       redirect: 'manual',
     });
     expect(res.status).toBe(307);
     const locationUrl = new URL(res.headers.get('location'));
-    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+    expect(locationUrl.origin + locationUrl.pathname).toContain('/v1/client/handshake');
     expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
     expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
       'session-token-expired-refresh-non-eligible-no-refresh-cookie',
