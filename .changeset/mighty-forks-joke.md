@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-Add `drawerRoot` descriptor.
+Add `drawerRoot` descriptor and adjust z-index approach.
