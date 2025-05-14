@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.58.1
+
+### Patch Changes
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
 ## 4.58.0
 
 ### Minor Changes
