@@ -46,6 +46,14 @@ export type AuthenticateRequestOptions = {
    */
   organizationSyncOptions?: OrganizationSyncOptions;
   /**
+   * Specifies the handshake format to be used during OAuth authentication flows.
+   * When set to 'nonce', the backend signals to the frontend that it can handle nonce-based handshakes
+   * during OAuth flow resolution.
+   *
+   * @default 'token'
+   */
+  handshakeFormat?: 'nonce' | 'token';
+  /**
    * @internal
    */
   apiClient?: ApiClient;

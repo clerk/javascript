@@ -81,6 +81,11 @@ export type AuthenticateWithRedirectParams = {
    * Whether the user has accepted the legal requirements.
    */
   legalAccepted?: boolean;
+
+  /**
+   * Whether to use handshake nonce or handshake token
+   */
+  handshakeFormat?: 'nonce' | 'token';
 };
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };

@@ -106,16 +106,19 @@ export type OAuthConfig = OauthFactor & {
   actionCompleteRedirectUrl: string;
   oidcPrompt?: string;
   oidcLoginHint?: string;
+  handshakeFormat?: 'nonce' | 'token';
 };
 
 export type SamlConfig = SamlFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  handshakeFormat?: 'nonce' | 'token';
 };
 
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  handshakeFormat?: 'nonce' | 'token';
 };
 
 export type PhoneCodeSecondFactorConfig = {

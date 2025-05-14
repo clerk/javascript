@@ -76,6 +76,23 @@ export async function authenticateRequest(
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
+  /**
+   * Merges headers from the RequestState with a default handshake cookie.
+   * Creates a new Headers object with a nonce cookie and adds all headers from the result.
+   *
+   * @param result - The RequestState containing headers to merge
+   * @returns The RequestState with merged headers
+   */
+  function mergeHeaders(result: RequestState): RequestState {
+    const headers = new Headers();
+    headers.append('Set-Cookie', `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=Lax;`);
+    for (const [key, value] of result.headers.entries()) {
+      headers.append(key, value);
+    }
+    result.headers = headers;
+    return result;
+  }
+
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
     if (authenticateContext.signInUrl && authenticateContext.origin) {
@@ -533,10 +550,10 @@ export async function authenticateRequest(
   }
 
   if (authenticateContext.sessionTokenInHeader) {
-    return authenticateRequestWithTokenInHeader();
+    return mergeHeaders(await authenticateRequestWithTokenInHeader());
   }
 
-  return authenticateRequestWithTokenInCookie();
+  return mergeHeaders(await authenticateRequestWithTokenInCookie());
 }
 
 /**
