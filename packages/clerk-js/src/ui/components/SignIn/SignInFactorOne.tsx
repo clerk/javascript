@@ -37,7 +37,9 @@ function SignInFactorOneInternal(): JSX.Element {
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
-  const { supportedFirstFactors } = useCoreSignIn();
+  const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
+
+  const alternativePhoneCodeChannel = firstFactorVerification.channel;
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -157,7 +159,7 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePhoneCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
+          factor={{ ...currentFactor, channel: alternativePhoneCodeChannel }}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
