@@ -83,10 +83,53 @@ jobs:
             pnpm changeset status --since=origin/main;
           fi
 
-  formatting-linting:
+  build-packages:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Static analysis & build
+    name: Build Packages
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    env:
+      TURBO_SUMMARIZE: false
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Turbo Build
+        run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Upload Turbo Summary
+        uses: actions/upload-artifact@v4
+        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
+        continue-on-error: true
+        with:
+          name: turbo-summary-report-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .turbo/runs
+          retention-days: 5
+
+  static-analysis:
+    needs: [build-packages]
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    name: Static analysis
     permissions:
       contents: read
       actions: write   # needed for actions/upload-artifact
@@ -114,12 +157,6 @@ jobs:
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-
-      - name: Deduplicate lockfile
-        run: pnpm dedupe
-
-      - name: Build Packages
-        run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Check size using bundlewatch
         run: pnpm turbo bundlewatch $TURBO_ARGS --only
@@ -150,7 +187,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
-    needs: [check-permissions]
+    needs: [build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests
     permissions:
@@ -223,7 +260,7 @@ jobs:
           retention-days: 5
 
   integration-tests:
-    needs: [check-permissions]
+    needs: [build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests
     permissions:
