@@ -225,6 +225,7 @@ export type ElementsConfig = {
   dividerLine: WithOptions;
 
   drawerBackdrop: WithOptions;
+  drawerRoot: WithOptions;
   drawerContent: WithOptions;
   drawerHeader: WithOptions;
   drawerTitle: WithOptions;

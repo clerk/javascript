@@ -222,7 +222,8 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <div
+      <Span
+        elementDescriptor={descriptors.drawerRoot}
         ref={mergedRefs}
         {...getFloatingProps()}
         style={{
@@ -260,13 +261,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderColor: t.colors.$neutralAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
-            zIndex: t.zIndices.$modal,
             pointerEvents: 'auto',
           })}
         >
           {children}
         </Flex>
-      </div>
+      </Span>
     </FloatingFocusManager>
   );
 });
