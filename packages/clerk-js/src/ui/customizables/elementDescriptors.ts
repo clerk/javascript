@@ -106,6 +106,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'dividerLine',
 
   'drawerBackdrop',
+  'drawerRoot',
   'drawerContent',
   'drawerHeader',
   'drawerTitle',
