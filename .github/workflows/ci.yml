@@ -128,7 +128,7 @@ jobs:
           retention-days: 5
 
   static-analysis:
-    needs: [build-packages]
+    needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Static analysis
     permissions:
@@ -188,7 +188,7 @@ jobs:
           retention-days: 5
 
   unit-tests:
-    needs: [build-packages]
+    needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Unit Tests
     permissions:
@@ -261,7 +261,7 @@ jobs:
           retention-days: 5
 
   integration-tests:
-    needs: [build-packages]
+    needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests
     permissions:
