@@ -85,7 +85,10 @@ export async function authenticateRequest(
    */
   function mergeHeaders(result: RequestState): RequestState {
     const headers = new Headers();
-    headers.append('Set-Cookie', `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=Lax;`);
+    headers.append(
+      'Set-Cookie',
+      `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=None; Secure; Domain=${authenticateContext.frontendApi || ''};`,
+    );
     for (const [key, value] of result.headers.entries()) {
       headers.append(key, value);
     }
