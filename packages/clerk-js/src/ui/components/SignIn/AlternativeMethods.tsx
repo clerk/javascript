@@ -85,6 +85,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                   <SignInSocialButtons
                     enableWeb3Providers
                     enableOAuthProviders
+                    enableAlternativePhoneCodeProviders={false}
                   />
                   {firstPartyFactors &&
                     firstPartyFactors.map((factor, i) => (

@@ -1,5 +1,6 @@
 import type { ClerkAPIError } from './api';
 import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ClerkResource } from './resource';
 import type { VerificationJSONSnapshot } from './snapshots';
 
@@ -14,6 +15,7 @@ export interface VerificationResource extends ClerkResource {
   strategy: string | null;
   verifiedAtClient: string | null;
   verifiedFromTheSameClient: () => boolean;
+  channel?: PhoneCodeChannel;
   __internal_toSnapshot: () => VerificationJSONSnapshot;
 }
 

@@ -1,4 +1,4 @@
-import type { CommerceFeatureJSON, CommerceFeatureResource } from '@clerk/types';
+import type { CommerceFeatureJSON, CommerceFeatureJSONSnapshot, CommerceFeatureResource } from '@clerk/types';
 
 import { BaseResource } from './internal';
 
@@ -26,5 +26,16 @@ export class CommerceFeature extends BaseResource implements CommerceFeatureReso
     this.avatarUrl = data.avatar_url;
 
     return this;
+  }
+
+  public __internal_toSnapshot(): CommerceFeatureJSONSnapshot {
+    return {
+      object: 'commerce_feature',
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      slug: this.slug,
+      avatar_url: this.avatarUrl,
+    };
   }
 }

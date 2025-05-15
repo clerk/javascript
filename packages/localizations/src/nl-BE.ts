@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
   backButton: 'Terug',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standaard',
@@ -31,11 +32,17 @@ export const nlBE: LocalizationResource = {
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const nlBE: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Creëer organisatie',
@@ -157,6 +193,42 @@ export const nlBE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
     badge__unverified: 'Ongeverifieerd',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Voeg het domein toe om te verifiëren. Gebruikers met e-mailadressen in dit domein kunnen de organisatie automatisch toegang krijgen of een verzoek om toegang te maken.',
@@ -219,6 +291,12 @@ export const nlBE: LocalizationResource = {
       general: 'Algemeen',
       members: 'Leden',
       title: 'Organisatie',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -405,6 +483,12 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Problemen? Je kan een van deze methoden gebruiken om in te loggen.',
       title: 'Gebruik een andere methode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Voer een backupcode in',
@@ -511,6 +595,12 @@ export const nlBE: LocalizationResource = {
       actionLink__use_username: 'Gebruik gebruikersnaam',
       actionText: 'Geen account?',
       actionText__join_waitlist: 'Nog geen account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'om door te gaan naar {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Inloggen',
@@ -524,6 +614,11 @@ export const nlBE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Inloggen',
       actionText: 'Heb je een account?',
@@ -591,6 +686,12 @@ export const nlBE: LocalizationResource = {
       actionLink__use_email: 'Gebruik e-mail',
       actionLink__use_phone: 'Gebruik telefoon',
       actionText: 'Heb je al een account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'om door te gaan naar {{applicationName}}',
       subtitleCombined: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
@@ -735,12 +836,20 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -886,6 +995,9 @@ export const nlBE: LocalizationResource = {
       title: 'Telefoonnummer toevoegen',
       verifySubtitle: 'Voer de verificatiecode in die verstuurd is naar {{phoneNumber}}',
       verifyTitle: 'Verifieer telefoonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Upload een JPG, PNG, GIF, of WEBP afbeelding kleiner dan 10 MB',

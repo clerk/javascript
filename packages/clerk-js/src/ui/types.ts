@@ -2,8 +2,8 @@ import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
-  CommerceInvoiceResource,
   CommercePlanResource,
+  CommerceStatementResource,
   CommerceSubscriptionResource,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -125,13 +125,13 @@ export type PaymentSourcesCtx = {
   componentName: 'PaymentSources';
 };
 
-export type InvoicesCtx = {
-  componentName: 'Invoices';
-  invoices: CommerceInvoiceResource[];
+export type StatementsCtx = {
+  componentName: 'Statements';
+  statements: CommerceStatementResource[];
   totalCount: number;
   isLoading: boolean;
   revalidate: () => void;
-  getInvoiceById: (invoiceId: string) => CommerceInvoiceResource | undefined;
+  getStatementById: (statementId: string) => CommerceStatementResource | undefined;
 };
 
 export type PlansCtx = {

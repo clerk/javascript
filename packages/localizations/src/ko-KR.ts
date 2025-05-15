@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
   backButton: '돌아가기',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: '기본값',
@@ -31,11 +32,17 @@ export const koKR: LocalizationResource = {
   badge__userDevice: '사용자 장치',
   badge__you: '당신',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const koKR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const koKR: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: '조직 만들기',
@@ -158,6 +194,42 @@ export const koKR: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -219,6 +291,12 @@ export const koKR: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -400,6 +478,12 @@ export const koKR: LocalizationResource = {
       subtitle: '문제가 있나요? 다른 방법으로 로그인할 수 있습니다.',
       title: '다른 방법 사용하기',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: '백업코드는 2단계 인증을 설정할 때 얻은 코드입니다',
       title: '백업 코드 입력',
@@ -506,6 +590,12 @@ export const koKR: LocalizationResource = {
       actionLink__use_username: '사용자 이름 사용하기',
       actionText: '계정이 없으신가요?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       subtitleCombined: undefined,
       title: '{{applicationName}}에 로그인',
@@ -519,6 +609,11 @@ export const koKR: LocalizationResource = {
   },
   signInEnterPasswordTitle: '비밀번호를 입력하세요',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: '로그인',
       actionText: '계정이 있으신가요?',
@@ -586,6 +681,12 @@ export const koKR: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: '계정이 있으신가요?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '환영합니다! 아래 정보를 입력해주세요.',
       subtitleCombined: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
@@ -729,12 +830,20 @@ export const koKR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -875,6 +984,9 @@ export const koKR: LocalizationResource = {
       title: '휴대폰 번호 추가',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: '10MB보다 작은 JPG, PNG, GIF 또는 WEBP 이미지를 업로드합니다',

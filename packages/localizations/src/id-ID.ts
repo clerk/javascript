@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   backButton: 'Kembali',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Default',
@@ -31,11 +32,17 @@ export const idID: LocalizationResource = {
   badge__userDevice: 'Perangkat pengguna',
   badge__you: 'Anda',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const idID: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Buat organisasi',
@@ -158,6 +194,42 @@ export const idID: LocalizationResource = {
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
     badge__unverified: 'Belum diverifikasi',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Tambahkan domain untuk verifikasi. Pengguna dengan alamat email di domain ini dapat bergabung dengan organisasi secara otomatis atau meminta untuk bergabung.',
@@ -220,6 +292,12 @@ export const idID: LocalizationResource = {
       general: 'Umum',
       members: 'Anggota',
       title: 'Organisasi',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -406,6 +484,12 @@ export const idID: LocalizationResource = {
       subtitle: 'Mengalami masalah? Anda dapat menggunakan salah satu metode ini untuk masuk.',
       title: 'Gunakan metode lain',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Kode cadangan Anda adalah yang Anda dapatkan saat menyiapkan verifikasi dua langkah.',
       title: 'Masukkan kode cadangan',
@@ -514,6 +598,12 @@ export const idID: LocalizationResource = {
       actionLink__use_username: 'Gunakan nama pengguna',
       actionText: 'Belum punya akun?',
       actionText__join_waitlist: 'Ingin akses awal?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Selamat datang kembali! Silakan masuk untuk melanjutkan',
       subtitleCombined: undefined,
       title: 'Masuk ke {{applicationName}}',
@@ -527,6 +617,11 @@ export const idID: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Masuk',
       actionText: 'Sudah punya akun?',
@@ -598,6 +693,12 @@ export const idID: LocalizationResource = {
       actionLink__use_email: 'Gunakan email sebagai gantinya',
       actionLink__use_phone: 'Gunakan telepon sebagai gantinya',
       actionText: 'Sudah punya akun?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Selamat datang! Silakan isi detail untuk memulai.',
       subtitleCombined: 'Selamat datang! Silakan isi detail untuk memulai.',
       title: 'Buat akun Anda',
@@ -746,12 +847,20 @@ export const idID: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -890,6 +999,9 @@ export const idID: LocalizationResource = {
       title: 'Tambah nomor telepon',
       verifySubtitle: 'Masukkan kode verifikasi yang dikirim ke {{identifier}}',
       verifyTitle: 'Verifikasi nomor telepon',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ukuran yang disarankan 1:1, hingga 10MB.',

@@ -68,3 +68,4 @@ export * from './samlConnection';
 export * from './waitlist';
 export * from './snapshots';
 export * from './authObject';
+export * from './phoneCodeChannel';

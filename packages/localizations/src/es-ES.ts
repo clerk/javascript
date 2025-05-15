@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const esES: LocalizationResource = {
   locale: 'es-ES',
   backButton: 'Atrás',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Por defecto',
@@ -31,11 +32,17 @@ export const esES: LocalizationResource = {
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const esES: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const esES: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Crear organización',
@@ -158,6 +194,42 @@ export const esES: LocalizationResource = {
     badge__automaticSuggestion: 'Sugerencias automáticas',
     badge__manualInvitation: 'Sin inscripción automática',
     badge__unverified: 'No verificado',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Agregue el dominio para verificar. Los usuarios con direcciones de correo electrónico en este dominio pueden unirse a la organización automáticamente o solicitar unirse.',
@@ -220,6 +292,12 @@ export const esES: LocalizationResource = {
       general: 'General',
       members: 'Miembros',
       title: 'Organización',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -406,6 +484,12 @@ export const esES: LocalizationResource = {
       subtitle: '¿Tienes problemas? Puedes usar cualquiera de estos métodos para iniciar sesión.',
       title: 'Usa otro método',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduce un código de seguridad',
@@ -512,6 +596,12 @@ export const esES: LocalizationResource = {
       actionLink__use_username: 'Usar nombre de usuario',
       actionText: '¿No tienes cuenta?',
       actionText__join_waitlist: '¿Te gustaría unirte a la lista de espera?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'para continuar a {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Entrar',
@@ -525,6 +615,11 @@ export const esES: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Entrar',
       actionText: '¿Tiene una cuenta?',
@@ -592,6 +687,12 @@ export const esES: LocalizationResource = {
       actionLink__use_email: 'Usar correo electrónico',
       actionLink__use_phone: 'Usar teléfono',
       actionText: '¿Ya tienes una cuenta?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'para continuar en {{applicationName}}',
       subtitleCombined: 'para continuar en {{applicationName}}',
       title: 'Crea tu cuenta',
@@ -739,12 +840,20 @@ export const esES: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -893,6 +1002,9 @@ export const esES: LocalizationResource = {
       title: 'Agregar el número de teléfono',
       verifySubtitle: 'Introduzca el código de verificación enviado a {{identifier}}',
       verifyTitle: 'Verificar número de teléfono',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Cargue una imagen JPG, PNG, GIF o WEBP de menos de 10 MB',

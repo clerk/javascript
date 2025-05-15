@@ -77,6 +77,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
       {currentOrg && !hidePersonal && (
         <PreviewButton
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
+          elementId={descriptors.organizationSwitcherPreviewButton.setId('personal')}
           icon={SwitchArrowRight}
           onClick={onPersonalWorkspaceClick}
           role='menuitem'
@@ -92,6 +93,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         <PreviewButton
           key={organization.id}
           elementDescriptor={descriptors.organizationSwitcherPreviewButton}
+          elementId={descriptors.organizationSwitcherPreviewButton.setId('organization')}
           icon={SwitchArrowRight}
           onClick={() => onOrganizationClick(organization)}
           role='menuitem'

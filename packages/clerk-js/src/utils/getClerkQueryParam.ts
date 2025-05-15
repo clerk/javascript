@@ -10,6 +10,7 @@ const _ClerkQueryParams = [
   '__clerk_ticket',
   '__clerk_modal_state',
   '__clerk_handshake',
+  '__clerk_handshake_nonce',
   '__clerk_help',
   CLERK_NETLIFY_CACHE_BUST_PARAM,
   CLERK_SYNCED,

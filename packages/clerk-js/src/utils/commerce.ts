@@ -1,10 +1,10 @@
 import type {
   CommerceCheckoutTotals,
   CommerceCheckoutTotalsJSON,
-  CommerceInvoiceTotals,
-  CommerceInvoiceTotalsJSON,
   CommerceMoney,
   CommerceMoneyJSON,
+  CommerceStatementTotals,
+  CommerceStatementTotalsJSON,
 } from '@clerk/types';
 
 export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney => {
@@ -16,7 +16,7 @@ export const commerceMoneyFromJSON = (data: CommerceMoneyJSON): CommerceMoney =>
   };
 };
 
-export const commerceTotalsFromJSON = <T extends CommerceInvoiceTotalsJSON | CommerceCheckoutTotalsJSON>(data: T) => {
+export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | CommerceCheckoutTotalsJSON>(data: T) => {
   const totals = {
     grandTotal: commerceMoneyFromJSON(data.grand_total),
     subtotal: commerceMoneyFromJSON(data.subtotal),
@@ -26,13 +26,10 @@ export const commerceTotalsFromJSON = <T extends CommerceInvoiceTotalsJSON | Com
     // @ts-ignore
     totals['totalDueNow'] = commerceMoneyFromJSON(data.total_due_now);
   }
-  if ('proration' in data) {
+  if ('credit' in data) {
     // @ts-ignore
-    totals['proration'] = {
-      // @ts-ignore
-      credit: commerceMoneyFromJSON(data.proration.credit),
-    };
+    totals['credit'] = commerceMoneyFromJSON(data.credit);
   }
 
-  return totals as T extends { total_due_now: CommerceMoneyJSON } ? CommerceCheckoutTotals : CommerceInvoiceTotals;
+  return totals as T extends { total_due_now: CommerceMoneyJSON } ? CommerceCheckoutTotals : CommerceStatementTotals;
 };

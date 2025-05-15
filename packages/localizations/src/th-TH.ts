@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
   backButton: 'กลับ',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ค่าเริ่มต้น',
@@ -31,11 +32,17 @@ export const thTH: LocalizationResource = {
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const thTH: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'สร้างองค์กร',
@@ -157,6 +193,42 @@ export const thTH: LocalizationResource = {
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
@@ -219,6 +291,12 @@ export const thTH: LocalizationResource = {
       general: 'ทั่วไป',
       members: 'สมาชิก',
       title: 'องค์กร',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -401,6 +479,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'มีปัญหาหรือ? คุณสามารถใช้วิธีใดวิธีหนึ่งนี้เพื่อเข้าสู่ระบบได้',
       title: 'ใช้วิธีอื่น',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'รหัสสำรองของคุณคือรหัสที่คุณได้รับเมื่อตั้งค่าการยืนยันสองขั้นตอน',
       title: 'ใส่รหัสสำรอง',
@@ -507,6 +591,12 @@ export const thTH: LocalizationResource = {
       actionLink__use_username: 'ใช้ชื่อผู้ใช้',
       actionText: 'ไม่มีบัญชีหรือ?',
       actionText__join_waitlist: 'ต้องการเข้าถึงก่อนใช่หรือไม่?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'ยินดีต้อนรับกลับ! โปรดเข้าสู่ระบบเพื่อดำเนินการต่อ',
       subtitleCombined: undefined,
       title: 'เข้าสู่ระบบ {{applicationName}}',
@@ -520,6 +610,11 @@ export const thTH: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'ใส่รหัสผ่านของคุณ',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'เข้าสู่ระบบ',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
@@ -589,6 +684,12 @@ export const thTH: LocalizationResource = {
       actionLink__use_email: 'ใช้อีเมลแทน',
       actionLink__use_phone: 'ใช้โทรศัพท์แทน',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
       subtitleCombined: 'ยินดีต้อนรับ! โปรดกรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
@@ -734,12 +835,20 @@ export const thTH: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -882,6 +991,9 @@ export const thTH: LocalizationResource = {
       title: 'เพิ่มหมายเลขโทรศัพท์',
       verifySubtitle: 'ป้อนรหัสยืนยันที่ถูกส่งไปยัง {{identifier}}',
       verifyTitle: 'ยืนยันหมายเลขโทรศัพท์',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'แนะนำสัดส่วน 1:1 และ สูงสุด 10MB',

@@ -1,0 +1,8 @@
+---
+import type { CreateOrganizationProps } from "@clerk/types";
+type Props = CreateOrganizationProps
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="create-organization" />

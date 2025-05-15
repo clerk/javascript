@@ -5,6 +5,8 @@ import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
   ClientJSON,
+  CommerceFeatureJSON,
+  CommercePlanJSON,
   EmailAddressJSON,
   EnterpriseAccountConnectionJSON,
   EnterpriseAccountJSON,
@@ -185,3 +187,7 @@ export type Web3WalletJSONSnapshot = Override<
 export type PublicUserDataJSONSnapshot = PublicUserDataJSON;
 
 export type CommerceSettingsJSONSnapshot = CommerceSettingsJSON;
+
+export type CommercePlanJSONSnapshot = CommercePlanJSON;
+
+export type CommerceFeatureJSONSnapshot = CommerceFeatureJSON;

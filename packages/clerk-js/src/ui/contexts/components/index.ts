@@ -13,5 +13,5 @@ export * from './GoogleOneTap';
 export * from './Waitlist';
 export * from './PricingTable';
 export * from './Checkout';
-export * from './Invoices';
+export * from './Statements';
 export * from './Plans';

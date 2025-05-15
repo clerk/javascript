@@ -16,7 +16,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  CommerceNamespace,
+  CommerceBillingNamespace,
   CommercePlanResource,
   CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
@@ -181,8 +181,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  commerce: CommerceNamespace;
+  /** Billing Object */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -1117,6 +1117,10 @@ export type SignInProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1254,6 +1258,10 @@ export type SignUpProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1302,6 +1310,11 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  /**
+   * Specify on which page the organization profile modal will open.
+   * @experimental
+   **/
+  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1568,15 +1581,40 @@ export type WaitlistProps = {
 export type WaitlistModalProps = WaitlistProps;
 
 type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
   newSubscriptionRedirectUrl?: string;
 };
 
 type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
   forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: PricingTableTheme;
-  __internal_CheckoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
 type PortalRoot = HTMLElement | null | undefined;
@@ -1596,6 +1634,7 @@ export type __internal_CheckoutProps = {
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
 export type __internal_PlanDetailsProps = {

@@ -83,3 +83,16 @@ export type ButtonProps<Tag> = {
   as: Tag;
   asChild?: boolean;
 };
+
+export type InternalUIComponentId =
+  | 'sign-in'
+  | 'sign-up'
+  | 'create-organization'
+  | 'organization-list'
+  | 'organization-profile'
+  | 'organization-switcher'
+  | 'user-button'
+  | 'user-profile'
+  | 'google-one-tap'
+  | 'waitlist'
+  | 'pricing-table';

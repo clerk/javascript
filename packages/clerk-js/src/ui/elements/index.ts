@@ -56,6 +56,7 @@ export * from './TagInput';
 export * from './ThreeDotsMenu';
 export * from './TileButton';
 export * from './TimerButton';
+export * from './Tooltip';
 export * from './UserAvatar';
 export * from './UserPreview';
 export * from './VerificationCodeCard';

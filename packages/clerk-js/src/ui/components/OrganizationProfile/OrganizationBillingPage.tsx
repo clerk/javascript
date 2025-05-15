@@ -1,11 +1,11 @@
+import { Protect } from '../../common';
 import {
-  InvoicesContextProvider,
   PlansContextProvider,
-  PricingTableContext,
+  StatementsContextProvider,
   SubscriberTypeContext,
   useSubscriptions,
 } from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -18,15 +18,13 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { useRouter } from '../../router';
-import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
-import { PricingTable } from '../PricingTable';
+import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const orgTabMap = {
   0: 'plans',
-  1: 'invoices',
+  1: 'statements',
   2: 'payment-methods',
 } as const;
 
@@ -34,7 +32,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
   const { data: subscriptions } = useSubscriptions('org');
   const { selectedTab, handleTabChange } = useTabState(orgTabMap);
-  const { navigate } = useRouter();
+
   if (!Array.isArray(subscriptions?.data)) {
     return null;
   }
@@ -51,7 +49,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('userProfile.billingPage.title')}
+            localizationKey={localizationKeys('organizationProfile.billingPage.title')}
             textVariant='h2'
           />
         </Header.Root>
@@ -64,43 +62,29 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
         >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
             <Tab
-              localizationKey={
-                subscriptions.data.length > 0
-                  ? localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('userProfile.billingPage.start.headerTitle__plans')
-              }
+              localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__subscriptions')}
             />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
+            <Tab localizationKey={localizationKeys('organizationProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  />
-                  <PaymentSources />
-                </Flex>
-              ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
-              )}
+              <SubscriptionsList
+                title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
+              <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                <PaymentSources />
+              </Protect>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <InvoicesContextProvider>
-                <InvoicesList />
-              </InvoicesContextProvider>
+              <StatementsContextProvider>
+                <StatementsList />
+              </StatementsContextProvider>
             </TabPanel>
           </TabPanels>
         </Tabs>

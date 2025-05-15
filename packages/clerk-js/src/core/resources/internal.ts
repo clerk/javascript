@@ -6,7 +6,7 @@ export * from './AuthConfig';
 export * from './Client';
 export * from './CommerceCheckout';
 export * from './CommerceFeature';
-export * from './CommerceInvoice';
+export * from './CommerceStatement';
 export * from './CommercePaymentSource';
 export * from './CommercePlan';
 export * from './CommerceProduct';

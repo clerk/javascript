@@ -1,6 +1,6 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -14,30 +14,54 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const subscriberType = useSubscriberTypeContext();
   const isCompact = mode === 'modal';
   const { organization } = useOrganization();
-
+  const { user } = useUser();
+  const { subscriptions } = usePlansContext();
   const { plans, handleSelectPlan } = usePlansContext();
 
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>('month');
+  const resource = subscriberType === 'org' ? organization : user;
+
+  const defaultPlanPeriod = useMemo(() => {
+    if (isCompact) {
+      const upcomingSubscription = subscriptions?.find(sub => sub.status === 'upcoming');
+      if (upcomingSubscription) {
+        return upcomingSubscription.planPeriod;
+      }
+
+      // don't pay attention to the default plan
+      const activeSubscription = subscriptions?.find(
+        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
+      );
+      if (activeSubscription) {
+        return activeSubscription.planPeriod;
+      }
+    }
+
+    return 'annual';
+  }, [isCompact, subscriptions]);
+
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(defaultPlanPeriod);
+
+  useEffect(() => {
+    setPlanPeriod(defaultPlanPeriod);
+  }, [defaultPlanPeriod]);
 
   const selectPlan = (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       return clerk.redirectToSignIn();
     }
 
-    handleSelectPlan({ mode, plan, planPeriod, event });
+    handleSelectPlan({
+      mode,
+      plan,
+      planPeriod,
+      event,
+      appearance: props.checkoutProps?.appearance,
+      newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
+    });
+    return;
   };
 
-  const { commerce } = useClerk();
-
-  const { user } = useUser();
-  useFetch(
-    user ? commerce?.getPaymentSources : undefined,
-    {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    },
-    undefined,
-    `commerce-payment-sources-${user?.id}`,
-  );
+  useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);
 
   return (
     <Flow.Root

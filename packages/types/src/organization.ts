@@ -1,4 +1,4 @@
-import type { CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
+import type { CommercePaymentSourceMethods, CommerceSubscriptionResource, GetSubscriptionsParams } from './commerce';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -35,7 +35,7 @@ declare global {
  *
  * @interface
  */
-export interface OrganizationResource extends ClerkResource {
+export interface OrganizationResource extends ClerkResource, CommercePaymentSourceMethods {
   id: string;
   name: string;
   slug: string | null;

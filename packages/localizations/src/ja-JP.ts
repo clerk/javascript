@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
   backButton: '戻る',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'デフォルト',
@@ -31,11 +32,17 @@ export const jaJP: LocalizationResource = {
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const jaJP: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: '組織を作成する',
@@ -158,6 +194,42 @@ export const jaJP: LocalizationResource = {
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
     badge__unverified: '未承認',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'ドメインを追加して検証します。このドメインのメールアドレスを持つユーザーは、自動的に組織に参加するか、参加をリクエストすることができます。',
@@ -219,6 +291,12 @@ export const jaJP: LocalizationResource = {
       general: '一般',
       members: 'メンバー',
       title: '組織',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -404,6 +482,12 @@ export const jaJP: LocalizationResource = {
       subtitle: '問題が発生していますか？これらの方法を使用してサインインすることができます。',
       title: '別の方法を使用',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'バックアップコードを入力',
@@ -503,14 +587,20 @@ export const jaJP: LocalizationResource = {
     },
     start: {
       actionLink: 'サインアップ',
-      actionLink__join_waitlist: undefined,
+      actionLink__join_waitlist: 'ウェイトリストに登録',
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'パスキーを使用',
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
-      actionText__join_waitlist: undefined,
+      actionText__join_waitlist: '先行体験にご興味ありますか？',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '{{applicationName}}へのアクセスを続ける',
       subtitleCombined: undefined,
       title: 'サインイン',
@@ -524,6 +614,11 @@ export const jaJP: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'パスワードを入力してください',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'サインイン',
       actionText: 'アカウントをお持ちですか？',
@@ -591,6 +686,12 @@ export const jaJP: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'アカウントをお持ちですか？',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '{{applicationName}}へのアクセスを続ける',
       subtitleCombined: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',
@@ -735,12 +836,20 @@ export const jaJP: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -883,6 +992,9 @@ export const jaJP: LocalizationResource = {
       title: '電話番号の追加',
       verifySubtitle: '{{identifier}}に送信された検証コードを入力してください',
       verifyTitle: '電話番号の確認',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: '10MB未満のJPG、PNG、GIF、またはWEBP画像をアップロードしてください',

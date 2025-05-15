@@ -8,6 +8,9 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
     waitForMounted: (selector = '.cl-checkout-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
+    closeDrawer: () => {
+      return page.locator('.cl-drawerClose').click();
+    },
     fillTestCard: async () => {
       await self.fillCard({
         number: '4242424242424242',
@@ -29,6 +32,18 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await page
         .locator('.cl-checkout-root')
         .getByRole('button', { name: /subscribe|pay\s\$/i })
+        .click();
+    },
+    waitForSubscribeButton: async () => {
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^subscribe$/i })
+        .waitFor({ state: 'visible' });
+    },
+    confirmAndContinue: async () => {
+      await page
+        .locator('.cl-checkout-root')
+        .getByRole('button', { name: /^continue$/i })
         .click();
     },
     clickAddPaymentMethod: async () => {

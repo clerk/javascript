@@ -261,8 +261,8 @@ export const CheckoutComplete = ({
                       ? `${capitalize(checkout.paymentSource.paymentMethod)}`
                       : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
-                  : checkout.subscription?.periodStart
-                    ? formatDate(new Date(checkout.subscription.periodStart))
+                  : checkout.planPeriodStart
+                    ? formatDate(new Date(checkout.planPeriodStart))
                     : '–'
               }
             />

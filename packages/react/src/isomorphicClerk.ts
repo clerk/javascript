@@ -16,7 +16,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
-  CommerceNamespace,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -97,12 +97,12 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | 'commerce'
+  | 'billing'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  commerce: CommerceNamespace | undefined;
+  billing: CommerceBillingNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -682,8 +682,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get commerce(): CommerceNamespace | undefined {
-    return this.clerkjs?.commerce;
+  get billing(): CommerceBillingNamespace | undefined {
+    return this.clerkjs?.billing;
   }
 
   __unstable__setEnvironment(...args: any): void {
