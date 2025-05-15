@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __internal_CheckoutProps } from '@clerk/types';
+import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -14,22 +14,26 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
   const cacheKey = {
     key: `commerce-checkout`,
     userId: user?.id,
-    ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-    planId,
-    planPeriod,
+    arguments: {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      planId,
+      planPeriod,
+    },
   };
 
+  // Manually handle the cache
   const { data, mutate } = useSWR(cacheKey);
 
+  // Use `useSWRMutation` to avoid revalidations on stale-data/focus etc.
   const { trigger, isMutating, error } = useSWRMutation(
     cacheKey,
     key =>
-      clerk.billing?.startCheckout({
-        planId: key.planId,
-        planPeriod: key.planPeriod,
-        ...(key.orgId ? { orgId: key.orgId } : {}),
-      }),
+      clerk.billing?.startCheckout(
+        // @ts-expect-error things are typed as optional
+        key.arguments,
+      ),
     {
+      // TODO: Checkt if this is needed
       throwOnError: true,
       onSuccess: data => {
         mutate(data, false);
@@ -39,6 +43,10 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
 
   useEffect(() => {
     void trigger();
+    return () => {
+      // Clear the cache on unmount
+      mutate(undefined, false);
+    };
   }, []);
 
   return {
