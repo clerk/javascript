@@ -420,5 +420,11 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Debug Environment
+        run: |
+          echo "PKG_PR_NEW_VERSION: ${{ env.PKG_PR_NEW_VERSION }}"
+          echo "All env vars:"
+          env | sort
+
       - name: Publish with pkg-pr-new
         run: pnpm run build && pnpx pkg-pr-new@${{ env.PKG_PR_NEW_VERSION }} publish --compact --pnpm './packages/*'
