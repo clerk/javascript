@@ -159,11 +159,10 @@ const MfaPhoneCodeMenu = ({ phone, showTOTP }: MfaPhoneCodeMenuProps) => {
 
   const actions = (
     [
-      !showTOTP
+      !showTOTP && !phone.defaultSecondFactor
         ? {
             label: localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault'),
             onClick: () => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
-            isDisabled: phone.defaultSecondFactor,
           }
         : null,
       {

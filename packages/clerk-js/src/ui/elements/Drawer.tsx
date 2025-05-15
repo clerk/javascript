@@ -222,15 +222,20 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <div
+      <Box
         ref={mergedRefs}
         {...getFloatingProps()}
-        style={{
+        sx={t => ({
           position: strategy,
           insetBlock: 0,
           insetInline: 0,
           pointerEvents: 'none',
-        }}
+          isolation: 'isolate',
+          // When drawer is within the profile components, we need to ensure it is above the drawer
+          // renders above the profile close button
+          zIndex: strategy === 'absolute' ? t.zIndices.$modal : undefined,
+        })}
+        elementDescriptor={descriptors.drawerRoot}
       >
         <Flex
           elementDescriptor={descriptors.drawerContent}
@@ -260,13 +265,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderColor: t.colors.$neutralAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
-            zIndex: t.zIndices.$modal,
             pointerEvents: 'auto',
           })}
         >
           {children}
         </Flex>
-      </div>
+      </Box>
     </FloatingFocusManager>
   );
 });

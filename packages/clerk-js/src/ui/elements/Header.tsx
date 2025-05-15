@@ -4,18 +4,21 @@ import { Col, descriptors, Heading, Icon, Link, Text, useAppearance } from '../c
 import { ArrowLeftIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
+import { VerticalDivider } from './Divider';
 
 export type HeaderProps = PropsOfComponent<typeof Col> & {
   showLogo?: boolean;
+  showDivider?: boolean;
   contentSx?: ThemableCssProp;
 };
 
 const Root = React.memo(
   React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
-    const { sx, children, contentSx, gap = 6, showLogo = false, ...rest } = props;
+    const { sx, children, contentSx, gap = 6, showLogo = false, showDivider = false, ...rest } = props;
     const appearance = useAppearance();
 
     const logoIsVisible = appearance.parsedLayout.logoPlacement === 'inside' && showLogo;
+    const verticalDividerIsVisible = showDivider && logoIsVisible;
 
     return (
       <Col
@@ -26,6 +29,7 @@ const Root = React.memo(
         {...rest}
       >
         {logoIsVisible && <ApplicationLogo />}
+        {verticalDividerIsVisible && <VerticalDivider />}
         <Col
           gap={1}
           sx={contentSx}

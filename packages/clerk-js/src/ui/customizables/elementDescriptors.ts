@@ -101,10 +101,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formResendCodeLink',
 
   'dividerRow',
+  'dividerColumn',
   'dividerText',
   'dividerLine',
 
   'drawerBackdrop',
+  'drawerRoot',
   'drawerContent',
   'drawerHeader',
   'drawerTitle',

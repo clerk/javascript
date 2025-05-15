@@ -1154,6 +1154,10 @@ export type SignInProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1291,6 +1295,10 @@ export type SignUpProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1339,6 +1347,11 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  /**
+   * Specify on which page the organization profile modal will open.
+   * @experimental
+   **/
+  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1683,6 +1696,7 @@ export type __internal_CheckoutProps = {
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
 export type __internal_PlanDetailsProps = {

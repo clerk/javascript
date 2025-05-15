@@ -69,3 +69,4 @@ export * from './waitlist';
 export * from './apiKey';
 export * from './snapshots';
 export * from './authObject';
+export * from './phoneCodeChannel';

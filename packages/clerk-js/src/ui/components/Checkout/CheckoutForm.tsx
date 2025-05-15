@@ -51,7 +51,6 @@ export const CheckoutForm = ({
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
             />
-            {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
               text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
@@ -62,28 +61,22 @@ export const CheckoutForm = ({
             borderTop
             variant='tertiary'
           >
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Subtotal' />
+            <LineItems.Title title={localizationKeys('commerce.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           {showCredits && (
             <LineItems.Group variant='tertiary'>
-              {/* TODO(@Commerce): needs localization */}
-              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
-              {/* TODO(@Commerce): needs localization */}
-              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
+              <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
             </LineItems.Group>
           )}
           <LineItems.Group borderTop>
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title={`Total Due Today`} />
+            <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
 
-      {/* TODO(@Commerce): needs localization */}
       {showDowngradeInfo && (
         <Box
           elementDescriptor={descriptors.checkoutFormLineItemsRoot}
@@ -201,13 +194,11 @@ const CheckoutFormElements = ({
         >
           <SegmentedControl.Button
             value='existing'
-            // TODO(@Commerce): needs localization
-            text='Payment Methods'
+            text={localizationKeys('commerce.paymentMethods')}
           />
           <SegmentedControl.Button
             value='new'
-            // TODO(@Commerce): needs localization
-            text='Add payment method'
+            text={localizationKeys('commerce.addPaymentMethod')}
           />
         </SegmentedControl.Root>
       )}
@@ -228,13 +219,12 @@ const CheckoutFormElements = ({
           checkout={checkout}
           onSuccess={onAddPaymentSourceSuccess}
           onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
-          // @ts-ignore TODO(@COMMERCE): needs localization
           submitLabel={
             checkout.totals.totalDueNow.amount > 0
               ? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__pay', {
                   amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
                 })
-              : 'Subscribe'
+              : localizationKeys('commerce.subscribe')
           }
           submitError={submitError}
           setSubmitError={setSubmitError}
@@ -351,15 +341,15 @@ const ExistingPaymentSourceForm = ({
         }}
         isLoading={isSubmitting}
       >
-        {totalDueNow.amount > 0 ? (
-          <>
-            {/* TODO(@COMMERCE): needs localization */}
-            Pay {totalDueNow.currencySymbol}
-            {totalDueNow.amountFormatted}
-          </>
-        ) : (
-          'Subscribe'
-        )}
+        <Text
+          localizationKey={
+            totalDueNow.amount > 0
+              ? localizationKeys('commerce.pay', {
+                  amount: `${totalDueNow.currencySymbol}${totalDueNow.amountFormatted}`,
+                })
+              : localizationKeys('commerce.subscribe')
+          }
+        />
       </Button>
     </Form>
   );

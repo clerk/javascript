@@ -1,5 +1,34 @@
 # Change Log
 
+## 5.66.0
+
+### Minor Changes
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+### Patch Changes
+
+- Fixes incorrect heading spacing within PlanDetails drawer header ([#5918](https://github.com/clerk/javascript/pull/5918)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
+- Improvements of flows for switching between plans ([#5883](https://github.com/clerk/javascript/pull/5883)) by [@octoper](https://github.com/octoper)
+
+- Bug fix: Revalidate payment methods after checking out with test card. ([#5913](https://github.com/clerk/javascript/pull/5913)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure Checkout drawer animation and content respects RTL usage. ([#5906](https://github.com/clerk/javascript/pull/5906)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue in Safari where navigating between profile tabs caused the navbar icons to shift unexpectedly. ([#5887](https://github.com/clerk/javascript/pull/5887)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes `newSubscriptionRedirectUrl` usage on `PricingTable`. ([#5909](https://github.com/clerk/javascript/pull/5909)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`36c6f8f`](https://github.com/clerk/javascript/commit/36c6f8fe389389d2af33106fb7ca2ffeb5513407), [`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`68a7b40`](https://github.com/clerk/javascript/commit/68a7b40e5ffd040bcdad11b7f8a8a3c6ad7569ea), [`f288881`](https://github.com/clerk/javascript/commit/f28888134e46c1b70a776fd8c6aa24293308b7cb), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/localizations@3.15.3
+  - @clerk/shared@3.9.0
+  - @clerk/types@4.58.1
+
 ## 5.65.0
 
 ### Minor Changes

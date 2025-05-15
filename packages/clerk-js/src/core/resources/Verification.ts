@@ -2,6 +2,7 @@ import { errorToJSON, parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
   PasskeyVerificationResource,
+  PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
@@ -32,6 +33,7 @@ export class Verification extends BaseResource implements VerificationResource {
   expireAt: Date | null = null;
   error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
+  channel?: PhoneCodeChannel;
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
@@ -57,6 +59,7 @@ export class Verification extends BaseResource implements VerificationResource {
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at || undefined);
       this.error = data.error ? parseError(data.error) : null;
+      this.channel = data.channel || undefined;
     }
     return this;
   }

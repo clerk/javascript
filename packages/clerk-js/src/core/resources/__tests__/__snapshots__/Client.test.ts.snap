@@ -229,6 +229,7 @@ Client {
     "createdSessionId": null,
     "firstFactorVerification": Verification {
       "attempts": null,
+      "channel": undefined,
       "error": {
         "code": "",
         "longMessage": undefined,
@@ -259,6 +260,7 @@ Client {
     "resetPassword": [Function],
     "secondFactorVerification": Verification {
       "attempts": null,
+      "channel": undefined,
       "error": {
         "code": "",
         "longMessage": undefined,
@@ -335,6 +337,7 @@ Client {
     "verifications": SignUpVerifications {
       "emailAddress": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -361,6 +364,7 @@ Client {
       },
       "externalAccount": Verification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -385,6 +389,7 @@ Client {
       },
       "phoneNumber": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,
@@ -411,6 +416,7 @@ Client {
       },
       "web3Wallet": SignUpVerification {
         "attempts": null,
+        "channel": undefined,
         "error": {
           "code": "",
           "longMessage": undefined,

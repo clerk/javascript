@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
   Appearance,
   CommercePlanResource,
@@ -142,6 +142,7 @@ type HandleSelectPlanProps = {
 
 export const usePlansContext = () => {
   const clerk = useClerk();
+  const { session } = useSession();
   const subscriberType = useSubscriberTypeContext();
   const context = useContext(PlansContext);
 
@@ -344,19 +345,19 @@ export const usePlansContext = () => {
           portalRoot,
         });
       } else {
-        // if the plan doesn't support annual, use monthly
-        let _planPeriod = planPeriod;
-        if (planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
-          _planPeriod = 'month';
-        }
-
         clerk.__internal_openCheckout({
           planId: plan.id,
-          planPeriod: _planPeriod,
-          subscriberType: subscriberType,
+          // if the plan doesn't support annual, use monthly
+          planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+          subscriberType,
           onSubscriptionComplete: () => {
             ctx.revalidate();
             onSubscriptionChange?.();
+          },
+          onClose: () => {
+            if (session?.id) {
+              void clerk.setActive({ session: session.id });
+            }
           },
           appearance,
           portalRoot,
@@ -364,7 +365,7 @@ export const usePlansContext = () => {
         });
       }
     },
-    [clerk, ctx, activeOrUpcomingSubscription, subscriberType],
+    [clerk, ctx, activeOrUpcomingSubscription, subscriberType, session?.id],
   );
 
   const defaultFreePlan = useMemo(() => {

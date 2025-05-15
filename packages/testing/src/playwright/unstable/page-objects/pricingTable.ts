@@ -14,9 +14,29 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
-    startCheckout: async ({ planSlug, shouldSwitch }: { planSlug: string; shouldSwitch?: boolean }) => {
+    startCheckout: async ({
+      planSlug,
+      shouldSwitch,
+      period,
+    }: {
+      planSlug: string;
+      shouldSwitch?: boolean;
+      period?: 'monthly' | 'annually';
+    }) => {
       const targetButtonName =
         shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
+
+      if (period) {
+        await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
+
+        const billedAnnuallyChecked = await page
+          .locator(`.cl-pricingTableCard__${planSlug} .cl-switchIndicator`)
+          .getAttribute('data-checked');
+
+        if (billedAnnuallyChecked === 'true' && period === 'monthly') {
+          await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
+        }
+      }
 
       await page
         .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`)

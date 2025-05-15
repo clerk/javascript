@@ -34,6 +34,7 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
         align='center'
         as='label'
         sx={t => ({
+          isolation: 'isolate',
           width: 'fit-content',
           '&:has(input:focus-visible) > input + span': {
             ...common.focusRingStyles(t),
