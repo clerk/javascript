@@ -600,3 +600,31 @@ export const PricingTable = withClerk(
   },
   { component: 'PricingTable', renderWhileLoading: true },
 );
+
+export const __experimental_Tasks = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTasks}
+            unmount={clerk.unmountTasks}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: '__experimental_Tasks', renderWhileLoading: true },
+);
