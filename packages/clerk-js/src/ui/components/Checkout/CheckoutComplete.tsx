@@ -67,16 +67,39 @@ export const CheckoutComplete = ({
             }),
           })}
         >
-          {[1, 0.75, 0.5].map((scale, index, array) => {
-            return (
-              <Ring
-                key={scale}
-                scale={scale}
-                index={array.length - 1 - index}
-                isMotionSafe={isMotionSafe}
-              />
-            );
-          })}
+          <Box
+            sx={t => ({
+              position: 'relative',
+              overflow: 'hidden',
+              backgroundColor: t.colors.$colorBackground,
+              display: 'grid',
+              gridArea: '1/1',
+            })}
+          >
+            {[1, 0.75, 0.5].map((scale, index, array) => {
+              return (
+                <Ring
+                  key={scale}
+                  scale={scale}
+                  index={array.length - 1 - index}
+                  isMotionSafe={isMotionSafe}
+                />
+              );
+            })}
+            <Box
+              sx={t => ({
+                position: 'absolute',
+                inset: '0',
+                right: '50%',
+                borderRadius: '50%',
+                backgroundColor: t.colors.$success500,
+                mixBlendMode: 'color',
+                filter: 'blur(20px)',
+                opacity: 0.5,
+                zIndex: 1,
+              })}
+            />
+          </Box>
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
@@ -89,6 +112,7 @@ export const CheckoutComplete = ({
               borderRadius: t.radii.$circle,
               backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
               boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
+              color: t.colors.$success500,
               ':before': {
                 content: '""',
                 position: 'absolute',
@@ -155,16 +179,17 @@ export const CheckoutComplete = ({
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout.totals.totalDueNow.amount > 0
+                checkout?.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
-              sx={{
+              sx={t => ({
                 opacity: 0,
                 animationName: 'slideUp',
                 animationDuration: `${transitionDurationValues.slowest}ms`,
                 animationTimingFunction: transitionTiming.bezier,
                 animationFillMode: 'forwards',
+                color: t.colors.$colorText,
                 '@keyframes slideUp': {
                   '0%': {
                     transform: 'translateY(30px)',
@@ -179,7 +204,7 @@ export const CheckoutComplete = ({
                   opacity: 1,
                   animation: 'none',
                 }),
-              }}
+              })}
             />
             <Text
               elementDescriptor={descriptors.checkoutSuccessDescription}
@@ -209,7 +234,7 @@ export const CheckoutComplete = ({
                 }),
               })}
               localizationKey={
-                checkout.totals.totalDueNow.amount > 0
+                checkout?.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
               }
@@ -242,27 +267,27 @@ export const CheckoutComplete = ({
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
-              text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
+              text={`${checkout?.totals.totalDueNow.currencySymbol}${checkout?.totals.totalDueNow.amountFormatted}`}
             />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout.totals.totalDueNow.amount > 0
+                checkout?.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout.totals.totalDueNow.amount > 0
-                  ? checkout.paymentSource
-                    ? checkout.paymentSource.paymentMethod !== 'card'
-                      ? `${capitalize(checkout.paymentSource.paymentMethod)}`
-                      : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
+                checkout?.totals.totalDueNow.amount > 0
+                  ? checkout?.paymentSource
+                    ? checkout?.paymentSource.paymentMethod !== 'card'
+                      ? `${capitalize(checkout?.paymentSource.paymentMethod)}`
+                      : `${capitalize(checkout?.paymentSource.cardType)} ⋯ ${checkout?.paymentSource.last4}`
                     : '–'
-                  : checkout.planPeriodStart
-                    ? formatDate(new Date(checkout.planPeriodStart))
+                  : checkout?.planPeriodStart
+                    ? formatDate(new Date(checkout?.planPeriodStart))
                     : '–'
               }
             />
