@@ -482,7 +482,7 @@ const Components = (props: ComponentsProps) => {
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
       startPath={buildVirtualRouterUrl({
         base: '/organizationProfile',
-        path: urlStateParam?.path,
+        path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
