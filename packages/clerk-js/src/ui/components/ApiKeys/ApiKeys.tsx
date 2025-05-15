@@ -1,4 +1,7 @@
-import { useOrganization, useUser } from '@clerk/shared/react';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import type { CreateApiKeyParams } from '@clerk/types';
+import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext } from '../../contexts';
 import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
@@ -6,14 +9,14 @@ import { Card, InputWithIcon, Pagination, withCardStateProvider } from '../../el
 import { Action } from '../../elements/Action';
 import { MagnifyingGlass } from '../../icons';
 import { ApiKeysTable } from './ApiKeysTable';
+import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
-import { useApiKeys } from './useApiKeys';
+import { getTimeLeftInSeconds, useApiKeys } from './useApiKeys';
 
 export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage?: number }) => {
   const {
     apiKeys,
     isLoading,
-    revokeApiKey,
     search,
     setSearch,
     page,
@@ -22,9 +25,40 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
     itemCount,
     startingRow,
     endingRow,
-    handleCreate,
+    mutate: mutateApiKeys,
+    cacheKey,
   } = useApiKeys({ subject, perPage });
+  const { trigger: createApiKey, isMutating } = useSWRMutation(
+    cacheKey,
+    (_, { arg }: { arg: CreateApiKeyParams }) => clerk.createApiKey(arg),
+    {
+      throwOnError: false,
+      onError(err) {
+        if (isClerkAPIResponseError(err)) {
+          console.log(err.errors);
+          console.log(err.message);
+          console.log(err.name);
+        }
+      },
+    },
+  );
   const { t } = useLocalizations();
+  const clerk = useClerk();
+
+  const handleRevokeApiKey = async (id: string) => {
+    await clerk.revokeApiKey({ apiKeyID: id });
+    void mutateApiKeys();
+    setPage(1);
+  };
+
+  const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
+    await createApiKey({
+      name: params.name,
+      creationReason: params.description,
+      secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
+    });
+    closeCardFn();
+  };
 
   return (
     <Col gap={4}>
@@ -44,7 +78,10 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
               }}
             />
           </Box>
-          <Action.Trigger value='add'>
+          <Action.Trigger
+            value='add'
+            hideOnActive={false}
+          >
             <Button
               variant='solid'
               localizationKey={localizationKeys('apiKey.action__add')}
@@ -54,7 +91,10 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
         <Action.Open value='add'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
             <Action.Card sx={{ width: '100%' }}>
-              <CreateApiKeyForm onCreate={params => void handleCreate(params)} />
+              <CreateApiKeyForm
+                onCreate={handleCreateApiKey}
+                isSubmitting={isMutating}
+              />
             </Action.Card>
           </Flex>
         </Action.Open>
@@ -62,7 +102,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}
-        onRevoke={revokeApiKey}
+        onRevoke={handleRevokeApiKey}
       />
       {itemCount > 5 && (
         <Pagination
