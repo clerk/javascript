@@ -145,6 +145,10 @@ export class HandshakeService {
       this.authenticateContext.usesSuffixedCookies().toString(),
     );
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
+    /**
+     * Appends the supported handshake format parameter to the URL
+     * This parameter indicates the format of the handshake response that the client expects
+     */
     url.searchParams.append(constants.QueryParameters.HandshakeFormat, SUPPORTED_HANDSHAKE_FORMAT);
 
     if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
