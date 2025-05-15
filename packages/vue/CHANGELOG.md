@@ -1,5 +1,15 @@
 # @clerk/vue
 
+## 1.8.1
+
+### Patch Changes
+
+- Add `isSatellite` prop type in Vue and Nuxt SDKs ([#5911](https://github.com/clerk/javascript/pull/5911)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/shared@3.9.0
+  - @clerk/types@4.58.1
+
 ## 1.8.0
 
 ### Minor Changes

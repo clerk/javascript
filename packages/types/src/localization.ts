@@ -127,7 +127,39 @@ type _LocalizationResource = {
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
     availableFeatures: LocalizationValue;
+    subtotal: LocalizationValue;
+    creditRemainder: LocalizationValue;
+    totalDueToday: LocalizationValue;
+    paymentMethods: LocalizationValue;
+    addPaymentMethod: LocalizationValue;
+    pay: LocalizationValue;
+    cancelSubscriptionTitle: LocalizationValue;
+    cancelSubscriptionNoCharge: LocalizationValue;
+    cancelSubscriptionAccessUntil: LocalizationValue;
+    popular: LocalizationValue;
+    monthly: LocalizationValue;
+    annually: LocalizationValue;
+    cannotSubscribeMonthly: LocalizationValue;
+    pricingTable: {
+      billingCycle: LocalizationValue;
+      included: LocalizationValue;
+    };
+    paymentSource: {
+      dev: {
+        testCardInfo: LocalizationValue;
+        developmentMode: LocalizationValue;
+        cardNumber: LocalizationValue;
+        expirationDate: LocalizationValue;
+        cvcZip: LocalizationValue;
+        anyNumbers: LocalizationValue;
+      };
+      applePayDescription: {
+        monthly: LocalizationValue;
+        annual: LocalizationValue;
+      };
+    };
     checkout: {
+      title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
@@ -156,6 +188,12 @@ type _LocalizationResource = {
       actionLink: LocalizationValue;
       actionLink__use_phone: LocalizationValue;
       actionLink__use_email: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     emailLink: {
       title: LocalizationValue;
@@ -192,6 +230,13 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formSubtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     continue: {
       title: LocalizationValue;
@@ -235,6 +280,12 @@ type _LocalizationResource = {
       actionLink__use_passkey: LocalizationValue;
       actionText__join_waitlist: LocalizationValue;
       actionLink__join_waitlist: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     password: {
       title: LocalizationValue;
@@ -316,6 +367,12 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;

@@ -62,6 +62,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.checkout.fillTestCard();
     await u.po.checkout.clickPayOrSubscribe();
     await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+    await u.po.checkout.confirmAndContinue();
+
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (app.name.includes('next')) {
+      // Correctly updates RSCs with the new `pla` claim.
+      await expect(u.po.page.getByText('user in plus')).toBeVisible({
+        timeout: 5_000,
+      });
+    }
   });
 
   test('can upgrade to a new plan with saved card', async ({ page, context }) => {
@@ -176,6 +185,34 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
       await u.po.checkout.waitForSubscribeButton();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('checkout always revalidates on open', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.closeDrawer();
+
+      await u.po.checkout.waitForMounted();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus', period: 'monthly' });
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
+      await expect(u.po.page.getByText('- $9.99')).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });
