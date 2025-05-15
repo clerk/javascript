@@ -8,6 +8,11 @@ import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../
 import type { ClerkRequest } from './clerkRequest';
 import type { AuthenticateRequestOptions } from './types';
 
+/**
+ * Interface defining the structure of authentication context data.
+ * Contains all necessary information for request authentication including
+ * headers, cookies, and handshake-related values.
+ */
 interface AuthenticateContext extends AuthenticateRequestOptions {
   // header-based values
   sessionTokenInHeader: string | undefined;
@@ -38,14 +43,14 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
 }
 
 /**
- * All data required to authenticate a request.
- * This is the data we use to decide whether a request
- * is in a signed in or signed out state or if we need
- * to perform a handshake.
+ * Class responsible for managing authentication context data and determining
+ * the authentication state of a request. Handles session tokens, cookies,
+ * headers, and handshake-related operations.
  */
 class AuthenticateContext implements AuthenticateContext {
   /**
    * Retrieves the session token from either the cookie or the header.
+   * Prioritizes cookie-based tokens over header-based ones.
    *
    * @returns {string | undefined} The session token if available, otherwise undefined.
    */
@@ -53,6 +58,14 @@ class AuthenticateContext implements AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
+  /**
+   * Creates a new instance of AuthenticateContext.
+   * Initializes all necessary authentication data from cookies, headers, and options.
+   *
+   * @param {string} cookieSuffix - The suffix to use for cookie names
+   * @param {ClerkRequest} clerkRequest - The request object containing headers and cookies
+   * @param {AuthenticateRequestOptions} options - Configuration options for authentication
+   */
   public constructor(
     private cookieSuffix: string,
     private clerkRequest: ClerkRequest,
@@ -70,6 +83,12 @@ class AuthenticateContext implements AuthenticateContext {
     this.clerkUrl = this.clerkRequest.clerkUrl;
   }
 
+  /**
+   * Determines whether to use suffixed or unsuffixed cookies for authentication.
+   * Implements complex logic to handle various edge cases and migration scenarios.
+   *
+   * @returns {boolean} True if suffixed cookies should be used, false otherwise
+   */
   public usesSuffixedCookies(): boolean {
     const suffixedClientUat = this.getSuffixedCookie(constants.Cookies.ClientUat);
     const clientUat = this.getCookie(constants.Cookies.ClientUat);
@@ -159,6 +178,13 @@ class AuthenticateContext implements AuthenticateContext {
     return true;
   }
 
+  /**
+   * Initializes publishable key related values and validates the key.
+   * Sets up instance type and frontend API information.
+   *
+   * @param {AuthenticateRequestOptions} options - Configuration options containing the publishable key
+   * @throws {Error} If the publishable key is invalid
+   */
   private initPublishableKeyValues(options: AuthenticateRequestOptions) {
     assertValidPublishableKey(options.publishableKey);
     this.publishableKey = options.publishableKey;
@@ -172,6 +198,10 @@ class AuthenticateContext implements AuthenticateContext {
     this.frontendApi = pk.frontendApi;
   }
 
+  /**
+   * Initializes header-based values from the request.
+   * Extracts and processes various HTTP headers for authentication.
+   */
   private initHeaderValues() {
     this.sessionTokenInHeader = this.parseAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
@@ -185,6 +215,10 @@ class AuthenticateContext implements AuthenticateContext {
     this.accept = this.getHeader(constants.Headers.Accept);
   }
 
+  /**
+   * Initializes cookie-based values from the request.
+   * Handles both suffixed and unsuffixed cookies based on the current configuration.
+   */
   private initCookieValues() {
     // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
     this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
@@ -192,6 +226,10 @@ class AuthenticateContext implements AuthenticateContext {
     this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
   }
 
+  /**
+   * Initializes handshake-related values from the request.
+   * Processes dev browser tokens, handshake tokens, and nonce values.
+   */
   private initHandshakeValues() {
     this.devBrowserToken =
       this.getQueryParam(constants.QueryParameters.DevBrowser) ||
@@ -204,22 +242,52 @@ class AuthenticateContext implements AuthenticateContext {
       this.getQueryParam(constants.QueryParameters.HandshakeNonce) || this.getCookie(constants.Cookies.HandshakeNonce);
   }
 
+  /**
+   * Retrieves a query parameter value from the request URL.
+   *
+   * @param {string} name - The name of the query parameter
+   * @returns {string | null} The value of the query parameter or null if not found
+   */
   private getQueryParam(name: string) {
     return this.clerkRequest.clerkUrl.searchParams.get(name);
   }
 
+  /**
+   * Retrieves a header value from the request.
+   *
+   * @param {string} name - The name of the header
+   * @returns {string | undefined} The value of the header or undefined if not found
+   */
   private getHeader(name: string) {
     return this.clerkRequest.headers.get(name) || undefined;
   }
 
+  /**
+   * Retrieves a cookie value from the request.
+   *
+   * @param {string} name - The name of the cookie
+   * @returns {string | undefined} The value of the cookie or undefined if not found
+   */
   private getCookie(name: string) {
     return this.clerkRequest.cookies.get(name) || undefined;
   }
 
+  /**
+   * Retrieves a suffixed cookie value from the request.
+   *
+   * @param {string} name - The base name of the cookie
+   * @returns {string | undefined} The value of the suffixed cookie or undefined if not found
+   */
   private getSuffixedCookie(name: string) {
     return this.getCookie(getSuffixedCookieName(name, this.cookieSuffix)) || undefined;
   }
 
+  /**
+   * Retrieves either a suffixed or unsuffixed cookie value based on the current configuration.
+   *
+   * @param {string} cookieName - The base name of the cookie
+   * @returns {string | undefined} The value of the cookie or undefined if not found
+   */
   private getSuffixedOrUnSuffixedCookie(cookieName: string) {
     if (this.usesSuffixedCookies()) {
       return this.getSuffixedCookie(cookieName);
@@ -227,6 +295,13 @@ class AuthenticateContext implements AuthenticateContext {
     return this.getCookie(cookieName);
   }
 
+  /**
+   * Parses an Authorization header value to extract the token.
+   * Supports both Bearer token and raw token formats.
+   *
+   * @param {string | undefined | null} authorizationHeader - The Authorization header value
+   * @returns {string | undefined} The extracted token or undefined if invalid
+   */
   private parseAuthorizationHeader(authorizationHeader: string | undefined | null): string | undefined {
     if (!authorizationHeader) {
       return undefined;
@@ -247,6 +322,12 @@ class AuthenticateContext implements AuthenticateContext {
     return undefined;
   }
 
+  /**
+   * Checks if a JWT token contains an issuer claim.
+   *
+   * @param {string} token - The JWT token to check
+   * @returns {boolean} True if the token has an issuer claim, false otherwise
+   */
   private tokenHasIssuer(token: string): boolean {
     const { data, errors } = decodeJwt(token);
     if (errors) {
@@ -255,6 +336,12 @@ class AuthenticateContext implements AuthenticateContext {
     return !!data.payload.iss;
   }
 
+  /**
+   * Verifies if a token belongs to the current instance by checking its issuer.
+   *
+   * @param {string} token - The JWT token to verify
+   * @returns {boolean} True if the token belongs to the current instance, false otherwise
+   */
   private tokenBelongsToInstance(token: string): boolean {
     if (!token) {
       return false;
@@ -268,6 +355,12 @@ class AuthenticateContext implements AuthenticateContext {
     return this.frontendApi === tokenIssuer;
   }
 
+  /**
+   * Checks if a JWT session has expired.
+   *
+   * @param {Jwt | undefined} jwt - The JWT to check
+   * @returns {boolean} True if the session has expired, false otherwise
+   */
   private sessionExpired(jwt: Jwt | undefined): boolean {
     return !!jwt && jwt?.payload.exp <= (Date.now() / 1000) >> 0;
   }
@@ -275,6 +368,13 @@ class AuthenticateContext implements AuthenticateContext {
 
 export type { AuthenticateContext };
 
+/**
+ * Creates a new AuthenticateContext instance with the provided request and options.
+ *
+ * @param {ClerkRequest} clerkRequest - The request object containing headers and cookies
+ * @param {AuthenticateRequestOptions} options - Configuration options for authentication
+ * @returns {Promise<AuthenticateContext>} A promise that resolves to a new AuthenticateContext instance
+ */
 export const createAuthenticateContext = async (
   clerkRequest: ClerkRequest,
   options: AuthenticateRequestOptions,
