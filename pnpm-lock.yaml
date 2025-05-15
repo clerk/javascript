@@ -497,6 +497,9 @@ importers:
       regenerator-runtime:
         specifier: 0.13.11
         version: 0.13.11
+      swr:
+        specifier: 2.3.3
+        version: 2.3.3(react@18.3.1)
     devDependencies:
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.13
