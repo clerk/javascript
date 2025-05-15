@@ -1,47 +1,50 @@
-import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { __internal_CheckoutProps, CommerceCheckoutResource } from '@clerk/types';
-import { useEffect, useState } from 'react';
-
-import { useFetch } from '../../hooks/useFetch';
+import type { __internal_CheckoutProps } from '@clerk/types';
+import { useEffect } from 'react';
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 export const useCheckout = (props: __internal_CheckoutProps) => {
   const { planId, planPeriod, subscriberType = 'user' } = props;
   const clerk = useClerk();
   const { organization } = useOrganization();
-  const [currentCheckout, setCurrentCheckout] = useState<CommerceCheckoutResource | null>(null);
+
   const { user } = useUser();
-  const {
-    data: initialCheckout,
-    isLoading,
-    invalidate,
-    revalidate,
-    error: _error,
-  } = useFetch(
-    clerk.billing?.startCheckout,
+
+  const cacheKey = {
+    key: `commerce-checkout`,
+    userId: user?.id,
+    ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+    planId,
+    planPeriod,
+  };
+
+  const { data, mutate } = useSWR(cacheKey);
+
+  const { trigger, isMutating, error } = useSWRMutation(
+    cacheKey,
+    key =>
+      clerk.billing?.startCheckout({
+        planId: key.planId,
+        planPeriod: key.planPeriod,
+        ...(key.orgId ? { orgId: key.orgId } : {}),
+      }),
     {
-      planId,
-      planPeriod,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      throwOnError: true,
+      onSuccess: data => {
+        mutate(data, false);
+      },
     },
-    undefined,
-    `commerce-checkout-${user?.id}`,
   );
 
-  const error = _error as ClerkAPIResponseError | undefined;
-
   useEffect(() => {
-    if (initialCheckout && !currentCheckout) {
-      setCurrentCheckout(initialCheckout);
-    }
-  }, [initialCheckout, currentCheckout]);
+    void trigger();
+  }, []);
 
   return {
-    checkout: currentCheckout || initialCheckout,
-    updateCheckout: setCurrentCheckout,
-    isLoading,
-    invalidate,
-    revalidate,
+    checkout: data,
+    updateCheckout: (checkout: CommerceCheckoutResource) => mutate(checkout, false),
+    isLoading: isMutating,
     errors: error?.errors,
   };
 };

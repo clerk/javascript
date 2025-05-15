@@ -1,5 +1,4 @@
 import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
-import { useEffect } from 'react';
 
 import { usePlans } from '../../contexts';
 import {
@@ -28,7 +27,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const { data: plans, isLoading: plansLoading } = usePlans();
 
-  const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
+  const { checkout, isLoading, updateCheckout, errors } = useCheckout({
     planId,
     planPeriod,
     subscriberType,
@@ -39,14 +38,9 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const plan = plans?.find(p => p.id === planId);
 
   const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
-    invalidate(); // invalidate the initial checkout on complete
-    updateCheckout(newCheckout);
+    void updateCheckout(newCheckout);
     onSubscriptionComplete?.();
   };
-
-  useEffect(() => {
-    return invalidate;
-  }, []);
 
   if (isLoading || plansLoading) {
     return (
