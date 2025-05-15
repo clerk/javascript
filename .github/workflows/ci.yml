@@ -401,6 +401,7 @@ jobs:
 
     env:
       TURBO_SUMMARIZE: false
+      PKG_PR_NEW_VERSION: latest
 
     steps:
       - name: Checkout repository
@@ -420,4 +421,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
-        run: pnpm run build && pnpx pkg-pr-new@${{env.PKG_PR_NEW_VERSION || 'latest'}} publish --compact --pnpm './packages/*'
+        run: pnpm run build && pnpx pkg-pr-new@${{ env.PKG_PR_NEW_VERSION }} publish --compact --pnpm './packages/*'
