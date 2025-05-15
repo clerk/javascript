@@ -8,6 +8,9 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
     waitForMounted: (selector = '.cl-checkout-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
+    closeDrawer: () => {
+      return page.locator('.cl-drawerClose').click();
+    },
     fillTestCard: async () => {
       await self.fillCard({
         number: '4242424242424242',
