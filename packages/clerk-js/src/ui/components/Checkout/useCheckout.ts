@@ -25,7 +25,11 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
   const { data, mutate } = useSWR(cacheKey);
 
   // Use `useSWRMutation` to avoid revalidations on stale-data/focus etc.
-  const { trigger, isMutating, error } = useSWRMutation(
+  const {
+    trigger: startCheckout,
+    isMutating,
+    error,
+  } = useSWRMutation(
     cacheKey,
     key =>
       clerk.billing?.startCheckout(
@@ -33,8 +37,8 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
         key.arguments,
       ),
     {
-      // TODO: Checkt if this is needed
-      throwOnError: true,
+      // Never throw on error, we want to handle it during rendering
+      throwOnError: false,
       onSuccess: data => {
         mutate(data, false);
       },
@@ -42,7 +46,7 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
   );
 
   useEffect(() => {
-    void trigger();
+    void startCheckout();
     return () => {
       // Clear the cache on unmount
       mutate(undefined, false);
@@ -51,6 +55,7 @@ export const useCheckout = (props: __internal_CheckoutProps) => {
 
   return {
     checkout: data,
+    startCheckout,
     updateCheckout: (checkout: CommerceCheckoutResource) => mutate(checkout, false),
     isLoading: isMutating,
     errors: error?.errors,

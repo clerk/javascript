@@ -100,6 +100,34 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Success!')).toBeVisible();
   });
 
+  test('user is prompted to add email before checkout', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const fakeUser = u.services.users.createFakeUser({ withEmail: false, withPhoneNumber: true });
+    await u.services.users.createBapiUser(fakeUser);
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.usePhoneNumberIdentifier().click();
+    await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+    await u.po.page.goToRelative('/pricing-table');
+
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    await u.po.checkout.waitForMounted();
+    await expect(u.po.page.getByText('Checkout')).toBeVisible();
+    await expect(u.po.page.getByText(/^Add an email address$/i)).toBeVisible();
+
+    const newFakeUser = u.services.users.createFakeUser();
+    const newFakeEmail = `new-${newFakeUser.email}`;
+    await u.po.userProfile.typeEmailAddress(newFakeEmail);
+
+    await u.page.getByRole('button', { name: /^add$/i }).click();
+    await u.po.userProfile.enterTestOtpCode();
+    await u.po.checkout.clickPayOrSubscribe();
+  });
+
   // test('can manage and cancel subscription', async ({ page, context }) => {
   //   const u = createTestUtils({ app, page, context });
   //   await u.po.signIn.goTo();

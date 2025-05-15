@@ -27,7 +27,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const { data: plans, isLoading: plansLoading } = usePlans();
 
-  const { checkout, isLoading, updateCheckout, errors } = useCheckout({
+  const { checkout, isLoading, updateCheckout, errors, startCheckout } = useCheckout({
     planId,
     planPeriod,
     subscriberType,
@@ -81,7 +81,7 @@ export const CheckoutPage = (props: __internal_CheckoutProps) => {
           <EmailForm
             title={localizationKeys('commerce.checkout.emailForm.title')}
             subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-            onSuccess={revalidate}
+            onSuccess={startCheckout}
             onReset={() => setIsOpen(false)}
             disableAutoFocus
           />
