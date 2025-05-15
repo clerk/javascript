@@ -274,18 +274,16 @@ const AddPaymentSourceForm = withCardStateProvider(
                   <Text
                     variant='caption'
                     colorScheme='body'
-                  >
-                    <Text localizationKey={localizationKeys('commerce.paymentSource.dev.testCardInfo')} />
-                  </Text>
+                    localizationKey={localizationKeys('commerce.paymentSource.dev.testCardInfo')}
+                  />
                   <Text
                     variant='caption'
                     sx={t => ({
                       color: t.colors.$warning500,
                       fontWeight: t.fontWeights.$semibold,
                     })}
-                  >
-                    <Text localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')} />
-                  </Text>
+                    localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+                  />
                 </Box>
                 <LineItems.Root>
                   <LineItems.Group variant='tertiary'>
@@ -403,9 +401,8 @@ const PayWithTestPaymentSource = withCardStateProvider(
               color: t.colors.$warning500,
               fontWeight: t.fontWeights.$semibold,
             })}
-          >
-            <Text localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')} />
-          </Text>
+            localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+          />
           <Button
             type='button'
             block
