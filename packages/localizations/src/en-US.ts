@@ -7,7 +7,7 @@ export const enUS: LocalizationResource = {
     action__search: 'Search keys',
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
     formTitle: 'Add new API key',
-    menuAction__revoke: 'Revoke',
+    menuAction__revoke: 'Revoke key',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',

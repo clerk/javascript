@@ -5,18 +5,21 @@ import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elemen
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFormControl } from '../../utils';
 
+export type OnCreateParams = { name: string; description?: string; expiration: Expiration };
+
 interface CreateApiKeyFormProps {
-  onCreate: (params: { name: string; description?: string; expiration: Expiration; closeFn: () => void }) => void;
+  onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
+  isSubmitting: boolean;
 }
 
 export type Expiration = 'never' | '30d' | '90d' | 'custom';
 
-export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
+export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const { close } = useActionContext();
   const [expiration, setExpiration] = useState<Expiration>('never');
   const createApiKeyFormId = React.useId();
   const segmentedControlId = `${createApiKeyFormId}-segmented-control`;
+  const { close: closeCardFn } = useActionContext();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -36,12 +39,14 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate({
-      name: nameField.value,
-      description: descriptionField.value || undefined,
-      expiration,
-      closeFn: close,
-    });
+    onCreate(
+      {
+        name: nameField.value,
+        description: descriptionField.value || undefined,
+        expiration,
+      },
+      closeCardFn,
+    );
   };
 
   return (
@@ -106,6 +111,7 @@ export const CreateApiKeyForm = ({ onCreate }: CreateApiKeyFormProps) => {
           <FormButtons
             isDisabled={!canSubmit}
             onReset={close}
+            isLoading={isSubmitting}
           />
         </Flex>
       </Form.Root>
