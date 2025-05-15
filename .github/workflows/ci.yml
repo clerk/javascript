@@ -176,7 +176,7 @@ jobs:
         run: pnpm turbo lint:attw $TURBO_ARGS
 
       - name: Run lint
-        run: pnpm turbo lint $TURBO_ARGS -- --quiet
+        run: pnpm turbo lint $TURBO_ARGS
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
