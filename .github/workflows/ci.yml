@@ -389,3 +389,29 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
           path: integration/test-results
           retention-days: 1
+
+  pkg-pr-new:
+    name: Publish with pkg-pr-new
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    needs: [check-permissions, build-packages]
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup Node
+        uses: ./.github/actions/init-blacksmith
+        with:
+          turbo-enabled: true
+          node-version: 22
+
+      - name: Publish with pkg-pr-new
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm pkg-pr-new

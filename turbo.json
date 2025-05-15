@@ -146,6 +146,10 @@
     "format:check": {
       "outputs": []
     },
+    "pkg-pr-new": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
     "//#test:integration:ap-flows": {
       "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
