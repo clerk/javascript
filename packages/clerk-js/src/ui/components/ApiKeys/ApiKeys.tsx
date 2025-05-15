@@ -5,7 +5,7 @@ import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext } from '../../contexts';
 import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { Card, InputWithIcon, Pagination, withCardStateProvider } from '../../elements';
+import { Card, InputWithIcon, Pagination, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { MagnifyingGlass } from '../../icons';
 import { ApiKeysTable } from './ApiKeysTable';
@@ -28,19 +28,9 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
     mutate: mutateApiKeys,
     cacheKey,
   } = useApiKeys({ subject, perPage });
-  const { trigger: createApiKey, isMutating } = useSWRMutation(
-    cacheKey,
-    (_, { arg }: { arg: CreateApiKeyParams }) => clerk.createApiKey(arg),
-    {
-      throwOnError: false,
-      onError(err) {
-        if (isClerkAPIResponseError(err)) {
-          console.log(err.errors);
-          console.log(err.message);
-          console.log(err.name);
-        }
-      },
-    },
+  const card = useCardState();
+  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateApiKeyParams }) =>
+    clerk.createApiKey(arg),
   );
   const { t } = useLocalizations();
   const clerk = useClerk();
@@ -52,12 +42,21 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
   };
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
-    await createApiKey({
-      name: params.name,
-      creationReason: params.description,
-      secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
-    });
-    closeCardFn();
+    try {
+      await createApiKey({
+        name: params.name,
+        creationReason: params.description,
+        secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
+      });
+      closeCardFn();
+      card.setError(undefined);
+    } catch (err: any) {
+      if (isClerkAPIResponseError(err)) {
+        if (err.status === 409) {
+          card.setError('API Key name already exists');
+        }
+      }
+    }
   };
 
   return (
