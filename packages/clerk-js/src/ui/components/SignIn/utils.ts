@@ -159,3 +159,29 @@ export const getPreferredAlternativePhoneChannel = (
   }
   return preferredChannel;
 };
+
+// This function is almost identical to getPreferredAlternativePhoneChannel, but it's used in the combined flow
+// where we don't have access to the form fields.
+export const getPreferredAlternativePhoneChannelForCombinedFlow = (
+  preferredChannels: Record<string, PhoneCodeChannel> | null,
+  identifierAttribute: 'phoneNumber' | 'emailAddress' | 'username',
+  identifierValue: string,
+): PhoneCodeChannel | null => {
+  if (!preferredChannels) {
+    return null;
+  }
+  if (!identifierAttribute || identifierAttribute !== 'phoneNumber') {
+    return null;
+  }
+  if (!identifierValue || !identifierValue?.startsWith('+')) {
+    return null;
+  }
+  const preferredChannel: PhoneCodeChannel | null = getPreferredPhoneCodeChannelByCountry(
+    identifierValue,
+    preferredChannels,
+  );
+  if (preferredChannel === 'sms') {
+    return null;
+  }
+  return preferredChannel;
+};

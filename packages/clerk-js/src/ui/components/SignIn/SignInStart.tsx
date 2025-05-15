@@ -41,7 +41,11 @@ import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
-import { getPreferredAlternativePhoneChannel, getSignUpAttributeFromIdentifier } from './utils';
+import {
+  getPreferredAlternativePhoneChannel,
+  getPreferredAlternativePhoneChannelForCombinedFlow,
+  getSignUpAttributeFromIdentifier,
+} from './utils';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -453,7 +457,13 @@ function SignInStartInternal(): JSX.Element {
         redirectUrl,
         redirectUrlComplete,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
-        alternativePhoneCodeProvider,
+        alternativePhoneCodeChannel:
+          alternativePhoneCodeProvider?.channel ||
+          getPreferredAlternativePhoneChannelForCombinedFlow(
+            authConfig.preferredChannels,
+            attribute,
+            identifierField.value,
+          ),
       });
     } else {
       handleError(e, [identifierField, instantPasswordField], card.setError);
