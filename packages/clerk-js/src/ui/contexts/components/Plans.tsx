@@ -2,63 +2,58 @@ import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/re
 import type {
   Appearance,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
 } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import useSWR from 'swr';
 
 import { CommerceSubscription } from '../../../core/resources/internal';
-import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import type { PlansCtx } from '../../types';
 import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-const PlansContext = createContext<PlansCtx | null>(null);
+const dedupeOptions = {
+  dedupingInterval: 1_000 * 60, // 1 minute,
+};
 
-export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
-  const { billing } = useClerk();
+export const usePaymentSourcesCacheKey = () => {
   const { organization } = useOrganization();
   const { user } = useUser();
-  const resource = subscriberType === 'org' ? organization : user;
+  const subscriberType = useSubscriberTypeContext();
 
-  return useFetch(
-    user ? billing.getSubscriptions : undefined,
-    { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    undefined,
-    `commerce-subscriptions-${resource?.id}`,
-  );
+  return {
+    key: `commerce-payment-sources`,
+    resourceId: subscriberType === 'org' ? organization?.id : user?.id,
+  };
 };
 
-export const usePlans = (subscriberType?: CommerceSubscriberType) => {
+export const usePaymentSources = () => {
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
+  const cacheKey = usePaymentSourcesCacheKey();
+
+  return useSWR(cacheKey, () => (subscriberType === 'org' ? organization : user)?.getPaymentSources({}), dedupeOptions);
+};
+
+export const useSubscriptions = () => {
   const { billing } = useClerk();
-
-  return useFetch(
-    billing.getPlans,
-    {
-      subscriberType,
-    },
-    undefined,
-    'commerce-plans',
-  );
-};
-
-export const PlansContextProvider = ({ children }: PropsWithChildren) => {
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  const resource = subscriberType === 'org' ? organization : user;
+  const { data: plans } = usePlans();
 
-  const {
-    data: _subscriptions,
-    isLoading: isLoadingSubscriptions,
-    revalidate: revalidateSubscriptions,
-  } = useSubscriptions(subscriberType);
-
-  const { data: plans, isLoading: isLoadingPlans, revalidate: revalidatePlans } = usePlans(subscriberType);
+  const { data: _subscriptions, ...rest } = useSWR(
+    {
+      key: `commerce-subscriptions`,
+      userId: user?.id,
+      args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
+    },
+    ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
+    dedupeOptions,
+  );
 
   const subscriptions = useMemo(() => {
     if (!_subscriptions) {
@@ -91,42 +86,23 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     return _subscriptions.data;
   }, [_subscriptions, plans, isSignedIn]);
 
-  // Revalidates the next time the hooks gets mounted
-  const { revalidate: revalidateStatements } = useFetch(
-    undefined,
+  return {
+    data: subscriptions,
+    ...rest,
+  };
+};
+
+export const usePlans = () => {
+  const { billing } = useClerk();
+  const subscriberType = useSubscriberTypeContext();
+
+  return useSWR(
     {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      key: `commerce-plans`,
+      args: { subscriberType },
     },
-    undefined,
-    `commerce-statements-${resource?.id}`,
-  );
-
-  const revalidate = useCallback(() => {
-    // Revalidate the plans and subscriptions
-    revalidateSubscriptions();
-    revalidatePlans();
-    revalidateStatements();
-  }, [revalidateStatements, revalidatePlans, revalidateSubscriptions]);
-
-  const isLoaded = useMemo(() => {
-    if (isSignedIn) {
-      return isLoadingSubscriptions === false && isLoadingPlans === false;
-    }
-    return isLoadingPlans === false;
-  }, [isLoadingPlans, isLoadingSubscriptions, isSignedIn]);
-
-  return (
-    <PlansContext.Provider
-      value={{
-        componentName: 'Plans',
-        plans: isLoaded ? (plans ?? []) : [],
-        subscriptions: isLoaded ? subscriptions : [],
-        isLoading: isLoadingSubscriptions || isLoadingPlans || false,
-        revalidate,
-      }}
-    >
-      {children}
-    </PlansContext.Provider>
+    ({ args }) => billing.getPlans(args),
+    dedupeOptions,
   );
 };
 
@@ -144,11 +120,6 @@ export const usePlansContext = () => {
   const clerk = useClerk();
   const { session } = useSession();
   const subscriberType = useSubscriberTypeContext();
-  const context = useContext(PlansContext);
-
-  if (!context || context.componentName !== 'Plans') {
-    throw new Error('Clerk: usePlansContext called outside Plans.');
-  }
 
   const canManageBilling = useMemo(() => {
     if (!clerk.session) {
@@ -162,28 +133,49 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { componentName, ...ctx } = context;
+  const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
+
+  const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
+    key: `commerce-plans`,
+    args: { subscriberType },
+  });
+
+  // Revalidates the next time the hooks gets mounted
+  // const { revalidate: revalidateStatements } = useFetch(
+  //   undefined,
+  //   {
+  //     ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+  //   },
+  //   undefined,
+  //   `commerce-statements-${resource?.id}`,
+  // );
+
+  const revalidateAll = useCallback(() => {
+    // Revalidate the plans and subscriptions
+    void mutateSubscriptions();
+    void mutatePlans();
+  }, [mutateSubscriptions, mutatePlans]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return ctx.subscriptions.length === 0 || !ctx.subscriptions.some(subscription => !subscription.canceledAt);
-  }, [ctx.subscriptions]);
+    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAt);
+  }, [subscriptions]);
 
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
     (plan: CommercePlanResource) => {
-      return ctx.subscriptions.find(subscription => subscription.plan.id === plan.id);
+      return subscriptions.find(subscription => subscription.plan.id === plan.id);
     },
-    [ctx.subscriptions],
+    [subscriptions],
   );
 
   // returns all subscriptions for a plan that are active or upcoming
   const activeAndUpcomingSubscriptions = useCallback(
     (plan: CommercePlanResource) => {
-      return ctx.subscriptions.filter(subscription => subscription.plan.id === plan.id);
+      return subscriptions.filter(subscription => subscription.plan.id === plan.id);
     },
-    [ctx.subscriptions],
+    [subscriptions],
   );
 
   // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
@@ -224,10 +216,9 @@ export const usePlansContext = () => {
   // should the default plan be shown as active
   const upcomingSubscriptionsExist = useMemo(() => {
     return (
-      ctx.subscriptions.some(subscription => subscription.status === 'upcoming') ||
-      isDefaultPlanImplicitlyActiveOrUpcoming
+      subscriptions.some(subscription => subscription.status === 'upcoming') || isDefaultPlanImplicitlyActiveOrUpcoming
     );
-  }, [ctx.subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
+  }, [subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
 
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
@@ -291,7 +282,7 @@ export const usePlansContext = () => {
 
         // Handle non-subscription cases
         const hasNonDefaultSubscriptions =
-          ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
+          subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
         return hasNonDefaultSubscriptions
           ? localizationKeys('commerce.switchPlan')
           : localizationKeys('commerce.subscribe');
@@ -305,7 +296,7 @@ export const usePlansContext = () => {
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, ctx.subscriptions],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptions],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
@@ -338,7 +329,7 @@ export const usePlansContext = () => {
           plan,
           subscriberType,
           onSubscriptionCancel: () => {
-            ctx.revalidate();
+            revalidateAll();
             onSubscriptionChange?.();
           },
           appearance,
@@ -351,7 +342,7 @@ export const usePlansContext = () => {
           planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
           subscriberType,
           onSubscriptionComplete: () => {
-            ctx.revalidate();
+            revalidateAll();
             onSubscriptionChange?.();
           },
           onClose: () => {
@@ -365,16 +356,14 @@ export const usePlansContext = () => {
         });
       }
     },
-    [clerk, ctx, activeOrUpcomingSubscription, subscriberType, session?.id],
+    [clerk, revalidateAll, activeOrUpcomingSubscription, subscriberType, session?.id],
   );
 
   const defaultFreePlan = useMemo(() => {
-    return ctx.plans.find(plan => plan.isDefault);
-  }, [ctx.plans]);
+    return plans?.find(plan => plan.isDefault);
+  }, [plans]);
 
   return {
-    ...ctx,
-    componentName,
     activeOrUpcomingSubscription,
     activeAndUpcomingSubscriptions,
     activeOrUpcomingSubscriptionBasedOnPlanPeriod: activeOrUpcomingSubscriptionWithPlanPeriod,
@@ -385,5 +374,6 @@ export const usePlansContext = () => {
     captionForSubscription,
     upcomingSubscriptionsExist,
     defaultFreePlan,
+    revalidateAll,
   };
 };

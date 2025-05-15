@@ -1,10 +1,5 @@
 import { Protect } from '../../common';
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
+import { StatementsContextProvider, SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -30,12 +25,8 @@ const orgTabMap = {
 
 const OrganizationBillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions('org');
-  const { selectedTab, handleTabChange } = useTabState(orgTabMap);
 
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
+  const { selectedTab, handleTabChange } = useTabState(orgTabMap);
 
   return (
     <Col
@@ -96,9 +87,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
 export const OrganizationBillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='org'>
-      <PlansContextProvider>
-        <OrganizationBillingPageInternal />
-      </PlansContextProvider>
+      <OrganizationBillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

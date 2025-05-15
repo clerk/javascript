@@ -79,6 +79,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     },
   };
 
+  //  TODO: use useSWRMutation
   const {
     data: initializedPaymentSource,
     invalidate,
@@ -183,16 +184,6 @@ const AddPaymentSourceForm = withCardStateProvider(
     const { displayConfig } = useEnvironment();
     const { t } = useLocalizations();
 
-    const subscriberType = useSubscriberTypeContext();
-
-    const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
-    const { revalidate } = useFetch(
-      resource?.getPaymentSources,
-      {},
-      undefined,
-      `commerce-payment-sources-${resource?.id}`,
-    );
-
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!stripe || !elements) {
@@ -215,7 +206,6 @@ const AddPaymentSourceForm = withCardStateProvider(
         await onSuccess({ stripeSetupIntent: setupIntent });
 
         // if onSuccess doesn't redirect us, revalidate the payment sources and reset the stripe elements in case we need to input a different payment source
-        revalidate();
         resetStripeElements?.();
       } catch (error) {
         void handleError(error, [], setSubmitError);

@@ -14,6 +14,7 @@ export const StatementsContextProvider = ({ children }: PropsWithChildren) => {
   const subscriberType = useSubscriberTypeContext();
   const { user } = useUser();
 
+  // TODO: use useSWR
   const { data, isLoading, revalidate } = useFetch(
     billing.getStatements,
     { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
