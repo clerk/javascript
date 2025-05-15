@@ -414,4 +414,4 @@ jobs:
       - name: Publish with pkg-pr-new
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm turbo runpkg-pr-new
+        run: pnpm turbo run pkg-pr-new

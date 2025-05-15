@@ -22,7 +22,7 @@
     "lint:packages": "FORCE_COLOR=1 turbo lint",
     "lint:publint": "FORCE_COLOR=1 turbo lint:publint",
     "nuke": "node ./scripts/nuke.mjs",
-    "pkg-pr-new": "pnpx pkg-pr-new publish './packages/*'",
+    "pkg-pr-new": "pnpx pkg-pr-new publish --compact './packages/*' ",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
     "release:canary": "changeset publish --tag canary --no-git-tag",
