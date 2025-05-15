@@ -87,7 +87,7 @@ export async function authenticateRequest(
     const headers = new Headers();
     headers.append(
       'Set-Cookie',
-      `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=None; Secure; Domain=${authenticateContext.clerkUrl.hostname.replace('clerk.', '') || ''};`,
+      `${constants.Cookies.HandshakeFormat}=nonce; Path=/; SameSite=None; Secure; Domain=${authenticateContext.frontendApi.replace(/^clerk\./, '') || ''};`,
     );
     for (const [key, value] of result.headers.entries()) {
       headers.append(key, value);
