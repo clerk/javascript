@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-wip
+Replace `useFetch` with `useSWRMutate` on checkout.
