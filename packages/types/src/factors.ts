@@ -1,3 +1,5 @@
+import type { PhoneCodeChannel } from 'phoneCodeChannel';
+
 import type { PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
 import type {
   BackupCodeStrategy,
@@ -35,6 +37,7 @@ export type PhoneCodeFactor = {
   safeIdentifier: string;
   primary?: boolean;
   default?: boolean;
+  channel?: PhoneCodeChannel;
 };
 
 export type Web3SignatureFactor = {
@@ -113,6 +116,7 @@ export type SamlConfig = SamlFactor & {
 export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
+  oidcPrompt?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {

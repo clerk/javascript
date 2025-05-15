@@ -306,6 +306,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata,
       emailAddress,
       legalAccepted,
+      oidcPrompt,
     } = params;
 
     const authenticateFn = () => {
@@ -316,6 +317,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         unsafeMetadata,
         emailAddress,
         legalAccepted,
+        oidcPrompt,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };

@@ -14,7 +14,7 @@ import { useProtect } from '../../common';
 import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
 import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Alert, Avatar, Drawer, Switch, useDrawerContext } from '../../elements';
-import { formatDate, handleError } from '../../utils';
+import { handleError } from '../../utils';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
@@ -295,27 +295,23 @@ const PlanDetailsInternal = ({
             elementDescriptor={descriptors.drawerConfirmationTitle}
             as='h2'
             textVariant='h3'
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Cancel {subscription.status === 'upcoming' ? 'upcoming ' : ''}
-            {subscription.plan.name} Subscription?
-          </Heading>
+            localizationKey={localizationKeys('commerce.cancelSubscriptionTitle', {
+              plan: `${subscription.status === 'upcoming' ? 'upcoming ' : ''}${subscription.plan.name}`,
+            })}
+          />
           <Text
             elementDescriptor={descriptors.drawerConfirmationDescription}
             colorScheme='secondary'
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            {subscription.status === 'upcoming' ? (
-              <>You will not be charged for this subscription.</>
-            ) : (
-              <>
-                You can keep using &ldquo;{subscription.plan.name}&rdquo; features until{' '}
-                {formatDate(new Date(subscription.periodEnd))}, after which you will no longer have access.
-              </>
-            )}
-          </Text>
+            localizationKey={
+              subscription.status === 'upcoming'
+                ? localizationKeys('commerce.cancelSubscriptionNoCharge')
+                : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                    plan: subscription.plan.name,
+                    date: subscription.periodEnd,
+                  })
+            }
+          />
           {cancelError && (
-            // TODO(@COMMERCE): needs localization
             <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
           )}
         </Drawer.Confirmation>
@@ -382,7 +378,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
       ) : null}
       <Box
         sx={t => ({
-          paddingBlockEnd: t.space.$10,
+          paddingInlineEnd: t.space.$10,
         })}
       >
         <Flex

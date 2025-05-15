@@ -1,7 +1,7 @@
 import type { __internal_CheckoutProps } from '@clerk/types';
 
 import { CheckoutContext, SubscriberTypeContext } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flow, localizationKeys } from '../../customizables';
 import { Drawer } from '../../elements';
 import { CheckoutPage } from './CheckoutPage';
 
@@ -17,7 +17,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             }}
           >
             <Drawer.Content>
-              <Drawer.Header title='Checkout' />
+              <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
               <CheckoutPage {...props} />
             </Drawer.Content>
           </CheckoutContext.Provider>
