@@ -111,6 +111,7 @@ export const enUS: LocalizationResource = {
   },
   dividerText: 'or',
   footerActionLink__useAnotherMethod: 'Use another method',
+  footerActionLink__alternativePhoneCodeProvider: 'Send code via SMS instead',
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',
   footerPageLink__terms: 'Terms',
