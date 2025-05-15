@@ -188,5 +188,33 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await fakeUser.deleteIfExists();
     });
+
+    test('checkout always revalidates on open', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+      await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.closeDrawer();
+
+      await u.po.checkout.waitForMounted();
+      await u.po.pricingTable.startCheckout({ planSlug: 'plus', period: 'monthly' });
+      await u.po.checkout.fillTestCard();
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+      await u.po.pricingTable.startCheckout({ planSlug: 'pro', period: 'monthly' });
+      await expect(u.po.page.getByText('- $9.99')).toBeVisible();
+
+      await fakeUser.deleteIfExists();
+    });
   });
 });
