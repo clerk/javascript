@@ -49,6 +49,8 @@ export const CheckoutComplete = ({
             animationTimingFunction: transitionTiming.bezier,
             animationFillMode: 'forwards',
             opacity: 0,
+            overflow: 'hidden',
+            backgroundColor: t.colors.$colorBackground,
             '@keyframes scaleIn': {
               '0%': {
                 filter: 'blur(10px)',
@@ -67,39 +69,29 @@ export const CheckoutComplete = ({
             }),
           })}
         >
+          {[1, 0.75, 0.5].map((scale, index, array) => {
+            return (
+              <Ring
+                key={scale}
+                scale={scale}
+                index={array.length - 1 - index}
+                isMotionSafe={isMotionSafe}
+              />
+            );
+          })}
           <Box
             sx={t => ({
-              position: 'relative',
-              overflow: 'hidden',
-              backgroundColor: t.colors.$colorBackground,
-              display: 'grid',
-              gridArea: '1/1',
+              position: 'absolute',
+              inset: '0',
+              right: '50%',
+              borderRadius: '50%',
+              backgroundColor: t.colors.$success500,
+              mixBlendMode: 'color',
+              filter: 'blur(20px)',
+              opacity: 0.5,
+              zIndex: 1,
             })}
-          >
-            {[1, 0.75, 0.5].map((scale, index, array) => {
-              return (
-                <Ring
-                  key={scale}
-                  scale={scale}
-                  index={array.length - 1 - index}
-                  isMotionSafe={isMotionSafe}
-                />
-              );
-            })}
-            <Box
-              sx={t => ({
-                position: 'absolute',
-                inset: '0',
-                right: '50%',
-                borderRadius: '50%',
-                backgroundColor: t.colors.$success500,
-                mixBlendMode: 'color',
-                filter: 'blur(20px)',
-                opacity: 0.5,
-                zIndex: 1,
-              })}
-            />
-          </Box>
+          />
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
