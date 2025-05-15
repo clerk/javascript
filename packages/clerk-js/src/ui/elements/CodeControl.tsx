@@ -1,6 +1,6 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { PropsWithChildren } from 'react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Input } from '../customizables';
@@ -159,6 +159,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const [disabled, setDisabled] = React.useState(false);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const firstClickRef = React.useRef(false);
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
   const { otpControl, isLoading, isDisabled, centerAlign = true } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
@@ -167,6 +168,9 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     reset: () => {
       setValues(values.map(() => ''));
       setDisabled(false);
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = '';
+      }
       setTimeout(() => focusInputAt(0), 0);
     },
   }));
@@ -180,6 +184,32 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
       setDisabled(true);
     }
   }, [feedback]);
+
+  // Monitor changes to the hidden input from autofill
+  useEffect(() => {
+    const handleAutofill = () => {
+      const hiddenValue = hiddenInputRef.current?.value || '';
+      if (hiddenValue && hiddenValue.length > 0) {
+        // Distribute the autofilled value to the individual inputs
+        const autofillValues = hiddenValue.split('').slice(0, length);
+        const newValues = Array.from({ length }, (_, i) => autofillValues[i] || '');
+        setValues(newValues);
+      }
+    };
+
+    const hiddenInput = hiddenInputRef.current;
+    if (hiddenInput) {
+      hiddenInput.addEventListener('input', handleAutofill);
+      // Check for immediate autofill on mount
+      setTimeout(handleAutofill, 100);
+    }
+
+    return () => {
+      if (hiddenInput) {
+        hiddenInput.removeEventListener('input', handleAutofill);
+      }
+    };
+  }, [length, setValues]);
 
   const handleMultipleCharValue = ({ eventValue, inputPosition }: { eventValue: string; inputPosition: number }) => {
     const eventValues = (eventValue || '').split('');
@@ -282,6 +312,27 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
       gap={2}
       sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
     >
+      {/* Hidden input to catch autofill */}
+      <input
+        ref={hiddenInputRef}
+        type='text'
+        autoComplete='one-time-code'
+        name='otp'
+        inputMode='numeric'
+        style={{
+          opacity: 0,
+          position: 'absolute',
+          pointerEvents: 'none',
+          width: '1px',
+          height: '1px',
+          clip: 'rect(0 0 0 0)',
+          clipPath: 'inset(50%)',
+          overflow: 'hidden',
+        }}
+        aria-hidden='true'
+        tabIndex={-1}
+      />
+
       {values.map((value, index: number) => (
         <SingleCharInput
           elementDescriptor={descriptors.otpCodeFieldInput}
@@ -295,7 +346,6 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           id={`digit-${index}-field`}
           ref={node => (refs.current[index] = node)}
           autoFocus={index === 0 || undefined}
-          autoComplete='one-time-code'
           aria-label={`${index === 0 ? 'Enter verification code. ' : ''}Digit ${index + 1}`}
           isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
           hasError={feedbackType === 'error'}
