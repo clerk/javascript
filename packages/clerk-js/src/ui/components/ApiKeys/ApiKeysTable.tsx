@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { ApiKeyResource } from '@clerk/types';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 import {
   Button,
@@ -19,21 +20,13 @@ import {
   Tr,
 } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
-import { useClipboard, useFetch } from '../../hooks';
+import { useClipboard } from '../../hooks';
 import { Check, Copy, Eye, EyeSlash } from '../../icons';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
 
-  const getSecret = async (apiKeyID?: string) => {
-    if (!apiKeyID) {
-      return '';
-    }
-    const secret = await clerk.getApiKeySecret(apiKeyID);
-    return secret;
-  };
-
-  return useFetch(getSecret, enabled ? apiKeyID : undefined);
+  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, ([_, id]) => clerk.getApiKeySecret(id));
 };
 
 const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
