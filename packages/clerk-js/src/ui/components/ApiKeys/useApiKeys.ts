@@ -1,8 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
+import useSWR from 'swr';
 
 import { unixEpochToDate } from '../../../utils/date';
-import { useFetch } from '../../hooks';
 import type { Expiration } from './CreateApiKeyForm';
 
 function getTimeLeftInSeconds(expirationOption: Expiration) {
@@ -28,8 +28,8 @@ export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?
   const {
     data: apiKeys,
     isLoading,
-    revalidate,
-  } = useFetch(clerk.getApiKeys, { subject }, undefined, `api-key-source-${subject}`);
+    mutate,
+  } = useSWR(['api-keys', subject], ([_, userIdOrOrgId]) => clerk.getApiKeys({ subject: userIdOrOrgId }));
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const itemsPerPage = perPage;
@@ -53,13 +53,13 @@ export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?
       secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
     });
     params.closeFn();
-    revalidate();
+    void mutate();
   };
 
   const revokeApiKey = async (apiKeyID: string) => {
     await clerk.revokeApiKey({ apiKeyID, revocationReason: 'Revoked by user' });
     setPage(1);
-    revalidate();
+    void mutate();
   };
 
   return {
