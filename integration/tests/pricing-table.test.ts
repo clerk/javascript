@@ -120,12 +120,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText(/^Add an email address$/i)).toBeVisible();
 
     const newFakeUser = u.services.users.createFakeUser();
-    const newFakeEmail = `new-${newFakeUser.email}`;
-    await u.po.userProfile.typeEmailAddress(newFakeEmail);
+    await u.po.userProfile.typeEmailAddress(newFakeUser.email);
 
     await u.page.getByRole('button', { name: /^add$/i }).click();
     await u.po.userProfile.enterTestOtpCode();
     await u.po.checkout.clickPayOrSubscribe();
+
+    await newFakeUser.deleteIfExists();
   });
 
   // test('can manage and cancel subscription', async ({ page, context }) => {
