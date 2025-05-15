@@ -412,6 +412,4 @@ jobs:
           node-version: 22
 
       - name: Publish with pkg-pr-new
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm run build && pnpx pkg-pr-new publish --compact --pnpm './packages/*'
