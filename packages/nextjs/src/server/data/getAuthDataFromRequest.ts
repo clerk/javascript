@@ -31,11 +31,7 @@ export const getAuthDataFromRequestSync = (
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions = {},
 ): SignedInAuthObject | SignedOutAuthObject => {
-  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
-  const authToken = getAuthKeyFromRequest(req, 'AuthToken');
-  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
-  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
-  const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
+  const { authStatus, authMessage, authReason, authToken, authSignature } = getAuthHeaders(req);
 
   opts.logger?.debug('headers', { authStatus, authMessage, authReason });
 
@@ -82,30 +78,53 @@ export const getAuthDataFromRequestAsync = async (
   req: RequestLike,
   opts: GetAuthDataFromRequestOptions = {},
 ): Promise<AuthObject> => {
+  const { authStatus, authMessage, authReason } = getAuthHeaders(req);
+
+  opts.logger?.debug('headers', { authStatus, authMessage, authReason });
+
   const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
 
   if (bearerToken && isMachineToken(bearerToken)) {
     const tokenType = getMachineTokenType(bearerToken);
 
-    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
-      return unauthenticatedMachineObject(tokenType);
-    }
-
     const options = {
       secretKey: opts?.secretKey || SECRET_KEY,
       publishableKey: PUBLISHABLE_KEY,
       apiUrl: API_URL,
+      authStatus,
+      authMessage,
+      authReason,
     };
 
-    // TODO: Cache the result of verifyMachineAuthToken
+    if (!isTokenTypeAccepted(tokenType, acceptsToken)) {
+      return unauthenticatedMachineObject(tokenType, options);
+    }
+
+    // TODO(Rob): Cache the result of verifyMachineAuthToken
     const { data, errors } = await verifyMachineAuthToken(bearerToken, options);
     if (errors) {
-      return unauthenticatedMachineObject(tokenType);
+      return unauthenticatedMachineObject(tokenType, options);
     }
 
     return authenticatedMachineObject(tokenType, bearerToken, data);
   }
 
   return getAuthDataFromRequestSync(req, opts);
+};
+
+const getAuthHeaders = (req: RequestLike) => {
+  const authStatus = getAuthKeyFromRequest(req, 'AuthStatus');
+  const authToken = getAuthKeyFromRequest(req, 'AuthToken');
+  const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
+  const authReason = getAuthKeyFromRequest(req, 'AuthReason');
+  const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
+
+  return {
+    authStatus,
+    authToken,
+    authMessage,
+    authReason,
+    authSignature,
+  };
 };

@@ -12,6 +12,7 @@ import {
   constants,
   createClerkRequest,
   createRedirect,
+  isMachineToken,
   isTokenTypeAccepted,
   signedOutAuthObject,
   TokenType,
@@ -31,6 +32,7 @@ import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { type ContentSecurityPolicyOptions, createContentSecurityPolicyHeaders } from './content-security-policy';
 import { errorThrower } from './errorThrower';
+import { getHeader } from './headers-utils';
 import { getKeylessCookieValue } from './keyless';
 import { clerkMiddlewareRequestDataStorage, clerkMiddlewareRequestDataStore } from './middleware-storage';
 import {
@@ -279,11 +281,14 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       const resolvedParams = typeof params === 'function' ? await params(request) : params;
       const keyless = await getKeylessCookieValue(name => request.cookies.get(name)?.value);
+
       const isMissingPublishableKey = !(resolvedParams.publishableKey || PUBLISHABLE_KEY || keyless?.publishableKey);
+      const authHeader = getHeader(request, constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
+
       /**
        * In keyless mode, if the publishable key is missing, let the request through, to render `<ClerkProvider/>` that will resume the flow gracefully.
        */
-      if (isMissingPublishableKey) {
+      if (isMissingPublishableKey && !isMachineToken(authHeader)) {
         const res = NextResponse.next();
         setRequestHeadersOnNextResponse(res, request, {
           [constants.Headers.AuthStatus]: 'signed-out',
