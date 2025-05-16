@@ -142,6 +142,7 @@ export const csCZ: LocalizationResource = {
   formFieldHintText__slug:
     'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadejte záložní kód',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Potvrďte smazání účtu',
@@ -160,6 +161,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Záložní kód',

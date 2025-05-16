@@ -1675,7 +1675,7 @@ export type CreateApiKeyParams = {
   name: string;
   subject?: string;
   secondsUntilExpiration?: number;
-  creationReason?: string;
+  description?: string;
 };
 
 export type RevokeApiKeyParams = {

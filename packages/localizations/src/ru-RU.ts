@@ -143,6 +143,7 @@ export const ruRU: LocalizationResource = {
   formFieldHintText__slug:
     'Slug - это человекочитаемый идентификатор, который должен быть уникальным. Он часто используется в URL-адресах.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Удалить учетную запись',
@@ -161,6 +162,7 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код восстановления',

@@ -5,7 +5,7 @@ import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elemen
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFormControl } from '../../utils';
 
-export type OnCreateParams = { name: string; description?: string; expiration: Expiration };
+export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
 
 interface CreateApiKeyFormProps {
   onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
@@ -13,6 +13,39 @@ interface CreateApiKeyFormProps {
 }
 
 export type Expiration = 'never' | '30d' | '90d' | 'custom';
+
+const getTimeLeftInSeconds = (expirationOption: Expiration, customDate?: string) => {
+  if (expirationOption === 'never') {
+    return;
+  }
+
+  const now = new Date();
+  let future = new Date(now);
+
+  switch (expirationOption) {
+    case '30d':
+      future.setDate(future.getDate() + 30);
+      break;
+    case '90d':
+      future.setDate(future.getDate() + 90);
+      break;
+    case 'custom':
+      future = new Date(customDate as string);
+      break;
+    default:
+      throw new Error('Invalid expiration option');
+  }
+
+  const diffInMs = future.getTime() - now.getTime();
+  const diffInSecs = Math.floor(diffInMs / 1000);
+  return diffInSecs;
+};
+
+const getMinDate = () => {
+  const min = new Date();
+  min.setDate(min.getDate() + 1);
+  return min.toISOString().split('T')[0];
+};
 
 export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -35,6 +68,13 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     isRequired: false,
   });
 
+  const expirationDateField = useFormControl('expirationDate', '', {
+    type: 'date',
+    label: localizationKeys('formFieldLabel__apiKeyExpirationDate'),
+    placeholder: localizationKeys('formFieldInputPlaceholder__apiKeyExpirationDate'),
+    isRequired: false,
+  });
+
   const canSubmit = nameField.value.length > 2;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -43,7 +83,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
       {
         name: nameField.value,
         description: descriptionField.value || undefined,
-        expiration,
+        expiration: getTimeLeftInSeconds(expiration, expirationDateField.value),
       },
       closeCardFn,
     );
@@ -96,6 +136,15 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                 />
               </SegmentedControl.Root>
             </Col>
+            {expiration === 'custom' && (
+              <Form.ControlRow elementId={expirationDateField.id}>
+                <Form.PlainInput
+                  type='date'
+                  {...expirationDateField.props}
+                  min={getMinDate()}
+                />
+              </Form.ControlRow>
+            )}
           </>
         )}
         <Flex
