@@ -1055,6 +1055,7 @@ type _LocalizationResource = {
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
+    formButtonPrimary__add: LocalizationValue;
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
     action__add: LocalizationValue;
