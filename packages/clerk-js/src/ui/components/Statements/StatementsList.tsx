@@ -1,7 +1,7 @@
 import type { CommerceStatementResource } from '@clerk/types';
 import React from 'react';
 
-import { useStatementsContext } from '../../contexts';
+import { useStatements } from '../../../ui/contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '../../customizables';
 import { Pagination } from '../../elements';
@@ -14,19 +14,19 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
  * -----------------------------------------------------------------------------------------------*/
 
 export const StatementsList = () => {
-  const { statements, isLoading, totalCount } = useStatementsContext();
+  const { data: statements, isLoading } = useStatements();
 
   return (
     <DataTable
       page={1}
       onPageChange={_ => {}}
-      itemCount={totalCount}
+      itemCount={statements?.total_count || 0}
       pageCount={1}
       itemsPerPage={10}
       isLoading={isLoading}
       emptyStateLocalizationKey='No statements to display'
       headers={['Date', 'Amount']}
-      rows={statements.map(i => (
+      rows={(statements?.data || []).map(i => (
         <StatementsListRow
           key={i.id}
           statement={i}

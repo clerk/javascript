@@ -23,7 +23,7 @@ import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../
 import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[];
+  plans: CommercePlanResource[] | undefined;
   highlightedPlan?: CommercePlanResource['slug'];
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;

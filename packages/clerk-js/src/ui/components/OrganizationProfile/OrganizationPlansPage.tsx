@@ -1,5 +1,5 @@
 import { Protect } from '../../common';
-import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
+import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { Flex } from '../../customizables';
 import { Alert, Header } from '../../elements';
 import { localizationKeys } from '../../localization';
@@ -50,9 +50,7 @@ const OrganizationPlansPageInternal = () => {
 export const OrganizationPlansPage = () => {
   return (
     <SubscriberTypeContext.Provider value='org'>
-      <PlansContextProvider>
-        <OrganizationPlansPageInternal />
-      </PlansContextProvider>
+      <OrganizationPlansPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

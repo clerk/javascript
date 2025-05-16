@@ -1,4 +1,4 @@
-import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
+import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { Header } from '../../elements';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
@@ -36,9 +36,7 @@ const PlansPageInternal = () => {
 export const PlansPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <PlansPageInternal />
-      </PlansContextProvider>
+      <PlansPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

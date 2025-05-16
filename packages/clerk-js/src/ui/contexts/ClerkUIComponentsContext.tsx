@@ -8,7 +8,6 @@ import {
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
-  PlansContextProvider,
   PricingTableContext,
   SignInContext,
   SignUpContext,
@@ -84,11 +83,9 @@ export function ComponentContextProvider({
     case 'PricingTable':
       return (
         <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'org' : 'user'}>
-          <PlansContextProvider>
-            <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
-              {children}
-            </PricingTableContext.Provider>
-          </PlansContextProvider>
+          <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
+            {children}
+          </PricingTableContext.Provider>
         </SubscriberTypeContext.Provider>
       );
 

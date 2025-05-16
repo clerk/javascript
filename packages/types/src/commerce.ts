@@ -8,7 +8,7 @@ type WithOptionalOrgType<T> = T & {
 };
 
 export interface CommerceBillingNamespace {
-  getPlans: () => Promise<CommercePlanResource[]>;
+  getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;

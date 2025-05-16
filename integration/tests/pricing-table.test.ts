@@ -214,6 +214,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'free_user', shouldSwitch: true });
       await u.po.checkout.waitForSubscribeButton();
+      await expect(
+        page.locator('.cl-checkout-root').getByRole('button', { name: /^pay with test card$/i }),
+      ).toBeHidden();
 
       await fakeUser.deleteIfExists();
     });

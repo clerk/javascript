@@ -11,7 +11,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { useProtect } from '../../common';
-import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Alert, Avatar, Drawer, Switch, useDrawerContext } from '../../elements';
 import { handleError } from '../../utils';
@@ -19,9 +19,7 @@ import { handleError } from '../../utils';
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-      <PlansContextProvider>
-        <PlanDetailsInternal {...props} />
-      </PlansContextProvider>
+      <PlanDetailsInternal {...props} />
     </SubscriberTypeContext.Provider>
   );
 };
@@ -40,7 +38,7 @@ const PlanDetailsInternal = ({
   const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(_planPeriod);
 
   const { setIsOpen } = useDrawerContext();
-  const { activeOrUpcomingSubscription, revalidate, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
+  const { activeOrUpcomingSubscription, revalidateAll, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
     usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
@@ -100,7 +98,7 @@ const PlanDetailsInternal = ({
       planPeriod: _planPeriod,
       subscriberType: subscriberType,
       onSubscriptionComplete: () => {
-        revalidate();
+        void revalidateAll();
       },
       portalRoot,
     });
@@ -335,7 +333,8 @@ interface HeaderProps {
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming, subscriptions } = usePlansContext();
+  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
+  const { data: subscriptions } = useSubscriptions();
 
   const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 

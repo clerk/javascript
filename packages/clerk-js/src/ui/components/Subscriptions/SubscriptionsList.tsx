@@ -1,7 +1,7 @@
 import type { CommerceSubscriptionResource } from '@clerk/types';
 
 import { useProtect } from '../../common';
-import { usePlansContext, useSubscriberTypeContext } from '../../contexts';
+import { usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
@@ -32,8 +32,9 @@ export function SubscriptionsList({
   arrowButtonText: LocalizationKey;
   arrowButtonEmptyText: LocalizationKey;
 }) {
-  const { subscriptions, handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
+  const { handleSelectPlan, captionForSubscription, canManageSubscription } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
+  const { data: subscriptions } = useSubscriptions();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );

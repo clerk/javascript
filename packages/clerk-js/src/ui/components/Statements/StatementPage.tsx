@@ -1,4 +1,4 @@
-import { StatementsContextProvider, useStatementsContext } from '../../contexts';
+import { useStatements, useStatementsContext } from '../../contexts';
 import { Box, descriptors, Spinner, Text } from '../../customizables';
 import { Header } from '../../elements';
 import { Plus, RotateLeftRight } from '../../icons';
@@ -6,9 +6,11 @@ import { useRouter } from '../../router';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { Statement } from './Statement';
 
-const StatementPageInternal = () => {
+export const StatementPage = () => {
   const { params, navigate } = useRouter();
-  const { getStatementById, isLoading } = useStatementsContext();
+  const { isLoading } = useStatements();
+  const { getStatementById } = useStatementsContext();
+
   const statement = params.statementId ? getStatementById(params.statementId) : null;
 
   if (isLoading) {
@@ -103,13 +105,5 @@ const StatementPageInternal = () => {
         />
       </Statement.Root>
     </>
-  );
-};
-
-export const StatementPage = () => {
-  return (
-    <StatementsContextProvider>
-      <StatementPageInternal />
-    </StatementsContextProvider>
   );
 };
