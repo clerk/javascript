@@ -358,7 +358,7 @@ function SignUpStartInternal(): JSX.Element {
               gap={6}
             >
               <SocialButtonsReversibleContainerWithDivider>
-                {(showOauthProviders || showWeb3Providers) && (
+                {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
                   <SignUpSocialButtons
                     enableOAuthProviders={showOauthProviders}
                     enableWeb3Providers={showWeb3Providers}
