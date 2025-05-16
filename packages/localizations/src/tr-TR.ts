@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const trTR: LocalizationResource = {
     titleWithoutPersonal: 'Bir organizasyon seçin',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Otomatik davetler',
     badge__automaticSuggestion: 'Otomatik öneriler',
     badge__manualInvitation: 'Davetler',
@@ -817,6 +821,9 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopyala',

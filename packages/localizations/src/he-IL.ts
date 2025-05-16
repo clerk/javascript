@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const heIL: LocalizationResource = {
     titleWithoutPersonal: 'בחר ארגון',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'הזמנות אוטומטיות',
     badge__automaticSuggestion: 'הצעות אוטומטיות',
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
@@ -805,6 +809,9 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',

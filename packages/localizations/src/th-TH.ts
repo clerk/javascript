@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const thTH: LocalizationResource = {
     titleWithoutPersonal: 'เลือกองค์กร',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'คำเชิญอัตโนมัติ',
     badge__automaticSuggestion: 'ข้อเสนอแนะอัตโนมัติ',
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
@@ -813,6 +817,9 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',

@@ -35,7 +35,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     isRequired: false,
   });
 
-  const canSubmit = nameField.value.length > 1;
+  const canSubmit = nameField.value.length > 2;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +51,8 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('apiKey.formTitle')}
-      headerSubtitle={localizationKeys('apiKey.formHint')}
+      headerTitle={localizationKeys('apiKeys.formTitle')}
+      headerSubtitle={localizationKeys('apiKeys.formHint')}
     >
       <Form.Root onSubmit={handleSubmit}>
         <Form.ControlRow elementId={nameField.id}>

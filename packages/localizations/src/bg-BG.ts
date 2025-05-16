@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const bgBG: LocalizationResource = {
     titleWithoutPersonal: 'Изберете организация',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автоматични покани',
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',
@@ -811,6 +815,9 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',

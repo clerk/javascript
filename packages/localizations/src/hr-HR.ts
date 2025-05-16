@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const hrHR: LocalizationResource = {
     titleWithoutPersonal: 'Odaberite organizaciju',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski prijedlozi',
     badge__manualInvitation: 'Bez automatskog učlanjenja',
@@ -820,6 +824,9 @@ export const hrHR: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih računa',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',

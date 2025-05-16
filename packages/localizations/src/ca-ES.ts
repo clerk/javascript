@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -201,6 +202,9 @@ export const caES: LocalizationResource = {
     titleWithoutPersonal: 'Trieu una organització',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitacions automàtiques',
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
@@ -815,6 +819,9 @@ export const caES: LocalizationResource = {
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copia tot',
