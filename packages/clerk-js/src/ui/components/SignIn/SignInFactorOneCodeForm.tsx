@@ -1,14 +1,15 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
+import { useState } from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
-import { useCardState, VerificationCodeCard } from '../../elements';
+import { LoadingCard, useCardState, VerificationCodeCard } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import type { LocalizationKey } from '../../localization';
+import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
@@ -19,6 +20,7 @@ export type SignInFactorOneCodeCard = Pick<
   factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
+  onChangePhoneCodeChannel?: (factor: SignInFactor) => void;
 };
 
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
@@ -36,6 +38,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userSelectedFallbackToSMS, setUserSelectedFallbackToSMS] = useState(false);
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
   const isAlternativePhoneCodeProvider =
@@ -59,7 +63,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   useFetch(
     // If an alternative phone code provider is used, we skip the prepare step
     // because the verification is already created on the Start screen
-    shouldAvoidPrepare || isAlternativePhoneCodeProvider
+    shouldAvoidPrepare || isAlternativePhoneCodeProvider || userSelectedFallbackToSMS
       ? undefined
       : () =>
           signIn
@@ -103,6 +107,22 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       });
   };
 
+  const prepareWithSMS = () => {
+    setIsLoading(true);
+    card.setError(undefined);
+    void signIn
+      .prepareFirstFactor({ ...props.factor, channel: 'sms' } as PhoneCodeFactor)
+      .then(() => setUserSelectedFallbackToSMS(true))
+      .then(() => props.onFactorPrepare())
+      .then(() => props.onChangePhoneCodeChannel?.({ ...props.factor, channel: 'sms' } as SignInFactor))
+      .catch(err => handleError(err, [], card.setError))
+      .finally(() => setIsLoading(false));
+  };
+
+  if (isLoading) {
+    return <LoadingCard />;
+  }
+
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
@@ -115,8 +135,13 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       profileImageUrl={signIn.userData.imageUrl}
       // if the factor is an alternative phone code provider, we don't want to show the alternative methods
       // instead we want to go back to the start screen
-      onShowAlternativeMethodsClicked={isAlternativePhoneCodeProvider ? goBack : props.onShowAlternativeMethodsClicked}
-      showAlternativeMethods={props.showAlternativeMethods}
+      alternativeMethodsLabel={
+        isAlternativePhoneCodeProvider ? localizationKeys('footerActionLink__alternativePhoneCodeProvider') : undefined
+      }
+      onShowAlternativeMethodsClicked={
+        isAlternativePhoneCodeProvider ? prepareWithSMS : props.onShowAlternativeMethodsClicked
+      }
+      showAlternativeMethods={isAlternativePhoneCodeProvider ? true : props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
     />

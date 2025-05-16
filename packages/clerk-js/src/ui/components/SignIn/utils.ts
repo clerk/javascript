@@ -1,9 +1,16 @@
 import { titleize } from '@clerk/shared/underscore';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
-import type { FormControlState } from 'ui/utils';
+import type {
+  PhoneCodeChannel,
+  PreferredSignInStrategy,
+  SignInFactor,
+  SignInResource,
+  SignInStrategy,
+} from '@clerk/types';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
+import { type FormControlState } from '../../utils';
+import { getPreferredPhoneCodeChannelByCountry } from '../../utils';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
@@ -122,3 +129,59 @@ export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'i
 
   return 'username';
 }
+
+export const getPreferredAlternativePhoneChannel = (
+  fields: Array<FormControlState<string>>,
+  preferredChannels: Record<string, PhoneCodeChannel> | null,
+  phoneNumberFieldName: 'identifier' | 'phoneNumber',
+): PhoneCodeChannel | null => {
+  // If preferred channels are not set, we don't expect to have a preferred phone code provider
+  if (!preferredChannels) {
+    return null;
+  }
+  const strategy = fields.find(f => f.id === 'strategy')?.value;
+  // If the strategy is missing, it could be implied from the identifier being a phone number
+  if (!!strategy && strategy !== 'phone_code') {
+    return null;
+  }
+  const phoneNumber = fields.find(f => f.id === phoneNumberFieldName)?.value;
+  // If identifier is missing or if it does not start with '+' (meaning that it's not a phone number), then it's not a phone_code strategy
+  if (!phoneNumber || !phoneNumber?.startsWith('+')) {
+    return null;
+  }
+  const preferredChannel: PhoneCodeChannel | null = getPreferredPhoneCodeChannelByCountry(
+    phoneNumber,
+    preferredChannels,
+  );
+  // If the preferred channel is sms, we don't expect to have a preferred phone code provider
+  if (preferredChannel === 'sms') {
+    return null;
+  }
+  return preferredChannel;
+};
+
+// This function is almost identical to getPreferredAlternativePhoneChannel, but it's used in the combined flow
+// where we don't have access to the form fields.
+export const getPreferredAlternativePhoneChannelForCombinedFlow = (
+  preferredChannels: Record<string, PhoneCodeChannel> | null,
+  identifierAttribute: 'phoneNumber' | 'emailAddress' | 'username',
+  identifierValue: string,
+): PhoneCodeChannel | null => {
+  if (!preferredChannels) {
+    return null;
+  }
+  if (!identifierAttribute || identifierAttribute !== 'phoneNumber') {
+    return null;
+  }
+  if (!identifierValue || !identifierValue?.startsWith('+')) {
+    return null;
+  }
+  const preferredChannel: PhoneCodeChannel | null = getPreferredPhoneCodeChannelByCountry(
+    identifierValue,
+    preferredChannels,
+  );
+  if (preferredChannel === 'sms') {
+    return null;
+  }
+  return preferredChannel;
+};

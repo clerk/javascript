@@ -16,6 +16,9 @@ type SignInFactorOneCodeFormProps = {
   prepare: () => Promise<SignUpResource | void> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
   safeIdentifier?: string | undefined | null;
+  alternativeMethodsLabel?: LocalizationKey;
+  onShowAlternativeMethodsClicked?: React.MouseEventHandler;
+  showAlternativeMethods?: boolean;
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
@@ -56,6 +59,9 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       onResendCodeClicked={props.prepare}
       safeIdentifier={props.safeIdentifier}
       onIdentityPreviewEditClicked={goBack}
+      alternativeMethodsLabel={props.alternativeMethodsLabel}
+      onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      showAlternativeMethods={props.showAlternativeMethods}
     />
   );
 };
