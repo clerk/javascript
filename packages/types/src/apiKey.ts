@@ -13,6 +13,7 @@ export interface ApiKeyResource extends ClerkResource {
   expiration: Date | null;
   createdBy: string | null;
   description: string | null;
+  lastUsedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

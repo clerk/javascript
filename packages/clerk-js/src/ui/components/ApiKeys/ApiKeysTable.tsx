@@ -3,6 +3,7 @@ import type { ApiKeyResource } from '@clerk/types';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
+import { timeAgo } from '../../../utils/date';
 import {
   Button,
   descriptors,
@@ -140,7 +141,7 @@ export const ApiKeysTable = ({
                 </Text>
               </Td>
               <Td>
-                <Text>3d ago</Text>
+                <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : ''}</Text>
               </Td>
               <Td>
                 <Flex
