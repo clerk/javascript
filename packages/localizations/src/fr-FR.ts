@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -205,6 +206,9 @@ export const frFR: LocalizationResource = {
     titleWithoutPersonal: 'Choisissez une organisation',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitations automatiques',
     badge__automaticSuggestion: 'Suggestions automatiques',
     badge__manualInvitation: "Pas d'inscription automatique",
@@ -822,6 +826,9 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',

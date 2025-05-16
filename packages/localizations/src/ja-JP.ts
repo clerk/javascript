@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -204,6 +205,9 @@ export const jaJP: LocalizationResource = {
     titleWithoutPersonal: '組織を選択',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: '自動招待',
     badge__automaticSuggestion: '自動サジェスト',
     badge__manualInvitation: '自動登録なし',
@@ -816,6 +820,9 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',

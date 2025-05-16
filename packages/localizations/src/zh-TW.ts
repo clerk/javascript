@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -202,6 +203,9 @@ export const zhTW: LocalizationResource = {
     titleWithoutPersonal: '選擇一個組織',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: '自動邀請',
     badge__automaticSuggestion: '自動建議',
     badge__manualInvitation: '不自動註冊',
@@ -802,6 +806,9 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',

@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -203,6 +204,9 @@ export const huHU: LocalizationResource = {
     titleWithoutPersonal: 'Válassz egy szervezetet',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatikus meghívások',
     badge__automaticSuggestion: 'Automatikus javaslatok',
     badge__manualInvitation: 'Nincs automatikus felvétel',
@@ -818,6 +822,9 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',

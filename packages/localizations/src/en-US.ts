@@ -2,9 +2,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  apiKey: {
+  apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    detailsTitle__emptyRow: 'No API keys found',
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
     formTitle: 'Add new API key',
     menuAction__revoke: 'Revoke key',
@@ -195,6 +196,9 @@ export const enUS: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: 'API Keys',
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -291,9 +295,6 @@ export const enUS: LocalizationResource = {
         headerTitle__members: 'Members',
         headerTitle__requests: 'Requests',
       },
-    },
-    apiKeysPage: {
-      title: 'API Keys',
     },
     navbar: {
       billing: 'Billing',
@@ -813,6 +814,9 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: 'API Keys',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -915,9 +919,6 @@ export const enUS: LocalizationResource = {
       },
       title: 'Add email address',
       verifyTitle: 'Verify email address',
-    },
-    apiKeysPage: {
-      title: 'API Keys',
     },
     formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continue',

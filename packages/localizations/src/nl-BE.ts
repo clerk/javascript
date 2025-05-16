@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-NL',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -203,6 +204,9 @@ export const nlBE: LocalizationResource = {
     titleWithoutPersonal: 'Kies een organisatie',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatische Uitnodiging',
     badge__automaticSuggestion: 'Automatische Suggesties',
     badge__manualInvitation: 'Geen automatische inschrijving',
@@ -815,6 +819,9 @@ export const nlBE: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',

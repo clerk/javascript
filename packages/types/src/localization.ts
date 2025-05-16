@@ -643,6 +643,7 @@ type _LocalizationResource = {
     };
     apiKeysPage: {
       title: LocalizationValue;
+      detailsTitle__emptyRow: LocalizationValue;
     };
     passkeyScreen: {
       title__rename: LocalizationValue;
@@ -1008,6 +1009,7 @@ type _LocalizationResource = {
     };
     apiKeysPage: {
       title: LocalizationValue;
+      detailsTitle__emptyRow: LocalizationValue;
     };
   };
   createOrganization: {
@@ -1051,12 +1053,13 @@ type _LocalizationResource = {
       message: LocalizationValue;
     };
   };
-  apiKey: {
+  apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
     menuAction__revoke: LocalizationValue;
     action__search: LocalizationValue;
     action__add: LocalizationValue;
+    detailsTitle__emptyRow: LocalizationValue;
   };
 };
 

@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -204,6 +205,9 @@ export const elGR: LocalizationResource = {
     titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
@@ -822,6 +826,9 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',

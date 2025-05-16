@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -207,6 +208,9 @@ export const ruRU: LocalizationResource = {
     titleWithoutPersonal: 'Выбрать организацию',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автоматические приглашения',
     badge__automaticSuggestion: 'Автоматические предложения',
     badge__manualInvitation: 'Нет автоматической регистрации',
@@ -830,6 +834,9 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',

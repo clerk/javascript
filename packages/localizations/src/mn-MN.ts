@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -204,6 +205,9 @@ export const mnMN: LocalizationResource = {
     titleWithoutPersonal: 'Байгууллага сонгоно уу',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автомат урилга',
     badge__automaticSuggestion: 'Автомат саналууд',
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',
@@ -817,6 +821,9 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',

@@ -68,7 +68,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
         >
           <Box>
             <InputWithIcon
-              placeholder={t(localizationKeys('apiKey.action__search'))}
+              placeholder={t(localizationKeys('apiKeys.action__search'))}
               leftIcon={<Icon icon={MagnifyingGlass} />}
               value={search}
               onChange={e => {
@@ -83,7 +83,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
           >
             <Button
               variant='solid'
-              localizationKey={localizationKeys('apiKey.action__add')}
+              localizationKey={localizationKeys('apiKeys.action__add')}
             />
           </Action.Trigger>
         </Flex>
@@ -130,6 +130,7 @@ export const ApiKeys = withCardStateProvider(() => {
             perPage={ctx.perPage}
           />
         </Card.Content>
+        <Card.Footer />
       </Card.Root>
     </Flow.Root>
   );

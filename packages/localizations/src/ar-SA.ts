@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -204,6 +205,9 @@ export const arSA: LocalizationResource = {
     titleWithoutPersonal: 'أختر منظمة',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'دعوات تلقائية',
     badge__automaticSuggestion: 'أقتراحات تلقائية',
     badge__manualInvitation: 'ليس هناك تسجيل تلقائي',
@@ -814,6 +818,9 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',

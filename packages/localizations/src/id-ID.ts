@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -204,6 +205,9 @@ export const idID: LocalizationResource = {
     titleWithoutPersonal: 'Pilih organisasi',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Undangan otomatis',
     badge__automaticSuggestion: 'Saran otomatis',
     badge__manualInvitation: 'Tanpa pendaftaran otomatis',
@@ -826,6 +830,9 @@ export const idID: LocalizationResource = {
     action__signOutAll: 'Keluar dari semua akun',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Disalin!',
       actionLabel__copy: 'Salin semua',
