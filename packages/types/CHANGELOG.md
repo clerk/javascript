@@ -1,5 +1,38 @@
 # Change Log
 
+## 4.59.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Add `onClose` to `__internal_CheckoutProps`. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.58.1
 
 ### Patch Changes
