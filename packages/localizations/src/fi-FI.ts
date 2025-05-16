@@ -144,6 +144,7 @@ export const fiFI: LocalizationResource = {
   formFieldHintText__slug:
     'Slug on luettava tunniste, joka on oltava yksilöllinen. Sitä käytetään usein URL-osoitteissa.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
@@ -161,6 +162,7 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ota automaattiset kutsut käyttöön tälle verkkotunnukselle',
   formFieldLabel__backupCode: 'Varakoodi',

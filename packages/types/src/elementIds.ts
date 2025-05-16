@@ -22,7 +22,8 @@ export type FieldId =
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
   | 'legalAccepted'
-  | 'description';
+  | 'description'
+  | 'expirationDate';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

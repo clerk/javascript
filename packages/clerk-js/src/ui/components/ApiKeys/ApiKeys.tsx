@@ -11,7 +11,7 @@ import { MagnifyingGlass } from '../../icons';
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
-import { getTimeLeftInSeconds, useApiKeys } from './useApiKeys';
+import { useApiKeys } from './useApiKeys';
 
 export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage?: number }) => {
   const {
@@ -45,8 +45,8 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
     try {
       await createApiKey({
         name: params.name,
-        creationReason: params.description,
-        secondsUntilExpiration: getTimeLeftInSeconds(params.expiration),
+        description: params.description,
+        secondsUntilExpiration: params.expiration,
       });
       closeCardFn();
       card.setError(undefined);

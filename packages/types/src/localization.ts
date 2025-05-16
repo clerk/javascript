@@ -57,6 +57,7 @@ type _LocalizationResource = {
   formFieldLabel__apiKeyName: LocalizationValue;
   formFieldLabel__apiKeyDescription: LocalizationValue;
   formFieldLabel__apiKeyExpiration: LocalizationValue;
+  formFieldLabel__apiKeyExpirationDate: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -73,6 +74,7 @@ type _LocalizationResource = {
   formFieldInputPlaceholder__confirmDeletionUserAccount: LocalizationValue;
   formFieldInputPlaceholder__apiKeyName: LocalizationValue;
   formFieldInputPlaceholder__apiKeyDescription: LocalizationValue;
+  formFieldInputPlaceholder__apiKeyExpirationDate: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;

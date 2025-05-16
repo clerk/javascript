@@ -144,6 +144,7 @@ export const esMX: LocalizationResource = {
   formFieldHintText__slug:
     'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
@@ -162,6 +163,7 @@ export const esMX: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activar invitaciones automaticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',

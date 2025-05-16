@@ -144,6 +144,7 @@ export const ptBR: LocalizationResource = {
   formFieldHintText__slug:
     'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Insira o código de backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
@@ -161,6 +162,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',

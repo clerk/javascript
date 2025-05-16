@@ -144,6 +144,7 @@ export const beBY: LocalizationResource = {
   formFieldHintText__slug:
     'Slug — гэта чытальны ідэнтыфікатар, які павінен быць унікальным. Часто выкарыстоўваецца ў URL-ах.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Увядзіце рэзервовы код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Пацвердзіць выдаленне ўліковага запісу',
@@ -162,6 +163,7 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Уключыць аўтаматычныя запрашэнні для гэтага дамена',
   formFieldLabel__backupCode: 'Код аднаўлення',

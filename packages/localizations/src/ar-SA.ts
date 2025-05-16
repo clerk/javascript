@@ -144,6 +144,7 @@ export const arSA: LocalizationResource = {
   formFieldHintText__slug:
     '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
@@ -161,6 +162,7 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',

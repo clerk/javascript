@@ -144,6 +144,7 @@ export const isIS: LocalizationResource = {
   formFieldHintText__slug:
     'Stubbur (e. slug) er auðlesanlegt auðkenni sem verður að vera einstakt. Það er oft notað í vefslóðum.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eyða aðgangi',
@@ -161,6 +162,7 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Virkja sjálfvirk boð fyrir þetta lén',
   formFieldLabel__backupCode: 'Öryggiskóði',

@@ -144,6 +144,7 @@ export const roRO: LocalizationResource = {
   formFieldHintText__slug:
     'Un slug este un ID lizibil de către om, care trebuie să fie unic. Este adesea utilizat în URL-uri.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
@@ -162,6 +163,7 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__username: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activați invitațiile automate pentru acest domeniu',
   formFieldLabel__backupCode: 'Cod de rezervă',
