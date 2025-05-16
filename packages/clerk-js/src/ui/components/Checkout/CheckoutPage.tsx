@@ -12,7 +12,7 @@ import {
 } from '../../customizables';
 import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
-// TODO: Is this cauzing bundle size  issues ?
+// TODO(@COMMERCE): Is this causing bundle size  issues ?
 import { EmailForm } from '../UserProfile/EmailForm';
 import { CheckoutComplete } from './CheckoutComplete';
 import { CheckoutForm } from './CheckoutForm';
