@@ -5,6 +5,7 @@ import type { Appearance as StripeAppearance, SetupIntent } from '@stripe/stripe
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
@@ -20,7 +21,6 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, LineItems, withCardStateProvider } from '../../elements';
-import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
 import { animations } from '../../styledSystem';
 import { handleError, normalizeColorString } from '../../utils';
@@ -32,7 +32,6 @@ type AddPaymentSourceProps = {
   cancelAction?: () => void;
   submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
-  resetStripeElements?: () => void;
   onPayWithTestPaymentSourceSuccess?: () => void;
   showPayWithTestCardSection?: boolean;
 };
@@ -77,19 +76,20 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     },
   };
 
-  //  TODO(@commerce): use useSWRMutation
-  const {
-    data: initializedPaymentSource,
-    invalidate,
-    revalidate: revalidateInitializedPaymentSource,
-  } = useFetch(
-    resource?.initializePaymentSource,
+  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
     {
-      gateway: 'stripe',
+      key: 'commerce-payment-source-initialize',
+      resourceId: resource?.id,
     },
-    undefined,
-    `commerce-payment-source-initialize-${resource?.id}`,
+    () =>
+      resource?.initializePaymentSource({
+        gateway: 'stripe',
+      }),
   );
+
+  useEffect(() => {
+    void initializePaymentSource();
+  }, []);
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
@@ -113,13 +113,6 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
       dedupingInterval: 1_000 * 60, // 1 minute
     },
   );
-
-  // invalidate the initialized payment source when the component unmounts
-  useEffect(() => {
-    return invalidate;
-  }, [invalidate]);
-
-  const resetStripeElements = () => revalidateInitializedPaymentSource?.();
 
   if (!stripe || !externalClientSecret) {
     return (
@@ -153,7 +146,6 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         checkout={checkout}
         submitError={submitError}
         setSubmitError={setSubmitError}
-        resetStripeElements={resetStripeElements}
         onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
         showPayWithTestCardSection={showPayWithTestCardSection}
       />
@@ -169,7 +161,6 @@ const AddPaymentSourceForm = withCardStateProvider(
     checkout,
     submitError,
     setSubmitError,
-    resetStripeElements,
     onPayWithTestPaymentSourceSuccess,
     showPayWithTestCardSection,
   }: AddPaymentSourceProps) => {
@@ -200,9 +191,6 @@ const AddPaymentSourceForm = withCardStateProvider(
         }
 
         await onSuccess({ stripeSetupIntent: setupIntent });
-
-        // if onSuccess doesn't redirect us, revalidate the payment sources and reset the stripe elements in case we need to input a different payment source
-        resetStripeElements?.();
       } catch (error) {
         void handleError(error, [], setSubmitError);
       }
