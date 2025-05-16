@@ -111,7 +111,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
           <FormButtons
             submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
             isDisabled={!canSubmit}
-            onReset={close}
+            onReset={closeCardFn}
             isLoading={isSubmitting}
           />
         </Flex>
