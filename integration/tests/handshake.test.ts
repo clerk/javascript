@@ -400,7 +400,7 @@ test.describe('Client handshake @generic', () => {
     const locationUrl = new URL(res.headers.get('location'));
 
     // The domain is used as the redirect url
-    expect(locationUrl.origin + locationUrl.pathname).toBe('https://example.com/v1/client/handshake');
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
   });
 
   test('missing session token, positive uat - dev', async () => {
