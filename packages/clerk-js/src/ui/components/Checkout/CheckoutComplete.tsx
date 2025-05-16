@@ -1,5 +1,3 @@
-import type { CommerceCheckoutResource } from '@clerk/types';
-
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
@@ -7,19 +5,19 @@ import { transitionDurationValues, transitionTiming } from '../../foundations/tr
 import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
+import { useCheckoutContextRoot } from './CheckoutPage';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutComplete = ({
-  checkout,
-  isMotionSafe,
-}: {
-  checkout: CommerceCheckoutResource;
-  isMotionSafe: boolean;
-}) => {
+export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
-  const { newSubscriptionRedirectUrl } = useCheckoutContext();
+  const { newSubscriptionRedirectUrl, isMotionSafe } = useCheckoutContext();
+  const { checkout } = useCheckoutContextRoot();
+
+  if (!checkout) {
+    return null;
+  }
 
   const handleClose = () => {
     if (newSubscriptionRedirectUrl) {
@@ -119,14 +117,11 @@ export const CheckoutComplete = ({
                 pathLength='1'
                 style={{
                   strokeDashoffset: '1',
-                  animationName: 'check',
-                  animationDuration: `${transitionDurationValues.drawer}ms`,
-                  animationTimingFunction: transitionTiming.bezier,
-                  animationFillMode: 'forwards',
-                  animationDelay: `${transitionDurationValues.slow}ms`,
+                  animation: isMotionSafe
+                    ? `check ${transitionDurationValues.drawer}ms ${transitionTiming.bezier} forwards ${transitionDurationValues.slow}ms`
+                    : 'none',
                   ...(!isMotionSafe && {
                     strokeDashoffset: '0',
-                    animation: 'none',
                   }),
                 }}
               />

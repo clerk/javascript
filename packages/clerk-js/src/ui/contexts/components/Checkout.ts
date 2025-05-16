@@ -1,6 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
+import { useAppearance } from '../../../ui/customizables/AppearanceContext';
+import { usePrefersReducedMotion } from '../../../ui/hooks/usePrefersReducedMotion';
 import { isAllowedRedirect } from '../../../utils';
 import type { CheckoutCtx } from '../../types';
 import { useOptions } from '../OptionsContext';
@@ -17,6 +19,10 @@ export const useCheckoutContext = () => {
   const context = useContext(CheckoutContext);
   const clerk = useClerk();
   const options = useOptions();
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
   if (!context || context.componentName !== 'Checkout') {
     throw new Error('Clerk: useCheckoutContext called outside Checkout.');
@@ -52,5 +58,6 @@ export const useCheckoutContext = () => {
     componentName,
     newSubscriptionRedirectUrl,
     subscriber,
+    isMotionSafe,
   };
 };
