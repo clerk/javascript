@@ -6,6 +6,7 @@ export const enUS: LocalizationResource = {
     action__add: 'Add new key',
     action__search: 'Search keys',
     detailsTitle__emptyRow: 'No API keys found',
+    formButtonPrimary__add: 'Create key',
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
     formTitle: 'Add new API key',
     menuAction__revoke: 'Revoke key',
