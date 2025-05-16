@@ -1,10 +1,10 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 
 import { useEnvironment } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { localizationKeys, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
-import { handleError, useFormControl } from '../../utils';
+import { createUsernameError, handleError, useFormControl } from '../../utils';
 
 type UsernameFormProps = FormProps;
 
@@ -16,10 +16,13 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
 
   const { userSettings } = useEnvironment();
   const card = useCardState();
+  const { t, locale } = useLocalizations();
+  const { usernameSettings } = userSettings;
   const usernameField = useFormControl('username', user?.username || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+    buildErrorMessage: errors => createUsernameError(errors, { t, locale, usernameSettings }),
   });
 
   if (!user) {
