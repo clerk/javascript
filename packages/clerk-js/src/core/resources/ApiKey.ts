@@ -23,7 +23,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
   expired!: boolean;
   expiration!: Date | null;
   createdBy!: string | null;
-  creationReason!: string | null;
+  description!: string | null;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -48,7 +48,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
     this.expired = data.expired;
     this.expiration = data.expiration ? unixEpochToDate(data.expiration) : null;
     this.createdBy = data.created_by;
-    this.creationReason = data.creation_reason;
+    this.description = data.description;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
     return this;
@@ -110,7 +110,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
           type: params.type ?? 'api_key',
           name: params.name,
           subject: params.subject ?? this.clerk.organization?.id ?? this.clerk.user?.id ?? '',
-          creation_reason: params.creationReason,
+          description: params.description,
           seconds_until_expiration: params.secondsUntilExpiration,
         }),
       })

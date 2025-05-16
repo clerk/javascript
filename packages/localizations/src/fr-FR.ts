@@ -142,6 +142,7 @@ export const frFR: LocalizationResource = {
   formFieldHintText__slug:
     'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Code de sauvegarde',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Supprimer le compte',
@@ -160,6 +161,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Autoriser les invitations automatiques pour ce domaine',
   formFieldLabel__backupCode: 'Code de récupération',

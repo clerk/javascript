@@ -144,6 +144,7 @@ export const deDE: LocalizationResource = {
   formFieldHintText__slug:
     'Der Slug ist eine für Menschen lesbare ID. Sie muss einzigartig sein und wird oft in URLs verwendet.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Sicherheitscode eingeben',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Konto löschen',
@@ -161,6 +162,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktivieren Sie automatische Einladungen für diese Domain',
   formFieldLabel__backupCode: 'Sicherungscode',

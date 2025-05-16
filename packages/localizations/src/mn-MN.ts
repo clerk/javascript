@@ -142,6 +142,7 @@ export const mnMN: LocalizationResource = {
   formFieldHintText__slug:
     'Slug нь хүн унших боломжтой ID бөгөөд өвөрмөц байх ёстой. Энэ нь ихэвчлэн URL-д ашиглагддаг.',
   formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Нөөц код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Бүртгэл устгах',
@@ -159,6 +160,7 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
   formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
