@@ -1,9 +1,12 @@
 import type { __internal_CheckoutProps } from '@clerk/types';
 
 import { CheckoutContext, SubscriberTypeContext } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
+import { Flow, localizationKeys, Spinner } from '../../customizables';
 import { Drawer } from '../../elements';
-import { CheckoutPage } from './CheckoutPage';
+import { CheckoutComplete } from './CheckoutComplete';
+import { CheckoutForm } from './CheckoutForm';
+import * as CheckoutPage from './CheckoutPage';
+import { AddEmailForm, GenericError, InvalidPlanError } from './parts';
 
 export const Checkout = (props: __internal_CheckoutProps) => {
   return (
@@ -18,7 +21,35 @@ export const Checkout = (props: __internal_CheckoutProps) => {
           >
             <Drawer.Content>
               <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
-              <CheckoutPage {...props} />
+              <CheckoutPage.Root>
+                <CheckoutPage.PendingCheckout>
+                  <Spinner
+                    sx={{
+                      margin: 'auto',
+                    }}
+                  />
+                </CheckoutPage.PendingCheckout>
+
+                <CheckoutPage.SuccessScreen>
+                  <CheckoutComplete />
+                </CheckoutPage.SuccessScreen>
+
+                <CheckoutPage.ErrorScreen>
+                  <GenericError />
+                </CheckoutPage.ErrorScreen>
+
+                <CheckoutPage.InvalidPlanChange>
+                  <InvalidPlanError />
+                </CheckoutPage.InvalidPlanChange>
+
+                <CheckoutPage.MissingPayerEmail>
+                  <AddEmailForm />
+                </CheckoutPage.MissingPayerEmail>
+
+                <CheckoutPage.Valid>
+                  <CheckoutForm />
+                </CheckoutPage.Valid>
+              </CheckoutPage.Root>
             </Drawer.Content>
           </CheckoutContext.Provider>
         </SubscriberTypeContext.Provider>
