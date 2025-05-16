@@ -43,11 +43,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
-      await createApiKey({
-        name: params.name,
-        description: params.description,
-        secondsUntilExpiration: params.expiration,
-      });
+      await createApiKey(params);
       closeCardFn();
       card.setError(undefined);
     } catch (err: any) {
