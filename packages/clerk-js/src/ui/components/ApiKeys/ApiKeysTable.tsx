@@ -26,7 +26,7 @@ import { Check, Copy, Eye, EyeSlash } from '../../icons';
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
 
-  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, ([_, id]) => clerk.getApiKeySecret(id));
+  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, () => clerk.getApiKeySecret(apiKeyID));
 };
 
 const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
@@ -120,6 +120,8 @@ export const ApiKeysTable = ({
               />
             </Td>
           </Tr>
+        ) : !rows.length ? (
+          <EmptyRow />
         ) : (
           rows.map(apiKey => (
             <Tr key={apiKey.id}>
@@ -153,7 +155,7 @@ export const ApiKeysTable = ({
                 <ThreeDotsMenu
                   actions={[
                     {
-                      label: localizationKeys('apiKey.menuAction__revoke'),
+                      label: localizationKeys('apiKeys.menuAction__revoke'),
                       isDestructive: true,
                       onClick: () => onRevoke(apiKey.id),
                     },
@@ -165,5 +167,22 @@ export const ApiKeysTable = ({
         )}
       </Tbody>
     </Table>
+  );
+};
+
+const EmptyRow = () => {
+  return (
+    <Tr>
+      <Td colSpan={4}>
+        <Text
+          localizationKey={localizationKeys('apiKeys.detailsTitle__emptyRow')}
+          sx={{
+            margin: 'auto',
+            display: 'block',
+            width: 'fit-content',
+          }}
+        />
+      </Td>
+    </Tr>
   );
 };

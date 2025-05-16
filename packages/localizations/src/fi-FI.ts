@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -202,6 +203,9 @@ export const fiFI: LocalizationResource = {
     titleWithoutPersonal: 'Valitse organisaatio',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automaattiset kutsut',
     badge__automaticSuggestion: 'Automaattiset ehdotukset',
     badge__manualInvitation: 'Ei automaattista liittymistä',
@@ -815,6 +819,9 @@ export const fiFI: LocalizationResource = {
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopioitu',
       actionLabel__copy: 'Kopioi',

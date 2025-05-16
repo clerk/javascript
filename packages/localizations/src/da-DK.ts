@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -202,6 +203,9 @@ export const daDK: LocalizationResource = {
     titleWithoutPersonal: 'Vælg en organisation',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatiske invitationer',
     badge__automaticSuggestion: 'Automatiske forslag',
     badge__manualInvitation: 'Ingen automatisk tilmelding',
@@ -812,6 +816,9 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',

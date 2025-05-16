@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -203,6 +204,9 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Selectați o organizație',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
@@ -818,6 +822,9 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',

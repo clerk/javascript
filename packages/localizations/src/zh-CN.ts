@@ -14,9 +14,10 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
-  apiKey: {
+  apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    detailsTitle__emptyRow: undefined,
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
@@ -200,6 +201,9 @@ export const zhCN: LocalizationResource = {
     titleWithoutPersonal: '选择一个组织',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: '自动邀请',
     badge__automaticSuggestion: '自动建议',
     badge__manualInvitation: '无自动注册',
@@ -799,6 +803,9 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
