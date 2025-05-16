@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.4.6
+
+### Patch Changes
+
+- Updated dependencies [[`685792e`](https://github.com/clerk/javascript/commit/685792e91fda533175246573a3a1734980bbf5b5)]:
+  - @clerk/clerk-js@5.67.1
+
 ## 2.4.5
 
 ### Patch Changes

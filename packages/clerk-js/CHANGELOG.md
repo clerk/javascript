@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.67.1
+
+### Patch Changes
+
+- Fix showing alternative phone code provider when no other SSO exists. ([#5942](https://github.com/clerk/javascript/pull/5942)) by [@anagstef](https://github.com/anagstef)
+
 ## 5.67.0
 
 ### Minor Changes
