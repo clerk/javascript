@@ -165,12 +165,15 @@ export const usePlansContext = () => {
   const { mutate: mutateStatements } =
     useSWR<Awaited<ReturnType<typeof clerk.billing.getStatements>>>(useStatementsCacheKey());
 
+  const { mutate: mutatePaymentSources } = usePaymentSources();
+
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void mutateSubscriptions();
     void mutatePlans();
     void mutateStatements();
-  }, [mutateSubscriptions, mutatePlans, mutateStatements]);
+    void mutatePaymentSources();
+  }, [mutateSubscriptions, mutatePlans, mutateStatements, mutatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {

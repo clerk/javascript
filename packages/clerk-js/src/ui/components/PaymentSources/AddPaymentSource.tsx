@@ -1,9 +1,10 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { ClerkAPIError, ClerkRuntimeError, CommerceCheckoutResource } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, SetupIntent, Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, SetupIntent } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
@@ -54,9 +55,6 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   const resource = subscriberType === 'org' ? organization : user;
 
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
-
   const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
   const elementsAppearance: StripeAppearance = {
     variables: {
@@ -98,33 +96,30 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
-  useEffect(() => {
-    if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
+  const { data: stripe } = useSWR(
+    externalGatewayId && stripePublishableKey ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey } : null,
+    ({ stripePublishableKey, externalGatewayId }) => {
       if (__BUILD_DISABLE_RHC__) {
         clerkUnsupportedEnvironmentWarning('Stripe');
         return;
       }
-
-      stripePromiseRef.current = loadStripe(stripePublishableKey, {
+      return loadStripe(stripePublishableKey, {
         stripeAccount: externalGatewayId,
       });
-
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [externalGatewayId, externalClientSecret, stripePublishableKey, commerceSettings]);
+    },
+    {
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      dedupingInterval: 1_000 * 60, // 1 minute
+    },
+  );
 
   // invalidate the initialized payment source when the component unmounts
   useEffect(() => {
     return invalidate;
   }, [invalidate]);
 
-  const resetStripeElements = () => {
-    setStripe(null);
-    stripePromiseRef.current = null;
-    revalidateInitializedPaymentSource?.();
-  };
+  const resetStripeElements = () => revalidateInitializedPaymentSource?.();
 
   if (!stripe || !externalClientSecret) {
     return (
@@ -178,6 +173,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     onPayWithTestPaymentSourceSuccess,
     showPayWithTestCardSection,
   }: AddPaymentSourceProps) => {
+    const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
     const clerk = useClerk();
     const stripe = useStripe();
     const elements = useElements();
@@ -293,11 +289,13 @@ const AddPaymentSourceForm = withCardStateProvider(
             )
           )}
           <PaymentElement
+            onReady={() => setIsPaymentElementReady(true)}
             options={{
               layout: {
                 type: 'tabs',
                 defaultCollapsed: false,
               },
+              // TODO(@COMMERCE): Should this be fetched from the fapi?
               paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
               applePay: checkout
                 ? {
@@ -325,6 +323,7 @@ const AddPaymentSourceForm = withCardStateProvider(
             </Alert>
           )}
           <FormButtons
+            isDisabled={!isPaymentElementReady}
             submitLabel={
               submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
             }
