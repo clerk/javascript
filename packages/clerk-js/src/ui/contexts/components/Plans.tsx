@@ -16,6 +16,7 @@ import { useSubscriberTypeContext } from './SubscriberType';
 
 const dedupeOptions = {
   dedupingInterval: 1_000 * 60, // 1 minute,
+  keepPreviousData: true,
 };
 
 export const usePaymentSourcesCacheKey = () => {
@@ -36,6 +37,25 @@ export const usePaymentSources = () => {
   const cacheKey = usePaymentSourcesCacheKey();
 
   return useSWR(cacheKey, () => (subscriberType === 'org' ? organization : user)?.getPaymentSources({}), dedupeOptions);
+};
+
+export const useStatementsCacheKey = () => {
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
+
+  return {
+    key: `commerce-statements`,
+    userId: user?.id,
+    args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
+  };
+};
+
+export const useStatements = () => {
+  const { billing } = useClerk();
+  const cacheKey = useStatementsCacheKey();
+
+  return useSWR(cacheKey, ({ args, userId }) => (userId ? billing.getStatements(args) : undefined), dedupeOptions);
 };
 
 export const useSubscriptions = () => {
@@ -135,26 +155,22 @@ export const usePlansContext = () => {
 
   const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
 
+  // Invalidates cache but does not fetch immediately
   const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
     key: `commerce-plans`,
     args: { subscriberType },
   });
 
-  // Revalidates the next time the hooks gets mounted
-  // const { revalidate: revalidateStatements } = useFetch(
-  //   undefined,
-  //   {
-  //     ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-  //   },
-  //   undefined,
-  //   `commerce-statements-${resource?.id}`,
-  // );
+  // Invalidates cache but does not fetch immediately
+  const { mutate: mutateStatements } =
+    useSWR<Awaited<ReturnType<typeof clerk.billing.getStatements>>>(useStatementsCacheKey());
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void mutateSubscriptions();
     void mutatePlans();
-  }, [mutateSubscriptions, mutatePlans]);
+    void mutateStatements();
+  }, [mutateSubscriptions, mutatePlans, mutateStatements]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {

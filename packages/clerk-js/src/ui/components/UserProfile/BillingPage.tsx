@@ -1,4 +1,4 @@
-import { StatementsContextProvider, SubscriberTypeContext } from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -67,9 +67,7 @@ const BillingPageInternal = withCardStateProvider(() => {
               <PaymentSources />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>

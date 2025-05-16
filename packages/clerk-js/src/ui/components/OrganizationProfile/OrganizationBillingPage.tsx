@@ -1,5 +1,5 @@
 import { Protect } from '../../common';
-import { StatementsContextProvider, SubscriberTypeContext } from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -73,9 +73,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
               </Protect>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>

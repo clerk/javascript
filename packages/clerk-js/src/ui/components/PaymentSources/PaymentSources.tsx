@@ -1,7 +1,7 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { Fragment, useMemo, useRef } from 'react';
+import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
 import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
@@ -97,6 +97,8 @@ export const PaymentSources = withCardStateProvider(() => {
     [paymentSources],
   );
 
+  const revalidatePaymentSources = useCallback(() => void mutatePaymentSources(), [mutatePaymentSources]);
+
   if (!resource) {
     return null;
   }
@@ -128,7 +130,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <PaymentSourceRow paymentSource={paymentSource} />
                     <PaymentSourceMenu
                       paymentSource={paymentSource}
-                      revalidate={mutatePaymentSources}
+                      revalidate={revalidatePaymentSources}
                     />
                   </ProfileSection.Item>
 
@@ -136,7 +138,7 @@ export const PaymentSources = withCardStateProvider(() => {
                     <Action.Card variant='destructive'>
                       <RemoveScreen
                         paymentSource={paymentSource}
-                        revalidate={mutatePaymentSources}
+                        revalidate={revalidatePaymentSources}
                       />
                     </Action.Card>
                   </Action.Open>
@@ -150,7 +152,7 @@ export const PaymentSources = withCardStateProvider(() => {
               </Action.Trigger>
               <Action.Open value='add'>
                 <Action.Card>
-                  <AddScreen onSuccess={mutatePaymentSources} />
+                  <AddScreen onSuccess={revalidatePaymentSources} />
                 </Action.Card>
               </Action.Open>
             </>
