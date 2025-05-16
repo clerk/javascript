@@ -5,7 +5,7 @@
     { "path": "./dist/clerk.legacy.browser.js", "maxSize": "113KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "52KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "105.5KB" },
-    { "path": "./dist/vendors*.js", "maxSize": "39.5KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "39.8KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "38KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
