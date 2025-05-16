@@ -420,4 +420,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
-        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || 'latest' }} publish --compact --pnpm './packages/*'
+        run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'
