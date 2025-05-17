@@ -14,6 +14,15 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+  },
   backButton: 'Voltar',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +140,9 @@ export const ptPT: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Insira o código de backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar conta',
   formFieldInputPlaceholder__emailAddress: 'Insira o seu endereço de e-mail',
@@ -145,6 +157,10 @@ export const ptPT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Insira a sua palavra-passe',
   formFieldInputPlaceholder__phoneNumber: 'Insira o seu número de telefone',
   formFieldInputPlaceholder__username: 'Insira o seu nome de utilizador',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -189,6 +205,9 @@ export const ptPT: LocalizationResource = {
     titleWithoutPersonal: 'Selecione uma organização',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Convites automáticos',
     badge__automaticSuggestion: 'Sugestões automáticas',
     badge__manualInvitation: 'Sem inscrição automática',
@@ -801,6 +820,9 @@ export const ptPT: LocalizationResource = {
     action__signOutAll: 'Terminar sessão de todas as contas',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',

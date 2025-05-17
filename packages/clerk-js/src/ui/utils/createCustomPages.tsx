@@ -3,7 +3,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types'
 import { disabledBillingFeature, hasPaidOrgPlans, hasPaidUserPlans, isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
-import { CreditCard, Organization, TickShield, User, Users } from '../icons';
+import { CreditCard, Organization, TickShield, User, Users, InformationCircle } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -259,6 +259,12 @@ const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDe
       icon: TickShield,
       path: 'security',
     },
+    {
+      name: 'API keys',
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
+      icon: InformationCircle,
+      path: 'api-keys',
+    },
   ];
   if (commerce) {
     INITIAL_ROUTES.push({
@@ -298,6 +304,12 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS,
       icon: Users,
       path: 'organization-members',
+    },
+    {
+      name: 'API keys',
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
+      icon: InformationCircle,
+      path: 'organization-api-keys',
     },
   ];
   if (commerce) {

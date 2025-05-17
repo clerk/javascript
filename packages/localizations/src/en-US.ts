@@ -2,6 +2,15 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  apiKeys: {
+    action__add: 'Add new key',
+    action__search: 'Search keys',
+    detailsTitle__emptyRow: 'No API keys found',
+    formButtonPrimary__add: 'Create key',
+    formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
+    formTitle: 'Add new API key',
+    menuAction__revoke: 'Revoke key',
+  },
   backButton: 'Back',
   badge__activePlan: 'Active',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
@@ -122,6 +131,9 @@ export const enUS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Optional',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: 'Enter your secret key description',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'Enter expiration date',
+  formFieldInputPlaceholder__apiKeyName: 'Enter your secret key name',
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
@@ -136,6 +148,10 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: 'Description',
+  formFieldLabel__apiKeyExpiration: 'Expiration',
+  formFieldLabel__apiKeyExpirationDate: 'Select date',
+  formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -181,6 +197,9 @@ export const enUS: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: 'API Keys',
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -796,6 +815,9 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: 'API Keys',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',

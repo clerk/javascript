@@ -14,6 +14,15 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+  },
   backButton: 'Indietro',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -132,6 +141,9 @@ export const itIT: LocalizationResource = {
   formFieldHintText__optional: 'Opzionale',
   formFieldHintText__slug:
     'Uno slug è un identificativo leggibile dall’uomo che deve essere univoco. Spesso viene usato negli URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Inserisci il codice di backup',
   formFieldInputPlaceholder__confirmDeletionUserAccount: undefined,
   formFieldInputPlaceholder__emailAddress: "Inserisci l'indirizzo email",
@@ -147,6 +159,10 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Abilita inviti automatici per questo dominio',
   formFieldLabel__backupCode: 'Codice di backup',
   formFieldLabel__confirmDeletion: 'Conferma',
@@ -191,6 +207,9 @@ export const itIT: LocalizationResource = {
     titleWithoutPersonal: 'Scegli un’organizzazione',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Inviti automatici',
     badge__automaticSuggestion: 'Suggerimenti automatici',
     badge__manualInvitation: 'Nessuna iscrizione automatica',
@@ -803,6 +822,9 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',

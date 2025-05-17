@@ -14,6 +14,15 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+  },
   backButton: 'Vissza',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +140,9 @@ export const huHU: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'A megerősítő link lejárt. Kérlek kérj egy újat.',
   formFieldHintText__optional: 'Nem kötelező',
   formFieldHintText__slug: 'A slug egy egyedi azonosító, amelyet általában URL-ben használunk.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Fiók törlése',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -145,6 +157,10 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',
@@ -189,6 +205,9 @@ export const huHU: LocalizationResource = {
     titleWithoutPersonal: 'Válassz egy szervezetet',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatikus meghívások',
     badge__automaticSuggestion: 'Automatikus javaslatok',
     badge__manualInvitation: 'Nincs automatikus felvétel',
@@ -804,6 +823,9 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',

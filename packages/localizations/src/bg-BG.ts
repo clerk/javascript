@@ -14,6 +14,15 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+  },
   backButton: 'Назад',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +140,9 @@ export const bgBG: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Линкът за потвърждение е изтекъл. Моля, заявете нов линк.',
   formFieldHintText__optional: 'По избор',
   formFieldHintText__slug: 'Slug е четим идентификатор, който трябва да бъде уникален. Често се използва в URL адреси.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Въведете резервен код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Изтрий акаунта',
   formFieldInputPlaceholder__emailAddress: 'example@email.com',
@@ -145,6 +157,10 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Парола',
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',
@@ -189,6 +205,9 @@ export const bgBG: LocalizationResource = {
     titleWithoutPersonal: 'Изберете организация',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автоматични покани',
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',
@@ -799,6 +818,9 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
