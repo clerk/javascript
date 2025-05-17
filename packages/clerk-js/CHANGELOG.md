@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.67.2
+
+### Patch Changes
+
+- Fixes issue where min/max username lengths errors were not properly interpolated within profile component. ([#5948](https://github.com/clerk/javascript/pull/5948)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/shared@3.9.2
+
 ## 5.67.1
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.32.3
+
+### Patch Changes
+
+- Use domain in AuthenticateRequest only for satellite domains ([#5919](https://github.com/clerk/javascript/pull/5919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/shared@3.9.2
+
 ## 1.32.2
 
 ### Patch Changes
