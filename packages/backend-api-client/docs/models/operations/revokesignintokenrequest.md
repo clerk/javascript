@@ -1,0 +1,17 @@
+# RevokeSignInTokenRequest
+
+## Example Usage
+
+```typescript
+import { RevokeSignInTokenRequest } from "@clerk/backend-api-client/models/operations";
+
+let value: RevokeSignInTokenRequest = {
+  signInTokenId: "<id>",
+};
+```
+
+## Fields
+
+| Field                                     | Type                                      | Required                                  | Description                               |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| `signInTokenId`                           | *string*                                  | :heavy_check_mark:                        | The ID of the sign-in token to be revoked |
