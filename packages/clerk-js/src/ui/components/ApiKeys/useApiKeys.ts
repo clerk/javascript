@@ -2,26 +2,6 @@ import { useClerk } from '@clerk/shared/react';
 import { useState } from 'react';
 import useSWR from 'swr';
 
-import type { Expiration } from './CreateApiKeyForm';
-
-export function getTimeLeftInSeconds(expirationOption: Expiration) {
-  if (expirationOption === 'never') {
-    return;
-  }
-  const now = new Date();
-  const future = new Date(now);
-  if (expirationOption === '30d') {
-    future.setDate(future.getDate() + 30);
-  } else if (expirationOption === '90d') {
-    future.setDate(future.getDate() + 90);
-  } else {
-    throw new Error('TODO: Improve time handling');
-  }
-  const diffInMs = future.getTime() - now.getTime();
-  const diffInSecs = Math.floor(diffInMs / 1000);
-  return diffInSecs;
-}
-
 export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?: number }) => {
   const clerk = useClerk();
   const cacheKey = {
