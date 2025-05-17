@@ -119,7 +119,14 @@ export const ApiKeys = withCardStateProvider(() => {
 
   return (
     <Flow.Root flow='apiKey'>
-      <Card.Root sx={{ width: '100%' }}>
+      <Card.Root
+        sx={[
+          t => ({
+            width: t.sizes.$220,
+            maxWidth: `calc(100vw - ${t.sizes.$8})`,
+          }),
+        ]}
+      >
         <Card.Content sx={{ textAlign: 'left' }}>
           <ApiKeysInternal
             subject={ctx.subject ?? organization?.id ?? user?.id ?? ''}
