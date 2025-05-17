@@ -101,7 +101,7 @@ export const ApiKeysTable = ({
   onRevoke: (id: string) => void;
 }) => {
   return (
-    <Table sx={{ tableLayout: 'fixed' }}>
+    <Table sx={t => ({ tableLayout: 'fixed' })}>
       <Thead>
         <Tr>
           <Th>Name</Th>
@@ -141,7 +141,7 @@ export const ApiKeysTable = ({
                 </Text>
               </Td>
               <Td>
-                <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : ''}</Text>
+                <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'}</Text>
               </Td>
               <Td>
                 <Flex
