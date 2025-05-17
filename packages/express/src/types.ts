@@ -1,8 +1,8 @@
-import type { AuthObject, createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
+import type { createClerkClient } from '@clerk/backend';
+import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type { Request as ExpressRequest } from 'express';
 
-export type ExpressRequestWithAuth = ExpressRequest & { auth: AuthObject };
+export type ExpressRequestWithAuth = ExpressRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;

@@ -78,7 +78,6 @@ describe('createAuthenticateRequest({ options, apiClient })', () => {
     });
 
     const requestState = await authenticateRequest(new Request('http://example.com/'), {
-      // @ts-expect-error is used to check runtime code
       apiUrl: 'r-apiUrl',
       apiVersion: 'r-apiVersion',
     });
