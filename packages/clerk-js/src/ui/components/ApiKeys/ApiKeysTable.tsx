@@ -101,7 +101,7 @@ export const ApiKeysTable = ({
   onRevoke: (id: string) => void;
 }) => {
   return (
-    <Table sx={t => ({ tableLayout: 'fixed' })}>
+    <Table sx={{ tableLayout: 'fixed' }}>
       <Thead>
         <Tr>
           <Th>Name</Th>
