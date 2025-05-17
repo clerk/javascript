@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.66.0",
+  "version": "5.67.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -75,7 +75,8 @@
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.13.11"
+    "regenerator-runtime": "0.13.11",
+    "swr": "2.3.3"
   },
   "devDependencies": {
     "@rsdoctor/rspack-plugin": "^0.4.13",

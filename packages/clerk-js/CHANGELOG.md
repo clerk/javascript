@@ -1,5 +1,59 @@
 # Change Log
 
+## 5.67.1
+
+### Patch Changes
+
+- Fix showing alternative phone code provider when no other SSO exists. ([#5942](https://github.com/clerk/javascript/pull/5942)) by [@anagstef](https://github.com/anagstef)
+
+## 5.67.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Hide "Set as default" from the action menu of the default MFA method ([#5933](https://github.com/clerk/javascript/pull/5933)) by [@octoper](https://github.com/octoper)
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Replace `useFetch` with `useSWRMutate` on checkout. ([#5932](https://github.com/clerk/javascript/pull/5932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Call `setActive` after closing Checkout to ensure RSCs re-render with the new auth context. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only lock scroll when Drawer is using fixed strategy ([#5936](https://github.com/clerk/javascript/pull/5936)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixing issues where checkout data being stale ([#5921](https://github.com/clerk/javascript/pull/5921)) by [@octoper](https://github.com/octoper)
+
+- Bug fix: Always invalidate checkout object when `<Checkout/>` unmounts. ([#5929](https://github.com/clerk/javascript/pull/5929)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+  - @clerk/localizations@3.16.0
+  - @clerk/shared@3.9.1
+
 ## 5.66.0
 
 ### Minor Changes

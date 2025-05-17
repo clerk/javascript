@@ -167,6 +167,7 @@ class AuthenticateContext implements AuthenticateContext {
       fatal: true,
       proxyUrl: options.proxyUrl,
       domain: options.domain,
+      isSatellite: options.isSatellite,
     });
     this.instanceType = pk.instanceType;
     this.frontendApi = pk.frontendApi;
