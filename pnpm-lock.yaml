@@ -105,7 +105,7 @@ importers:
         version: 10.1.0
       '@testing-library/jest-dom':
         specifier: ^6.4.6
-        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.15.2)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.2)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
+        version: 6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.15.2)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.2)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -129,7 +129,7 @@ importers:
         version: 18.3.7(@types/react@18.3.21)
       '@vitest/coverage-v8':
         specifier: 3.0.2
-        version: 3.0.2(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
+        version: 3.0.2(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -300,7 +300,7 @@ importers:
         version: 5.33.0(typanion@3.14.0)
       vitest:
         specifier: 3.0.5
-        version: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
+        version: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
       yalc:
         specifier: 1.0.0-pre.53
         version: 1.0.0-pre.53(patch_hash=nepk7g7jbppq422nppscin4xqm)
@@ -383,8 +383,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       msw:
-        specifier: 2.7.6
-        version: 2.7.6(@types/node@22.15.2)(typescript@5.8.3)
+        specifier: 2.8.2
+        version: 2.8.2(@types/node@22.15.2)(typescript@5.8.3)
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
@@ -393,7 +393,7 @@ importers:
         version: 1.65.0
       vitest-environment-miniflare:
         specifier: 2.14.4
-        version: 2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
+        version: 2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
 
   packages/chrome-extension:
     dependencies:
@@ -10637,8 +10637,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  msw@2.7.6:
-    resolution: {integrity: sha512-P+rwn43ktxN8ghcl8q+hSAUlEi0PbJpDhGmDkw4zeUnRj3hBCVynWD+dTu38yLYKCE9ZF1OYcvpy7CTBRcqkZA==}
+  msw@2.8.2:
+    resolution: {integrity: sha512-ugu8RBgUj6//RD0utqDDPdS+QIs36BKYkDAM6u59hcMVtFM4PM0vW4l3G1R+1uCWP2EWFUG8reT/gPXVEtx7/w==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -19678,7 +19678,7 @@ snapshots:
       lz-string: 1.5.0
       pretty-format: 27.5.1
 
-  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.15.2)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.2)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
+  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0)(@types/jest@29.5.12)(jest@29.7.0(@types/node@22.15.2)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.2)(typescript@5.8.3)))(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
     dependencies:
       '@adobe/css-tools': 4.4.0
       '@babel/runtime': 7.26.0
@@ -19692,7 +19692,7 @@ snapshots:
       '@jest/globals': 29.7.0
       '@types/jest': 29.5.12
       jest: 29.7.0(@types/node@22.15.2)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.15.2)(typescript@5.8.3))
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
 
   '@testing-library/react@16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -20397,7 +20397,7 @@ snapshots:
       vite: 6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
       vue: 3.5.13(typescript@5.8.3)
 
-  '@vitest/coverage-v8@3.0.2(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
+  '@vitest/coverage-v8@3.0.2(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -20411,7 +20411,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -20422,13 +20422,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.5(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(vite@6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
+  '@vitest/mocker@3.0.5(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(vite@6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))':
     dependencies:
       '@vitest/spy': 3.0.5
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      msw: 2.7.6(@types/node@22.15.2)(typescript@5.8.3)
+      msw: 2.8.2(@types/node@22.15.2)(typescript@5.8.3)
       vite: 6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
 
   '@vitest/pretty-format@3.0.5':
@@ -27085,7 +27085,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3):
+  msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
@@ -31135,22 +31135,22 @@ snapshots:
     optionalDependencies:
       vite: 6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
 
-  vitest-environment-miniflare@2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)):
+  vitest-environment-miniflare@2.14.4(vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)):
     dependencies:
       '@miniflare/queues': 2.14.4
       '@miniflare/runner-vm': 2.14.4
       '@miniflare/shared': 2.14.4
       '@miniflare/shared-test-environment': 2.14.4
       undici: 5.28.4
-      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
+      vitest: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1):
+  vitest@3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.2)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1):
     dependencies:
       '@vitest/expect': 3.0.5
-      '@vitest/mocker': 3.0.5(msw@2.7.6(@types/node@22.15.2)(typescript@5.8.3))(vite@6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
+      '@vitest/mocker': 3.0.5(msw@2.8.2(@types/node@22.15.2)(typescript@5.8.3))(vite@6.2.6(@types/node@22.15.2)(jiti@2.4.2)(lightningcss@1.27.0)(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1))
       '@vitest/pretty-format': 3.0.5
       '@vitest/runner': 3.0.5
       '@vitest/snapshot': 3.0.5
