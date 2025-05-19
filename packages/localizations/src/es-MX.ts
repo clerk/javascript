@@ -307,6 +307,7 @@ export const esMX: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona tu organización.',
       general: 'General',
@@ -989,6 +990,7 @@ export const esMX: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administra tu información de cuenta.',
       security: 'Seguridad',

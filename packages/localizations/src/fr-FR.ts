@@ -307,6 +307,7 @@ export const frFR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gérer votre organisation.',
       general: 'Général',
@@ -990,6 +991,7 @@ export const frFR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Compte',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gérer votre compte.',
       security: 'Sécurité',

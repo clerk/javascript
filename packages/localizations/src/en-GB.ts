@@ -306,6 +306,7 @@ export const enGB: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organisation.',
       general: 'General',
@@ -989,6 +990,7 @@ export const enGB: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',

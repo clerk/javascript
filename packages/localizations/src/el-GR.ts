@@ -306,6 +306,7 @@ export const elGR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -991,6 +992,7 @@ export const elGR: LocalizationResource = {
     mobileButton__menu: 'Μενού',
     navbar: {
       account: 'Προφίλ',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
       security: 'Ασφάλεια',

@@ -306,6 +306,7 @@ export const mnMN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Байгууллагаа удирдих',
       general: 'Ерөнхий',
@@ -984,6 +985,7 @@ export const mnMN: LocalizationResource = {
     mobileButton__menu: 'Цэс',
     navbar: {
       account: 'Профайл',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Бүртгэлийнхээ мэдээллийг удирдана уу.',
       security: 'Аюулгүй байдал',

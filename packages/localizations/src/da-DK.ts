@@ -305,6 +305,7 @@ export const daDK: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer din organisation.',
       general: 'Generelt',
@@ -981,6 +982,7 @@ export const daDK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer dine kontooplysninger.',
       security: 'Sikkerhed',

@@ -307,6 +307,7 @@ export const roRO: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -990,6 +991,7 @@ export const roRO: LocalizationResource = {
     mobileButton__menu: 'Meniu',
     navbar: {
       account: 'Profile',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',

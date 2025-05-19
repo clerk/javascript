@@ -306,6 +306,7 @@ export const itIT: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestisci la tua organizzazione.',
       general: 'Generale',
@@ -985,6 +986,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profilo',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestisci il tuo account.',
       security: 'Sicurezza',

@@ -306,6 +306,7 @@ export const idID: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Kelola organisasi Anda.',
       general: 'Umum',
@@ -985,6 +986,7 @@ export const idID: LocalizationResource = {
     mobileButton__menu: undefined,
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Kelola info akun Anda.',
       security: 'Keamanan',

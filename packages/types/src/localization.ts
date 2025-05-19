@@ -502,6 +502,7 @@ type _LocalizationResource = {
       account: LocalizationValue;
       security: LocalizationValue;
       billing: LocalizationValue;
+      apiKeys: LocalizationValue;
     };
     start: {
       headerTitle__account: LocalizationValue;
@@ -831,6 +832,7 @@ type _LocalizationResource = {
       general: LocalizationValue;
       members: LocalizationValue;
       billing: LocalizationValue;
+      apiKeys: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;

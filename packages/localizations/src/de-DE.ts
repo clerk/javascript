@@ -310,6 +310,7 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: 'Abrechnung',
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
@@ -1005,6 +1006,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',

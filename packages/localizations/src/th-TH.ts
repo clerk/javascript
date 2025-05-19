@@ -305,6 +305,7 @@ export const thTH: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'จัดการองค์กรของคุณ',
       general: 'ทั่วไป',
@@ -978,6 +979,7 @@ export const thTH: LocalizationResource = {
     mobileButton__menu: 'เมนู',
     navbar: {
       account: 'โปรไฟล์',
+      apiKeys: undefined,
       billing: undefined,
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',

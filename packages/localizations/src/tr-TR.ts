@@ -305,6 +305,7 @@ export const trTR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Organizasyonunuzu yönetin.',
       general: 'Genel',
@@ -986,6 +987,7 @@ export const trTR: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hesap bilgilerinizi yönetin.',
       security: 'Güvenlik',

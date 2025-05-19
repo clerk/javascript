@@ -146,7 +146,7 @@ export const ApiKeysTable = ({
               <Td>
                 <Flex
                   direction='row'
-                  gap={2}
+                  gap={1}
                 >
                   <SecretInputWithToggle apiKeyID={apiKey.id} />
                   <CopySecretButton apiKeyID={apiKey.id} />

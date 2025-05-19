@@ -306,6 +306,7 @@ export const beBY: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -991,6 +992,7 @@ export const beBY: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профіль',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Кіруйце інфармацыяй аб вашым уліковым запісе.',
       security: 'Бяспека',

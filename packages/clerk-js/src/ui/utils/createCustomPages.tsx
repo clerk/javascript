@@ -3,7 +3,7 @@ import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types'
 import { disabledBillingFeature, hasPaidOrgPlans, hasPaidUserPlans, isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
-import { CreditCard, Organization, TickShield, User, Users, InformationCircle } from '../icons';
+import { CreditCard, InformationCircle, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -260,7 +260,7 @@ const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDe
       path: 'security',
     },
     {
-      name: 'API keys',
+      name: localizationKeys('userProfile.navbar.apiKeys'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: InformationCircle,
       path: 'api-keys',
@@ -306,7 +306,7 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
       path: 'organization-members',
     },
     {
-      name: 'API keys',
+      name: localizationKeys('organizationProfile.navbar.apiKeys'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: InformationCircle,
       path: 'organization-api-keys',

@@ -306,6 +306,7 @@ export const fiFI: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hallitse organisaatiotasi.',
       general: 'Yleinen',
@@ -985,6 +986,7 @@ export const fiFI: LocalizationResource = {
     mobileButton__menu: 'Valikko',
     navbar: {
       account: 'Profiili',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hallitse tilisi tietoja',
       security: 'Turvallisuus',

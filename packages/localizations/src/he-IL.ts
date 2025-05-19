@@ -303,6 +303,7 @@ export const heIL: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'נהל את הארגון שלך.',
       general: 'כללי',
@@ -966,6 +967,7 @@ export const heIL: LocalizationResource = {
     mobileButton__menu: 'תפריט',
     navbar: {
       account: 'פרופיל',
+      apiKeys: undefined,
       billing: undefined,
       description: 'נהל את פרטי החשבון שלך.',
       security: 'אבטחה',

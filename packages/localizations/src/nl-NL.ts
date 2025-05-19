@@ -305,6 +305,7 @@ export const nlNL: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Beheer je organisatie.',
       general: 'Algemeen',
@@ -981,6 +982,7 @@ export const nlNL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profiel',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Beheer je account informatie.',
       security: 'Beveiliging',

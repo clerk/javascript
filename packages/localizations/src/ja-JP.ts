@@ -305,6 +305,7 @@ export const jaJP: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: '組織を管理します。',
       general: '一般',
@@ -979,6 +980,7 @@ export const jaJP: LocalizationResource = {
     mobileButton__menu: 'メニュー',
     navbar: {
       account: 'プロファイル',
+      apiKeys: undefined,
       billing: undefined,
       description: 'アカウント情報管理',
       security: 'セキュリティ',

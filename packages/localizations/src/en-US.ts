@@ -299,6 +299,7 @@ export const enUS: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your organization.',
       general: 'General',
@@ -979,6 +980,7 @@ export const enUS: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      apiKeys: 'API keys',
       billing: 'Billing',
       description: 'Manage your account info.',
       security: 'Security',

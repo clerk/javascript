@@ -305,6 +305,7 @@ export const svSE: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hantera din organisation.',
       general: 'Allmänna inställningar',
@@ -985,6 +986,7 @@ export const svSE: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Hantera din kontoinformation.',
       security: 'Säkerhet',

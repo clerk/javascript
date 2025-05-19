@@ -305,6 +305,7 @@ export const plPL: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Zarządzaj organizacją.',
       general: 'Główne',
@@ -993,6 +994,7 @@ export const plPL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Zarządzaj danymi konta.',
       security: 'Bezpieczeństwo',
