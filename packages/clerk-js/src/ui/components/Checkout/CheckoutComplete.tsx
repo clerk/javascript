@@ -218,7 +218,7 @@ export const CheckoutComplete = ({
               as='h2'
               textVariant='h2'
               localizationKey={
-                checkout?.totals.totalDueNow.amount > 0
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
@@ -273,7 +273,7 @@ export const CheckoutComplete = ({
                 }),
               })}
               localizationKey={
-                checkout?.totals.totalDueNow.amount > 0
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.description__paymentSuccessful')
                   : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
               }
@@ -306,27 +306,27 @@ export const CheckoutComplete = ({
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description
-              text={`${checkout?.totals.totalDueNow.currencySymbol}${checkout?.totals.totalDueNow.amountFormatted}`}
+              text={`${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`}
             />
           </LineItems.Group>
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                checkout?.totals.totalDueNow.amount > 0
+                checkout.totals.totalDueNow.amount > 0
                   ? localizationKeys('commerce.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('commerce.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                checkout?.totals.totalDueNow.amount > 0
-                  ? checkout?.paymentSource
-                    ? checkout?.paymentSource.paymentMethod !== 'card'
-                      ? `${capitalize(checkout?.paymentSource.paymentMethod)}`
-                      : `${capitalize(checkout?.paymentSource.cardType)} ⋯ ${checkout?.paymentSource.last4}`
+                checkout.totals.totalDueNow.amount > 0
+                  ? checkout.paymentSource
+                    ? checkout.paymentSource.paymentMethod !== 'card'
+                      ? `${capitalize(checkout.paymentSource.paymentMethod)}`
+                      : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
-                  : checkout?.planPeriodStart
-                    ? formatDate(new Date(checkout?.planPeriodStart))
+                  : checkout.planPeriodStart
+                    ? formatDate(new Date(checkout.planPeriodStart))
                     : '–'
               }
             />
