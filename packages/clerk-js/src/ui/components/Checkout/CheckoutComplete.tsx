@@ -30,6 +30,7 @@ export const CheckoutComplete = ({
     typeof window === 'undefined' ? true : window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
+    if (!canHover) return;
     if (spanRef.current) {
       const rect = spanRef.current.getBoundingClientRect();
       setMousePosition({
@@ -40,9 +41,10 @@ export const CheckoutComplete = ({
   };
 
   useEffect(() => {
+    if (!canHover) return;
     const animate = () => {
       setCurrentPosition(prev => {
-        const amt = 0.15; // Lower = slower, higher = snappier
+        const amt = 0.15;
         const x = lerp(prev.x, mousePosition.x, amt);
         const y = lerp(prev.y, mousePosition.y, amt);
         return { x, y };
@@ -53,7 +55,7 @@ export const CheckoutComplete = ({
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [mousePosition]);
+  }, [mousePosition, canHover]);
 
   const handleClose = () => {
     if (newSubscriptionRedirectUrl) {
