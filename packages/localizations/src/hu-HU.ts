@@ -307,6 +307,7 @@ export const huHU: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'A szervezeted kezelése',
       general: 'Általános',
@@ -988,6 +989,7 @@ export const huHU: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Fiók információk kezelése',
       security: 'Biztonság',

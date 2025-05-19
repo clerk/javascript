@@ -307,6 +307,7 @@ export const caES: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la teva organització.',
       general: 'General',
@@ -989,6 +990,7 @@ export const caES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la informació del teu compte.',
       security: 'Seguretat',

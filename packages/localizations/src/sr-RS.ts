@@ -307,6 +307,7 @@ export const srRS: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljaj svojom organizacijom.',
       general: 'Opšte',
@@ -984,6 +985,7 @@ export const srRS: LocalizationResource = {
     mobileButton__menu: 'Meni',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljaj informacijama svog naloga.',
       security: 'Sigurnost',

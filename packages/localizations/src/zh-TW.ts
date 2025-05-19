@@ -303,6 +303,7 @@ export const zhTW: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的組織。',
       general: '一般的',
@@ -960,6 +961,7 @@ export const zhTW: LocalizationResource = {
     mobileButton__menu: '菜單',
     navbar: {
       account: '輪廓',
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的帳戶資訊。',
       security: '安全',

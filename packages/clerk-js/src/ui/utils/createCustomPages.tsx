@@ -260,7 +260,7 @@ const getUserProfileDefaultRoutes = ({ commerce }: { commerce: boolean }): GetDe
       path: 'security',
     },
     {
-      name: 'API keys',
+      name: localizationKeys('userProfile.navbar.apiKeys'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: InformationCircle,
       path: 'api-keys',
@@ -306,7 +306,7 @@ const getOrganizationProfileDefaultRoutes = ({ commerce }: { commerce: boolean }
       path: 'organization-members',
     },
     {
-      name: 'API keys',
+      name: localizationKeys('organizationProfile.navbar.apiKeys'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS,
       icon: InformationCircle,
       path: 'organization-api-keys',

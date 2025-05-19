@@ -308,6 +308,7 @@ export const esES: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestione su organización.',
       general: 'General',
@@ -990,6 +991,7 @@ export const esES: LocalizationResource = {
     mobileButton__menu: 'Menú',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gestiona la información de tu cuenta.',
       security: 'Seguridad',

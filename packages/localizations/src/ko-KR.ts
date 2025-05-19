@@ -307,6 +307,7 @@ export const koKR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -973,6 +974,7 @@ export const koKR: LocalizationResource = {
     mobileButton__menu: '메뉴',
     navbar: {
       account: '프로필',
+      apiKeys: undefined,
       billing: undefined,
       description: '계정 정보를 관리하세요.',
       security: '보안',

@@ -307,6 +307,7 @@ export const ptBR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gerencie sua organização.',
       general: 'Geral',
@@ -992,6 +993,7 @@ export const ptBR: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Perfil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Gerencie seus dados de perfil.',
       security: 'Segurança',

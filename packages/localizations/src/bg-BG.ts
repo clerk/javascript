@@ -307,6 +307,7 @@ export const bgBG: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управление на вашата организация.',
       general: 'Общи',
@@ -983,6 +984,7 @@ export const bgBG: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Profile',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управлявайте информацията в профила си.',
       security: 'Security',

@@ -311,6 +311,7 @@ export const ruRU: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управлять вашей организацией.',
       general: 'Общее',
@@ -1001,6 +1002,7 @@ export const ruRU: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профиль',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управление информацией вашей учетной записи.',
       security: 'Безопасность',

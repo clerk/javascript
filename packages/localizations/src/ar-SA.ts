@@ -307,6 +307,7 @@ export const arSA: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'إدارة منظمتك.',
       general: 'عام',
@@ -979,6 +980,7 @@ export const arSA: LocalizationResource = {
     mobileButton__menu: 'القائمة',
     navbar: {
       account: 'الملف الشخصي',
+      apiKeys: undefined,
       billing: undefined,
       description: 'إدارة معلومات ملفك الشخصي.',
       security: 'حماية',

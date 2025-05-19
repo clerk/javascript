@@ -307,6 +307,7 @@ export const nbNO: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer organisasjonen din.',
       general: 'Generelt',
@@ -986,6 +987,7 @@ export const nbNO: LocalizationResource = {
     mobileButton__menu: 'Meny',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer kontoinformasjonen din.',
       security: 'Sikkerhet',

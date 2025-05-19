@@ -303,6 +303,7 @@ export const zhCN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的组织。',
       general: '常规',
@@ -959,6 +960,7 @@ export const zhCN: LocalizationResource = {
     mobileButton__menu: '菜单',
     navbar: {
       account: '账户',
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的账户。',
       security: '安全',

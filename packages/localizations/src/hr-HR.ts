@@ -307,6 +307,7 @@ export const hrHR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljajte svojom organizacijom.',
       general: 'Općenito',
@@ -990,6 +991,7 @@ export const hrHR: LocalizationResource = {
     mobileButton__menu: 'Izbornik',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljajte informacijama vašeg računa.',
       security: 'Sigurnost',

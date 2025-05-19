@@ -308,6 +308,7 @@ export const isIS: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Stjórna samtökunum þínum.',
       general: 'Almennt',
@@ -990,6 +991,7 @@ export const isIS: LocalizationResource = {
     mobileButton__menu: 'Valmynd',
     navbar: {
       account: 'Prófíll',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Stjórna reikningsupplýsingum þínum.',
       security: 'Öryggi',
