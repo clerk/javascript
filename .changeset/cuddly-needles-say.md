@@ -3,4 +3,4 @@
 '@clerk/types': patch
 ---
 
-wip
+Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components.
