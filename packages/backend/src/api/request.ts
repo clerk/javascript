@@ -12,7 +12,7 @@ export type ClerkBackendApiRequestOptions = {
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   queryParams?: Record<string, unknown>;
   headerParams?: Record<string, string>;
-  bodyParams?: Record<string, unknown>;
+  bodyParams?: Record<string, unknown> | Array<Record<string, unknown>>;
   formData?: FormData;
 } & (
   | {
