@@ -26,6 +26,8 @@ export const CheckoutComplete = ({
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
+  const canHover =
+    typeof window === 'undefined' ? true : window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
     if (spanRef.current) {
@@ -126,6 +128,9 @@ export const CheckoutComplete = ({
               opacity: 0.5,
               zIndex: 1,
               pointerEvents: 'none',
+              ...(!canHover && {
+                display: 'none',
+              }),
             })}
             style={{
               left: currentPosition.x,
@@ -144,7 +149,7 @@ export const CheckoutComplete = ({
               borderRadius: t.radii.$circle,
               backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
               boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
-              color: t.colors.$success500,
+              color: canHover ? t.colors.$success500 : t.colors.$colorText,
               ':before': {
                 content: '""',
                 position: 'absolute',
