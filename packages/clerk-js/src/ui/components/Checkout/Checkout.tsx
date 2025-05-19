@@ -22,33 +22,33 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             <Drawer.Content>
               <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
               <CheckoutPage.Root>
-                <CheckoutPage.PendingCheckout>
+                <CheckoutPage.Stage name='pending'>
                   <Spinner
                     sx={{
                       margin: 'auto',
                     }}
                   />
-                </CheckoutPage.PendingCheckout>
+                </CheckoutPage.Stage>
 
-                <CheckoutPage.SuccessScreen>
+                <CheckoutPage.Stage name='completed'>
                   <CheckoutComplete />
-                </CheckoutPage.SuccessScreen>
+                </CheckoutPage.Stage>
 
-                <CheckoutPage.ErrorScreen>
+                <CheckoutPage.Stage name='error'>
                   <GenericError />
-                </CheckoutPage.ErrorScreen>
+                </CheckoutPage.Stage>
 
-                <CheckoutPage.InvalidPlanChange>
+                <CheckoutPage.Stage name='invalid_plan_change'>
                   <InvalidPlanError />
-                </CheckoutPage.InvalidPlanChange>
+                </CheckoutPage.Stage>
 
-                <CheckoutPage.MissingPayerEmail>
+                <CheckoutPage.Stage name='missing_payer_email'>
                   <AddEmailForm />
-                </CheckoutPage.MissingPayerEmail>
+                </CheckoutPage.Stage>
 
-                <CheckoutPage.Valid>
+                <CheckoutPage.Stage name='ready'>
                   <CheckoutForm />
-                </CheckoutPage.Valid>
+                </CheckoutPage.Stage>
               </CheckoutPage.Root>
             </Drawer.Content>
           </CheckoutContext.Provider>

@@ -1,11 +1,13 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
 import { useUser } from '@clerk/shared/react/index';
 import type { ClerkAPIError, CommerceCheckoutResource, CommercePlanResource } from '@clerk/types';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { useCheckoutContext, usePlans } from '../../contexts';
+
+type CheckoutStatus = 'pending' | 'ready' | 'completed' | 'missing_payer_email' | 'invalid_plan_change' | 'error';
 
 const CheckoutContextRoot = createContext<{
   checkout: CommerceCheckoutResource | undefined;
@@ -14,6 +16,7 @@ const CheckoutContextRoot = createContext<{
   errors: ClerkAPIError[];
   startCheckout: () => void;
   plan: CommercePlanResource | undefined;
+  status: CheckoutStatus;
 } | null>(null);
 
 export const useCheckoutContextRoot = () => {
@@ -91,6 +94,20 @@ const Root = ({ children }: { children: React.ReactNode }) => {
 
   const isLoading = isMutating || plansLoading;
 
+  const status = useMemo(() => {
+    if (isLoading) return 'pending';
+    const completedCode = 'completed';
+    if (checkout?.status === completedCode) return completedCode;
+    if (checkout) return 'ready';
+
+    const missingCode = 'missing_payer_email';
+    const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === missingCode);
+    if (isMissingPayerEmail) return missingCode;
+    const invalidChangeCode = 'invalid_plan_change';
+    if (errors?.[0]?.code === invalidChangeCode && plan) return invalidChangeCode;
+    return 'error';
+  }, [isLoading, errors, checkout, plan?.id]);
+
   return (
     <CheckoutContextRoot.Provider
       value={{
@@ -100,6 +117,7 @@ const Root = ({ children }: { children: React.ReactNode }) => {
         errors,
         startCheckout,
         plan,
+        status,
       }}
     >
       {children}
@@ -107,55 +125,12 @@ const Root = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const PendingCheckout = ({ children }: { children: React.ReactNode }) => {
+const Stage = ({ children, name }: { children: React.ReactNode; name: CheckoutStatus }) => {
   const ctx = useCheckoutContextRoot();
-  if (ctx.isLoading) {
-    return children;
-  }
-  return null;
-};
-
-const SuccessScreen = ({ children }: { children: React.ReactNode }) => {
-  const ctx = useCheckoutContextRoot();
-  if (ctx.checkout?.status === 'completed' && !ctx.isLoading) {
-    return children;
-  }
-  return null;
-};
-
-const ErrorScreen = ({ children }: { children: React.ReactNode }) => {
-  const ctx = useCheckoutContextRoot();
-  const isMissingPayerEmail = !!ctx.errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
-  if (ctx.errors && ctx.errors?.[0]?.code !== 'invalid_plan_change' && !isMissingPayerEmail && !ctx.isLoading) {
-    return children;
-  }
-  return null;
-};
-
-const InvalidPlanChange = ({ children }: { children: React.ReactNode }) => {
-  const ctx = useCheckoutContextRoot();
-  if (ctx.errors?.[0]?.code === 'invalid_plan_change' && ctx.plan && !ctx.isLoading) {
-    return children;
-  }
-  return null;
-};
-
-const MissingPayerEmail = ({ children }: { children: React.ReactNode }) => {
-  const ctx = useCheckoutContextRoot();
-
-  const isMissingPayerEmail = !!ctx.errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
-  if (isMissingPayerEmail && !ctx.isLoading) {
-    return children;
-  }
-  return null;
-};
-
-const Valid = ({ children }: { children: React.ReactNode }) => {
-  const ctx = useCheckoutContextRoot();
-  if (ctx.errors || ctx.checkout?.status === 'completed' || ctx.isLoading) {
+  if (ctx.status !== name) {
     return null;
   }
   return children;
 };
 
-export { Root, Valid, PendingCheckout, SuccessScreen, ErrorScreen, InvalidPlanChange, MissingPayerEmail };
+export { Root, Stage };
