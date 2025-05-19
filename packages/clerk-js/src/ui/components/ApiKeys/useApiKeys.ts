@@ -20,7 +20,7 @@ export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?
     startingRow,
     endingRow,
     paginatedItems: paginatedApiKeys,
-  } = usePagination(filteredApiKeys, perPage);
+  } = useClientSidePagination(filteredApiKeys, perPage);
 
   return {
     apiKeys: paginatedApiKeys,
@@ -38,7 +38,7 @@ export const useApiKeys = ({ subject, perPage = 5 }: { subject: string; perPage?
   };
 };
 
-const usePagination = <T>(items: T[], itemsPerPage: number) => {
+const useClientSidePagination = <T>(items: T[], itemsPerPage: number) => {
   const [page, setPage] = useState(1);
 
   const itemCount = items.length;

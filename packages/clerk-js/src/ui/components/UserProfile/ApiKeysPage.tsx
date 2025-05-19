@@ -3,9 +3,9 @@ import { useUser } from '@clerk/shared/react';
 import { ApiKeysContext } from '../../contexts';
 import { Col, localizationKeys } from '../../customizables';
 import { Header } from '../../elements';
-import { ApiKeysInternal } from '../ApiKeys';
+import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys';
 
-export const ApiKeysPage = () => {
+export const APIKeysPage = () => {
   const { user } = useUser();
 
   return (
@@ -16,8 +16,8 @@ export const ApiKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <ApiKeysContext.Provider value={{ componentName: 'ApiKeys' }}>
-        <ApiKeysInternal subject={user?.id ?? ''} />
+      <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
+        <APIKeysPageInternal subject={user?.id ?? ''} />
       </ApiKeysContext.Provider>
     </Col>
   );

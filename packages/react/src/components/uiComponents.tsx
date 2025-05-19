@@ -602,7 +602,7 @@ export const PricingTable = withClerk(
   { component: 'PricingTable', renderWhileLoading: true },
 );
 
-export const ApiKeys = withClerk(
+export const APIKeys = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<ApiKeysProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;

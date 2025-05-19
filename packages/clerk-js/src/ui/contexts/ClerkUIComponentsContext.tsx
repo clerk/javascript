@@ -89,7 +89,7 @@ export function ComponentContextProvider({
           </PricingTableContext.Provider>
         </SubscriberTypeContext.Provider>
       );
-    case 'ApiKeys':
+    case 'APIKeys':
       return (
         <ApiKeysContext.Provider value={{ componentName, ...(props as ApiKeysProps) }}>
           {children}
