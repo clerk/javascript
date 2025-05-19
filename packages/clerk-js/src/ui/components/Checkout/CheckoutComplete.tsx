@@ -25,14 +25,14 @@ export const CheckoutComplete = ({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number | null>(null);
-  const spanRef = useRef<HTMLSpanElement>(null);
+  const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);
   const canHover =
     typeof window === 'undefined' ? true : window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
     if (!canHover) return;
-    if (spanRef.current) {
-      const rect = spanRef.current.getBoundingClientRect();
+    if (checkoutSuccessRootRef.current) {
+      const rect = checkoutSuccessRootRef.current.getBoundingClientRect();
       setMousePosition({
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
@@ -104,7 +104,7 @@ export const CheckoutComplete = ({
               opacity: 1,
             }),
           })}
-          ref={spanRef}
+          ref={checkoutSuccessRootRef}
           onMouseMove={handleMouseMove}
         >
           {[1, 0.75, 0.5].map((scale, index, array) => {
