@@ -11,7 +11,6 @@ import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const signUp = useCoreSignUp();
   const card = useCardState();
-  const [isLoading, setIsLoading] = useState(false);
   const [userSelectedFallbackToSMS, setUserSelectedFallbackToSMS] = useState(false);
   const channel = signUp.verifications.phoneNumber.channel;
 
@@ -62,16 +61,16 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   }
 
   const prepareWithSMS = () => {
-    setIsLoading(true);
+    card.setLoading();
     card.setError(undefined);
     void signUp
       .preparePhoneNumberVerification({ strategy: 'phone_code', channel: 'sms' })
       .then(() => setUserSelectedFallbackToSMS(true))
       .catch(err => handleError(err, [], card.setError))
-      .finally(() => setIsLoading(false));
+      .finally(() => card.setIdle());
   };
 
-  if (isLoading) {
+  if (card.isLoading) {
     return <LoadingCard />;
   }
 

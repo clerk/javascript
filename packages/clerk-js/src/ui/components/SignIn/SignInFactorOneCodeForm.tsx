@@ -38,7 +38,6 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
-  const [isLoading, setIsLoading] = useState(false);
   const [userSelectedFallbackToSMS, setUserSelectedFallbackToSMS] = useState(false);
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
@@ -108,7 +107,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   const prepareWithSMS = () => {
-    setIsLoading(true);
+    card.setLoading();
     card.setError(undefined);
     void signIn
       .prepareFirstFactor({ ...props.factor, channel: 'sms' } as PhoneCodeFactor)
@@ -116,10 +115,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .then(() => props.onFactorPrepare())
       .then(() => props.onChangePhoneCodeChannel?.({ ...props.factor, channel: 'sms' } as SignInFactor))
       .catch(err => handleError(err, [], card.setError))
-      .finally(() => setIsLoading(false));
+      .finally(() => card.setIdle());
   };
 
-  if (isLoading) {
+  if (card.isLoading) {
     return <LoadingCard />;
   }
 
