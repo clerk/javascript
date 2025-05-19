@@ -13,7 +13,8 @@ export class APIKey {
     readonly expired: boolean,
     readonly expiration: number | null,
     readonly createdBy: string | null,
-    readonly creationReason: string | null,
+    readonly description: string | null,
+    readonly lastUsedAt: number | null,
     readonly createdAt: number,
     readonly updatedAt: number,
   ) {}
@@ -31,7 +32,8 @@ export class APIKey {
       data.expired,
       data.expiration,
       data.created_by,
-      data.creation_reason,
+      data.description,
+      data.last_used_at,
       data.created_at,
       data.updated_at,
     );
