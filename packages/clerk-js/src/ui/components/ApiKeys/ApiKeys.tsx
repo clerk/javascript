@@ -13,7 +13,7 @@ import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 import { useApiKeys } from './useApiKeys';
 
-export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage?: number }) => {
+export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: number }) => {
   const {
     apiKeys,
     isLoading,
@@ -74,7 +74,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
             />
           </Box>
           <Action.Trigger
-            value='add'
+            value='add-api-key'
             hideOnActive={false}
           >
             <Button
@@ -83,7 +83,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
             />
           </Action.Trigger>
         </Flex>
-        <Action.Open value='add'>
+        <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
             <Action.Card sx={{ width: '100%' }}>
               <CreateApiKeyForm
@@ -112,7 +112,7 @@ export const ApiKeysInternal = ({ subject, perPage }: { subject: string; perPage
   );
 };
 
-export const ApiKeys = withCardStateProvider(() => {
+export const APIKeys = withCardStateProvider(() => {
   const ctx = useApiKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
@@ -128,7 +128,7 @@ export const ApiKeys = withCardStateProvider(() => {
         ]}
       >
         <Card.Content sx={{ textAlign: 'left' }}>
-          <ApiKeysInternal
+          <APIKeysPage
             subject={ctx.subject ?? organization?.id ?? user?.id ?? ''}
             perPage={ctx.perPage}
           />

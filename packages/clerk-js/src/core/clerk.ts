@@ -1045,16 +1045,16 @@ export class Clerk implements ClerkInterface {
 
   public mountApiKeys = (node: HTMLDivElement, props?: ApiKeysProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'ApiKeys' }).then(controls =>
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
       controls.mountComponent({
-        name: 'ApiKeys',
+        name: 'APIKeys',
         appearanceKey: 'apiKeys',
         node,
         props,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('ApiKeys', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
   };
 
   public unmountApiKeys = (node: HTMLDivElement): void => {

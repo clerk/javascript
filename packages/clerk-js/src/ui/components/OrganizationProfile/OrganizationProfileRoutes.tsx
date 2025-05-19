@@ -15,9 +15,9 @@ const OrganizationBillingPage = lazy(() =>
   })),
 );
 
-const OrganizationApiKeysPage = lazy(() =>
+const OrganizationAPIKeysPage = lazy(() =>
   import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
-    default: module.OrganizationApiKeysPage,
+    default: module.OrganizationAPIKeysPage,
   })),
 );
 
@@ -100,7 +100,7 @@ export const OrganizationProfileRoutes = () => {
           <Switch>
             <Route index>
               <Suspense fallback={''}>
-                <OrganizationApiKeysPage />
+                <OrganizationAPIKeysPage />
               </Suspense>
             </Route>
           </Switch>

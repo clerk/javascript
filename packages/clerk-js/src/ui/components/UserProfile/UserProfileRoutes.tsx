@@ -15,9 +15,9 @@ const BillingPage = lazy(() =>
   })),
 );
 
-const ApiKeysPage = lazy(() =>
+const APIKeysPage = lazy(() =>
   import(/* webpackChunkName: "up-api-keys-page"*/ './ApiKeysPage').then(module => ({
-    default: module.ApiKeysPage,
+    default: module.APIKeysPage,
   })),
 );
 
@@ -91,7 +91,7 @@ export const UserProfileRoutes = () => {
           <Switch>
             <Route index>
               <Suspense fallback={''}>
-                <ApiKeysPage />
+                <APIKeysPage />
               </Suspense>
             </Route>
           </Switch>

@@ -116,8 +116,8 @@ export type PricingTableCtx = PricingTableProps & {
   mode?: ComponentMode;
 };
 
-export type ApiKeysCtx = APIKeysProps & {
-  componentName: 'ApiKeys';
+export type APIKeysCtx = APIKeysProps & {
+  componentName: 'APIKeys';
   mode?: ComponentMode;
 };
 
@@ -144,6 +144,6 @@ export type AvailableComponentCtx =
   | WaitlistCtx
   | PricingTableCtx
   | CheckoutCtx
-  | ApiKeysCtx;
+  | APIKeysCtx;
 
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
