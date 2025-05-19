@@ -118,6 +118,7 @@ export const CheckoutComplete = ({
             );
           })}
           <Box
+            elementDescriptor={descriptors.checkoutSuccessHighlight}
             sx={t => ({
               position: 'absolute',
               width: t.sizes.$56,
