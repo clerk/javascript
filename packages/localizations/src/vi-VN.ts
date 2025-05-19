@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Quay lại',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Mặc định',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
   badge__primary: 'Chính',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Yêu cầu hành động',
   badge__startsAt: undefined,
   badge__thisDevice: 'Thiết bị này',
@@ -56,6 +31,78 @@ export const viVN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Tạo tổ chức',
     invitePage: {
@@ -147,6 +194,42 @@ export const viVN: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -208,6 +291,12 @@ export const viVN: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -392,6 +481,12 @@ export const viVN: LocalizationResource = {
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
       title: 'Sử dụng phương pháp khác',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Nhập mã sao lưu',
@@ -498,6 +593,12 @@ export const viVN: LocalizationResource = {
       actionLink__use_username: 'Sử dụng tên đăng nhập',
       actionText: 'Chưa có tài khoản?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'để tiếp tục với {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Đăng nhập',
@@ -511,6 +612,11 @@ export const viVN: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu của bạn',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Đăng nhập',
       actionText: 'Đã có tài khoản?',
@@ -578,6 +684,12 @@ export const viVN: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Đã có tài khoản?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'để tiếp tục với {{applicationName}}',
       subtitleCombined: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
@@ -688,34 +800,6 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -731,6 +815,42 @@ export const viVN: LocalizationResource = {
         'Bạn có thể sử dụng một trong các mã này để đăng nhập vào tài khoản của mình, nếu bạn mất quyền truy cập vào thiết bị xác thực của mình.',
       title: 'Thêm mã xác thực sao lưu',
       title__codelist: 'Các mã sao lưu',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Chọn một nhà cung cấp để kết nối tài khoản của bạn.',
@@ -874,6 +994,9 @@ export const viVN: LocalizationResource = {
       title: 'Thêm số điện thoại',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Tải lên ảnh JPG, PNG, GIF, hoặc WEBP có dung lượng nhỏ hơn 10 MB',

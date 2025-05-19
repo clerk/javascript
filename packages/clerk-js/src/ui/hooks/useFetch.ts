@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 
 export type State<Data = any, Error = any> = {
   data: Data | null;
@@ -94,7 +94,15 @@ export const useFetch = <K, T>(
 ) => {
   const cacheKey = { resourceId, params };
   const { subscribeCache, getCache, setCache, clearCache } = useCache<typeof cacheKey, T>(cacheKey);
-  const [revalidationCounter, setRevalidationCounter] = useState(0);
+  const {
+    subscribeCache: subscribeRevalidationCounter,
+    getCache: getRevalidationCounter,
+    setCache: setRevalidationCounter,
+  } = useCache<typeof cacheKey, number>({
+    ...cacheKey,
+    // @ts-ignore just an extra identifier for the cache key
+    rv: true,
+  });
 
   const staleTime = options?.staleTime ?? 1000 * 60 * 2; //cache for 2 minutes by default
   const throttleTime = options?.throttleTime || 0;
@@ -105,14 +113,20 @@ export const useFetch = <K, T>(
   }
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
+  const revalidateCache = useSyncExternalStore(subscribeRevalidationCounter, getRevalidationCounter);
 
   const revalidate = useCallback(() => {
     setCache(d => ({
       ...d,
       cachedAt: 0,
     }));
-    setRevalidationCounter(prev => prev + 1);
-  }, [setCache]);
+    setRevalidationCounter(d => ({
+      isLoading: false,
+      isValidating: false,
+      error: null,
+      data: (d?.data || 0) + 1,
+    }));
+  }, [setCache, setRevalidationCounter]);
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
@@ -161,7 +175,7 @@ export const useFetch = <K, T>(
           cachedAt: Date.now(),
         });
       });
-  }, [serialize(params), setCache, getCache, revalidationCounter]);
+  }, [serialize(params), setCache, getCache, revalidateCache]);
 
   return {
     ...cached,

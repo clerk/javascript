@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Back',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Default',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Other impersonator device',
   badge__primary: 'Primary',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Requires action',
   badge__startsAt: undefined,
   badge__thisDevice: 'This device',
@@ -56,6 +31,78 @@ export const enGB: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'User device',
   badge__you: 'You',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Create organisation',
     invitePage: {
@@ -147,6 +194,42 @@ export const enGB: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organisation automatically or request to join.',
@@ -209,6 +292,12 @@ export const enGB: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -394,6 +483,12 @@ export const enGB: LocalizationResource = {
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
       title: 'Use another method',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Your backup code is the one you got when setting up two-step authentication.',
       title: 'Enter a backup code',
@@ -501,6 +596,12 @@ export const enGB: LocalizationResource = {
       actionLink__use_username: 'Use username',
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Welcome back! Please sign in to continue',
       subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
@@ -514,6 +615,11 @@ export const enGB: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -583,6 +689,12 @@ export const enGB: LocalizationResource = {
       actionLink__use_email: 'Use email instead',
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Welcome! Please fill in the details to get started.',
       subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
@@ -696,34 +808,6 @@ export const enGB: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -739,6 +823,42 @@ export const enGB: LocalizationResource = {
         'You can use one of these to sign in to your account, if you lose access to your authentication device.',
       title: 'Add backup code verification',
       title__codelist: 'Backup codes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Select a provider to connect your account.',
@@ -883,6 +1003,9 @@ export const enGB: LocalizationResource = {
       title: 'Add phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

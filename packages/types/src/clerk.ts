@@ -5,10 +5,10 @@ import type {
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
+  PlanDetailTheme,
   PricingTableTheme,
   SignInTheme,
   SignUpTheme,
-  SubscriptionDetailTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -16,10 +16,10 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type {
-  __experimental_CommerceNamespace,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionPlanPeriod,
-  __experimental_CommerceSubscriptionResource,
+  CommerceBillingNamespace,
+  CommercePlanResource,
+  CommerceSubscriberType,
+  CommerceSubscriptionPlanPeriod,
 } from './commerce';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
@@ -33,6 +33,7 @@ import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
+  NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -180,8 +181,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
-  /** Commerce Object */
-  __experimental_commerce: __experimental_CommerceNamespace;
+  /** Billing Object */
+  billing: CommerceBillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -210,7 +211,7 @@ export interface Clerk {
    * Opens the Clerk Checkout component in a drawer.
    * @param props Optional checkout configuration parameters.
    */
-  __internal_openCheckout: (props?: __experimental_CheckoutProps) => void;
+  __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
   /**
    * Closes the Clerk Checkout drawer.
@@ -218,15 +219,15 @@ export interface Clerk {
   __internal_closeCheckout: () => void;
 
   /**
-   * Opens the Clerk SubscriptionDetails drawer component in a drawer.
+   * Opens the Clerk PlanDetails drawer component in a drawer.
    * @param props Optional subscription details drawer configuration parameters.
    */
-  __internal_openSubscriptionDetails: (props?: __experimental_SubscriptionDetailsProps) => void;
+  __internal_openPlanDetails: (props?: __internal_PlanDetailsProps) => void;
 
   /**
-   * Closes the Clerk SubscriptionDetails drawer.
+   * Closes the Clerk PlanDetails drawer.
    */
-  __internal_closeSubscriptionDetails: () => void;
+  __internal_closePlanDetails: () => void;
 
   /** Opens the Clerk UserVerification component in a modal.
    * @param props Optional user verification configuration parameters.
@@ -447,7 +448,7 @@ export interface Clerk {
    * @param targetNode Target node to mount the PricingTable component.
    * @param props configuration parameters.
    */
-  __experimental_mountPricingTable: (targetNode: HTMLDivElement, props?: __experimental_PricingTableProps) => void;
+  mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
   /**
    * Unmount a pricing table component from the target element.
@@ -455,7 +456,7 @@ export interface Clerk {
    *
    * @param targetNode Target node to unmount the PricingTable component from.
    */
-  __experimental_unmountPricingTable: (targetNode: HTMLDivElement) => void;
+  unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -564,6 +565,11 @@ export interface Clerk {
    * Returns the configured afterSignOutUrl of the instance.
    */
   buildAfterSignOutUrl(): string;
+
+  /**
+   * Returns the configured newSubscriptionRedirectUrl of the instance.
+   */
+  buildNewSubscriptionRedirectUrl(): string;
 
   /**
    * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
@@ -706,10 +712,10 @@ export interface Clerk {
   /**
    * Navigates to the next task or redirects to completion URL.
    * If the current session has pending tasks, it navigates to the next task.
-   * If all tasks are complete, it navigates to the provided completion URL.
+   * If all tasks are complete, it navigates to the provided completion URL or defaults to the origin redirect URL (either from sign-in or sign-up).
    * @experimental
    */
-  __experimental_nextTask: (params?: NextTaskParams) => Promise<void>;
+  __experimental_navigateToTask: (params?: NextTaskParams) => Promise<void>;
 
   /**
    * This is an optional function.
@@ -814,6 +820,7 @@ export type ClerkOptions = PendingSessionOptions &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
@@ -1126,6 +1133,10 @@ export type SignInProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -1263,6 +1274,10 @@ export type SignUpProps = RoutingOptions & {
    * Control whether OAuth flows use redirects or popups.
    */
   oauthFlow?: 'auto' | 'redirect' | 'popup';
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
@@ -1311,6 +1326,11 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  /**
+   * Specify on which page the organization profile modal will open.
+   * @experimental
+   **/
+  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1576,39 +1596,71 @@ export type WaitlistProps = {
 
 export type WaitlistModalProps = WaitlistProps;
 
-type __experimental_PricingTableDefaultProps = {
+type PricingTableDefaultProps = {
+  /**
+   * The position of the CTA button.
+   * @default 'bottom'
+   */
   ctaPosition?: 'top' | 'bottom';
+  /**
+   * Whether to collapse features on the pricing table.
+   * @default false
+   */
   collapseFeatures?: boolean;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
 };
 
-type __experimental_PricingTableBaseProps = {
+type PricingTableBaseProps = {
+  /**
+   * Whether to show pricing table for organizations.
+   * @default false
+   */
+  forOrganizations?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: PricingTableTheme;
-  checkoutProps?: Pick<__experimental_CheckoutProps, 'appearance'>;
+  /*
+   * Specify options for the underlying <Checkout /> component.
+   * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
+   */
+  checkoutProps?: Pick<__internal_CheckoutProps, 'appearance'>;
 };
 
-export type __experimental_PricingTableProps = __experimental_PricingTableBaseProps &
-  __experimental_PricingTableDefaultProps;
+type PortalRoot = HTMLElement | null | undefined;
 
-export type __experimental_CheckoutProps = {
+export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
+
+export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: __experimental_CommerceSubscriptionPlanPeriod;
-  subscriberType?: __experimental_CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
+  subscriberType?: CommerceSubscriberType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
+  portalRoot?: PortalRoot;
+  /**
+   * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   * @default undefined
+   */
+  newSubscriptionRedirectUrl?: string;
+  onClose?: () => void;
 };
 
-export type __experimental_SubscriptionDetailsProps = {
-  appearance?: SubscriptionDetailTheme;
-  subscription?: __experimental_CommerceSubscriptionResource;
-  subscriberType?: __experimental_CommerceSubscriberType;
-  setPlanPeriod?: (p: __experimental_CommerceSubscriptionPlanPeriod) => void;
+export type __internal_PlanDetailsProps = {
+  appearance?: PlanDetailTheme;
+  plan?: CommercePlanResource;
+  subscriberType?: CommerceSubscriberType;
+  planPeriod?: CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
-};
-
-export type __experimental_PaymentSourcesProps = {
-  subscriberType?: __experimental_CommerceSubscriberType;
+  portalRoot?: PortalRoot;
 };
 
 export interface HandleEmailLinkVerificationParams {

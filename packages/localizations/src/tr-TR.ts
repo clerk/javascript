@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Geri',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Varsayılan',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Diğer taklit eden cihaz',
   badge__primary: 'Birincil',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Eylem gerekli',
   badge__startsAt: undefined,
   badge__thisDevice: 'Bu cihaz',
@@ -56,6 +31,78 @@ export const trTR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Kullanıcı cihazı',
   badge__you: 'Siz',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Oluştur',
     invitePage: {
@@ -146,6 +193,42 @@ export const trTR: LocalizationResource = {
     badge__automaticSuggestion: 'Otomatik öneriler',
     badge__manualInvitation: 'Davetler',
     badge__unverified: 'Doğrulanmamış',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Alan adını ekleyerek doğrulama yapın. Bu alana sahip e-posta adresleri ile kaydolan kullanıcılar organizasyona otomatik olarak katılabilir veya katılma talebi gönderebilir.',
@@ -208,6 +291,12 @@ export const trTR: LocalizationResource = {
       general: 'Genel',
       members: 'Üyeler',
       title: 'Organizasyon',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -393,6 +482,12 @@ export const trTR: LocalizationResource = {
       subtitle: 'Sorunlarla mı karşılaşıyorsunuz? Oturum açmak için bu yöntemlerden birini deneyebilirsiniz.',
       title: 'Farklı bir yöntem kullan',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Yedekleme kodu girişi',
@@ -501,6 +596,12 @@ export const trTR: LocalizationResource = {
       actionLink__use_username: 'Kullanıcı adı kullan',
       actionText: 'Hesabınız yok mu?',
       actionText__join_waitlist: 'Bekleme listesine katılın',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '{{applicationName}} ile devam etmek için',
       subtitleCombined: undefined,
       title: 'Giriş yap',
@@ -514,6 +615,11 @@ export const trTR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Giriş yap',
       actionText: 'Hesabınız var mı?',
@@ -581,6 +687,12 @@ export const trTR: LocalizationResource = {
       actionLink__use_email: 'Bunun yerine e-posta kullanın',
       actionLink__use_phone: 'Bunun yerine telefon kullanın',
       actionText: 'Hesabınız var mı?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: '{{applicationName}} ile devam etmek için',
       subtitleCombined: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
@@ -693,34 +805,6 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopyala',
@@ -736,6 +820,42 @@ export const trTR: LocalizationResource = {
         'Eğer Authenticator uygulamanızın olduğu cihazınıza erişiminizi kaybederseniz, bu kodlardan birini kullanarak hesabınıza giriş yapabilirsiniz.',
       title: 'Yedekleme kodu doğrulaması ekle',
       title__codelist: 'Yedekleme kodları',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Yeni bir hesap bağlamak için bir sağlayıcı seçiniz.',
@@ -879,6 +999,9 @@ export const trTR: LocalizationResource = {
       title: 'Telefon numarası ekle',
       verifySubtitle: '{{identifier}} numarasına gönderilen doğrulama kodunu girin',
       verifyTitle: 'Telefon numarasını doğrulayın',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: "10 MB'tan küçük boyutta bir JPG, PNG, GIF, veya WEBP dosyası yükle",

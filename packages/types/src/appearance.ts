@@ -13,6 +13,7 @@ import type {
 } from './elementIds';
 import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
 import type { Web3Provider } from './web3';
@@ -163,6 +164,7 @@ export type ElementsConfig = {
   lineItemsDescriptionSuffix: WithOptions;
   lineItemsDescriptionPrefix: WithOptions;
   lineItemsCopyButton: WithOptions;
+  lineItemsDowngradeNotice: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -187,21 +189,21 @@ export type ElementsConfig = {
 
   socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
-  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
+  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
-  providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
-  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
+  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
 
   alternativeMethods: WithOptions;
-  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
+  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
+  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
 
   checkoutFormLineItemsRoot: WithOptions;
   checkoutFormElementsRoot: WithOptions;
@@ -218,10 +220,12 @@ export type ElementsConfig = {
   otpCodeFieldErrorText: WithOptions;
 
   dividerRow: WithOptions;
+  dividerColumn: WithOptions;
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
   drawerBackdrop: WithOptions;
+  drawerRoot: WithOptions;
   drawerContent: WithOptions;
   drawerHeader: WithOptions;
   drawerTitle: WithOptions;
@@ -281,6 +285,11 @@ export type ElementsConfig = {
   segmentedControlRoot: WithOptions;
   segmentedControlButton: WithOptions;
 
+  switchRoot: WithOptions;
+  switchIndicator: WithOptions;
+  switchThumb: WithOptions;
+  switchLabel: WithOptions;
+
   avatarBox: WithOptions;
   avatarImage: WithOptions;
   avatarImageActions: WithOptions;
@@ -306,7 +315,7 @@ export type ElementsConfig = {
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
-  organizationSwitcherTrigger: WithOptions<never, 'open'>;
+  organizationSwitcherTrigger: WithOptions<'personal' | 'organization', 'open'>;
   organizationSwitcherTriggerIcon: WithOptions<never, 'open'>;
   organizationSwitcherPopoverRootBox: WithOptions;
   organizationSwitcherPopoverCard: WithOptions;
@@ -317,7 +326,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
-  organizationSwitcherPreviewButton: WithOptions;
+  organizationSwitcherPreviewButton: WithOptions<'personal' | 'organization'>;
   organizationSwitcherInvitationAcceptButton: WithOptions;
   organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
@@ -341,6 +350,7 @@ export type ElementsConfig = {
   userPreviewAvatarIcon: WithOptions<UserPreviewId>;
   userPreviewTextContainer: WithOptions<UserPreviewId>;
   userPreviewMainIdentifier: WithOptions<UserPreviewId>;
+  userPreviewMainIdentifierText: WithOptions<UserPreviewId>;
   userPreviewSecondaryIdentifier: WithOptions<UserPreviewId>;
 
   organizationPreview: WithOptions<OrganizationPreviewId>;
@@ -369,28 +379,27 @@ export type ElementsConfig = {
   pricingTable: WithOptions;
   pricingTableCard: WithOptions<string>;
   pricingTableCardHeader: WithOptions;
-  pricingTableCardAvatarBadgeContainer: WithOptions;
-  pricingTableCardAvatar: WithOptions;
-  pricingTableCardBadgeContainer: WithOptions;
-  pricingTableCardBadge: WithOptions;
+  pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
   pricingTableCardDescription: WithOptions;
+  pricingTableCardFeeContainer: WithOptions;
+  pricingTableCardFee: WithOptions;
+  pricingTableCardFeePeriod: WithOptions;
+  pricingTableCardPeriodToggle: WithOptions;
+  pricingTableCardFeePeriodNotice: WithOptions;
+  pricingTableCardBody: WithOptions;
   pricingTableCardFeatures: WithOptions;
   pricingTableCardFeaturesList: WithOptions<string>;
   pricingTableCardFeaturesListItem: WithOptions<string>;
   pricingTableCardFeaturesListItemContent: WithOptions;
   pricingTableCardFeaturesListItemTitle: WithOptions;
-  pricingTableCardFeaturesListItemDescription: WithOptions;
-  pricingTableCardAction: WithOptions;
-  pricingTableCardPeriodToggle: WithOptions;
-  pricingTableCardFeeContainer: WithOptions;
-  pricingTableCardFee: WithOptions;
-  pricingTableCardFeePeriod: WithOptions;
-  pricingTableCardFeePeriodNotice: WithOptions;
-  pricingTableCardFeePeriodNoticeInner: WithOptions;
-  pricingTableCardFeePeriodNoticeLabel: WithOptions;
+  pricingTableCardStatusRow: WithOptions;
+  pricingTableCardStatus: WithOptions;
+  pricingTableCardFooter: WithOptions;
+  pricingTableCardFooterButton: WithOptions;
+  pricingTableCardFooterNotice: WithOptions;
 
-  pricingTableMatrixRoot: WithOptions;
+  pricingTableMatrix: WithOptions;
   pricingTableMatrixTable: WithOptions;
   pricingTableMatrixRowGroup: WithOptions;
   pricingTableMatrixRowGroupHeader: WithOptions;
@@ -411,26 +420,28 @@ export type ElementsConfig = {
   pricingTableMatrixFeePeriodNoticeLabel: WithOptions;
   pricingTableMatrixFooter: WithOptions;
 
-  subscriptionDetailHeader: WithOptions;
-  subscriptionDetailAvatarBadgeContainer: WithOptions;
-  subscriptionDetailAvatar: WithOptions;
-  subscriptionDetailBadgeContainer: WithOptions;
-  subscriptionDetailBadge: WithOptions;
-  subscriptionDetailTitle: WithOptions;
-  subscriptionDetailDescription: WithOptions;
-  subscriptionDetailAction: WithOptions;
-  subscriptionDetailFeeContainer: WithOptions;
-  subscriptionDetailFee: WithOptions;
-  subscriptionDetailFeePeriod: WithOptions;
-  subscriptionDetailFeePeriodNotice: WithOptions;
-  subscriptionDetailFeePeriodNoticeInner: WithOptions;
-  subscriptionDetailFeePeriodNoticeLabel: WithOptions;
-  subscriptionDetailFeatures: WithOptions;
-  subscriptionDetailFeaturesList: WithOptions<string>;
-  subscriptionDetailFeaturesListItem: WithOptions<string>;
-  subscriptionDetailFeaturesListItemContent: WithOptions;
-  subscriptionDetailFeaturesListItemTitle: WithOptions;
-  subscriptionDetailFeaturesListItemDescription: WithOptions;
+  planDetailHeader: WithOptions;
+  planDetailAvatarBadgeContainer: WithOptions;
+  planDetailAvatar: WithOptions;
+  planDetailBadgeContainer: WithOptions;
+  planDetailBadge: WithOptions;
+  planDetailTitle: WithOptions;
+  planDetailDescription: WithOptions;
+  planDetailAction: WithOptions;
+  planDetailFeeContainer: WithOptions;
+  planDetailFee: WithOptions;
+  planDetailFeePeriod: WithOptions;
+  planDetailFeePeriodNotice: WithOptions;
+  planDetailFeePeriodNoticeInner: WithOptions;
+  planDetailFeePeriodNoticeLabel: WithOptions;
+  planDetailCaption: WithOptions;
+  planDetailFeatures: WithOptions;
+  planDetailFeaturesList: WithOptions<string>;
+  planDetailFeaturesListItem: WithOptions<string>;
+  planDetailFeaturesListItemContent: WithOptions;
+  planDetailFeaturesListItemTitle: WithOptions;
+  planDetailFeaturesListItemDescription: WithOptions;
+  planDetailPeriodToggle: WithOptions;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
@@ -464,25 +475,35 @@ export type ElementsConfig = {
   paymentSourceRowValue: WithOptions;
   paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
 
-  invoiceRoot: WithOptions;
-  invoiceCard: WithOptions;
-  invoiceHeader: WithOptions;
-  invoiceHeaderContent: WithOptions;
-  invoiceTitle: WithOptions;
-  invoiceHeaderTitleBadgeContainer: WithOptions;
-  invoiceTitleIdContainer: WithOptions;
-  invoiceId: WithOptions;
-  invoiceIdContainer: WithOptions;
-  invoiceBadge: WithOptions;
-  invoiceDetails: WithOptions;
-  invoiceDetailsItem: WithOptions;
-  invoiceDetailsItemTitle: WithOptions;
-  invoiceDetailsItemTitleText: WithOptions;
-  invoiceDetailsItemValue: WithOptions;
-  invoiceDetailsItemValueText: WithOptions;
-  invoiceCopyButton: WithOptions;
-  invoiceContent: WithOptions;
-
+  statementRoot: WithOptions;
+  statementHeader: WithOptions;
+  statementHeaderTitle: WithOptions;
+  statementHeaderBadge: WithOptions;
+  statementBody: WithOptions;
+  statementSection: WithOptions;
+  statementSectionHeader: WithOptions;
+  statementHeaderTitleContainer: WithOptions;
+  statementSectionHeaderTitle: WithOptions;
+  statementSectionContent: WithOptions;
+  statementSectionContentItem: WithOptions;
+  statementSectionContentDetailsList: WithOptions;
+  statementSectionContentDetailsListItem: WithOptions;
+  statementSectionContentDetailsListItemLabelContainer: WithOptions;
+  statementSectionContentDetailsListItemLabel: WithOptions;
+  statementSectionContentDetailsListItemValue: WithOptions;
+  statementSectionContentDetailsHeader: WithOptions;
+  statementSectionContentDetailsHeaderItem: WithOptions;
+  statementSectionContentDetailsHeaderItemIcon: WithOptions;
+  statementSectionContentDetailsHeaderTitle: WithOptions;
+  statementSectionContentDetailsHeaderDescription: WithOptions;
+  statementSectionContentDetailsHeaderSecondaryTitle: WithOptions;
+  statementSectionContentDetailsHeaderSecondaryDescription: WithOptions;
+  statementFooter: WithOptions;
+  statementFooterLabel: WithOptions;
+  statementFooterValueContainer: WithOptions;
+  statementFooterCurrency: WithOptions;
+  statementFooterValue: WithOptions;
+  statementCopyButton: WithOptions;
   menuButton: WithOptions<MenuId>;
   menuButtonEllipsis: WithOptions;
   menuList: WithOptions<MenuId>;
@@ -534,6 +555,10 @@ export type ElementsConfig = {
   impersonationFabIconContainer: WithOptions;
   impersonationFabTitle: WithOptions;
   impersonationFabActionLink: WithOptions;
+
+  tooltip: WithOptions;
+  tooltipContent: WithOptions;
+  tooltipText: WithOptions;
 
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;
@@ -806,7 +831,7 @@ export type UserVerificationTheme = Theme;
 export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
-export type SubscriptionDetailTheme = Theme;
+export type PlanDetailTheme = Theme;
 
 export type Appearance<T = Theme> = T & {
   /**

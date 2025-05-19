@@ -1,13 +1,19 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
-import type { Clerk, ClientResource, Resources } from '@clerk/types';
+import type { Clerk, ClientResource, MultiDomainAndOrProxy, Resources, Without } from '@clerk/types';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
 
-export type PluginOptions = LoadClerkJsScriptOptions;
+export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> & MultiDomainAndOrProxy;
+
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
+};
 
 /**
  * Vue plugin for integrating Clerk.
@@ -28,9 +34,9 @@ export type PluginOptions = LoadClerkJsScriptOptions;
  * ```
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
-  install(app, options) {
+  install(app, pluginOptions) {
     // @ts-expect-error: Internal property for SSR frameworks like Nuxt
-    const { initialState } = options;
+    const { initialState } = pluginOptions;
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);
@@ -41,6 +47,11 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       user: undefined,
       organization: undefined,
     });
+
+    const options = {
+      ...pluginOptions,
+      sdkMetadata: pluginOptions.sdkMetadata || SDK_METADATA,
+    } as LoadClerkJsScriptOptions;
 
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code
@@ -68,9 +79,30 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));
 
     const authCtx = computed(() => {
-      const { sessionId, userId, orgId, actor, orgRole, orgSlug, orgPermissions, sessionStatus, sessionClaims } =
-        derivedState.value;
-      return { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, sessionStatus, sessionClaims };
+      const {
+        sessionId,
+        userId,
+        orgId,
+        actor,
+        orgRole,
+        orgSlug,
+        orgPermissions,
+        sessionStatus,
+        sessionClaims,
+        factorVerificationAge,
+      } = derivedState.value;
+      return {
+        sessionId,
+        userId,
+        actor,
+        orgId,
+        orgRole,
+        orgSlug,
+        orgPermissions,
+        sessionStatus,
+        sessionClaims,
+        factorVerificationAge,
+      };
     });
     const clientCtx = computed(() => resources.value.client);
     const userCtx = computed(() => derivedState.value.user);

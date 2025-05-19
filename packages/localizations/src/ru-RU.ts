@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Назад',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По-умолчанию',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Другое устройство',
   badge__primary: 'Основной',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Требуется действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Это устройство',
@@ -56,6 +31,78 @@ export const ruRU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Создать организацию',
     invitePage: {
@@ -150,6 +197,42 @@ export const ruRU: LocalizationResource = {
     badge__automaticSuggestion: 'Автоматические предложения',
     badge__manualInvitation: 'Нет автоматической регистрации',
     badge__unverified: 'Неверифицированный',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Добавьте верифицированный домен. Пользователи, чья электронная почта зарегистрирована на верифицированном домене, могут присоединяться к организации автоматически или по запросу.',
@@ -212,6 +295,12 @@ export const ruRU: LocalizationResource = {
       general: 'Общее',
       members: 'Участники',
       title: 'Организация',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -401,6 +490,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Возникают проблемы? Вы можете использовать любой из этих методов для входа.',
       title: 'Использовать другой метод',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Введите резервный код',
@@ -509,6 +604,12 @@ export const ruRU: LocalizationResource = {
       actionLink__use_username: 'Использовать имя пользователя',
       actionText: 'Нет учетной записи?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       subtitleCombined: undefined,
       title: 'Войти',
@@ -522,6 +623,11 @@ export const ruRU: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Войти',
       actionText: 'Уже есть учетная запись?',
@@ -592,6 +698,12 @@ export const ruRU: LocalizationResource = {
       actionLink__use_email: 'Использовать электронную почту вместо этого',
       actionLink__use_phone: 'Использовать телефон вместо этого',
       actionText: 'Уже есть учетная запись?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       subtitleCombined: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
@@ -704,34 +816,6 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -747,6 +831,42 @@ export const ruRU: LocalizationResource = {
         'Вы можете использовать один из этих кодов для входа в свою учетную запись, если вы потеряете доступ к своему устройству аутентификации.',
       title: 'Добавить резервный код подтверждения',
       title__codelist: 'Резервные коды',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Выберите провайдера для подключения вашей учетной записи.',
@@ -893,6 +1013,9 @@ export const ruRU: LocalizationResource = {
       title: 'Добавить номер телефона',
       verifySubtitle: 'Введите верификационный код отправленный на {{identifier}}',
       verifyTitle: 'Верифицировать номер телефона',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Загрузите изображение в форматах JPG, PNG, GIF или WEBP размером меньше 10 МБ',

@@ -81,6 +81,11 @@ export type AuthenticateWithRedirectParams = {
    * Whether the user has accepted the legal requirements.
    */
   legalAccepted?: boolean;
+
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
 };
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
@@ -120,4 +125,11 @@ export type SignInForceRedirectUrl = {
    * This URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInForceRedirectUrl?: string | null;
+};
+
+export type NewSubscriptionRedirectUrl = {
+  /**
+   * The URL to navigate to after the user completes the checkout and clicks the "Continue" button.
+   */
+  newSubscriptionRedirectUrl?: string | null;
 };

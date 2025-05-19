@@ -32,12 +32,19 @@ type FakeUserOptions = {
    * @default false
    **/
   withUsername?: boolean;
+
+  /**
+   * If true, the user will have an email otherwise will be set to undefined.
+   *
+   * @default true
+   **/
+  withEmail?: boolean;
 };
 
 export type FakeUser = {
   firstName: string;
   lastName: string;
-  email: string;
+  email?: string;
   password: string;
   username?: string;
   phoneNumber?: string;
@@ -76,6 +83,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
     createFakeUser: (options?: FakeUserOptions) => {
       const {
         fictionalEmail = true,
+        withEmail = true,
         withPassword = true,
         withPhoneNumber = false,
         withUsername = false,
@@ -88,7 +96,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
-        email,
+        email: withEmail ? email : undefined,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? `${email}${randomHash}` : undefined,
         phoneNumber: withPhoneNumber ? fakerPhoneNumber() : undefined,
@@ -97,7 +105,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
     },
     createBapiUser: async fakeUser => {
       return await clerkClient.users.createUser({
-        emailAddress: [fakeUser.email],
+        emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
         password: fakeUser.password,
         firstName: fakeUser.firstName,
         lastName: fakeUser.lastName,

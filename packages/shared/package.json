@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.7.4",
+  "version": "3.9.1",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -120,7 +120,9 @@
     "organization",
     "jwtPayloadParser",
     "eventBus",
-    "clerkEventBus"
+    "netlifyCacheHandler",
+    "clerkEventBus",
+    "phoneCodeChannel"
   ],
   "scripts": {
     "build": "tsup",

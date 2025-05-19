@@ -9,6 +9,7 @@ type CompleteSignUpFlowProps = {
   handleComplete?: () => Promise<void>;
   redirectUrl?: string;
   redirectUrlComplete?: string;
+  oidcPrompt?: string;
 };
 
 export const completeSignUpFlow = ({
@@ -20,6 +21,7 @@ export const completeSignUpFlow = ({
   handleComplete,
   redirectUrl = '',
   redirectUrlComplete = '',
+  oidcPrompt,
 }: CompleteSignUpFlowProps): Promise<unknown> | undefined => {
   if (signUp.status === 'complete') {
     return handleComplete && handleComplete();
@@ -30,6 +32,7 @@ export const completeSignUpFlow = ({
         redirectUrl,
         redirectUrlComplete,
         continueSignUp: true,
+        oidcPrompt,
       });
     }
 

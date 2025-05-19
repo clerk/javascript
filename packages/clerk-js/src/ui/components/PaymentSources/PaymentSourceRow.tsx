@@ -1,13 +1,9 @@
-import type { __experimental_CommercePaymentSourceResource } from '@clerk/types';
+import type { CommercePaymentSourceResource } from '@clerk/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
-import { ApplePay, CreditCard } from '../../icons';
+import { CreditCard, GenericPayment } from '../../icons';
 
-export const PaymentSourceRow = ({
-  paymentSource,
-}: {
-  paymentSource: __experimental_CommercePaymentSourceResource;
-}) => {
+export const PaymentSourceRow = ({ paymentSource }: { paymentSource: CommercePaymentSourceResource }) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}
@@ -16,7 +12,7 @@ export const PaymentSourceRow = ({
       elementDescriptor={descriptors.paymentSourceRow}
     >
       <Icon
-        icon={paymentSource.walletType === 'apple_pay' ? ApplePay : CreditCard}
+        icon={paymentSource.paymentMethod === 'card' ? CreditCard : GenericPayment}
         sx={{ alignSelf: 'center' }}
         elementDescriptor={descriptors.paymentSourceRowIcon}
       />
@@ -33,7 +29,7 @@ export const PaymentSourceRow = ({
         truncate
         elementDescriptor={descriptors.paymentSourceRowValue}
       >
-        {paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}
+        {paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : null}
       </Text>
       {paymentSource.isDefault && (
         <Badge

@@ -14,48 +14,96 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
-  __experimental_commerce: {
-    billedAnnually: 'Jährlich abgerechnet',
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: 'Kostenlos',
-    getStarted: 'Jetzt starten',
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: 'Mitgliedschaft verwalten',
-    month: 'Monat',
-    reSubscribe: undefined,
-    switchPlan: 'Zu diesem Plan wechseln',
-  },
   backButton: 'Zurück',
+  badge__activePlan: 'Aktiv',
+  badge__canceledEndsAt: "Storniert • Endet am {{ date | shortDate('de-DE') }}",
   badge__currentPlan: 'Aktueller Plan',
   badge__default: 'Standard',
-  badge__endsAt: undefined,
-  badge__expired: undefined,
+  badge__endsAt: "Endet am {{ date | shortDate('de-DE') }}",
+  badge__expired: 'Abgelaufen',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
   badge__primary: 'Primär',
-  badge__requiresAction: 'Erfordert Handeln',
-  badge__startsAt: undefined,
+  badge__renewsAt: "Verlängert sich am {{ date | shortDate('de-DE') }}",
+  badge__requiresAction: 'Handlung erforderlich',
+  badge__startsAt: "Startet am {{ date | shortDate('de-DE') }}",
   badge__thisDevice: 'Dieses Gerät',
   badge__unverified: 'Unbestätigt',
-  badge__upcomingPlan: undefined,
+  badge__upcomingPlan: 'Bevorstehend',
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: 'Immer kostenlos',
+    annually: undefined,
+    availableFeatures: 'Verfügbare Funktionen',
+    billedAnnually: 'Jährlich abgerechnet',
+    billedMonthlyOnly: 'Nur monatlich abgerechnet',
+    cancelSubscription: 'Abonnement kündigen',
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: 'Ihre Bezahlung war erfolgreich.',
+      description__subscriptionSuccessful: 'Ihr Abonnement wurde erfolgreich aktiviert.',
+      downgradeNotice:
+        'Sie behalten Ihr aktuelles Abonnement bis zum Ende des Abrechnungszeitraums. So lange können Sie weiterhin alle Funktionen nutzen, danach werden Sie auf dieses Abonnement umgestellt.',
+      emailForm: {
+        subtitle: 'Geben Sie eine E-Mail-Adresse an, um Abrechnungsbelege zu erhalten.',
+        title: 'E-Mail-Adresse hinzufügen',
+      },
+      lineItems: {
+        title__paymentMethod: 'Bezahlmethode',
+        title__statementId: 'Statement-ID',
+        title__subscriptionBegins: 'Abonnement beginnt',
+        title__totalPaid: 'Insgesamt bezahlt',
+      },
+      perMonth: 'pro Monat',
+      title: undefined,
+      title__paymentSuccessful: 'Zahlung erfolgreich!',
+      title__subscriptionSuccessful: 'Geschafft!',
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
+    free: 'Kostenlos',
+    getStarted: 'Jetzt starten',
+    keepSubscription: 'Abonnement behalten',
+    manage: 'Verwalten',
+    manageSubscription: 'Mitgliedschaft verwalten',
+    month: 'Monat',
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: 'Erneut abonnieren',
+    seeAllFeatures: 'Alle Funktionen anzeigen',
+    subscribe: 'Abonnieren',
+    subtotal: undefined,
+    switchPlan: 'Zu diesem Plan wechseln',
+    switchToAnnual: 'Wechsel zu jährlich',
+    switchToMonthly: 'Wechsel zu monatlich',
+    totalDueToday: undefined,
+    viewFeatures: 'Funktionen anzeigen',
+    year: 'Jahr',
+  },
   createOrganization: {
     formButtonSubmit: 'Organisation erstellen',
     invitePage: {
@@ -149,6 +197,43 @@ export const deDE: LocalizationResource = {
     badge__automaticSuggestion: 'Automatische Vorschläge',
     badge__manualInvitation: 'Keine automatische Aufnahme',
     badge__unverified: 'Nicht verifiziert',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Als Standard festlegen',
+        actionLabel__remove: 'Entfernen',
+        add: 'Neue Zahlungsmethode hinzufügen',
+        addSubtitle: 'Fügen Sie eine neue Zahlungsmethode hinzu.',
+        cancelButton: 'Abbrechen',
+        formButtonPrimary__add: 'Zahlungsmethode hinzufügen',
+        formButtonPrimary__pay: '{{amount}} bezahlen',
+        payWithTestCardButton: 'Mit Test-Kreditkarte bezahlen',
+        removeResource: {
+          messageLine1: '{{identifier}} wird von diesem Konto entfernt.',
+          messageLine2:
+            'In Zukunft können Sie diese Zahlungsmethode nicht mehr verwenden. Alle laufenden Abonnements, die diese Zahlungsmethode verwenden, werden aufhören zu funktionieren.',
+          successMessage: '{{paymentSource}} wurde von diesem Konto entfernt.',
+          title: 'Zahlungsmethode entfernen',
+        },
+        title: 'Zahlungsmethoden',
+      },
+      start: {
+        headerTitle__plans: 'Pläne',
+        headerTitle__statements: 'Abrechnungen',
+        headerTitle__subscriptions: 'Abonnements',
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: 'Plan wechseln',
+        title: 'Abonnement',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Verwalten',
+      },
+      switchPlansSection: {
+        title: 'Plan wechseln',
+      },
+      title: 'Abrechnung',
+    },
     createDomainPage: {
       subtitle:
         'Fügen Sie die zu überprüfende Domain hinzu. Benutzer mit E-Mail-Adressen von dieser Domain können der Organisation automatisch beitreten oder einen Antrag auf Beitritt stellen.',
@@ -206,11 +291,18 @@ export const deDE: LocalizationResource = {
       },
     },
     navbar: {
-      billing: undefined,
+      billing: 'Abrechnung',
       description: 'Verwalten Sie ihre Organisation.',
       general: 'Allgemein',
       members: 'Mitglieder',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling:
+          'Sie haben keine Berechtigung, die Abrechnungen für diese Organisation zu verwalten.',
+      },
+      title: 'Pläne',
     },
     profilePage: {
       dangerSection: {
@@ -397,6 +489,12 @@ export const deDE: LocalizationResource = {
       subtitle: 'Haben Sie Probleme? Sie können eine der folgenden Methoden zur Anmeldung verwenden.',
       title: 'Verwenden Sie eine andere Methode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Geben Sie einen Backup-Code ein',
@@ -505,6 +603,12 @@ export const deDE: LocalizationResource = {
       actionLink__use_username: 'Benutzername nutzen',
       actionText: 'Kein Account?',
       actionText__join_waitlist: 'Warteliste beitreten',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'weiter zu {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Einloggen',
@@ -519,6 +623,11 @@ export const deDE: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Einloggen',
       actionText: 'Haben Sie ein Konto?',
@@ -587,6 +696,12 @@ export const deDE: LocalizationResource = {
       actionLink__use_email: 'Mit E-Mail einloggen',
       actionLink__use_phone: 'Mit Telefonnummer einloggen',
       actionText: 'Haben Sie ein Konto?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'weiter zu {{applicationName}}',
       subtitleCombined: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',
@@ -706,34 +821,6 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: 'Rechnungen',
-        headerTitle__paymentMethods: 'Zahlungsquellen',
-        headerTitle__plans: 'Pläne',
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: 'Abrechnung & Zahlungen',
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -749,6 +836,43 @@ export const deDE: LocalizationResource = {
         'Sie können diese Codes verwenden, um sich bei Ihrem Konto anzumelden, wenn Sie den Zugriff auf Ihr Authentifizierungsgerät verlieren.',
       title: 'Backup-Code-Verifizierung hinzufügen',
       title__codelist: 'Sicherungscodes',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Als Standard festlegen',
+        actionLabel__remove: 'Entfernen',
+        add: 'Neue Zahlungsmethode hinzufügen',
+        addSubtitle: 'Fügen Sie eine neue Zahlungsmethode hinzu.',
+        cancelButton: 'Abbrechen',
+        formButtonPrimary__add: 'Zahlungsmethode hinzufügen',
+        formButtonPrimary__pay: '{{amount}} bezahlen',
+        payWithTestCardButton: 'Mit Test-Kreditkarte bezahlen',
+        removeResource: {
+          messageLine1: '{{identifier}} wird von diesem Konto entfernt.',
+          messageLine2:
+            'In Zukunft können Sie diese Zahlungsmethode nicht mehr verwenden. Alle laufenden Abonnements, die diese Zahlungsmethode verwenden, werden aufhören zu funktionieren.',
+          successMessage: '{{paymentSource}} wurde von diesem Konto entfernt.',
+          title: 'Zahlungsmethode entfernen',
+        },
+        title: 'Zahlungsmethoden',
+      },
+      start: {
+        headerTitle__plans: 'Pläne',
+        headerTitle__statements: 'Abrechnungen',
+        headerTitle__subscriptions: 'Abonnements',
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: 'Plan wechseln',
+        title: 'Abonnement',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Verwalten',
+      },
+      switchPlansSection: {
+        title: 'Plan wechseln',
+      },
+      title: 'Abrechnung',
     },
     connectedAccountPage: {
       formHint: 'Wählen Sie einen Anbieter aus, um Ihr Konto zu verbinden.',
@@ -896,8 +1020,11 @@ export const deDE: LocalizationResource = {
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
     },
+    plansPage: {
+      title: 'Pläne',
+    },
     profilePage: {
-      fileDropAreaHint: 'Laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch, welches kleiner als 10 MB ist',
+      fileDropAreaHint: 'Laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch, das kleiner als 10 MB ist',
       imageFormDestructiveActionSubtitle: 'Bild entfernen',
       imageFormSubtitle: 'Bild hochladen',
       imageFormTitle: 'Profilbild',

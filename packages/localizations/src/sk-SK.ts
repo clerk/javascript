@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Späť',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Predvolené',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
   badge__primary: 'Hlavný',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Vyžaduje akciu',
   badge__startsAt: undefined,
   badge__thisDevice: 'Toto zariadenie',
@@ -56,6 +31,78 @@ export const skSK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Vytvoriť organizáciu',
     invitePage: {
@@ -147,6 +194,42 @@ export const skSK: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -208,6 +291,12 @@ export const skSK: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -392,6 +481,12 @@ export const skSK: LocalizationResource = {
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
       title: 'Použiť inú metódu',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Zadajte záložný kód',
@@ -498,6 +593,12 @@ export const skSK: LocalizationResource = {
       actionLink__use_username: 'Použiť užívateľské meno',
       actionText: 'Nemáte účet?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'pre pokračovanie do {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Prihlásiť sa',
@@ -511,6 +612,11 @@ export const skSK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Prihlásiť sa',
       actionText: 'Máte účet?',
@@ -578,6 +684,12 @@ export const skSK: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'pre pokračovanie do {{applicationName}}',
       subtitleCombined: 'pre pokračovanie do {{applicationName}}',
       title: 'Vytvorte si účet',
@@ -687,34 +799,6 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -730,6 +814,42 @@ export const skSK: LocalizationResource = {
         'Použite jeden z týchto kódov na prihlásenie do vášho účtu, ak stratíte prístup k vášmu overovaciemu zariadeniu.',
       title: 'Pridať overovanie pomocou záložných kódov',
       title__codelist: 'Záložné kódy',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Vyberte poskytovateľa pre pripojenie vášho účtu.',
@@ -873,6 +993,9 @@ export const skSK: LocalizationResource = {
       title: 'Pridať telefónne číslo',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Nahrajte obrázok vo formátoch JPG, PNG, GIF alebo WEBP s veľkosťou menšou než 10 MB',

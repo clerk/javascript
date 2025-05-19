@@ -3,10 +3,8 @@ import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailsProps,
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
   AuthenticateWithCoinbaseWalletParams,
@@ -18,6 +16,7 @@ import type {
   ClerkOptions,
   ClerkStatus,
   ClientResource,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -32,6 +31,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  PricingTableProps,
   RedirectOptions,
   SetActiveParams,
   SignInProps,
@@ -97,12 +97,12 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_addNavigationListener'
   | '__internal_getCachedResources'
   | '__internal_reloadInitialResources'
-  | '__experimental_commerce'
+  | 'billing'
   | '__internal_setComponentNavigationContext'
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  __experimental_commerce: __experimental_CommerceNamespace | undefined;
+  billing: CommerceBillingNamespace | undefined;
 };
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
@@ -113,8 +113,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
-  private preopenCheckout?: null | __experimental_CheckoutProps = null;
-  private preopenSubscriptionDetails?: null | __experimental_SubscriptionDetailsProps = null;
+  private preopenCheckout?: null | __internal_CheckoutProps = null;
+  private preopenPlanDetails?: null | __internal_PlanDetailsProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
@@ -130,7 +130,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps | undefined>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
-  private premountPricingTableNodes = new Map<HTMLDivElement, __experimental_PricingTableProps | undefined>();
+  private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -243,7 +243,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.options.sdkMetadata = SDK_METADATA;
     }
     this.#eventBus.emit(clerkEvents.Status, 'loading');
-    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status as ClerkStatus));
+    this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
       void this.loadClerkJS();
@@ -320,6 +320,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignOutUrl', callback);
+    }
+  };
+
+  buildNewSubscriptionRedirectUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildNewSubscriptionRedirectUrl() || '';
+    if (this.clerkjs && this.loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildNewSubscriptionRedirectUrl', callback);
     }
   };
 
@@ -540,8 +549,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_openCheckout(this.preopenCheckout);
     }
 
-    if (this.preopenSubscriptionDetails !== null) {
-      clerkjs.__internal_openSubscriptionDetails(this.preopenSubscriptionDetails);
+    if (this.preopenPlanDetails !== null) {
+      clerkjs.__internal_openPlanDetails(this.preopenPlanDetails);
     }
 
     if (this.preopenSignUp !== null) {
@@ -597,7 +606,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
 
     this.premountPricingTableNodes.forEach((props, node) => {
-      clerkjs.__experimental_mountPricingTable(node, props);
+      clerkjs.mountPricingTable(node, props);
     });
 
     /**
@@ -673,8 +682,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __experimental_commerce(): __experimental_CommerceNamespace | undefined {
-    return this.clerkjs?.__experimental_commerce;
+  get billing(): CommerceBillingNamespace | undefined {
+    return this.clerkjs?.billing;
   }
 
   __unstable__setEnvironment(...args: any): void {
@@ -693,9 +702,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_nextTask = async (params?: NextTaskParams): Promise<void> => {
+  __experimental_navigateToTask = async (params?: NextTaskParams): Promise<void> => {
     if (this.clerkjs) {
-      return this.clerkjs.__experimental_nextTask(params);
+      return this.clerkjs.__experimental_navigateToTask(params);
     } else {
       return Promise.reject();
     }
@@ -728,7 +737,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openCheckout = (props?: __experimental_CheckoutProps) => {
+  __internal_openCheckout = (props?: __internal_CheckoutProps) => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_openCheckout(props);
     } else {
@@ -744,19 +753,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps) => {
+  __internal_openPlanDetails = (props?: __internal_PlanDetailsProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__internal_openSubscriptionDetails(props);
+      this.clerkjs.__internal_openPlanDetails(props);
     } else {
-      this.preopenSubscriptionDetails = props;
+      this.preopenPlanDetails = props;
     }
   };
 
-  __internal_closeSubscriptionDetails = () => {
+  __internal_closePlanDetails = () => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__internal_closeSubscriptionDetails();
+      this.clerkjs.__internal_closePlanDetails();
     } else {
-      this.preopenSubscriptionDetails = null;
+      this.preopenPlanDetails = null;
     }
   };
 
@@ -1025,17 +1034,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps) => {
+  mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_mountPricingTable(node, props);
+      this.clerkjs.mountPricingTable(node, props);
     } else {
       this.premountPricingTableNodes.set(node, props);
     }
   };
 
-  __experimental_unmountPricingTable = (node: HTMLDivElement) => {
+  unmountPricingTable = (node: HTMLDivElement) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__experimental_unmountPricingTable(node);
+      this.clerkjs.unmountPricingTable(node);
     } else {
       this.premountPricingTableNodes.delete(node);
     }

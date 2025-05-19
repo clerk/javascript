@@ -48,6 +48,7 @@ interface GroupProps {
    */
   borderTop?: boolean;
   variant?: GroupVariant;
+  expand?: boolean;
 }
 
 function Group({ children, borderTop = false, variant = 'primary' }: GroupProps) {

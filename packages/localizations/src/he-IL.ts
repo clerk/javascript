@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'חזור',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'ברירת מחדל',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
   badge__primary: 'ראשי',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'דורש פעולה',
   badge__startsAt: undefined,
   badge__thisDevice: 'מכשיר זה',
@@ -56,6 +31,78 @@ export const heIL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
   badge__you: 'אתה',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'צור ארגון',
     invitePage: {
@@ -146,6 +193,42 @@ export const heIL: LocalizationResource = {
     badge__automaticSuggestion: 'הצעות אוטומטיות',
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
     badge__unverified: 'לא מאומת',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'הוסף את הדומיין לאימות. משתמשים עם כתובות אימייל תחת דומיין זה יכולים להצטרף לארגון באופן אוטומטי או לבקש להצטרף.',
@@ -206,6 +289,12 @@ export const heIL: LocalizationResource = {
       general: 'כללי',
       members: 'חברים',
       title: 'ארגון',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -387,6 +476,12 @@ export const heIL: LocalizationResource = {
       subtitle: 'נתקלת בבעיה? תוכל להשתמש באחת מהשיטות האלה כדי להתחבר.',
       title: 'השתמש בשיטה אחרת',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'הכנס קוד גיבוי',
@@ -493,6 +588,12 @@ export const heIL: LocalizationResource = {
       actionLink__use_username: 'השתמש בשם משתמש',
       actionText: 'אין לך חשבון?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'להמשיך אל {{applicationName}}',
       subtitleCombined: undefined,
       title: 'התחבר',
@@ -506,6 +607,11 @@ export const heIL: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'התחבר',
       actionText: 'יש לך חשבון?',
@@ -573,6 +679,12 @@ export const heIL: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'יש לך חשבון?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'להמשיך אל {{applicationName}}',
       subtitleCombined: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
@@ -681,34 +793,6 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -722,6 +806,42 @@ export const heIL: LocalizationResource = {
       successSubtitle: 'תוכל להשתמש באחד מאלה כדי להתחבר לחשבון שלך, אם אתה מאבד גישה למכשיר האימות שלך.',
       title: 'הוסף אימות קוד גיבוי',
       title__codelist: 'קודי גיבוי',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'בחר ספק כדי לחבר את החשבון שלך.',
@@ -858,6 +978,9 @@ export const heIL: LocalizationResource = {
       title: 'הוסף מספר טלפון',
       verifySubtitle: 'הזן את קוד האימות שנשלח ל{{identifier}}',
       verifyTitle: 'אמת מספר טלפון',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'העלה תמונה בפורמט JPG, PNG, GIF, או WEBP הקטנה מ-10 מ"ב',

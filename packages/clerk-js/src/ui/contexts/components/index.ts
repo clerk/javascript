@@ -1,6 +1,7 @@
 export * from './SignIn';
 export * from './SignUp';
 export * from './SignOut';
+export * from './SubscriberType';
 export * from './UserProfile';
 export * from './UserVerification';
 export * from './UserButton';
@@ -12,6 +13,5 @@ export * from './GoogleOneTap';
 export * from './Waitlist';
 export * from './PricingTable';
 export * from './Checkout';
-export * from './PaymentSources';
-export * from './Invoices';
+export * from './Statements';
 export * from './Plans';

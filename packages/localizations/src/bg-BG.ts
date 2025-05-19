@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Назад',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'По подразбиране',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
   badge__primary: 'Основен',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Изисква действие',
   badge__startsAt: undefined,
   badge__thisDevice: 'Това устройство',
@@ -56,6 +31,78 @@ export const bgBG: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Създаване на организация',
     invitePage: {
@@ -146,6 +193,42 @@ export const bgBG: LocalizationResource = {
     badge__automaticSuggestion: 'Автоматични предложения',
     badge__manualInvitation: 'Няма автоматично включване',
     badge__unverified: 'Неверифициран',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Добавете домейн за верификация. Потребителите с имейл адреси на този домейн могат да се присъединят към организацията автоматично или да заявят да се присъединят.',
@@ -208,6 +291,12 @@ export const bgBG: LocalizationResource = {
       general: 'Общи',
       members: 'Членове',
       title: 'Организация',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -393,6 +482,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Имате проблеми? Можете да използвате някой от тези методи за влизане.',
       title: 'Използвайте друг метод',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Вашият резервен код е този, който сте получили при настройване на двустепенната аутентикация.',
       title: 'Въведете резервен код',
@@ -499,6 +594,12 @@ export const bgBG: LocalizationResource = {
       actionLink__use_username: 'Използвайте потребителско име',
       actionText: 'Нямате акаунт?',
       actionText__join_waitlist: 'Все още нямате акаунт? Присъединете се към листата за изчакване.',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Добре дошли обратно! Моля, влезте, за да продължите',
       subtitleCombined: undefined,
       title: 'Влезте в {{applicationName}}',
@@ -513,6 +614,11 @@ export const bgBG: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Въведете вашата парола',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Влезте',
       actionText: 'Вече имате акаунт?',
@@ -580,6 +686,12 @@ export const bgBG: LocalizationResource = {
       actionLink__use_email: 'Използвайте имейл',
       actionLink__use_phone: 'Използвайте телефон',
       actionText: 'Вече имате акаунт?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       subtitleCombined: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
@@ -687,34 +799,6 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -730,6 +814,42 @@ export const bgBG: LocalizationResource = {
         'Можете да използвате един от тях, за да влезете в акаунта си, ако загубите достъпа до устройството си за удостоверяване.',
       title: 'Добавяне на резервен код за потвърждение',
       title__codelist: 'Резервни кодове',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Изберете доставчик, за да свържете вашия профил.',
@@ -875,6 +995,9 @@ export const bgBG: LocalizationResource = {
       title: 'Добави телефонен номер',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Препоръчителен размер 1:1, до 10MB.',

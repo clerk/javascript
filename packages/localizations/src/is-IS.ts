@@ -14,41 +14,16 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
-  __experimental_commerce: {
-    billedAnnually: undefined,
-    cancelSubscription: undefined,
-    checkout: {
-      description__paymentSuccessful: undefined,
-      description__subscriptionSuccessful: undefined,
-      emailForm: {
-        subtitle: undefined,
-        title: undefined,
-      },
-      lineItems: {
-        title__invoiceId: undefined,
-        title__paymentMethod: undefined,
-        title__subscriptionBegins: undefined,
-        title__totalPaid: undefined,
-      },
-      title__paymentSuccessful: undefined,
-      title__subscriptionSuccessful: undefined,
-    },
-    free: undefined,
-    getStarted: undefined,
-    keepSubscription: undefined,
-    manage: undefined,
-    manageSubscription: undefined,
-    month: undefined,
-    reSubscribe: undefined,
-    switchPlan: undefined,
-  },
   backButton: 'Til baka',
+  badge__activePlan: undefined,
+  badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Sjálfgefið',
   badge__endsAt: undefined,
   badge__expired: undefined,
   badge__otherImpersonatorDevice: 'Önnur tæki sem herma eftir',
   badge__primary: 'Aðal',
+  badge__renewsAt: undefined,
   badge__requiresAction: 'Krefst aðgerða',
   badge__startsAt: undefined,
   badge__thisDevice: 'Þetta tæki',
@@ -56,6 +31,78 @@ export const isIS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Notendatæki',
   badge__you: 'Þú',
+  commerce: {
+    addPaymentMethod: undefined,
+    alwaysFree: undefined,
+    annually: undefined,
+    availableFeatures: undefined,
+    billedAnnually: undefined,
+    billedMonthlyOnly: undefined,
+    cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
+    checkout: {
+      description__paymentSuccessful: undefined,
+      description__subscriptionSuccessful: undefined,
+      downgradeNotice: undefined,
+      emailForm: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      lineItems: {
+        title__paymentMethod: undefined,
+        title__statementId: undefined,
+        title__subscriptionBegins: undefined,
+        title__totalPaid: undefined,
+      },
+      perMonth: undefined,
+      title: undefined,
+      title__paymentSuccessful: undefined,
+      title__subscriptionSuccessful: undefined,
+    },
+    creditRemainder: undefined,
+    defaultFreePlanActive: undefined,
+    free: undefined,
+    getStarted: undefined,
+    keepSubscription: undefined,
+    manage: undefined,
+    manageSubscription: undefined,
+    month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
+    reSubscribe: undefined,
+    seeAllFeatures: undefined,
+    subscribe: undefined,
+    subtotal: undefined,
+    switchPlan: undefined,
+    switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
+    viewFeatures: undefined,
+    year: undefined,
+  },
   createOrganization: {
     formButtonSubmit: 'Stofna samtök',
     invitePage: {
@@ -147,6 +194,42 @@ export const isIS: LocalizationResource = {
     badge__automaticSuggestion: 'Sjálfvirkar tillögur',
     badge__manualInvitation: 'Engin sjálfvirk skráning',
     badge__unverified: 'Óstaðfest',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Bættu við léni til að staðfesta. Notendur með netföng undir þessu léni geta gengið í samtökin sjálfkrafa eða beðið um að ganga í.',
@@ -209,6 +292,12 @@ export const isIS: LocalizationResource = {
       general: 'Almennt',
       members: 'Meðlimir',
       title: 'Samtök',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -394,6 +483,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'Áttu í vandræðum? Þú getur notað einhverja af þessum aðferðum til að skrá þig inn.',
       title: 'Nota aðra aðferð',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Öryggiskóðinn þinn er sá sem þú fékkst þegar þú stilltir tveggja þrepa auðkenningu.',
       title: 'Sláðu inn öryggiskóða',
@@ -502,6 +597,12 @@ export const isIS: LocalizationResource = {
       actionLink__use_username: 'Nota notendanafn',
       actionText: 'Ertu ekki með reikning?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Velkomin aftur! Vinsamlegast skráðu þig inn til að halda áfram',
       subtitleCombined: undefined,
       title: 'Skrá inn í {{applicationName}}',
@@ -515,6 +616,11 @@ export const isIS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Skrá inn',
       actionText: 'Ertu með reikning?',
@@ -583,6 +689,12 @@ export const isIS: LocalizationResource = {
       actionLink__use_email: 'Nota netfang í staðinn',
       actionLink__use_phone: 'Nota síma í staðinn',
       actionText: 'Ertu með reikning?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       subtitleCombined: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
@@ -694,34 +806,6 @@ export const isIS: LocalizationResource = {
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
   userProfile: {
-    __experimental_billingPage: {
-      paymentSourcesSection: {
-        actionLabel__default: undefined,
-        actionLabel__remove: undefined,
-        add: undefined,
-        addSubtitle: undefined,
-        cancelButton: undefined,
-        formButtonPrimary__add: undefined,
-        formButtonPrimary__pay: undefined,
-        removeResource: {
-          messageLine1: undefined,
-          messageLine2: undefined,
-          successMessage: undefined,
-          title: undefined,
-        },
-        title: undefined,
-      },
-      start: {
-        headerTitle__invoices: undefined,
-        headerTitle__paymentMethods: undefined,
-        headerTitle__plans: undefined,
-        headerTitle__subscriptions: undefined,
-      },
-      subscriptionsSection: {
-        actionLabel__default: undefined,
-      },
-      title: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Afritað!',
       actionLabel__copy: 'Afrita allt',
@@ -737,6 +821,42 @@ export const isIS: LocalizationResource = {
         'Þú getur notað einn af þessum til að skrá þig inn á reikninginn þinn, ef þú missir aðgang að auðkennis tækinu þínu.',
       title: 'Bæta við öryggiskóða staðfestingu',
       title__codelist: 'Öryggiskóðar',
+    },
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
     },
     connectedAccountPage: {
       formHint: 'Veldu þjónustuaðila til að tengja reikninginn þinn.',
@@ -883,6 +1003,9 @@ export const isIS: LocalizationResource = {
       title: 'Bæta við símanúmeri',
       verifySubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á {{identifier}}',
       verifyTitle: 'Staðfesta símanúmer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Mælt stærð 1:1, allt að 10MB.',

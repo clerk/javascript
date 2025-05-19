@@ -1,17 +1,17 @@
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceInvoiceResource,
-  __experimental_CommercePlanResource,
-  __experimental_CommerceSubscriberType,
-  __experimental_CommerceSubscriptionResource,
-  __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailsProps,
+  __internal_CheckoutProps,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
+  CommercePlanResource,
+  CommerceStatementResource,
+  CommerceSubscriptionResource,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  NewSubscriptionRedirectUrl,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
+  PricingTableProps,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
@@ -47,10 +47,10 @@ export type AvailableComponentProps =
   | CreateOrganizationProps
   | OrganizationListProps
   | WaitlistProps
-  | __experimental_PricingTableProps
-  | __experimental_CheckoutProps
+  | PricingTableProps
+  | __internal_CheckoutProps
   | __internal_UserVerificationProps
-  | __experimental_SubscriptionDetailsProps;
+  | __internal_PlanDetailsProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -112,36 +112,32 @@ export type WaitlistCtx = WaitlistProps & {
   mode?: ComponentMode;
 };
 
-export type __experimental_PricingTableCtx = __experimental_PricingTableProps & {
+export type PricingTableCtx = PricingTableProps & {
   componentName: 'PricingTable';
   mode?: ComponentMode;
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
-export type __experimental_CheckoutCtx = __experimental_CheckoutProps & {
+export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
-};
+} & NewSubscriptionRedirectUrl;
 
-export type __experimental_PaymentSourcesCtx = {
+export type PaymentSourcesCtx = {
   componentName: 'PaymentSources';
-  subscriberType?: __experimental_CommerceSubscriberType;
 };
 
-export type __experimental_InvoicesCtx = {
-  componentName: 'Invoices';
-  subscriberType: __experimental_CommerceSubscriberType;
-  invoices: __experimental_CommerceInvoiceResource[];
+export type StatementsCtx = {
+  componentName: 'Statements';
+  statements: CommerceStatementResource[];
   totalCount: number;
   isLoading: boolean;
   revalidate: () => void;
-  getInvoiceById: (invoiceId: string) => __experimental_CommerceInvoiceResource | undefined;
+  getStatementById: (statementId: string) => CommerceStatementResource | undefined;
 };
 
-export type __experimental_PlansCtx = {
+export type PlansCtx = {
   componentName: 'Plans';
-  subscriberType: __experimental_CommerceSubscriberType;
-  plans: __experimental_CommercePlanResource[];
-  subscriptions: __experimental_CommerceSubscriptionResource[];
+  plans: CommercePlanResource[];
+  subscriptions: CommerceSubscriptionResource[];
   isLoading: boolean;
   revalidate: () => void;
 };
@@ -163,6 +159,6 @@ export type AvailableComponentCtx =
   | OrganizationListCtx
   | GoogleOneTapCtx
   | WaitlistCtx
-  | __experimental_PricingTableCtx
-  | __experimental_CheckoutCtx;
+  | PricingTableCtx
+  | CheckoutCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

@@ -5,6 +5,7 @@ import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResp
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
+import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
 import {
   eventPrebuiltComponentMounted,
@@ -14,11 +15,9 @@ import {
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
-  __experimental_CheckoutProps,
-  __experimental_CommerceNamespace,
-  __experimental_PricingTableProps,
-  __experimental_SubscriptionDetailsProps,
+  __internal_CheckoutProps,
   __internal_ComponentNavigationContext,
+  __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
@@ -30,6 +29,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -50,6 +50,7 @@ import type {
   OrganizationResource,
   OrganizationSwitcherProps,
   PendingSessionResource,
+  PricingTableProps,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -130,7 +131,7 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
-import { __experimental_Commerce } from './modules/commerce';
+import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -174,6 +175,7 @@ const defaultOptions: ClerkOptions = {
   signInForceRedirectUrl: undefined,
   signUpForceRedirectUrl: undefined,
   treatPendingAsSignedOut: true,
+  newSubscriptionRedirectUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -185,7 +187,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  private static _commerce: __experimental_CommerceNamespace;
+  private static _billing: CommerceBillingNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -314,11 +316,11 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get __experimental_commerce(): __experimental_CommerceNamespace {
-    if (!Clerk._commerce) {
-      Clerk._commerce = new __experimental_Commerce();
+  get billing(): CommerceBillingNamespace {
+    if (!Clerk._billing) {
+      Clerk._billing = new CommerceBilling();
     }
-    return Clerk._commerce;
+    return Clerk._billing;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -544,7 +546,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public __internal_openCheckout = (props?: __experimental_CheckoutProps): void => {
+  public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -554,6 +556,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenCheckout, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
     void this.#componentControls
       .ensureMounted({ preloadHint: 'Checkout' })
       .then(controls => controls.openDrawer('checkout', props || {}));
@@ -564,24 +575,24 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('checkout'));
   };
 
-  public __internal_openSubscriptionDetails = (props?: __experimental_SubscriptionDetailsProps): void => {
+  public __internal_openPlanDetails = (props?: __internal_PlanDetailsProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('SubscriptionDetails'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
       return;
     }
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'SubscriptionDetails' })
-      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
+      .ensureMounted({ preloadHint: 'PlanDetails' })
+      .then(controls => controls.openDrawer('planDetails', props || {}));
   };
 
-  public __internal_closeSubscriptionDetails = (): void => {
+  public __internal_closePlanDetails = (): void => {
     this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('subscriptionDetails'));
+    void this.#componentControls.ensureMounted().then(controls => controls.closeDrawer('planDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
@@ -995,7 +1006,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls?.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
 
-  public __experimental_mountPricingTable = (node: HTMLDivElement, props?: __experimental_PricingTableProps): void => {
+  public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledBillingFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
@@ -1017,7 +1028,7 @@ export class Clerk implements ClerkInterface {
     this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
   };
 
-  public __experimental_unmountPricingTable = (node: HTMLDivElement): void => {
+  public unmountPricingTable = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -1188,7 +1199,7 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  public __experimental_nextTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
+  public __experimental_navigateToTask = async ({ redirectUrlComplete }: NextTaskParams = {}): Promise<void> => {
     const session = await this.session?.reload();
     if (!session || !this.environment) {
       return;
@@ -1205,7 +1216,7 @@ export class Clerk implements ClerkInterface {
     }
 
     const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignUpUrl();
+    const defaultRedirectUrlComplete = this.client?.signUp ? this.buildAfterSignUpUrl() : this.buildAfterSignInUrl();
 
     this.#setTransitiveState();
 
@@ -1365,6 +1376,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
+  public buildNewSubscriptionRedirectUrl(): string {
+    if (!this.#options.newSubscriptionRedirectUrl) {
+      return this.buildAfterSignInUrl();
+    }
+
+    return this.#options.newSubscriptionRedirectUrl;
   }
 
   public buildWaitlistUrl(options?: { initialValues?: Record<string, string> }): string {
@@ -2613,10 +2632,12 @@ export class Clerk implements ClerkInterface {
   #clearClerkQueryParams = () => {
     try {
       removeClerkQueryParam(CLERK_SYNCED);
+      removeClerkQueryParam(CLERK_NETLIFY_CACHE_BUST_PARAM);
       // @nikos: we're looking into dropping this param completely
       // in the meantime, we're removing it here to keep the URL clean
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
+      removeClerkQueryParam('__clerk_handshake_nonce');
       removeClerkQueryParam('__clerk_help');
     } catch {
       // ignore

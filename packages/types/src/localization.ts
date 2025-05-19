@@ -89,9 +89,12 @@ type _LocalizationResource = {
   badge__you: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
+  badge__activePlan: LocalizationValue;
   badge__startsAt: LocalizationValue;
   badge__endsAt: LocalizationValue;
   badge__expired: LocalizationValue;
+  badge__canceledEndsAt: LocalizationValue;
+  badge__renewsAt: LocalizationValue;
   footerPageLink__help: LocalizationValue;
   footerPageLink__privacy: LocalizationValue;
   footerPageLink__terms: LocalizationValue;
@@ -102,8 +105,9 @@ type _LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  __experimental_commerce: {
+  commerce: {
     month: LocalizationValue;
+    year: LocalizationValue;
     free: LocalizationValue;
     getStarted: LocalizationValue;
     manage: LocalizationValue;
@@ -111,10 +115,51 @@ type _LocalizationResource = {
     cancelSubscription: LocalizationValue;
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
+    subscribe: LocalizationValue;
     switchPlan: LocalizationValue;
+    switchToMonthly: LocalizationValue;
+    switchToAnnual: LocalizationValue;
     billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
+    alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
+    defaultFreePlanActive: LocalizationValue;
+    viewFeatures: LocalizationValue;
+    seeAllFeatures: LocalizationValue;
+    availableFeatures: LocalizationValue;
+    subtotal: LocalizationValue;
+    creditRemainder: LocalizationValue;
+    totalDueToday: LocalizationValue;
+    paymentMethods: LocalizationValue;
+    addPaymentMethod: LocalizationValue;
+    pay: LocalizationValue;
+    cancelSubscriptionTitle: LocalizationValue;
+    cancelSubscriptionNoCharge: LocalizationValue;
+    cancelSubscriptionAccessUntil: LocalizationValue;
+    popular: LocalizationValue;
+    monthly: LocalizationValue;
+    annually: LocalizationValue;
+    cannotSubscribeMonthly: LocalizationValue;
+    pricingTable: {
+      billingCycle: LocalizationValue;
+      included: LocalizationValue;
+    };
+    paymentSource: {
+      dev: {
+        testCardInfo: LocalizationValue;
+        developmentMode: LocalizationValue;
+        cardNumber: LocalizationValue;
+        expirationDate: LocalizationValue;
+        cvcZip: LocalizationValue;
+        anyNumbers: LocalizationValue;
+      };
+      applePayDescription: {
+        monthly: LocalizationValue;
+        annual: LocalizationValue;
+      };
+    };
     checkout: {
+      title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
       description__paymentSuccessful: LocalizationValue;
@@ -122,13 +167,15 @@ type _LocalizationResource = {
       lineItems: {
         title__totalPaid: LocalizationValue;
         title__paymentMethod: LocalizationValue;
-        title__invoiceId: LocalizationValue;
+        title__statementId: LocalizationValue;
         title__subscriptionBegins: LocalizationValue;
       };
       emailForm: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
+      downgradeNotice: LocalizationValue;
+      perMonth: LocalizationValue;
     };
   };
   signUp: {
@@ -141,6 +188,12 @@ type _LocalizationResource = {
       actionLink: LocalizationValue;
       actionLink__use_phone: LocalizationValue;
       actionLink__use_email: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     emailLink: {
       title: LocalizationValue;
@@ -177,6 +230,13 @@ type _LocalizationResource = {
       formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formSubtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     continue: {
       title: LocalizationValue;
@@ -220,6 +280,12 @@ type _LocalizationResource = {
       actionLink__use_passkey: LocalizationValue;
       actionText__join_waitlist: LocalizationValue;
       actionLink__join_waitlist: LocalizationValue;
+      alternativePhoneCodeProvider: {
+        actionLink: LocalizationValue;
+        label: LocalizationValue;
+        subtitle: LocalizationValue;
+        title: LocalizationValue;
+      };
     };
     password: {
       title: LocalizationValue;
@@ -301,6 +367,12 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
+    };
+    alternativePhoneCodeProvider: {
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+      subtitle: LocalizationValue;
+      title: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;
@@ -678,13 +750,20 @@ type _LocalizationResource = {
       actionDescription: LocalizationValue;
       confirm: LocalizationValue;
     };
-    __experimental_billingPage: {
+    billingPage: {
       title: LocalizationValue;
       start: {
         headerTitle__plans: LocalizationValue;
         headerTitle__subscriptions: LocalizationValue;
-        headerTitle__invoices: LocalizationValue;
-        headerTitle__paymentMethods: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__newSubscription: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
       };
       paymentSourcesSection: {
         title: LocalizationValue;
@@ -701,9 +780,16 @@ type _LocalizationResource = {
           messageLine2: LocalizationValue;
           successMessage: LocalizationValue;
         };
+        payWithTestCardButton: LocalizationValue;
       };
       subscriptionsSection: {
         actionLabel__default: LocalizationValue;
+      };
+    };
+    plansPage: {
+      title: LocalizationValue;
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
       };
     };
   };
@@ -866,6 +952,48 @@ type _LocalizationResource = {
           headerSubtitle: LocalizationValue;
           primaryButton: LocalizationValue;
         };
+      };
+    };
+    billingPage: {
+      title: LocalizationValue;
+      start: {
+        headerTitle__plans: LocalizationValue;
+        headerTitle__subscriptions: LocalizationValue;
+        headerTitle__statements: LocalizationValue;
+      };
+      switchPlansSection: {
+        title: LocalizationValue;
+      };
+      subscriptionsListSection: {
+        title: LocalizationValue;
+        actionLabel__newSubscription: LocalizationValue;
+        actionLabel__switchPlan: LocalizationValue;
+      };
+      paymentSourcesSection: {
+        title: LocalizationValue;
+        add: LocalizationValue;
+        addSubtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        actionLabel__default: LocalizationValue;
+        actionLabel__remove: LocalizationValue;
+        formButtonPrimary__add: LocalizationValue;
+        formButtonPrimary__pay: LocalizationValue;
+        removeResource: {
+          title: LocalizationValue;
+          messageLine1: LocalizationValue;
+          messageLine2: LocalizationValue;
+          successMessage: LocalizationValue;
+        };
+        payWithTestCardButton: LocalizationValue;
+      };
+      subscriptionsSection: {
+        actionLabel__default: LocalizationValue;
+      };
+    };
+    plansPage: {
+      title: LocalizationValue;
+      alerts: {
+        noPermissionsToManageBilling: LocalizationValue;
       };
     };
   };

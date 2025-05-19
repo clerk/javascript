@@ -3,6 +3,7 @@ import type { RequestState } from '@clerk/backend/internal';
 import type {
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
+  NewSubscriptionRedirectUrl,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
@@ -36,6 +37,7 @@ export type RootAuthLoaderOptions = {
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps;
 
 export type RequestStateWithRedirectUrls = RequestState &
@@ -43,6 +45,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  NewSubscriptionRedirectUrl &
   LegacyRedirectProps;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
