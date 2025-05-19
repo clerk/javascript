@@ -25,7 +25,6 @@ test.describe('Client handshake @generic', () => {
   });
   // Strip trailing slash
   const devBrowserCookie = '__clerk_db_jwt=needstobeset;';
-  const devBrowserQuery = '&__clerk_db_jwt=needstobeset';
 
   test.beforeAll('setup local Clerk API mock', async () => {
     const env = appConfigs.envs.withEmailCodes
@@ -367,13 +366,41 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     const locationUrl = new URL(res.headers.get('location'));
-    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
+
+    // The domain is ignored for non-satellite requests
+    expect(locationUrl.hostname).not.toBe('example.com');
+
+    expect(locationUrl.origin + locationUrl.pathname).toContain('/v1/client/handshake');
     expect(locationUrl.searchParams.get('redirect_url')).toBe(`${app.serverUrl}/`);
     expect(locationUrl.searchParams.get('__clerk_hs_reason')).toBe(
       'session-token-expired-refresh-non-eligible-no-refresh-cookie',
     );
     expect(locationUrl.searchParams.has('__clerk_api_version')).toBe(true);
     expect(locationUrl.searchParams.get('suffixed_cookies')).toBe('false');
+  });
+
+  test('domain - prod satellite - domain is used as the redirect url', async () => {
+    const config = generateConfig({
+      mode: 'live',
+    });
+    const { token, claims } = config.generateToken({ state: 'expired' });
+    const clientUat = claims.iat;
+    const res = await fetch(app.serverUrl + '/', {
+      headers: new Headers({
+        Cookie: `__client_uat=${clientUat}; __session=${token}`,
+        'X-Publishable-Key': config.pk,
+        'X-Secret-Key': config.sk,
+        'X-Satellite': 'true',
+        'X-Domain': 'example.com',
+        'Sec-Fetch-Dest': 'document',
+      }),
+      redirect: 'manual',
+    });
+    expect(res.status).toBe(307);
+    const locationUrl = new URL(res.headers.get('location'));
+
+    // The domain is used as the redirect url
+    expect(locationUrl.origin + locationUrl.pathname).toBe('https://clerk.example.com/v1/client/handshake');
   });
 
   test('missing session token, positive uat - dev', async () => {
