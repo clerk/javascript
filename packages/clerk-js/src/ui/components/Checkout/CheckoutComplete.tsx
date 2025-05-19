@@ -1,4 +1,5 @@
 import type { CommerceCheckoutResource } from '@clerk/types';
+import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
@@ -9,6 +10,7 @@ import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 export const CheckoutComplete = ({
   checkout,
@@ -20,6 +22,36 @@ export const CheckoutComplete = ({
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
+  const animationRef = useRef<number | null>(null);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
+    if (spanRef.current) {
+      const rect = spanRef.current.getBoundingClientRect();
+      setMousePosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+    }
+  };
+
+  useEffect(() => {
+    const animate = () => {
+      setCurrentPosition(prev => {
+        const amt = 0.15; // Lower = slower, higher = snappier
+        const x = lerp(prev.x, mousePosition.x, amt);
+        const y = lerp(prev.y, mousePosition.y, amt);
+        return { x, y };
+      });
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [mousePosition]);
 
   const handleClose = () => {
     if (newSubscriptionRedirectUrl) {
@@ -68,6 +100,8 @@ export const CheckoutComplete = ({
               opacity: 1,
             }),
           })}
+          ref={spanRef}
+          onMouseMove={handleMouseMove}
         >
           {[1, 0.75, 0.5].map((scale, index, array) => {
             return (
@@ -82,16 +116,21 @@ export const CheckoutComplete = ({
           <Box
             sx={t => ({
               position: 'absolute',
-              inset: '0',
+              width: t.sizes.$56,
+              height: t.sizes.$56,
+              transform: 'translate(-50%, -50%)',
               borderRadius: '50%',
               backgroundColor: t.colors.$success500,
               mixBlendMode: 'color',
               filter: 'blur(20px)',
-              opacity: 0,
-              transform: 'translateX(-50%)',
+              opacity: 0.5,
               zIndex: 1,
               pointerEvents: 'none',
             })}
+            style={{
+              left: currentPosition.x,
+              top: currentPosition.y,
+            }}
           />
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
