@@ -138,4 +138,135 @@ describe('completeSignUpFlow', () => {
       continueSignUp: true,
     });
   });
+
+  it('forwards clerk ticket and status query params when navigating to verify email', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
+      unverifiedFields: ['email_address'],
+    } as SignUpResource;
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '?__clerk_ticket=test_ticket&__clerk_status=verified&custom_param=value',
+      },
+      writable: true,
+    });
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      verifyEmailPath: 'verify-email',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('verify-email', {
+      searchParams: expect.any(URLSearchParams),
+    });
+
+    const searchParams = mockNavigate.mock.calls[0][1].searchParams;
+    expect(searchParams.get('__clerk_ticket')).toBe('test_ticket');
+    expect(searchParams.get('__clerk_status')).toBe('verified');
+    expect(searchParams.get('custom_param')).toBeNull();
+  });
+
+  it('forwards clerk ticket and status query params when navigating to verify phone', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
+      unverifiedFields: ['phone_number'],
+    } as SignUpResource;
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '?__clerk_ticket=test_ticket&__clerk_status=verified&custom_param=value',
+      },
+      writable: true,
+    });
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      verifyPhonePath: 'verify-phone',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('verify-phone', {
+      searchParams: expect.any(URLSearchParams),
+    });
+
+    const searchParams = mockNavigate.mock.calls[0][1].searchParams;
+    expect(searchParams.get('__clerk_ticket')).toBe('test_ticket');
+    expect(searchParams.get('__clerk_status')).toBe('verified');
+    expect(searchParams.get('custom_param')).toBeNull();
+  });
+
+  it('forwards clerk ticket and status query params when navigating to continue path', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
+    } as SignUpResource;
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '?__clerk_ticket=test_ticket&__clerk_status=verified&custom_param=value',
+      },
+      writable: true,
+    });
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      continuePath: 'continue',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('continue', {
+      searchParams: expect.any(URLSearchParams),
+    });
+
+    const searchParams = mockNavigate.mock.calls[0][1].searchParams;
+    expect(searchParams.get('__clerk_ticket')).toBe('test_ticket');
+    expect(searchParams.get('__clerk_status')).toBe('verified');
+    expect(searchParams.get('custom_param')).toBeNull();
+  });
+
+  it('handles missing clerk query params gracefully', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: [] as SignUpField[],
+      unverifiedFields: ['email_address'],
+    } as SignUpResource;
+
+    Object.defineProperty(window, 'location', {
+      value: {
+        search: '?custom_param=value',
+      },
+      writable: true,
+    });
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      verifyEmailPath: 'verify-email',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+    });
+
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('verify-email', {
+      searchParams: expect.any(URLSearchParams),
+    });
+
+    const searchParams = mockNavigate.mock.calls[0][1].searchParams;
+    expect(searchParams.get('__clerk_ticket')).toBeNull();
+    expect(searchParams.get('__clerk_status')).toBeNull();
+    expect(searchParams.get('custom_param')).toBeNull();
+  });
 });
