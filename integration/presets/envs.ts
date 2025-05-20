@@ -160,7 +160,6 @@ const withBilling = base
 const withWhatsappPhoneCode = base
   .clone()
   .setId('withWhatsappPhoneCode')
-  // .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-whatsapp-phone-code').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-whatsapp-phone-code').pk);
 
