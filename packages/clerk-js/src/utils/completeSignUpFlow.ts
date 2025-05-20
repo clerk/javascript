@@ -1,5 +1,7 @@
 import type { SignUpResource } from '@clerk/types';
 
+import { forwardClerkQueryParams } from './getClerkQueryParam';
+
 type CompleteSignUpFlowProps = {
   signUp: SignUpResource;
   verifyEmailPath?: string;
@@ -36,17 +38,7 @@ export const completeSignUpFlow = ({
       });
     }
 
-    const currentSearchParams = new URLSearchParams(window.location.search);
-    const params = new URLSearchParams();
-
-    if (currentSearchParams.has('__clerk_ticket')) {
-      const ticket = currentSearchParams.get('__clerk_ticket');
-      if (ticket) params.set('__clerk_ticket', ticket);
-    }
-    if (currentSearchParams.has('__clerk_status')) {
-      const status = currentSearchParams.get('__clerk_status');
-      if (status) params.set('__clerk_status', status);
-    }
+    const params = forwardClerkQueryParams();
 
     if (signUp.unverifiedFields?.includes('email_address') && verifyEmailPath) {
       return navigate(verifyEmailPath, { searchParams: params });

@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 
+import { forwardClerkQueryParams } from '../../../utils/getClerkQueryParam';
 import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
@@ -21,16 +22,10 @@ type SignInFactorOneCodeFormProps = {
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { afterSignUpUrl } = useSignUpContext();
   const { setActive } = useClerk();
-  const { navigate, queryParams } = useRouter();
+  const { navigate } = useRouter();
 
   const goBack = () => {
-    const params = new URLSearchParams();
-    if (queryParams['__clerk_ticket']) {
-      params.set('__clerk_ticket', queryParams['__clerk_ticket']);
-    }
-    if (queryParams['__clerk_status']) {
-      params.set('__clerk_status', queryParams['__clerk_status']);
-    }
+    const params = forwardClerkQueryParams();
     return navigate('../', { searchParams: params });
   };
 
@@ -39,21 +34,25 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       .attempt(code)
       .then(async res => {
         await resolve();
-        const params = new URLSearchParams();
-        if (queryParams['__clerk_ticket']) {
-          params.set('__clerk_ticket', queryParams['__clerk_ticket']);
+        const params = forwardClerkQueryParams();
+
+        if (res.unverifiedFields?.includes('email_address')) {
+          return navigate('verify-email-address', { searchParams: params });
         }
-        if (queryParams['__clerk_status']) {
-          params.set('__clerk_status', queryParams['__clerk_status']);
+        if (res.unverifiedFields?.includes('phone_number')) {
+          return navigate('verify-phone-number', { searchParams: params });
         }
-        return completeSignUpFlow({
-          signUp: res,
-          verifyEmailPath: '../verify-email-address',
-          verifyPhonePath: '../verify-phone-number',
-          continuePath: '../continue',
-          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
-          navigate: (path, options) => navigate(path, options),
-        });
+
+        if (afterSignUpUrl) {
+          return completeSignUpFlow({
+            signUp: res,
+            verifyEmailPath: '../verify-email-address',
+            verifyPhonePath: '../verify-phone-number',
+            continuePath: '../continue',
+            handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
+            navigate: (path, options) => navigate(path, { ...options, searchParams: params }),
+          });
+        }
       })
       .catch(err => {
         // TODO: Check if this is enough
