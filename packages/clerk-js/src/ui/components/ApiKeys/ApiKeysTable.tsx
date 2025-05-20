@@ -69,7 +69,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
     >
       <Input
         type={revealed ? 'text' : 'password'}
-        value={revealed ? (apiKeySecret ?? '') : '•••••••••••••••••••••••••'}
+        value={revealed && apiKeySecret ? apiKeySecret : '•••••••••••••••••••••••••'}
         readOnly
         aria-label={revealed ? 'API key (visible)' : 'API key (hidden)'}
         tabIndex={-1}
