@@ -44,9 +44,12 @@ function SignUpStartInternal(): JSX.Element {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
-  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
-  );
+  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() => {
+    if (isCombinedFlow && (signUp.emailAddress || signUp.phoneNumber)) {
+      return signUp.phoneNumber ? 'phoneNumber' : 'emailAddress';
+    }
+    return getInitialActiveIdentifier(attributes, userSettings.signUp.progressive);
+  });
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
   const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] = React.useState<PhoneCodeChannelData | null>(
