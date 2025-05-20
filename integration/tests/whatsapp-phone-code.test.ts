@@ -60,7 +60,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           const request = route.request();
           const body = await request.postDataJSON();
           expect(body.strategy).toBe('phone_code');
-          expect(body.channel).toBe('sms');
+          expect(body.channel).toBeUndefined();
           await route.continue();
         });
 
@@ -98,7 +98,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           const request = route.request();
           const body = await request.postDataJSON();
           expect(body.strategy).toBe('phone_code');
-          expect(body.channel).toBe('sms');
+          expect(body.channel).toBeUndefined();
           await route.continue();
         });
 
@@ -137,7 +137,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
           const request = route.request();
           const body = await request.postDataJSON();
           expect(body.strategy).toBe('phone_code');
-          expect(body.channel).toBe('sms');
+          expect(body.channel).toBeUndefined();
           await route.continue();
         });
 

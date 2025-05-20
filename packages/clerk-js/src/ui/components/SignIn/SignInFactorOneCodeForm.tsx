@@ -43,6 +43,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
   const isAlternativePhoneCodeProvider =
     props.factor.strategy === 'phone_code' ? !!props.factor.channel && props.factor.channel !== 'sms' : false;
+  const channelToBeSent = isAlternativePhoneCodeProvider ? (props.factor as PhoneCodeFactor).channel : undefined;
 
   const goBack = () => {
     return navigate('../');
@@ -54,7 +55,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     }
 
     void signIn
-      .prepareFirstFactor(props.factor)
+      .prepareFirstFactor({ ...props.factor, channel: channelToBeSent } as PhoneCodeFactor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
@@ -66,7 +67,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       ? undefined
       : () =>
           signIn
-            ?.prepareFirstFactor(props.factor)
+            ?.prepareFirstFactor({ ...props.factor, channel: channelToBeSent } as PhoneCodeFactor)
             .then(() => props.onFactorPrepare())
             .catch(err => handleError(err, [], card.setError)),
     {
@@ -110,7 +111,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     card.setLoading();
     card.setError(undefined);
     void signIn
-      .prepareFirstFactor({ ...props.factor, channel: 'sms' } as PhoneCodeFactor)
+      .prepareFirstFactor({ ...props.factor, channel: undefined } as PhoneCodeFactor)
       .then(() => setUserSelectedFallbackToSMS(true))
       .then(() => props.onFactorPrepare())
       .then(() => props.onChangePhoneCodeChannel?.({ ...props.factor, channel: 'sms' } as SignInFactor))

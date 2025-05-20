@@ -17,13 +17,13 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
-
+  const channelToBeSent = isAlternativePhoneCodeProvider ? channel : undefined;
   const prepare = () => {
     if (shouldAvoidPrepare) {
       return;
     }
     return signUp
-      .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: channelToBeSent })
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -35,7 +35,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
       ? undefined
       : () =>
           signUp
-            .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+            .preparePhoneNumberVerification({ strategy: 'phone_code', channel: channelToBeSent })
             .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signUp.preparePhoneNumberVerification',
@@ -64,7 +64,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     card.setLoading();
     card.setError(undefined);
     void signUp
-      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: 'sms' })
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined })
       .then(() => setUserSelectedFallbackToSMS(true))
       .catch(err => handleError(err, [], card.setError))
       .finally(() => card.setIdle());
