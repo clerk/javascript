@@ -56,12 +56,6 @@ export function handleCombinedFlowTransfer({
   if (organizationTicket) {
     searchParams.set('__clerk_ticket', organizationTicket);
   }
-  if (redirectUrl) {
-    searchParams.set('__clerk_redirect_url', redirectUrl);
-  }
-  if (redirectUrlComplete) {
-    searchParams.set('__clerk_redirect_url_complete', redirectUrlComplete);
-  }
   if (identifierValue) {
     const paramName =
       identifierAttribute === 'phoneNumber'
