@@ -72,7 +72,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
             .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signIn.prepareFirstFactor',
-      factor: props.factor,
+      factor: { ...props.factor, channel: undefined },
       id: signIn.id,
     },
     {
