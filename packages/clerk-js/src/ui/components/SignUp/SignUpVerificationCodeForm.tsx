@@ -52,7 +52,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           verifyPhonePath: '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
-          navigate: path => navigate(path, { searchParams: params }),
+          navigate: (path, options) => navigate(path, options),
         });
       })
       .catch(err => {
