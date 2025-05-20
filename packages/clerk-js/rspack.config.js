@@ -80,63 +80,67 @@ const common = ({ mode, variant, disableRHC = false }) => {
      */
     externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
     optimization: {
-      splitChunks: {
-        cacheGroups: {
-          zxcvbnTSCoreVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
-            name: 'zxcvbn-ts-core',
-            chunks: 'all',
-          },
-          zxcvbnTSCommonVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
-            name: 'zxcvbn-common',
-            chunks: 'all',
-          },
-          coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
-            name: 'coinbase-wallet-sdk',
-            chunks: 'all',
-          },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          paymentSources: {
-            minChunks: 1,
-            name: 'paymentSources',
-            test: module =>
-              !!(
-                module.resource &&
-                (module.resource.includes('/ui/components/PaymentSources') ||
-                  // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
-                  module.resource.includes('/node_modules/@stripe'))
-              ),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
-          },
-          defaultVendors: {
-            minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: -10,
-          },
-          react: {
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/](react-dom|scheduler)[\\/]/,
-            name: 'framework',
-            priority: 40,
-            enforce: true,
-          },
-        },
-      },
+      ...(isProduction(mode)
+        ? {
+            splitChunks: {
+              cacheGroups: {
+                zxcvbnTSCoreVendor: {
+                  test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
+                  name: 'zxcvbn-ts-core',
+                  chunks: 'all',
+                },
+                zxcvbnTSCommonVendor: {
+                  test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
+                  name: 'zxcvbn-common',
+                  chunks: 'all',
+                },
+                coinbaseWalletSDKVendor: {
+                  test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
+                  name: 'coinbase-wallet-sdk',
+                  chunks: 'all',
+                },
+                /**
+                 * Sign up is shared between the SignUp component and the SignIn component.
+                 */
+                signUp: {
+                  minChunks: 1,
+                  name: 'signup',
+                  test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
+                },
+                paymentSources: {
+                  minChunks: 1,
+                  name: 'paymentSources',
+                  test: module =>
+                    !!(
+                      module.resource &&
+                      (module.resource.includes('/ui/components/PaymentSources') ||
+                        // Include `@stripe/react-stripe-js` and `@stripe/stripe-js` in the checkout chunk
+                        module.resource.includes('/node_modules/@stripe'))
+                    ),
+                },
+                common: {
+                  minChunks: 1,
+                  name: 'ui-common',
+                  priority: -20,
+                  test: module => !!(module.resource && !module.resource.includes('/ui/components')),
+                },
+                defaultVendors: {
+                  minChunks: 1,
+                  test: /[\\/]node_modules[\\/]/,
+                  name: 'vendors',
+                  priority: -10,
+                },
+                react: {
+                  chunks: 'all',
+                  test: /[\\/]node_modules[\\/](react-dom|scheduler)[\\/]/,
+                  name: 'framework',
+                  priority: 40,
+                  enforce: true,
+                },
+              },
+            },
+          }
+        : {}),
     },
     // Disable Rspack's warnings since we use bundlewatch
     ignoreWarnings: [/entrypoint size limit/, /asset size limit/, /Rspack performance recommendations/],
@@ -571,6 +575,7 @@ const devConfig = ({ mode, env }) => {
       },
       optimization: {
         minimize: false,
+        splitChunks: false,
       },
       devServer: {
         allowedHosts: ['all'],
