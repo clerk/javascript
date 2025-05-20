@@ -82,7 +82,7 @@ export type UseOrganizationParams = {
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
-       * A boolean that indicates whether Clerk has completed initialization and there is an authenicated user. Initially `false`, becomes `true` once Clerk loads with a user
+       * A boolean that indicates whether Clerk has completed initialization. Initially `false`, becomes `true` once Clerk loads.
        */
       isLoaded: false;
       /**
