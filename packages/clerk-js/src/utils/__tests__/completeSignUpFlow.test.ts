@@ -45,7 +45,7 @@ describe('completeSignUpFlow', () => {
 
     expect(mockHandleComplete).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith('verify-email');
+    expect(mockNavigate).toHaveBeenCalledWith('verify-email', { searchParams: new URLSearchParams() });
   });
 
   it('navigates to verify phone page if phone still unverified', async () => {
@@ -64,7 +64,7 @@ describe('completeSignUpFlow', () => {
 
     expect(mockHandleComplete).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith('verify-phone');
+    expect(mockNavigate).toHaveBeenCalledWith('verify-phone', { searchParams: new URLSearchParams() });
   });
 
   it('does nothing in any other case', async () => {
