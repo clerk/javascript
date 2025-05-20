@@ -1,10 +1,10 @@
 import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
-import { waitFor } from '@testing-library/dom';
+import { act, screen, waitFor } from '@testing-library/react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { mockWebAuthn, render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorOne } from '../SignInFactorOne';

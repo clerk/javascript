@@ -1,4 +1,5 @@
-import { renderHook } from '../../../testUtils';
+import { renderHook } from '@testing-library/react';
+
 import { OptionsProvider } from '../../contexts';
 import { useLocalizations } from '../../customizables';
 import { createPasswordError } from '../passwordUtils';

@@ -1,10 +1,11 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { waitFor } from '@testing-library/dom';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { render, runFakeTimers, screen } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignUpContinue } from '../SignUpContinue';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

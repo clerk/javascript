@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
-import { waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 
-import { render, screen } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserVerificationFactorOne } from '../UserVerificationFactorOne';

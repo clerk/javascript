@@ -1,8 +1,9 @@
 import type { UserResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UsernameSection } from '../UsernameSection';
 

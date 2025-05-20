@@ -1,7 +1,7 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { renderHook } from '@testing-library/react';
 
-import { bindCreateFixtures } from '../../../testUtils';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { useEnabledThirdPartyProviders } from '../useEnabledThirdPartyProviders';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

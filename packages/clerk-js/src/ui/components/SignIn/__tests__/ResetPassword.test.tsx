@@ -1,7 +1,8 @@
 import type { SignInResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { ResetPassword } from '../ResetPassword';

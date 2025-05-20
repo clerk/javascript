@@ -1,9 +1,10 @@
 import { parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
+import { screen, waitFor } from '@testing-library/react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorTwo } from '../SignInFactorTwo';

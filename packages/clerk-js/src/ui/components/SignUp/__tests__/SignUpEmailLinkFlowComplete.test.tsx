@@ -1,9 +1,11 @@
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { EmailLinkError, EmailLinkErrorCodeStatus } from '../../../../core/resources';
-import { render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
 

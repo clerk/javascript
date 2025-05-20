@@ -1,7 +1,8 @@
 import type { EnterpriseAccountJSON } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { screen, waitFor } from '@testing-library/react';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { AccountPage } from '../AccountPage';
 

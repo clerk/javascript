@@ -8,7 +8,7 @@ expect.extend(matchers);
 
 Element.prototype.scrollIntoView = jest.fn();
 
-const render = (ui: React.ReactElement, options?: RenderOptions) => {
+export const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });
   return { ..._render(ui, { ...options }), userEvent };
 };
@@ -68,10 +68,3 @@ export const mockWebAuthn = (fn: () => void) => {
     fn();
   });
 };
-
-export * from './ui/utils/test/runFakeTimers';
-export * from './ui/utils/test/createFixtures';
-// eslint-disable-next-line import/export
-export * from '@testing-library/react';
-// eslint-disable-next-line import/export
-export { render };

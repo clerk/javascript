@@ -1,8 +1,8 @@
 import type { MembershipRole } from '@clerk/types';
 import { describe } from '@jest/globals';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 
-import { act, render } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import {

@@ -1,6 +1,6 @@
+import { renderHook } from '@testing-library/react';
 import React from 'react';
 
-import { renderHook } from '../../../testUtils';
 import { OptionsProvider } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import { bindCreateFixtures } from '../../utils/test/createFixtures';

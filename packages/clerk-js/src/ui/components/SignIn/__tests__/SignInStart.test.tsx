@@ -1,9 +1,9 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/types';
-import { waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { mockWebAuthn, render } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';

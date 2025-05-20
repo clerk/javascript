@@ -1,6 +1,7 @@
 import { describe } from '@jest/globals';
+import { waitFor } from '@testing-library/react';
 
-import { render, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserButton } from '../UserButton';
 

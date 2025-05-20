@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { fireEvent, render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';

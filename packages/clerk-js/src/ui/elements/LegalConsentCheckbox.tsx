@@ -1,5 +1,5 @@
 import { useEnvironment } from '../../ui/contexts';
-import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks';
+import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks/useFormField';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,

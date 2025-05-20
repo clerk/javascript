@@ -1,4 +1,5 @@
-import { act, renderHook } from '../../../testUtils';
+import { act, renderHook } from '@testing-library/react';
+
 import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { usePasswordComplexity } from '../usePasswordComplexity';
 

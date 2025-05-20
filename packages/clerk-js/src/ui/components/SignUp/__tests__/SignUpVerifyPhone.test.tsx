@@ -1,6 +1,6 @@
-import { waitFor } from '@testing-library/dom';
+import { screen, waitFor } from '@testing-library/react';
 
-import { render, screen } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpVerifyPhone } from '../SignUpVerifyPhone';
 

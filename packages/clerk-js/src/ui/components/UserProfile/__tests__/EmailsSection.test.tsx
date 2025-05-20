@@ -1,7 +1,7 @@
 import { describe, it } from '@jest/globals';
-import { act } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 
-import { render, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { EmailsSection } from '../EmailsSection';

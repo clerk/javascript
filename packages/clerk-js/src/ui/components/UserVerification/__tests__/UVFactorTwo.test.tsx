@@ -1,9 +1,10 @@
 import { describe, it } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
 
-import { render, runFakeTimers } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { UserVerificationFactorTwo } from '../UserVerificationFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('UserVerification');

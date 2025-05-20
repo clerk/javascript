@@ -1,7 +1,7 @@
 import { useOrganizationList } from '@clerk/shared/react';
 import { describe } from '@jest/globals';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { act, renderHook, waitFor } from '../../../testUtils';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,

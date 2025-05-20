@@ -1,8 +1,9 @@
 import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { act, render, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationGeneralPage } from '../OrganizationGeneralPage';

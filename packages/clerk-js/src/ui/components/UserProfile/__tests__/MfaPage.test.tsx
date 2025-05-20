@@ -6,11 +6,12 @@ import type {
   VerificationJSON,
 } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import { act, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 
-import { render, runFakeTimers, screen } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { MfaSection } from '../MfaSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

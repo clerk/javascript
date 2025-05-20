@@ -1,7 +1,8 @@
 import type { CustomPage } from '@clerk/types';
 import { describe, it } from '@jest/globals';
+import { screen } from '@testing-library/react';
 
-import { render, screen } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserProfile } from '../UserProfile';
 

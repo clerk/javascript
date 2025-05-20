@@ -1,4 +1,6 @@
-import { render, renderHook, screen } from '../../../testUtils';
+import { renderHook, screen } from '@testing-library/react';
+
+import { render } from '../../../testUtils';
 import {
   Badge,
   Button,

@@ -1,5 +1,6 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
+import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
 import { useLocalizations } from '../../customizables';
@@ -15,7 +16,7 @@ type CardStateCtxValue = {
 
 const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
-const CardStateProvider = (props: React.PropsWithChildren<any>) => {
+export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
 
   const [state, setState] = useSafeState<State>({
@@ -28,7 +29,7 @@ const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
 };
 
-const useCardState = () => {
+export const useCardState = () => {
   const { state, setState } = _useCardState();
   const { translateError } = useLocalizations();
 
@@ -58,8 +59,6 @@ const useCardState = () => {
   };
 };
 
-export { useCardState, CardStateProvider };
-
 export const withCardStateProvider = <T,>(Component: React.ComponentType<T>) => {
   return (props: T) => {
     return (
@@ -68,5 +67,70 @@ export const withCardStateProvider = <T,>(Component: React.ComponentType<T>) => 
         <Component {...props} />
       </CardStateProvider>
     );
+  };
+};
+
+export type FlowMetadata = {
+  flow:
+    | 'signIn'
+    | 'signUp'
+    | 'userButton'
+    | 'userProfile'
+    | 'userVerification'
+    | 'organizationProfile'
+    | 'createOrganization'
+    | 'organizationSwitcher'
+    | 'organizationList'
+    | 'oneTap'
+    | 'blankCaptcha'
+    | 'waitlist'
+    | 'checkout'
+    | 'planDetails'
+    | 'pricingTable';
+  part?:
+    | 'start'
+    | 'emailCode'
+    | 'phoneCode'
+    | 'phoneCode2Fa'
+    | 'totp2Fa'
+    | 'backupCode2Fa'
+    | 'password'
+    | 'resetPassword'
+    | 'emailLink'
+    | 'emailLinkVerify'
+    | 'emailLinkStatus'
+    | 'alternativeMethods'
+    | 'forgotPasswordMethods'
+    | 'passwordPwnedMethods'
+    | 'havingTrouble'
+    | 'ssoCallback'
+    | 'popupCallback'
+    | 'popover'
+    | 'complete'
+    | 'accountSwitcher';
+};
+
+export const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
+
+export const FlowMetadataProvider = (props: React.PropsWithChildren<FlowMetadata>) => {
+  const { flow, part } = props;
+  const value = React.useMemo(() => ({ value: props }), [flow, part]);
+  return <FlowMetadataCtx.Provider value={value}>{props.children}</FlowMetadataCtx.Provider>;
+};
+
+export const withFloatingTree = <T,>(Component: React.ComponentType<T>): React.ComponentType<T> => {
+  return (props: T) => {
+    const parentId = useFloatingParentNodeId();
+    if (parentId == null) {
+      return (
+        <FloatingTree>
+          {/* @ts-expect-error */}
+          <Component {...props} />
+        </FloatingTree>
+      );
+    }
+
+    /* @ts-expect-error */
+    return <Component {...props} />;
   };
 };

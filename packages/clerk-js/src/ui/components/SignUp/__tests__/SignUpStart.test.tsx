@@ -1,7 +1,8 @@
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
+import { screen, waitFor } from '@testing-library/react';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';

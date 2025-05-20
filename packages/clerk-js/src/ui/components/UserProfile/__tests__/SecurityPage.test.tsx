@@ -1,8 +1,8 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import { within } from '@testing-library/dom';
+import { screen, waitFor, within } from '@testing-library/react';
 
-import { render, screen, waitFor } from '../../../../testUtils';
+import { render } from '../../../../testUtils';
 import { clearFetchCache } from '../../../hooks';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SecurityPage } from '../SecurityPage';
