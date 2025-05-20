@@ -34,25 +34,14 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       .attempt(code)
       .then(async res => {
         await resolve();
-        const params = forwardClerkQueryParams();
-
-        if (res.unverifiedFields?.includes('email_address')) {
-          return navigate('verify-email-address', { searchParams: params });
-        }
-        if (res.unverifiedFields?.includes('phone_number')) {
-          return navigate('verify-phone-number', { searchParams: params });
-        }
-
-        if (afterSignUpUrl) {
-          return completeSignUpFlow({
-            signUp: res,
-            verifyEmailPath: '../verify-email-address',
-            verifyPhonePath: '../verify-phone-number',
-            continuePath: '../continue',
-            handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
-            navigate: (path, options) => navigate(path, { ...options, searchParams: params }),
-          });
-        }
+        return completeSignUpFlow({
+          signUp: res,
+          verifyEmailPath: '../verify-email-address',
+          verifyPhonePath: '../verify-phone-number',
+          continuePath: '../continue',
+          handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
+          navigate,
+        });
       })
       .catch(err => {
         // TODO: Check if this is enough
