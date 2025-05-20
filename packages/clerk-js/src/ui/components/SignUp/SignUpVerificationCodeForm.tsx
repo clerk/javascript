@@ -21,10 +21,17 @@ type SignInFactorOneCodeFormProps = {
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
   const { afterSignUpUrl } = useSignUpContext();
   const { setActive } = useClerk();
-  const { navigate } = useRouter();
+  const { navigate, queryParams } = useRouter();
 
   const goBack = () => {
-    return navigate('../');
+    const params = new URLSearchParams();
+    if (queryParams['__clerk_ticket']) {
+      params.set('__clerk_ticket', queryParams['__clerk_ticket']);
+    }
+    if (queryParams['__clerk_status']) {
+      params.set('__clerk_status', queryParams['__clerk_status']);
+    }
+    return navigate('../', { searchParams: params });
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
@@ -32,13 +39,20 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       .attempt(code)
       .then(async res => {
         await resolve();
+        const params = new URLSearchParams();
+        if (queryParams['__clerk_ticket']) {
+          params.set('__clerk_ticket', queryParams['__clerk_ticket']);
+        }
+        if (queryParams['__clerk_status']) {
+          params.set('__clerk_status', queryParams['__clerk_status']);
+        }
         return completeSignUpFlow({
           signUp: res,
           verifyEmailPath: '../verify-email-address',
           verifyPhonePath: '../verify-phone-number',
           continuePath: '../continue',
           handleComplete: () => setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
-          navigate,
+          navigate: path => navigate(path, { searchParams: params }),
         });
       })
       .catch(err => {

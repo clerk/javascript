@@ -5,7 +5,7 @@ type CompleteSignUpFlowProps = {
   verifyEmailPath?: string;
   verifyPhonePath?: string;
   continuePath?: string;
-  navigate: (to: string) => Promise<unknown>;
+  navigate: (to: string, options?: { searchParams?: URLSearchParams }) => Promise<unknown>;
   handleComplete?: () => Promise<void>;
   redirectUrl?: string;
   redirectUrlComplete?: string;
@@ -36,15 +36,27 @@ export const completeSignUpFlow = ({
       });
     }
 
+    const currentSearchParams = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams();
+
+    if (currentSearchParams.has('__clerk_ticket')) {
+      const ticket = currentSearchParams.get('__clerk_ticket');
+      if (ticket) params.set('__clerk_ticket', ticket);
+    }
+    if (currentSearchParams.has('__clerk_status')) {
+      const status = currentSearchParams.get('__clerk_status');
+      if (status) params.set('__clerk_status', status);
+    }
+
     if (signUp.unverifiedFields?.includes('email_address') && verifyEmailPath) {
-      return navigate(verifyEmailPath);
+      return navigate(verifyEmailPath, { searchParams: params });
     }
     if (signUp.unverifiedFields?.includes('phone_number') && verifyPhonePath) {
-      return navigate(verifyPhonePath);
+      return navigate(verifyPhonePath, { searchParams: params });
     }
 
     if (continuePath) {
-      return navigate(continuePath);
+      return navigate(continuePath, { searchParams: params });
     }
   }
   return;
