@@ -113,7 +113,6 @@ export const useSignInContext = (): SignInContextType => {
   });
 
   if (isCombinedFlow) {
-    // Preserve the current identifier (phone or email) in the query string
     const currentIdentifier = initialValuesFromQueryParams.phoneNumber || initialValuesFromQueryParams.emailAddress;
     const queryParamsWithIdentifier = currentIdentifier
       ? { ...queryParams, identifier: currentIdentifier }
