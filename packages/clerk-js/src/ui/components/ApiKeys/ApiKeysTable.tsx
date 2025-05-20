@@ -74,7 +74,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         aria-label='API key (hidden)'
         tabIndex={-1}
         sx={t => ({
-          paddingRight: t.sizes.$12,
+          paddingInlineEnd: t.sizes.$12,
         })}
       />
       <Button
