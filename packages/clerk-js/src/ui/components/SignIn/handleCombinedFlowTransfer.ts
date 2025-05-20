@@ -51,9 +51,25 @@ export function handleCombinedFlowTransfer({
   }
 
   clerk.client.signUp[identifierAttribute] = identifierValue;
-  const paramsToForward = new URLSearchParams();
+
+  const searchParams = new URLSearchParams();
   if (organizationTicket) {
-    paramsToForward.set('__clerk_ticket', organizationTicket);
+    searchParams.set('__clerk_ticket', organizationTicket);
+  }
+  if (redirectUrl) {
+    searchParams.set('__clerk_redirect_url', redirectUrl);
+  }
+  if (redirectUrlComplete) {
+    searchParams.set('__clerk_redirect_url_complete', redirectUrlComplete);
+  }
+  if (identifierValue) {
+    const paramName =
+      identifierAttribute === 'phoneNumber'
+        ? 'phone_number'
+        : identifierAttribute === 'emailAddress'
+          ? 'email_address'
+          : identifierAttribute;
+    searchParams.set(paramName, identifierValue);
   }
 
   // We need to send the alternative phone code provider channel in the sign up request
@@ -92,7 +108,7 @@ export function handleCombinedFlowTransfer({
       .catch(err => handleError(err));
   }
 
-  return navigate(`create`, { searchParams: paramsToForward });
+  return navigate(`create`, { searchParams });
 }
 
 function hasOptionalFields(signUp: SignUpResource) {

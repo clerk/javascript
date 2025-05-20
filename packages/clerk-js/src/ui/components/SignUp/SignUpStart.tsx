@@ -44,11 +44,12 @@ function SignUpStartInternal(): JSX.Element {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
+  const initialValues = ctx.initialValues || {};
+
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, initialValues),
   );
   const { t, locale } = useLocalizations();
-  const initialValues = ctx.initialValues || {};
   const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] = React.useState<PhoneCodeChannelData | null>(
     null,
   );

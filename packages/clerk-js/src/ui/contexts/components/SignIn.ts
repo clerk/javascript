@@ -113,8 +113,13 @@ export const useSignInContext = (): SignInContextType => {
   });
 
   if (isCombinedFlow) {
+    // Preserve the current identifier (phone or email) in the query string
+    const currentIdentifier = initialValuesFromQueryParams.phoneNumber || initialValuesFromQueryParams.emailAddress;
+    const queryParamsWithIdentifier = currentIdentifier
+      ? { ...queryParams, identifier: currentIdentifier }
+      : queryParams;
     signUpUrl = buildURL(
-      { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
+      { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParamsWithIdentifier, preservedParams] },
       { stringify: true },
     );
   }

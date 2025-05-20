@@ -103,12 +103,22 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
   }
 }
 
-export const getInitialActiveIdentifier = (
+export function getInitialActiveIdentifier(
   attributes: Partial<Attributes>,
   isProgressiveSignUp: boolean,
-): ActiveIdentifier => {
-  if (emailOrPhone(attributes, isProgressiveSignUp)) {
-    // If we are in the case of Email OR Phone, email takes priority
+  initialValues?: { phoneNumber?: string; emailAddress?: string },
+): ActiveIdentifier {
+  if (initialValues?.phoneNumber) {
+    return 'phoneNumber';
+  }
+
+  if (initialValues?.emailAddress) {
+    return 'emailAddress';
+  }
+
+  const isEmailOrPhone = emailOrPhone(attributes, isProgressiveSignUp);
+
+  if (isEmailOrPhone) {
     return 'emailAddress';
   }
 
@@ -123,7 +133,7 @@ export const getInitialActiveIdentifier = (
   }
 
   return null;
-};
+}
 
 export function showFormFields(userSettings: UserSettingsResource): boolean {
   const { authenticatableSocialStrategies, web3FirstFactors } = userSettings;
