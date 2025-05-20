@@ -3,7 +3,6 @@ import { forwardClerkQueryParams, getClerkQueryParam, removeClerkQueryParam } fr
 
 describe('getClerkQueryParam', () => {
   beforeEach(() => {
-    // Reset window.location before each test
     Object.defineProperty(window, 'location', {
       value: {
         href: 'http://localhost',
@@ -45,7 +44,6 @@ describe('getClerkQueryParam', () => {
 
 describe('removeClerkQueryParam', () => {
   beforeEach(() => {
-    // Reset window.location before each test
     Object.defineProperty(window, 'location', {
       value: {
         href: 'http://localhost',
@@ -94,7 +92,6 @@ describe('removeClerkQueryParam', () => {
 
 describe('forwardClerkQueryParams', () => {
   beforeEach(() => {
-    // Reset window.location before each test
     Object.defineProperty(window, 'location', {
       value: {
         href: 'http://localhost',
@@ -112,7 +109,6 @@ describe('forwardClerkQueryParams', () => {
       [CLERK_SYNCED]: 'true',
     };
 
-    // Set up test URL with Clerk parameters
     const searchParams = new URLSearchParams(testParams);
     Object.defineProperty(window, 'location', {
       value: {
@@ -124,7 +120,6 @@ describe('forwardClerkQueryParams', () => {
 
     const result = forwardClerkQueryParams();
 
-    // Verify all Clerk parameters were forwarded
     Object.entries(testParams).forEach(([key, value]) => {
       expect(result.get(key)).toBe(value);
     });
@@ -141,7 +136,6 @@ describe('forwardClerkQueryParams', () => {
       __clerk_ticket: 'test_ticket',
     };
 
-    // Set up test URL with Clerk parameters
     const searchParams = new URLSearchParams(testParams);
     Object.defineProperty(window, 'location', {
       value: {
@@ -153,12 +147,10 @@ describe('forwardClerkQueryParams', () => {
 
     const result = forwardClerkQueryParams(existingParams);
 
-    // Verify Clerk parameters were forwarded
     Object.entries(testParams).forEach(([key, value]) => {
       expect(result.get(key)).toBe(value);
     });
 
-    // Verify existing parameters were preserved
     expect(result.get('custom_param')).toBe('value');
     expect(result.get('other_param')).toBe('other_value');
   });
@@ -175,7 +167,6 @@ describe('forwardClerkQueryParams', () => {
       other_param: 'other_value',
     };
 
-    // Set up test URL with mixed parameters
     const searchParams = new URLSearchParams(testParams);
     Object.defineProperty(window, 'location', {
       value: {
@@ -187,7 +178,6 @@ describe('forwardClerkQueryParams', () => {
 
     const result = forwardClerkQueryParams();
 
-    // Verify only Clerk parameters were forwarded
     expect(result.get('__clerk_status')).toBe('verified');
     expect(result.get('custom_param')).toBeNull();
     expect(result.get('other_param')).toBeNull();
