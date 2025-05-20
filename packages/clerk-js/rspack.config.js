@@ -71,7 +71,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
         }),
     ].filter(Boolean),
     output: {
-      chunkFilename: `[name]_${variant}_[fullhash:6]_${packageJSON.version}.js`,
+      chunkFilename: isProduction(mode) ? `[name]_${variant}_[fullhash:6]_${packageJSON.version}.js` : `[name].js`,
     },
     /**
      * Remove the Stripe dependencies from the bundle, if RHC is disabled.
