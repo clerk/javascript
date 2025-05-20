@@ -85,6 +85,14 @@ type CreateOrganizationInvitationParams = {
   publicMetadata?: OrganizationInvitationPublicMetadata;
 };
 
+type CreateBulkOrganizationInvitationParams = Array<{
+  inviterUserId?: string;
+  emailAddress: string;
+  role: OrganizationMembershipRole;
+  redirectUrl?: string;
+  publicMetadata?: OrganizationInvitationPublicMetadata;
+}>;
+
 type GetOrganizationInvitationListParams = ClerkPaginationRequest<{
   organizationId: string;
   status?: OrganizationInvitationStatus[];
@@ -278,6 +286,19 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, organizationId, 'invitations'),
       bodyParams,
+    });
+  }
+
+  public async createOrganizationInvitationBulk(
+    organizationId: string,
+    params: CreateBulkOrganizationInvitationParams,
+  ) {
+    this.requireId(organizationId);
+
+    return this.request<OrganizationInvitation[]>({
+      method: 'POST',
+      path: joinPaths(basePath, organizationId, 'invitations', 'bulk'),
+      bodyParams: params,
     });
   }
 
