@@ -112,7 +112,6 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                 />
               </FormLabel>
               <SegmentedControl.Root
-                aria-label='Expiration'
                 aria-labelledby={segmentedControlId}
                 value={expiration}
                 onChange={value => setExpiration(value as Expiration)}

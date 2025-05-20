@@ -23,6 +23,7 @@ import {
 import { ThreeDotsMenu } from '../../elements';
 import { useClipboard } from '../../hooks';
 import { Check, Copy, Eye, EyeSlash } from '../../icons';
+import { common } from '../../styledSystem';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
@@ -71,8 +72,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         type={revealed ? 'text' : 'password'}
         value={revealed && apiKeySecret ? apiKeySecret : '•••••••••••••••••••••••••'}
         readOnly
-        aria-label={revealed ? 'API key (visible)' : 'API key (hidden)'}
-        tabIndex={-1}
+        aria-label='API key (hidden)'
         sx={t => ({
           paddingInlineEnd: t.sizes.$12,
         })}
@@ -80,10 +80,16 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
       <Button
         variant='ghost'
         size='sm'
-        sx={{ position: 'absolute', insetInlineEnd: 0 }}
-        aria-label={revealed ? 'Hide key' : 'Show key'}
-        onClick={() => setRevealed(!revealed)}
+        sx={t => ({
+          position: 'absolute',
+          right: 0,
+          '&:focus-visible': {
+            ...common.focusRingStyles(t),
+          },
+        })}
         focusRing={false}
+        aria-label={'Show key'}
+        onClick={() => setRevealed(!revealed)}
       >
         <Icon icon={revealed ? EyeSlash : Eye} />
       </Button>
