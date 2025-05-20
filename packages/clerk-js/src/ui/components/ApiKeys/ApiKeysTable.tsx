@@ -71,7 +71,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         type={revealed ? 'text' : 'password'}
         value={revealed ? (apiKeySecret ?? '') : '•••••••••••••••••••••••••'}
         readOnly
-        aria-label='API key (hidden)'
+        aria-label={revealed ? 'API key (visible)' : 'API key (hidden)'}
         tabIndex={-1}
         sx={t => ({
           paddingInlineEnd: t.sizes.$12,
