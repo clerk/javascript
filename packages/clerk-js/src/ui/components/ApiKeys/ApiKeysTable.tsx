@@ -46,7 +46,7 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
     <Button
       variant='ghost'
       sx={{ margin: 1 }}
-      aria-label={'Copy key'}
+      aria-label={hasCopied ? 'Copied API key to clipboard' : 'Copy API key'}
       onClick={() => setEnabled(true)}
       focusRing={false}
     >
