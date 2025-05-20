@@ -17,6 +17,8 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
+
+  // If the channel is 'sms', we don't want to send the channel parameter
   const channelToBeSent = isAlternativePhoneCodeProvider ? channel : undefined;
 
   const prepare = () => {

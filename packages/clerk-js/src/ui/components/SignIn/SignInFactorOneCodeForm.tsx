@@ -43,6 +43,8 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
   const isAlternativePhoneCodeProvider =
     props.factor.strategy === 'phone_code' ? !!props.factor.channel && props.factor.channel !== 'sms' : false;
+
+  // If the channel is 'sms', we don't want to send the channel parameter
   const channelToBeSent = isAlternativePhoneCodeProvider ? (props.factor as PhoneCodeFactor).channel : undefined;
 
   const goBack = () => {
