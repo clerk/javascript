@@ -123,7 +123,6 @@ export const APIKeys = withCardStateProvider(() => {
         sx={[
           t => ({
             width: t.sizes.$220,
-            maxWidth: `calc(100vw - ${t.sizes.$8})`,
           }),
         ]}
       >
