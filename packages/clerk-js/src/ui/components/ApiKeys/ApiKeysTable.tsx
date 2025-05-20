@@ -80,7 +80,7 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
       <Button
         variant='ghost'
         size='sm'
-        sx={{ position: 'absolute', right: 0 }}
+        sx={{ position: 'absolute', insetInlineEnd: 0 }}
         aria-label={revealed ? 'Hide key' : 'Show key'}
         onClick={() => setRevealed(!revealed)}
         focusRing={false}
