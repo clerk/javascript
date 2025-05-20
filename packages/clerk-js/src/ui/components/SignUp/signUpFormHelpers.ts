@@ -108,12 +108,12 @@ export function getInitialActiveIdentifier(
   isProgressiveSignUp: boolean,
   initialValues?: { phoneNumber?: string; emailAddress?: string },
 ): ActiveIdentifier {
-  if (initialValues?.phoneNumber) {
-    return 'phoneNumber';
-  }
-
   if (initialValues?.emailAddress) {
     return 'emailAddress';
+  }
+
+  if (initialValues?.phoneNumber) {
+    return 'phoneNumber';
   }
 
   const isEmailOrPhone = emailOrPhone(attributes, isProgressiveSignUp);

@@ -547,7 +547,7 @@ describe('getInitialActiveIdentifier()', () => {
       expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('emailAddress');
     });
 
-    it('prioritizes phoneNumber over emailAddress when both are provided in initialValues', () => {
+    it('prioritizes emailAddress over phoneNumber when both are provided in initialValues', () => {
       const attributes = {
         email_address: { enabled: true, required: true },
         phone_number: { enabled: true, required: true },
@@ -557,7 +557,7 @@ describe('getInitialActiveIdentifier()', () => {
         emailAddress: 'test@example.com',
       };
 
-      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('phoneNumber');
+      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('emailAddress');
     });
   });
 
