@@ -93,6 +93,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'checkoutSuccessBadge',
   'checkoutSuccessTitle',
   'checkoutSuccessDescription',
+  'checkoutSuccessHighlight',
 
   'otpCodeField',
   'otpCodeFieldInputs',
