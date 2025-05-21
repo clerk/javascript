@@ -708,6 +708,10 @@ export class Clerk implements ClerkInterface {
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
+
+    // SDKI-1012: Capture props to prevent mutations after this call
+    const capturedProps = props ? { ...props } : {};
+
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
@@ -718,9 +722,9 @@ export class Clerk implements ClerkInterface {
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
-      .then(controls => controls.openModal('createOrganization', props || {}));
+      .then(controls => controls.openModal('createOrganization', capturedProps || {}));
 
-    this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', capturedProps));
   };
 
   public closeCreateOrganization = (): void => {
