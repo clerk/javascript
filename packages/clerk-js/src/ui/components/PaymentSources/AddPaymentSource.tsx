@@ -27,6 +27,7 @@ import { handleError, normalizeColorString } from '../../utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
+  onResetPaymentIntent?: () => void;
   checkout?: CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
@@ -136,12 +137,15 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   return (
     <Elements
+      // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
+      key={externalClientSecret}
       stripe={stripe}
       options={{ clientSecret: externalClientSecret, appearance: elementsAppearance }}
     >
       <AddPaymentSourceForm
         submitLabel={submitLabel}
         onSuccess={onSuccess}
+        onResetPaymentIntent={initializePaymentSource}
         cancelAction={cancelAction}
         checkout={checkout}
         submitError={submitError}
@@ -157,6 +161,7 @@ const AddPaymentSourceForm = withCardStateProvider(
   ({
     submitLabel,
     onSuccess,
+    onResetPaymentIntent,
     cancelAction,
     checkout,
     submitError,
@@ -193,6 +198,8 @@ const AddPaymentSourceForm = withCardStateProvider(
         await onSuccess({ stripeSetupIntent: setupIntent });
       } catch (error) {
         void handleError(error, [], setSubmitError);
+      } finally {
+        onResetPaymentIntent?.();
       }
     };
 
