@@ -28,10 +28,12 @@ export const AuthStatus = {
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 type ToAuth<T extends TokenType, Authenticated extends boolean> = T extends SessionTokenType
-  ? Authenticated extends true ? (opts?: PendingSessionOptions) => SignedInAuthObject : () => SignedOutAuthObject
-  : (opts?: PendingSessionOptions) => Authenticated extends true
-      ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType>>
-      : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType>>;
+  ? Authenticated extends true
+    ? (opts?: PendingSessionOptions) => SignedInAuthObject
+    : () => SignedOutAuthObject
+  : Authenticated extends true
+    ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType>>
+    : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType>>;
 
 export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   status: typeof AuthStatus.SignedIn;
@@ -141,12 +143,11 @@ export function signedIn<T extends TokenType>(params: SignedInParams & { tokenTy
     if (params.tokenType === TokenType.SessionToken) {
       const { sessionClaims } = params as { sessionClaims: JwtPayload };
       const authObject = signedInAuthObject(authenticateContext, token, sessionClaims);
-      
-      
+
       if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
         return signedOutAuthObject(undefined, authObject.sessionStatus);
       }
-      
+
       return authObject;
     }
 

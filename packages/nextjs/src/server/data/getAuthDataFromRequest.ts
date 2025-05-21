@@ -30,10 +30,7 @@ export type GetAuthDataFromRequestOptions = {
 
 export const getAuthDataFromRequestSync = (
   req: RequestLike,
-  {
-    treatPendingAsSignedOut = true,
-    ...opts
-  }: GetAuthDataFromRequestOptions,
+  { treatPendingAsSignedOut = true, ...opts }: GetAuthDataFromRequestOptions = {},
 ): SignedInAuthObject | SignedOutAuthObject => {
   const { authStatus, authMessage, authReason, authToken, authSignature } = getAuthHeaders(req);
 

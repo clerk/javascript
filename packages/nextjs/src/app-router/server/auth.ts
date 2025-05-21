@@ -1,3 +1,4 @@
+import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticatedMachineObject,
   AuthenticateRequestOptions,
@@ -80,7 +81,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    * @example
    * const authObject = await auth()
    */
-  (): Promise<SessionAuth<TRedirect>>;
+  (options?: PendingSessionOptions): Promise<SessionAuth<TRedirect>>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:

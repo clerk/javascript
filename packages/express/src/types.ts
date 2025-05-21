@@ -3,7 +3,9 @@ import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObjec
 import type { Request as ExpressRequest } from 'express';
 import type { PendingSessionOptions } from '@clerk/types';
 
-export type ExpressRequestWithAuth = ExpressRequest & { auth: (options?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject };
+export type ExpressRequestWithAuth = ExpressRequest & {
+  auth: (options?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject;
+};
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
