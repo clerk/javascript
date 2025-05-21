@@ -197,7 +197,7 @@ const PlanDetailsInternal = ({
         </Drawer.Body>
       ) : null}
 
-      {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
+      {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
         <Drawer.Footer>
           {subscription ? (
             subscription.canceledAt ? (
