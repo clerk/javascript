@@ -19,7 +19,6 @@ import {
   unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import type { PendingSessionOptions } from '@clerk/types';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -415,7 +414,7 @@ const createMiddlewareAuthHandler = (
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
-  const authHandler = async (options?: GetAuthOptions & PendingSessionOptions) => {
+  const authHandler = async (options?: GetAuthOptions) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const authObject = requestState.toAuth(options)!;
 

@@ -17,7 +17,7 @@ import { assertAuthStatus } from './utils';
 
 export type GetAuthOptions = {
   acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
-};
+} & PendingSessionOptions;
 
 /**
  * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
@@ -26,14 +26,12 @@ export type GetAuthOptions = {
 export const createAsyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
-  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
-  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): Promise<AuthObject> => {
+    return async (req: RequestLike, opts?: { secretKey?: string } & GetAuthOptions): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
@@ -57,10 +55,10 @@ export const createAsyncGetAuth = ({
       }
 
       const getAuthDataFromRequestAsync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
-        return getAuthDataFromRequestAsyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+        return getAuthDataFromRequestAsyncOriginal(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
       };
 
-      return getAuthDataFromRequestAsync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      return getAuthDataFromRequestAsync(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
     };
   });
 
@@ -72,16 +70,14 @@ export const createAsyncGetAuth = ({
 export const createSyncGetAuth = ({
   debugLoggerName,
   noAuthStatusMessage,
-  options,
 }: {
   debugLoggerName: string;
   noAuthStatusMessage: string;
-  options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
     return (
       req: RequestLike,
-      opts?: { secretKey?: string } & PendingSessionOptions,
+      opts?: { secretKey?: string } & GetAuthOptions,
     ): SignedInAuthObject | SignedOutAuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
@@ -90,10 +86,10 @@ export const createSyncGetAuth = ({
       assertAuthStatus(req, noAuthStatusMessage);
 
       const getAuthDataFromRequestSync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
-        return getAuthDataFromRequestSyncOriginal(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+        return getAuthDataFromRequestSyncOriginal(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
       };
 
-      return getAuthDataFromRequestSync(req, { ...opts, logger, acceptsToken: options?.acceptsToken });
+      return getAuthDataFromRequestSync(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
     };
   });
 

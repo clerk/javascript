@@ -132,10 +132,10 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
-    options: {
-      acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
-    },
-  })(request, { treatPendingAsSignedOut: options?.treatPendingAsSignedOut });
+  })(request, {
+    treatPendingAsSignedOut: options?.treatPendingAsSignedOut,
+    acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
+  });
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 
