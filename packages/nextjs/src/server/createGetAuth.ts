@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
@@ -32,7 +33,7 @@ export const createAsyncGetAuth = ({
   options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string }): Promise<AuthObject> => {
+    return async (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
@@ -78,7 +79,7 @@ export const createSyncGetAuth = ({
   options?: GetAuthOptions;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string }): SignedInAuthObject | SignedOutAuthObject => {
+    return (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): SignedInAuthObject | SignedOutAuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }

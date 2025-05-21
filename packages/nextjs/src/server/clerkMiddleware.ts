@@ -207,7 +207,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       const redirectToSignUp = createMiddlewareRedirectToSignUp(clerkRequest);
       const protect = await createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
 
-      const authHandler = createMiddlewareAuthHandler(authObject, redirectToSignIn, redirectToSignUp);
+      const authHandler = createMiddlewareAuthHandler(requestState, redirectToSignIn, redirectToSignUp);
       authHandler.protect = protect;
 
       let handlerResult: Response = NextResponse.next();
@@ -410,21 +410,24 @@ const createMiddlewareProtect = (
  * - For machine tokens: validates token type and returns appropriate auth object
  */
 const createMiddlewareAuthHandler = (
-  authObject: AuthObject,
+  requestState: RequestState,
   redirectToSignIn: RedirectFun<Response>,
   redirectToSignUp: RedirectFun<Response>,
 ): ClerkMiddlewareAuth => {
-  const authObjWithMethods = Object.assign(
-    authObject,
-    authObject.tokenType === TokenType.SessionToken
-      ? {
-          redirectToSignIn,
-          redirectToSignUp,
-        }
-      : {},
-  );
-
   const authHandler = async (options?: GetAuthOptions) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const authObject = requestState.toAuth()!; // todo: add pending session options
+
+    const authObjWithMethods = Object.assign(
+      authObject,
+      authObject.tokenType === TokenType.SessionToken
+        ? {
+            redirectToSignIn,
+            redirectToSignUp,
+          }
+        : {},
+    );
+
     const acceptsToken = options?.acceptsToken ?? TokenType.SessionToken;
 
     if (acceptsToken === 'any') {

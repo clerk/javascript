@@ -14,6 +14,7 @@ import {
   verifyMachineAuthToken,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
+import type { PendingSessionOptions } from '@clerk/types';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';
@@ -25,11 +26,14 @@ export type GetAuthDataFromRequestOptions = {
   secretKey?: string;
   logger?: LoggerNoCommit;
   acceptsToken?: AuthenticateRequestOptions['acceptsToken'];
-};
+} & PendingSessionOptions;
 
 export const getAuthDataFromRequestSync = (
   req: RequestLike,
-  opts: GetAuthDataFromRequestOptions = {},
+  {
+    treatPendingAsSignedOut = true,
+    ...opts
+  }: GetAuthDataFromRequestOptions,
 ): SignedInAuthObject | SignedOutAuthObject => {
   const { authStatus, authMessage, authReason, authToken, authSignature } = getAuthHeaders(req);
 
@@ -46,6 +50,7 @@ export const getAuthDataFromRequestSync = (
     authStatus,
     authMessage,
     authReason,
+    treatPendingAsSignedOut,
   };
 
   // Only accept session tokens in the synchronous version.
@@ -54,16 +59,25 @@ export const getAuthDataFromRequestSync = (
     return signedOutAuthObject(options);
   }
 
+  let authObject;
   if (!authStatus || authStatus !== AuthStatus.SignedIn) {
-    return signedOutAuthObject(options);
+    authObject = signedOutAuthObject(options);
+  } else {
+    assertTokenSignature(authToken as string, options.secretKey, authSignature);
+
+    const jwt = decodeJwt(authToken as string);
+
+    opts.logger?.debug('jwt', jwt.raw);
+
+    // @ts-expect-error -- Restrict parameter type of options to only list what's needed
+    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
   }
 
-  assertTokenSignature(authToken as string, options.secretKey, authSignature);
-  const jwt = decodeJwt(authToken as string);
-  opts.logger?.debug('jwt', jwt.raw);
+  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+    authObject = signedOutAuthObject(options, authObject.sessionStatus);
+  }
 
-  // @ts-expect-error -- Restrict parameter type of options to only list what's needed
-  return signedInAuthObject(options, jwt.raw.text, jwt.payload);
+  return authObject;
 };
 
 /**

@@ -30,7 +30,7 @@ export function mockRequestWithAuth(
   auth: Partial<SignedInAuthObject | SignedOutAuthObject> = {},
 ): ExpressRequestWithAuth {
   return {
-    auth: {
+    auth: () => ({
       sessionClaims: null,
       sessionId: null,
       actor: null,
@@ -43,7 +43,7 @@ export function mockRequestWithAuth(
       has: () => false,
       debug: () => ({}),
       ...auth,
-    },
+    }),
   } as unknown as ExpressRequestWithAuth;
 }
 

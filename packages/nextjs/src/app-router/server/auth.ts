@@ -1,4 +1,3 @@
-import type { AuthObject } from '@clerk/backend';
 import type {
   AuthenticatedMachineObject,
   AuthenticateRequestOptions,
@@ -8,6 +7,7 @@ import type {
   UnauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect, TokenType } from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/types';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -47,12 +47,11 @@ type SessionAuth<TRedirect> = (SignedInAuthObject | SignedOutAuthObject) & {
   redirectToSignUp: RedirectFun<TRedirect>;
 };
 
-// Machine token auth objects
 type MachineAuth<T extends TokenType> = (AuthenticatedMachineObject | UnauthenticatedMachineObject) & {
   tokenType: T;
 };
 
-export type AuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
   /**
@@ -135,7 +134,7 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
     options: {
       acceptsToken: options?.acceptsToken ?? TokenType.SessionToken,
     },
-  })(request);
+  })(request, { treatPendingAsSignedOut: options?.treatPendingAsSignedOut });
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 

@@ -1,8 +1,9 @@
 import type { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import type { Request as ExpressRequest } from 'express';
+import type { PendingSessionOptions } from '@clerk/types';
 
-export type ExpressRequestWithAuth = ExpressRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
+export type ExpressRequestWithAuth = ExpressRequest & { auth: (options?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject };
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;

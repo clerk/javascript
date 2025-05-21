@@ -12,6 +12,7 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
+import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -251,8 +252,8 @@ function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, req
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.auth = () => {
-    const authObject = getAuth(clerkRequest, context.locals);
+  context.locals.auth = ({ treatPendingAsSignedOut }: PendingSessionOptions = {}) => {
+    const authObject = getAuth(clerkRequest, context.locals, { treatPendingAsSignedOut });
 
     const clerkUrl = clerkRequest.clerkUrl;
 

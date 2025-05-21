@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, PendingSessionOptions } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
@@ -28,10 +28,10 @@ export const AuthStatus = {
 export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 type ToAuth<T extends TokenType, Authenticated extends boolean> = T extends SessionTokenType
-  ? () => Authenticated extends true ? SignedInAuthObject : SignedOutAuthObject
-  : () => Authenticated extends true
-      ? AuthenticatedMachineObject<Exclude<T, SessionTokenType>>
-      : UnauthenticatedMachineObject<Exclude<T, SessionTokenType>>;
+  ? Authenticated extends true ? (opts?: PendingSessionOptions) => SignedInAuthObject : () => SignedOutAuthObject
+  : (opts?: PendingSessionOptions) => Authenticated extends true
+      ? () => AuthenticatedMachineObject<Exclude<T, SessionTokenType>>
+      : () => UnauthenticatedMachineObject<Exclude<T, SessionTokenType>>;
 
 export type AuthenticatedState<T extends TokenType = SessionTokenType> = {
   status: typeof AuthStatus.SignedIn;
@@ -137,10 +137,17 @@ type SignedInParams =
 export function signedIn<T extends TokenType>(params: SignedInParams & { tokenType: T }): AuthenticatedState<T> {
   const { authenticateContext, headers = new Headers(), token } = params;
 
-  const toAuth = (() => {
+  const toAuth = (({ treatPendingAsSignedOut = true } = {}) => {
     if (params.tokenType === TokenType.SessionToken) {
       const { sessionClaims } = params as { sessionClaims: JwtPayload };
-      return signedInAuthObject(authenticateContext, token, sessionClaims);
+      const authObject = signedInAuthObject(authenticateContext, token, sessionClaims);
+      
+      
+      if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+        return signedOutAuthObject(undefined, authObject.sessionStatus);
+      }
+      
+      return authObject;
     }
 
     const { machineData } = params as { machineData: MachineAuthType };

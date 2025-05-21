@@ -539,13 +539,13 @@ export const authenticateRequest: AuthenticateRequest = (async (
         token: authenticateContext.sessionTokenInCookie!,
       });
 
+      const authObject = signedInRequestState.toAuth();
       // Org sync if necessary
-      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
-        authenticateContext,
-        signedInRequestState.toAuth(),
-      );
-      if (handshakeRequestState) {
-        return handshakeRequestState;
+      if (authObject.userId) {
+        const handshakeRequestState = handleMaybeOrganizationSyncHandshake(authenticateContext, authObject);
+        if (handshakeRequestState) {
+          return handshakeRequestState;
+        }
       }
 
       return signedInRequestState;
