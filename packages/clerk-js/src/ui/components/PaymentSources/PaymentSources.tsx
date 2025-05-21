@@ -4,7 +4,7 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
+import { usePaymentSources, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -174,7 +174,7 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
-  const { subscriptions } = usePlansContext();
+  const { data: subscriptions } = useSubscriptions();
 
   const actions = [
     {
