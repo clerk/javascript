@@ -213,6 +213,7 @@ export type ElementsConfig = {
   checkoutSuccessBadge: WithOptions;
   checkoutSuccessTitle: WithOptions;
   checkoutSuccessDescription: WithOptions;
+  checkoutSuccessHighlight: WithOptions;
 
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
