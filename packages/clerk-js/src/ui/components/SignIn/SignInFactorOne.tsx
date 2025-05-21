@@ -8,6 +8,7 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
@@ -168,15 +169,28 @@ function SignInFactorOneInternal(): JSX.Element {
         />
       );
     case 'phone_code':
-      return (
-        <SignInFactorOnePhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onChangePhoneCodeChannel={selectFactor}
-        />
-      );
+      if (currentFactor.channel && currentFactor.channel !== 'sms') {
+        // Alternative phone code provider (e.g. WhatsApp)
+        return (
+          <SignInFactorOneAlternativePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onChangePhoneCodeChannel={selectFactor}
+          />
+        );
+      } else {
+        // SMS
+        return (
+          <SignInFactorOnePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onShowAlternativeMethodsClicked={toggleAllStrategies}
+          />
+        );
+      }
+
     case 'email_link':
       return (
         <SignInFactorOneEmailLinkCard
