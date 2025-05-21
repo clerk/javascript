@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, PendingSessionOptions } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
@@ -27,7 +27,7 @@ export type SignedInState = {
   afterSignInUrl: string;
   afterSignUpUrl: string;
   isSignedIn: true;
-  toAuth: () => SignedInAuthObject;
+  toAuth: (opts?: PendingSessionOptions) => SignedInAuthObject | SignedOutAuthObject;
   headers: Headers;
   token: string;
 };
@@ -99,7 +99,13 @@ export function signedIn(
     afterSignInUrl: authenticateContext.afterSignInUrl || '',
     afterSignUpUrl: authenticateContext.afterSignUpUrl || '',
     isSignedIn: true,
-    toAuth: () => authObject,
+    toAuth: ({ treatPendingAsSignedOut = true } = {}) => {
+      if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+        return signedOutAuthObject(undefined, authObject.sessionStatus);
+      }
+
+      return authObject;
+    },
     headers,
     token,
   };

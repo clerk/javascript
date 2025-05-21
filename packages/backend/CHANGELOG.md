@@ -1,5 +1,35 @@
 # Change Log
 
+## 1.32.3
+
+### Patch Changes
+
+- Introduces `createOrganizationInvitationBulk` - it creates new organization invitations in bulk and sends out emails to the provided email addresses with a link to accept the invitation and join the organization. ([#5962](https://github.com/clerk/javascript/pull/5962)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  const organizationId = 'org_123';
+  const params = [
+    {
+      inviterUserId: 'user_1',
+      emailAddress: 'testclerk1@clerk.dev',
+      role: 'org:admin',
+    },
+    {
+      inviterUserId: 'user_2',
+      emailAddress: 'testclerk2@clerk.dev',
+      role: 'org:member',
+    },
+  ];
+
+  const response = await clerkClient.organizations.createOrganizationInvitationBulk(organizationId, params);
+  ```
+
+- Use domain in AuthenticateRequest only for satellite domains ([#5919](https://github.com/clerk/javascript/pull/5919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
 ## 1.32.2
 
 ### Patch Changes

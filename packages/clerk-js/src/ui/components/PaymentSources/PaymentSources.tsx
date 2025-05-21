@@ -174,13 +174,14 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
+  const { subscriptions } = usePlansContext();
 
   const actions = [
     {
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault,
+      isDisabled: paymentSource.isDefault && subscriptions.length > 0,
     },
   ];
 
