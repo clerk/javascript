@@ -44,8 +44,17 @@ function SignUpStartInternal(): JSX.Element {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
-  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
+      phoneNumber: ctx.initialValues?.phoneNumber === null ? undefined : ctx.initialValues?.phoneNumber,
+      emailAddress: ctx.initialValues?.emailAddress === null ? undefined : ctx.initialValues?.emailAddress,
+      ...(isCombinedFlow
+        ? {
+            emailAddress: signUp.emailAddress,
+            phoneNumber: signUp.phoneNumber,
+          }
+        : {}),
+    }),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
