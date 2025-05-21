@@ -88,7 +88,14 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
-      return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen, hideSlug });
+
+      const createOrgProps = {
+        afterCreateOrganizationUrl,
+        skipInvitationScreen,
+        hideSlug,
+      };
+
+      return openCreateOrganization(createOrgProps);
     };
 
     const handleItemClick = () => {
