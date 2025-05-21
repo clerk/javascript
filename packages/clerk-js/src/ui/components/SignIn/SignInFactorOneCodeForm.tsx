@@ -1,7 +1,6 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
-import { useState } from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
@@ -38,7 +37,6 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
-  const [userSelectedFallbackToSMS, setUserSelectedFallbackToSMS] = useState(false);
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
   const isAlternativePhoneCodeProvider =
@@ -62,14 +60,15 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       .catch(err => handleError(err, [], card.setError));
   };
 
+  // runs only on sms phone code channel
   useFetch(
     // If an alternative phone code provider is used, we skip the prepare step
     // because the verification is already created on the Start screen
-    shouldAvoidPrepare || isAlternativePhoneCodeProvider || userSelectedFallbackToSMS
+    shouldAvoidPrepare || isAlternativePhoneCodeProvider
       ? undefined
       : () =>
           signIn
-            ?.prepareFirstFactor({ ...props.factor, channel: channelToBeSent } as PhoneCodeFactor)
+            ?.prepareFirstFactor({ ...props.factor, channel: undefined } as PhoneCodeFactor)
             .then(() => props.onFactorPrepare())
             .catch(err => handleError(err, [], card.setError)),
     {
@@ -109,14 +108,15 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       });
   };
 
+  // This is only used on clicking "Send code via SMS instead" when the factor is a phone code
+  // and the channel is not 'sms' (e.g. WhatsApp)
   const prepareWithSMS = () => {
     card.setLoading();
     card.setError(undefined);
     void signIn
       .prepareFirstFactor({ ...props.factor, channel: undefined } as PhoneCodeFactor)
-      .then(() => setUserSelectedFallbackToSMS(true))
       .then(() => props.onFactorPrepare())
-      .then(() => props.onChangePhoneCodeChannel?.({ ...props.factor, channel: 'sms' } as SignInFactor))
+      .then(() => props.onChangePhoneCodeChannel?.({ ...props.factor, channel: undefined } as SignInFactor))
       .catch(err => handleError(err, [], card.setError))
       .finally(() => card.setIdle());
   };

@@ -42,16 +42,26 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
-  const phoneCodeChannel = firstFactorVerification.channel;
-
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
-  }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
-    prevCurrentFactor: undefined,
-  }));
+  }>(() => {
+    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    if (
+      factor?.strategy === 'phone_code' &&
+      !!firstFactorVerification.channel &&
+      firstFactorVerification.channel !== 'sms'
+    ) {
+      // This is only applied to phone_code with channel that is not 'sms'
+      // because we don't want to send the channel parameter when its value is 'sms'
+      factor.channel = firstFactorVerification.channel;
+    }
+    return {
+      currentFactor: factor,
+      prevCurrentFactor: undefined,
+    };
+  });
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
@@ -162,7 +172,7 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePhoneCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
-          factor={{ ...currentFactor, channel: phoneCodeChannel }}
+          factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           onChangePhoneCodeChannel={selectFactor}
         />
