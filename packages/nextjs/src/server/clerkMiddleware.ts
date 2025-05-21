@@ -19,7 +19,7 @@ import {
   unauthenticatedMachineObject,
 } from '@clerk/backend/internal';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/types';
 import { notFound as nextjsNotFound } from 'next/navigation';
 import type { NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
