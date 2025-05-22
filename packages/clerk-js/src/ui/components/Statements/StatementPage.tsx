@@ -3,7 +3,6 @@ import { Box, descriptors, Spinner, Text } from '../../customizables';
 import { Header } from '../../elements';
 import { Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { Statement } from './Statement';
 
 export const StatementPage = () => {
@@ -82,7 +81,7 @@ export const StatementPage = () => {
                             : `Subscribed and paid for ${item.subscription.plan.name} ${item.subscription.planPeriod} plan`
                         }
                         labelIcon={item.chargeType === 'recurring' ? RotateLeftRight : Plus}
-                        value={truncateWithEndVisible(item.id)}
+                        value={item.id}
                         valueTruncated
                         valueCopyable
                       />
