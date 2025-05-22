@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 import { useCheckoutContextRoot } from './CheckoutPage';
-import { usePrefersReducedMotion } from '../../hooks';
-import { useAppearance } from '../../customizables';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
