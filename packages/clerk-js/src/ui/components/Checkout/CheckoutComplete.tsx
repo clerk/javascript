@@ -8,6 +8,8 @@ import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 import { useCheckoutContextRoot } from './CheckoutPage';
+import { usePrefersReducedMotion } from '../../hooks';
+import { useAppearance } from '../../customizables';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
@@ -15,10 +17,15 @@ const lerp = (start: number, end: number, amt: number) => start + (end - start) 
 export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
-  const { newSubscriptionRedirectUrl, isMotionSafe } = useCheckoutContext();
+  const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckoutContextRoot();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
   const animationRef = useRef<number | null>(null);
   const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);
   const canHover =
