@@ -48,7 +48,7 @@ describe('SignUpVerifyPhone', () => {
         name: /edit/i,
       }),
     );
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('../', { searchParams: new URLSearchParams() });
   });
 
   it('Resend code button exists', async () => {

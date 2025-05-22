@@ -1,5 +1,39 @@
 # Change Log
 
+## 5.67.3
+
+### Patch Changes
+
+- Bug fix: Remove cancel subscription option when implicitly subscribed to the default free plan. ([#5946](https://github.com/clerk/javascript/pull/5946)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Maintain \_ _clerk_ticket and _ \_clerk_status query params through sign up verification flow ([#5965](https://github.com/clerk/javascript/pull/5965)) by [@jacekradko](https://github.com/jacekradko)
+
+- Maintain selected identifier when going through combined flow ([#5972](https://github.com/clerk/javascript/pull/5972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove 'sms' channel parameter from phone code requests ([#5966](https://github.com/clerk/javascript/pull/5966)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 5.67.2
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Allow removal of all payment methods when there are no active subscriptions ([#5963](https://github.com/clerk/javascript/pull/5963)) by [@aeliox](https://github.com/aeliox)
+
+- Removes z-index from keyless prompt to prevent overlay issues with drawers. ([#5951](https://github.com/clerk/javascript/pull/5951)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add checkout success animation highlight. ([#5940](https://github.com/clerk/javascript/pull/5940)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue where min/max username lengths errors were not properly interpolated within profile component. ([#5948](https://github.com/clerk/javascript/pull/5948)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/localizations@3.16.1
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
 ## 5.67.1
 
 ### Patch Changes

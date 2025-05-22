@@ -1,5 +1,44 @@
 # Change Log
 
+## 6.20.0
+
+### Minor Changes
+
+- Introduce `treatPendingAsSignedOut` option to `getAuth` and `auth` from `clerkMiddleware` ([#5756](https://github.com/clerk/javascript/pull/5756)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  By default, `treatPendingAsSignedOut` is set to `true`, which means pending sessions are treated as signed-out. You can set this option to `false` to treat pending sessions as authenticated.
+
+  ```ts
+  const { userId } = auth({ treatPendingAsSignedOut: false });
+  ```
+
+  ```ts
+  const { userId } = getAuth(req, { treatPendingAsSignedOut: false });
+  ```
+
+  ```tsx
+  <SignedIn treatPendingAsSignedOut={false}>
+    User has a session that is either pending (requires tasks resolution) or active
+  </SignedIn>
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`ced8912`](https://github.com/clerk/javascript/commit/ced8912e8c9fb7eb7846de6ca9a872e794d9e15d), [`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00), [`5f1375b`](https://github.com/clerk/javascript/commit/5f1375ba7cc50cccb11d5aee03bfd4c3d1bf462f)]:
+  - @clerk/backend@1.33.0
+  - @clerk/shared@3.9.3
+  - @clerk/clerk-react@5.31.6
+
+## 6.19.5
+
+### Patch Changes
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`b813cbe`](https://github.com/clerk/javascript/commit/b813cbe29252ab9710f355cecd4511172aea3548), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/types@4.59.1
+  - @clerk/backend@1.32.3
+  - @clerk/shared@3.9.2
+  - @clerk/clerk-react@5.31.5
+
 ## 6.19.4
 
 ### Patch Changes
