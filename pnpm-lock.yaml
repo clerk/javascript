@@ -556,14 +556,14 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2
       '@radix-ui/react-form':
-        specifier: ^0.1.4
-        version: 0.1.4(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.6
+        version: 0.1.6(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
-        specifier: ^1.2.0
-        version: 1.2.0(@types/react@18.3.21)(react@18.3.1)
+        specifier: ^1.2.2
+        version: 1.2.2(@types/react@18.3.21)(react@18.3.1)
       '@xstate/react':
-        specifier: ^5.0.3
-        version: 5.0.3(@types/react@18.3.21)(react@18.3.1)(xstate@5.19.2)
+        specifier: ^5.0.4
+        version: 5.0.4(@types/react@18.3.21)(react@18.3.1)(xstate@5.19.3)
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -577,12 +577,12 @@ importers:
         specifier: catalog:repo
         version: 2.8.1
       xstate:
-        specifier: ^5.19.2
-        version: 5.19.2
+        specifier: ^5.19.3
+        version: 5.19.3
     devDependencies:
       '@statelyai/inspect':
         specifier: ^0.4.0
-        version: 0.4.0(ws@8.18.1)(xstate@5.19.2)
+        version: 0.4.0(ws@8.18.1)(xstate@5.19.3)
       concurrently:
         specifier: ^8.2.2
         version: 8.2.2
@@ -4012,8 +4012,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@radix-ui/react-form@0.1.4':
-    resolution: {integrity: sha512-97Q7Hb0///sMF2X8XvyVx3Aub7WG/ybIofoDVUo8utG/z/6TBzWGjgai7ZjECXYLbKip88t9/ibyQJvYe5k6SA==}
+  '@radix-ui/react-form@0.1.6':
+    resolution: {integrity: sha512-7AMSeVvepeJU8dIUSDlR92Pm8mScmqWBaiYw0oIAcN8wU/H5muJGcZdU/sYRHNws3b7eCoHyq4FTLrstVtCacQ==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -4034,8 +4034,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@radix-ui/react-label@2.1.4':
-    resolution: {integrity: sha512-wy3dqizZnZVV4ja0FNnUhIWNwWdoldXrneEyUcVtLYDAt8ovGS4ridtMAOGgXBBIfggL4BOveVWsjXDORdGEQg==}
+  '@radix-ui/react-label@2.1.6':
+    resolution: {integrity: sha512-S/hv1mTlgcPX2gCTJrWuTjSXf7ER3Zf7zWGtOprxhIIY93Qin3n5VgNA0Ez9AgrK/lEtlYgzLd4f5x6AVar4Yw==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -4047,8 +4047,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-primitive@2.1.0':
-    resolution: {integrity: sha512-/J/FhLdK0zVcILOwt5g+dH4KnkonCtkVJsa2G6JmvbbtZfBEI1gMsO3QMjseL4F/SwfAMt1Vc/0XKYKq+xJ1sw==}
+  '@radix-ui/react-primitive@2.1.2':
+    resolution: {integrity: sha512-uHa+l/lKfxuDD2zjN/0peM/RhhSmRjr5YWdk/37EnSv1nJ88uvG85DPexSm8HdFQROd2VdERJ6ynXbkCFi+APw==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -4060,8 +4060,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@radix-ui/react-slot@1.2.0':
-    resolution: {integrity: sha512-ujc+V6r0HNDviYqIK3rW4ffgYiZ8g5DEHrGJVk4x7kTlLXRDILnKX9vAUYeIsLOoDpDJ0ujpqMkjH4w2ofuo6w==}
+  '@radix-ui/react-slot@1.2.2':
+    resolution: {integrity: sha512-y7TBO4xN4Y94FvcWIOIh18fM4R1A8S4q1jhoz4PNzOoHsFcN8pogcFmZrTYAm4F9VRUrWP/Mw7xSKybIeRI+CQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -5640,11 +5640,11 @@ packages:
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
 
-  '@xstate/react@5.0.3':
-    resolution: {integrity: sha512-Zdnn0VTPcVdoaAiW0OX6Nkvdoe7SNGjfaZqM61NKhjt2aNULqiicmDu2tOd1ChzlRWYDxGTdbzVqqVyMLpoHJw==}
+  '@xstate/react@5.0.4':
+    resolution: {integrity: sha512-VZTG0p2dYGDZvV7zuU7mwnhu158h9KFhXCCpkd/p9l54EjUo8OZ6w7lsezpF51rVSqejazFsnZ0HDFzj/eG2Xg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      xstate: ^5.19.2
+      xstate: ^5.19.3
     peerDependenciesMeta:
       xstate:
         optional: true
@@ -14522,8 +14522,8 @@ packages:
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
 
-  xstate@5.19.2:
-    resolution: {integrity: sha512-B8fL2aP0ogn5aviAXFzI5oZseAMqN00fg/TeDa3ZtatyDcViYLIfuQl4y8qmHCiKZgGEzmnTyNtNQL9oeJE2gw==}
+  xstate@5.19.3:
+    resolution: {integrity: sha512-q6sqD7LuontFVxQoGB7D6NkQRDLzs87qzQhUKvI0osKKK8xxktZBT7uwfisjh7Yi5VB2cN9NOpCSxJNpUPQCeg==}
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -18145,14 +18145,14 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.21
 
-  '@radix-ui/react-form@0.1.4(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-form@0.1.6(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@radix-ui/primitive': 1.1.2
       '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.21)(react@18.3.1)
       '@radix-ui/react-context': 1.1.2(@types/react@18.3.21)(react@18.3.1)
       '@radix-ui/react-id': 1.1.1(@types/react@18.3.21)(react@18.3.1)
-      '@radix-ui/react-label': 2.1.4(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-primitive': 2.1.0(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-label': 2.1.6(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-primitive': 2.1.2(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
@@ -18166,25 +18166,25 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.21
 
-  '@radix-ui/react-label@2.1.4(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-label@2.1.6(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@radix-ui/react-primitive': 2.1.0(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-primitive': 2.1.2(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.21
       '@types/react-dom': 18.3.7(@types/react@18.3.21)
 
-  '@radix-ui/react-primitive@2.1.0(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@radix-ui/react-primitive@2.1.2(@types/react-dom@18.3.7(@types/react@18.3.21))(@types/react@18.3.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@radix-ui/react-slot': 1.2.0(@types/react@18.3.21)(react@18.3.1)
+      '@radix-ui/react-slot': 1.2.2(@types/react@18.3.21)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.21
       '@types/react-dom': 18.3.7(@types/react@18.3.21)
 
-  '@radix-ui/react-slot@1.2.0(@types/react@18.3.21)(react@18.3.1)':
+  '@radix-ui/react-slot@1.2.2(@types/react@18.3.21)(react@18.3.1)':
     dependencies:
       '@radix-ui/react-compose-refs': 1.1.2(@types/react@18.3.21)(react@18.3.1)
       react: 18.3.1
@@ -19004,7 +19004,7 @@ snapshots:
 
   '@stablelib/base64@1.0.1': {}
 
-  '@statelyai/inspect@0.4.0(ws@8.18.1)(xstate@5.19.2)':
+  '@statelyai/inspect@0.4.0(ws@8.18.1)(xstate@5.19.3)':
     dependencies:
       fast-safe-stringify: 2.1.1
       isomorphic-ws: 5.0.0(ws@8.18.1)
@@ -19012,7 +19012,7 @@ snapshots:
       safe-stable-stringify: 2.4.3
       superjson: 1.13.3
       uuid: 9.0.1
-      xstate: 5.19.2
+      xstate: 5.19.3
     transitivePeerDependencies:
       - ws
 
@@ -20752,13 +20752,13 @@ snapshots:
 
   '@xmldom/xmldom@0.8.10': {}
 
-  '@xstate/react@5.0.3(@types/react@18.3.21)(react@18.3.1)(xstate@5.19.2)':
+  '@xstate/react@5.0.4(@types/react@18.3.21)(react@18.3.1)(xstate@5.19.3)':
     dependencies:
       react: 18.3.1
       use-isomorphic-layout-effect: 1.1.2(@types/react@18.3.21)(react@18.3.1)
       use-sync-external-store: 1.4.0(react@18.3.1)
     optionalDependencies:
-      xstate: 5.19.2
+      xstate: 5.19.3
     transitivePeerDependencies:
       - '@types/react'
 
@@ -31608,7 +31608,7 @@ snapshots:
 
   xmlchars@2.2.0: {}
 
-  xstate@5.19.2: {}
+  xstate@5.19.3: {}
 
   xtend@4.0.2: {}
 
