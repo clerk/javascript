@@ -1094,8 +1094,8 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      if (session?.lastActiveToken) {
-        eventBus.emit(events.TokenUpdate, { token: session.lastActiveToken });
+      if (this.session?.lastActiveToken) {
+        eventBus.emit(events.TokenUpdate, { token: this.session.lastActiveToken });
       }
 
       /**

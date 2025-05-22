@@ -166,7 +166,7 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy;
+      let eventBusSpy: jest.SpyInstance;
 
       beforeEach(() => {
         eventBusSpy = jest.spyOn(eventBus, 'emit');
@@ -472,6 +472,56 @@ describe('Clerk singleton', () => {
           expect(mockSession.getToken).toHaveBeenCalled();
           expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
           expect(sut.session).toMatchObject(mockSession);
+        });
+      });
+
+      it('emits token update event with session token when switching sessions', async () => {
+        const mockSession1 = {
+          id: '1',
+          status: 'active',
+          user: {},
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(() => Promise.resolve('token-1')),
+          lastActiveToken: { getRawString: () => 'token-1' },
+        };
+
+        const mockSession2 = {
+          id: '2',
+          status: 'active',
+          user: {},
+          touch: jest.fn(() => Promise.resolve()),
+          getToken: jest.fn(() => Promise.resolve('token-2')),
+          lastActiveToken: { getRawString: () => 'token-2' },
+        };
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession1, mockSession2],
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        // Set initial session
+        await sut.setActive({ session: mockSession1 as any as ActiveSessionResource });
+
+        // Clear all previous calls to start fresh
+        eventBusSpy.mockClear();
+
+        // Switch to another session
+        await sut.setActive({ session: mockSession2 as any as ActiveSessionResource });
+
+        // Verify token update was emitted with the first session token
+        await waitFor(() => {
+          const [, { token }] = eventBusSpy.mock.lastCall;
+          expect(token?.getRawString()).toBe(mockSession1.lastActiveToken.getRawString());
+        });
+
+        // Verify getToken was called from new session
+        await waitFor(() => {
+          expect(mockSession2.getToken).toHaveBeenCalled();
+          expect(sut.session).toMatchObject(mockSession2);
         });
       });
     });
