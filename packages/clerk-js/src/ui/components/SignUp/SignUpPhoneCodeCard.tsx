@@ -1,5 +1,4 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { useState } from 'react';
 
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
@@ -11,19 +10,21 @@ import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const signUp = useCoreSignUp();
   const card = useCardState();
-  const [userSelectedFallbackToSMS, setUserSelectedFallbackToSMS] = useState(false);
   const channel = signUp.verifications.phoneNumber.channel;
 
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
   const isAlternativePhoneCodeProvider = !!channel && channel !== 'sms';
 
+  // If the channel is 'sms', we don't want to send the channel parameter
+  const channelToBeSent = isAlternativePhoneCodeProvider ? channel : undefined;
+
   const prepare = () => {
     if (shouldAvoidPrepare) {
       return;
     }
     return signUp
-      .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: channelToBeSent })
       .catch(err => handleError(err, [], card.setError));
   };
 
@@ -31,11 +32,11 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   useFetch(
     // If an alternative phone code provider is used, we skip the prepare step
     // because the verification is already created on the Start screen
-    shouldAvoidPrepare || isAlternativePhoneCodeProvider || userSelectedFallbackToSMS
+    shouldAvoidPrepare || isAlternativePhoneCodeProvider
       ? undefined
       : () =>
           signUp
-            .preparePhoneNumberVerification({ strategy: 'phone_code', channel })
+            .preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined })
             .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signUp.preparePhoneNumberVerification',
@@ -64,8 +65,7 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     card.setLoading();
     card.setError(undefined);
     void signUp
-      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: 'sms' })
-      .then(() => setUserSelectedFallbackToSMS(true))
+      .preparePhoneNumberVerification({ strategy: 'phone_code', channel: undefined })
       .catch(err => handleError(err, [], card.setError))
       .finally(() => card.setIdle());
   };

@@ -8,6 +8,7 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
@@ -42,16 +43,26 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
-  const phoneCodeChannel = firstFactorVerification.channel;
-
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
-  }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
-    prevCurrentFactor: undefined,
-  }));
+  }>(() => {
+    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    if (
+      factor?.strategy === 'phone_code' &&
+      !!firstFactorVerification.channel &&
+      firstFactorVerification.channel !== 'sms'
+    ) {
+      // This is only applied to phone_code with channel that is not 'sms'
+      // because we don't want to send the channel parameter when its value is 'sms'
+      factor.channel = firstFactorVerification.channel;
+    }
+    return {
+      currentFactor: factor,
+      prevCurrentFactor: undefined,
+    };
+  });
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
@@ -158,15 +169,28 @@ function SignInFactorOneInternal(): JSX.Element {
         />
       );
     case 'phone_code':
-      return (
-        <SignInFactorOnePhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
-          onFactorPrepare={handleFactorPrepare}
-          factor={{ ...currentFactor, channel: phoneCodeChannel }}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-          onChangePhoneCodeChannel={selectFactor}
-        />
-      );
+      if (currentFactor.channel && currentFactor.channel !== 'sms') {
+        // Alternative phone code provider (e.g. WhatsApp)
+        return (
+          <SignInFactorOneAlternativePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onChangePhoneCodeChannel={selectFactor}
+          />
+        );
+      } else {
+        // SMS
+        return (
+          <SignInFactorOnePhoneCodeCard
+            factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            onFactorPrepare={handleFactorPrepare}
+            factor={currentFactor}
+            onShowAlternativeMethodsClicked={toggleAllStrategies}
+          />
+        );
+      }
+
     case 'email_link':
       return (
         <SignInFactorOneEmailLinkCard

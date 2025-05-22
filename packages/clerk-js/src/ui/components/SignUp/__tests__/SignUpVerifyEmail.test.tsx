@@ -68,7 +68,7 @@ describe('SignUpVerifyEmail', () => {
         name: /edit/i,
       }),
     );
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('../', { searchParams: new URLSearchParams() });
   });
 
   it('Resend link button exists', async () => {

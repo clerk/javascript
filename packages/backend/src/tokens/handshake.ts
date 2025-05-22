@@ -83,7 +83,6 @@ export async function verifyHandshakeToken(
 }
 
 export class HandshakeService {
-  private redirectLoopCounter: number;
   private readonly authenticateContext: AuthenticateContext;
   private readonly organizationMatcher: OrganizationMatcher;
   private readonly options: { organizationSyncOptions?: OrganizationSyncOptions };
@@ -96,7 +95,6 @@ export class HandshakeService {
     this.authenticateContext = authenticateContext;
     this.options = options;
     this.organizationMatcher = organizationMatcher;
-    this.redirectLoopCounter = 0;
   }
 
   /**
@@ -294,11 +292,11 @@ ${developmentError.getFullMessage()}`,
    * @returns boolean indicating if a redirect loop was detected (true) or if the request can proceed (false)
    */
   checkAndTrackRedirectLoop(headers: Headers): boolean {
-    if (this.redirectLoopCounter === 3) {
+    if (this.authenticateContext.handshakeRedirectLoopCounter === 3) {
       return true;
     }
 
-    const newCounterValue = this.redirectLoopCounter + 1;
+    const newCounterValue = this.authenticateContext.handshakeRedirectLoopCounter + 1;
     const cookieName = constants.Cookies.RedirectCount;
     headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
     return false;

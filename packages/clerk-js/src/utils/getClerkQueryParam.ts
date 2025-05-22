@@ -47,3 +47,24 @@ export function removeClerkQueryParam<T extends ClerkQueryParam>(param: T) {
   }
   return;
 }
+
+/**
+ * Extracts and forwards Clerk query parameters from the current URL to a new URLSearchParams object.
+ * This is useful when navigating between pages while preserving Clerk-specific query parameters.
+ *
+ * @param params - Optional URLSearchParams object to add the parameters to. If not provided, a new one will be created.
+ * @returns A URLSearchParams object containing the forwarded Clerk parameters
+ */
+export function forwardClerkQueryParams(params?: URLSearchParams): URLSearchParams {
+  const currentSearchParams = new URLSearchParams(window.location.search);
+  const newParams = params || new URLSearchParams();
+
+  for (const param of _ClerkQueryParams) {
+    const value = currentSearchParams.get(param);
+    if (value) {
+      newParams.set(param, value);
+    }
+  }
+
+  return newParams;
+}

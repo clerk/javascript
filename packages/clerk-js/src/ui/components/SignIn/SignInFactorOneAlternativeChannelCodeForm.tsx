@@ -1,34 +1,34 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/types';
+import type { PhoneCodeFactor, SignInFactor } from '@clerk/types';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
-import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { type LocalizationKey } from '../../localization';
+import { type LocalizationKey, localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
-export type SignInFactorOneCodeCard = Pick<
+export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
+  factor: PhoneCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
+  onChangePhoneCodeChannel: (factor: SignInFactor) => void;
 };
 
-export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
+export type SignInFactorOneAlternativeChannelCodeFormProps = SignInFactorOneAlternativeChannelCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
 };
 
-export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => {
+export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOneAlternativeChannelCodeFormProps) => {
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { navigate } = useRouter();
@@ -36,6 +36,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
+  const channel = props.factor.channel;
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
 
@@ -49,28 +50,10 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     }
 
     void signIn
-      .prepareFirstFactor(props.factor)
+      .prepareFirstFactor({ ...props.factor, channel } as PhoneCodeFactor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
-
-  useFetch(
-    shouldAvoidPrepare
-      ? undefined
-      : () =>
-          signIn
-            ?.prepareFirstFactor(props.factor)
-            .then(() => props.onFactorPrepare())
-            .catch(err => handleError(err, [], card.setError)),
-    {
-      name: 'signIn.prepareFirstFactor',
-      factor: props.factor,
-      id: signIn.id,
-    },
-    {
-      staleTime: 100,
-    },
-  );
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
@@ -99,6 +82,12 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       });
   };
 
+  // This is used on clicking "Send code via SMS instead"
+  const prepareWithSMS = () => {
+    card.setError(undefined);
+    props.onChangePhoneCodeChannel({ ...props.factor, channel: undefined } as SignInFactor);
+  };
+
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
@@ -109,8 +98,9 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
-      onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
-      showAlternativeMethods={props.showAlternativeMethods}
+      alternativeMethodsLabel={localizationKeys('footerActionLink__alternativePhoneCodeProvider')}
+      onShowAlternativeMethodsClicked={prepareWithSMS}
+      showAlternativeMethods
       onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
     />

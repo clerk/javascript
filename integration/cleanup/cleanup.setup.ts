@@ -17,11 +17,19 @@ setup('cleanup instances ', async () => {
   for (const entry of entries) {
     console.log(`Cleanup for ${entry.secretKey.replace(/(sk_test_)(.+)(...)/, '$1***$3')}`);
     const clerkClient = createClerkClient({ secretKey: entry.secretKey });
-    const { data: users } = await clerkClient.users.getUserList({
+    const { data: usersWithEmail } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',
       limit: 150,
     });
+
+    const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
+      orderBy: '-created_at',
+      query: '55501',
+      limit: 150,
+    });
+
+    const users = [...usersWithEmail, ...usersWithPhoneNumber];
 
     const { data: orgs } = await clerkClient.organizations
       .getOrganizationList({

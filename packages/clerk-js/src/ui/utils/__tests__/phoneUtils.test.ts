@@ -1,9 +1,12 @@
+import type { PhoneCodeChannel } from '@clerk/types';
+
 import {
   extractDigits,
   formatPhoneNumber,
   getCountryFromPhoneString,
   getCountryIsoFromFormattedNumber,
   getFlagEmojiFromCountryIso,
+  getPreferredPhoneCodeChannelByCountry,
 } from '../phoneUtils';
 
 describe('phoneUtils', () => {
@@ -218,6 +221,45 @@ describe('phoneUtils', () => {
       const res = getCountryFromPhoneString('+699090909090');
       expect(res.number).toBe('99090909090');
       expect(res.country.iso).toBe('us');
+    });
+  });
+
+  describe('getPreferredPhoneCodeChannelByCountry', () => {
+    it('returns null when preferredChannels is undefined', () => {
+      const res = getPreferredPhoneCodeChannelByCountry('+12064563059', undefined as any);
+      expect(res).toBe(null);
+    });
+
+    it('returns null when preferredChannels is empty', () => {
+      const res = getPreferredPhoneCodeChannelByCountry('+12064563059', {});
+      expect(res).toBe(null);
+    });
+
+    it('returns the preferred channel for a US number', () => {
+      const preferredChannels = {
+        US: 'sms' as PhoneCodeChannel,
+        GB: 'whatsapp' as PhoneCodeChannel,
+      };
+      const res = getPreferredPhoneCodeChannelByCountry('+12064563059', preferredChannels);
+      expect(res).toBe('sms');
+    });
+
+    it('returns the preferred channel for a non-US number', () => {
+      const preferredChannels = {
+        US: 'sms' as PhoneCodeChannel,
+        GB: 'whatsapp' as PhoneCodeChannel,
+      };
+      const res = getPreferredPhoneCodeChannelByCountry('+447911123456', preferredChannels);
+      expect(res).toBe('whatsapp');
+    });
+
+    it('returns null when no preferred channel exists for the country', () => {
+      const preferredChannels = {
+        US: 'sms' as PhoneCodeChannel,
+        GB: 'whatsapp' as PhoneCodeChannel,
+      };
+      const res = getPreferredPhoneCodeChannelByCountry('+306999999999', preferredChannels);
+      expect(res).toBe(null);
     });
   });
 });
