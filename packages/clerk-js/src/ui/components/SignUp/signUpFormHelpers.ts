@@ -106,7 +106,15 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
 export const getInitialActiveIdentifier = (
   attributes: Partial<Attributes>,
   isProgressiveSignUp: boolean,
+  initialValues?: { phoneNumber?: string | null; emailAddress?: string | null },
 ): ActiveIdentifier => {
+  if (initialValues?.emailAddress) {
+    return 'emailAddress';
+  }
+  if (initialValues?.phoneNumber) {
+    return 'phoneNumber';
+  }
+
   if (emailOrPhone(attributes, isProgressiveSignUp)) {
     // If we are in the case of Email OR Phone, email takes priority
     return 'emailAddress';

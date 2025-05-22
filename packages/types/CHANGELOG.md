@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.59.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.59.0
 
 ### Minor Changes
