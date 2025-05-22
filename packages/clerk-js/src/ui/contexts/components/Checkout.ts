@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
-import { useAppearance } from '../../../ui/customizables/AppearanceContext';
-import { usePrefersReducedMotion } from '../../../ui/hooks/usePrefersReducedMotion';
 import { isAllowedRedirect } from '../../../utils';
+import { useAppearance } from '../../customizables';
+import { usePrefersReducedMotion } from '../../hooks';
 import type { CheckoutCtx } from '../../types';
 import { useOptions } from '../OptionsContext';
 

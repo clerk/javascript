@@ -1,4 +1,4 @@
-import { useCheckoutContext } from '../../../ui/contexts';
+import { useCheckoutContext } from '../../contexts';
 import { Box, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
 // TODO(@COMMERCE): Is this causing bundle size  issues ?
