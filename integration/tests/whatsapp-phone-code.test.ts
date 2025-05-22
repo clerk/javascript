@@ -21,7 +21,7 @@ test.describe('sign up and sign in with WhatsApp phone code @generic', () => {
         await app.withEnv(appConfigs.envs.withWhatsappPhoneCode);
         await app.dev();
         fakeUser = createTestUtils({ app }).services.users.createFakeUser({
-          fictionalEmail: true,
+          withEmail: false,
           withPhoneNumber: true,
           withPassword: false,
         });
