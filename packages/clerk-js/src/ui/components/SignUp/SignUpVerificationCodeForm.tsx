@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 
+import { forwardClerkQueryParams } from '../../../utils/getClerkQueryParam';
 import { useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import type { VerificationCodeCardProps } from '../../elements';
@@ -27,7 +28,8 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
   const { navigate } = useRouter();
 
   const goBack = () => {
-    return navigate('../');
+    const params = forwardClerkQueryParams();
+    return navigate('../', { searchParams: params });
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {

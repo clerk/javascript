@@ -181,7 +181,7 @@ const PaymentSourceMenu = ({
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault && subscriptions.length > 0,
+      isDisabled: paymentSource.isDefault && subscriptions.some(s => !s.plan.isDefault),
     },
   ];
 

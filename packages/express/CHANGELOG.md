@@ -1,5 +1,27 @@
 # Change Log
 
+## 1.5.0
+
+### Minor Changes
+
+- Introduce `treatPendingAsSignedOut` option to `getAuth` ([#5842](https://github.com/clerk/javascript/pull/5842)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  // `pending` sessions will be treated as signed-out by default
+  const { userId } = getAuth(req);
+  ```
+
+  ```ts
+  // Both `active` and `pending` sessions will be treated as authenticated when `treatPendingAsSignedOut` is false
+  const { userId } = getAuth(req, { treatPendingAsSignedOut: false });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`ced8912`](https://github.com/clerk/javascript/commit/ced8912e8c9fb7eb7846de6ca9a872e794d9e15d), [`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00), [`5f1375b`](https://github.com/clerk/javascript/commit/5f1375ba7cc50cccb11d5aee03bfd4c3d1bf462f)]:
+  - @clerk/backend@1.33.0
+  - @clerk/shared@3.9.3
+
 ## 1.4.20
 
 ### Patch Changes
