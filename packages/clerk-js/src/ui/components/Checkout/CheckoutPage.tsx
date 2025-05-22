@@ -105,7 +105,7 @@ const Root = ({ children }: { children: React.ReactNode }) => {
     const invalidChangeCode = 'invalid_plan_change';
     if (errors?.[0]?.code === invalidChangeCode && plan) return invalidChangeCode;
     return 'error';
-  }, [isLoading, errors, checkout, plan?.id]);
+  }, [isLoading, errors, checkout, plan?.id, checkout?.status]);
 
   return (
     <CheckoutContextRoot.Provider
