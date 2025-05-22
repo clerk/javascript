@@ -1,9 +1,4 @@
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
@@ -29,13 +24,7 @@ const tabMap = {
 
 const BillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions();
-
   const { selectedTab, handleTabChange } = useTabState(tabMap);
-
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
 
   return (
     <Col
@@ -78,9 +67,7 @@ const BillingPageInternal = withCardStateProvider(() => {
               <PaymentSources />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -92,9 +79,7 @@ const BillingPageInternal = withCardStateProvider(() => {
 export const BillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <BillingPageInternal />
-      </PlansContextProvider>
+      <BillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

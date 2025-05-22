@@ -99,6 +99,7 @@ describe('HandshakeService', () => {
       accept: 'text/html',
       apiUrl: 'https://api.clerk.dev',
       secretKey: 'test-secret-key',
+      handshakeRedirectLoopCounter: 0,
     } as AuthenticateContext;
 
     mockOrganizationMatcher = new OrganizationMatcher({
@@ -204,7 +205,7 @@ describe('HandshakeService', () => {
   describe('checkAndTrackRedirectLoop', () => {
     it('should return true after 3 redirects', () => {
       const headers = new Headers();
-      handshakeService['redirectLoopCounter'] = 3;
+      mockAuthenticateContext.handshakeRedirectLoopCounter = 3;
 
       const result = handshakeService.checkAndTrackRedirectLoop(headers);
 
@@ -214,7 +215,7 @@ describe('HandshakeService', () => {
 
     it('should increment counter and set cookie for first redirect', () => {
       const headers = new Headers();
-      handshakeService['redirectLoopCounter'] = 0;
+      mockAuthenticateContext.handshakeRedirectLoopCounter = 0;
 
       const result = handshakeService.checkAndTrackRedirectLoop(headers);
 
