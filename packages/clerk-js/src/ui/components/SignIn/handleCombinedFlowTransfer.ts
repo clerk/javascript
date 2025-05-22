@@ -1,4 +1,4 @@
-import type { LoadedClerk, PhoneCodeChannelData, PhoneCodeStrategy, SignUpModes, SignUpResource } from '@clerk/types';
+import type { LoadedClerk, PhoneCodeChannel, PhoneCodeStrategy, SignUpModes, SignUpResource } from '@clerk/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
 import type { RouteContextValue } from '../../router/RouteContext';
@@ -16,7 +16,7 @@ type HandleCombinedFlowTransferProps = {
   redirectUrl?: string;
   redirectUrlComplete?: string;
   passwordEnabled: boolean;
-  alternativePhoneCodeProvider?: PhoneCodeChannelData | null;
+  alternativePhoneCodeChannel?: PhoneCodeChannel | null;
 };
 
 /**
@@ -35,7 +35,7 @@ export function handleCombinedFlowTransfer({
   redirectUrl,
   redirectUrlComplete,
   passwordEnabled,
-  alternativePhoneCodeProvider,
+  alternativePhoneCodeChannel,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
@@ -58,10 +58,10 @@ export function handleCombinedFlowTransfer({
 
   // We need to send the alternative phone code provider channel in the sign up request
   // together with the phone_code strategy, in order for FAPI to create a Verification.
-  const alternativePhoneCodeProviderParams = alternativePhoneCodeProvider
+  const alternativePhoneCodeChannelParams = alternativePhoneCodeChannel
     ? {
         strategy: 'phone_code' as PhoneCodeStrategy,
-        channel: alternativePhoneCodeProvider.channel,
+        channel: alternativePhoneCodeChannel,
       }
     : {};
 
@@ -75,7 +75,7 @@ export function handleCombinedFlowTransfer({
     return clerk.client.signUp
       .create({
         [identifierAttribute]: identifierValue,
-        ...alternativePhoneCodeProviderParams,
+        ...alternativePhoneCodeChannelParams,
       })
       .then(async res => {
         const completeSignUpFlow = await lazyCompleteSignUpFlow();

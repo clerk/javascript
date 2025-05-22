@@ -1,4 +1,18 @@
+import type { Attribute } from '@clerk/types';
+
 import { determineActiveFields, getInitialActiveIdentifier } from '../signUpFormHelpers';
+
+const createAttributeData = (name: Attribute, enabled: boolean, required: boolean, usedForFirstFactor: boolean) => ({
+  name,
+  enabled,
+  required,
+  verifications: [],
+  used_for_first_factor: usedForFirstFactor,
+  first_factors: [],
+  used_for_second_factor: false,
+  second_factors: [],
+  verify_at_sign_up: false,
+});
 
 describe('determineActiveFields()', () => {
   // For specs refer to https://www.notion.so/clerkdev/Vocabulary-8f775765258643978f5811c88b140b2d
@@ -521,6 +535,94 @@ describe('determineActiveFields()', () => {
       });
 
       expect(res).toEqual(result);
+    });
+  });
+});
+
+describe('getInitialActiveIdentifier()', () => {
+  describe('prioritizes initialValues', () => {
+    it('returns phoneNumber when phoneNumber is provided in initialValues', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+      const initialValues = { phoneNumber: '+1234567890' };
+
+      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('phoneNumber');
+    });
+
+    it('returns emailAddress when emailAddress is provided in initialValues', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+      const initialValues = { emailAddress: 'test@example.com' };
+
+      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('emailAddress');
+    });
+
+    it('prioritizes emailAddress over phoneNumber when both are provided in initialValues', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+      const initialValues = {
+        phoneNumber: '+1234567890',
+        emailAddress: 'test@example.com',
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('emailAddress');
+    });
+
+    it('handles null values in initialValues gracefully', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+      const initialValues = {
+        phoneNumber: null,
+        emailAddress: null,
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false, initialValues)).toBe('emailAddress');
+    });
+  });
+
+  describe('falls back to attribute-based logic when no initialValues', () => {
+    it('returns emailAddress when both email and phone are optional in progressive signup', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, false, true),
+        phone_number: createAttributeData('phone_number', true, false, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, true)).toBe('emailAddress');
+    });
+
+    it('returns emailAddress when email is required in progressive signup', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', true, true, true),
+        phone_number: createAttributeData('phone_number', false, false, false),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, true)).toBe('emailAddress');
+    });
+
+    it('returns phoneNumber when phone is required in progressive signup', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', false, false, false),
+        phone_number: createAttributeData('phone_number', true, true, true),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, true)).toBe('phoneNumber');
+    });
+
+    it('returns null when no identifiers are enabled', () => {
+      const attributes = {
+        email_address: createAttributeData('email_address', false, false, false),
+        phone_number: createAttributeData('phone_number', false, false, false),
+      };
+
+      expect(getInitialActiveIdentifier(attributes, false)).toBe(null);
     });
   });
 });

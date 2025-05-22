@@ -110,7 +110,7 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         }
       }
 
-      const auth = requestState.toAuth();
+      const auth = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
       Object.assign(request, { auth });
 
       next();

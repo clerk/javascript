@@ -50,5 +50,9 @@
  "with-session-tasks": {
     "pk": "",
     "sk": ""
+  },
+ "with-whatsapp-phone-code": {
+    "pk": "",
+    "sk": ""
   }
 }

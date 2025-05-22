@@ -305,6 +305,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {

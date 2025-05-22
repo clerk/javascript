@@ -278,6 +278,7 @@ Environment {
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
+    "preferredChannels": null,
     "reverification": false,
     "singleSessionMode": false,
   },
@@ -509,6 +510,7 @@ Environment {
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
+    "preferredChannels": null,
     "reverification": true,
     "singleSessionMode": true,
   },

@@ -28,6 +28,9 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   if ('phoneNumberId' in factor) {
     key += factor.phoneNumberId;
   }
+  if ('channel' in factor) {
+    key += factor.channel;
+  }
   return key;
 };
 
@@ -39,7 +42,7 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
-  const alternativePhoneCodeChannel = firstFactorVerification.channel;
+  const phoneCodeChannel = firstFactorVerification.channel;
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -159,8 +162,9 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePhoneCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
-          factor={{ ...currentFactor, channel: alternativePhoneCodeChannel }}
+          factor={{ ...currentFactor, channel: phoneCodeChannel }}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onChangePhoneCodeChannel={selectFactor}
         />
       );
     case 'email_link':

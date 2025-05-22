@@ -1,5 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants, createClerkRequest, createRedirect, type RedirectFun } from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/types';
 import { notFound, redirect } from 'next/navigation';
 
 import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
@@ -38,7 +39,7 @@ type Auth = AuthObject & {
 };
 
 export interface AuthFn {
-  (): Promise<Auth>;
+  (options?: PendingSessionOptions): Promise<Auth>;
 
   /**
    * `auth` includes a single property, the `protect()` method, which you can use in two ways:
@@ -68,7 +69,7 @@ export interface AuthFn {
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
  * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
  */
-export const auth: AuthFn = async () => {
+export const auth: AuthFn = async ({ treatPendingAsSignedOut } = {}) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('server-only');
 
@@ -89,7 +90,7 @@ export const auth: AuthFn = async () => {
   const authObject = await createAsyncGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing('auth', await stepsBasedOnSrcDirectory()),
-  })(request);
+  })(request, { treatPendingAsSignedOut });
 
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 
