@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.67.3
+
+### Patch Changes
+
+- Bug fix: Remove cancel subscription option when implicitly subscribed to the default free plan. ([#5946](https://github.com/clerk/javascript/pull/5946)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Maintain \_ _clerk_ticket and _ \_clerk_status query params through sign up verification flow ([#5965](https://github.com/clerk/javascript/pull/5965)) by [@jacekradko](https://github.com/jacekradko)
+
+- Maintain selected identifier when going through combined flow ([#5972](https://github.com/clerk/javascript/pull/5972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove 'sms' channel parameter from phone code requests ([#5966](https://github.com/clerk/javascript/pull/5966)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
 ## 5.67.2
 
 ### Patch Changes

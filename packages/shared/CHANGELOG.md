@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.9.3
+
+### Patch Changes
+
+- Updated `isLoaded` comments for useOrganizationList. ([#5970](https://github.com/clerk/javascript/pull/5970)) by [@royanger](https://github.com/royanger)
+
 ## 3.9.2
 
 ### Patch Changes
