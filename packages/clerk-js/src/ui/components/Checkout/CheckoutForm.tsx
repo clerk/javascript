@@ -10,10 +10,9 @@ import type {
 import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
-import { useCheckoutContext } from '../../contexts';
+import { useCheckoutContext, usePaymentSources } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
-import { useFetch } from '../../hooks';
 import { ChevronUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
@@ -109,17 +108,12 @@ const CheckoutFormElements = ({
   onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { organization } = useOrganization();
-  const { subscriber, subscriberType } = useCheckoutContext();
+  const { subscriberType } = useCheckoutContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  const { data, revalidate: revalidatePaymentSources } = useFetch(
-    subscriber().getPaymentSources,
-    {},
-    undefined,
-    `commerce-payment-sources-${subscriber().id}`,
-  );
+  const { data } = usePaymentSources();
   const { data: paymentSources } = data || { data: [] };
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -133,7 +127,6 @@ const CheckoutFormElements = ({
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
-      void revalidatePaymentSources();
     } catch (error) {
       handleError(error, [], setSubmitError);
     }
@@ -170,7 +163,6 @@ const CheckoutFormElements = ({
         useTestCard: true,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
-      void revalidatePaymentSources();
       onCheckoutComplete(newCheckout);
     } catch (error) {
       handleError(error, [], setSubmitError);
