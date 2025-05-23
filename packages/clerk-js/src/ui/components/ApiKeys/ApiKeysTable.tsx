@@ -5,6 +5,7 @@ import useSWR from 'swr';
 
 import { timeAgo } from '../../../utils/date';
 import {
+  Box,
   Button,
   descriptors,
   Flex,
@@ -22,8 +23,8 @@ import {
 } from '../../customizables';
 import { ThreeDotsMenu } from '../../elements';
 import { useClipboard } from '../../hooks';
-import { Check, Copy, Eye, EyeSlash } from '../../icons';
-import { common } from '../../styledSystem';
+import { Check, ClipboardOutline, Eye, EyeSlash } from '../../icons';
+import { common, mqu } from '../../styledSystem';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();
@@ -50,7 +51,11 @@ const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
       onClick={() => setEnabled(true)}
       focusRing={false}
     >
-      <Icon icon={hasCopied ? Check : Copy} />
+      <Icon
+        size='sm'
+        icon={hasCopied ? Check : ClipboardOutline}
+        sx={t => ({ color: t.colors.$primary500 })}
+      />
     </Button>
   );
 };
@@ -78,7 +83,6 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
       />
       <Button
         variant='ghost'
-        size='sm'
         sx={t => ({
           position: 'absolute',
           right: 0,
@@ -90,7 +94,10 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
         aria-label={'Show key'}
         onClick={() => setRevealed(!revealed)}
       >
-        <Icon icon={revealed ? EyeSlash : Eye} />
+        <Icon
+          icon={revealed ? EyeSlash : Eye}
+          sx={t => ({ color: t.colors.$colorTextSecondary })}
+        />
       </Button>
     </Flex>
   );
@@ -106,73 +113,98 @@ export const ApiKeysTable = ({
   onRevoke: (id: string, name: string) => void;
 }) => {
   return (
-    <Table sx={{ tableLayout: 'fixed' }}>
-      <Thead>
-        <Tr>
-          <Th>Name</Th>
-          <Th sx={{ width: '15%' }}>Last used</Th>
-          <Th>Key</Th>
-          <Th sx={{ width: '10%' }}>Actions</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {isLoading ? (
+    <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1, width: '100%' })}>
+      <Table sx={t => ({ background: t.colors.$colorBackground })}>
+        <Thead>
           <Tr>
-            <Td colSpan={4}>
-              <Spinner
-                colorScheme='primary'
-                sx={{ margin: 'auto', display: 'block' }}
-                elementDescriptor={descriptors.spinner}
-              />
-            </Td>
+            <Th>Name</Th>
+            <Th>Last used</Th>
+            <Th>Key</Th>
+            <Th>Actions</Th>
           </Tr>
-        ) : !rows.length ? (
-          <EmptyRow />
-        ) : (
-          rows.map(apiKey => (
-            <Tr key={apiKey.id}>
-              <Td>
-                <Text variant='subtitle'>{apiKey.name}</Text>
-                <Text
-                  variant='caption'
-                  colorScheme='secondary'
-                >
-                  Created at{' '}
-                  {apiKey.createdAt.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: '2-digit',
-                    year: 'numeric',
-                  })}
-                </Text>
-              </Td>
-              <Td>
-                <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'}</Text>
-              </Td>
-              <Td>
-                <Flex
-                  direction='row'
-                  gap={1}
-                >
-                  <SecretInputWithToggle apiKeyID={apiKey.id} />
-                  <CopySecretButton apiKeyID={apiKey.id} />
-                </Flex>
-              </Td>
-              <Td>
-                <ThreeDotsMenu
-                  actions={[
-                    {
-                      label: localizationKeys('apiKeys.menuAction__revoke'),
-                      isDestructive: true,
-                      onClick: () => onRevoke(apiKey.id, apiKey.name),
-                    },
-                  ]}
+        </Thead>
+        <Tbody>
+          {isLoading ? (
+            <Tr>
+              <Td colSpan={4}>
+                <Spinner
+                  colorScheme='primary'
+                  sx={{ margin: 'auto', display: 'block' }}
+                  elementDescriptor={descriptors.spinner}
                 />
               </Td>
             </Tr>
-          ))
-        )}
-      </Tbody>
-    </Table>
+          ) : !rows.length ? (
+            <EmptyRow />
+          ) : (
+            rows.map(apiKey => (
+              <Tr key={apiKey.id}>
+                <Td>
+                  <Flex
+                    direction='col'
+                    sx={{ minWidth: '25ch' }}
+                  >
+                    <Text
+                      variant='subtitle'
+                      truncate
+                    >
+                      {apiKey.name}
+                    </Text>
+                    <Text
+                      variant='caption'
+                      colorScheme='secondary'
+                    >
+                      Created at{' '}
+                      {apiKey.createdAt.toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: '2-digit',
+                        year: 'numeric',
+                      })}
+                    </Text>
+                  </Flex>
+                </Td>
+                <Td>
+                  <Box
+                    sx={{
+                      [mqu.sm]: {
+                        minWidth: '10ch',
+                      },
+                    }}
+                  >
+                    <Text>{apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'}</Text>
+                  </Box>
+                </Td>
+                <Td>
+                  <Flex
+                    direction='row'
+                    gap={1}
+                    sx={{
+                      [mqu.sm]: {
+                        minWidth: '25ch',
+                      },
+                    }}
+                  >
+                    <SecretInputWithToggle apiKeyID={apiKey.id} />
+                    <CopySecretButton apiKeyID={apiKey.id} />
+                  </Flex>
+                </Td>
+                <Td>
+                  <ThreeDotsMenu
+                    actions={[
+                      {
+                        label: localizationKeys('apiKeys.menuAction__revoke'),
+                        isDestructive: true,
+                        onClick: () => onRevoke(apiKey.id, apiKey.name),
+                      },
+                    ]}
+                  />
+                </Td>
+              </Tr>
+            ))
+          )}
+        </Tbody>
+      </Table>
+    </Flex>
   );
 };
 

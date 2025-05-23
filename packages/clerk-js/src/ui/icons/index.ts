@@ -23,6 +23,7 @@ export { default as CheckmarkFilled } from './checkmark-filled.svg';
 export { default as ChevronDown } from './chevron-down.svg';
 export { default as ChevronUpDown } from './chevron-up-down.svg';
 export { default as Clipboard } from './clipboard.svg';
+export { default as ClipboardOutline } from './clipboard-outline.svg';
 export { default as Close } from './close.svg';
 export { default as Code } from './code.svg';
 export { default as CogFilled } from './cog-filled.svg';

@@ -3,7 +3,6 @@ import { useSWRConfig } from 'swr';
 
 import { Card, Form, FormButtons, FormContainer, Modal } from '../../elements';
 import { localizationKeys } from '../../localization';
-import type { ThemableCssProp } from '../../styledSystem';
 import { useFormControl } from '../../utils';
 
 type RevokeAPIKeyConfirmationModalProps = {
@@ -49,26 +48,29 @@ export const RevokeAPIKeyConfirmationModal = ({
     return null;
   }
 
-  const innerDialogStyle: ThemableCssProp = {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'inherit',
-    backdropFilter: 'blur(8px)',
-    display: 'flex',
-    justifyContent: 'center',
-    minHeight: '100%',
-    height: '100%',
-    width: '100%',
-  };
-
   return (
     <Modal
       handleOpen={onOpen}
       handleClose={onClose}
       canCloseModal={false}
       portalRoot={modalRoot}
-      containerSx={[{ alignItems: 'center' }, modalRoot ? innerDialogStyle : {}]}
+      containerSx={[
+        { alignItems: 'center' },
+        modalRoot
+          ? t => ({
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'inherit',
+              backdropFilter: `blur(${t.sizes.$2})`,
+              display: 'flex',
+              justifyContent: 'center',
+              minHeight: '100%',
+              height: '100%',
+              width: '100%',
+            })
+          : {},
+      ]}
     >
       <Card.Root role='alertdialog'>
         <Card.Content
