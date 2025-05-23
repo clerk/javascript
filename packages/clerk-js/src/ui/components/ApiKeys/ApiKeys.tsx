@@ -158,7 +158,7 @@ const _APIKeys = () => {
   const subject = organization?.id ?? user?.id ?? '';
 
   return (
-    <Flow.Root flow='apiKey'>
+    <Flow.Root flow='apiKeys'>
       <APIKeysPage
         subject={subject}
         perPage={ctx.perPage}
