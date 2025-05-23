@@ -117,9 +117,12 @@ export const CheckoutComplete = ({
           ref={checkoutSuccessRootRef}
           onMouseMove={handleMouseMove}
         >
-          <svg
+          <Box
+            elementDescriptor={descriptors.checkoutSuccessRings}
+            as='svg'
+            // @ts-ignore - viewBox is a valid prop for svg
             viewBox='0 0 512 512'
-            style={{
+            sx={{
               position: 'absolute',
               inset: 0,
               pointerEvents: 'none',
@@ -185,7 +188,7 @@ export const CheckoutComplete = ({
                 />
               )}
             </g>
-          </svg>
+          </Box>
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
