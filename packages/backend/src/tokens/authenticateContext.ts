@@ -25,6 +25,7 @@ interface AuthenticateContext extends AuthenticateRequestOptions {
   clientUat: number;
   // handshake-related values
   devBrowserToken: string | undefined;
+  handshakeFormat: 'nonce' | 'token' | undefined;
   handshakeNonce: string | undefined;
   handshakeToken: string | undefined;
   handshakeRedirectLoopCounter: number;

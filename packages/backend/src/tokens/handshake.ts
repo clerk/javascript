@@ -1,4 +1,4 @@
-import { constants, SUPPORTED_BAPI_VERSION } from '../constants';
+import { constants, SUPPORTED_BAPI_VERSION, SUPPORTED_HANDSHAKE_FORMAT } from '../constants';
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
 import { assertHeaderAlgorithm, assertHeaderType } from '../jwt/assertions';
@@ -143,6 +143,11 @@ export class HandshakeService {
       this.authenticateContext.usesSuffixedCookies().toString(),
     );
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
+    /**
+     * Appends the supported handshake format parameter to the URL
+     * This parameter indicates the format of the handshake response that the client expects
+     */
+    url.searchParams.append(constants.QueryParameters.HandshakeFormat, SUPPORTED_HANDSHAKE_FORMAT);
 
     if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);
