@@ -1,15 +1,23 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants } from '@clerk/backend/internal';
+import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { PendingSessionOptions } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
-import { getAuthDataFromRequest } from './data/getAuthDataFromRequest';
+import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
+import {
+  getAuthDataFromRequestAsync as getAuthDataFromRequestAsyncOriginal,
+  getAuthDataFromRequestSync as getAuthDataFromRequestSyncOriginal,
+} from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
 import { detectClerkMiddleware, getHeader } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus } from './utils';
+
+export type GetAuthOptions = {
+  acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
+} & PendingSessionOptions;
 
 /**
  * The async variant of our old `createGetAuth` allows for asynchronous code inside its callback.
@@ -23,7 +31,7 @@ export const createAsyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return async (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): Promise<AuthObject> => {
+    return async (req: RequestLike, opts?: { secretKey?: string } & GetAuthOptions): Promise<AuthObject> => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
@@ -46,7 +54,11 @@ export const createAsyncGetAuth = ({
         assertAuthStatus(req, noAuthStatusMessage);
       }
 
-      return getAuthDataFromRequest(req, { ...opts, logger });
+      const getAuthDataFromRequestAsync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestAsyncOriginal(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
+      };
+
+      return getAuthDataFromRequestAsync(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
     };
   });
 
@@ -63,13 +75,21 @@ export const createSyncGetAuth = ({
   noAuthStatusMessage: string;
 }) =>
   withLogger(debugLoggerName, logger => {
-    return (req: RequestLike, opts?: { secretKey?: string } & PendingSessionOptions): AuthObject => {
+    return (
+      req: RequestLike,
+      opts?: { secretKey?: string } & GetAuthOptions,
+    ): SignedInAuthObject | SignedOutAuthObject => {
       if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
         logger.enable();
       }
 
       assertAuthStatus(req, noAuthStatusMessage);
-      return getAuthDataFromRequest(req, { ...opts, logger });
+
+      const getAuthDataFromRequestSync = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
+        return getAuthDataFromRequestSyncOriginal(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
+      };
+
+      return getAuthDataFromRequestSync(req, { ...opts, logger, acceptsToken: opts?.acceptsToken });
     };
   });
 

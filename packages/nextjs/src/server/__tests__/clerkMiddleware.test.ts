@@ -1,6 +1,6 @@
 // There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
-import { AuthStatus, constants } from '@clerk/backend/internal';
+import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 // used to assert the mock
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
@@ -17,6 +17,7 @@ vi.mock('../clerkClient');
 const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 const authenticateRequestMock = vi.fn().mockResolvedValue({
   toAuth: () => ({
+    tokenType: TokenType.SessionToken,
     debug: (d: any) => d,
   }),
   headers: new Headers(),
@@ -104,6 +105,13 @@ describe('ClerkMiddleware type tests', () => {
       const { getToken } = await auth();
       await getToken();
       request.cookies.clear();
+    });
+  });
+
+  it('can be used with a handler that expects a token type', () => {
+    clerkMiddlewareMock(async auth => {
+      const { getToken } = await auth({ acceptsToken: TokenType.ApiKey });
+      await getToken();
     });
   });
 
@@ -391,6 +399,7 @@ describe('clerkMiddleware(params)', () => {
       vi.mocked(clerkClient).mockResolvedValue({
         authenticateRequest: vi.fn().mockResolvedValue({
           toAuth: () => ({
+            tokenType: TokenType.SessionToken,
             debug: (d: any) => d,
           }),
           headers: new Headers(),
@@ -429,7 +438,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -452,7 +461,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
-        toAuth: () => ({ userId: 'user-id' }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id' }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -461,6 +470,31 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('does not throw when protect is called and the request is authenticated with a machine token', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: TokenType.ApiKey });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect(resp?.headers.get('WWW-Authenticate')).toBeFalsy();
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -475,7 +509,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -484,6 +518,62 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws an unauthorized error when protect is called and the machine auth token is invalid', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({
+          tokenType: TokenType.ApiKey,
+          id: null,
+        }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: TokenType.ApiKey });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('WWW-Authenticate')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws an unauthorized error with WWW-Authenticate header when protect is called and the oauth token is invalid', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer oauth_token_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({
+          tokenType: TokenType.OAuthToken,
+          id: null,
+        }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: TokenType.ApiKey });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect(resp?.headers.get('WWW-Authenticate')).toBe(
+        'Bearer resource_metadata="https://clerk.included.katydid-92.lcl.dev/.well-known/oauth-protected-resource"',
+      );
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
 
@@ -498,7 +588,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
-        toAuth: () => ({ userId: 'user-id', has: () => false }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: () => false }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -521,7 +611,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -545,7 +635,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
-        toAuth: () => ({ userId: 'user-id', has: () => false }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'user-id', has: () => false }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -563,6 +653,76 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect((await clerkClient()).authenticateRequest).toBeCalled();
     });
+
+    it('throws an unauthorized error when protect is called with mismatching token types', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer m2m_xxxxxxxxxxxxxxxxxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.MachineToken, id: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: TokenType.ApiKey });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('does not throw when protect is called with array of token types and request matches one', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedIn,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.ApiKey, id: 'api_key_xxxxxxxxxxxxxxxxxx' }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: [TokenType.SessionToken, TokenType.ApiKey] });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(200);
+      expect(resp?.headers.get('location')).toBeFalsy();
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    it('throws a not found error when protect is called with array of token types and request does not match any', async () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: 'Bearer api_key_xxx',
+        }),
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers(),
+        toAuth: () => ({ tokenType: TokenType.ApiKey, id: null }),
+      });
+
+      const resp = await clerkMiddleware(async auth => {
+        await auth.protect({ token: [TokenType.SessionToken, TokenType.MachineToken] });
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(401);
+      expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
   });
 
   describe('auth().redirectToSignIn()', () => {
@@ -577,7 +737,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -603,7 +763,7 @@ describe('clerkMiddleware(params)', () => {
           'Set-Cookie': 'session=;',
           'X-Clerk-Auth': '1',
         }),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -628,7 +788,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: null }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -655,7 +815,7 @@ describe('clerkMiddleware(params)', () => {
         publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
-        toAuth: () => ({ userId: 'userId', has: () => false }),
+        toAuth: () => ({ tokenType: TokenType.SessionToken, userId: 'userId', has: () => false }),
       });
 
       const resp = await clerkMiddleware(async auth => {
@@ -714,7 +874,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
       publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
-      toAuth: () => ({ userId: null }),
+      toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
     });
 
     const resp = await clerkMiddleware(async auth => {
@@ -739,7 +899,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
       publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
-      toAuth: () => ({ userId: null }),
+      toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
     });
 
     const resp = await clerkMiddleware(async auth => {
@@ -764,7 +924,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
       publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
-      toAuth: () => ({ userId: null }),
+      toAuth: () => ({ tokenType: TokenType.SessionToken, userId: null }),
     });
 
     const resp = await clerkMiddleware(() => {

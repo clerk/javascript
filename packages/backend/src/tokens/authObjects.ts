@@ -9,12 +9,17 @@ import type {
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
-import type { CreateBackendApiOptions } from '../api';
+import type { APIKey, CreateBackendApiOptions, MachineToken } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
+import type { MachineAuthType } from './types';
 
 type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
+
+type Claims = Record<string, any>;
 
 /**
  * @internal
@@ -27,6 +32,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  tokenType: SessionTokenType;
   getToken: ServerGetToken;
   has: CheckAuthorizationFromSessionClaims;
   debug: AuthObjectDebug;
@@ -40,6 +46,7 @@ export type SignedOutAuthObject = {
   sessionId: null;
   sessionStatus: SessionStatusClaim | null;
   actor: null;
+  tokenType: SessionTokenType;
   userId: null;
   orgId: null;
   orgRole: null;
@@ -57,9 +64,59 @@ export type SignedOutAuthObject = {
 };
 
 /**
+ * Extended properties specific to each machine token type.
+ * While all machine token types share common properties (id, name, subject, etc),
+ * this type defines the additional properties that are unique to each token type.
+ *
+ * @example
+ * api_key & machine_token: adds `claims` property
+ * oauth_token: adds no additional properties (empty object)
+ *
+ * @template TAuthenticated - Whether the machine object is authenticated or not
+ */
+type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
+  api_key: {
+    name: TAuthenticated extends true ? string : null;
+    claims: TAuthenticated extends true ? Claims | null : null;
+  };
+  machine_token: {
+    name: TAuthenticated extends true ? string : null;
+    claims: TAuthenticated extends true ? Claims | null : null;
+  };
+  oauth_token: object;
+};
+
+/**
  * @internal
  */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
+export type AuthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
+  id: string;
+  subject: string;
+  scopes: string[];
+  getToken: () => Promise<string>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+  tokenType: T;
+} & MachineObjectExtendedProperties<true>[T];
+
+/**
+ * @internal
+ */
+export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTokenType> = {
+  id: null;
+  subject: null;
+  scopes: null;
+  getToken: () => Promise<null>;
+  has: CheckAuthorizationFromSessionClaims;
+  debug: AuthObjectDebug;
+  tokenType: T;
+} & MachineObjectExtendedProperties<false>[T];
+
+export type AuthObject =
+  | SignedInAuthObject
+  | SignedOutAuthObject
+  | AuthenticatedMachineObject
+  | UnauthenticatedMachineObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
@@ -87,6 +144,7 @@ export function signedInAuthObject(
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
   return {
+    tokenType: TokenType.SessionToken,
     actor,
     sessionClaims,
     sessionId,
@@ -119,6 +177,7 @@ export function signedOutAuthObject(
   initialSessionStatus?: SessionStatusClaim,
 ): SignedOutAuthObject {
   return {
+    tokenType: TokenType.SessionToken,
     sessionClaims: null,
     sessionId: null,
     sessionStatus: initialSessionStatus ?? null,
@@ -133,6 +192,104 @@ export function signedOutAuthObject(
     has: () => false,
     debug: createDebug(debugData),
   };
+}
+
+/**
+ * @internal
+ */
+export function authenticatedMachineObject<T extends MachineTokenType>(
+  tokenType: T,
+  token: string,
+  verificationResult: MachineAuthType,
+  debugData?: AuthObjectDebugData,
+): AuthenticatedMachineObject<T> {
+  const baseObject = {
+    id: verificationResult.id,
+    subject: verificationResult.subject,
+    getToken: () => Promise.resolve(token),
+    has: () => false,
+    debug: createDebug(debugData),
+  };
+
+  // Type assertions are safe here since we know the verification result type matches the tokenType.
+  // We need these assertions because TS can't infer the specific type
+  // just from the tokenType discriminator.
+
+  switch (tokenType) {
+    case TokenType.ApiKey: {
+      const result = verificationResult as APIKey;
+      return {
+        ...baseObject,
+        tokenType,
+        name: result.name,
+        claims: result.claims,
+        scopes: result.scopes,
+      };
+    }
+    case TokenType.MachineToken: {
+      const result = verificationResult as MachineToken;
+      return {
+        ...baseObject,
+        tokenType,
+        name: result.name,
+        claims: result.claims,
+        scopes: result.scopes,
+      };
+    }
+    case TokenType.OAuthToken: {
+      return {
+        ...baseObject,
+        tokenType,
+        scopes: verificationResult.scopes,
+      } as AuthenticatedMachineObject<T>;
+    }
+    default:
+      throw new Error(`Invalid token type: ${tokenType}`);
+  }
+}
+
+/**
+ * @internal
+ */
+export function unauthenticatedMachineObject<T extends MachineTokenType>(
+  tokenType: T,
+  debugData?: AuthObjectDebugData,
+): UnauthenticatedMachineObject<T> {
+  const baseObject = {
+    id: null,
+    subject: null,
+    scopes: null,
+    has: () => false,
+    getToken: () => Promise.resolve(null),
+    debug: createDebug(debugData),
+  };
+
+  switch (tokenType) {
+    case TokenType.ApiKey: {
+      return {
+        ...baseObject,
+        tokenType,
+        name: null,
+        claims: null,
+      };
+    }
+    case TokenType.MachineToken: {
+      return {
+        ...baseObject,
+        tokenType,
+        name: null,
+        claims: null,
+      };
+    }
+    case TokenType.OAuthToken: {
+      return {
+        ...baseObject,
+        tokenType,
+      } as UnauthenticatedMachineObject<T>;
+    }
+    default:
+      throw new Error(`Invalid token type: ${tokenType}`);
+  }
 }
 
 /**

@@ -22,6 +22,8 @@ describe('subpath /errors exports', () => {
   it('should not include a breaking change', () => {
     expect(Object.keys(errorExports).sort()).toMatchInlineSnapshot(`
       [
+        "MachineTokenVerificationError",
+        "MachineTokenVerificationErrorCode",
         "SignJWTError",
         "TokenVerificationError",
         "TokenVerificationErrorAction",
@@ -37,18 +39,25 @@ describe('subpath /internal exports', () => {
     expect(Object.keys(internalExports).sort()).toMatchInlineSnapshot(`
       [
         "AuthStatus",
+        "TokenType",
+        "authenticatedMachineObject",
         "constants",
         "createAuthenticateRequest",
         "createClerkRequest",
         "createRedirect",
         "debugRequestState",
         "decorateObjectWithResources",
+        "getMachineTokenType",
+        "isMachineToken",
+        "isTokenTypeAccepted",
         "makeAuthObjectSerializable",
         "reverificationError",
         "reverificationErrorResponse",
         "signedInAuthObject",
         "signedOutAuthObject",
         "stripPrivateDataFromObject",
+        "unauthenticatedMachineObject",
+        "verifyMachineAuthToken",
       ]
     `);
   });
