@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.33.1
+
+### Patch Changes
+
+- Add missing request params to `getOrganizationMembershipList` ([#5987](https://github.com/clerk/javascript/pull/5987)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+  - @clerk/shared@3.9.4
+
 ## 1.33.0
 
 ### Minor Changes

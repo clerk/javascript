@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.59.2
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.59.1
 
 ### Patch Changes
