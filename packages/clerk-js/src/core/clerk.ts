@@ -2434,6 +2434,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
+      // In multi-session apps, it's possible that different tabs will have different active sessions. It's critical that the tab's active session is touched in this case so the session is properly updated on the backend, and so we avoid any throttling when multi-session mode is enabled.
       const multisessionMode = this.environment && !this.environment.authConfig.singleSessionMode;
       if (!multisessionMode && this.#touchThrottledUntil > Date.now()) {
         return;
