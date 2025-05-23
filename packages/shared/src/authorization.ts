@@ -75,8 +75,7 @@ const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 /**
  * Checks if a user has the required organization-level authorization.
  * Verifies if the user has the specified role or permission within their organization.
- *
- * @returns Null, if unable to determine due to missing data or unspecified role/permission.
+ * @returns null, if unable to determine due to missing data or unspecified role/permission.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;
