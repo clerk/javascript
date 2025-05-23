@@ -1,6 +1,8 @@
 import type { LoadedClerk, SignUpResource } from '@clerk/types';
+
 import { handleCombinedFlowTransfer, hasOptionalFields } from '../handleCombinedFlowTransfer';
 
+// eslint-disable-next-line no-var -- Jest hoists mock calls to the top of the file, so var is needed.
 var mockCompleteSignUpFlow: jest.Mock;
 jest.mock('../lazy-sign-up', () => {
   mockCompleteSignUpFlow = jest.fn();
