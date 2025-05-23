@@ -1094,10 +1094,6 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      if (this.session?.lastActiveToken) {
-        eventBus.emit(events.TokenUpdate, { token: this.session.lastActiveToken });
-      }
-
       /**
        * Hint to each framework, that the user will be signed out when `{session: null}` is provided.
        */
