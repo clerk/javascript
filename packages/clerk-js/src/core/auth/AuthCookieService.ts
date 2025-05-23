@@ -40,7 +40,7 @@ export class AuthCookieService {
   private poller: SessionCookiePoller | null = null;
   private clientUat: ClientUatCookieHandler;
   private sessionCookie: SessionCookieHandler;
-  private activeOrgCookie: ReturnType<typeof createCookieHandler>;
+  private activeCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
 
   public static async create(
@@ -73,7 +73,7 @@ export class AuthCookieService {
 
     this.clientUat = createClientUatCookie(cookieSuffix);
     this.sessionCookie = createSessionCookie(cookieSuffix);
-    this.activeOrgCookie = createCookieHandler('clerk_active_org');
+    this.activeCookie = createCookieHandler('clerk_active_context');
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
@@ -82,6 +82,10 @@ export class AuthCookieService {
   }
 
   public async setup() {
+    // Cleanup old cookie
+    // TODO: This should be removed after 2025-08-01
+    createCookieHandler('clerk_active_org').remove();
+
     if (this.instanceType === 'production') {
       return this.setupProduction();
     } else {
@@ -166,13 +170,12 @@ export class AuthCookieService {
   }
 
   private updateSessionCookie(token: string | null) {
-    // only update session cookie from the active tab,
-    // or if the tab's selected organization matches the session's active organization
-    if (!document.hasFocus() && !this.isCurrentOrganizationActive()) {
+    // Only allow background tabs to update if both session and organization match
+    if (!document.hasFocus() && !this.isCurrentContextActive()) {
       return;
     }
 
-    this.setActiveOrganizationInStorage();
+    this.setActiveContextInStorage();
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
@@ -210,29 +213,35 @@ export class AuthCookieService {
   }
 
   /**
-   * The below methods are used to determine whether or not an unfocused tab can be responsible
-   * for setting the session cookie. A session cookie should only be set by a tab who's selected
-   * organization matches the session's active organization. By storing the active organization
-   * ID in a cookie, we can check the value across tabs. If a tab's organization ID does not
-   * match the value in the active org cookie, it is not responsible for updating the session cookie.
+   * The below methods handle active context tracking (session and organization) to ensure
+   * only tabs with matching context can update the session cookie.
+   * The format of the cookie value is "<session id>:<org id>" where either part can be empty.
    */
 
-  public setActiveOrganizationInStorage() {
-    if (this.clerk.organization?.id) {
-      this.activeOrgCookie.set(this.clerk.organization.id);
+  public setActiveContextInStorage() {
+    const sessionId = this.clerk.session?.id || '';
+    const orgId = this.clerk.organization?.id || '';
+    const contextValue = `${sessionId}:${orgId}`;
+
+    if (contextValue !== ':') {
+      this.activeCookie.set(contextValue);
     } else {
-      this.activeOrgCookie.remove();
+      this.activeCookie.remove();
     }
   }
 
-  private isCurrentOrganizationActive() {
-    const activeOrganizationId = this.activeOrgCookie.get();
-
-    if (!activeOrganizationId && !this.clerk.organization?.id) {
+  private isCurrentContextActive() {
+    const activeContext = this.activeCookie.get();
+    if (!activeContext) {
+      // we should always have an active context, so return true if there isn't one and treat the current context as active
       return true;
     }
 
-    return this.clerk.organization?.id === activeOrganizationId;
+    const [activeSessionId, activeOrgId] = activeContext.split(':');
+    const currentSessionId = this.clerk.session?.id || '';
+    const currentOrgId = this.clerk.organization?.id || '';
+
+    return activeSessionId === currentSessionId && activeOrgId === currentOrgId;
   }
 
   public getSessionCookie() {
