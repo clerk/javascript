@@ -23,7 +23,8 @@ export type FieldId =
   | 'deleteExistingInvitationsSuggestions'
   | 'legalAccepted'
   | 'description'
-  | 'expirationDate';
+  | 'expirationDate'
+  | 'revokeConfirmation';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

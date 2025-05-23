@@ -22,6 +22,11 @@ export const caES: LocalizationResource = {
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'Enrere',
   badge__activePlan: undefined,

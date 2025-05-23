@@ -22,6 +22,11 @@ export const csCZ: LocalizationResource = {
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'Zpět',
   badge__activePlan: undefined,

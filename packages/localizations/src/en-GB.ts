@@ -22,6 +22,11 @@ export const enGB: LocalizationResource = {
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'Back',
   badge__activePlan: undefined,

@@ -22,6 +22,11 @@ export const zhTW: LocalizationResource = {
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: '返回',
   badge__activePlan: undefined,

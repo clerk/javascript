@@ -1,6 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateApiKeyParams } from '@clerk/types';
+import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext } from '../../contexts';
@@ -13,7 +14,19 @@ import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 import { useApiKeys } from './useApiKeys';
 
-export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: number }) => {
+type APIKeysPageProps = {
+  subject: string;
+  perPage?: number;
+  revokeModalRoot?: React.MutableRefObject<HTMLElement | null>;
+};
+
+const RevokeAPIKeyConfirmationModal = lazy(() =>
+  import(/* webpackChunkName: "revoke-api-key-modal"*/ './RevokeAPIKeyConfirmationModal').then(module => ({
+    default: module.RevokeAPIKeyConfirmationModal,
+  })),
+);
+
+export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
   const {
     apiKeys,
     isLoading,
@@ -25,7 +38,6 @@ export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: n
     itemCount,
     startingRow,
     endingRow,
-    mutate: mutateApiKeys,
     cacheKey,
   } = useApiKeys({ subject, perPage });
   const card = useCardState();
@@ -34,12 +46,9 @@ export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: n
   );
   const { t } = useLocalizations();
   const clerk = useClerk();
-
-  const handleRevokeApiKey = async (id: string) => {
-    await clerk.revokeApiKey({ apiKeyID: id });
-    void mutateApiKeys();
-    setPage(1);
-  };
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+  const [selectedApiKeyId, setSelectedApiKeyId] = useState<string>('');
+  const [selectedApiKeyName, setSelectedApiKeyName] = useState<string>('');
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
@@ -53,6 +62,12 @@ export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: n
         }
       }
     }
+  };
+
+  const handleRevoke = (apiKeyId: string, apiKeyName: string) => {
+    setSelectedApiKeyId(apiKeyId);
+    setSelectedApiKeyName(apiKeyName);
+    setIsRevokeModalOpen(true);
   };
 
   return (
@@ -97,7 +112,7 @@ export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: n
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}
-        onRevoke={handleRevokeApiKey}
+        onRevoke={handleRevoke}
       />
       {itemCount > 5 && (
         <Pagination
@@ -108,6 +123,18 @@ export const APIKeysPage = ({ subject, perPage }: { subject: string; perPage?: n
           rowInfo={{ allRowsCount: itemCount, startingRow, endingRow }}
         />
       )}
+      <RevokeAPIKeyConfirmationModal
+        isOpen={isRevokeModalOpen}
+        onOpen={() => setIsRevokeModalOpen(true)}
+        onClose={() => {
+          setSelectedApiKeyId('');
+          setSelectedApiKeyName('');
+          setIsRevokeModalOpen(false);
+        }}
+        apiKeyId={selectedApiKeyId}
+        apiKeyName={selectedApiKeyName}
+        modalRoot={revokeModalRoot}
+      />
     </Col>
   );
 };

@@ -10,6 +10,11 @@ export const enUS: LocalizationResource = {
     formHint: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
     formTitle: 'Add new API key',
     menuAction__revoke: 'Revoke key',
+    revokeConfirmation: {
+      formButtonPrimary__revoke: 'Revoke key',
+      formHint: 'Are you sure you want to delete this Secret key?',
+      formTitle: 'Revoke "{{apiKeyName}}" secret key?',
+    },
   },
   backButton: 'Back',
   badge__activePlan: 'Active',

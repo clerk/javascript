@@ -22,6 +22,11 @@ export const skSK: LocalizationResource = {
     formHint: undefined,
     formTitle: undefined,
     menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
   },
   backButton: 'Späť',
   badge__activePlan: undefined,

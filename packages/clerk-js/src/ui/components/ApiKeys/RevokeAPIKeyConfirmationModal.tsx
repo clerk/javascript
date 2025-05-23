@@ -1,0 +1,100 @@
+import { useClerk } from '@clerk/shared/react';
+import { useSWRConfig } from 'swr';
+
+import { Card, Form, FormButtons, FormContainer, Modal } from '../../elements';
+import { localizationKeys } from '../../localization';
+import type { ThemableCssProp } from '../../styledSystem';
+import { useFormControl } from '../../utils';
+
+type RevokeAPIKeyConfirmationModalProps = {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  apiKeyId?: string;
+  apiKeyName?: string;
+  modalRoot?: React.MutableRefObject<HTMLElement | null>;
+};
+
+export const RevokeAPIKeyConfirmationModal = ({
+  isOpen,
+  onOpen,
+  onClose,
+  apiKeyId,
+  apiKeyName,
+  modalRoot,
+}: RevokeAPIKeyConfirmationModalProps) => {
+  const clerk = useClerk();
+  const { mutate } = useSWRConfig();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apiKeyId) return;
+
+    await clerk.revokeApiKey({ apiKeyID: apiKeyId });
+    void mutate({ key: 'api-keys', subject: clerk.organization?.id ?? clerk.session?.user.id });
+    onClose();
+  };
+
+  const revokeField = useFormControl('revokeConfirmation', '', {
+    type: 'text',
+    label: `Type "Revoke" to confirm`,
+    placeholder: 'Revoke',
+    isRequired: true,
+  });
+
+  // TODO: Maybe use secret key name for confirmation
+  const canSubmit = revokeField.value === 'Revoke';
+
+  if (!isOpen) {
+    return null;
+  }
+
+  const innerDialogStyle: ThemableCssProp = {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'inherit',
+    backdropFilter: 'blur(8px)',
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: '100%',
+    height: '100%',
+    width: '100%',
+  };
+
+  return (
+    <Modal
+      handleOpen={onOpen}
+      handleClose={onClose}
+      canCloseModal={false}
+      portalRoot={modalRoot}
+      containerSx={[{ alignItems: 'center' }, modalRoot ? innerDialogStyle : {}]}
+    >
+      <Card.Root role='alertdialog'>
+        <Card.Content
+          sx={t => ({
+            textAlign: 'left',
+            padding: `${t.sizes.$4} ${t.sizes.$5} ${t.sizes.$4} ${t.sizes.$6}`,
+          })}
+        >
+          <FormContainer
+            headerTitle={localizationKeys('apiKeys.revokeConfirmation.formTitle', { apiKeyName })}
+            headerSubtitle={localizationKeys('apiKeys.revokeConfirmation.formHint')}
+          >
+            <Form.Root onSubmit={handleSubmit}>
+              <Form.ControlRow elementId={revokeField.id}>
+                <Form.PlainInput {...revokeField.props} />
+              </Form.ControlRow>
+              <FormButtons
+                submitLabel={localizationKeys('apiKeys.revokeConfirmation.formButtonPrimary__revoke')}
+                colorScheme='danger'
+                isDisabled={!canSubmit}
+                onReset={onClose}
+              />
+            </Form.Root>
+          </FormContainer>
+        </Card.Content>
+      </Card.Root>
+    </Modal>
+  );
+};

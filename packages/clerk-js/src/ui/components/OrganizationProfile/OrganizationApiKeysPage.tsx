@@ -2,11 +2,12 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { ApiKeysContext } from '../../contexts';
 import { Col, localizationKeys } from '../../customizables';
-import { Header } from '../../elements';
+import { Header, useUnsafeNavbarContext } from '../../elements';
 import { APIKeysPage } from '../ApiKeys';
 
 export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
+  const { contentRef } = useUnsafeNavbarContext();
 
   return (
     <Col gap={4}>
@@ -17,7 +18,10 @@ export const OrganizationAPIKeysPage = () => {
         />
       </Header.Root>
       <ApiKeysContext.Provider value={{ componentName: 'APIKeys' }}>
-        <APIKeysPage subject={organization?.id ?? ''} />
+        <APIKeysPage
+          subject={organization?.id ?? ''}
+          revokeModalRoot={contentRef}
+        />
       </ApiKeysContext.Provider>
     </Col>
   );

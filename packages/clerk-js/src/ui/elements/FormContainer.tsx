@@ -38,14 +38,16 @@ export const FormContainer = (props: PageProps) => {
         <Header.Root>
           {headerTitle && (
             <Header.Title
-              localizationKey={headerTitle}
               textVariant={headerTitleTextVariant}
+              {...(typeof headerTitle === 'string' ? { children: headerTitle } : { localizationKey: headerTitle })}
             />
           )}
           {headerSubtitle && (
             <Header.Subtitle
-              localizationKey={headerSubtitle}
               variant={headerSubtitleTextVariant}
+              {...(typeof headerSubtitle === 'string'
+                ? { children: headerSubtitle }
+                : { localizationKey: headerSubtitle })}
             />
           )}
         </Header.Root>
