@@ -1659,10 +1659,22 @@ type PortalRoot = HTMLElement | null | undefined;
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
 export type ApiKeysProps = {
+  /**
+   * The type of API key to filter by.
+   * Currently, only 'api_key' is supported.
+   * @default 'api_key'
+   */
   type?: 'api_key';
-  subject?: string;
+  /**
+   * The number of API keys to show per page.
+   * @default 5
+   */
   perPage?: number;
-  showSecretByDefault?: boolean;
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
   appearance?: ApiKeysTheme;
 };
 

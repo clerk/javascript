@@ -6,9 +6,10 @@ import useSWRMutation from 'swr/mutation';
 
 import { useApiKeysContext } from '../../contexts';
 import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { Card, InputWithIcon, Pagination, useCardState, withCardStateProvider } from '../../elements';
+import { InputWithIcon, Pagination, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { MagnifyingGlass } from '../../icons';
+import { mqu } from '../../styledSystem';
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
@@ -47,8 +48,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const { t } = useLocalizations();
   const clerk = useClerk();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
-  const [selectedApiKeyId, setSelectedApiKeyId] = useState<string>('');
-  const [selectedApiKeyName, setSelectedApiKeyName] = useState<string>('');
+  const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
+  const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
@@ -71,11 +72,21 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   };
 
   return (
-    <Col gap={4}>
+    <Col
+      gap={4}
+      sx={{ width: '100%' }}
+    >
       <Action.Root>
         <Flex
           justify='between'
           align='center'
+          gap={4}
+          sx={{
+            [mqu.sm]: {
+              flexDirection: 'column',
+              alignItems: 'stretch',
+            },
+          }}
         >
           <Box>
             <InputWithIcon
@@ -144,23 +155,14 @@ export const APIKeys = withCardStateProvider(() => {
   const { user } = useUser();
   const { organization } = useOrganization();
 
+  const subject = organization?.id ?? user?.id ?? '';
+
   return (
     <Flow.Root flow='apiKey'>
-      <Card.Root
-        sx={[
-          t => ({
-            width: t.sizes.$220,
-          }),
-        ]}
-      >
-        <Card.Content sx={{ textAlign: 'left' }}>
-          <APIKeysPage
-            subject={ctx.subject ?? organization?.id ?? user?.id ?? ''}
-            perPage={ctx.perPage}
-          />
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
+      <APIKeysPage
+        subject={subject}
+        perPage={ctx.perPage}
+      />
     </Flow.Root>
   );
 });

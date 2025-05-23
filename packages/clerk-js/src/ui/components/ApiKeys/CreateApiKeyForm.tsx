@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { mqu } from '../../styledSystem';
 import { useFormControl } from '../../utils';
 
 export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
@@ -103,52 +104,85 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             <Form.ControlRow elementId={descriptionField.id}>
               <Form.PlainInput {...descriptionField.props} />
             </Form.ControlRow>
-            <Col gap={2}>
-              <FormLabel htmlFor={segmentedControlId}>
-                <Text
-                  as='span'
-                  variant='subtitle'
-                  localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
-                />
-              </FormLabel>
-              <SegmentedControl.Root
-                aria-labelledby={segmentedControlId}
-                value={expiration}
-                onChange={value => setExpiration(value as Expiration)}
-                fullWidth
+            <Flex
+              gap={4}
+              sx={{
+                width: '100%',
+                [mqu.sm]: {
+                  flexDirection: 'column',
+                },
+              }}
+            >
+              <Col
+                gap={2}
+                sx={{
+                  width: '70%',
+                  [mqu.sm]: {
+                    width: '100%',
+                  },
+                }}
               >
-                <SegmentedControl.Button
-                  value='never'
-                  text='Never'
-                />
-                <SegmentedControl.Button
-                  value='30d'
-                  text='30 days'
-                />
-                <SegmentedControl.Button
-                  value='90d'
-                  text='90 days'
-                />
-                <SegmentedControl.Button
-                  value='custom'
-                  text='Custom'
-                />
-              </SegmentedControl.Root>
-            </Col>
-            {expiration === 'custom' && (
-              <Form.ControlRow elementId={expirationDateField.id}>
-                <Form.PlainInput
-                  type='date'
-                  {...expirationDateField.props}
-                  min={getMinDate()}
-                />
-              </Form.ControlRow>
-            )}
+                <FormLabel htmlFor={segmentedControlId}>
+                  <Text
+                    as='span'
+                    variant='subtitle'
+                    localizationKey={localizationKeys('formFieldLabel__apiKeyExpiration')}
+                  />
+                </FormLabel>
+                <SegmentedControl.Root
+                  aria-labelledby={segmentedControlId}
+                  value={expiration}
+                  onChange={value => setExpiration(value as Expiration)}
+                  fullWidth
+                >
+                  <SegmentedControl.Button
+                    value='never'
+                    text='Never'
+                  />
+                  <SegmentedControl.Button
+                    value='30d'
+                    text='30 days'
+                  />
+                  <SegmentedControl.Button
+                    value='90d'
+                    text='90 days'
+                  />
+                  <SegmentedControl.Button
+                    value='custom'
+                    text='Custom'
+                  />
+                </SegmentedControl.Root>
+              </Col>
+              {expiration === 'custom' && (
+                <Form.ControlRow
+                  elementId={expirationDateField.id}
+                  sx={{
+                    width: '30%',
+                    [mqu.sm]: {
+                      width: '100%',
+                    },
+                  }}
+                >
+                  <Form.PlainInput
+                    type='date'
+                    {...expirationDateField.props}
+                    min={getMinDate()}
+                  />
+                </Form.ControlRow>
+              )}
+            </Flex>
           </>
         )}
         <Flex
           justify='between'
           align='center'
+          gap={4}
+          sx={{
+            [mqu.sm]: {
+              flexDirection: 'column',
+              alignItems: 'stretch',
+            },
+          }}
         >
           <Button
             variant='outline'
