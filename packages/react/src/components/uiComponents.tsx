@@ -1,6 +1,6 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
-  ApiKeysProps,
+  APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -602,8 +602,12 @@ export const PricingTable = withClerk(
   { component: 'PricingTable', renderWhileLoading: true },
 );
 
+/**
+ * @experimental
+ * This component is in early access and may change in future releases.
+ */
 export const APIKeys = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<ApiKeysProps & FallbackProp>) => {
+  ({ clerk, component, fallback, ...props }: WithClerkProp<APIKeysProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 

@@ -1,6 +1,6 @@
-import type { ApiKeyResource } from './apiKey';
+import type { APIKeyResource } from './apiKey';
 import type {
-  ApiKeysTheme,
+  APIKeysTheme,
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
@@ -461,13 +461,19 @@ export interface Clerk {
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
    * Mount a api keys component at the target element.
-   * @param targetNode Target to mount the ApiKeys component.
+   * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
-  mountApiKeys: (targetNode: HTMLDivElement, props?: ApiKeysProps) => void;
+  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
    * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
@@ -756,24 +762,36 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
+   * @experimental
+   * EARLY ACCESS: This API is in early access and may change in future releases.
+   *
    * Retrieves all API keys for the current user or organization.
    */
-  getApiKeys: (params?: GetApiKeysParams) => Promise<ApiKeyResource[]>;
+  getApiKeys: (params?: GetAPIKeysParams) => Promise<APIKeyResource[]>;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
    * Retrieves the secret for a given API key ID.
    */
   getApiKeySecret: (apiKeyID: string) => Promise<string>;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
    * Creates a new API key.
    */
-  createApiKey: (params: CreateApiKeyParams) => Promise<ApiKeyResource>;
+  createApiKey: (params: CreateAPIKeyParams) => Promise<APIKeyResource>;
 
   /**
+   * @experimental
+   * This API is in early access and may change in future releases.
+   *
    * Revokes a given API key by ID.
    */
-  revokeApiKey: (params: RevokeApiKeyParams) => Promise<ApiKeyResource>;
+  revokeApiKey: (params: RevokeAPIKeyParams) => Promise<APIKeyResource>;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -1658,7 +1676,7 @@ type PortalRoot = HTMLElement | null | undefined;
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
-export type ApiKeysProps = {
+export type APIKeysProps = {
   /**
    * The type of API key to filter by.
    * Currently, only 'api_key' is supported.
@@ -1675,14 +1693,14 @@ export type ApiKeysProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: ApiKeysTheme;
+  appearance?: APIKeysTheme;
 };
 
-export type GetApiKeysParams = {
+export type GetAPIKeysParams = {
   subject?: string;
 };
 
-export type CreateApiKeyParams = {
+export type CreateAPIKeyParams = {
   type?: 'api_key';
   name: string;
   subject?: string;
@@ -1690,7 +1708,7 @@ export type CreateApiKeyParams = {
   description?: string;
 };
 
-export type RevokeApiKeyParams = {
+export type RevokeAPIKeyParams = {
   apiKeyID: string;
   revocationReason?: string;
 };

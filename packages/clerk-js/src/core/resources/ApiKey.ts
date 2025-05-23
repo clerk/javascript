@@ -1,15 +1,15 @@
 import type {
   ApiKeyJSON,
-  ApiKeyResource,
-  CreateApiKeyParams,
-  GetApiKeysParams,
-  RevokeApiKeyParams,
+  APIKeyResource,
+  CreateAPIKeyParams,
+  GetAPIKeysParams,
+  RevokeAPIKeyParams,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 
-export class ApiKey extends BaseResource implements ApiKeyResource {
+export class APIKey extends BaseResource implements APIKeyResource {
   pathRoot = '/api_keys';
 
   id!: string;
@@ -56,7 +56,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
     return this;
   }
 
-  static async getAll(params?: GetApiKeysParams): Promise<ApiKeyResource[]> {
+  static async getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]> {
     return this.clerk
       .getFapiClient()
       .request<{ api_keys: ApiKeyJSON[] }>({
@@ -73,7 +73,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
       })
       .then(res => {
         const apiKeysJSON = res.payload as unknown as { api_keys: ApiKeyJSON[] };
-        return apiKeysJSON.api_keys.map(json => new ApiKey(json));
+        return apiKeysJSON.api_keys.map(json => new APIKey(json));
       })
       .catch(() => []);
   }
@@ -97,7 +97,7 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
       .catch(() => '');
   }
 
-  static async create(params: CreateApiKeyParams): Promise<ApiKeyResource> {
+  static async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
     const json = (
       await BaseResource._fetch<ApiKeyJSON>({
         path: '/api_keys',
@@ -118,10 +118,10 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
       })
     )?.response as ApiKeyJSON;
 
-    return new ApiKey(json);
+    return new APIKey(json);
   }
 
-  static async revoke(params: RevokeApiKeyParams): Promise<ApiKeyResource> {
+  static async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
     const json = (
       await BaseResource._fetch<ApiKeyJSON>({
         path: `/api_keys/${params.apiKeyID}/revoke`,
@@ -138,6 +138,6 @@ export class ApiKey extends BaseResource implements ApiKeyResource {
       })
     )?.response as ApiKeyJSON;
 
-    return new ApiKey(json);
+    return new APIKey(json);
   }
 }

@@ -1,6 +1,6 @@
 import type { ClerkResource } from './resource';
 
-export interface ApiKeyResource extends ClerkResource {
+export interface APIKeyResource extends ClerkResource {
   id: string;
   type: string;
   name: string;

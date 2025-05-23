@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { ApiKeyResource } from '@clerk/types';
+import type { APIKeyResource } from '@clerk/types';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
@@ -108,7 +108,7 @@ export const ApiKeysTable = ({
   isLoading,
   onRevoke,
 }: {
-  rows: ApiKeyResource[];
+  rows: APIKeyResource[];
   isLoading: boolean;
   onRevoke: (id: string, name: string) => void;
 }) => {

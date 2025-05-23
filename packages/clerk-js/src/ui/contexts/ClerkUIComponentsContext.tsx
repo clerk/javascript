@@ -1,4 +1,4 @@
-import type { ApiKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { APIKeysProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
@@ -91,7 +91,7 @@ export function ComponentContextProvider({
       );
     case 'APIKeys':
       return (
-        <ApiKeysContext.Provider value={{ componentName, ...(props as ApiKeysProps) }}>
+        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
         </ApiKeysContext.Provider>
       );

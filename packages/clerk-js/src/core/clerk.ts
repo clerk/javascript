@@ -19,8 +19,8 @@ import type {
   __internal_ComponentNavigationContext,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
-  ApiKeyResource,
-  ApiKeysProps,
+  APIKeyResource,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -32,7 +32,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   CommerceBillingNamespace,
-  CreateApiKeyParams,
+  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -40,7 +40,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
-  GetApiKeysParams,
+  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -61,7 +61,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
-  RevokeApiKeyParams,
+  RevokeAPIKeyParams,
   SDKMetadata,
   SetActiveParams,
   SignedInSessionResource,
@@ -138,7 +138,7 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { CommerceBilling } from './modules/commerce';
 import {
-  ApiKey,
+  APIKey,
   BaseResource,
   Client,
   EmailLinkError,
@@ -1043,8 +1043,11 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public mountApiKeys = (node: HTMLDivElement, props?: ApiKeysProps): void => {
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
     this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
       controls.mountComponent({
         name: 'APIKeys',
@@ -2056,13 +2059,13 @@ export class Clerk implements ClerkInterface {
     this.environment = environment;
   }
 
-  public getApiKeys = (params?: GetApiKeysParams): Promise<ApiKeyResource[]> => ApiKey.getAll(params);
+  public getApiKeys = (params?: GetAPIKeysParams): Promise<APIKeyResource[]> => APIKey.getAll(params);
 
-  public getApiKeySecret = (apiKeyID: string): Promise<string> => ApiKey.getSecret(apiKeyID);
+  public getApiKeySecret = (apiKeyID: string): Promise<string> => APIKey.getSecret(apiKeyID);
 
-  public createApiKey = (params: CreateApiKeyParams): Promise<ApiKeyResource> => ApiKey.create(params);
+  public createApiKey = (params: CreateAPIKeyParams): Promise<APIKeyResource> => APIKey.create(params);
 
-  public revokeApiKey = (params: RevokeApiKeyParams): Promise<ApiKeyResource> => ApiKey.revoke(params);
+  public revokeApiKey = (params: RevokeAPIKeyParams): Promise<APIKeyResource> => APIKey.revoke(params);
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
