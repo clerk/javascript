@@ -70,12 +70,13 @@ const isValidMaxAge = (maxAge: any) => typeof maxAge === 'number' && maxAge > 0;
 const isValidLevel = (level: any) => ALLOWED_LEVELS.has(level);
 const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 
-const prefixWithOrg = (value: string) => (value.startsWith('org:') ? value : `org:${value}`);
+const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
  * Checks if a user has the required organization-level authorization.
  * Verifies if the user has the specified role or permission within their organization.
- * @returns null, if unable to determine due to missing data or unspecified role/permission.
+ *
+ * @returns Null, if unable to determine due to missing data or unspecified role/permission.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;

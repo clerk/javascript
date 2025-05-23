@@ -148,6 +148,33 @@ describe('signedInAuthObject', () => {
       expect(authObject.has({ feature: 'org:impersonation' })).toBe(true);
     });
 
+    // This state should not happen since the JWT v2 payload is normalized to remove the `org:` prefix from o.rol.
+    it('has() for orgs with `org:` prefix in role', () => {
+      const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
+
+      const partialJwtPayload = {
+        v: 2,
+        ___raw: 'raw',
+        act: { sub: 'actor' },
+        sid: 'sessionId',
+        fea: 'o:reservations,o:impersonation',
+        o: {
+          id: 'orgId',
+          rol: 'org:admin',
+          slg: 'orgSlug',
+          per: 'read,manage',
+          fpm: '3',
+        },
+
+        sub: 'userId',
+      } as Partial<JwtPayload>;
+
+      const authObject = signedInAuthObject(mockAuthenticateContext, 'token', partialJwtPayload as JwtPayload);
+
+      expect(authObject.has({ role: 'org:admin' })).toBe(true);
+      expect(authObject.has({ role: 'admin' })).toBe(true);
+    });
+
     it('has() for billing with scopes', () => {
       const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
 
