@@ -1,5 +1,5 @@
 import type { AnyRouter } from '@tanstack/react-router';
-import type { EventHandler } from '@tanstack/react-start/server';
+import type { RequestHandler } from '@tanstack/react-start/server';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
@@ -11,13 +11,13 @@ export type HandlerCallback<TRouter extends AnyRouter> = (ctx: {
   router: TRouter;
   responseHeaders: Headers;
 }) => Response | Promise<Response>;
-export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => EventHandler;
+export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => RequestHandler;
 
 export function createClerkHandler<TRouter extends AnyRouter>(
   eventHandler: CustomizeStartHandler<TRouter>,
   clerkOptions: LoaderOptions = {},
 ) {
-  return (cb: HandlerCallback<TRouter>): EventHandler => {
+  return (cb: HandlerCallback<TRouter>): RequestHandler => {
     return eventHandler(async ({ request, router, responseHeaders }) => {
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
