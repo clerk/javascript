@@ -166,7 +166,7 @@ describe('Clerk singleton', () => {
         getToken: jest.fn(),
         lastActiveToken: { getRawString: () => 'mocked-token' },
       };
-      let eventBusSpy;
+      let eventBusSpy: jest.SpyInstance;
 
       beforeEach(() => {
         eventBusSpy = jest.spyOn(eventBus, 'emit');
