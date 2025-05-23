@@ -2434,7 +2434,8 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      if (this.#touchThrottledUntil > Date.now()) {
+      const multisessionMode = this.environment && !this.environment.authConfig.singleSessionMode;
+      if (!multisessionMode && this.#touchThrottledUntil > Date.now()) {
         return;
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
