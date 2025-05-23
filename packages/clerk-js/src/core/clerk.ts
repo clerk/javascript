@@ -114,6 +114,8 @@ import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
+import { ClerkSharedWorkerManager } from '../utils/sharedWorker';
+import type { SharedWorkerOptions } from '../utils/sharedWorkerUtils';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
@@ -218,6 +220,7 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #componentNavigationContext: __internal_ComponentNavigationContext | null = null;
   #publicEventBus = createClerkEventBus();
+  #sharedWorkerManager?: ClerkSharedWorkerManager;
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -2360,6 +2363,9 @@ export class Clerk implements ClerkInterface {
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
 
+    // Initialize SharedWorker if configured
+    void this.#initializeSharedWorker();
+
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
@@ -2396,6 +2402,9 @@ export class Clerk implements ClerkInterface {
     if (Clerk.mountComponentRenderer) {
       this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
     }
+
+    // Initialize SharedWorker if configured
+    void this.#initializeSharedWorker();
 
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
@@ -2582,6 +2591,195 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(url);
   };
 
+  #initializeSharedWorker = async (): Promise<void> => {
+    if (!this.#options.sharedWorker) {
+      return;
+    }
+
+    const sharedWorkerOptions = this.#options.sharedWorker;
+
+    if (sharedWorkerOptions.autoStart === false) {
+      logger.logOnce('Clerk: SharedWorker autoStart is disabled');
+      return;
+    }
+
+    try {
+      const clerkInstanceId = `clerk-${this.publishableKey.slice(-8)}-${Date.now()}`;
+
+      this.#sharedWorkerManager = new ClerkSharedWorkerManager(
+        sharedWorkerOptions as SharedWorkerOptions,
+        clerkInstanceId,
+      );
+
+      const worker = await this.#sharedWorkerManager.initialize();
+
+      if (worker) {
+        this.#setupSharedWorkerEventForwarding();
+        logger.logOnce('Clerk: SharedWorker initialized successfully');
+      }
+    } catch (error) {
+      logger.warnOnce(`Clerk: Failed to initialize SharedWorker: ${error}`);
+    }
+  };
+
+  #setupSharedWorkerEventForwarding = (): void => {
+    if (!this.#sharedWorkerManager) {
+      return;
+    }
+
+    this.addListener(resources => {
+      this.#sharedWorkerManager?.postClerkEvent('clerk:state_change', {
+        isSignedIn: this.isSignedIn,
+        user: resources.user?.id || null,
+        session: resources.session?.id || null,
+        organization: resources.organization?.id || null,
+      });
+    });
+
+    eventBus.on(events.UserSignOut, () => {
+      this.#sharedWorkerManager?.postClerkEvent('clerk:sign_out', {
+        timestamp: Date.now(),
+      });
+    });
+
+    eventBus.on(events.SessionTokenResolved, () => {
+      this.#sharedWorkerManager?.postClerkEvent('clerk:session_update', {
+        sessionId: this.session?.id,
+        timestamp: Date.now(),
+      });
+    });
+
+    eventBus.on(events.TokenUpdate, payload => {
+      this.#sharedWorkerManager?.postClerkEvent('clerk:token_update', {
+        hasToken: !!payload.token,
+        timestamp: Date.now(),
+      });
+    });
+
+    eventBus.on(events.EnvironmentUpdate, () => {
+      this.#sharedWorkerManager?.postClerkEvent('clerk:environment_update', {
+        timestamp: Date.now(),
+      });
+    });
+  };
+
+  /**
+   * Returns the SharedWorker manager instance if available.
+   * @public
+   */
+  public getSharedWorkerManager(): ClerkSharedWorkerManager | undefined {
+    return this.#sharedWorkerManager;
+  }
+
+  /**
+   * Manually initializes the SharedWorker if not already initialized.
+   * Useful when autoStart is disabled.
+   * @public
+   */
+  public async initializeSharedWorker(): Promise<SharedWorker | null> {
+    if (!this.#options.sharedWorker) {
+      logger.warnOnce('Clerk: No SharedWorker configuration provided');
+      return null;
+    }
+
+    if (this.#sharedWorkerManager?.isActive()) {
+      logger.logOnce('Clerk: SharedWorker is already initialized');
+      return this.#sharedWorkerManager.getWorker();
+    }
+
+    await this.#initializeSharedWorker();
+    return this.#sharedWorkerManager?.getWorker() || null;
+  }
+
+  /**
+   * Terminates the SharedWorker if active.
+   * @public
+   */
+  public terminateSharedWorker(): void {
+    if (this.#sharedWorkerManager) {
+      this.#sharedWorkerManager.terminate();
+      this.#sharedWorkerManager = undefined;
+      logger.logOnce('Clerk: SharedWorker terminated');
+    }
+  }
+
+  /**
+   * Gets connection information for the current tab's SharedWorker.
+   * @public
+   */
+  public getSharedWorkerConnectionInfo(): { tabId: string; instanceId: string; isActive: boolean } | null {
+    if (this.#sharedWorkerManager) {
+      return this.#sharedWorkerManager.getConnectionInfo();
+    }
+    return null;
+  }
+
+  /**
+   * Runs debugging diagnostics on the SharedWorker connection.
+   * Useful for troubleshooting SharedWorker issues.
+   * @public
+   */
+  public debugSharedWorker(): void {
+    if (this.#sharedWorkerManager) {
+      this.#sharedWorkerManager.debug();
+    } else {
+      logger.warnOnce('Clerk: No SharedWorker manager available for debugging');
+    }
+  }
+
+  /**
+   * Sends a message to another tab via the SharedWorker.
+   * The receiving tab will console log the message.
+   * @param targetTabId - The ID of the tab to send the message to
+   * @param message - The message to send
+   * @public
+   */
+  public sendTabMessage(targetTabId: string, message: any): void {
+    if (!this.#sharedWorkerManager) {
+      logger.warnOnce('Clerk: SharedWorker not initialized. Cannot send tab message.');
+      return;
+    }
+
+    if (!this.#sharedWorkerManager.isActive()) {
+      logger.warnOnce('Clerk: SharedWorker is not active. Cannot send tab message.');
+      return;
+    }
+
+    this.#sharedWorkerManager.sendTabMessage(targetTabId, message);
+  }
+
+  /**
+   * Gets the current tab ID for this Clerk instance.
+   * @returns The tab ID string or null if SharedWorker is not initialized
+   * @public
+   */
+  public getTabId(): string | null {
+    if (!this.#sharedWorkerManager) {
+      return null;
+    }
+
+    return this.#sharedWorkerManager.getTabId();
+  }
+
+  /**
+   * Requests the status of all connected tabs from the SharedWorker.
+   * The response will be logged to the console.
+   * @public
+   */
+  public getConnectedTabs(): void {
+    if (!this.#sharedWorkerManager) {
+      logger.warnOnce('Clerk: SharedWorker not initialized. Cannot get connected tabs.');
+      return;
+    }
+
+    if (!this.#sharedWorkerManager.isActive()) {
+      logger.warnOnce('Clerk: SharedWorker is not active. Cannot get connected tabs.');
+      return;
+    }
+
+    this.#sharedWorkerManager.getTabStatus();
+  }
+
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
     if (!Clerk.mountComponentRenderer) {
       throw new Error('ClerkJS was loaded without UI components.');
@@ -2654,5 +2852,82 @@ export class Clerk implements ClerkInterface {
     }
 
     return allowedProtocols;
+  }
+
+  /**
+   * Gets access to the SharedWorker manager for tab-to-tab communication.
+   * Provides methods like sendTabMessage, getTabId, getTabStatus, etc.
+   * @returns The SharedWorker manager instance or a temporary proxy if still initializing
+   * @public
+   */
+  public get sharedWorker(): ClerkSharedWorkerManager | undefined {
+    // If the SharedWorker manager is ready, return it
+    if (this.#sharedWorkerManager) {
+      return this.#sharedWorkerManager;
+    }
+
+    // If SharedWorker is configured and initialization is in progress,
+    // return a temporary proxy with helpful methods
+    if (this.#options.sharedWorker) {
+      const proxy = {
+        getTabStatus: () => {
+          console.warn(
+            '[Clerk] SharedWorker is still initializing. Use window.Clerk.sharedWorker.getTabStatus() in a moment.',
+          );
+          return undefined;
+        },
+        ping: () => {
+          console.warn('[Clerk] SharedWorker is still initializing. Use window.Clerk.sharedWorker.ping() in a moment.');
+        },
+        sendTabMessage: (_targetTabId: string, _message: any) => {
+          console.warn('[Clerk] SharedWorker is still initializing. Cannot send tab message yet.');
+        },
+        getTabId: () => {
+          console.warn('[Clerk] SharedWorker is still initializing. Tab ID not available yet.');
+          return null;
+        },
+        getConnectionInfo: () => {
+          console.warn('[Clerk] SharedWorker is still initializing. Connection info not available yet.');
+          return null;
+        },
+        isActive: () => {
+          return false; // Not active yet during initialization
+        },
+        debug: () => {
+          console.log('[Clerk] SharedWorker Debug - Status: Initializing...');
+          console.log('  - SharedWorker configuration is present');
+          console.log('  - Auto-initialization is in progress');
+          console.log('  - Please wait a moment and try again');
+        },
+        getInitializationStatus: () => {
+          return {
+            isComplete: false,
+            isActive: false,
+            initializationTime: null,
+            tabId: null,
+            instanceId: `clerk-${this.publishableKey.slice(-8)}-pending`,
+          };
+        },
+        terminate: () => {
+          console.warn('[Clerk] SharedWorker is still initializing. Cannot terminate yet.');
+        },
+        getWorker: () => {
+          return null; // No worker available yet
+        },
+        testConnection: () => {
+          console.log('🔍 [Clerk] SharedWorker Test - Status: Initializing...');
+          console.log('  - Cannot test connection while initializing');
+          console.log('  - Please wait for initialization to complete');
+        },
+      } as any;
+
+      // Add a helpful property to indicate this is a temporary proxy
+      proxy._isInitializingProxy = true;
+
+      return proxy;
+    }
+
+    // No SharedWorker configuration found
+    return undefined;
   }
 }
