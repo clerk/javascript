@@ -4,7 +4,9 @@ import type { PendingSessionOptions } from '@clerk/types';
 declare global {
   namespace Express {
     interface Request {
-      auth: (options?: PendingSessionOptions) => AuthObject;
+      auth: AuthObject & {
+        (options?: PendingSessionOptions): AuthObject;
+      };
     }
   }
 }
