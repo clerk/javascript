@@ -1,0 +1,42 @@
+{
+  "name": "@clerk/backend-api-client",
+  "version": "0.4.1",
+  "author": "Speakeasy",
+  "type": "module",
+  "tshy": {
+    "sourceDialects": [
+      "@clerk/backend-api-client/source"
+    ],
+    "exports": {
+      ".": "./src/index.ts",
+      "./package.json": "./package.json",
+      "./types": "./src/types/index.ts",
+      "./models/errors": "./src/models/errors/index.ts",
+      "./models/components": "./src/models/components/index.ts",
+      "./models/operations": "./src/models/operations/index.ts",
+      "./*.js": "./src/*.ts",
+      "./*": "./src/*.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "lint": "eslint --cache --max-warnings=0 src",
+    "build": "tshy",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "zod": ">= 3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "tshy": "^2.0.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.22.0",
+    "zod": "^3.23.4"
+  },
+  "dependencies": {
+    
+  }
+}

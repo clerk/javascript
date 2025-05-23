@@ -1,0 +1,20 @@
+# RevokeOrganizationInvitationRequest
+
+## Example Usage
+
+```typescript
+import { RevokeOrganizationInvitationRequest } from "@clerk/backend-api-client/models/operations";
+
+let value: RevokeOrganizationInvitationRequest = {
+  organizationId: "<id>",
+  invitationId: "<id>",
+};
+```
+
+## Fields
+
+| Field                                                                                                                    | Type                                                                                                                     | Required                                                                                                                 | Description                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `organizationId`                                                                                                         | *string*                                                                                                                 | :heavy_check_mark:                                                                                                       | The organization ID.                                                                                                     |
+| `invitationId`                                                                                                           | *string*                                                                                                                 | :heavy_check_mark:                                                                                                       | The organization invitation ID.                                                                                          |
+| `requestBody`                                                                                                            | [operations.RevokeOrganizationInvitationRequestBody](../../models/operations/revokeorganizationinvitationrequestbody.md) | :heavy_minus_sign:                                                                                                       | N/A                                                                                                                      |
