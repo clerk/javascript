@@ -1065,6 +1065,11 @@ type _LocalizationResource = {
     action__search: LocalizationValue;
     action__add: LocalizationValue;
     detailsTitle__emptyRow: LocalizationValue;
+    revokeConfirmation: {
+      formTitle: LocalizationValue;
+      formHint: LocalizationValue;
+      formButtonPrimary__revoke: LocalizationValue;
+    };
   };
 };
 

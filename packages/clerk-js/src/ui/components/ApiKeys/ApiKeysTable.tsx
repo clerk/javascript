@@ -103,7 +103,7 @@ export const ApiKeysTable = ({
 }: {
   rows: ApiKeyResource[];
   isLoading: boolean;
-  onRevoke: (id: string) => void;
+  onRevoke: (id: string, name: string) => void;
 }) => {
   return (
     <Table sx={{ tableLayout: 'fixed' }}>
@@ -163,7 +163,7 @@ export const ApiKeysTable = ({
                     {
                       label: localizationKeys('apiKeys.menuAction__revoke'),
                       isDestructive: true,
-                      onClick: () => onRevoke(apiKey.id),
+                      onClick: () => onRevoke(apiKey.id, apiKey.name),
                     },
                   ]}
                 />

@@ -34,6 +34,7 @@ const _UserProfile = (_: UserProfileProps) => {
 
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <ProfileCard.Root>
       <UserProfileNavbar contentRef={contentRef}>
