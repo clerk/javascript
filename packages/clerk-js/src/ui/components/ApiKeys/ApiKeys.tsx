@@ -1,10 +1,10 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { CreateApiKeyParams } from '@clerk/types';
+import type { CreateAPIKeyParams } from '@clerk/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
-import { useApiKeysContext } from '../../contexts';
+import { useApiKeysContext, withCoreUserGuard } from '../../contexts';
 import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { InputWithIcon, Pagination, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -42,7 +42,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     cacheKey,
   } = useApiKeys({ subject, perPage });
   const card = useCardState();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateApiKeyParams }) =>
+  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
     clerk.createApiKey(arg),
   );
   const { t } = useLocalizations();
@@ -150,7 +150,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   );
 };
 
-export const APIKeys = withCardStateProvider(() => {
+const _APIKeys = () => {
   const ctx = useApiKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
@@ -165,4 +165,6 @@ export const APIKeys = withCardStateProvider(() => {
       />
     </Flow.Root>
   );
-});
+};
+
+export const APIKeys = withCoreUserGuard(withCardStateProvider(_APIKeys));
