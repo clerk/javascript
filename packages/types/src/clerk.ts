@@ -737,6 +737,37 @@ export interface Clerk {
    * initiated outside of the Clerk class.
    */
   __internal_setActiveInProgress: boolean;
+
+  /**
+   * Returns the SharedWorker manager instance if available.
+   * Allows you to interact directly with the SharedWorker for advanced use cases.
+   */
+  getSharedWorkerManager(): any; // Using any to avoid circular imports
+
+  /**
+   * Manually initializes the SharedWorker if not already initialized.
+   * Useful when autoStart is disabled in SharedWorker configuration.
+   * @returns Promise that resolves to the SharedWorker instance or null if initialization fails
+   */
+  initializeSharedWorker(): Promise<SharedWorker | null>;
+
+  /**
+   * Terminates the SharedWorker if active.
+   * Use this method to clean up the SharedWorker when it's no longer needed.
+   */
+  terminateSharedWorker(): void;
+
+  /**
+   * Gets connection information for the current tab's SharedWorker.
+   * @returns Object with tab ID, instance ID, and active status, or null if no SharedWorker manager is available
+   */
+  getSharedWorkerConnectionInfo(): { tabId: string; instanceId: string; isActive: boolean } | null;
+
+  /**
+   * Runs debugging diagnostics on the SharedWorker connection.
+   * Useful for troubleshooting SharedWorker issues in development.
+   */
+  debugSharedWorker(): void;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -890,6 +921,10 @@ export type ClerkOptions = PendingSessionOptions &
      * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
      */
     waitlistUrl?: string;
+    /**
+     * Configuration options for SharedWorker functionality. Allows you to initialize a SharedWorker when Clerk loads.
+     */
+    sharedWorker?: any;
     /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */

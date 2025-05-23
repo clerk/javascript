@@ -61,6 +61,16 @@ const common = ({ mode, variant, disableRHC = false }) => {
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
+      // Copy SharedWorker script to dist folder
+      isProduction(mode) &&
+        new rspack.CopyRspackPlugin({
+          patterns: [
+            {
+              from: path.resolve(__dirname, 'src/utils/clerk-shared-worker.js'),
+              to: 'clerk-shared-worker.js',
+            },
+          ],
+        }),
       process.env.RSDOCTOR &&
         new RsdoctorRspackPlugin({
           mode: process.env.RSDOCTOR === 'brief' ? 'brief' : 'normal',
