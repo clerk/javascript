@@ -92,7 +92,7 @@ const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   }
 
   if (params.role) {
-    return orgRole === prefixWithOrg(params.role);
+    return prefixWithOrg(orgRole) === prefixWithOrg(params.role);
   }
   return null;
 };
@@ -162,7 +162,8 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
  * Evaluates if the user meets re-verification authentication requirements.
  * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
- * @returns null, if requirements or verification data are missing.
+ *
+ * @returns Null, if requirements or verification data are missing.
  */
 const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
   if (!params.reverification || !factorVerificationAge) {
@@ -236,7 +237,8 @@ type AuthStateOptions = {
 
 /**
  * Shared utility function that centralizes auth state resolution logic,
- * preventing duplication across different packages
+ * preventing duplication across different packages.
+ *
  * @internal
  */
 const resolveAuthState = ({
