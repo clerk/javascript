@@ -16,7 +16,7 @@ import {
   useLocalizations,
 } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks';
+import { FormFieldContextProvider, sanitizeInputProps, useFormField } from '../primitives/hooks/useFormField';
 import type { PropsOfComponent } from '../styledSystem';
 import type { useFormControl as useFormControlUtil } from '../utils';
 import { OTPCodeControl, OTPResendButton, OTPRoot } from './CodeControl';
