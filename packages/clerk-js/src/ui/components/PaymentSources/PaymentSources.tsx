@@ -4,16 +4,22 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
+import { DevOnly } from '../../common/DevOnly';
 import { usePaymentSources, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from './AddPaymentSource';
+import {
+  AddPaymentSource,
+  AddPaymentSourceFormHeader,
+  AddPaymentSourceFormSubtitle,
+  TestPaymentSource,
+} from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
 
-const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
+const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -33,9 +39,17 @@ const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
     <AddPaymentSource
       onSuccess={onAddPaymentSourceSuccess}
       cancelAction={close}
-    />
+    >
+      <AddPaymentSourceFormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
+      <AddPaymentSourceFormSubtitle
+        text={localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle')}
+      />
+      <DevOnly>
+        <TestPaymentSource />
+      </DevOnly>
+    </AddPaymentSource>
   );
-};
+});
 
 const RemoveScreen = ({
   paymentSource,
