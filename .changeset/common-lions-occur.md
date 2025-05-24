@@ -2,4 +2,4 @@
 '@clerk/express': patch
 ---
 
-Bring back option to access `auth` object via `req.auth` for backward compatibility.
+Allow property access on `req.auth` to get `AuthObject` for backward compatibility.
