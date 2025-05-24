@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: '返回',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const zhCN: LocalizationResource = {
   formFieldError__verificationLinkExpired: '验证链接已过期。请申请新的链接。',
   formFieldHintText__optional: '选填',
   formFieldHintText__slug: 'Slug 是一个人类可读的 ID，它必须是唯一的。它通常用于 URL 中。',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '删除帐户',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -145,6 +162,10 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: '为此域名启用自动邀请',
   formFieldLabel__backupCode: '备用代码',
   formFieldLabel__confirmDeletion: '确认',
@@ -188,6 +209,9 @@ export const zhCN: LocalizationResource = {
     titleWithoutPersonal: '选择一个组织',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: '自动邀请',
     badge__automaticSuggestion: '自动建议',
     badge__manualInvitation: '无自动注册',
@@ -282,6 +306,7 @@ export const zhCN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的组织。',
       general: '常规',
@@ -787,6 +812,9 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
@@ -935,6 +963,7 @@ export const zhCN: LocalizationResource = {
     mobileButton__menu: '菜单',
     navbar: {
       account: '账户',
+      apiKeys: undefined,
       billing: undefined,
       description: '管理您的账户。',
       security: '安全',

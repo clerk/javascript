@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Πίσω',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const elGR: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Προαιρετικό',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Εισάγετε τη διεύθυνση email σας',
@@ -146,6 +163,10 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Εισάγετε τον κωδικό σας',
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -190,6 +211,9 @@ export const elGR: LocalizationResource = {
     titleWithoutPersonal: 'Επιλέξτε οργανισμό',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Αυτόματες προσκλήσεις',
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
@@ -287,6 +311,7 @@ export const elGR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -808,6 +833,9 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -969,6 +997,7 @@ export const elGR: LocalizationResource = {
     mobileButton__menu: 'Μενού',
     navbar: {
       account: 'Προφίλ',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Διαχειριστείτε τις πληροφορίες του λογαριασμού σας.',
       security: 'Ασφάλεια',

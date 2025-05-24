@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Înapoi',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -132,6 +146,9 @@ export const roRO: LocalizationResource = {
   formFieldHintText__optional: 'Opțional',
   formFieldHintText__slug:
     'Un slug este un ID lizibil de către om, care trebuie să fie unic. Este adesea utilizat în URL-uri.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -147,6 +164,10 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Activați invitațiile automate pentru acest domeniu',
   formFieldLabel__backupCode: 'Cod de rezervă',
   formFieldLabel__confirmDeletion: 'Confirmare',
@@ -191,6 +212,9 @@ export const roRO: LocalizationResource = {
     titleWithoutPersonal: 'Selectați o organizație',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Invitații automate',
     badge__automaticSuggestion: 'Sugestii automate',
     badge__manualInvitation: 'Fără înscriere automată',
@@ -288,6 +312,7 @@ export const roRO: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -806,6 +831,9 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -968,6 +996,7 @@ export const roRO: LocalizationResource = {
     mobileButton__menu: 'Meniu',
     navbar: {
       account: 'Profile',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',

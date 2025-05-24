@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Буцах',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -132,6 +146,9 @@ export const mnMN: LocalizationResource = {
   formFieldHintText__optional: 'Сонголтоор',
   formFieldHintText__slug:
     'Slug нь хүн унших боломжтой ID бөгөөд өвөрмөц байх ёстой. Энэ нь ихэвчлэн URL-д ашиглагддаг.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Нөөц код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Бүртгэл устгах',
   formFieldInputPlaceholder__emailAddress: 'Имэйл хаяг',
@@ -146,6 +163,10 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
   formFieldLabel__confirmDeletion: 'Баталгаажуулалт',
@@ -190,6 +211,9 @@ export const mnMN: LocalizationResource = {
     titleWithoutPersonal: 'Байгууллага сонгоно уу',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автомат урилга',
     badge__automaticSuggestion: 'Автомат саналууд',
     badge__manualInvitation: 'Автомат бүртгэл байхгүй',
@@ -287,6 +311,7 @@ export const mnMN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Байгууллагаа удирдих',
       general: 'Ерөнхий',
@@ -803,6 +828,9 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -962,6 +990,7 @@ export const mnMN: LocalizationResource = {
     mobileButton__menu: 'Цэс',
     navbar: {
       account: 'Профайл',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Бүртгэлийнхээ мэдээллийг удирдана уу.',
       security: 'Аюулгүй байдал',

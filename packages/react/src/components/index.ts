@@ -10,6 +10,7 @@ export {
   GoogleOneTap,
   Waitlist,
   PricingTable,
+  APIKeys,
 } from './uiComponents';
 
 export {

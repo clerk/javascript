@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'חזור',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const heIL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'הקישור לאימות פג תוקף. אנא בקש/י קישור חדש.',
   formFieldHintText__optional: 'אופציונלי',
   formFieldHintText__slug: '(slug) הוא מזהה קריא שמיועד להיות ייחודי. הוא משמש לעיתים קרובות בכתובות URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'מחיקת חשבון',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -145,6 +162,10 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'הפעל הזמנות אוטומטיות לדומיין הזה',
   formFieldLabel__backupCode: 'קוד גיבוי',
   formFieldLabel__confirmDeletion: 'אישור',
@@ -189,6 +210,9 @@ export const heIL: LocalizationResource = {
     titleWithoutPersonal: 'בחר ארגון',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'הזמנות אוטומטיות',
     badge__automaticSuggestion: 'הצעות אוטומטיות',
     badge__manualInvitation: 'ללא הרשמה אוטומטית',
@@ -284,6 +308,7 @@ export const heIL: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'נהל את הארגון שלך.',
       general: 'כללי',
@@ -793,6 +818,9 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -944,6 +972,7 @@ export const heIL: LocalizationResource = {
     mobileButton__menu: 'תפריט',
     navbar: {
       account: 'פרופיל',
+      apiKeys: undefined,
       billing: undefined,
       description: 'נהל את פרטי החשבון שלך.',
       security: 'אבטחה',

@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Zpět',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -132,6 +146,9 @@ export const csCZ: LocalizationResource = {
   formFieldHintText__optional: 'Volitelné',
   formFieldHintText__slug:
     'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Zadejte záložní kód',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Potvrďte smazání účtu',
   formFieldInputPlaceholder__emailAddress: 'Zadejte vaši emailovou adresu',
@@ -147,6 +164,10 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Záložní kód',
   formFieldLabel__confirmDeletion: 'Potvrzení',
@@ -191,6 +212,9 @@ export const csCZ: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -287,6 +311,7 @@ export const csCZ: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -799,6 +824,9 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -958,6 +986,7 @@ export const csCZ: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Spravujte své údaje.',
       security: 'Zabezpečení',

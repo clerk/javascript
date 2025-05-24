@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Powrót',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const plPL: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Link weryfikacyjny wygasł. Spróbuj ponownie.',
   formFieldHintText__optional: 'Opcjonalne',
   formFieldHintText__slug: 'Jest to unikalne ID, które jest czytelne dla człowieka, często używane w adresach URL.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Wprowadź kod zapasowy',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Usuń konto',
   formFieldInputPlaceholder__emailAddress: 'Wprowadź adres email',
@@ -146,6 +163,10 @@ export const plPL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wprowadź swoje hasło',
   formFieldInputPlaceholder__phoneNumber: 'Wprowadź numer telefonu',
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Włącz automatyczne zaproszenia dla tej domeny',
   formFieldLabel__backupCode: 'Kod zapasowy',
   formFieldLabel__confirmDeletion: 'Potwierdzenie',
@@ -190,6 +211,9 @@ export const plPL: LocalizationResource = {
     titleWithoutPersonal: 'Wybierz organizację',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatyczne zaproszenia',
     badge__automaticSuggestion: 'Automatyczne sugestie',
     badge__manualInvitation: 'Brak automatycznej rejestracji',
@@ -286,6 +310,7 @@ export const plPL: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Zarządzaj organizacją.',
       general: 'Główne',
@@ -811,6 +836,9 @@ export const plPL: LocalizationResource = {
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopiowane!',
       actionLabel__copy: 'Skopiuj wszystkie',
@@ -971,6 +999,7 @@ export const plPL: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Zarządzaj danymi konta.',
       security: 'Bezpieczeństwo',

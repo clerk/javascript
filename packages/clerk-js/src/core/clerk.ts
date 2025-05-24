@@ -19,6 +19,8 @@ import type {
   __internal_ComponentNavigationContext,
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
+  APIKeyResource,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -30,6 +32,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   CommerceBillingNamespace,
+  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -37,6 +40,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
+  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -57,6 +61,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
+  RevokeAPIKeyParams,
   SDKMetadata,
   SetActiveParams,
   SignedInSessionResource,
@@ -133,6 +138,7 @@ import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { CommerceBilling } from './modules/commerce';
 import {
+  APIKey,
   BaseResource,
   Client,
   EmailLinkError,
@@ -1029,6 +1035,32 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+
+    logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
+      controls.mountComponent({
+        name: 'APIKeys',
+        appearanceKey: 'apiKeys',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
+  };
+
+  public unmountApiKeys = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -2026,6 +2058,14 @@ export class Clerk implements ClerkInterface {
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
   }
+
+  public getApiKeys = (params?: GetAPIKeysParams): Promise<APIKeyResource[]> => APIKey.getAll(params);
+
+  public getApiKeySecret = (apiKeyID: string): Promise<string> => APIKey.getSecret(apiKeyID);
+
+  public createApiKey = (params: CreateAPIKeyParams): Promise<APIKeyResource> => APIKey.create(params);
+
+  public revokeApiKey = (params: RevokeAPIKeyParams): Promise<APIKeyResource> => APIKey.revoke(params);
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {

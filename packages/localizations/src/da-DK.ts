@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Tilbage',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const daDK: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Bekræftelseslinket er udløbet. Venligst anmod om et nyt link.',
   formFieldHintText__optional: 'Valgfri',
   formFieldHintText__slug: 'En slug er en menneskelig læsbar ID, der skal være unik. Det bruges ofte i URL’er.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Indtast sikkerhedskode',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Slet konto',
   formFieldInputPlaceholder__emailAddress: 'Indtast e-mailadresse',
@@ -146,6 +163,10 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Indtast adgangskode',
   formFieldInputPlaceholder__phoneNumber: 'Indtast telefonnummer',
   formFieldInputPlaceholder__username: 'Indtast brugernavn',
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Aktiver automatiske invitationer for dette domæne',
   formFieldLabel__backupCode: 'Sikkerhedskode',
   formFieldLabel__confirmDeletion: 'Bekræftelse',
@@ -190,6 +211,9 @@ export const daDK: LocalizationResource = {
     titleWithoutPersonal: 'Vælg en organisation',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatiske invitationer',
     badge__automaticSuggestion: 'Automatiske forslag',
     badge__manualInvitation: 'Ingen automatisk tilmelding',
@@ -286,6 +310,7 @@ export const daDK: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer din organisation.',
       general: 'Generelt',
@@ -800,6 +825,9 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -959,6 +987,7 @@ export const daDK: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Administrer dine kontooplysninger.',
       security: 'Sikkerhed',

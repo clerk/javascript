@@ -33,6 +33,7 @@ const AVAILABLE_COMPONENTS = [
   'organizationSwitcher',
   'waitlist',
   'pricingTable',
+  'apiKeys',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -91,6 +92,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   organizationSwitcher: buildComponentControls('organizationSwitcher'),
   waitlist: buildComponentControls('waitlist'),
   pricingTable: buildComponentControls('pricingTable'),
+  apiKeys: buildComponentControls('apiKeys'),
 };
 
 declare global {
@@ -309,6 +311,9 @@ void (async () => {
     },
     '/pricing-table': () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
+    },
+    '/api-keys': () => {
+      Clerk.mountApiKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

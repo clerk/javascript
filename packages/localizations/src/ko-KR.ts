@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: '돌아가기',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -131,6 +145,9 @@ export const koKR: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: '선택사항',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '계정 삭제',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -146,6 +163,10 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: '백업 코드',
   formFieldLabel__confirmDeletion: '확인',
@@ -190,6 +211,9 @@ export const koKR: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -286,6 +310,7 @@ export const koKR: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -796,6 +821,9 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -949,6 +977,7 @@ export const koKR: LocalizationResource = {
     mobileButton__menu: '메뉴',
     navbar: {
       account: '프로필',
+      apiKeys: undefined,
       billing: undefined,
       description: '계정 정보를 관리하세요.',
       security: '보안',

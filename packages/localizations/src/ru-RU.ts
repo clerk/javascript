@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Назад',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const ruRU: LocalizationResource = {
   formFieldHintText__optional: 'Опционально',
   formFieldHintText__slug:
     'Slug - это человекочитаемый идентификатор, который должен быть уникальным. Он часто используется в URL-адресах.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Удалить учетную запись',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -148,6 +165,10 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код восстановления',
   formFieldLabel__confirmDeletion: 'Подтверждение',
@@ -193,6 +214,9 @@ export const ruRU: LocalizationResource = {
     titleWithoutPersonal: 'Выбрать организацию',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Автоматические приглашения',
     badge__automaticSuggestion: 'Автоматические предложения',
     badge__manualInvitation: 'Нет автоматической регистрации',
@@ -290,6 +314,7 @@ export const ruRU: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управлять вашей организацией.',
       general: 'Общее',
@@ -816,6 +841,9 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех учетных записей',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -977,6 +1005,7 @@ export const ruRU: LocalizationResource = {
     mobileButton__menu: 'Меню',
     navbar: {
       account: 'Профиль',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Управление информацией вашей учетной записи.',
       security: 'Безопасность',
