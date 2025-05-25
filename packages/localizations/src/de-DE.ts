@@ -594,7 +594,7 @@ export const deDE: LocalizationResource = {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
     },
     start: {
-      actionLink: 'Anmelden',
+      actionLink: 'Registrieren',
       actionLink__join_waitlist: 'Warteliste beitreten',
       actionLink__use_email: 'E-mail nutzen',
       actionLink__use_email_username: 'E-mail oder Benutzernamen nutzen',
@@ -611,7 +611,7 @@ export const deDE: LocalizationResource = {
       },
       subtitle: 'weiter zu {{applicationName}}',
       subtitleCombined: undefined,
-      title: 'Einloggen',
+      title: 'Anmelden',
       titleCombined: 'Weiter zu {{applicationName}}',
     },
     totpMfa: {
@@ -629,7 +629,7 @@ export const deDE: LocalizationResource = {
       title: undefined,
     },
     continue: {
-      actionLink: 'Einloggen',
+      actionLink: 'Anmelden',
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Füllen Sie fehlende Felder aus',
@@ -692,9 +692,9 @@ export const deDE: LocalizationResource = {
       title: 'Zugang verweigert',
     },
     start: {
-      actionLink: 'Einloggen',
-      actionLink__use_email: 'Mit E-Mail einloggen',
-      actionLink__use_phone: 'Mit Telefonnummer einloggen',
+      actionLink: 'Anmelden',
+      actionLink__use_email: 'Mit E-Mail anmelden',
+      actionLink__use_phone: 'Mit Telefonnummer anmelden',
       actionText: 'Haben Sie ein Konto?',
       alternativePhoneCodeProvider: {
         actionLink: undefined,
@@ -817,7 +817,7 @@ export const deDE: LocalizationResource = {
   userButton: {
     action__addAccount: 'Konto hinzufügen',
     action__manageAccount: 'Konto verwalten',
-    action__signOut: 'Ausloggen',
+    action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
