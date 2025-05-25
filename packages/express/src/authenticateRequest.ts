@@ -111,6 +111,8 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         }
       }
 
+      // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
+      // to use `req.auth` without calling it as a function. We need to keep this for backwards compatibility.
       const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
       const authObject = requestState.toAuth();
 
