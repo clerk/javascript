@@ -222,6 +222,10 @@ function SignInStartInternal(): JSX.Element {
       .then(res => {
         switch (res.status) {
           case 'needs_first_factor':
+            if (res.supportedFirstFactors?.every(ff => ff.strategy === 'enterprise_sso')) {
+              return authenticateWithEnterpriseSSO();
+            }
+
             return navigate('factor-one');
           case 'needs_second_factor':
             return navigate('factor-two');
