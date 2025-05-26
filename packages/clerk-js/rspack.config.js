@@ -418,33 +418,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked(),
   );
 
-  const clerkEsm = merge(
-    entryForVariant(variants.clerk),
-    common({ mode, variant: variants.clerk }),
-    commonForProd(),
-    commonForProdBundled(),
-    {
-      experiments: {
-        outputModule: true,
-      },
-      output: {
-        filename: '[name].mjs',
-        libraryTarget: 'module',
-      },
-      plugins: [
-        // Include the lazy chunks in the bundle as well
-        // so that the final bundle can be imported and bundled again
-        // by a different bundler, eg the webpack instance used by react-scripts
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
-      },
-    },
-  );
-
   const clerkCjs = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -526,7 +499,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkHeadless,
     clerkHeadlessBrowser,
     clerkCHIPS,
-    clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
     clerkCjsNoRHC,
