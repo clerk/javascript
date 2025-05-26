@@ -121,6 +121,7 @@ function SignUpStartInternal(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
+  const oidcPrompt = ctx.oidcPrompt;
 
   const fields = determineActiveFields({
     attributes,
@@ -147,8 +148,13 @@ function SignUpStartInternal(): JSX.Element {
           setMissingRequirementsWithTicket(true);
         }
 
+        const redirectUrl = ctx.ssoCallbackUrl;
+        const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
         return completeSignUpFlow({
           signUp,
+          redirectUrl,
+          redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           handleComplete: () => {
@@ -157,6 +163,7 @@ function SignUpStartInternal(): JSX.Element {
             return setActive({ session: signUp.createdSessionId, redirectUrl: afterSignUpUrl });
           },
           navigate,
+          oidcPrompt,
         });
       })
       .catch(err => {
@@ -303,7 +310,7 @@ function SignUpStartInternal(): JSX.Element {
           navigate,
           redirectUrl,
           redirectUrlComplete,
-          oidcPrompt: ctx.oidcPrompt,
+          oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
