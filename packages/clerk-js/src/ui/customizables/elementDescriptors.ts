@@ -93,6 +93,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'checkoutSuccessBadge',
   'checkoutSuccessTitle',
   'checkoutSuccessDescription',
+  'checkoutSuccessHighlight',
 
   'otpCodeField',
   'otpCodeFieldInputs',
@@ -101,10 +102,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formResendCodeLink',
 
   'dividerRow',
+  'dividerColumn',
   'dividerText',
   'dividerLine',
 
   'drawerBackdrop',
+  'drawerRoot',
   'drawerContent',
   'drawerHeader',
   'drawerTitle',

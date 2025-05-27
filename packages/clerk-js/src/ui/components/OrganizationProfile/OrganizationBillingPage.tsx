@@ -1,15 +1,9 @@
 import { Protect } from '../../common';
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { SubscriberTypeContext } from '../../contexts';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
-  ProfileSection,
   Tab,
   TabPanel,
   TabPanels,
@@ -19,8 +13,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { ArrowsUpDown } from '../../icons';
-import { useRouter } from '../../router';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
@@ -33,12 +25,8 @@ const orgTabMap = {
 
 const OrganizationBillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions('org');
+
   const { selectedTab, handleTabChange } = useTabState(orgTabMap);
-  const { navigate } = useRouter();
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
 
   return (
     <Col
@@ -71,45 +59,21 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
-              <Flex
-                sx={{ width: '100%', flexDirection: 'column' }}
-                gap={4}
-              >
-                <ProfileSection.Root
-                  id='subscriptionsList'
-                  title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
-                  centered={false}
-                  sx={t => ({
-                    borderTop: 'none',
-                    paddingTop: t.space.$1,
-                  })}
-                >
-                  <SubscriptionsList />
-                  <ProfileSection.ArrowButton
-                    id='subscriptionsList'
-                    textLocalizationKey={localizationKeys(
-                      'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
-                    )}
-                    sx={[
-                      t => ({
-                        justifyContent: 'start',
-                        height: t.sizes.$8,
-                      }),
-                    ]}
-                    leftIcon={ArrowsUpDown}
-                    leftIconSx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-                    onClick={() => void navigate('plans')}
-                  />
-                </ProfileSection.Root>
-                <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
-                  <PaymentSources />
-                </Protect>
-              </Flex>
+              <SubscriptionsList
+                title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
+              <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
+                <PaymentSources />
+              </Protect>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -121,9 +85,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
 export const OrganizationBillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='org'>
-      <PlansContextProvider>
-        <OrganizationBillingPageInternal />
-      </PlansContextProvider>
+      <OrganizationBillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

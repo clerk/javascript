@@ -109,8 +109,7 @@ function Card(props: CardProps) {
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
-
-  const { buttonPropsForPlan, upcomingSubscriptionsExist, activeOrUpcomingSubscription } = usePlansContext();
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -123,21 +122,38 @@ function Card(props: CardProps) {
     });
   };
 
-  const subscription = activeOrUpcomingSubscription(plan);
-  const hasFeatures = plan.features.length > 0;
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
   const isPlanActive = subscription?.status === 'active';
+  const hasFeatures = plan.features.length > 0;
   const showStatusRow = !!subscription;
-  const isEligibleForSwitchToAnnual = plan.annualMonthlyAmount > 0 && planPeriod === 'annual';
 
-  const shouldShowFooter =
-    !subscription ||
-    subscription?.status === 'upcoming' ||
-    subscription?.canceledAt ||
-    (planPeriod !== subscription?.planPeriod && !plan.isDefault && isEligibleForSwitchToAnnual);
-  const shouldShowFooterNotice =
-    subscription?.status === 'upcoming' && (planPeriod === subscription.planPeriod || plan.isDefault);
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
 
-  const planPeriodSameAsSelectedPlanPeriod = !upcomingSubscriptionsExist && subscription?.planPeriod === planPeriod;
+  if (!subscription) {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true;
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
 
   return (
     <Box
@@ -226,7 +242,6 @@ function Card(props: CardProps) {
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: planPeriodSameAsSelectedPlanPeriod && hasFeatures ? t.colors.$colorBackground : undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
@@ -334,6 +349,9 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             elementDescriptor={descriptors.pricingTableCardDescription}
             variant='subtitle'
             colorScheme='secondary'
+            sx={{
+              justifySelf: 'flex-start',
+            }}
           >
             {plan.description}
           </Text>
@@ -397,6 +415,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
           sx={{
+            justifySelf: 'flex-start',
             alignSelf: 'center',
           }}
         />

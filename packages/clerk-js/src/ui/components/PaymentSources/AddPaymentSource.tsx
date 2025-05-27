@@ -1,27 +1,38 @@
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { ClerkAPIError, ClerkRuntimeError, CommerceCheckoutResource } from '@clerk/types';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { Appearance as StripeAppearance, SetupIntent, Stripe } from '@stripe/stripe-js';
+import type { Appearance as StripeAppearance, SetupIntent } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import { clerkUnsupportedEnvironmentWarning } from '../../../core/errors';
 import { useEnvironment, useSubscriberTypeContext } from '../../contexts';
-import { Box, Button, descriptors, Flex, localizationKeys, Spinner, Text, useAppearance } from '../../customizables';
+import {
+  Box,
+  Button,
+  descriptors,
+  Flex,
+  localizationKeys,
+  Spinner,
+  Text,
+  useAppearance,
+  useLocalizations,
+} from '../../customizables';
 import { Alert, Form, FormButtons, FormContainer, LineItems, withCardStateProvider } from '../../elements';
-import { useFetch } from '../../hooks/useFetch';
 import type { LocalizationKey } from '../../localization';
 import { animations } from '../../styledSystem';
 import { handleError, normalizeColorString } from '../../utils';
 
 type AddPaymentSourceProps = {
   onSuccess: (context: { stripeSetupIntent?: SetupIntent }) => Promise<void>;
+  onResetPaymentIntent?: () => void;
   checkout?: CommerceCheckoutResource;
   submitLabel?: LocalizationKey;
   cancelAction?: () => void;
   submitError?: ClerkRuntimeError | ClerkAPIError | string | undefined;
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
-  resetStripeElements?: () => void;
   onPayWithTestPaymentSourceSuccess?: () => void;
   showPayWithTestCardSection?: boolean;
 };
@@ -43,9 +54,6 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
   const subscriberType = useSubscriberTypeContext();
 
   const resource = subscriberType === 'org' ? organization : user;
-
-  const stripePromiseRef = useRef<Promise<Stripe | null> | null>(null);
-  const [stripe, setStripe] = useState<Stripe | null>(null);
 
   const { colors, fontWeights, fontSizes, radii, space } = useAppearance().parsedInternalTheme;
   const elementsAppearance: StripeAppearance = {
@@ -69,51 +77,43 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
     },
   };
 
-  const {
-    data: initializedPaymentSource,
-    invalidate,
-    revalidate: revalidateInitializedPaymentSource,
-  } = useFetch(
-    resource?.initializePaymentSource,
+  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
     {
-      gateway: 'stripe',
+      key: 'commerce-payment-source-initialize',
+      resourceId: resource?.id,
     },
-    undefined,
-    `commerce-payment-source-initialize-${resource?.id}`,
+    () =>
+      resource?.initializePaymentSource({
+        gateway: 'stripe',
+      }),
   );
+
+  useEffect(() => {
+    void initializePaymentSource();
+  }, []);
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
 
   const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
-  useEffect(() => {
-    if (!stripePromiseRef.current && externalGatewayId && stripePublishableKey) {
+  const { data: stripe } = useSWR(
+    externalGatewayId && stripePublishableKey ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey } : null,
+    ({ stripePublishableKey, externalGatewayId }) => {
       if (__BUILD_DISABLE_RHC__) {
         clerkUnsupportedEnvironmentWarning('Stripe');
         return;
       }
-
-      stripePromiseRef.current = loadStripe(stripePublishableKey, {
+      return loadStripe(stripePublishableKey, {
         stripeAccount: externalGatewayId,
       });
-
-      void stripePromiseRef.current.then(stripeInstance => {
-        setStripe(stripeInstance);
-      });
-    }
-  }, [externalGatewayId, externalClientSecret, stripePublishableKey, commerceSettings]);
-
-  // invalidate the initialized payment source when the component unmounts
-  useEffect(() => {
-    return invalidate;
-  }, [invalidate]);
-
-  const resetStripeElements = () => {
-    setStripe(null);
-    stripePromiseRef.current = null;
-    revalidateInitializedPaymentSource?.();
-  };
+    },
+    {
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      dedupingInterval: 1_000 * 60, // 1 minute
+    },
+  );
 
   if (!stripe || !externalClientSecret) {
     return (
@@ -137,17 +137,19 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   return (
     <Elements
+      // This key is used to reset the payment intent, since Stripe doesn't not provide a way to reset the payment intent.
+      key={externalClientSecret}
       stripe={stripe}
       options={{ clientSecret: externalClientSecret, appearance: elementsAppearance }}
     >
       <AddPaymentSourceForm
         submitLabel={submitLabel}
         onSuccess={onSuccess}
+        onResetPaymentIntent={initializePaymentSource}
         cancelAction={cancelAction}
         checkout={checkout}
         submitError={submitError}
         setSubmitError={setSubmitError}
-        resetStripeElements={resetStripeElements}
         onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
         showPayWithTestCardSection={showPayWithTestCardSection}
       />
@@ -159,31 +161,20 @@ const AddPaymentSourceForm = withCardStateProvider(
   ({
     submitLabel,
     onSuccess,
+    onResetPaymentIntent,
     cancelAction,
     checkout,
     submitError,
     setSubmitError,
-    resetStripeElements,
     onPayWithTestPaymentSourceSuccess,
     showPayWithTestCardSection,
   }: AddPaymentSourceProps) => {
+    const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
     const clerk = useClerk();
     const stripe = useStripe();
     const elements = useElements();
     const { displayConfig } = useEnvironment();
-    const { organization } = useOrganization();
-    const { user } = useUser();
-    const subscriberType = useSubscriberTypeContext();
-
-    // Revalidates the next time the hooks gets mounted
-    const { revalidate } = useFetch(
-      undefined,
-      {
-        ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
-      },
-      undefined,
-      `commerce-payment-sources-${user?.id}`,
-    );
+    const { t } = useLocalizations();
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -205,12 +196,10 @@ const AddPaymentSourceForm = withCardStateProvider(
         }
 
         await onSuccess({ stripeSetupIntent: setupIntent });
-
-        // if onSuccess doesn't redirect us, revalidate the payment sources and reset the stripe elements in case we need to input a different payment source
-        revalidate();
-        resetStripeElements?.();
       } catch (error) {
         void handleError(error, [], setSubmitError);
+      } finally {
+        onResetPaymentIntent?.();
       }
     };
 
@@ -266,47 +255,47 @@ const AddPaymentSourceForm = withCardStateProvider(
                   <Text
                     variant='caption'
                     colorScheme='body'
-                  >
-                    Test card information
-                  </Text>
+                    localizationKey={localizationKeys('commerce.paymentSource.dev.testCardInfo')}
+                  />
                   <Text
                     variant='caption'
                     sx={t => ({
                       color: t.colors.$warning500,
                       fontWeight: t.fontWeights.$semibold,
                     })}
-                  >
-                    Development mode
-                  </Text>
+                    localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+                  />
                 </Box>
                 <LineItems.Root>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'Card number'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cardNumber')} />
                     <LineItems.Description text={'4242 4242 4242 4242'} />
                   </LineItems.Group>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'Expiration date'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.expirationDate')} />
                     <LineItems.Description text={'11/44'} />
                   </LineItems.Group>
                   <LineItems.Group variant='tertiary'>
-                    <LineItems.Title title={'CVC, ZIP'} />
-                    <LineItems.Description text={'Any numbers'} />
+                    <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cvcZip')} />
+                    <LineItems.Description text={t(localizationKeys('commerce.paymentSource.dev.anyNumbers'))} />
                   </LineItems.Group>
                 </LineItems.Root>
               </Box>
             )
           )}
           <PaymentElement
+            onReady={() => setIsPaymentElementReady(true)}
             options={{
               layout: {
                 type: 'tabs',
                 defaultCollapsed: false,
               },
+              // TODO(@COMMERCE): Should this be fetched from the fapi?
               paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
               applePay: checkout
                 ? {
                     recurringPaymentRequest: {
-                      paymentDescription: `${checkout.planPeriod === 'month' ? 'Monthly' : 'Annual'} payment`,
+                      paymentDescription: `${t(localizationKeys(checkout.planPeriod === 'month' ? 'commerce.paymentSource.applePayDescription.monthly' : 'commerce.paymentSource.applePayDescription.annual'))}`,
                       managementURL: displayConfig.homeUrl, // TODO(@COMMERCE): is this the right URL?
                       regularBilling: {
                         amount: checkout.totals.totalDueNow?.amount || checkout.totals.grandTotal.amount,
@@ -329,6 +318,7 @@ const AddPaymentSourceForm = withCardStateProvider(
             </Alert>
           )}
           <FormButtons
+            isDisabled={!isPaymentElementReady}
             submitLabel={
               submitLabel ?? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__add')
             }
@@ -395,9 +385,8 @@ const PayWithTestPaymentSource = withCardStateProvider(
               color: t.colors.$warning500,
               fontWeight: t.fontWeights.$semibold,
             })}
-          >
-            Development mode
-          </Text>
+            localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+          />
           <Button
             type='button'
             block

@@ -290,7 +290,11 @@ const NavButton = (props: NavButtonProps) => {
         elementDescriptor={iconElementDescriptor}
         elementId={iconElementId}
         icon={icon}
-        sx={{ opacity: isActive ? 1 : 0.7 }}
+        sx={{
+          opacity: isActive ? 1 : 0.7,
+          // Fixes a bug in Safari where the icon shifts when navigating between routes.
+          transform: 'translateZ(0)',
+        }}
       />
       {children}
     </Button>

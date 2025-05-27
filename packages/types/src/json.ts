@@ -20,6 +20,7 @@ import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './organizationMembership';
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
@@ -304,6 +305,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -315,6 +317,7 @@ export interface VerificationJSON extends ClerkResourceJSON {
   external_verification_redirect_url?: string;
   attempts: number;
   expire_at: number;
+  channel?: PhoneCodeChannel;
   error: ClerkAPIErrorJSON;
 }
 
@@ -328,6 +331,7 @@ export interface SignUpVerificationsJSON {
 export interface SignUpVerificationJSON extends VerificationJSON {
   next_action: string;
   supported_strategies: string[];
+  channel?: PhoneCodeChannel;
 }
 
 export interface ClerkAPIErrorJSON {

@@ -8,7 +8,7 @@ import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import type { LocalizationKey } from '../../localization';
+import { type LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 

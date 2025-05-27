@@ -13,6 +13,7 @@ import type {
 } from './elementIds';
 import type { EnterpriseProvider } from './enterpriseAccount';
 import type { OAuthProvider } from './oauth';
+import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SamlIdpSlug } from './saml';
 import type { BuiltInColors, TransparentColor } from './theme';
 import type { Web3Provider } from './web3';
@@ -188,21 +189,21 @@ export type ElementsConfig = {
 
   socialButtonsRoot: WithOptions;
   socialButtons: WithOptions;
-  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+  socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
+  socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
-  providerIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
-  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | SamlIdpSlug, LoadingState>;
+  providerIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
+  providerInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
 
   alternativeMethods: WithOptions;
-  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
-  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
+  alternativeMethodsBlockButton: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
+  alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
+  alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
 
   checkoutFormLineItemsRoot: WithOptions;
   checkoutFormElementsRoot: WithOptions;
@@ -212,6 +213,7 @@ export type ElementsConfig = {
   checkoutSuccessBadge: WithOptions;
   checkoutSuccessTitle: WithOptions;
   checkoutSuccessDescription: WithOptions;
+  checkoutSuccessHighlight: WithOptions;
 
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
@@ -219,10 +221,12 @@ export type ElementsConfig = {
   otpCodeFieldErrorText: WithOptions;
 
   dividerRow: WithOptions;
+  dividerColumn: WithOptions;
   dividerText: WithOptions;
   dividerLine: WithOptions;
 
   drawerBackdrop: WithOptions;
+  drawerRoot: WithOptions;
   drawerContent: WithOptions;
   drawerHeader: WithOptions;
   drawerTitle: WithOptions;

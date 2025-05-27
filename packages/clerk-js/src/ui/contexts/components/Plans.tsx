@@ -1,64 +1,79 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
   Appearance,
   CommercePlanResource,
-  CommerceSubscriberType,
   CommerceSubscriptionPlanPeriod,
   CommerceSubscriptionResource,
 } from '@clerk/types';
-import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import useSWR from 'swr';
 
 import { CommerceSubscription } from '../../../core/resources/internal';
-import { useFetch } from '../../hooks';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
-import type { PlansCtx } from '../../types';
 import { getClosestProfileScrollBox } from '../../utils';
 import { useSubscriberTypeContext } from './SubscriberType';
 
-const PlansContext = createContext<PlansCtx | null>(null);
+const dedupeOptions = {
+  dedupingInterval: 1_000 * 60, // 1 minute,
+  keepPreviousData: true,
+};
 
-export const useSubscriptions = (subscriberType?: CommerceSubscriberType) => {
-  const { billing } = useClerk();
+export const usePaymentSourcesCacheKey = () => {
   const { organization } = useOrganization();
   const { user } = useUser();
-  const resource = subscriberType === 'org' ? organization : user;
+  const subscriberType = useSubscriberTypeContext();
 
-  return useFetch(
-    user ? billing.getSubscriptions : undefined,
-    { orgId: subscriberType === 'org' ? organization?.id : undefined },
-    undefined,
-    `commerce-subscriptions-${resource?.id}`,
-  );
+  return {
+    key: `commerce-payment-sources`,
+    resourceId: subscriberType === 'org' ? organization?.id : user?.id,
+  };
 };
 
-export const usePlans = (subscriberType?: CommerceSubscriberType) => {
+export const usePaymentSources = () => {
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
+  const cacheKey = usePaymentSourcesCacheKey();
+
+  return useSWR(cacheKey, () => (subscriberType === 'org' ? organization : user)?.getPaymentSources({}), dedupeOptions);
+};
+
+export const useStatementsCacheKey = () => {
+  const { organization } = useOrganization();
+  const { user } = useUser();
+  const subscriberType = useSubscriberTypeContext();
+
+  return {
+    key: `commerce-statements`,
+    userId: user?.id,
+    args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
+  };
+};
+
+export const useStatements = () => {
   const { billing } = useClerk();
+  const cacheKey = useStatementsCacheKey();
 
-  return useFetch(
-    billing.getPlans,
-    {
-      subscriberType,
-    },
-    undefined,
-    'commerce-plans',
-  );
+  return useSWR(cacheKey, ({ args, userId }) => (userId ? billing.getStatements(args) : undefined), dedupeOptions);
 };
 
-export const PlansContextProvider = ({ children }: PropsWithChildren) => {
+export const useSubscriptions = () => {
+  const { billing } = useClerk();
   const { organization } = useOrganization();
   const { user, isSignedIn } = useUser();
   const subscriberType = useSubscriberTypeContext();
-  const resource = subscriberType === 'org' ? organization : user;
+  const { data: plans } = usePlans();
 
-  const {
-    data: _subscriptions,
-    isLoading: isLoadingSubscriptions,
-    revalidate: revalidateSubscriptions,
-  } = useSubscriptions(subscriberType);
-
-  const { data: plans, isLoading: isLoadingPlans, revalidate: revalidatePlans } = usePlans(subscriberType);
+  const { data: _subscriptions, ...rest } = useSWR(
+    {
+      key: `commerce-subscriptions`,
+      userId: user?.id,
+      args: { orgId: subscriberType === 'org' ? organization?.id : undefined },
+    },
+    ({ args, userId }) => (userId ? billing.getSubscriptions(args) : undefined),
+    dedupeOptions,
+  );
 
   const subscriptions = useMemo(() => {
     if (!_subscriptions) {
@@ -91,42 +106,23 @@ export const PlansContextProvider = ({ children }: PropsWithChildren) => {
     return _subscriptions.data;
   }, [_subscriptions, plans, isSignedIn]);
 
-  // Revalidates the next time the hooks gets mounted
-  const { revalidate: revalidateStatements } = useFetch(
-    undefined,
+  return {
+    data: subscriptions,
+    ...rest,
+  };
+};
+
+export const usePlans = () => {
+  const { billing } = useClerk();
+  const subscriberType = useSubscriberTypeContext();
+
+  return useSWR(
     {
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      key: `commerce-plans`,
+      args: { subscriberType },
     },
-    undefined,
-    `commerce-statements-${resource?.id}`,
-  );
-
-  const revalidate = useCallback(() => {
-    // Revalidate the plans and subscriptions
-    revalidateSubscriptions();
-    revalidatePlans();
-    revalidateStatements();
-  }, [revalidateStatements, revalidatePlans, revalidateSubscriptions]);
-
-  const isLoaded = useMemo(() => {
-    if (isSignedIn) {
-      return isLoadingSubscriptions === false && isLoadingPlans === false;
-    }
-    return isLoadingPlans === false;
-  }, [isLoadingPlans, isLoadingSubscriptions, isSignedIn]);
-
-  return (
-    <PlansContext.Provider
-      value={{
-        componentName: 'Plans',
-        plans: isLoaded ? (plans ?? []) : [],
-        subscriptions: isLoaded ? subscriptions : [],
-        isLoading: isLoadingSubscriptions || isLoadingPlans || false,
-        revalidate,
-      }}
-    >
-      {children}
-    </PlansContext.Provider>
+    ({ args }) => billing.getPlans(args),
+    dedupeOptions,
   );
 };
 
@@ -137,16 +133,13 @@ type HandleSelectPlanProps = {
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
   appearance?: Appearance;
+  newSubscriptionRedirectUrl?: string;
 };
 
 export const usePlansContext = () => {
   const clerk = useClerk();
+  const { session } = useSession();
   const subscriberType = useSubscriberTypeContext();
-  const context = useContext(PlansContext);
-
-  if (!context || context.componentName !== 'Plans') {
-    throw new Error('Clerk: usePlansContext called outside Plans.');
-  }
 
   const canManageBilling = useMemo(() => {
     if (!clerk.session) {
@@ -160,20 +153,74 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { componentName, ...ctx } = context;
+  const { data: subscriptions, mutate: mutateSubscriptions } = useSubscriptions();
+
+  // Invalidates cache but does not fetch immediately
+  const { data: plans, mutate: mutatePlans } = useSWR<Awaited<ReturnType<typeof clerk.billing.getPlans>>>({
+    key: `commerce-plans`,
+    args: { subscriberType },
+  });
+
+  // Invalidates cache but does not fetch immediately
+  const { mutate: mutateStatements } =
+    useSWR<Awaited<ReturnType<typeof clerk.billing.getStatements>>>(useStatementsCacheKey());
+
+  const { mutate: mutatePaymentSources } = usePaymentSources();
+
+  const revalidateAll = useCallback(() => {
+    // Revalidate the plans and subscriptions
+    void mutateSubscriptions();
+    void mutatePlans();
+    void mutateStatements();
+    void mutatePaymentSources();
+  }, [mutateSubscriptions, mutatePlans, mutateStatements, mutatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
     // are there no subscriptions or are all subscriptions canceled
-    return ctx.subscriptions.length === 0 || !ctx.subscriptions.some(subscription => !subscription.canceledAt);
-  }, [ctx.subscriptions]);
+    return subscriptions.length === 0 || !subscriptions.some(subscription => !subscription.canceledAt);
+  }, [subscriptions]);
 
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
     (plan: CommercePlanResource) => {
-      return ctx.subscriptions.find(subscription => subscription.plan.id === plan.id);
+      return subscriptions.find(subscription => subscription.plan.id === plan.id);
     },
-    [ctx.subscriptions],
+    [subscriptions],
+  );
+
+  // returns all subscriptions for a plan that are active or upcoming
+  const activeAndUpcomingSubscriptions = useCallback(
+    (plan: CommercePlanResource) => {
+      return subscriptions.filter(subscription => subscription.plan.id === plan.id);
+    },
+    [subscriptions],
+  );
+
+  // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
+  const activeOrUpcomingSubscriptionWithPlanPeriod = useCallback(
+    (plan: CommercePlanResource, planPeriod: CommerceSubscriptionPlanPeriod = 'month') => {
+      const plansSubscriptions = activeAndUpcomingSubscriptions(plan);
+      // Handle multiple subscriptions for the same plan
+      if (plansSubscriptions.length > 1) {
+        const subscriptionBaseOnPanPeriod = plansSubscriptions.find(subscription => {
+          return subscription.planPeriod === planPeriod;
+        });
+
+        if (subscriptionBaseOnPanPeriod) {
+          return subscriptionBaseOnPanPeriod;
+        }
+
+        return plansSubscriptions[0];
+      }
+
+      if (plansSubscriptions.length === 1) {
+        return plansSubscriptions[0];
+      }
+
+      return undefined;
+    },
+    [activeAndUpcomingSubscriptions],
   );
 
   const canManageSubscription = useCallback(
@@ -188,10 +235,9 @@ export const usePlansContext = () => {
   // should the default plan be shown as active
   const upcomingSubscriptionsExist = useMemo(() => {
     return (
-      ctx.subscriptions.some(subscription => subscription.status === 'upcoming') ||
-      isDefaultPlanImplicitlyActiveOrUpcoming
+      subscriptions.some(subscription => subscription.status === 'upcoming') || isDefaultPlanImplicitlyActiveOrUpcoming
     );
-  }, [ctx.subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
+  }, [subscriptions, isDefaultPlanImplicitlyActiveOrUpcoming]);
 
   // return the CTA button props for a plan
   const buttonPropsForPlan = useCallback(
@@ -212,7 +258,8 @@ export const usePlansContext = () => {
       isDisabled: boolean;
       disabled: boolean;
     } => {
-      const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
+      const subscription =
+        sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
       if (_selectedPlanPeriod === 'annual' && sub?.plan.annualMonthlyAmount === 0) {
         _selectedPlanPeriod = 'month';
@@ -220,28 +267,55 @@ export const usePlansContext = () => {
 
       const isEligibleForSwitchToAnnual = (plan?.annualMonthlyAmount ?? 0) > 0;
 
+      const getLocalizationKey = () => {
+        // Handle subscription cases
+        if (subscription) {
+          if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
+            if (_selectedPlanPeriod === 'month') {
+              return localizationKeys('commerce.switchToMonthly');
+            }
+
+            if (isEligibleForSwitchToAnnual) {
+              return localizationKeys('commerce.switchToAnnual');
+            }
+          }
+
+          if (subscription.canceledAt) {
+            return localizationKeys('commerce.reSubscribe');
+          }
+
+          if (_selectedPlanPeriod !== subscription.planPeriod) {
+            if (_selectedPlanPeriod === 'month') {
+              return localizationKeys('commerce.switchToMonthly');
+            }
+
+            if (isEligibleForSwitchToAnnual) {
+              return localizationKeys('commerce.switchToAnnual');
+            }
+
+            return localizationKeys('commerce.manageSubscription');
+          }
+
+          return localizationKeys('commerce.manageSubscription');
+        }
+
+        // Handle non-subscription cases
+        const hasNonDefaultSubscriptions =
+          subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0;
+        return hasNonDefaultSubscriptions
+          ? localizationKeys('commerce.switchPlan')
+          : localizationKeys('commerce.subscribe');
+      };
+
       return {
-        localizationKey: subscription
-          ? subscription.canceledAt
-            ? localizationKeys('commerce.reSubscribe')
-            : selectedPlanPeriod !== subscription.planPeriod
-              ? selectedPlanPeriod === 'month'
-                ? localizationKeys('commerce.switchToMonthly')
-                : isEligibleForSwitchToAnnual
-                  ? localizationKeys('commerce.switchToAnnual')
-                  : localizationKeys('commerce.manageSubscription')
-              : localizationKeys('commerce.manageSubscription')
-          : // If there are no active or grace period subscriptions, show the get started button
-            ctx.subscriptions.filter(subscription => !subscription.plan.isDefault).length > 0
-            ? localizationKeys('commerce.switchPlan')
-            : localizationKeys('commerce.subscribe'),
+        localizationKey: getLocalizationKey(),
         variant: isCompact ? 'bordered' : 'solid',
         colorScheme: isCompact ? 'secondary' : 'primary',
         isDisabled: !canManageBilling,
         disabled: !canManageBilling,
       };
     },
-    [activeOrUpcomingSubscription, canManageBilling, ctx.subscriptions],
+    [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptions],
   );
 
   const captionForSubscription = useCallback((subscription: CommerceSubscriptionResource) => {
@@ -256,53 +330,62 @@ export const usePlansContext = () => {
 
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, onSubscriptionChange, mode = 'mounted', event, appearance }: HandleSelectPlanProps) => {
+    ({
+      plan,
+      planPeriod,
+      onSubscriptionChange,
+      mode = 'mounted',
+      event,
+      appearance,
+      newSubscriptionRedirectUrl,
+    }: HandleSelectPlanProps) => {
       const subscription = activeOrUpcomingSubscription(plan);
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
-      if (subscription && !subscription.canceledAt) {
+      if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
           subscriberType,
           onSubscriptionCancel: () => {
-            ctx.revalidate();
+            revalidateAll();
             onSubscriptionChange?.();
           },
           appearance,
           portalRoot,
         });
       } else {
-        // if the plan doesn't support annual, use monthly
-        let _planPeriod = planPeriod;
-        if (planPeriod === 'annual' && plan.annualMonthlyAmount === 0) {
-          _planPeriod = 'month';
-        }
-
         clerk.__internal_openCheckout({
           planId: plan.id,
-          planPeriod: _planPeriod,
-          subscriberType: subscriberType,
+          // if the plan doesn't support annual, use monthly
+          planPeriod: planPeriod === 'annual' && plan.annualMonthlyAmount === 0 ? 'month' : planPeriod,
+          subscriberType,
           onSubscriptionComplete: () => {
-            ctx.revalidate();
+            revalidateAll();
             onSubscriptionChange?.();
+          },
+          onClose: () => {
+            if (session?.id) {
+              void clerk.setActive({ session: session.id });
+            }
           },
           appearance,
           portalRoot,
+          newSubscriptionRedirectUrl,
         });
       }
     },
-    [clerk, ctx, activeOrUpcomingSubscription, subscriberType],
+    [clerk, revalidateAll, activeOrUpcomingSubscription, subscriberType, session?.id],
   );
 
   const defaultFreePlan = useMemo(() => {
-    return ctx.plans.find(plan => plan.isDefault);
-  }, [ctx.plans]);
+    return plans?.find(plan => plan.isDefault);
+  }, [plans]);
 
   return {
-    ...ctx,
-    componentName,
     activeOrUpcomingSubscription,
+    activeAndUpcomingSubscriptions,
+    activeOrUpcomingSubscriptionBasedOnPlanPeriod: activeOrUpcomingSubscriptionWithPlanPeriod,
     isDefaultPlanImplicitlyActiveOrUpcoming,
     handleSelectPlan,
     buttonPropsForPlan,
@@ -310,5 +393,6 @@ export const usePlansContext = () => {
     captionForSubscription,
     upcomingSubscriptionsExist,
     defaultFreePlan,
+    revalidateAll,
   };
 };

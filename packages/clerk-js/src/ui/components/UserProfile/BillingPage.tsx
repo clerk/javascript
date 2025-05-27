@@ -1,14 +1,8 @@
-import {
-  PlansContextProvider,
-  StatementsContextProvider,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
+import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
-  ProfileSection,
   Tab,
   TabPanel,
   TabPanels,
@@ -18,8 +12,6 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { ArrowsUpDown } from '../../icons';
-import { useRouter } from '../../router';
 import { PaymentSources } from '../PaymentSources';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
@@ -32,14 +24,7 @@ const tabMap = {
 
 const BillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions();
-  const { navigate } = useRouter();
-
   const { selectedTab, handleTabChange } = useTabState(tabMap);
-
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
 
   return (
     <Col
@@ -70,43 +55,19 @@ const BillingPageInternal = withCardStateProvider(() => {
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-              <>
-                <ProfileSection.Root
-                  id='subscriptionsList'
-                  title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
-                  centered={false}
-                  sx={t => ({
-                    borderTop: 'none',
-                    paddingTop: t.space.$1,
-                  })}
-                >
-                  <SubscriptionsList />
-                  <ProfileSection.ArrowButton
-                    id='subscriptionsList'
-                    textLocalizationKey={localizationKeys(
-                      'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
-                    )}
-                    sx={[
-                      t => ({
-                        justifyContent: 'start',
-                        height: t.sizes.$8,
-                      }),
-                    ]}
-                    leftIcon={ArrowsUpDown}
-                    leftIconSx={t => ({
-                      width: t.sizes.$4,
-                      height: t.sizes.$4,
-                    })}
-                    onClick={() => void navigate('plans')}
-                  />
-                </ProfileSection.Root>
-                <PaymentSources />
-              </>
+              <SubscriptionsList
+                title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
+              <PaymentSources />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <StatementsContextProvider>
-                <StatementsList />
-              </StatementsContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -118,9 +79,7 @@ const BillingPageInternal = withCardStateProvider(() => {
 export const BillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <BillingPageInternal />
-      </PlansContextProvider>
+      <BillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

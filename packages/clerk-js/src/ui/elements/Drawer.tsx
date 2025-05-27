@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useSafeLayoutEffect } from '@clerk/shared/react/index';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -16,8 +16,7 @@ import * as React from 'react';
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
-import { usePrefersReducedMotion } from '../hooks';
-import { useScrollLock } from '../hooks/useScrollLock';
+import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
@@ -38,6 +37,7 @@ interface DrawerContext {
   context: ReturnType<typeof useFloating>['context'];
   getFloatingProps: ReturnType<typeof useInteractions>['getFloatingProps'];
   portalProps: FloatingPortalProps;
+  direction: ReturnType<typeof useDirection>;
 }
 
 const DrawerContext = React.createContext<DrawerContext | null>(null);
@@ -87,12 +87,14 @@ function Root({
   portalProps,
   dismissProps,
 }: RootProps) {
+  const direction = useDirection();
+
   const { refs, context } = useFloating({
     open,
     onOpenChange,
     transform: false,
     strategy,
-    placement: 'right',
+    placement: direction === 'ltr' ? 'right' : 'left',
     ...floatingProps,
   });
 
@@ -112,6 +114,7 @@ function Root({
         refs,
         context,
         getFloatingProps,
+        direction,
       }}
     >
       <FloatingPortal {...portalProps}>{children}</FloatingPortal>
@@ -127,15 +130,18 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
   props: React.ComponentPropsWithoutRef<typeof Box>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { strategy } = useDrawerContext();
   const { disableScrollLock, enableScrollLock } = useScrollLock();
 
   useSafeLayoutEffect(() => {
+    if (strategy !== 'fixed') {
+      return;
+    }
     enableScrollLock();
-
     return () => {
       disableScrollLock();
     };
-  }, []);
+  }, [strategy, disableScrollLock, enableScrollLock]);
 
   return (
     <Box
@@ -195,7 +201,7 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
   const prefersReducedMotion = usePrefersReducedMotion();
   const { animations: layoutAnimations } = useAppearance().parsedLayout;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
-  const { strategy, refs, context, getFloatingProps } = useDrawerContext();
+  const { strategy, refs, context, getFloatingProps, direction } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
 
   const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
@@ -218,15 +224,20 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
       outsideElementsInert
       initialFocus={refs.floating}
     >
-      <div
+      <Box
         ref={mergedRefs}
         {...getFloatingProps()}
-        style={{
+        sx={t => ({
           position: strategy,
           insetBlock: 0,
           insetInline: 0,
           pointerEvents: 'none',
-        }}
+          isolation: 'isolate',
+          // When drawer is within the profile components, we need to ensure it is above the drawer
+          // renders above the profile close button
+          zIndex: strategy === 'absolute' ? t.zIndices.$modal : undefined,
+        })}
+        elementDescriptor={descriptors.drawerRoot}
       >
         <Flex
           elementDescriptor={descriptors.drawerContent}
@@ -236,7 +247,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             // Apply the conditional right offset + the spread of the
             // box shadow to ensure it is fully offscreen before unmounting
             '--transform-offset':
-              strategy === 'fixed' ? `calc(100% + ${t.space.$3} + ${t.space.$8x75})` : `calc(100% + ${t.space.$8x75})`,
+              strategy === 'fixed'
+                ? `calc((100% + ${t.space.$3} + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`
+                : `calc((100% + ${t.space.$8x75}) * ${direction === 'rtl' ? -1 : 1})`,
             willChange: 'transform',
             position: strategy,
             insetBlock: strategy === 'fixed' ? t.space.$3 : 0,
@@ -254,13 +267,12 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, re
             borderColor: t.colors.$neutralAlpha100,
             boxShadow: t.shadows.$cardBoxShadow,
             overflow: 'hidden',
-            zIndex: t.zIndices.$modal,
             pointerEvents: 'auto',
           })}
         >
           {children}
         </Flex>
-      </div>
+      </Box>
     </FloatingFocusManager>
   );
 });
