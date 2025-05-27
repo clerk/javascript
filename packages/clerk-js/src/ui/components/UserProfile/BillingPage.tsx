@@ -1,11 +1,5 @@
-import {
-  InvoicesContextProvider,
-  PlansContextProvider,
-  PricingTableContext,
-  SubscriberTypeContext,
-  useSubscriptions,
-} from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { SubscriberTypeContext } from '../../contexts';
+import { Col, descriptors, localizationKeys } from '../../customizables';
 import {
   Card,
   Header,
@@ -18,28 +12,19 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { useTabState } from '../../hooks/useTabState';
-import { useRouter } from '../../router';
-import { InvoicesList } from '../Invoices';
 import { PaymentSources } from '../PaymentSources';
-import { PricingTable } from '../PricingTable';
+import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
 const tabMap = {
   0: 'plans',
-  1: 'invoices',
+  1: 'statements',
   2: 'payment-methods',
 } as const;
 
 const BillingPageInternal = withCardStateProvider(() => {
   const card = useCardState();
-  const { data: subscriptions } = useSubscriptions();
-  const { navigate } = useRouter();
-
   const { selectedTab, handleTabChange } = useTabState(tabMap);
-
-  if (!Array.isArray(subscriptions?.data)) {
-    return null;
-  }
 
   return (
     <Col
@@ -65,44 +50,24 @@ const BillingPageInternal = withCardStateProvider(() => {
           onChange={handleTabChange}
         >
           <TabsList sx={t => ({ gap: t.space.$6 })}>
-            <Tab
-              localizationKey={
-                subscriptions.data.length > 0
-                  ? localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')
-                  : localizationKeys('userProfile.billingPage.start.headerTitle__plans')
-              }
-            />
-            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__invoices')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__subscriptions')} />
+            <Tab localizationKey={localizationKeys('userProfile.billingPage.start.headerTitle__statements')} />
           </TabsList>
           <TabPanels>
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
-              {subscriptions.data.length > 0 ? (
-                <Flex
-                  sx={{ width: '100%', flexDirection: 'column' }}
-                  gap={4}
-                >
-                  <SubscriptionsList />
-                  <Button
-                    localizationKey='View all plans'
-                    hasArrow
-                    variant='ghost'
-                    onClick={() => navigate('plans')}
-                    sx={{
-                      width: 'fit-content',
-                    }}
-                  />
-                  <PaymentSources />
-                </Flex>
-              ) : (
-                <PricingTableContext.Provider value={{ componentName: 'PricingTable', mode: 'modal' }}>
-                  <PricingTable />
-                </PricingTableContext.Provider>
-              )}
+              <SubscriptionsList
+                title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
+                arrowButtonText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
+                )}
+                arrowButtonEmptyText={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+              />
+              <PaymentSources />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
-              <InvoicesContextProvider>
-                <InvoicesList />
-              </InvoicesContextProvider>
+              <StatementsList />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -114,9 +79,7 @@ const BillingPageInternal = withCardStateProvider(() => {
 export const BillingPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <BillingPageInternal />
-      </PlansContextProvider>
+      <BillingPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

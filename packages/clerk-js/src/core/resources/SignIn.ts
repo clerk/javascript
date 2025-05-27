@@ -120,6 +120,7 @@ export class SignIn extends BaseResource implements SignInResource {
         config = {
           phoneNumberId: factor.phoneNumberId,
           default: factor.default,
+          channel: factor.channel,
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
@@ -147,6 +148,7 @@ export class SignIn extends BaseResource implements SignInResource {
         config = {
           redirectUrl: factor.redirectUrl,
           actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+          oidcPrompt: factor.oidcPrompt,
         } as EnterpriseSSOConfig;
         break;
       default:
@@ -230,7 +232,7 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrl, redirectUrlComplete, identifier } = params || {};
+    const { strategy, redirectUrl, redirectUrlComplete, identifier, oidcPrompt } = params || {};
 
     const { firstFactorVerification } =
       (strategy === 'saml' || strategy === 'enterprise_sso') && this.id
@@ -238,12 +240,14 @@ export class SignIn extends BaseResource implements SignInResource {
             strategy,
             redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
             actionCompleteRedirectUrl: redirectUrlComplete,
+            oidcPrompt,
           })
         : await this.create({
             strategy,
             identifier,
             redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectUrl),
             actionCompleteRedirectUrl: redirectUrlComplete,
+            oidcPrompt,
           });
 
     const { status, externalVerificationRedirectURL } = firstFactorVerification;

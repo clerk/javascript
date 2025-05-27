@@ -2,9 +2,6 @@ import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
-  CommerceInvoiceResource,
-  CommercePlanResource,
-  CommerceSubscriptionResource,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
@@ -120,27 +117,6 @@ export type PricingTableCtx = PricingTableProps & {
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
-
-export type PaymentSourcesCtx = {
-  componentName: 'PaymentSources';
-};
-
-export type InvoicesCtx = {
-  componentName: 'Invoices';
-  invoices: CommerceInvoiceResource[];
-  totalCount: number;
-  isLoading: boolean;
-  revalidate: () => void;
-  getInvoiceById: (invoiceId: string) => CommerceInvoiceResource | undefined;
-};
-
-export type PlansCtx = {
-  componentName: 'Plans';
-  plans: CommercePlanResource[];
-  subscriptions: CommerceSubscriptionResource[];
-  isLoading: boolean;
-  revalidate: () => void;
-};
 
 export type SessionTasksCtx = {
   nextTask: () => Promise<void>;

@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   backButton: 'Πίσω',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Προεπιλογή',
@@ -31,11 +32,17 @@ export const elGR: LocalizationResource = {
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const elGR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const elGR: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Δημιουργία οργανισμού',
@@ -158,6 +194,42 @@ export const elGR: LocalizationResource = {
     badge__automaticSuggestion: 'Αυτόματες προτάσεις',
     badge__manualInvitation: 'Χωρίς αυτόματη εγγραφή',
     badge__unverified: 'Μη επαληθευμένο',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Προσθέστε τον τομέα για επαλήθευση. Χρήστες με διευθύνσεις email σε αυτόν τον τομέα μπορούν να συμμετάσχουν στον οργανισμό αυτόματα ή να αιτηθούν συμμετοχή.',
@@ -220,6 +292,12 @@ export const elGR: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -405,6 +483,12 @@ export const elGR: LocalizationResource = {
         'Αντιμετωπίζετε δυσκολίες; Μπορείτε να χρησιμοποιήσετε οποιαδήποτε από αυτές τις μεθόδους για να συνδεθείτε.',
       title: 'Χρήση μιας άλλης μεθόδου',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή ενός εφεδρικού κωδικού',
@@ -513,6 +597,12 @@ export const elGR: LocalizationResource = {
       actionLink__use_username: 'Χρήση ονόματος χρήστη',
       actionText: 'Δεν έχετε λογαριασμό;',
       actionText__join_waitlist: 'Θέλετε πρώιμη πρόσβαση;',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Σύνδεση',
@@ -526,6 +616,11 @@ export const elGR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Σύνδεση',
       actionText: 'Έχετε ήδη λογαριασμό;',
@@ -594,6 +689,12 @@ export const elGR: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Έχετε ήδη λογαριασμό;',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       subtitleCombined: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
@@ -742,12 +843,20 @@ export const elGR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -896,6 +1005,9 @@ export const elGR: LocalizationResource = {
       title: 'Προσθήκη αριθμού τηλεφώνου',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Ανεβάστε μια εικόνα σε μορφή JPG, PNG, GIF ή WEBP μικρότερη των 10 MB',

@@ -1,30 +1,28 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization } from '@clerk/shared/react';
 import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
-import { Fragment, useRef } from 'react';
+import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { useSubscriberTypeContext } from '../../contexts';
+import { usePaymentSources, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
+import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 import { AddPaymentSource } from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
 
 const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
-  const { commerce } = useClerk();
+  const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
 
   const onAddPaymentSourceSuccess = async (context: { stripeSetupIntent?: SetupIntent }) => {
-    await commerce.addPaymentSource({
+    const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+    await resource?.addPaymentSource({
       gateway: 'stripe',
       paymentToken: context.stripeSetupIntent?.payment_method as string,
-      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
     });
     onSuccess();
     close();
@@ -84,25 +82,32 @@ const RemoveScreen = ({
   );
 };
 
-export const PaymentSources = () => {
-  const { commerce } = useClerk();
-  const { organization } = useOrganization();
+export const PaymentSources = withCardStateProvider(() => {
+  const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
 
-  const { user } = useUser();
-  const { data, revalidate } = useFetch(
-    commerce?.getPaymentSources,
-    { ...(subscriberType === 'org' ? { orgId: organization?.id } : {}) },
-    undefined,
-    `commerce-payment-sources-${user?.id}`,
+  const resource = subscriberType === 'org' ? clerk?.organization : clerk.user;
+
+  const { data, isLoading, mutate: mutatePaymentSources } = usePaymentSources();
+
+  const { data: paymentSources = [] } = data || {};
+
+  const sortedPaymentSources = useMemo(
+    () => paymentSources.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
+    [paymentSources],
   );
-  const { data: paymentSources } = data || { data: [] };
+
+  const revalidatePaymentSources = useCallback(() => void mutatePaymentSources(), [mutatePaymentSources]);
+
+  if (!resource) {
+    return null;
+  }
 
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.billingPage.paymentSourcesSection.title')}
       centered={false}
-      id='profile'
+      id='paymentSources'
       sx={t => ({
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
@@ -111,43 +116,52 @@ export const PaymentSources = () => {
       })}
     >
       <Action.Root>
-        <ProfileSection.ItemList id='paymentSources'>
-          {paymentSources.map(paymentSource => (
-            <Fragment key={paymentSource.id}>
-              <ProfileSection.Item id='paymentSources'>
-                <PaymentSourceRow paymentSource={paymentSource} />
-                <PaymentSourceMenu
-                  paymentSource={paymentSource}
-                  revalidate={revalidate}
-                />
-              </ProfileSection.Item>
+        <ProfileSection.ItemList
+          id='paymentSources'
+          disableAnimation
+        >
+          {isLoading ? (
+            <FullHeightLoader />
+          ) : (
+            <>
+              {sortedPaymentSources.map(paymentSource => (
+                <Fragment key={paymentSource.id}>
+                  <ProfileSection.Item id='paymentSources'>
+                    <PaymentSourceRow paymentSource={paymentSource} />
+                    <PaymentSourceMenu
+                      paymentSource={paymentSource}
+                      revalidate={revalidatePaymentSources}
+                    />
+                  </ProfileSection.Item>
 
-              <Action.Open value={`remove-${paymentSource.id}`}>
-                <Action.Card variant='destructive'>
-                  <RemoveScreen
-                    paymentSource={paymentSource}
-                    revalidate={revalidate}
-                  />
+                  <Action.Open value={`remove-${paymentSource.id}`}>
+                    <Action.Card variant='destructive'>
+                      <RemoveScreen
+                        paymentSource={paymentSource}
+                        revalidate={revalidatePaymentSources}
+                      />
+                    </Action.Card>
+                  </Action.Open>
+                </Fragment>
+              ))}
+              <Action.Trigger value='add'>
+                <ProfileSection.ArrowButton
+                  id='paymentSources'
+                  localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')}
+                />
+              </Action.Trigger>
+              <Action.Open value='add'>
+                <Action.Card>
+                  <AddScreen onSuccess={revalidatePaymentSources} />
                 </Action.Card>
               </Action.Open>
-            </Fragment>
-          ))}
-          <Action.Trigger value='add'>
-            <ProfileSection.ArrowButton
-              id='paymentSources'
-              localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')}
-            />
-          </Action.Trigger>
-          <Action.Open value='add'>
-            <Action.Card>
-              <AddScreen onSuccess={revalidate} />
-            </Action.Card>
-          </Action.Open>
+            </>
+          )}
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );
-};
+});
 
 const PaymentSourceMenu = ({
   paymentSource,
@@ -160,13 +174,14 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
+  const { data: subscriptions } = useSubscriptions();
 
   const actions = [
     {
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault,
+      isDisabled: paymentSource.isDefault && subscriptions.some(s => !s.plan.isDefault),
     },
   ];
 

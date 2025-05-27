@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
   backButton: 'Takaisin',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Oletus',
@@ -31,11 +32,17 @@ export const fiFI: LocalizationResource = {
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const fiFI: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const fiFI: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Luo organisaatio',
@@ -158,6 +194,42 @@ export const fiFI: LocalizationResource = {
     badge__automaticSuggestion: 'Automaattiset ehdotukset',
     badge__manualInvitation: 'Ei automaattista liittymistä',
     badge__unverified: 'Vahvistamaton',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Lisää verkkotunnus vahvistaaksesi. Tämän verkkotunnuksen sähköpostiosoitteilla varustetut käyttäjät voivat liittyä organisaatioon automaattisesti tai pyytää liittymistä.',
@@ -220,6 +292,12 @@ export const fiFI: LocalizationResource = {
       general: 'Yleinen',
       members: 'Jäsenet',
       title: 'Organisaatio',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -405,6 +483,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Ongelmia? Voit kirjautua sisään millä tahansa näistä tavoista.',
       title: 'Käytä toista tapaa',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Varakoodi on se, jonka sait asettaessasi kaksivaiheisen todennuksen.',
       title: 'Syötä varakoodi',
@@ -512,6 +596,12 @@ export const fiFI: LocalizationResource = {
       actionLink__use_username: 'Käytä käyttäjänimeä',
       actionText: 'Eikö sinulla ole tiliä?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Kirjaudu sisään',
@@ -525,6 +615,11 @@ export const fiFI: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
@@ -593,6 +688,12 @@ export const fiFI: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
       subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
@@ -737,12 +838,20 @@ export const fiFI: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -891,6 +1000,9 @@ export const fiFI: LocalizationResource = {
       title: 'Lisää puhelinnumero',
       verifySubtitle: 'Syötä puhelimeesi lähetetty vahvistuskoodi: {{identifier}}',
       verifyTitle: 'Vahvista puhelinnumero',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Suositeltu koko 1:1, enintään 10 Mt.',

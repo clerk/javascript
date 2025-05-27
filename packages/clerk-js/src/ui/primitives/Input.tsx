@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
-import { sanitizeInputProps, useFormField } from './hooks';
+import { sanitizeInputProps, useFormField } from './hooks/useFormField';
 import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({

@@ -2,15 +2,15 @@ import type {
   ClerkPaginatedResponse,
   CommerceBillingNamespace,
   CommerceCheckoutJSON,
-  CommerceInvoiceJSON,
-  CommerceInvoiceResource,
   CommercePlanResource,
   CommerceProductJSON,
+  CommerceStatementJSON,
+  CommerceStatementResource,
   CommerceSubscriptionJSON,
   CommerceSubscriptionResource,
   CreateCheckoutParams,
-  GetInvoicesParams,
   GetPlansParams,
+  GetStatementsParams,
   GetSubscriptionsParams,
 } from '@clerk/types';
 
@@ -18,8 +18,8 @@ import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOff
 import {
   BaseResource,
   CommerceCheckout,
-  CommerceInvoice,
   CommercePlan,
+  CommerceStatement,
   CommerceSubscription,
 } from '../../resources/internal';
 
@@ -41,7 +41,7 @@ export class CommerceBilling implements CommerceBillingNamespace {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/subscriptions` : `/me/commerce/subscriptions`,
+      path: orgId ? `/organizations/${orgId}/commerce/subscriptions` : `/me/commerce/subscriptions`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
@@ -55,19 +55,20 @@ export class CommerceBilling implements CommerceBillingNamespace {
     });
   };
 
-  getInvoices = async (params: GetInvoicesParams): Promise<ClerkPaginatedResponse<CommerceInvoiceResource>> => {
+  getStatements = async (params: GetStatementsParams): Promise<ClerkPaginatedResponse<CommerceStatementResource>> => {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/invoices` : `/me/commerce/invoices`,
+      path: orgId ? `/organizations/${orgId}/commerce/statements` : `/me/commerce/statements`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
-      const { data: invoices, total_count } = res?.response as unknown as ClerkPaginatedResponse<CommerceInvoiceJSON>;
+      const { data: statements, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<CommerceStatementJSON>;
 
       return {
         total_count,
-        data: invoices.map(invoice => new CommerceInvoice(invoice)),
+        data: statements.map(statement => new CommerceStatement(statement)),
       };
     });
   };

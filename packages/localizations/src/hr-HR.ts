@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
   backButton: 'Natrag',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Zadano',
@@ -31,11 +32,17 @@ export const hrHR: LocalizationResource = {
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const hrHR: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const hrHR: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'kreiraj organizaciju',
@@ -157,6 +193,42 @@ export const hrHR: LocalizationResource = {
     badge__automaticSuggestion: 'Automatski prijedlozi',
     badge__manualInvitation: 'Bez automatskog učlanjenja',
     badge__unverified: 'Nepotvrđeno',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Dodajte domenu za provjeru. Korisnici s e-mail adresama na ovoj domeni mogu se automatski pridružiti organizaciji ili zatražiti pridruživanje.',
@@ -219,6 +291,12 @@ export const hrHR: LocalizationResource = {
       general: 'Općenito',
       members: 'Članovi',
       title: 'Organizacija',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -404,6 +482,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Imate problema? Možete koristiti bilo koju od ovih metoda za prijavu.',
       title: 'Koristite drugu metodu',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Vaš rezervni kod je onaj koji ste dobili prilikom postavljanja dvostupanjske autentifikacije.',
       title: 'Unesite rezervni kod',
@@ -512,6 +596,12 @@ export const hrHR: LocalizationResource = {
       actionLink__use_username: 'Koristite korisničko ime',
       actionText: 'Nemate račun?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Dobrodošli natrag! Molimo prijavite se za nastavak',
       subtitleCombined: undefined,
       title: 'Prijavite se na {{applicationName}}',
@@ -525,6 +615,11 @@ export const hrHR: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Unesite svoju lozinku',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Prijavi se',
       actionText: 'Već imate račun?',
@@ -594,6 +689,12 @@ export const hrHR: LocalizationResource = {
       actionLink__use_email: 'Koristite e-poštu',
       actionLink__use_phone: 'Koristite telefon',
       actionText: 'Već imate račun?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Dobrodošli! Molimo ispunite detalje za početak.',
       subtitleCombined: 'Dobrodošli! Molimo ispunite detalje za početak.',
       title: 'Kreirajte svoj račun',
@@ -742,12 +843,20 @@ export const hrHR: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -893,6 +1002,9 @@ export const hrHR: LocalizationResource = {
       title: 'Dodaj telefonski broj',
       verifySubtitle: 'Unesite verifikacijski kod poslan na {{identifier}}',
       verifyTitle: 'Potvrdi telefonski broj',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Preporučena veličina 1:1, do 10MB.',

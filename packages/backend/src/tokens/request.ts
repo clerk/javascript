@@ -396,7 +396,7 @@ export async function authenticateRequest(
     /**
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
-    if (authenticateContext.handshakeToken) {
+    if (authenticateContext.handshakeNonce || authenticateContext.handshakeToken) {
       try {
         return await handshakeService.resolveHandshake();
       } catch (error) {
@@ -523,13 +523,13 @@ export async function authenticateRequest(
         authenticateContext.sessionTokenInCookie!,
       );
 
+      const authObject = signedInRequestState.toAuth();
       // Org sync if necessary
-      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(
-        authenticateContext,
-        signedInRequestState.toAuth(),
-      );
-      if (handshakeRequestState) {
-        return handshakeRequestState;
+      if (authObject.userId) {
+        const handshakeRequestState = handleMaybeOrganizationSyncHandshake(authenticateContext, authObject);
+        if (handshakeRequestState) {
+          return handshakeRequestState;
+        }
       }
 
       return signedInRequestState;

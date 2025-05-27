@@ -29,7 +29,7 @@ import type {
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  CommerceNamespace,
+  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -131,7 +131,7 @@ import { eventBus, events } from './events';
 import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
-import { Commerce } from './modules/commerce';
+import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -187,7 +187,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
     environment: process.env.NODE_ENV || 'production',
   };
-  private static _commerce: CommerceNamespace;
+  private static _billing: CommerceBillingNamespace;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -316,11 +316,11 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get commerce(): CommerceNamespace {
-    if (!Clerk._commerce) {
-      Clerk._commerce = new Commerce();
+  get billing(): CommerceBillingNamespace {
+    if (!Clerk._billing) {
+      Clerk._billing = new CommerceBilling();
     }
-    return Clerk._commerce;
+    return Clerk._billing;
   }
 
   public __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K] {
@@ -2434,7 +2434,9 @@ export class Clerk implements ClerkInterface {
         return;
       }
 
-      if (this.#touchThrottledUntil > Date.now()) {
+      // In multi-session apps, it's possible that different tabs will have different active sessions. It's critical that the tab's active session is touched in this case so the session is properly updated on the backend, and so we avoid any throttling when multi-session mode is enabled.
+      const multisessionMode = this.environment && !this.environment.authConfig.singleSessionMode;
+      if (!multisessionMode && this.#touchThrottledUntil > Date.now()) {
         return;
       }
       this.#touchThrottledUntil = Date.now() + 5_000;
@@ -2637,6 +2639,7 @@ export class Clerk implements ClerkInterface {
       // in the meantime, we're removing it here to keep the URL clean
       removeClerkQueryParam(CLERK_SUFFIXED_COOKIES);
       removeClerkQueryParam('__clerk_handshake');
+      removeClerkQueryParam('__clerk_handshake_nonce');
       removeClerkQueryParam('__clerk_help');
     } catch {
       // ignore

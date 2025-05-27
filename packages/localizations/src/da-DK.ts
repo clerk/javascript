@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
   backButton: 'Tilbage',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Standard',
@@ -31,11 +32,17 @@ export const daDK: LocalizationResource = {
   badge__userDevice: 'Brugerenhed',
   badge__you: 'Dig',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const daDK: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const daDK: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Opret organisation',
@@ -158,6 +194,42 @@ export const daDK: LocalizationResource = {
     badge__automaticSuggestion: 'Automatiske forslag',
     badge__manualInvitation: 'Ingen automatisk tilmelding',
     badge__unverified: 'Ikke verificeret',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         'Tilføj domænet for at verificere. Brugere med e-mailadresser under dette domæne kan automatisk deltage i organisationen eller anmode om at deltage.',
@@ -219,6 +291,12 @@ export const daDK: LocalizationResource = {
       general: 'Generelt',
       members: 'Medlemmer',
       title: 'Organisation',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -404,6 +482,12 @@ export const daDK: LocalizationResource = {
       subtitle: 'Oplever du problemer? Du kan bruge en af disse metoder til at logge ind.',
       title: 'Brug en anden metode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Indtast en backup-kode',
@@ -510,6 +594,12 @@ export const daDK: LocalizationResource = {
       actionLink__use_username: 'Brug brugernavn',
       actionText: 'Ingen konto?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Forsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
@@ -523,6 +613,11 @@ export const daDK: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
@@ -590,6 +685,12 @@ export const daDK: LocalizationResource = {
       actionLink__use_email: 'Brug email',
       actionLink__use_phone: 'Brug telefon',
       actionText: 'Har du en konto?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Forsæt til {{applicationName}}',
       subtitleCombined: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
@@ -734,12 +835,20 @@ export const daDK: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -886,6 +995,9 @@ export const daDK: LocalizationResource = {
       title: 'Tilføj telefonnummer',
       verifySubtitle: 'Indtast bekræftelseskoden sendt til {{identifier}}',
       verifyTitle: 'Verificer telefonnummer',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Upload et JPG, PNG, GIF, eller WEBP-billede mindre end 10 MB',

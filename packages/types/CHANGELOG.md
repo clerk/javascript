@@ -1,5 +1,141 @@
 # Change Log
 
+## 4.59.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+## 4.59.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Add `onClose` to `__internal_CheckoutProps`. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.58.1
+
+### Patch Changes
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
+## 4.58.0
+
+### Minor Changes
+
+- Fix issue where we were not correctly passing the checkoutProps through within the PricingTable component. Removes internal checkoutProps prefix from PricingTableBaseProps. ([#5888](https://github.com/clerk/javascript/pull/5888)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Update profile components plans page heading from `Switch plans` to `Plans` ([#5889](https://github.com/clerk/javascript/pull/5889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add element descriptor to the text element rendered within UserPreview component. ([#5878](https://github.com/clerk/javascript/pull/5878)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add descriptor ids to `UserMembershipList` and `OrganizationSwitcherTrigger` elements to improve styling experience. ([#5881](https://github.com/clerk/javascript/pull/5881)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the "Plan starts at" date when a user downgrades from a paid plan to the free plan ([#5893](https://github.com/clerk/javascript/pull/5893)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 4.57.1
+
+### Patch Changes
+
+- Update PricingTable badge and status messaging. ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add new Billing Statements UI to User and Org Profile ([#5850](https://github.com/clerk/javascript/pull/5850)) by [@aeliox](https://github.com/aeliox)
+
+- Show annual amount in the subscriptions list if the subscription has annual plan period ([#5863](https://github.com/clerk/javascript/pull/5863)) by [@octoper](https://github.com/octoper)
+
+- Update `PricingTable` plan card UI ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update `<Checkout />` line items to include `x12` prefix when plan is annual ([#5857](https://github.com/clerk/javascript/pull/5857)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.57.0
+
+### Minor Changes
+
+- Mark commerce apis as stable ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Expose Clerk Billing APIs. ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ## Render the pricing table component
+
+  - `Clerk.mountPricingTable`
+  - `Clerk.unmountPricingTable`
+
+  ## Manage payment methods
+
+  - `Clerk.[user|organization].initializePaymentSource()`
+  - `Clerk.[user|organization].addPaymentSource()`
+  - `Clerk.[user|organization].getPaymentSources()`
+
+  ## Billing namespace
+
+  - `Clerk.billing`
+    - `Clerk.billing.getPlans()`
+    - `Clerk.billing.getSubscriptions()`
+    - `Clerk.billing.getInvoices()`
+    - `Clerk.billing.startCheckout()`
+
+### Patch Changes
+
+- Move `credit` at the top-level and remove `proration` property ([#5849](https://github.com/clerk/javascript/pull/5849)) by [@octoper](https://github.com/octoper)
+
+- Add support for switching to the free plan ([#5810](https://github.com/clerk/javascript/pull/5810)) by [@aeliox](https://github.com/aeliox)
+
+- Only allow members with `org:sys_billing:manage` to manage billing for an Organization ([#5835](https://github.com/clerk/javascript/pull/5835)) by [@octoper](https://github.com/octoper)
+
+- Introduce `<Tooltip />` primitive ([#5841](https://github.com/clerk/javascript/pull/5841)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename ` __experimental_nextTask` to `__experimental_navigateToTask` ([#5715](https://github.com/clerk/javascript/pull/5715)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Introduce `checkoutContinueUrl` option. ([#5807](https://github.com/clerk/javascript/pull/5807)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adjusts the layout of the `PricingTable` plan cards ([#5824](https://github.com/clerk/javascript/pull/5824)) by [@aeliox](https://github.com/aeliox)
+
+- Allow switching from an existing monthly subscription to an annual subscription for the same plan ([#5811](https://github.com/clerk/javascript/pull/5811)) by [@aeliox](https://github.com/aeliox)
+
+- Rename CheckoutProps and PlanDetailsProps to **internal_CheckoutProps and **internal_PlanDetailsProps ([#5838](https://github.com/clerk/javascript/pull/5838)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update SubscriptionsList UI to be rendered within ProfileSections within UserProfile and OrganizationProfile. ([#5847](https://github.com/clerk/javascript/pull/5847)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update checkout downgrade notice placement and text. ([#5837](https://github.com/clerk/javascript/pull/5837)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename \_\_experimental_checkoutContinueUrl to checkoutContinueUrl ([#5826](https://github.com/clerk/javascript/pull/5826)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add `Pay with test card` button on `<AddPaymentSource />` component in dev instance ([#5831](https://github.com/clerk/javascript/pull/5831)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Replace \_\_experimental_PricingTable with PricingTable ([#5828](https://github.com/clerk/javascript/pull/5828)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.56.3
 
 ### Patch Changes

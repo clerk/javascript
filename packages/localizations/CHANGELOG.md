@@ -1,5 +1,97 @@
 # Change Log
 
+## 3.16.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310)]:
+  - @clerk/types@4.59.1
+
+## 3.16.0
+
+### Minor Changes
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+
+## 3.15.3
+
+### Patch Changes
+
+- Add "Clerk Billing" related translations to de-DE ([#5892](https://github.com/clerk/javascript/pull/5892)) by [@LekoArts](https://github.com/LekoArts)
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+- Add signIn related translation to ja-JP ([#5915](https://github.com/clerk/javascript/pull/5915)) by [@shogo-nakano-desu](https://github.com/shogo-nakano-desu)
+
+- Export mnMn localization files ([#5907](https://github.com/clerk/javascript/pull/5907)) by [@tmilewski](https://github.com/tmilewski)
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
+- Updated dependencies [[`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/types@4.58.1
+
+## 3.15.2
+
+### Patch Changes
+
+- Added a notice in tooltip when member no has permissions to manage billing for all manager related buttons ([#5852](https://github.com/clerk/javascript/pull/5852)) by [@octoper](https://github.com/octoper)
+
+- Update profile components plans page heading from `Switch plans` to `Plans` ([#5889](https://github.com/clerk/javascript/pull/5889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`0f5145e`](https://github.com/clerk/javascript/commit/0f5145e164f3d3d5faf57e58162b05e7110d2403), [`afdfd18`](https://github.com/clerk/javascript/commit/afdfd18d645608dec37e52a291a91ba5f42dcbe7), [`b7c51ba`](https://github.com/clerk/javascript/commit/b7c51baac6df1129b468274c9a7f63ca303f16ce), [`437b53b`](https://github.com/clerk/javascript/commit/437b53b67e281d076b5b3f927e11c1d64666d154), [`5217155`](https://github.com/clerk/javascript/commit/52171554250c5c58f4f497b6d3c7416e79ac77da)]:
+  - @clerk/types@4.58.0
+
+## 3.15.1
+
+### Patch Changes
+
+- Update PricingTable badge and status messaging. ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add new Billing Statements UI to User and Org Profile ([#5850](https://github.com/clerk/javascript/pull/5850)) by [@aeliox](https://github.com/aeliox)
+
+- Show annual amount in the subscriptions list if the subscription has annual plan period ([#5863](https://github.com/clerk/javascript/pull/5863)) by [@octoper](https://github.com/octoper)
+
+- Update `PricingTable` plan card UI ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update `<Checkout />` line items to include `x12` prefix when plan is annual ([#5857](https://github.com/clerk/javascript/pull/5857)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`36fb43f`](https://github.com/clerk/javascript/commit/36fb43f8b35866bdc20680fac58020f036d30d1f), [`e5ac444`](https://github.com/clerk/javascript/commit/e5ac4447f52bb6887ad686feab308fe9daf76e33), [`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`d227805`](https://github.com/clerk/javascript/commit/d22780599a5e29545a3d8309cc411c2e8659beac)]:
+  - @clerk/types@4.57.1
+
+## 3.15.0
+
+### Minor Changes
+
+- Rely on API-based error messaging for `en-US` localizations ([#5809](https://github.com/clerk/javascript/pull/5809)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Only allow members with `org:sys_billing:manage` to manage billing for an Organization ([#5835](https://github.com/clerk/javascript/pull/5835)) by [@octoper](https://github.com/octoper)
+
+- Move `<__experimental_PaymentSources />` component under `Billing` -> `Subscriptions` tab and delete `Payment methods` tab ([#5825](https://github.com/clerk/javascript/pull/5825)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Adjusts the layout of the `PricingTable` plan cards ([#5824](https://github.com/clerk/javascript/pull/5824)) by [@aeliox](https://github.com/aeliox)
+
+- Allow switching from an existing monthly subscription to an annual subscription for the same plan ([#5811](https://github.com/clerk/javascript/pull/5811)) by [@aeliox](https://github.com/aeliox)
+
+- Update SubscriptionsList UI to be rendered within ProfileSections within UserProfile and OrganizationProfile. ([#5847](https://github.com/clerk/javascript/pull/5847)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update checkout downgrade notice placement and text. ([#5837](https://github.com/clerk/javascript/pull/5837)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Pay with test card` button on `<AddPaymentSource />` component in dev instance ([#5831](https://github.com/clerk/javascript/pull/5831)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`db0138f`](https://github.com/clerk/javascript/commit/db0138f3f72aea8cb68a5684a90123f733848f63), [`aa97231`](https://github.com/clerk/javascript/commit/aa97231962e3f472a46135e376159c6ddcf1157b), [`c792f37`](https://github.com/clerk/javascript/commit/c792f37129fd6475d5af95146e9ef0f1c8eff730), [`3bf08a9`](https://github.com/clerk/javascript/commit/3bf08a9e0a9e65496edac5fc3bb22ad7b561df26), [`74cf3b2`](https://github.com/clerk/javascript/commit/74cf3b28cdf622a942aaf99caabfba74b7e856fd), [`037b113`](https://github.com/clerk/javascript/commit/037b113aaedd53d4647d88f1659eb9c14cf6f275), [`c15a412`](https://github.com/clerk/javascript/commit/c15a412169058e2304a51c9e92ffaa7f6bb2a898), [`7726a03`](https://github.com/clerk/javascript/commit/7726a03a7fec4d292b6de2587b84ed4371984c23), [`b846a9a`](https://github.com/clerk/javascript/commit/b846a9ab96db6b1d8344a4b693051618865508a8), [`e66c800`](https://github.com/clerk/javascript/commit/e66c8002b82b2902f77e852e16482f5cfb062d2c), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed), [`9c41091`](https://github.com/clerk/javascript/commit/9c41091eb795bce8ffeeeca0264ae841fe07b426), [`29462b4`](https://github.com/clerk/javascript/commit/29462b433eb411ce614e4768e5844cacd00c1975), [`322c43f`](https://github.com/clerk/javascript/commit/322c43f6807a932c3cfaaef1b587b472c80180d2), [`17397f9`](https://github.com/clerk/javascript/commit/17397f95b715bd4fefd7f63c1d351abcf1c8ee16), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed)]:
+  - @clerk/types@4.57.0
+
 ## 3.14.4
 
 ### Patch Changes

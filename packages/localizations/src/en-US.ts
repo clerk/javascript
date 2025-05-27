@@ -3,6 +3,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   backButton: 'Back',
+  badge__activePlan: 'Active',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
@@ -19,13 +20,21 @@ export const enUS: LocalizationResource = {
   badge__userDevice: 'User device',
   badge__you: 'You',
   commerce: {
+    addPaymentMethod: 'Add payment method',
     alwaysFree: 'Always free',
+    annually: 'Annually',
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
     billedMonthlyOnly: 'Only billed monthly',
     cancelSubscription: 'Cancel subscription',
+    cancelSubscriptionAccessUntil:
+      "You can keep using '{{plan}}' features until {{ date | longDate('en-US') }}, after which you will no longer have access.",
+    cancelSubscriptionNoCharge: 'You will not be charged for this subscription.',
+    cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
+    cannotSubscribeMonthly:
+      'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
     checkout: {
-      description__paymentSuccessful: 'Your new subscription is all set.',
+      description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
@@ -34,14 +43,17 @@ export const enUS: LocalizationResource = {
         title: 'Add an email address',
       },
       lineItems: {
-        title__invoiceId: 'Invoice ID',
         title__paymentMethod: 'Payment method',
+        title__statementId: 'Statement ID',
         title__subscriptionBegins: 'Subscription begins',
         title__totalPaid: 'Total paid',
       },
+      perMonth: 'per month',
+      title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
     },
+    creditRemainder: 'Credit for the remainder of your current subscription.',
     defaultFreePlanActive: "You're currently on the Free plan",
     free: 'Free',
     getStarted: 'Get started',
@@ -49,12 +61,38 @@ export const enUS: LocalizationResource = {
     manage: 'Manage',
     manageSubscription: 'Manage subscription',
     month: 'Month',
+    monthly: 'Monthly',
+    pay: 'Pay {{amount}}',
+    paymentMethods: 'Payment Methods',
+    paymentSource: {
+      applePayDescription: {
+        annual: 'Annual payment',
+        monthly: 'Monthly payment',
+      },
+      dev: {
+        anyNumbers: 'Any numbers',
+        cardNumber: 'Card number',
+        cvcZip: 'CVC, ZIP',
+        developmentMode: 'Development mode',
+        expirationDate: 'Expiration date',
+        testCardInfo: 'Test card information',
+      },
+    },
+    popular: 'Popular',
+    pricingTable: {
+      billingCycle: 'Billing cycle',
+      included: 'Included',
+    },
     reSubscribe: 'Resubscribe',
     seeAllFeatures: 'See all features',
     subscribe: 'Subscribe',
+    subtotal: 'Subtotal',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
+    switchToMonthly: 'Switch to monthly',
+    totalDueToday: 'Total Due Today',
     viewFeatures: 'View features',
+    year: 'Year',
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
@@ -73,6 +111,7 @@ export const enUS: LocalizationResource = {
   },
   dividerText: 'or',
   footerActionLink__useAnotherMethod: 'Use another method',
+  footerActionLink__alternativePhoneCodeProvider: 'Send code via SMS instead',
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',
   footerPageLink__terms: 'Terms',
@@ -147,6 +186,43 @@ export const enUS: LocalizationResource = {
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: 'Make default',
+        actionLabel__remove: 'Remove',
+        add: 'Add new payment method',
+        addSubtitle: 'Add a new payment method to your account.',
+        cancelButton: 'Cancel',
+        formButtonPrimary__add: 'Add Payment Method',
+        formButtonPrimary__pay: 'Pay {{amount}}',
+        payWithTestCardButton: 'Pay with test card',
+        removeResource: {
+          messageLine1: '{{identifier}} will be removed from this account.',
+          messageLine2:
+            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentSource}} has been removed from your account.',
+          title: 'Remove payment method',
+        },
+        title: 'Payment methods',
+      },
+      start: {
+        headerTitle__plans: 'Plans',
+        headerTitle__statements: 'Statements',
+        headerTitle__subscriptions: 'Subscriptions',
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: 'Subscribe to a plan',
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
+      },
+      subscriptionsSection: {
+        actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
+      },
+      title: 'Billing',
+    },
     createDomainPage: {
       subtitle:
         'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
@@ -209,6 +285,12 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: 'You do not have permissions to manage billing for this organization.',
+      },
+      title: 'Plans',
     },
     profilePage: {
       dangerSection: {
@@ -395,6 +477,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
       title: 'Use another method',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your {{provider}}',
+    },
     backupCodeMfa: {
       subtitle: 'Your backup code is the one you got when setting up two-step authentication.',
       title: 'Enter a backup code',
@@ -502,6 +590,12 @@ export const enUS: LocalizationResource = {
       actionLink__use_username: 'Use username',
       actionText: 'Don’t have an account?',
       actionText__join_waitlist: 'Want early access?',
+      alternativePhoneCodeProvider: {
+        actionLink: 'Use another method',
+        label: '{{provider}} phone number',
+        subtitle: 'Enter your phone number to get a verification code on {{provider}}.',
+        title: 'Sign in to {{applicationName}} with {{provider}}',
+      },
       subtitle: 'Welcome back! Please sign in to continue',
       subtitleCombined: undefined,
       title: 'Sign in to {{applicationName}}',
@@ -515,6 +609,11 @@ export const enUS: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'Enter the verification code sent to your {{provider}}',
+      title: 'Verify your {{provider}}',
+    },
     continue: {
       actionLink: 'Sign in',
       actionText: 'Already have an account?',
@@ -584,6 +683,12 @@ export const enUS: LocalizationResource = {
       actionLink__use_email: 'Use email instead',
       actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
+      alternativePhoneCodeProvider: {
+        actionLink: 'Use another method',
+        label: '{{provider}} phone number',
+        subtitle: 'Enter your phone number to get a verification code on {{provider}}.',
+        title: 'Sign up to {{applicationName}} with {{provider}}',
+      },
       subtitle: 'Welcome! Please fill in the details to get started.',
       subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
@@ -728,12 +833,20 @@ export const enUS: LocalizationResource = {
         title: 'Payment methods',
       },
       start: {
-        headerTitle__invoices: 'Invoices',
         headerTitle__plans: 'Plans',
-        headerTitle__subscriptions: 'Subscriptions',
+        headerTitle__statements: 'Statements',
+        headerTitle__subscriptions: 'Subscription',
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: 'Subscribe to a plan',
+        actionLabel__switchPlan: 'Switch plans',
+        title: 'Subscription',
       },
       subscriptionsSection: {
         actionLabel__default: 'Manage',
+      },
+      switchPlansSection: {
+        title: 'Switch plans',
       },
       title: 'Billing',
     },
@@ -880,6 +993,9 @@ export const enUS: LocalizationResource = {
       title: 'Add phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
+    },
+    plansPage: {
+      title: 'Plans',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

@@ -1,5 +1,284 @@
 # Change Log
 
+## 5.67.3
+
+### Patch Changes
+
+- Bug fix: Remove cancel subscription option when implicitly subscribed to the default free plan. ([#5946](https://github.com/clerk/javascript/pull/5946)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Maintain \_ _clerk_ticket and _ \_clerk_status query params through sign up verification flow ([#5965](https://github.com/clerk/javascript/pull/5965)) by [@jacekradko](https://github.com/jacekradko)
+
+- Maintain selected identifier when going through combined flow ([#5972](https://github.com/clerk/javascript/pull/5972)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove 'sms' channel parameter from phone code requests ([#5966](https://github.com/clerk/javascript/pull/5966)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 5.67.2
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Allow removal of all payment methods when there are no active subscriptions ([#5963](https://github.com/clerk/javascript/pull/5963)) by [@aeliox](https://github.com/aeliox)
+
+- Removes z-index from keyless prompt to prevent overlay issues with drawers. ([#5951](https://github.com/clerk/javascript/pull/5951)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add checkout success animation highlight. ([#5940](https://github.com/clerk/javascript/pull/5940)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue where min/max username lengths errors were not properly interpolated within profile component. ([#5948](https://github.com/clerk/javascript/pull/5948)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/localizations@3.16.1
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
+## 5.67.1
+
+### Patch Changes
+
+- Fix showing alternative phone code provider when no other SSO exists. ([#5942](https://github.com/clerk/javascript/pull/5942)) by [@anagstef](https://github.com/anagstef)
+
+## 5.67.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Hide "Set as default" from the action menu of the default MFA method ([#5933](https://github.com/clerk/javascript/pull/5933)) by [@octoper](https://github.com/octoper)
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Replace `useFetch` with `useSWRMutate` on checkout. ([#5932](https://github.com/clerk/javascript/pull/5932)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix: Call `setActive` after closing Checkout to ensure RSCs re-render with the new auth context. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Only lock scroll when Drawer is using fixed strategy ([#5936](https://github.com/clerk/javascript/pull/5936)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixing issues where checkout data being stale ([#5921](https://github.com/clerk/javascript/pull/5921)) by [@octoper](https://github.com/octoper)
+
+- Bug fix: Always invalidate checkout object when `<Checkout/>` unmounts. ([#5929](https://github.com/clerk/javascript/pull/5929)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+  - @clerk/localizations@3.16.0
+  - @clerk/shared@3.9.1
+
+## 5.66.0
+
+### Minor Changes
+
+- Introduce `WhatsApp` as an alternative channel for phone code delivery. ([#5894](https://github.com/clerk/javascript/pull/5894)) by [@anagstef](https://github.com/anagstef)
+
+  The new `channel` property accompanies the `phone_code` strategy. Possible values: `whatsapp` and `sms`.
+
+### Patch Changes
+
+- Fixes incorrect heading spacing within PlanDetails drawer header ([#5918](https://github.com/clerk/javascript/pull/5918)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Display a better subscription list / button when empty and the free plan is hidden ([#5912](https://github.com/clerk/javascript/pull/5912)) by [@aeliox](https://github.com/aeliox)
+
+- Improvements of flows for switching between plans ([#5883](https://github.com/clerk/javascript/pull/5883)) by [@octoper](https://github.com/octoper)
+
+- Bug fix: Revalidate payment methods after checking out with test card. ([#5913](https://github.com/clerk/javascript/pull/5913)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure Checkout drawer animation and content respects RTL usage. ([#5906](https://github.com/clerk/javascript/pull/5906)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes issue in Safari where navigating between profile tabs caused the navbar icons to shift unexpectedly. ([#5887](https://github.com/clerk/javascript/pull/5887)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes `newSubscriptionRedirectUrl` usage on `PricingTable`. ([#5909](https://github.com/clerk/javascript/pull/5909)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`36c6f8f`](https://github.com/clerk/javascript/commit/36c6f8fe389389d2af33106fb7ca2ffeb5513407), [`1ff6d6e`](https://github.com/clerk/javascript/commit/1ff6d6efbe838b3f7f6977b2b5215c2cafd715f6), [`68a7b40`](https://github.com/clerk/javascript/commit/68a7b40e5ffd040bcdad11b7f8a8a3c6ad7569ea), [`f288881`](https://github.com/clerk/javascript/commit/f28888134e46c1b70a776fd8c6aa24293308b7cb), [`fbf3cf4`](https://github.com/clerk/javascript/commit/fbf3cf4916469c4e118870bf12efca2d0f77d9d8)]:
+  - @clerk/localizations@3.15.3
+  - @clerk/shared@3.9.0
+  - @clerk/types@4.58.1
+
+## 5.65.0
+
+### Minor Changes
+
+- Add handling of new Handshake nonce flow when authenticating requests ([#5865](https://github.com/clerk/javascript/pull/5865)) by [@jacekradko](https://github.com/jacekradko)
+
+- Fix issue where we were not correctly passing the checkoutProps through within the PricingTable component. Removes internal checkoutProps prefix from PricingTableBaseProps. ([#5888](https://github.com/clerk/javascript/pull/5888)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Added a notice in tooltip when member no has permissions to manage billing for all manager related buttons ([#5852](https://github.com/clerk/javascript/pull/5852)) by [@octoper](https://github.com/octoper)
+
+- Fix and issue after paying with a new card where it was navigationg to existing payment sources and then complete checkout screen ([#5882](https://github.com/clerk/javascript/pull/5882)) by [@octoper](https://github.com/octoper)
+
+- Update profile components plans page heading from `Switch plans` to `Plans` ([#5889](https://github.com/clerk/javascript/pull/5889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Sort payment sources so always default one is on top ([#5875](https://github.com/clerk/javascript/pull/5875)) by [@octoper](https://github.com/octoper)
+
+- Add element descriptor to the text element rendered within UserPreview component. ([#5878](https://github.com/clerk/javascript/pull/5878)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Remove no manage billing permissions alert from the of start billing page ([#5873](https://github.com/clerk/javascript/pull/5873)) by [@octoper](https://github.com/octoper)
+
+- Fix mobile `<Drawer />` sizing. ([#5880](https://github.com/clerk/javascript/pull/5880)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add descriptor ids to `UserMembershipList` and `OrganizationSwitcherTrigger` elements to improve styling experience. ([#5881](https://github.com/clerk/javascript/pull/5881)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Removes white space from PlanCard when the ctaPosition is top and there are no features ([#5885](https://github.com/clerk/javascript/pull/5885)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the "Plan starts at" date when a user downgrades from a paid plan to the free plan ([#5893](https://github.com/clerk/javascript/pull/5893)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add loading state to `<PaymentSources />` component. ([#5879](https://github.com/clerk/javascript/pull/5879)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`d81c1c1`](https://github.com/clerk/javascript/commit/d81c1c168e5fa97793f79917d4981af685321cc4), [`0f5145e`](https://github.com/clerk/javascript/commit/0f5145e164f3d3d5faf57e58162b05e7110d2403), [`afdfd18`](https://github.com/clerk/javascript/commit/afdfd18d645608dec37e52a291a91ba5f42dcbe7), [`b7c51ba`](https://github.com/clerk/javascript/commit/b7c51baac6df1129b468274c9a7f63ca303f16ce), [`437b53b`](https://github.com/clerk/javascript/commit/437b53b67e281d076b5b3f927e11c1d64666d154), [`5217155`](https://github.com/clerk/javascript/commit/52171554250c5c58f4f497b6d3c7416e79ac77da)]:
+  - @clerk/localizations@3.15.2
+  - @clerk/types@4.58.0
+  - @clerk/shared@3.8.2
+
+## 5.64.2
+
+### Patch Changes
+
+- Fix PricingTable logic for plan button text. ([#5869](https://github.com/clerk/javascript/pull/5869)) by [@brkalow](https://github.com/brkalow)
+
+## 5.64.1
+
+### Patch Changes
+
+- Update Organization subscription API endpoints to include the `/commerce/` path segment. ([#5855](https://github.com/clerk/javascript/pull/5855)) by [@brkalow](https://github.com/brkalow)
+
+- Update PricingTable badge and status messaging. ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure statements ui is scrollable ([#5866](https://github.com/clerk/javascript/pull/5866)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Added a gap between no-permissions notice and pricing table in `<OrganizationProfile/>` billing page ([#5861](https://github.com/clerk/javascript/pull/5861)) by [@octoper](https://github.com/octoper)
+
+- Fix drawer positioning issues experienced in safari ([#5859](https://github.com/clerk/javascript/pull/5859)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix `ArrowsUpDown` stroke fill to user `currentColor` ([#5860](https://github.com/clerk/javascript/pull/5860)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle `invalid_plan_change` error with custom UI ([#5867](https://github.com/clerk/javascript/pull/5867)) by [@octoper](https://github.com/octoper)
+
+- Add new Billing Statements UI to User and Org Profile ([#5850](https://github.com/clerk/javascript/pull/5850)) by [@aeliox](https://github.com/aeliox)
+
+- Remove top border in `CheckoutForm` ([#5864](https://github.com/clerk/javascript/pull/5864)) by [@octoper](https://github.com/octoper)
+
+- Render long message for `submitError` within `CheckoutForm` ([#5862](https://github.com/clerk/javascript/pull/5862)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Show annual amount in the subscriptions list if the subscription has annual plan period ([#5863](https://github.com/clerk/javascript/pull/5863)) by [@octoper](https://github.com/octoper)
+
+- Update `PricingTable` plan card UI ([#5844](https://github.com/clerk/javascript/pull/5844)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update `<Checkout />` line items to include `x12` prefix when plan is annual ([#5857](https://github.com/clerk/javascript/pull/5857)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Updated dependencies [[`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`36fb43f`](https://github.com/clerk/javascript/commit/36fb43f8b35866bdc20680fac58020f036d30d1f), [`e5ac444`](https://github.com/clerk/javascript/commit/e5ac4447f52bb6887ad686feab308fe9daf76e33), [`4db96e0`](https://github.com/clerk/javascript/commit/4db96e0ff2ab44c7bdd8540e09ec70b84b19d3eb), [`d227805`](https://github.com/clerk/javascript/commit/d22780599a5e29545a3d8309cc411c2e8659beac)]:
+  - @clerk/localizations@3.15.1
+  - @clerk/types@4.57.1
+  - @clerk/shared@3.8.1
+
+## 5.64.0
+
+### Minor Changes
+
+- Mark commerce apis as stable ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Expose Clerk Billing APIs. ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ## Render the pricing table component
+
+  - `Clerk.mountPricingTable`
+  - `Clerk.unmountPricingTable`
+
+  ## Manage payment methods
+
+  - `Clerk.[user|organization].initializePaymentSource()`
+  - `Clerk.[user|organization].addPaymentSource()`
+  - `Clerk.[user|organization].getPaymentSources()`
+
+  ## Billing namespace
+
+  - `Clerk.billing`
+    - `Clerk.billing.getPlans()`
+    - `Clerk.billing.getSubscriptions()`
+    - `Clerk.billing.getInvoices()`
+    - `Clerk.billing.startCheckout()`
+
+### Patch Changes
+
+- Move `credit` at the top-level and remove `proration` property ([#5849](https://github.com/clerk/javascript/pull/5849)) by [@octoper](https://github.com/octoper)
+
+- Add support for switching to the free plan ([#5810](https://github.com/clerk/javascript/pull/5810)) by [@aeliox](https://github.com/aeliox)
+
+- Only allow members with `org:sys_billing:manage` to manage billing for an Organization ([#5835](https://github.com/clerk/javascript/pull/5835)) by [@octoper](https://github.com/octoper)
+
+- Replace Toggle component with Switch component in active subscription drawer ([#5853](https://github.com/clerk/javascript/pull/5853)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Introduce `<Tooltip />` primitive ([#5841](https://github.com/clerk/javascript/pull/5841)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Move `<__experimental_PaymentSources />` component under `Billing` -> `Subscriptions` tab and delete `Payment methods` tab ([#5825](https://github.com/clerk/javascript/pull/5825)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Rename ` __experimental_nextTask` to `__experimental_navigateToTask` ([#5715](https://github.com/clerk/javascript/pull/5715)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix interactive turnstile layout issue on SSO callback. ([#5783](https://github.com/clerk/javascript/pull/5783)) by [@anagstef](https://github.com/anagstef)
+
+- Introduce `checkoutContinueUrl` option. ([#5807](https://github.com/clerk/javascript/pull/5807)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Show a localized message for all errors returned from the backend if the user tries to perform an invalid plan change. ([#5805](https://github.com/clerk/javascript/pull/5805)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Always revalidate when checkout drawer opens ([#5798](https://github.com/clerk/javascript/pull/5798)) by [@octoper](https://github.com/octoper)
+
+- Adjusts the layout of the `PricingTable` plan cards ([#5824](https://github.com/clerk/javascript/pull/5824)) by [@aeliox](https://github.com/aeliox)
+
+- Add entry animations to CheckoutComplete component to smooth our the transition between checking out to successful state. ([#5802](https://github.com/clerk/javascript/pull/5802)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Allow switching from an existing monthly subscription to an annual subscription for the same plan ([#5811](https://github.com/clerk/javascript/pull/5811)) by [@aeliox](https://github.com/aeliox)
+
+- Rename CheckoutProps and PlanDetailsProps to **internal_CheckoutProps and **internal_PlanDetailsProps ([#5838](https://github.com/clerk/javascript/pull/5838)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix turnstile language fallback warning on captcha modal. ([#5827](https://github.com/clerk/javascript/pull/5827)) by [@anagstef](https://github.com/anagstef)
+
+- Update SubscriptionsList UI to be rendered within ProfileSections within UserProfile and OrganizationProfile. ([#5847](https://github.com/clerk/javascript/pull/5847)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Adjusts the order and layout of the checkout form's line items ([#5804](https://github.com/clerk/javascript/pull/5804)) by [@aeliox](https://github.com/aeliox)
+
+- Display generic payment icon in payment source row when payment method is not card ([#5851](https://github.com/clerk/javascript/pull/5851)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Sort subscriptions and add free plan to subsciption list if it's upcoming ([#5854](https://github.com/clerk/javascript/pull/5854)) by [@octoper](https://github.com/octoper)
+
+- Update checkout downgrade notice placement and text. ([#5837](https://github.com/clerk/javascript/pull/5837)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Rename \_\_experimental_checkoutContinueUrl to checkoutContinueUrl ([#5826](https://github.com/clerk/javascript/pull/5826)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Add `Pay with test card` button on `<AddPaymentSource />` component in dev instance ([#5831](https://github.com/clerk/javascript/pull/5831)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Update internal Switch component to require a label. ([#5845](https://github.com/clerk/javascript/pull/5845)) by [@LekoArts](https://github.com/LekoArts)
+
+- Replace \_\_experimental_PricingTable with PricingTable ([#5828](https://github.com/clerk/javascript/pull/5828)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`db0138f`](https://github.com/clerk/javascript/commit/db0138f3f72aea8cb68a5684a90123f733848f63), [`aa97231`](https://github.com/clerk/javascript/commit/aa97231962e3f472a46135e376159c6ddcf1157b), [`c792f37`](https://github.com/clerk/javascript/commit/c792f37129fd6475d5af95146e9ef0f1c8eff730), [`3bf08a9`](https://github.com/clerk/javascript/commit/3bf08a9e0a9e65496edac5fc3bb22ad7b561df26), [`a7c45b3`](https://github.com/clerk/javascript/commit/a7c45b39d27d81cef49afdbbeac2dff1dea7a426), [`74cf3b2`](https://github.com/clerk/javascript/commit/74cf3b28cdf622a942aaf99caabfba74b7e856fd), [`037b113`](https://github.com/clerk/javascript/commit/037b113aaedd53d4647d88f1659eb9c14cf6f275), [`c15a412`](https://github.com/clerk/javascript/commit/c15a412169058e2304a51c9e92ffaa7f6bb2a898), [`7726a03`](https://github.com/clerk/javascript/commit/7726a03a7fec4d292b6de2587b84ed4371984c23), [`ed10566`](https://github.com/clerk/javascript/commit/ed1056637624eec5bfd50333407c1e63e34c193b), [`b846a9a`](https://github.com/clerk/javascript/commit/b846a9ab96db6b1d8344a4b693051618865508a8), [`e66c800`](https://github.com/clerk/javascript/commit/e66c8002b82b2902f77e852e16482f5cfb062d2c), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed), [`b9d90da`](https://github.com/clerk/javascript/commit/b9d90da2397338dcebda3266b8c8330ab412a266), [`9c41091`](https://github.com/clerk/javascript/commit/9c41091eb795bce8ffeeeca0264ae841fe07b426), [`29462b4`](https://github.com/clerk/javascript/commit/29462b433eb411ce614e4768e5844cacd00c1975), [`322c43f`](https://github.com/clerk/javascript/commit/322c43f6807a932c3cfaaef1b587b472c80180d2), [`17397f9`](https://github.com/clerk/javascript/commit/17397f95b715bd4fefd7f63c1d351abcf1c8ee16), [`45e8298`](https://github.com/clerk/javascript/commit/45e829890ec9ac66f07e0d7076cd283f14c893ed)]:
+  - @clerk/types@4.57.0
+  - @clerk/localizations@3.15.0
+  - @clerk/shared@3.8.0
+
 ## 5.63.5
 
 ### Patch Changes

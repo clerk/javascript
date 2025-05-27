@@ -15,6 +15,7 @@ import type { LocalizationResource } from '@clerk/types';
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   backButton: 'Enrere',
+  badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
   badge__currentPlan: undefined,
   badge__default: 'Per defecte',
@@ -31,11 +32,17 @@ export const caES: LocalizationResource = {
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
   commerce: {
+    addPaymentMethod: undefined,
     alwaysFree: undefined,
+    annually: undefined,
     availableFeatures: undefined,
     billedAnnually: undefined,
     billedMonthlyOnly: undefined,
     cancelSubscription: undefined,
+    cancelSubscriptionAccessUntil: undefined,
+    cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionTitle: undefined,
+    cannotSubscribeMonthly: undefined,
     checkout: {
       description__paymentSuccessful: undefined,
       description__subscriptionSuccessful: undefined,
@@ -45,14 +52,17 @@ export const caES: LocalizationResource = {
         title: undefined,
       },
       lineItems: {
-        title__invoiceId: undefined,
         title__paymentMethod: undefined,
+        title__statementId: undefined,
         title__subscriptionBegins: undefined,
         title__totalPaid: undefined,
       },
+      perMonth: undefined,
+      title: undefined,
       title__paymentSuccessful: undefined,
       title__subscriptionSuccessful: undefined,
     },
+    creditRemainder: undefined,
     defaultFreePlanActive: undefined,
     free: undefined,
     getStarted: undefined,
@@ -60,12 +70,38 @@ export const caES: LocalizationResource = {
     manage: undefined,
     manageSubscription: undefined,
     month: undefined,
+    monthly: undefined,
+    pay: undefined,
+    paymentMethods: undefined,
+    paymentSource: {
+      applePayDescription: {
+        annual: undefined,
+        monthly: undefined,
+      },
+      dev: {
+        anyNumbers: undefined,
+        cardNumber: undefined,
+        cvcZip: undefined,
+        developmentMode: undefined,
+        expirationDate: undefined,
+        testCardInfo: undefined,
+      },
+    },
+    popular: undefined,
+    pricingTable: {
+      billingCycle: undefined,
+      included: undefined,
+    },
     reSubscribe: undefined,
     seeAllFeatures: undefined,
     subscribe: undefined,
+    subtotal: undefined,
     switchPlan: undefined,
     switchToAnnual: undefined,
+    switchToMonthly: undefined,
+    totalDueToday: undefined,
     viewFeatures: undefined,
+    year: undefined,
   },
   createOrganization: {
     formButtonSubmit: 'Crea organització',
@@ -157,6 +193,42 @@ export const caES: LocalizationResource = {
     badge__automaticSuggestion: 'Suggeriments automàtics',
     badge__manualInvitation: 'Sense inscripció automàtica',
     badge__unverified: 'No verificat',
+    billingPage: {
+      paymentSourcesSection: {
+        actionLabel__default: undefined,
+        actionLabel__remove: undefined,
+        add: undefined,
+        addSubtitle: undefined,
+        cancelButton: undefined,
+        formButtonPrimary__add: undefined,
+        formButtonPrimary__pay: undefined,
+        payWithTestCardButton: undefined,
+        removeResource: {
+          messageLine1: undefined,
+          messageLine2: undefined,
+          successMessage: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      start: {
+        headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
+        headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
+      },
+      subscriptionsSection: {
+        actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
+      },
+      title: undefined,
+    },
     createDomainPage: {
       subtitle:
         "Afegeix el domini per verificar. Els usuaris amb adreces de correu electrònic en aquest domini poden unir-se a l'organització automàticament o sol·licitar unir-se.",
@@ -219,6 +291,12 @@ export const caES: LocalizationResource = {
       general: 'General',
       members: 'Membres',
       title: 'Organització',
+    },
+    plansPage: {
+      alerts: {
+        noPermissionsToManageBilling: undefined,
+      },
+      title: undefined,
     },
     profilePage: {
       dangerSection: {
@@ -404,6 +482,12 @@ export const caES: LocalizationResource = {
       subtitle: "Tens problemes? Pots utilitzar qualsevol d'aquests mètodes per iniciar sessió.",
       title: 'Utilitza un altre mètode',
     },
+    alternativePhoneCodeProvider: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     backupCodeMfa: {
       subtitle: "El teu codi de seguretat és el que vas obtenir quan vas configurar l'autenticació de dos passos.",
       title: 'Introdueix un codi de seguretat',
@@ -511,6 +595,12 @@ export const caES: LocalizationResource = {
       actionLink__use_username: "Utilitza nom d'usuari",
       actionText: 'No tens un compte?',
       actionText__join_waitlist: undefined,
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Benvingut de nou! Si us plau, inicia sessió per continuar',
       subtitleCombined: undefined,
       title: 'Inicia sessió a {{applicationName}}',
@@ -524,6 +614,11 @@ export const caES: LocalizationResource = {
   },
   signInEnterPasswordTitle: 'Introdueix la teva contrasenya',
   signUp: {
+    alternativePhoneCodeProvider: {
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     continue: {
       actionLink: 'Inicia sessió',
       actionText: 'Ja tens un compte?',
@@ -591,6 +686,12 @@ export const caES: LocalizationResource = {
       actionLink__use_email: undefined,
       actionLink__use_phone: undefined,
       actionText: 'Ja tens un compte?',
+      alternativePhoneCodeProvider: {
+        actionLink: undefined,
+        label: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
       subtitle: 'Benvingut! Si us plau, completa els detalls per començar.',
       subtitleCombined: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
@@ -737,12 +838,20 @@ export const caES: LocalizationResource = {
         title: undefined,
       },
       start: {
-        headerTitle__invoices: undefined,
         headerTitle__plans: undefined,
+        headerTitle__statements: undefined,
         headerTitle__subscriptions: undefined,
+      },
+      subscriptionsListSection: {
+        actionLabel__newSubscription: undefined,
+        actionLabel__switchPlan: undefined,
+        title: undefined,
       },
       subscriptionsSection: {
         actionLabel__default: undefined,
+      },
+      switchPlansSection: {
+        title: undefined,
       },
       title: undefined,
     },
@@ -893,6 +1002,9 @@ export const caES: LocalizationResource = {
       title: 'Afegeix número de telèfon',
       verifySubtitle: 'Introdueix el codi de verificació enviat a { { identifier } } ',
       verifyTitle: 'Verifica número de telèfon',
+    },
+    plansPage: {
+      title: undefined,
     },
     profilePage: {
       fileDropAreaHint: 'Mida recomanada 1:1, fins a 10MB.',

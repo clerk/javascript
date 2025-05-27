@@ -1,4 +1,5 @@
 import type { CommerceCheckoutResource } from '@clerk/types';
+import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
@@ -9,6 +10,7 @@ import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 export const CheckoutComplete = ({
   checkout,
@@ -20,6 +22,40 @@ export const CheckoutComplete = ({
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
+  const animationRef = useRef<number | null>(null);
+  const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);
+  const canHover =
+    typeof window === 'undefined' ? true : window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLSpanElement>) => {
+    if (!canHover) return;
+    if (checkoutSuccessRootRef.current) {
+      const rect = checkoutSuccessRootRef.current.getBoundingClientRect();
+      setMousePosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!canHover) return;
+    const animate = () => {
+      setCurrentPosition(prev => {
+        const amt = 0.15;
+        const x = lerp(prev.x, mousePosition.x, amt);
+        const y = lerp(prev.y, mousePosition.y, amt);
+        return { x, y };
+      });
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [mousePosition, canHover]);
 
   const handleClose = () => {
     if (newSubscriptionRedirectUrl) {
@@ -49,6 +85,8 @@ export const CheckoutComplete = ({
             animationTimingFunction: transitionTiming.bezier,
             animationFillMode: 'forwards',
             opacity: 0,
+            overflow: 'hidden',
+            backgroundColor: t.colors.$colorBackground,
             '@keyframes scaleIn': {
               '0%': {
                 filter: 'blur(10px)',
@@ -66,6 +104,8 @@ export const CheckoutComplete = ({
               opacity: 1,
             }),
           })}
+          ref={checkoutSuccessRootRef}
+          onMouseMove={handleMouseMove}
         >
           {[1, 0.75, 0.5].map((scale, index, array) => {
             return (
@@ -78,6 +118,29 @@ export const CheckoutComplete = ({
             );
           })}
           <Box
+            elementDescriptor={descriptors.checkoutSuccessHighlight}
+            sx={t => ({
+              position: 'absolute',
+              width: t.sizes.$56,
+              height: t.sizes.$56,
+              transform: 'translate(-50%, -50%)',
+              borderRadius: '50%',
+              backgroundColor: t.colors.$success500,
+              mixBlendMode: 'color',
+              filter: 'blur(20px)',
+              opacity: 0.5,
+              zIndex: 1,
+              pointerEvents: 'none',
+              ...(!canHover && {
+                display: 'none',
+              }),
+            })}
+            style={{
+              left: currentPosition.x,
+              top: currentPosition.y,
+            }}
+          />
+          <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
               margin: 'auto',
@@ -89,6 +152,7 @@ export const CheckoutComplete = ({
               borderRadius: t.radii.$circle,
               backgroundImage: `linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.30) 95.31%)`,
               boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.35), 0px 1px 0px 0px rgba(255, 255, 255, 0.05) inset',
+              color: canHover ? t.colors.$success500 : t.colors.$colorText,
               ':before': {
                 content: '""',
                 position: 'absolute',
@@ -159,12 +223,13 @@ export const CheckoutComplete = ({
                   ? localizationKeys('commerce.checkout.title__paymentSuccessful')
                   : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
               }
-              sx={{
+              sx={t => ({
                 opacity: 0,
                 animationName: 'slideUp',
                 animationDuration: `${transitionDurationValues.slowest}ms`,
                 animationTimingFunction: transitionTiming.bezier,
                 animationFillMode: 'forwards',
+                color: t.colors.$colorText,
                 '@keyframes slideUp': {
                   '0%': {
                     transform: 'translateY(30px)',
@@ -179,7 +244,7 @@ export const CheckoutComplete = ({
                   opacity: 1,
                   animation: 'none',
                 }),
-              }}
+              })}
             />
             <Text
               elementDescriptor={descriptors.checkoutSuccessDescription}
@@ -261,8 +326,8 @@ export const CheckoutComplete = ({
                       ? `${capitalize(checkout.paymentSource.paymentMethod)}`
                       : `${capitalize(checkout.paymentSource.cardType)} ⋯ ${checkout.paymentSource.last4}`
                     : '–'
-                  : checkout.subscription?.periodStart
-                    ? formatDate(new Date(checkout.subscription.periodStart))
+                  : checkout.planPeriodStart
+                    ? formatDate(new Date(checkout.planPeriodStart))
                     : '–'
               }
             />

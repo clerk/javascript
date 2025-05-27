@@ -5,6 +5,7 @@ import type {
   JwtPayload,
   ServerGetToken,
   ServerGetTokenOptions,
+  SessionStatusClaim,
   SharedSignedInAuthObjectProperties,
 } from '@clerk/types';
 
@@ -52,7 +53,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
 export type SignedOutAuthObject = {
   sessionClaims: null;
   sessionId: null;
-  sessionStatus: null;
+  sessionStatus: SessionStatusClaim | null;
   actor: null;
   userId: null;
   orgId: null;
@@ -129,11 +130,14 @@ export function signedInAuthObject(
 /**
  * @internal
  */
-export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutAuthObject {
+export function signedOutAuthObject(
+  debugData?: AuthObjectDebugData,
+  initialSessionStatus?: SessionStatusClaim,
+): SignedOutAuthObject {
   return {
     sessionClaims: null,
     sessionId: null,
-    sessionStatus: null,
+    sessionStatus: initialSessionStatus ?? null,
     userId: null,
     actor: null,
     orgId: null,

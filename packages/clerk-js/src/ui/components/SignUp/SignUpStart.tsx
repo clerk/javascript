@@ -1,5 +1,6 @@
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/types';
+import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
 import React from 'react';
 
 import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
@@ -20,11 +21,13 @@ import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
+import { getPreferredAlternativePhoneChannel } from '../SignIn/utils';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
+import { SignUpStartAlternativePhoneCodePhoneNumberCard } from './SignUpStartAlternativePhoneCodePhoneNumberCard';
 import { completeSignUpFlow } from './util';
 
 function SignUpStartInternal(): JSX.Element {
@@ -33,7 +36,7 @@ function SignUpStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const { showOptionalFields } = useAppearance().parsedLayout;
-  const { userSettings } = useEnvironment();
+  const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
   const { setActive } = useClerk();
@@ -41,11 +44,23 @@ function SignUpStartInternal(): JSX.Element {
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const { afterSignUpUrl, signInUrl, unsafeMetadata } = ctx;
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
-  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
-    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
+  const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
+    getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
+      phoneNumber: ctx.initialValues?.phoneNumber === null ? undefined : ctx.initialValues?.phoneNumber,
+      emailAddress: ctx.initialValues?.emailAddress === null ? undefined : ctx.initialValues?.emailAddress,
+      ...(isCombinedFlow
+        ? {
+            emailAddress: signUp.emailAddress,
+            phoneNumber: signUp.phoneNumber,
+          }
+        : {}),
+    }),
   );
   const { t, locale } = useLocalizations();
   const initialValues = ctx.initialValues || {};
+  const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] = React.useState<PhoneCodeChannelData | null>(
+    null,
+  );
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
 
@@ -229,6 +244,32 @@ function SignUpStartInternal(): JSX.Element {
       } as any);
     }
 
+    // If the user has already selected an alternative phone code provider, we use that.
+    const preferredAlternativePhoneChannel =
+      alternativePhoneCodeProvider?.channel ||
+      getPreferredAlternativePhoneChannel(fieldsToSubmit, authConfig.preferredChannels, 'phoneNumber');
+    if (preferredAlternativePhoneChannel) {
+      // We need to send the alternative phone code provider channel in the sign up request
+      // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
+      const noop = () => {};
+      fieldsToSubmit.push({
+        id: 'strategy',
+        value: 'phone_code',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+      fieldsToSubmit.push({
+        id: 'channel',
+        value: preferredAlternativePhoneChannel,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+    }
+
     // In case of emailOrPhone (both email & phone are optional) and neither of them is provided,
     // add both to the submitted fields to trigger and render an error for both respective inputs
     const emailAddressProvided = !!(fieldsToSubmit.find(f => f.id === 'emailAddress')?.value || '');
@@ -262,6 +303,7 @@ function SignUpStartInternal(): JSX.Element {
           navigate,
           redirectUrl,
           redirectUrlComplete,
+          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))
@@ -279,6 +321,16 @@ function SignUpStartInternal(): JSX.Element {
   const showOauthProviders =
     (!hasTicket || missingRequirementsWithTicket) && userSettings.authenticatableSocialStrategies.length > 0;
   const showWeb3Providers = !hasTicket && userSettings.web3FirstFactors.length > 0;
+  const showAlternativePhoneCodeProviders = !hasTicket && userSettings.alternativePhoneCodeChannels.length > 0;
+
+  const onAlternativePhoneCodeUseAnotherMethod = () => {
+    setAlternativePhoneCodeProvider(null);
+  };
+  const onAlternativePhoneCodeProviderClick = (phoneCodeChannel: PhoneCodeChannel) => {
+    const phoneCodeProvider: PhoneCodeChannelData | null =
+      getAlternativePhoneCodeProviderData(phoneCodeChannel) || null;
+    setAlternativePhoneCodeProvider(phoneCodeProvider);
+  };
 
   if (mode !== SIGN_UP_MODES.PUBLIC && !hasTicket) {
     return <SignUpRestrictedAccess />;
@@ -286,61 +338,75 @@ function SignUpStartInternal(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title
-              localizationKey={
-                isCombinedFlow ? localizationKeys('signUp.start.titleCombined') : localizationKeys('signUp.start.title')
-              }
-            />
-            <Header.Subtitle
-              localizationKey={
-                isCombinedFlow
-                  ? localizationKeys('signUp.start.subtitleCombined')
-                  : localizationKeys('signUp.start.subtitle')
-              }
-            />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Flex
-            direction='col'
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && (
-                <SignUpSocialButtons
-                  enableOAuthProviders={showOauthProviders}
-                  enableWeb3Providers={showWeb3Providers}
-                  continueSignUp={missingRequirementsWithTicket}
-                  legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
-                />
-              )}
-              {shouldShowForm && (
-                <SignUpForm
-                  handleSubmit={handleSubmit}
-                  fields={fields}
-                  formState={formState}
-                  canToggleEmailPhone={canToggleEmailPhone}
-                  handleEmailPhoneToggle={handleChangeActive}
-                />
-              )}
-            </SocialButtonsReversibleContainerWithDivider>
-            {!shouldShowForm && <CaptchaElement />}
-          </Flex>
-        </Card.Content>
+      {!alternativePhoneCodeProvider ? (
+        <Card.Root>
+          <Card.Content>
+            <Header.Root showLogo>
+              <Header.Title
+                localizationKey={
+                  isCombinedFlow
+                    ? localizationKeys('signUp.start.titleCombined')
+                    : localizationKeys('signUp.start.title')
+                }
+              />
+              <Header.Subtitle
+                localizationKey={
+                  isCombinedFlow
+                    ? localizationKeys('signUp.start.subtitleCombined')
+                    : localizationKeys('signUp.start.subtitle')
+                }
+              />
+            </Header.Root>
+            <Card.Alert>{card.error}</Card.Alert>
+            <Flex
+              direction='col'
+              elementDescriptor={descriptors.main}
+              gap={6}
+            >
+              <SocialButtonsReversibleContainerWithDivider>
+                {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
+                  <SignUpSocialButtons
+                    enableOAuthProviders={showOauthProviders}
+                    enableWeb3Providers={showWeb3Providers}
+                    enableAlternativePhoneCodeProviders={showAlternativePhoneCodeProviders}
+                    onAlternativePhoneCodeProviderClick={onAlternativePhoneCodeProviderClick}
+                    continueSignUp={missingRequirementsWithTicket}
+                    legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
+                  />
+                )}
+                {shouldShowForm && (
+                  <SignUpForm
+                    handleSubmit={handleSubmit}
+                    fields={fields}
+                    formState={formState}
+                    canToggleEmailPhone={canToggleEmailPhone}
+                    handleEmailPhoneToggle={handleChangeActive}
+                  />
+                )}
+              </SocialButtonsReversibleContainerWithDivider>
+              {!shouldShowForm && <CaptchaElement />}
+            </Flex>
+          </Card.Content>
 
-        <Card.Footer>
-          <Card.Action elementId='signUp'>
-            <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+          <Card.Footer>
+            <Card.Action elementId='signUp'>
+              <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
+              <Card.ActionLink
+                localizationKey={localizationKeys('signUp.start.actionLink')}
+                to={isCombinedFlow ? '../' : clerk.buildUrlWithAuth(signInUrl)}
+              />
+            </Card.Action>
+          </Card.Footer>
+        </Card.Root>
+      ) : (
+        <SignUpStartAlternativePhoneCodePhoneNumberCard
+          handleSubmit={handleSubmit}
+          fields={fields}
+          formState={formState}
+          onUseAnotherMethod={onAlternativePhoneCodeUseAnotherMethod}
+          phoneCodeProvider={alternativePhoneCodeProvider}
+        />
+      )}
     </Flow.Part>
   );
 }

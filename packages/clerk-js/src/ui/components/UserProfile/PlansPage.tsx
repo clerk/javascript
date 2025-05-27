@@ -1,5 +1,6 @@
-import { PlansContextProvider, PricingTableContext, SubscriberTypeContext } from '../../contexts';
+import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
 import { Header } from '../../elements';
+import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { PricingTable } from '../PricingTable/PricingTable';
 
@@ -19,7 +20,7 @@ const PlansPageInternal = () => {
       >
         <Header.BackLink onClick={() => void navigate('../', { searchParams: new URLSearchParams('tab=plans') })}>
           <Header.Title
-            localizationKey='Available Plans'
+            localizationKey={localizationKeys('userProfile.plansPage.title')}
             textVariant='h2'
           />
         </Header.BackLink>
@@ -35,9 +36,7 @@ const PlansPageInternal = () => {
 export const PlansPage = () => {
   return (
     <SubscriberTypeContext.Provider value='user'>
-      <PlansContextProvider>
-        <PlansPageInternal />
-      </PlansContextProvider>
+      <PlansPageInternal />
     </SubscriberTypeContext.Provider>
   );
 };

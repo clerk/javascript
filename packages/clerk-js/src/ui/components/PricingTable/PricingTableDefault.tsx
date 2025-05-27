@@ -1,9 +1,11 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useClerk, useSession } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
+import { useProtect } from '../../common';
 import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
 import {
+  Badge,
   Box,
   Button,
   Col,
@@ -16,7 +18,7 @@ import {
   Span,
   Text,
 } from '../../customizables';
-import { Switch } from '../../elements';
+import { Switch, Tooltip } from '../../elements';
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { colors, getClosestProfileScrollBox } from '../../utils';
@@ -96,7 +98,7 @@ interface CardProps {
 function Card(props: CardProps) {
   const { plan, planPeriod, setPlanPeriod, onSelect, props: pricingTableProps, isCompact = false } = props;
   const clerk = useClerk();
-  const { isSignedIn } = useUser();
+  const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
 
@@ -104,13 +106,10 @@ function Card(props: CardProps) {
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
   const { id, slug } = plan;
 
-  const { buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming, activeOrUpcomingSubscription, subscriptions } =
-    usePlansContext();
-
-  const subscription = activeOrUpcomingSubscription(plan);
-  const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
-
-  const showStatusRow = !!subscription || (isImplicitlyActiveOrUpcoming && isSignedIn);
+  const canManageBilling = useProtect(
+    has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
+  );
+  const { buttonPropsForPlan, activeOrUpcomingSubscriptionBasedOnPlanPeriod } = usePlansContext();
 
   const showPlanDetails = (event?: React.MouseEvent<HTMLElement>) => {
     const portalRoot = getClosestProfileScrollBox(mode, event);
@@ -123,6 +122,39 @@ function Card(props: CardProps) {
     });
   };
 
+  const subscription = React.useMemo(
+    () => activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod),
+    [plan, planPeriod, activeOrUpcomingSubscriptionBasedOnPlanPeriod],
+  );
+  const isPlanActive = subscription?.status === 'active';
+  const hasFeatures = plan.features.length > 0;
+  const showStatusRow = !!subscription;
+
+  let shouldShowFooter = false;
+  let shouldShowFooterNotice = false;
+
+  if (!subscription) {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = false;
+  } else if (subscription.status === 'upcoming') {
+    shouldShowFooter = true;
+    shouldShowFooterNotice = true;
+  } else if (subscription.status === 'active') {
+    if (subscription.canceledAt) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyAmount > 0) {
+      shouldShowFooter = true;
+      shouldShowFooterNotice = false;
+    } else {
+      shouldShowFooter = false;
+      shouldShowFooterNotice = false;
+    }
+  } else {
+    shouldShowFooter = false;
+    shouldShowFooterNotice = false;
+  }
+
   return (
     <Box
       key={id}
@@ -132,7 +164,7 @@ function Card(props: CardProps) {
         display: 'grid',
         gap: 0,
         gridTemplateRows: 'subgrid',
-        gridRow: 'span 4',
+        gridRow: 'span 5',
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
           t.colors.$neutralAlpha50,
@@ -152,25 +184,42 @@ function Card(props: CardProps) {
         isCompact={isCompact}
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
+        badge={
+          showStatusRow ? (
+            isPlanActive ? (
+              <Badge
+                colorScheme='secondary'
+                localizationKey={localizationKeys('badge__activePlan')}
+              />
+            ) : (
+              <Badge
+                colorScheme='primary'
+                localizationKey={localizationKeys('badge__upcomingPlan')}
+              />
+            )
+          ) : undefined
+        }
       />
       <Box
         elementDescriptor={descriptors.pricingTableCardBody}
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gridTemplateRows: 'subgrid',
+          gridRow: 'span 2',
           gap: 0,
         }}
       >
-        {!collapseFeatures ? (
+        {(ctaPosition === 'bottom' && !collapseFeatures) || (ctaPosition === 'top' && hasFeatures) ? (
           <Box
             elementDescriptor={descriptors.pricingTableCardFeatures}
             sx={t => ({
+              // gridRow: shouldShowFooter ? 'auto' : 'span 2',
               display: 'flex',
               flexDirection: 'column',
               flex: '1',
               padding: isCompact ? t.space.$3 : t.space.$4,
-              backgroundColor: t.colors.$colorBackground,
-              borderTopWidth: t.borderWidths.$normal,
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+              borderTopWidth: hasFeatures ? t.borderWidths.$normal : 0,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
             })}
@@ -184,65 +233,56 @@ function Card(props: CardProps) {
           </Box>
         ) : null}
 
-        {showStatusRow && (
+        {shouldShowFooter ? (
           <Box
-            elementDescriptor={descriptors.pricingTableCardStatusRow}
-            sx={t => ({
-              padding: t.space.$1,
-              borderTopWidth: t.borderWidths.$normal,
-              borderTopStyle: t.borderStyles.$solid,
-              borderTopColor: t.colors.$neutralAlpha100,
-            })}
-          >
-            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-              <Text
-                elementDescriptor={descriptors.pricingTableCardStatus}
-                variant='caption'
-                colorScheme='body'
-                localizationKey={localizationKeys('badge__currentPlan')}
-                sx={{ textAlign: 'center' }}
-              />
-            ) : (
-              <Text
-                elementDescriptor={descriptors.pricingTableCardStatus}
-                variant='caption'
-                colorScheme='body'
-                localizationKey={
-                  subscription
-                    ? localizationKeys('badge__startsAt', {
-                        date: subscription.periodStart,
-                      })
-                    : localizationKeys('badge__upcomingPlan')
-                }
-                sx={{ textAlign: 'center' }}
-              />
-            )}
-          </Box>
-        )}
-
-        {(!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming) && (
-          <Box
-            elementDescriptor={descriptors.pricingTableCardAction}
+            elementDescriptor={descriptors.pricingTableCardFooter}
             sx={t => ({
               marginTop: 'auto',
               padding: isCompact ? t.space.$3 : t.space.$4,
               borderTopWidth: t.borderWidths.$normal,
               borderTopStyle: t.borderStyles.$solid,
               borderTopColor: t.colors.$neutralAlpha100,
-              background: undefined,
               order: ctaPosition === 'top' ? -1 : undefined,
             })}
           >
-            <Button
-              elementDescriptor={descriptors.pricingTableCardActionButton}
-              block
-              textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
-              {...buttonPropsForPlan({ plan, isCompact })}
-              onClick={event => {
-                onSelect(plan, event);
-              }}
-            />
+            {shouldShowFooterNotice ? (
+              <Text
+                elementDescriptor={descriptors.pricingTableCardFooterNotice}
+                variant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                localizationKey={localizationKeys('badge__startsAt', { date: subscription?.periodStart })}
+                colorScheme='secondary'
+                sx={t => ({
+                  paddingBlock: t.space.$1x5,
+                  textAlign: 'center',
+                })}
+              />
+            ) : (
+              <Tooltip.Root>
+                <Tooltip.Trigger sx={{ width: '100%' }}>
+                  <Button
+                    elementDescriptor={descriptors.pricingTableCardFooterButton}
+                    block
+                    textVariant={isCompact ? 'buttonSmall' : 'buttonLarge'}
+                    {...buttonPropsForPlan({ plan, isCompact, selectedPlanPeriod: planPeriod })}
+                    onClick={event => {
+                      onSelect(plan, event);
+                    }}
+                  />
+                </Tooltip.Trigger>
+                {isSignedIn && !canManageBilling && (
+                  <Tooltip.Content
+                    text={localizationKeys('organizationProfile.plansPage.alerts.noPermissionsToManageBilling')}
+                  />
+                )}
+              </Tooltip.Root>
+            )}
           </Box>
+        ) : (
+          <Box
+            sx={t => ({
+              backgroundColor: hasFeatures ? t.colors.$colorBackground : 'transparent',
+            })}
+          />
         )}
       </Box>
     </Box>
@@ -258,10 +298,11 @@ interface CardHeaderProps {
   isCompact?: boolean;
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  badge?: React.ReactNode;
 }
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref) => {
-  const { plan, isCompact, planPeriod, setPlanPeriod } = props;
+  const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
   const { name, annualMonthlyAmount } = plan;
 
   const getPlanFee = React.useMemo(() => {
@@ -286,18 +327,31 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
       data-variant={isCompact ? 'compact' : 'default'}
     >
       <Box elementDescriptor={descriptors.pricingTableCardTitleContainer}>
-        <Heading
-          elementDescriptor={descriptors.pricingTableCardTitle}
-          as='h2'
-          textVariant={isCompact ? 'h3' : 'h2'}
+        <Box
+          sx={t => ({
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: t.space.$0x25,
+          })}
         >
-          {name}
-        </Heading>
+          <Heading
+            elementDescriptor={descriptors.pricingTableCardTitle}
+            as='h2'
+            textVariant={isCompact ? 'h3' : 'h2'}
+          >
+            {name}
+          </Heading>
+          {badge && badge}
+        </Box>
         {!isCompact && plan.description ? (
           <Text
             elementDescriptor={descriptors.pricingTableCardDescription}
             variant='subtitle'
             colorScheme='secondary'
+            sx={{
+              justifySelf: 'flex-start',
+            }}
           >
             {plan.description}
           </Text>
@@ -361,6 +415,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
             plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
           sx={{
+            justifySelf: 'flex-start',
             alignSelf: 'center',
           }}
         />
@@ -453,7 +508,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
           variant='link'
           sx={t => ({
             marginBlockStart: 'auto',
-            paddingBlockStart: t.space.$2,
+            paddingBlock: t.space.$1,
             gap: t.space.$1,
           })}
         >
