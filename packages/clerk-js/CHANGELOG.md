@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.67.4
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fix logic for allowing removal of all payment methods if there are no paid subscriptions ([#5975](https://github.com/clerk/javascript/pull/5975)) by [@aeliox](https://github.com/aeliox)
+
+- Pass the full statement id to the list item to ensure the full value is copied to clipboard. ([#5984](https://github.com/clerk/javascript/pull/5984)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Refactors checkout success highlight animation to fix an issue where background colors other that white, would not properly mask the highlight glow. ([#5991](https://github.com/clerk/javascript/pull/5991)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Drop throttling for multisession apps to fix edge cases when quickly switching between tabs with different sessions, in apps that have multisession support enabled. ([#5990](https://github.com/clerk/javascript/pull/5990)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`f6a4a7b`](https://github.com/clerk/javascript/commit/f6a4a7b89b9728703ca1ec5bb63fdf2ae736e39c)]:
+  - @clerk/types@4.59.2
+  - @clerk/localizations@3.16.2
+  - @clerk/shared@3.9.4
+
 ## 5.67.3
 
 ### Patch Changes
