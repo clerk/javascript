@@ -17,7 +17,7 @@ import { BaseResource, Organization, PublicUserData } from './internal';
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;
   publicMetadata: OrganizationMembershipPublicMetadata = {};
-  publicUserData!: PublicUserData;
+  publicUserData?: PublicUserData;
   organization!: Organization;
   permissions: OrganizationPermissionKey[] = [];
   role!: OrganizationCustomRoleKey;
@@ -50,14 +50,16 @@ export class OrganizationMembership extends BaseResource implements Organization
 
   destroy = async (): Promise<OrganizationMembership> => {
     // TODO: Revise the return type of _baseDelete
+    // TODO: Handle case where publicUserData is not present
     return (await this._baseDelete({
-      path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
+      path: `/organizations/${this.organization.id}/memberships/${this.publicUserData?.userId}`,
     })) as unknown as OrganizationMembership;
   };
 
   update = async ({ role }: UpdateOrganizationMembershipParams): Promise<OrganizationMembership> => {
+    // TODO: Handle case where publicUserData is not present
     return await this._basePatch({
-      path: `/organizations/${this.organization.id}/memberships/${this.publicUserData.userId}`,
+      path: `/organizations/${this.organization.id}/memberships/${this.publicUserData?.userId}`,
       body: { role },
     });
   };
@@ -86,7 +88,7 @@ export class OrganizationMembership extends BaseResource implements Organization
       id: this.id,
       organization: this.organization.__internal_toSnapshot(),
       public_metadata: this.publicMetadata,
-      public_user_data: this.publicUserData.__internal_toSnapshot(),
+      public_user_data: this.publicUserData?.__internal_toSnapshot(),
       permissions: this.permissions,
       role: this.role,
       created_at: this.createdAt.getTime(),
