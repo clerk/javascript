@@ -207,9 +207,11 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - node-version: 18
+          - label: LTS subset
+            node-version: 18
             test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
-          - node-version: 22
+          - label: Full suite
+            node-version: 22
             test-filter: "**"
 
     steps:
