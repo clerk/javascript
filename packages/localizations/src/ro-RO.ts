@@ -71,6 +71,7 @@ export const roRO: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const roRO: LocalizationResource = {
     sameDay: "Astăzi la {{ date | timeString('en-US') }}",
   },
   dividerText: 'sau',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilizați o altă metodă',
   footerPageLink__help: 'Ajutor',
   footerPageLink__privacy: 'Confidențialitate',
