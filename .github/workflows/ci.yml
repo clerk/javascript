@@ -207,12 +207,13 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - label: LTS subset
+          - test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
             node-version: 18
-            test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo"
-          - label: Full suite
+            label: LTS subset
+            
+          - test-filter: "**"
             node-version: 22
-            test-filter: "**"
+            label: Full suite
 
     steps:
       - name: Checkout Repo
