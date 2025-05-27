@@ -1,152 +1,66 @@
-// Safe console wrapper for SharedWorker environment
-const safeConsole = {
-  log: (...args) => {
-    try {
-      if (typeof console !== 'undefined' && console.log) {
-        console.log(...args);
-      }
-    } catch (e) {
-      // Silent fail if console is not available
-    }
-  },
-  warn: (...args) => {
-    try {
-      if (typeof console !== 'undefined' && console.warn) {
-        console.warn(...args);
-      }
-    } catch (e) {
-      // Silent fail if console is not available
-    }
-  },
-  error: (...args) => {
-    try {
-      if (typeof console !== 'undefined' && console.error) {
-        console.error(...args);
-      }
-    } catch (e) {
-      // Silent fail if console is not available
-    }
-  },
-};
-
 class ClerkSharedWorkerState {
   constructor() {
-    this.connectedPorts = new Set();
-    this.clerkInstances = new Map();
-    this.tabRegistry = new Map();
-    this.lastAuthState = null;
-    this.lastSessionState = null;
     this.activeTabId = null;
+    this.connectedPorts = new Set();
+    this.tabRegistry = new Map();
   }
 
-  addPort(port, instanceId, tabId = null) {
+  addPort(port, tabId = null) {
     this.connectedPorts.add(port);
 
-    if (instanceId) {
-      const instanceData = {
+    if (tabId) {
+      this.tabRegistry.set(tabId, {
         port,
-        tabId,
-        connectedAt: Date.now(),
         lastActivity: Date.now(),
+        connectedAt: Date.now(),
         state: null,
-      };
+      });
 
-      this.clerkInstances.set(instanceId, instanceData);
+      this.log(`Port connected. Tab: ${tabId}. Total ports: ${this.connectedPorts.size}`);
 
-      if (tabId) {
-        this.tabRegistry.set(tabId, {
-          instanceId,
-          port,
-          lastActivity: Date.now(),
+      if (this.tabRegistry.size > 1) {
+        this.broadcastToOtherTabs(tabId, {
+          type: 'clerk_tab_connected',
+          payload: {
+            event: 'tab_connected',
+            newTabId: tabId,
+            totalTabs: this.tabRegistry.size,
+            totalPorts: this.connectedPorts.size,
+            timestamp: Date.now(),
+          },
         });
-        safeConsole.log(
-          `[ClerkSharedWorker] ➕ Added tab ${tabId} to registry. Registry size: ${this.tabRegistry.size}`,
-        );
-
-        if (this.tabRegistry.size > 1) {
-          this.broadcastToOtherTabs(tabId, {
-            type: 'clerk_tab_connected',
-            payload: {
-              event: 'tab_connected',
-              newTabId: tabId,
-              newInstanceId: instanceId,
-              totalTabs: this.tabRegistry.size,
-              totalPorts: this.connectedPorts.size,
-              timestamp: Date.now(),
-            },
-          });
-
-          safeConsole.log(
-            `[ClerkSharedWorker] 📢 Notified ${this.tabRegistry.size - 1} existing tabs about new tab ${tabId}`,
-          );
-        } else {
-          safeConsole.log(`[ClerkSharedWorker] 🏠 Tab ${tabId} is the first tab in this session`);
-        }
-      } else {
-        safeConsole.warn(`[ClerkSharedWorker] No tabId provided for instance ${instanceId}`);
       }
     }
-
-    safeConsole.log(
-      `[ClerkSharedWorker] Port connected. Instance: ${instanceId}, Tab: ${tabId}. Total ports: ${this.connectedPorts.size}`,
-    );
-    this.logConnectionStatus();
   }
 
   removePort(port) {
     this.connectedPorts.delete(port);
 
-    for (const [instanceId, data] of this.clerkInstances.entries()) {
-      if (data.port === port) {
-        const tabId = data.tabId;
-        this.clerkInstances.delete(instanceId);
+    for (const [tabId, tabData] of this.tabRegistry.entries()) {
+      if (tabData.port === port) {
+        this.tabRegistry.delete(tabId);
 
-        if (tabId) {
-          this.tabRegistry.delete(tabId);
-
-          if (this.tabRegistry.size > 0) {
-            this.broadcastToAllPorts({
-              type: 'clerk_tab_disconnected',
-              payload: {
-                event: 'tab_disconnected',
-                disconnectedTabId: tabId,
-                disconnectedInstanceId: instanceId,
-                totalTabs: this.tabRegistry.size,
-                totalPorts: this.connectedPorts.size,
-                timestamp: Date.now(),
-              },
-            });
-
-            safeConsole.log(
-              `[ClerkSharedWorker] 📢 Notified ${this.tabRegistry.size} remaining tabs about disconnection of tab ${tabId}`,
-            );
-          } else {
-            safeConsole.log(`[ClerkSharedWorker] 🏁 Last tab ${tabId} disconnected - no more active tabs`);
-          }
-
-          if (this.activeTabId === tabId) {
-            safeConsole.log(`[ClerkSharedWorker] 🔄 Active tab ${tabId} disconnected - clearing active state`);
-            this.activeTabId = null;
-          }
+        if (this.tabRegistry.size > 0) {
+          this.broadcastToAllPorts({
+            type: 'clerk_tab_disconnected',
+            payload: {
+              event: 'tab_disconnected',
+              disconnectedTabId: tabId,
+              totalTabs: this.tabRegistry.size,
+              totalPorts: this.connectedPorts.size,
+              timestamp: Date.now(),
+            },
+          });
+        } else {
+          this.log(`🏁 Last tab ${tabId} disconnected - no more active tabs`);
+          this.activeTabId = null;
         }
-
-        safeConsole.log(
-          `[ClerkSharedWorker] ➖ Port disconnected. Instance: ${instanceId}, Tab: ${tabId}. Total ports: ${this.connectedPorts.size}`,
-        );
-        this.logConnectionStatus();
         break;
       }
     }
   }
 
-  logConnectionStatus() {
-    const tabs = Array.from(this.tabRegistry.keys());
-    safeConsole.log(`[ClerkSharedWorker] Active tabs: ${tabs.length} [${tabs.join(', ')}]`);
-  }
-
   broadcastToOtherTabs(senderTabId, message) {
-    let broadcastCount = 0;
-
     for (const [tabId, tabData] of this.tabRegistry.entries()) {
       if (tabId !== senderTabId) {
         try {
@@ -155,15 +69,11 @@ class ClerkSharedWorkerState {
             sourceTabId: senderTabId,
             targetTabId: tabId,
           });
-          broadcastCount++;
         } catch (error) {
-          safeConsole.warn(`[ClerkSharedWorker] Failed to send message to tab ${tabId}:`, error);
           this.removePort(tabData.port);
         }
       }
     }
-
-    safeConsole.log(`[ClerkSharedWorker] Broadcasted message to ${broadcastCount} other tabs`);
   }
 
   broadcastToOtherPorts(senderPort, message) {
@@ -184,7 +94,6 @@ class ClerkSharedWorkerState {
           try {
             port.postMessage(message);
           } catch (error) {
-            safeConsole.warn('[ClerkSharedWorker] Failed to send message to port:', error);
             this.removePort(port);
           }
         }
@@ -197,7 +106,6 @@ class ClerkSharedWorkerState {
       try {
         port.postMessage(message);
       } catch (error) {
-        safeConsole.warn('[ClerkSharedWorker] Failed to send message to port:', error);
         this.removePort(port);
       }
     }
@@ -213,7 +121,6 @@ class ClerkSharedWorkerState {
         });
         return true;
       } catch (error) {
-        safeConsole.warn(`[ClerkSharedWorker] Failed to send message to tab ${targetTabId}:`, error);
         this.removePort(tabData.port);
         return false;
       }
@@ -221,18 +128,43 @@ class ClerkSharedWorkerState {
     return false;
   }
 
-  handleClerkEvent(port, event, data, instanceId) {
-    const tabId = data.tabId || null;
-    safeConsole.log(`[ClerkSharedWorker] Received Clerk event: ${event} from tab ${tabId}`, data);
+  postLogMessage(level, message, ...args) {
+    this.broadcastToAllPorts({
+      type: 'clerk_log_message',
+      payload: {
+        level,
+        message,
+        args,
+        timestamp: Date.now(),
+        source: 'ClerkSharedWorker',
+      },
+    });
+  }
 
-    if (instanceId && this.clerkInstances.has(instanceId)) {
-      const instanceData = this.clerkInstances.get(instanceId);
-      instanceData.lastActivity = Date.now();
-      instanceData.state = data;
-    }
+  log(message, ...args) {
+    this.postLogMessage('log', message, ...args);
+  }
+
+  warn(message, ...args) {
+    this.postLogMessage('warn', message, ...args);
+  }
+
+  error(message, ...args) {
+    this.postLogMessage('error', message, ...args);
+  }
+
+  handleClerkEvent(port, event, data) {
+    const tabId = data.tabId || null;
 
     if (tabId && this.tabRegistry.has(tabId)) {
-      this.tabRegistry.get(tabId).lastActivity = Date.now();
+      const tabData = this.tabRegistry.get(tabId);
+      tabData.lastActivity = Date.now();
+
+      if (tabData.state) {
+        tabData.state = { ...tabData.state, ...data };
+      } else {
+        tabData.state = { ...data };
+      }
     }
 
     switch (event) {
@@ -252,7 +184,7 @@ class ClerkSharedWorkerState {
         this.handleEnvironmentUpdate(port, data, tabId);
         break;
       default:
-        safeConsole.log(`[ClerkSharedWorker] Unknown event: ${event}`);
+        break;
     }
   }
 
@@ -265,7 +197,6 @@ class ClerkSharedWorkerState {
 
     if (stateChanged) {
       this.lastAuthState = data;
-      safeConsole.log(`[ClerkSharedWorker] Auth state changed in tab ${sourceTabId}, syncing to other tabs`);
 
       this.broadcastToOtherPorts(port, {
         type: 'clerk_sync_state',
@@ -282,8 +213,7 @@ class ClerkSharedWorkerState {
   handleSignOut(port, data, sourceTabId) {
     this.lastAuthState = null;
     this.lastSessionState = null;
-
-    safeConsole.log(`[ClerkSharedWorker] Sign out event from tab ${sourceTabId}, syncing to all other tabs`);
+    this.lastTokenState = null;
 
     this.broadcastToOtherPorts(port, {
       type: 'clerk_sync_state',
@@ -301,7 +231,6 @@ class ClerkSharedWorkerState {
 
     if (sessionChanged) {
       this.lastSessionState = data;
-      safeConsole.log(`[ClerkSharedWorker] Session updated in tab ${sourceTabId}, syncing to other tabs`);
 
       this.broadcastToOtherPorts(port, {
         type: 'clerk_sync_state',
@@ -316,7 +245,12 @@ class ClerkSharedWorkerState {
   }
 
   handleTokenUpdate(port, data, sourceTabId) {
-    safeConsole.log(`[ClerkSharedWorker] Token updated in tab ${sourceTabId}, syncing to other tabs`);
+    this.lastTokenState = {
+      token: data.token,
+      hasToken: data.hasToken,
+      timestamp: data.timestamp,
+      sourceTabId,
+    };
 
     this.broadcastToOtherPorts(port, {
       type: 'clerk_sync_state',
@@ -330,8 +264,6 @@ class ClerkSharedWorkerState {
   }
 
   handleEnvironmentUpdate(port, data, sourceTabId) {
-    safeConsole.log(`[ClerkSharedWorker] Environment updated in tab ${sourceTabId}, syncing to other tabs`);
-
     this.broadcastToOtherPorts(port, {
       type: 'clerk_sync_state',
       payload: {
@@ -346,13 +278,11 @@ class ClerkSharedWorkerState {
   getTabStatus() {
     const tabs = [];
     for (const [tabId, tabData] of this.tabRegistry.entries()) {
-      const instanceData = this.clerkInstances.get(tabData.instanceId);
       tabs.push({
         tabId,
-        instanceId: tabData.instanceId,
         lastActivity: tabData.lastActivity,
-        connectedAt: instanceData?.connectedAt,
-        state: instanceData?.state,
+        connectedAt: tabData.connectedAt,
+        state: tabData.state,
         isActive: tabId === this.activeTabId,
       });
     }
@@ -368,14 +298,6 @@ class ClerkSharedWorkerState {
       const previousActiveTab = this.activeTabId;
       this.activeTabId = tabId;
 
-      if (previousActiveTab && previousActiveTab !== tabId) {
-        safeConsole.log(`[ClerkSharedWorker] ✨ Active tab switched: ${previousActiveTab} → ${tabId}`);
-      } else if (!previousActiveTab) {
-        safeConsole.log(`[ClerkSharedWorker] 🎉 Tab ${tabId} is now the first active tab`);
-      } else {
-        safeConsole.log(`[ClerkSharedWorker] 🔄 Tab ${tabId} remains active`);
-      }
-
       this.broadcastToAllPorts({
         type: 'clerk_active_tab_changed',
         payload: {
@@ -385,15 +307,16 @@ class ClerkSharedWorkerState {
           timestamp: Date.now(),
         },
       });
-
       return true;
     }
-    safeConsole.warn(`[ClerkSharedWorker] ⚠️ Attempted to set unknown tab ${tabId} as active`);
     return false;
   }
 }
 
 const clerkState = new ClerkSharedWorkerState();
+
+// Log that the worker is ready
+clerkState.log('[ClerkSharedWorker] SharedWorker script loaded and ready');
 
 self.addEventListener('connect', event => {
   const port = event.ports[0];
@@ -403,18 +326,17 @@ self.addEventListener('connect', event => {
 
     switch (type) {
       case 'clerk_init':
-        safeConsole.log(`[ClerkSharedWorker] Received init message:`, payload);
-        clerkState.addPort(port, payload.instanceId, payload.tabId);
+        clerkState.log(`Received init message:`, payload);
+        clerkState.addPort(port, payload.tabId);
 
         const responsePayload = {
           timestamp: Date.now(),
           connectedPorts: clerkState.connectedPorts.size,
           connectedTabs: clerkState.tabRegistry.size,
           tabId: payload.tabId,
-          instanceId: payload.instanceId,
         };
 
-        safeConsole.log(`[ClerkSharedWorker] Sending ready response:`, responsePayload);
+        clerkState.log(`Sending ready response:`, responsePayload);
 
         port.postMessage({
           type: 'clerk_worker_ready',
@@ -423,7 +345,7 @@ self.addEventListener('connect', event => {
         break;
 
       case 'clerk_event':
-        clerkState.handleClerkEvent(port, payload.event, payload.data, payload.clerkInstanceId);
+        clerkState.handleClerkEvent(port, payload.event, payload.data);
         break;
 
       case 'clerk_ping':
@@ -431,7 +353,7 @@ self.addEventListener('connect', event => {
           type: 'clerk_pong',
           payload: {
             timestamp: Date.now(),
-            instances: clerkState.clerkInstances.size,
+            instances: clerkState.tabRegistry.size,
             ports: clerkState.connectedPorts.size,
             tabs: clerkState.tabRegistry.size,
             activeTabId: clerkState.activeTabId,
@@ -442,18 +364,8 @@ self.addEventListener('connect', event => {
 
       case 'clerk_tab_focus':
         const previousActive = clerkState.activeTabId;
-        safeConsole.log(`[ClerkSharedWorker] 🎯 Tab ${payload.tabId} gained focus`);
-        if (previousActive && previousActive !== payload.tabId) {
-          safeConsole.log(`[ClerkSharedWorker] 📋 Active tab changed: ${previousActive} → ${payload.tabId}`);
-        } else if (!previousActive) {
-          safeConsole.log(`[ClerkSharedWorker] 🚀 First tab became active: ${payload.tabId}`);
-        }
 
         clerkState.setActiveTab(payload.tabId);
-
-        safeConsole.log(
-          `[ClerkSharedWorker] 📊 Tab status: ${clerkState.tabRegistry.size} total tabs, ${payload.tabId} is active`,
-        );
 
         port.postMessage({
           type: 'clerk_tab_focus_response',
@@ -466,13 +378,8 @@ self.addEventListener('connect', event => {
         break;
 
       case 'clerk_tab_blur':
-        safeConsole.log(`[ClerkSharedWorker] 😴 Tab ${payload.tabId} lost focus`);
-
         if (clerkState.activeTabId === payload.tabId) {
-          safeConsole.log(`[ClerkSharedWorker] 🔄 Active tab ${payload.tabId} is now inactive - clearing active state`);
           clerkState.activeTabId = null;
-
-          safeConsole.log(`[ClerkSharedWorker] 📊 Tab status: ${clerkState.tabRegistry.size} total tabs, none active`);
 
           clerkState.broadcastToAllPorts({
             type: 'clerk_active_tab_changed',
@@ -483,10 +390,6 @@ self.addEventListener('connect', event => {
               timestamp: Date.now(),
             },
           });
-        } else {
-          safeConsole.log(
-            `[ClerkSharedWorker] ℹ️ Tab ${payload.tabId} lost focus, but it wasn't the active tab (active: ${clerkState.activeTabId})`,
-          );
         }
 
         port.postMessage({
@@ -501,7 +404,6 @@ self.addEventListener('connect', event => {
 
       case 'clerk_get_tab_status':
         const tabStatusData = clerkState.getTabStatus();
-        safeConsole.log(`[ClerkSharedWorker] Sending tab status:`, tabStatusData);
         port.postMessage({
           type: 'clerk_tab_status',
           payload: {
@@ -512,7 +414,6 @@ self.addEventListener('connect', event => {
         break;
 
       case 'debug_test':
-        safeConsole.log(`[ClerkSharedWorker] Debug test received:`, payload);
         port.postMessage({
           type: 'debug_test_response',
           payload: {
@@ -522,14 +423,13 @@ self.addEventListener('connect', event => {
             workerStatus: {
               connectedPorts: clerkState.connectedPorts.size,
               connectedTabs: clerkState.tabRegistry.size,
-              instances: clerkState.clerkInstances.size,
+              instances: clerkState.tabRegistry.size,
             },
           },
         });
         break;
 
       case 'debug_ping':
-        safeConsole.log(`[ClerkSharedWorker] Debug ping received from tab ${payload.tabId}:`, payload);
         port.postMessage({
           type: 'debug_pong',
           payload: {
@@ -538,35 +438,38 @@ self.addEventListener('connect', event => {
             workerState: {
               connectedPorts: clerkState.connectedPorts.size,
               connectedTabs: clerkState.tabRegistry.size,
-              instances: clerkState.clerkInstances.size,
+              instances: clerkState.tabRegistry.size,
               tabRegistry: Array.from(clerkState.tabRegistry.keys()),
               activeTabId: clerkState.activeTabId,
               lastAuthState: clerkState.lastAuthState ? 'present' : 'null',
+              lastTokenState: clerkState.lastTokenState ? 'present' : 'null',
             },
           },
         });
         break;
 
       case 'clerk_heartbeat':
-        const { tabId: heartbeatTabId, instanceId: heartbeatInstanceId } = payload;
-
-        if (heartbeatInstanceId && clerkState.clerkInstances.has(heartbeatInstanceId)) {
-          clerkState.clerkInstances.get(heartbeatInstanceId).lastActivity = Date.now();
-        }
+        const { tabId: heartbeatTabId } = payload;
 
         if (heartbeatTabId && clerkState.tabRegistry.has(heartbeatTabId)) {
           clerkState.tabRegistry.get(heartbeatTabId).lastActivity = Date.now();
         }
+        break;
 
-        safeConsole.log(`[ClerkSharedWorker] Heartbeat received from tab ${heartbeatTabId}`);
+      case 'clerk_get_token':
+        port.postMessage({
+          type: 'clerk_token_response',
+          payload: {
+            token: clerkState.lastTokenState?.token || null,
+            hasToken: clerkState.lastTokenState?.hasToken || false,
+            timestamp: Date.now(),
+            tokenTimestamp: clerkState.lastTokenState?.timestamp || null,
+            sourceTabId: clerkState.lastTokenState?.sourceTabId || null,
+          },
+        });
         break;
 
       case 'send_tab_message':
-        safeConsole.log(
-          `[ClerkSharedWorker] Message forwarding request from tab ${payload.sourceTabId} to tab ${payload.targetTabId}:`,
-          payload.message,
-        );
-
         let sourceTabId = payload.sourceTabId;
         if (!sourceTabId) {
           for (const [tabId, tabData] of clerkState.tabRegistry.entries()) {
@@ -598,24 +501,15 @@ self.addEventListener('connect', event => {
           },
         });
 
-        if (messageSent) {
-          safeConsole.log(
-            `[ClerkSharedWorker] Successfully forwarded message from tab ${sourceTabId} to tab ${payload.targetTabId}`,
-          );
-        } else {
-          safeConsole.warn(
-            `[ClerkSharedWorker] Failed to forward message from tab ${sourceTabId} to tab ${payload.targetTabId} - target tab not found`,
-          );
-        }
         break;
 
       default:
-        safeConsole.warn(`[ClerkSharedWorker] Unknown message type: ${type}`);
+        break;
     }
   };
 
   port.onmessageerror = error => {
-    safeConsole.error('[ClerkSharedWorker] Message error:', error);
+    debugger;
   };
 
   port.addEventListener('close', () => {
@@ -646,6 +540,3 @@ self.addEventListener('connect', event => {
 //     }
 //   }
 // }, 30000);
-
-safeConsole.log('[ClerkSharedWorker] SharedWorker script loaded and ready for tab coordination');
-

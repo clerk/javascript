@@ -2650,7 +2650,23 @@ export class Clerk implements ClerkInterface {
     });
 
     eventBus.on(events.TokenUpdate, payload => {
+      const tokenString = payload.token?.getRawString() || null;
+
+      // Store token in session storage per tab
+      try {
+        if (tokenString) {
+          sessionStorage.setItem('clerk-token', tokenString);
+        } else {
+          sessionStorage.removeItem('clerk-token');
+        }
+      } catch (error) {
+        // Session storage might not be available or quota exceeded
+        console.warn('Failed to store token in session storage:', error);
+      }
+
+      // Store token in shared worker state
       this.#sharedWorkerManager?.postClerkEvent('clerk:token_update', {
+        token: tokenString,
         hasToken: !!payload.token,
         timestamp: Date.now(),
       });
@@ -2704,80 +2720,69 @@ export class Clerk implements ClerkInterface {
   }
 
   /**
-   * Gets connection information for the current tab's SharedWorker.
+   * Retrieves the stored token from session storage for the current tab.
+   * @returns The stored token or null if not found
    * @public
    */
-  public getSharedWorkerConnectionInfo(): { tabId: string; instanceId: string; isActive: boolean } | null {
-    if (this.#sharedWorkerManager) {
-      return this.#sharedWorkerManager.getConnectionInfo();
-    }
-    return null;
-  }
-
-  /**
-   * Runs debugging diagnostics on the SharedWorker connection.
-   * Useful for troubleshooting SharedWorker issues.
-   * @public
-   */
-  public debugSharedWorker(): void {
-    if (this.#sharedWorkerManager) {
-      this.#sharedWorkerManager.debug();
-    } else {
-      logger.warnOnce('Clerk: No SharedWorker manager available for debugging');
+  public getStoredToken(): string | null {
+    try {
+      return sessionStorage.getItem('clerk-token');
+    } catch (error) {
+      console.warn('Failed to retrieve token from session storage:', error);
+      return null;
     }
   }
 
   /**
-   * Sends a message to another tab via the SharedWorker.
-   * The receiving tab will console log the message.
-   * @param targetTabId - The ID of the tab to send the message to
-   * @param message - The message to send
+   * Clears the stored token from session storage for the current tab.
    * @public
    */
-  public sendTabMessage(targetTabId: string, message: any): void {
-    if (!this.#sharedWorkerManager) {
-      logger.warnOnce('Clerk: SharedWorker not initialized. Cannot send tab message.');
-      return;
+  public clearStoredToken(): void {
+    try {
+      sessionStorage.removeItem('clerk-token');
+    } catch (error) {
+      console.warn('Failed to clear token from session storage:', error);
     }
-
-    if (!this.#sharedWorkerManager.isActive()) {
-      logger.warnOnce('Clerk: SharedWorker is not active. Cannot send tab message.');
-      return;
-    }
-
-    this.#sharedWorkerManager.sendTabMessage(targetTabId, message);
   }
 
   /**
-   * Gets the current tab ID for this Clerk instance.
-   * @returns The tab ID string or null if SharedWorker is not initialized
+   * Retrieves the token from the shared worker state if available.
+   * This method sends a request to the shared worker to get the current token.
+   * @returns Promise that resolves to the token or null if not available
    * @public
    */
-  public getTabId(): string | null {
-    if (!this.#sharedWorkerManager) {
+  public async getTokenFromSharedWorker(): Promise<string | null> {
+    if (!this.#sharedWorkerManager?.isActive()) {
       return null;
     }
 
-    return this.#sharedWorkerManager.getTabId();
-  }
+    try {
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Timeout waiting for token response'));
+        }, 5000);
 
-  /**
-   * Requests the status of all connected tabs from the SharedWorker.
-   * The response will be logged to the console.
-   * @public
-   */
-  public getConnectedTabs(): void {
-    if (!this.#sharedWorkerManager) {
-      logger.warnOnce('Clerk: SharedWorker not initialized. Cannot get connected tabs.');
-      return;
+        // Set up one-time listener for the response
+        const handleMessage = (event: MessageEvent) => {
+          if (event.data.type === 'clerk_token_response') {
+            clearTimeout(timeout);
+            this.#sharedWorkerManager?.getWorker()?.port.removeEventListener('message', handleMessage);
+            resolve(event.data.payload.token || null);
+          }
+        };
+
+        this.#sharedWorkerManager?.getWorker()?.port.addEventListener('message', handleMessage);
+
+        // Request token from shared worker
+        this.#sharedWorkerManager?.postMessage({
+          type: 'clerk_get_token',
+          payload: { timestamp: Date.now() },
+        });
+      });
+    } catch (error) {
+      console.warn('Failed to get token from shared worker:', error);
+      return null;
     }
-
-    if (!this.#sharedWorkerManager.isActive()) {
-      logger.warnOnce('Clerk: SharedWorker is not active. Cannot get connected tabs.');
-      return;
-    }
-
-    this.#sharedWorkerManager.getTabStatus();
   }
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

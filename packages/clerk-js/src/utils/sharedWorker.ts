@@ -115,13 +115,12 @@ export class ClerkSharedWorkerManager {
         const message = event.data;
 
         if (message.type === 'clerk_worker_ready') {
-          const { connectedTabs, connectedPorts, tabId, instanceId } = message.payload || {};
+          const { connectedTabs, connectedPorts, tabId } = message.payload || {};
           logger.logOnce(
             `Clerk: SharedWorker is ready for tab ${this.tabId}. ` +
               `Connected tabs: ${connectedTabs ?? 'unknown'}, ` +
               `Connected ports: ${connectedPorts ?? 'unknown'}, ` +
-              `Worker tab ID: ${tabId}, ` +
-              `Worker instance ID: ${instanceId}`,
+              `Worker tab ID: ${tabId}, `,
           );
         } else if (message.type === 'clerk_sync_state') {
           const { sourceTabId, event: syncEvent, data } = message.payload;
@@ -129,9 +128,18 @@ export class ClerkSharedWorkerManager {
 
           this.handleSyncEvent(syncEvent, data, sourceTabId);
         } else if (message.type === 'clerk_pong') {
-          const { tabs, instances, tabStatus } = message.payload || {};
+          const { tabs, instances, tabStatus, sessions, hasValidSession, mostRecentSession } = message.payload || {};
           logger.logOnce(`Clerk: Ping response - Tabs: ${tabs ?? 'unknown'}, Instances: ${instances ?? 'unknown'}`);
-          if (tabStatus && tabStatus.length > 0) {
+          if (tabStatus && tabStatus.tabs && tabStatus.tabs.length > 0) {
+            console.log(`🔍 [Clerk] Full Worker State:`);
+            console.log(`  📊 Summary: ${tabStatus.totalTabs} tabs, Active: ${tabStatus.activeTabId || 'none'}`);
+            console.log(`  📋 All Tabs:`, tabStatus.tabs);
+            console.log(`  🍪 Sessions:`, sessions || tabStatus.sessions);
+            console.log(`  ✅ Has Valid Session: ${hasValidSession ?? tabStatus.hasValidSession}`);
+            if (mostRecentSession || tabStatus.mostRecentSession) {
+              console.log(`  🕐 Most Recent Session:`, mostRecentSession || tabStatus.mostRecentSession);
+            }
+          } else if (tabStatus && tabStatus.length > 0) {
             logger.logOnce(`Clerk: Active tabs: ${JSON.stringify(tabStatus, null, 2)}`);
           }
         } else if (message.type === 'clerk_tab_status') {
@@ -147,6 +155,7 @@ export class ClerkSharedWorkerManager {
               `Total tabs: ${totalTabs}, ` +
               `Total ports: ${totalPorts}`,
           );
+          this.requestAndLogWorkerState('tab_connected');
         } else if (message.type === 'clerk_tab_disconnected') {
           const { disconnectedTabId, disconnectedInstanceId, totalTabs, totalPorts } = message.payload || {};
           console.log(
@@ -156,6 +165,7 @@ export class ClerkSharedWorkerManager {
               `Remaining tabs: ${totalTabs}, ` +
               `Remaining ports: ${totalPorts}`,
           );
+          this.requestAndLogWorkerState('tab_disconnected');
         } else if (message.type === 'debug_pong') {
           const { workerState, receivedPayload } = message.payload || {};
           console.log('🔍 [Clerk Debug] Debug pong received:', {
@@ -184,6 +194,24 @@ export class ClerkSharedWorkerManager {
           } else {
             console.log(`🔄 [Clerk] No active tab (previous: ${previousActiveTabId})`);
           }
+          // Auto-request and log worker state when active tab changes
+          this.requestAndLogWorkerState('active_tab_changed');
+        } else if (message.type === 'clerk_log_message') {
+          const { level, message: logMessage, args, source } = message.payload || {};
+          const logArgs = [`[${source}]`, logMessage, ...(args || [])];
+
+          switch (level) {
+            case 'warn':
+              console.warn(...logArgs);
+              break;
+            case 'error':
+              console.error(...logArgs);
+              break;
+            case 'log':
+            default:
+              console.log(...logArgs);
+              break;
+          }
         }
       } catch (error) {
         logger.warnOnce(`Clerk: Error handling SharedWorker message: ${error}`);
@@ -197,15 +225,19 @@ export class ClerkSharedWorkerManager {
     switch (event) {
       case 'state_change':
         logger.logOnce(`Clerk: Auth state synchronized from tab ${sourceTabId}`);
+        this.requestAndLogWorkerState('auth_state_changed');
         break;
       case 'sign_out':
         logger.logOnce(`Clerk: Sign out synchronized from tab ${sourceTabId}`);
+        this.requestAndLogWorkerState('user_signed_out');
         break;
       case 'session_update':
         logger.logOnce(`Clerk: Session update synchronized from tab ${sourceTabId}`);
+        this.requestAndLogWorkerState('session_updated');
         break;
       case 'token_update':
         logger.logOnce(`Clerk: Token update synchronized from tab ${sourceTabId}`);
+        this.requestAndLogWorkerState('token_updated');
         break;
       case 'environment_update':
         logger.logOnce(`Clerk: Environment update synchronized from tab ${sourceTabId}`);
@@ -416,6 +448,22 @@ export class ClerkSharedWorkerManager {
       payload: {
         tabId: this.tabId,
         timestamp: Date.now(),
+      },
+    });
+  }
+
+  /**
+   * Automatically requests and logs worker state for debugging purposes.
+   */
+  private requestAndLogWorkerState(event: string): void {
+    console.log(`🔍 [Clerk] Auto-requesting worker state due to: ${event}`);
+    this.postMessage({
+      type: 'clerk_ping',
+      payload: {
+        tabId: this.tabId,
+        timestamp: Date.now(),
+        autoLog: true,
+        triggerEvent: event,
       },
     });
   }
