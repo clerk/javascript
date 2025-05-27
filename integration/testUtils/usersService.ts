@@ -64,7 +64,7 @@ export type UserService = {
    * Creates a BAPI user if it doesn't exist, otherwise returns the existing user.
    */
   getOrCreateUser: (fakeUser: FakeUser) => Promise<User>;
-  deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
+  deleteIfExists: (opts: { id?: string; email?: string; phoneNumber?: string }) => Promise<void>;
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
 };
@@ -92,6 +92,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const email = fictionalEmail
         ? `${randomHash}+clerk_test@clerkcookie.com`
         : `clerkcookie+${randomHash}@mailsac.com`;
+      const phoneNumber = fakerPhoneNumber();
 
       return {
         firstName: faker.person.firstName(),
@@ -99,8 +100,8 @@ export const createUserService = (clerkClient: ClerkClient) => {
         email: withEmail ? email : undefined,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? `${email}${randomHash}` : undefined,
-        phoneNumber: withPhoneNumber ? fakerPhoneNumber() : undefined,
-        deleteIfExists: () => self.deleteIfExists({ email }),
+        phoneNumber: withPhoneNumber ? phoneNumber : undefined,
+        deleteIfExists: () => self.deleteIfExists({ email, phoneNumber }),
       };
     },
     createBapiUser: async fakeUser => {
@@ -121,16 +122,19 @@ export const createUserService = (clerkClient: ClerkClient) => {
       }
       return await self.createBapiUser(fakeUser);
     },
-    deleteIfExists: async (opts: { id?: string; email?: string }) => {
+    deleteIfExists: async (opts: { id?: string; email?: string; phoneNumber?: string }) => {
       let id = opts.id;
 
       if (!id) {
-        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        const { data: users } = await clerkClient.users.getUserList({
+          emailAddress: [opts.email],
+          phoneNumber: [opts.phoneNumber],
+        });
         id = users[0]?.id;
       }
 
       if (!id) {
-        console.log(`User "${opts.email}" does not exist!`);
+        console.log(`User "${opts.email || opts.phoneNumber}" does not exist!`);
         return;
       }
 

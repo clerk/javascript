@@ -22,12 +22,12 @@ import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, createPasswordError, createUsernameError, handleError, useFormControl } from '../../utils';
 import { getPreferredAlternativePhoneChannel } from '../SignIn/utils';
-import { SignUpAlternativePhoneCodePhoneNumberCard } from './SignUpAlternativePhoneCodePhoneNumberCard';
 import { SignUpForm } from './SignUpForm';
 import type { ActiveIdentifier } from './signUpFormHelpers';
 import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFormFields } from './signUpFormHelpers';
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
+import { SignUpStartAlternativePhoneCodePhoneNumberCard } from './SignUpStartAlternativePhoneCodePhoneNumberCard';
 import { completeSignUpFlow } from './util';
 
 function SignUpStartInternal(): JSX.Element {
@@ -399,7 +399,7 @@ function SignUpStartInternal(): JSX.Element {
           </Card.Footer>
         </Card.Root>
       ) : (
-        <SignUpAlternativePhoneCodePhoneNumberCard
+        <SignUpStartAlternativePhoneCodePhoneNumberCard
           handleSubmit={handleSubmit}
           fields={fields}
           formState={formState}

@@ -1,5 +1,6 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
+import { deprecated } from '@clerk/shared/deprecated';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
@@ -110,7 +111,19 @@ export const authenticateAndDecorateRequest = (options: ClerkMiddlewareOptions =
         }
       }
 
-      const auth = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
+      // TODO: For developers coming from the clerk-sdk-node package, we gave them examples
+      // to use `req.auth` without calling it as a function. We need to keep this for backwards compatibility.
+      const authHandler = (opts: Parameters<typeof requestState.toAuth>[0]) => requestState.toAuth(opts);
+      const authObject = requestState.toAuth();
+
+      const auth = new Proxy(Object.assign(authHandler, authObject), {
+        get(target, prop: string, receiver) {
+          deprecated('req.auth', 'Use `req.auth()` as a function instead.');
+
+          return Reflect.get(target, prop, receiver);
+        },
+      });
+
       Object.assign(request, { auth });
 
       next();

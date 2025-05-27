@@ -1,24 +1,19 @@
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { CommercePlanResource, CommerceSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import { useEffect, useMemo, useState } from 'react';
 
-import { usePlansContext, usePricingTableContext, useSubscriberTypeContext } from '../../contexts';
+import { usePaymentSources, usePlans, usePlansContext, usePricingTableContext, useSubscriptions } from '../../contexts';
 import { Flow } from '../../customizables';
-import { useFetch } from '../../hooks/useFetch';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted' } = usePricingTableContext();
-  const subscriberType = useSubscriberTypeContext();
   const isCompact = mode === 'modal';
-  const { organization } = useOrganization();
-  const { user } = useUser();
-  const { subscriptions } = usePlansContext();
-  const { plans, handleSelectPlan } = usePlansContext();
-
-  const resource = subscriberType === 'org' ? organization : user;
+  const { data: subscriptions } = useSubscriptions();
+  const { data: plans } = usePlans();
+  const { handleSelectPlan } = usePlansContext();
 
   const defaultPlanPeriod = useMemo(() => {
     if (isCompact) {
@@ -61,7 +56,8 @@ const PricingTableRoot = (props: PricingTableProps) => {
     return;
   };
 
-  useFetch(resource?.getPaymentSources, {}, undefined, `commerce-payment-sources-${resource?.id}`);
+  // Pre-fetch payment sources
+  usePaymentSources();
 
   return (
     <Flow.Root
