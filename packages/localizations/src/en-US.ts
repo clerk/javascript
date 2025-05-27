@@ -91,6 +91,7 @@ export const enUS: LocalizationResource = {
     switchToAnnual: 'Switch to annual',
     switchToMonthly: 'Switch to monthly',
     totalDueToday: 'Total Due Today',
+    pastDue: 'Past due',
     viewFeatures: 'View features',
     year: 'Year',
   },
