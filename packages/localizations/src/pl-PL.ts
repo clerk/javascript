@@ -71,6 +71,7 @@ export const plPL: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const plPL: LocalizationResource = {
     sameDay: "Dzisiaj o godzinie {{ date | timeString('pl-PL') }}",
   },
   dividerText: 'lub',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Użyj innej metody',
   footerPageLink__help: 'Pomoc',
   footerPageLink__privacy: 'Prywatność',

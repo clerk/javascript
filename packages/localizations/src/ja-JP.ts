@@ -71,6 +71,7 @@ export const jaJP: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const jaJP: LocalizationResource = {
     sameDay: "今日の{{ date | timeString('ja-JP') }}に",
   },
   dividerText: 'または',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: '別の方法を使用する',
   footerPageLink__help: 'ヘルプ',
   footerPageLink__privacy: 'プライバシー',
