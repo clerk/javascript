@@ -71,6 +71,7 @@ export const huHU: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const huHU: LocalizationResource = {
     sameDay: "Ma {{ date | timeString('hu-HU') }}-kor",
   },
   dividerText: 'vagy',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Másik módszer használata',
   footerPageLink__help: 'Súgó',
   footerPageLink__privacy: 'Adatvédelem',

@@ -71,6 +71,7 @@ export const srRS: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const srRS: LocalizationResource = {
     sameDay: "Danas u {{ date | timeString('sr-RS') }}",
   },
   dividerText: 'ili',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Koristi drugu metodu',
   footerPageLink__help: 'Pomoć',
   footerPageLink__privacy: 'Privatnost',
