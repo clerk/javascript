@@ -89,7 +89,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'checkoutFormElementsRoot',
 
   'checkoutSuccessRoot',
-  'checkoutSuccessRing',
+  'checkoutSuccessRings',
   'checkoutSuccessBadge',
   'checkoutSuccessTitle',
   'checkoutSuccessDescription',

@@ -8,7 +8,7 @@ import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import type { LocalizationKey } from '../../localization';
+import { type LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
@@ -38,8 +38,6 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const clerk = useClerk();
 
   const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
-  const isAlternativePhoneCodeProvider =
-    props.factor.strategy === 'phone_code' ? !!props.factor.channel && props.factor.channel !== 'sms' : false;
 
   const goBack = () => {
     return navigate('../');
@@ -57,9 +55,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   };
 
   useFetch(
-    // If an alternative phone code provider is used, we skip the prepare step
-    // because the verification is already created on the Start screen
-    shouldAvoidPrepare || isAlternativePhoneCodeProvider
+    shouldAvoidPrepare
       ? undefined
       : () =>
           signIn
@@ -113,9 +109,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
       profileImageUrl={signIn.userData.imageUrl}
-      // if the factor is an alternative phone code provider, we don't want to show the alternative methods
-      // instead we want to go back to the start screen
-      onShowAlternativeMethodsClicked={isAlternativePhoneCodeProvider ? goBack : props.onShowAlternativeMethodsClicked}
+      onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}

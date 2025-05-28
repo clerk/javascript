@@ -1,5 +1,4 @@
 import { useEnvironment } from '../../ui/contexts';
-import { sanitizeInputProps, useFormField } from '../../ui/primitives/hooks';
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,
@@ -10,6 +9,7 @@ import {
   useAppearance,
   useLocalizations,
 } from '../customizables';
+import { sanitizeInputProps, useFormField } from '../primitives/hooks/useFormField';
 import type { PropsOfComponent } from '../styledSystem';
 import { Field } from './FieldControl';
 import { LinkRenderer } from './LinkRenderer';

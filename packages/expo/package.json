@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.11.6",
+  "version": "2.11.9",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -92,7 +92,7 @@
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.73.9"
+    "react-native": "^0.79.2"
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",

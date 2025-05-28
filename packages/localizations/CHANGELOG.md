@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.16.2
+
+### Patch Changes
+
+- Improve de-DE localizations for "Clerk Billing" ([#6011](https://github.com/clerk/javascript/pull/6011)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+
+## 3.16.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310)]:
+  - @clerk/types@4.59.1
+
 ## 3.16.0
 
 ### Minor Changes

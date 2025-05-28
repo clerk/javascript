@@ -8,7 +8,7 @@ type WithOptionalOrgType<T> = T & {
 };
 
 export interface CommerceBillingNamespace {
-  getPlans: () => Promise<CommercePlanResource[]>;
+  getPlans: (params?: GetPlansParams) => Promise<CommercePlanResource[]>;
   getSubscriptions: (params: GetSubscriptionsParams) => Promise<ClerkPaginatedResponse<CommerceSubscriptionResource>>;
   getStatements: (params: GetStatementsParams) => Promise<ClerkPaginatedResponse<CommerceStatementResource>>;
   startCheckout: (params: CreateCheckoutParams) => Promise<CommerceCheckoutResource>;
@@ -168,6 +168,7 @@ export interface CommerceCheckoutTotals {
   taxTotal: CommerceMoney;
   totalDueNow: CommerceMoney;
   credit: CommerceMoney;
+  pastDue: CommerceMoney;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

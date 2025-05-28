@@ -1,5 +1,70 @@
 # Change Log
 
+## 1.33.1
+
+### Patch Changes
+
+- Ensure SAMLConnection API responses are explicitly deserialized ([#5993](https://github.com/clerk/javascript/pull/5993)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add missing request params to `getOrganizationMembershipList` ([#5987](https://github.com/clerk/javascript/pull/5987)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+  - @clerk/shared@3.9.4
+
+## 1.33.0
+
+### Minor Changes
+
+- Introduce `treatPendingAsSignedOut` option to `getAuth` ([#5842](https://github.com/clerk/javascript/pull/5842)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  // `pending` sessions will be treated as signed-out by default
+  const { userId } = getAuth(req);
+  ```
+
+  ```ts
+  // Both `active` and `pending` sessions will be treated as authenticated when `treatPendingAsSignedOut` is false
+  const { userId } = getAuth(req, { treatPendingAsSignedOut: false });
+  ```
+
+### Patch Changes
+
+- Fixes an issue with infinite redirect detection in the handshake flow. ([#5981](https://github.com/clerk/javascript/pull/5981)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`f237d76`](https://github.com/clerk/javascript/commit/f237d7617e5398ca0ba981e4336cac2191505b00)]:
+  - @clerk/shared@3.9.3
+
+## 1.32.3
+
+### Patch Changes
+
+- Introduces `createOrganizationInvitationBulk` - it creates new organization invitations in bulk and sends out emails to the provided email addresses with a link to accept the invitation and join the organization. ([#5962](https://github.com/clerk/javascript/pull/5962)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```ts
+  const organizationId = 'org_123';
+  const params = [
+    {
+      inviterUserId: 'user_1',
+      emailAddress: 'testclerk1@clerk.dev',
+      role: 'org:admin',
+    },
+    {
+      inviterUserId: 'user_2',
+      emailAddress: 'testclerk2@clerk.dev',
+      role: 'org:member',
+    },
+  ];
+
+  const response = await clerkClient.organizations.createOrganizationInvitationBulk(organizationId, params);
+  ```
+
+- Use domain in AuthenticateRequest only for satellite domains ([#5919](https://github.com/clerk/javascript/pull/5919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310), [`6bb480e`](https://github.com/clerk/javascript/commit/6bb480ef663a6dfa219bc9546aca087d5d9624d0)]:
+  - @clerk/types@4.59.1
+  - @clerk/shared@3.9.2
+
 ## 1.32.2
 
 ### Patch Changes

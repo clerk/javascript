@@ -3,7 +3,7 @@ import React from 'react';
 import type { PrimitiveProps, RequiredProp, StateProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';
-import { useFormField } from './hooks';
+import { useFormField } from './hooks/useFormField';
 
 const { applyVariants } = createVariants(theme => ({
   base: {
