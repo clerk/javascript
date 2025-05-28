@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
-import { ApplicationLogo, Card, Header, withCardStateProvider } from '../../elements';
+import { ApplicationLogo, Avatar, Card, Header, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
@@ -28,7 +28,11 @@ export function OAuthConsentInternal() {
           <Header.Root>
             {/* both have avatars */}
             <ConnectionHeader>
-              <ApplicationLogo />
+              <Avatar
+                imageUrl='https://placehold.co/64x64'
+                size={t => t.space.$12}
+                rounded={false}
+              />
               <ConnectionSeparator />
               <ApplicationLogo />
             </ConnectionHeader>
@@ -149,8 +153,7 @@ export function OAuthConsentInternal() {
               }}
               colorScheme='secondary'
               variant='caption'
-              localizationKey='If you allow access, this app will redirect you to
-{url}'
+              localizationKey='If you allow access, this app will redirect you to {url}'
             />
           </Grid>
         </Card.Content>
