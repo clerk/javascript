@@ -313,7 +313,30 @@ void (async () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/oauth-consent': () => {
-      Clerk.__internal_mountOAuthConsent(app, componentControls.oauthConsent.getProps() ?? {});
+      Clerk.__internal_mountOAuthConsent(
+        app,
+        componentControls.oauthConsent.getProps() ?? {
+          scopes: [
+            {
+              scope: 'email',
+              description: 'Grants access to your email address',
+              requires_consent: true,
+            },
+            {
+              scope: 'profile',
+              description: 'Grants access to your basic profile information',
+              requires_consent: true,
+            },
+          ],
+          applicationName: 'Awesome App',
+          onAllow() {
+            console.log('allowed');
+          },
+          onDeny() {
+            console.log('denied');
+          },
+        },
+      );
     },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});

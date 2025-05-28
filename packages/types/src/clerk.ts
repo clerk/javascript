@@ -1663,6 +1663,14 @@ export type __internal_PlanDetailsProps = {
 
 export type __internal_OAuthConsentProps = {
   appearance?: OAuthConsentTheme;
+  applicationName: string;
+  scopes: {
+    scope: string;
+    description: string | null;
+    requires_consent: boolean;
+  }[];
+  onAllow?: () => void;
+  onDeny?: () => void;
 };
 
 export interface HandleEmailLinkVerificationParams {

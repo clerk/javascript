@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/shared/react';
 import type { __internal_OAuthConsentProps } from 'ui/types';
 
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
@@ -7,7 +8,10 @@ import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
-export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
+export function OAuthConsentInternal(props: __internal_OAuthConsentProps) {
+  const { scopes, applicationName, onDeny, onAllow } = props;
+  const { user } = useUser();
+
   return (
     <Flow.Root flow='oauthConsent'>
       <Card.Root>
@@ -24,7 +28,7 @@ export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
             <Text
               colorScheme='warning'
               variant='caption'
-              localizationKey='Make sure that you trust Test app name {url}. You may be sharing sensitive data with this site or app.'
+              localizationKey={`Make sure that you trust ${applicationName} {url}. You may be sharing sensitive data with this site or app.`}
             />
           </Box>
           <Header.Root>
@@ -80,8 +84,10 @@ export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
             >
               <ConnectionIcon />
             </Flex>
-            <Header.Title localizationKey='Test app name' />
-            <Header.Subtitle localizationKey='wants to access to {yourApp} on behalf of {email}' />
+            <Header.Title localizationKey={applicationName} />
+            <Header.Subtitle
+              localizationKey={`wants to access to {yourApp} on behalf of ${user?.emailAddresses[0]?.emailAddress}`}
+            />
           </Header.Root>
           <Box
             sx={t => ({
@@ -107,10 +113,13 @@ export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
                 localizationKey='This app wants to access your account'
               />
             </Box>
-            <Box as='ul'>
-              {['Email address', 'Profile', 'Phone number'].map(item => (
+            <Box
+              as='ul'
+              sx={t => ({ margin: t.sizes.$none, padding: t.sizes.$none })}
+            >
+              {(scopes || []).map(item => (
                 <Box
-                  key={item}
+                  key={item.scope}
                   sx={t => ({
                     display: 'flex',
                     alignItems: 'center',
@@ -133,7 +142,7 @@ export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
                 >
                   <Text
                     variant='subtitle'
-                    localizationKey={item}
+                    localizationKey={item.description || ''}
                   />
                 </Box>
               ))}
@@ -147,8 +156,12 @@ export function OAuthConsentInternal(_: __internal_OAuthConsentProps) {
               colorScheme='secondary'
               variant='outline'
               localizationKey='Deny'
+              onClick={onDeny}
             />
-            <Button localizationKey='Allow' />
+            <Button
+              localizationKey='Allow'
+              onClick={onAllow}
+            />
             <Text
               sx={{
                 gridColumn: 'span 2',
