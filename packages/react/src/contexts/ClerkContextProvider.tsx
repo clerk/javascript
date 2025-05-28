@@ -113,6 +113,7 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   React.useEffect(() => {
     isomorphicClerkRef.current.on('status', setClerkStatus);
     return () => {
+      console.log('----unmounting');
       if (isomorphicClerkRef.current) {
         isomorphicClerkRef.current.off('status', setClerkStatus);
       }

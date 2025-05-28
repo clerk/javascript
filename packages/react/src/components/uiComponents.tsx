@@ -246,6 +246,7 @@ const _UserButton = withClerk(
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
+    console.log('----mounting UserButton', clerk.loaded, mountingStatus);
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
     };
