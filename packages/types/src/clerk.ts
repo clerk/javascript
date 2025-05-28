@@ -909,13 +909,13 @@ export type ClerkOptions = PendingSessionOptions &
          * The name of the CSS layer to use for Clerk components.
          * @example
          * ```tsx
-         * <ClerkProvider cssLayerName="components">
+         * <ClerkProvider experimental={{ cssLayerName: 'clerk' }}>
          *   <App />
          * </ClerkProvider>
          * ```
-         * This will wrap all Clerk styles in a `components` CSS layer to work with tools like Tailwind CSS V4.
+         * This will wrap all Clerk styles in a `clerk` CSS layer to work with tools like Tailwind CSS V4.
          *```css
-         * @layer components {
+         * @layer clerk {
          *   ... clerk styles ...
          * }
          *```
