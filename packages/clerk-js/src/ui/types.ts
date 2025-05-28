@@ -33,6 +33,7 @@ export type {
   OrganizationListProps,
   WaitlistProps,
   __internal_UserVerificationProps,
+  __internal_OAuthConsentProps,
 };
 
 export type AvailableComponentProps =
