@@ -71,6 +71,7 @@ export const beBY: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const beBY: LocalizationResource = {
     sameDay: "Сёння ў {{ date | timeString('be-BY') }}",
   },
   dividerText: 'ці',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Выкарыстаць іншы метад',
   footerPageLink__help: 'Дапамога',
   footerPageLink__privacy: 'Приватнасць',
