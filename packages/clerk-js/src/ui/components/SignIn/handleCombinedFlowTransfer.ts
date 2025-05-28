@@ -69,7 +69,7 @@ export function handleCombinedFlowTransfer({
   // inform us if the instance is eligible for moving directly to verification.
   if (
     !passwordEnabled &&
-    !hasOptionalFields(clerk.client.signUp) &&
+    !hasOptionalFields(clerk.client.signUp, identifierAttribute) &&
     (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber')
   ) {
     return clerk.client.signUp
@@ -95,14 +95,28 @@ export function handleCombinedFlowTransfer({
   return navigate(`create`, { searchParams: paramsToForward });
 }
 
-function hasOptionalFields(signUp: SignUpResource) {
-  const filteredFields = signUp.optionalFields.filter(
-    field =>
-      !field.startsWith('oauth_') &&
-      !field.startsWith('web3_') &&
-      field !== 'password' &&
-      field !== 'enterprise_sso' &&
-      field !== 'saml',
-  );
+export function hasOptionalFields(
+  signUp: SignUpResource,
+  identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username',
+) {
+  const filteredFields = signUp.optionalFields.filter(field => {
+    // OAuth, Web3, and SAML fields, while optional, are not relevant once sign up has been initiated with an identifier.
+    if (field.startsWith('oauth_') || field.startsWith('web3_') || ['enterprise_sso', 'saml'].includes(field)) {
+      return false;
+    }
+
+    // We already check for whether password is enabled, so we don't consider it an optional field.
+    if (field === 'password') {
+      return false;
+    }
+
+    // If a phone number is used as the identifier, we don't need to consider the phone_number field.
+    if (identifierAttribute === 'phoneNumber' && field === 'phone_number') {
+      return false;
+    }
+
+    return true;
+  });
+
   return filteredFields.length > 0;
 }
