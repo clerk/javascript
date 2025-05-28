@@ -17,6 +17,8 @@ const FILES_WITHOUT_HEADINGS = [
   'create-organization-params.mdx',
   'authenticate-request-options.mdx',
   'verify-token-options.mdx',
+  'public-organization-data-json.mdx',
+  'organization-membership-public-user-data.mdx',
 ];
 
 /**
@@ -38,6 +40,9 @@ const LINK_REPLACEMENTS = [
   ['organization-domain-resource', '/docs/references/javascript/types/organization-domain'],
   ['organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/references/javascript/types/organization-membership-request'],
+  ['session', '/docs/references/javascript/session'],
+  ['public-organization-data-json', '#public-organization-data-json'],
+  ['organization-membership-public-user-data', '#organization-membership-public-user-data'],
 ];
 
 /**
@@ -87,6 +92,29 @@ function getCatchAllReplacements() {
       replace: '| [SignInResource](/docs/references/javascript/sign-in) |',
     },
     {
+      pattern: /`OrganizationPrivateMetadata`/g,
+      replace:
+        '[`OrganizationPrivateMetadata`](/docs/references/javascript/types/metadata#organization-private-metadata)',
+    },
+    {
+      pattern: /OrganizationPublicMetadata/g,
+      replace: '[OrganizationPublicMetadata](/docs/references/javascript/types/metadata#organization-public-metadata)',
+    },
+    {
+      pattern: /`OrganizationInvitationPrivateMetadata`/g,
+      replace:
+        '[`OrganizationInvitationPrivateMetadata`](/docs/references/javascript/types/metadata#organization-invitation-private-metadata)',
+    },
+    {
+      pattern: /`OrganizationInvitationPublicMetadata`/g,
+      replace:
+        '[`OrganizationInvitationPublicMetadata`](/docs/references/javascript/types/metadata#organization-invitation-public-metadata)',
+    },
+    {
+      pattern: /`SessionActivity`/g,
+      replace: '[`SessionActivity`](/docs/references/javascript/types/session-with-activities#session-activity)',
+    },
+    {
       /**
        * By default, `@deprecated` is output with `**Deprecated**`. We want to add a full stop to it.
        */
@@ -106,6 +134,15 @@ function getCatchAllReplacements() {
        */
       pattern: /\*\*Example\*\* `([^`]+)`/g,
       replace: 'Example: `$1`.',
+    },
+    {
+      /**
+       * By default, multiple `@example` are output with "**Examples** `value1` `value2`". We want to capture the values and place them inside "Examples: `value1`, `value2`."
+       */
+      pattern: /\*\*Examples\*\* ((?:`[^`]+`)(?: `[^`]+`)*)/g,
+      replace: (/** @type {string} */ _match, /** @type {string} */ capturedGroup) => {
+        return `Examples: ${capturedGroup.split(' ').join(', ')}.`;
+      },
     },
   ];
 }
@@ -128,6 +165,7 @@ export function load(app) {
 
     for (const { pattern, replace } of catchAllReplacements) {
       if (output.contents) {
+        // @ts-ignore - Mixture of string and function replacements
         output.contents = output.contents.replace(pattern, replace);
       }
     }

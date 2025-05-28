@@ -13,7 +13,8 @@ export class RedirectUrl {
     readonly id: string,
     /**
      * The full URL value prefixed with `https://` or a custom scheme.
-     * @example `https://my-app.com/oauth-callback` or `my-app://oauth-callback`
+     * @example https://my-app.com/oauth-callback
+     * @example my-app://oauth-callback
      */
     readonly url: string,
     /**

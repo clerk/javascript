@@ -23,7 +23,7 @@ export class Client {
      */
     readonly signInId: string | null,
     /**
-     * The ID of the `SignUp`.
+     * The ID of the [`SignUp`](https://clerk.com/docs/references/javascript/sign-up){{ target: '_blank' }}.
      */
     readonly signUpId: string | null,
     /**

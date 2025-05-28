@@ -11,7 +11,7 @@ export class AllowlistIdentifier {
      */
     readonly id: string,
     /**
-     * The identifier that was added to the allowlist.
+     * The [identifier](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers) that was added to the allowlist.
      */
     readonly identifier: string,
     /**

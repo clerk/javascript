@@ -64,7 +64,13 @@ export const ObjectType = {
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
 
 export interface ClerkResourceJSON {
+  /**
+   * The type of the resource.
+   */
   object: ObjectType;
+  /**
+   * The unique identifier for the resource.
+   */
   id: string;
 }
 
@@ -368,10 +374,25 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+/**
+ * @interface
+ */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+  /**
+   * The name of the organization.
+   */
   name: string;
+  /**
+   * The slug of the organization.
+   */
   slug: string;
+  /**
+   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+   */
   image_url?: string;
+  /**
+   * Whether the organization has a profile image.
+   */
   has_image: boolean;
 }
 

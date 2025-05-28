@@ -68,10 +68,13 @@ export class OrganizationMembership {
   }
 }
 
+/**
+ * @class
+ */
 export class OrganizationMembershipPublicUserData {
   constructor(
     /**
-     * The [identifier](/docs/authentication/configuration/sign-up-sign-in-options#identifiers) of the user.
+     * The [identifier](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers) of the user.
      */
     readonly identifier: string,
     /**
@@ -83,7 +86,7 @@ export class OrganizationMembershipPublicUserData {
      */
     readonly lastName: string | null,
     /**
-     * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](/docs/guides/image-optimization).
+     * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
      */
     readonly imageUrl: string,
     /**
