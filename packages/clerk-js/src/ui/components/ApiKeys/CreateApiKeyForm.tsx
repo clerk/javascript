@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Box, Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { mqu, ThemableCssProp } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { useFormControl } from '../../utils';
 
 export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
@@ -90,8 +90,6 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     );
   };
 
-  const buttonSegmentStyle: ThemableCssProp = t => ({ height: t.sizes.$8 });
-
   return (
     <FormContainer
       headerTitle={localizationKeys('apiKeys.formTitle')}
@@ -130,26 +128,23 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                   value={expiration}
                   onChange={value => setExpiration(value as Expiration)}
                   fullWidth
+                  sx={t => ({ height: t.sizes.$8 })}
                 >
                   <SegmentedControl.Button
                     value='never'
                     text='Never'
-                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='30d'
                     text='30 days'
-                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='90d'
                     text='90 days'
-                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='custom'
                     text='Custom'
-                    sx={buttonSegmentStyle}
                   />
                 </SegmentedControl.Root>
               </Col>
