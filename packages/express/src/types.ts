@@ -3,7 +3,9 @@ import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
 import type { Request as ExpressRequest } from 'express';
 
-export type ExpressRequestWithAuth = ExpressRequest & { auth: (options?: PendingSessionOptions) => AuthObject };
+export type ExpressRequestWithAuth = ExpressRequest & {
+  auth: AuthObject & { (options?: PendingSessionOptions): AuthObject };
+};
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
   debug?: boolean;
