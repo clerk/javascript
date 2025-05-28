@@ -30,6 +30,10 @@ export const commerceTotalsFromJSON = <T extends CommerceStatementTotalsJSON | C
     // @ts-ignore
     totals['credit'] = commerceMoneyFromJSON(data.credit);
   }
+  if ('past_due' in data) {
+    // @ts-ignore
+    totals['pastDue'] = commerceMoneyFromJSON(data.past_due);
+  }
 
   return totals as T extends { total_due_now: CommerceMoneyJSON } ? CommerceCheckoutTotals : CommerceStatementTotals;
 };

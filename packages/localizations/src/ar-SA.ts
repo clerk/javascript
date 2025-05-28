@@ -85,6 +85,7 @@ export const arSA: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const arSA: LocalizationResource = {
     sameDay: "اليوم في {{ date | timeString('en-US') }}",
   },
   dividerText: 'أو',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'أختر طريقة أخرى',
   footerPageLink__help: 'المساعدة',
   footerPageLink__privacy: 'الخصوصية',

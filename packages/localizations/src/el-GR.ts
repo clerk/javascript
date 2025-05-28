@@ -85,6 +85,7 @@ export const elGR: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const elGR: LocalizationResource = {
     sameDay: "Σήμερα στις {{ date | timeString('el') }}",
   },
   dividerText: 'ή',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Χρησιμοποιήστε άλλη μέθοδο',
   footerPageLink__help: 'Βοήθεια',
   footerPageLink__privacy: 'Προστασία προσωπικών δεδομένων',

@@ -85,6 +85,7 @@ export const nbNO: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const nbNO: LocalizationResource = {
     sameDay: "I dag kl. {{ date | timeString('nb-NO') }}",
   },
   dividerText: 'eller',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Bruk en annen metode',
   footerPageLink__help: 'Hjelp',
   footerPageLink__privacy: 'Personvern',

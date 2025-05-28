@@ -85,6 +85,7 @@ export const ukUA: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const ukUA: LocalizationResource = {
     sameDay: "Сьогодні в {{ date | timeString('uk-UA') }}",
   },
   dividerText: 'або',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Використовувати інший метод',
   footerPageLink__help: 'Допомога',
   footerPageLink__privacy: 'Приватність',

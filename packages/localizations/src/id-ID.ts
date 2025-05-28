@@ -85,6 +85,7 @@ export const idID: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const idID: LocalizationResource = {
     sameDay: "Hari ini pada {{ date | timeString('id-ID') }}",
   },
   dividerText: 'atau',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Gunakan metode lain',
   footerPageLink__help: 'Bantuan',
   footerPageLink__privacy: 'Privasi',

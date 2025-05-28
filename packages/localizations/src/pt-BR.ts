@@ -85,6 +85,7 @@ export const ptBR: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const ptBR: LocalizationResource = {
     sameDay: "Hoje às {{ date | timeString('pt-BR') }}",
   },
   dividerText: 'ou',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilize outro método',
   footerPageLink__help: 'Ajuda',
   footerPageLink__privacy: 'Privacidade',

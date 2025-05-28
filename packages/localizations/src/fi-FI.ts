@@ -85,6 +85,7 @@ export const fiFI: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const fiFI: LocalizationResource = {
     sameDay: "Tänään klo {{ date | timeString('fi-FI') }}",
   },
   dividerText: 'tai',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Käytä toista tapaa',
   footerPageLink__help: 'Apua',
   footerPageLink__privacy: 'Tietosuoja',

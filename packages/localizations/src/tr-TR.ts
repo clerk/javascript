@@ -85,6 +85,7 @@ export const trTR: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const trTR: LocalizationResource = {
     sameDay: "Bugün saat {{ date | timeString('tr-TR') }}",
   },
   dividerText: 'veya',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Başka bir yöntem kullan',
   footerPageLink__help: 'Yardım',
   footerPageLink__privacy: 'Gizlilik',

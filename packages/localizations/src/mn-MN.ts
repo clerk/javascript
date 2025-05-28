@@ -85,6 +85,7 @@ export const mnMN: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const mnMN: LocalizationResource = {
     sameDay: "Өнөөдөр {{ date | timeString('mn-MN') }} цагт",
   },
   dividerText: 'эсвэл',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Өөр арга ашиглах',
   footerPageLink__help: 'Тусламж',
   footerPageLink__privacy: 'Нууцлал',

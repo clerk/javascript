@@ -85,6 +85,7 @@ export const csCZ: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const csCZ: LocalizationResource = {
     sameDay: "Dnes v  {{ date | timeString('cs-CZ') }}",
   },
   dividerText: 'nebo',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Použít jinou metodu',
   footerPageLink__help: 'Nápověda',
   footerPageLink__privacy: 'Ochrana soukromí',

@@ -85,6 +85,7 @@ export const skSK: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const skSK: LocalizationResource = {
     sameDay: "Dnes o {{ date | timeString('sk-SK') }}",
   },
   dividerText: 'alebo',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Použiť inú metódu',
   footerPageLink__help: 'Pomoc',
   footerPageLink__privacy: 'Ochrana súkromia',

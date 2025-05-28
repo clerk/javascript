@@ -85,6 +85,7 @@ export const daDK: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const daDK: LocalizationResource = {
     sameDay: "I dag: {{ date | timeString('en-US') }}",
   },
   dividerText: 'eller',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Brug en anden metode',
   footerPageLink__help: 'Hjælp',
   footerPageLink__privacy: 'Privatliv',

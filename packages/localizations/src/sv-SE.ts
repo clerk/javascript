@@ -85,6 +85,7 @@ export const svSE: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const svSE: LocalizationResource = {
     sameDay: "Idag klockan {{ date | timeString('sv-SE') }}",
   },
   dividerText: 'eller',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Använd en annan metod',
   footerPageLink__help: 'Hjälp',
   footerPageLink__privacy: 'Integritet',

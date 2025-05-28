@@ -85,6 +85,7 @@ export const nlNL: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const nlNL: LocalizationResource = {
     sameDay: "Vandaag om {{ date | timeString('nl-NL') }}",
   },
   dividerText: 'of',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Een andere methode gebruiken',
   footerPageLink__help: 'Helppagina',
   footerPageLink__privacy: 'Privacybeleid',

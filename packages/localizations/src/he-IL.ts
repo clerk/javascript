@@ -85,6 +85,7 @@ export const heIL: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -133,6 +134,7 @@ export const heIL: LocalizationResource = {
     sameDay: "היום ב-{{ date | timeString('iw') }}",
   },
   dividerText: 'או',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'השתמש בשיטה אחרת',
   footerPageLink__help: 'עזרה',
   footerPageLink__privacy: 'פרטיות',
