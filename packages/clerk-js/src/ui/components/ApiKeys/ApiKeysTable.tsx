@@ -113,7 +113,7 @@ export const ApiKeysTable = ({
   onRevoke: (id: string, name: string) => void;
 }) => {
   return (
-    <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1, width: '100%' })}>
+    <Flex sx={t => ({ width: '100%', [mqu.sm]: { overflowX: 'auto', padding: t.space.$0x25 } })}>
       <Table sx={t => ({ background: t.colors.$colorBackground })}>
         <Thead>
           <Tr>
