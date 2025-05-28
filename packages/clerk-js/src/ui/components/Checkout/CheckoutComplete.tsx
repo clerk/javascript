@@ -1,28 +1,29 @@
-import type { CommerceCheckoutResource } from '@clerk/types';
 import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 import { formatDate } from '../../utils';
+import { useCheckoutContextRoot } from './CheckoutPage';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
-export const CheckoutComplete = ({
-  checkout,
-  isMotionSafe,
-}: {
-  checkout: CommerceCheckoutResource;
-  isMotionSafe: boolean;
-}) => {
+export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
+  const { checkout } = useCheckoutContextRoot();
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
   const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
   const animationRef = useRef<number | null>(null);
   const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);
   const canHover =
@@ -73,6 +74,10 @@ export const CheckoutComplete = ({
       setIsOpen(false);
     }
   };
+
+  if (!checkout) {
+    return null;
+  }
 
   return (
     <>
@@ -232,14 +237,11 @@ export const CheckoutComplete = ({
                 pathLength='1'
                 style={{
                   strokeDashoffset: '1',
-                  animationName: 'check',
-                  animationDuration: `${transitionDurationValues.drawer}ms`,
-                  animationTimingFunction: transitionTiming.bezier,
-                  animationFillMode: 'forwards',
-                  animationDelay: `${transitionDurationValues.slow}ms`,
+                  animation: isMotionSafe
+                    ? `check ${transitionDurationValues.drawer}ms ${transitionTiming.bezier} forwards ${transitionDurationValues.slow}ms`
+                    : 'none',
                   ...(!isMotionSafe && {
                     strokeDashoffset: '0',
-                    animation: 'none',
                   }),
                 }}
               />
