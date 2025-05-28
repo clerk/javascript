@@ -390,7 +390,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
-  public_user_data: PublicUserDataJSON;
+  public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;
