@@ -158,7 +158,12 @@ const _APIKeys = () => {
   const subject = organization?.id ?? user?.id ?? '';
 
   return (
-    <Flow.Root flow='apiKeys'>
+    <Flow.Root
+      flow='apiKeys'
+      sx={{
+        width: '100%',
+      }}
+    >
       <APIKeysPage
         subject={subject}
         perPage={ctx.perPage}
