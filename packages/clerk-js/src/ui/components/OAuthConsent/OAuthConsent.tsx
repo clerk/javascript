@@ -27,27 +27,13 @@ export function OAuthConsentInternal() {
           </Box>
           <Header.Root>
             {/* both have avatars */}
-            <Flex
-              justify='center'
-              align='center'
-              gap={4}
-              sx={t => ({
-                marginBlockEnd: t.space.$6,
-              })}
-            >
+            <ConnectionHeader>
               <ApplicationLogo />
               <ConnectionSeparator />
               <ApplicationLogo />
-            </Flex>
+            </ConnectionHeader>
             {/* only OAuth app has an avatar */}
-            <Flex
-              justify='center'
-              align='center'
-              gap={4}
-              sx={t => ({
-                marginBlockEnd: t.space.$6,
-              })}
-            >
+            <ConnectionHeader>
               <Box
                 sx={{
                   position: 'relative',
@@ -63,7 +49,7 @@ export function OAuthConsentInternal() {
                   })}
                 />
               </Box>
-            </Flex>
+            </ConnectionHeader>
             {/* only Clerk application has an avatar */}
             <Flex
               justify='center'
@@ -174,6 +160,21 @@ export function OAuthConsentInternal() {
   );
 }
 
+function ConnectionHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <Flex
+      justify='center'
+      align='center'
+      gap={4}
+      sx={t => ({
+        marginBlockEnd: t.space.$6,
+      })}
+    >
+      {children}
+    </Flex>
+  );
+}
+
 function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: ThemableCssProp }) {
   const scale: ThemableCssProp = t => {
     const value = size === 'sm' ? t.space.$6 : t.space.$12;
@@ -182,6 +183,7 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
       height: value,
     };
   };
+
   return (
     <Box
       sx={t => [
