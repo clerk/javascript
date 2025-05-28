@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, SimpleButton } from '../customizables';
+import type { ThemableCssProp } from '../styledSystem';
 
 /* -------------------------------------------------------------------------------------------------
  * SegmentedControl Context
@@ -106,9 +107,10 @@ Root.displayName = 'SegmentedControl.Root';
 interface ButtonProps {
   text: string | LocalizationKey;
   value: string;
+  sx?: ThemableCssProp;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value, sx }, ref) => {
   const { currentValue, onValueChange, size, fullWidth } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
@@ -126,20 +128,23 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }
             aria-checked={isSelected}
             onClick={() => onValueChange(value)}
             isActive={isSelected}
-            sx={t => ({
-              position: 'relative',
-              width: fullWidth ? '100%' : 'auto',
-              backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
-              color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
-              fontSize: size === 'lg' ? t.fontSizes.$md : t.fontSizes.$xs,
-              minHeight: t.sizes.$6,
-              boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
-              borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
-              zIndex: 1,
-              ':focus-visible': {
-                zIndex: 2,
-              },
-            })}
+            sx={[
+              t => ({
+                position: 'relative',
+                width: fullWidth ? '100%' : 'auto',
+                backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
+                color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+                fontSize: size === 'lg' ? t.fontSizes.$md : t.fontSizes.$xs,
+                minHeight: t.sizes.$6,
+                boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
+                borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
+                zIndex: 1,
+                ':focus-visible': {
+                  zIndex: 2,
+                },
+              }),
+              sx,
+            ]}
           />
         );
       }}

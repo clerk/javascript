@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import { Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
 import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { mqu } from '../../styledSystem';
+import { mqu, ThemableCssProp } from '../../styledSystem';
 import { useFormControl } from '../../utils';
 
 export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
@@ -90,6 +90,8 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
     );
   };
 
+  const buttonSegmentStyle: ThemableCssProp = t => ({ height: t.sizes.$8 });
+
   return (
     <FormContainer
       headerTitle={localizationKeys('apiKeys.formTitle')}
@@ -107,7 +109,6 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             <Flex
               gap={4}
               sx={{
-                width: '100%',
                 [mqu.sm]: {
                   flexDirection: 'column',
                 },
@@ -115,12 +116,7 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
             >
               <Col
                 gap={2}
-                sx={{
-                  width: '70%',
-                  [mqu.sm]: {
-                    width: '100%',
-                  },
-                }}
+                sx={{ flex: 7 }}
               >
                 <FormLabel htmlFor={segmentedControlId}>
                   <Text
@@ -138,30 +134,29 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                   <SegmentedControl.Button
                     value='never'
                     text='Never'
+                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='30d'
                     text='30 days'
+                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='90d'
                     text='90 days'
+                    sx={buttonSegmentStyle}
                   />
                   <SegmentedControl.Button
                     value='custom'
                     text='Custom'
+                    sx={buttonSegmentStyle}
                   />
                 </SegmentedControl.Root>
               </Col>
-              {expiration === 'custom' && (
+              {expiration === 'custom' ? (
                 <Form.ControlRow
                   elementId={expirationDateField.id}
-                  sx={{
-                    width: '30%',
-                    [mqu.sm]: {
-                      width: '100%',
-                    },
-                  }}
+                  sx={{ flex: 3 }}
                 >
                   <Form.PlainInput
                     type='date'
@@ -169,6 +164,8 @@ export const CreateApiKeyForm = ({ onCreate, isSubmitting }: CreateApiKeyFormPro
                     min={getMinDate()}
                   />
                 </Form.ControlRow>
+              ) : (
+                <Box sx={{ flex: 3, visibility: 'hidden' }} />
               )}
             </Flex>
           </>
