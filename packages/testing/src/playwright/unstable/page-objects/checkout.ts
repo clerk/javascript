@@ -28,30 +28,28 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('Country').selectOption(card.country);
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
-    clickPayOrSubscribe: async () => {
-      await page
-        .locator('.cl-checkout-root')
-        .getByRole('button', { name: /subscribe|pay\s\$/i })
-        .click();
-    },
-    waitForSubscribeButton: async () => {
-      await page
-        .locator('.cl-checkout-root')
-        .getByRole('button', { name: /^subscribe$/i })
+    waitForStipeElements: async () => {
+      return page
+        .frameLocator('iframe[src*="elements-inner-payment"]')
+        .getByLabel('Card number')
         .waitFor({ state: 'visible' });
     },
+    clickPayOrSubscribe: async () => {
+      await self.root.getByRole('button', { name: /subscribe|pay\s\$/i }).click();
+    },
+    waitForSubscribeButton: async () => {
+      await self.root.getByRole('button', { name: /^subscribe$/i }).waitFor({ state: 'visible' });
+    },
     confirmAndContinue: async () => {
-      await page
-        .locator('.cl-checkout-root')
-        .getByRole('button', { name: /^continue$/i })
-        .click();
+      await self.root.getByRole('button', { name: /^continue$/i }).click();
     },
     clickAddPaymentMethod: async () => {
-      await page.getByRole('radio', { name: 'Add payment method' }).click();
+      await self.root.getByRole('radio', { name: 'Add payment method' }).click();
     },
     clickPaymentMethods: async () => {
-      await page.getByRole('radio', { name: 'Payment Methods' }).click();
+      await self.root.getByRole('radio', { name: 'Payment Methods' }).click();
     },
+    root: page.locator('.cl-checkout-root'),
   };
   return self;
 };

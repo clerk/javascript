@@ -27,7 +27,7 @@ export const useCheckoutContextRoot = () => {
 };
 
 const useCheckoutCreator = () => {
-  const { planId, planPeriod, subscriberType = 'user' } = useCheckoutContext();
+  const { planId, planPeriod, subscriberType = 'user', onSubscriptionComplete } = useCheckoutContext();
   const clerk = useClerk();
   const { organization } = useOrganization();
 
@@ -78,7 +78,10 @@ const useCheckoutCreator = () => {
   return {
     checkout: data,
     startCheckout,
-    updateCheckout: (checkout: CommerceCheckoutResource) => mutate(checkout, false),
+    updateCheckout: (checkout: CommerceCheckoutResource) => {
+      void mutate(checkout, false);
+      onSubscriptionComplete?.();
+    },
     isMutating,
     errors: error?.errors,
   };
