@@ -11,13 +11,9 @@ import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCard
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
-import {
-  AddPaymentSource,
-  AddPaymentSourceFormHeader,
-  AddPaymentSourceFormSubtitle,
-  TestPaymentSource,
-} from './AddPaymentSource';
+import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
+import { TestPaymentSource } from './TestPaymentSource';
 
 const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
@@ -36,18 +32,18 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   };
 
   return (
-    <AddPaymentSource
+    <AddPaymentSource.Root
       onSuccess={onAddPaymentSourceSuccess}
       cancelAction={close}
     >
-      <AddPaymentSourceFormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
-      <AddPaymentSourceFormSubtitle
+      <AddPaymentSource.FormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
+      <AddPaymentSource.FormSubtitle
         text={localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle')}
       />
       <DevOnly>
         <TestPaymentSource />
       </DevOnly>
-    </AddPaymentSource>
+    </AddPaymentSource.Root>
   );
 });
 

@@ -24,7 +24,8 @@ import {
 } from '../../elements';
 import { ChevronUpDown } from '../../icons';
 import { handleError } from '../../utils';
-import { AddPaymentSource, AddPaymentSourceFormButton, PaymentSourceRow } from '../PaymentSources';
+import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
+import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
@@ -162,6 +163,7 @@ const useCheckoutMutations = () => {
 
   const payWithTestCard = async () => {
     card.setLoading();
+    card.setError(undefined);
     try {
       const newCheckout = await checkout.confirm({
         gateway: 'stripe',
@@ -225,23 +227,7 @@ const CheckoutFormElements = ({ checkout }: { checkout: CommerceCheckoutResource
         />
       )}
 
-      {paymentMethodSource === 'new' && (
-        <AddPaymentSourceForCheckout>
-          <DevOnly>
-            <PayWithTestPaymentSource />
-          </DevOnly>
-
-          {checkout.totals.totalDueNow.amount > 0 ? (
-            <AddPaymentSourceFormButton
-              text={localizationKeys('commerce.pay', {
-                amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
-              })}
-            />
-          ) : (
-            <AddPaymentSourceFormButton text={localizationKeys('commerce.subscribe')} />
-          )}
-        </AddPaymentSourceForCheckout>
-      )}
+      {paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
     </Col>
   );
 };
@@ -303,9 +289,34 @@ export const PayWithTestPaymentSource = () => {
   );
 };
 
-const AddPaymentSourceForCheckout = withCardStateProvider(({ children }: { children: React.ReactNode }) => {
+const AddPaymentSourceForCheckout = withCardStateProvider(() => {
   const { addPaymentSourceAndPay } = useCheckoutMutations();
-  return <AddPaymentSource onSuccess={addPaymentSourceAndPay}>{children}</AddPaymentSource>;
+  const { checkout } = useCheckoutContextRoot();
+
+  if (!checkout) {
+    return null;
+  }
+
+  return (
+    <AddPaymentSource.Root
+      onSuccess={addPaymentSourceAndPay}
+      checkout={checkout}
+    >
+      <DevOnly>
+        <PayWithTestPaymentSource />
+      </DevOnly>
+
+      {checkout.totals.totalDueNow.amount > 0 ? (
+        <AddPaymentSource.FormButton
+          text={localizationKeys('commerce.pay', {
+            amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
+          })}
+        />
+      ) : (
+        <AddPaymentSource.FormButton text={localizationKeys('commerce.subscribe')} />
+      )}
+    </AddPaymentSource.Root>
+  );
 });
 
 const ExistingPaymentSourceForm = withCardStateProvider(
