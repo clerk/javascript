@@ -1,5 +1,6 @@
 import type {
   __internal_CheckoutProps,
+  __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
@@ -123,6 +124,10 @@ export type SessionTasksCtx = {
   redirectUrlComplete?: string;
 };
 
+export type OAuthConsentCtx = __internal_OAuthConsentProps & {
+  componentName: 'OAuthConsent';
+};
+
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
@@ -136,5 +141,6 @@ export type AvailableComponentCtx =
   | GoogleOneTapCtx
   | WaitlistCtx
   | PricingTableCtx
-  | CheckoutCtx;
+  | CheckoutCtx
+  | OAuthConsentCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];

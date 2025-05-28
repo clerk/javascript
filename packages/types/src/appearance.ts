@@ -887,4 +887,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<Checkout />` component
    */
   checkout?: T;
+  /**
+   * Theme overrides that only apply to the `<OAuthConsent />` component
+   */
+  oauthConsent?: T;
 };
