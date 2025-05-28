@@ -45,7 +45,7 @@ overrides:
 
 patchedDependencies:
   yalc@1.0.0-pre.53:
-    hash: nepk7g7jbppq422nppscin4xqm
+    hash: 2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f
     path: patches/yalc@1.0.0-pre.53.patch
 
 importers:
@@ -303,7 +303,7 @@ importers:
         version: 3.0.5(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.21)(jiti@2.4.2)(jsdom@24.1.3)(lightningcss@1.27.0)(msw@2.8.4(@types/node@22.15.21)(typescript@5.8.3))(terser@5.39.0)(tsx@4.19.2)(yaml@2.7.1)
       yalc:
         specifier: 1.0.0-pre.53
-        version: 1.0.0-pre.53(patch_hash=nepk7g7jbppq422nppscin4xqm)
+        version: 1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f)
       zx:
         specifier: catalog:repo
         version: 8.4.1
@@ -31533,7 +31533,7 @@ snapshots:
 
   y18n@5.0.8: {}
 
-  yalc@1.0.0-pre.53(patch_hash=nepk7g7jbppq422nppscin4xqm):
+  yalc@1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f):
     dependencies:
       chalk: 4.1.2
       detect-indent: 6.1.0
