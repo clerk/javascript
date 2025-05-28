@@ -1037,6 +1037,23 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: any) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'OAuthConsent' }).then(controls =>
+      controls.mountComponent({
+        name: 'OAuthConsent',
+        appearanceKey: 'oauthConsent',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */

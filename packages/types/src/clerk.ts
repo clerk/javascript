@@ -2,6 +2,7 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
   OrganizationSwitcherTheme,
@@ -457,6 +458,19 @@ export interface Clerk {
    * @param targetNode Target node to unmount the PricingTable component from.
    */
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a OAuth consent component at the target element.
+   * @param targetNode Target node to mount the OAuth consent component.
+   * @param oauthConsentProps OAuth consent configuration parameters.
+   */
+  __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: any) => void;
+
+  /**
+   * Unmounts a OAuth consent component from the target element.
+   * @param targetNode Target node to unmount the OAuth consent component from.
+   */
+  __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Register a listener that triggers a callback each time important Clerk resources are changed.
@@ -1645,6 +1659,10 @@ export type __internal_PlanDetailsProps = {
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
+};
+
+export type __internal_OAuthConsentProps = {
+  appearance?: OAuthConsentTheme;
 };
 
 export interface HandleEmailLinkVerificationParams {
