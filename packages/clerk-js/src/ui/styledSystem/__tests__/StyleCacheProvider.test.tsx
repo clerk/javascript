@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import type { StylisElement } from '@emotion/cache';
 
-import { getInsertionPoint, wrapInLayer } from '../StyleCacheProvider';
+import { wrapInLayer } from '../StyleCacheProvider';
 
 // Mock the StylisPlugin type
 type MockStylisElement = Partial<StylisElement> & {
@@ -63,34 +63,5 @@ describe('wrapInLayer', () => {
     plugin(node);
 
     expect(node).toEqual(originalNode);
-  });
-});
-
-describe('getInsertionPoint', () => {
-  beforeEach(() => {
-    document.head.innerHTML = '';
-  });
-
-  it('returns meta tag if found', () => {
-    const meta = document.createElement('meta');
-    meta.setAttribute('name', 'emotion-insertion-point');
-    document.head.appendChild(meta);
-
-    const result = getInsertionPoint();
-    expect(result).toBe(meta);
-  });
-
-  it('returns style tag if found', () => {
-    const style = document.createElement('style');
-    style.id = 'cl-style-insertion-point';
-    document.head.appendChild(style);
-
-    const result = getInsertionPoint();
-    expect(result).toBe(style);
-  });
-
-  it('returns null if no insertion point found', () => {
-    const result = getInsertionPoint();
-    expect(result).toBeNull();
   });
 });
