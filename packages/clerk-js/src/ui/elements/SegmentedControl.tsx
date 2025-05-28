@@ -41,6 +41,7 @@ interface RootProps {
   onChange?: (value: string) => void;
   size?: SegmentedControlSize;
   fullWidth?: boolean;
+  sx?: ThemableCssProp;
 }
 
 const Root = React.forwardRef<HTMLDivElement, RootProps>(
@@ -54,6 +55,7 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
       'aria-labelledby': ariaLabelledby,
       size = 'md',
       fullWidth = false,
+      sx,
     },
     ref,
   ) => {
@@ -80,14 +82,17 @@ const Root = React.forwardRef<HTMLDivElement, RootProps>(
               elementDescriptor={descriptors.segmentedControlRoot}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledby}
-              sx={t => ({
-                backgroundColor: t.colors.$neutralAlpha50,
-                borderRadius: t.radii.$md,
-                borderWidth: t.borderWidths.$normal,
-                borderStyle: t.borderStyles.$solid,
-                borderColor: t.colors.$neutralAlpha100,
-                isolation: 'isolate',
-              })}
+              sx={[
+                t => ({
+                  backgroundColor: t.colors.$neutralAlpha50,
+                  borderRadius: t.radii.$md,
+                  borderWidth: t.borderWidths.$normal,
+                  borderStyle: t.borderStyles.$solid,
+                  borderColor: t.colors.$neutralAlpha100,
+                  isolation: 'isolate',
+                }),
+                sx,
+              ]}
             />
           }
         >
@@ -107,10 +112,9 @@ Root.displayName = 'SegmentedControl.Root';
 interface ButtonProps {
   text: string | LocalizationKey;
   value: string;
-  sx?: ThemableCssProp;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value, sx }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value }, ref) => {
   const { currentValue, onValueChange, size, fullWidth } = useSegmentedControlContext();
   const isSelected = value === currentValue;
 
@@ -128,23 +132,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ text, value, 
             aria-checked={isSelected}
             onClick={() => onValueChange(value)}
             isActive={isSelected}
-            sx={[
-              t => ({
-                position: 'relative',
-                width: fullWidth ? '100%' : 'auto',
-                backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
-                color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
-                fontSize: size === 'lg' ? t.fontSizes.$md : t.fontSizes.$xs,
-                minHeight: t.sizes.$6,
-                boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
-                borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
-                zIndex: 1,
-                ':focus-visible': {
-                  zIndex: 2,
-                },
-              }),
-              sx,
-            ]}
+            sx={t => ({
+              position: 'relative',
+              width: fullWidth ? '100%' : 'auto',
+              backgroundColor: isSelected ? t.colors.$colorBackground : 'transparent',
+              color: isSelected ? t.colors.$colorText : t.colors.$colorTextSecondary,
+              fontSize: size === 'lg' ? t.fontSizes.$md : t.fontSizes.$xs,
+              minHeight: t.sizes.$6,
+              boxShadow: isSelected ? t.shadows.$segmentedControl : 'none',
+              borderRadius: `calc(${t.radii.$md} - ${t.borderWidths.$normal})`,
+              zIndex: 1,
+              ':focus-visible': {
+                zIndex: 2,
+              },
+            })}
           />
         );
       }}
