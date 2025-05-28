@@ -90,12 +90,12 @@
   "devDependencies": {
     "@types/cookie": "^0.6.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "react-router": "7.5.2"
+    "react-router": "7.6.1"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react",
-    "react-router": "^7.1.2"
+    "react-router": "^7.6.1"
   },
   "engines": {
     "node": ">=20.0.0"

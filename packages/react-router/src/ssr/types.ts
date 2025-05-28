@@ -9,7 +9,7 @@ import type {
   SignUpForceRedirectUrl,
 } from '@clerk/types';
 import type { LoaderFunction, UNSAFE_DataWithResponseInit } from 'react-router';
-import type { CreateServerLoaderArgs } from 'react-router/route-module';
+import type { GetAnnotations } from 'react-router/internal';
 
 type Func = (...args: any[]) => unknown;
 
@@ -21,15 +21,21 @@ type RouteModule = {
   clientLoader?: Func;
   action?: Func;
   clientAction?: Func;
-  HydrateFallback?: unknown;
-  default?: unknown;
-  ErrorBoundary?: unknown;
+  HydrateFallback?: Func;
+  default?: Func;
+  ErrorBoundary?: Func;
   [key: string]: unknown;
+};
+
+type MatchInfo = {
+  id: string;
+  module: RouteModule;
 };
 
 export type RouteInfo = {
   parents: RouteInfo[];
   module: RouteModule;
+  matches: Array<MatchInfo>;
   id: unknown;
   file: string;
   path: string;
@@ -102,7 +108,7 @@ type RootAuthLoaderCallbackReturn =
   | Promise<UNSAFE_DataWithResponseInit<unknown>>;
 
 // TODO: Figure out how to use the Route.LoaderArgs from userland code
-export type LoaderFunctionArgs = CreateServerLoaderArgs<RouteInfo>;
+export type LoaderFunctionArgs = GetAnnotations<RouteInfo>['LoaderArgs'];
 export type LoaderFunctionReturn = ReturnType<LoaderFunction>;
 
 export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs & {
