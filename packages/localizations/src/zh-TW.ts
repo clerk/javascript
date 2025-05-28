@@ -71,6 +71,7 @@ export const zhTW: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const zhTW: LocalizationResource = {
     sameDay: "今天{{ date | timeString('zh-TW') }}",
   },
   dividerText: '或者',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: '使用另一種方法',
   footerPageLink__help: '幫助',
   footerPageLink__privacy: '隱私',

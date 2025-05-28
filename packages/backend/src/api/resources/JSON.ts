@@ -45,6 +45,7 @@ export const ObjectType = {
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
+  SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
@@ -603,6 +604,7 @@ export interface PaginatedResponseJSON {
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SamlConnection;
   name: string;
   domain: string;
   organization_id: string | null;

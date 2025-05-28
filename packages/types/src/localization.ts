@@ -131,6 +131,7 @@ type _LocalizationResource = {
     subtotal: LocalizationValue;
     creditRemainder: LocalizationValue;
     totalDueToday: LocalizationValue;
+    pastDue: LocalizationValue;
     paymentMethods: LocalizationValue;
     addPaymentMethod: LocalizationValue;
     pay: LocalizationValue;

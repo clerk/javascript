@@ -17,21 +17,30 @@ import { ChevronUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
+import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutForm = ({
-  checkout,
-  onCheckoutComplete,
-}: {
-  checkout: CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
-}) => {
+export const CheckoutForm = () => {
+  const ctx = useCheckoutContextRoot();
+  const { onSubscriptionComplete } = useCheckoutContext();
+  const { checkout, updateCheckout } = ctx;
+
+  if (!checkout) {
+    return null;
+  }
+
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
+  const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
+
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
+    void updateCheckout(newCheckout);
+    onSubscriptionComplete?.();
+  };
 
   return (
     <Drawer.Body>
@@ -67,6 +76,12 @@ export const CheckoutForm = ({
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
+            </LineItems.Group>
+          )}
+          {showPastDue && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('commerce.pastDue')} />
+              <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
           <LineItems.Group borderTop>

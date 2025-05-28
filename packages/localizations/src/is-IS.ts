@@ -71,6 +71,7 @@ export const isIS: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const isIS: LocalizationResource = {
     sameDay: "Í dag kl {{ date | timeString('is-IS') }}",
   },
   dividerText: 'eða',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Nota aðra aðferð',
   footerPageLink__help: 'Hjálp',
   footerPageLink__privacy: 'Persónuvernd',

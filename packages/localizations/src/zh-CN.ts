@@ -71,6 +71,7 @@ export const zhCN: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const zhCN: LocalizationResource = {
     sameDay: "今天{{ date | timeString('zh-CN') }}",
   },
   dividerText: '或者',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: '使用另一种方法',
   footerPageLink__help: '帮助',
   footerPageLink__privacy: '隐私',

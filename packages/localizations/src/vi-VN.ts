@@ -71,6 +71,7 @@ export const viVN: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const viVN: LocalizationResource = {
     sameDay: "Hôm nay lúc {{ date | timeString('vi-VN') }}",
   },
   dividerText: 'hoặc',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Sử dụng phương pháp khác',
   footerPageLink__help: 'Trợ giúp',
   footerPageLink__privacy: 'Quyền riêng tư',
