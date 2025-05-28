@@ -71,6 +71,7 @@ export const koKR: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const koKR: LocalizationResource = {
     sameDay: "오늘 {{ date | timeString('ko-KR') }}",
   },
   dividerText: '또는',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: '다른 방법 사용하기',
   footerPageLink__help: '도움',
   footerPageLink__privacy: '개인정보처리방침',

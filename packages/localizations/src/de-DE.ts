@@ -74,6 +74,7 @@ export const deDE: LocalizationResource = {
     manageSubscription: 'Mitgliedschaft verwalten',
     month: 'Monat',
     monthly: 'Monatlich',
+    pastDue: undefined,
     pay: '{{amount}} bezahlen',
     paymentMethods: 'Zahlungsmethoden',
     paymentSource: {
@@ -122,6 +123,7 @@ export const deDE: LocalizationResource = {
     sameDay: "Heute um {{ date | timeString('de-DE') }}",
   },
   dividerText: 'oder',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Verwenden Sie eine andere Methode',
   footerPageLink__help: 'Hilfe',
   footerPageLink__privacy: 'Privatsphäre',
