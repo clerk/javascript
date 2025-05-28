@@ -9,9 +9,7 @@ Enable CSS layer name on `ClerkProvider`
 
 ```tsx
 <ClerkProvider
-  experimental={{
-    cssLayerName: "clerk",
-  }}
+  cssLayerName="clerk"
 >
  ...
 </ClerkProvider>

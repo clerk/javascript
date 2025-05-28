@@ -34,7 +34,7 @@ export const LazyProviders = (props: LazyProvidersProps) => {
   return (
     <StyleCacheProvider
       nonce={props.options.nonce}
-      cssLayerName={props.options.experimental?.cssLayerName}
+      cssLayerName={props.options.cssLayerName}
     >
       <CoreClerkContextWrapper clerk={props.clerk}>
         <EnvironmentProvider value={props.environment}>
