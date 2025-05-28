@@ -23,7 +23,7 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
     });
 
     if (props.cssLayerName) {
-      const prevInsert = emotionCache.insert;
+      const prevInsert = emotionCache.insert.bind(emotionCache);
       emotionCache.insert = (...args) => {
         if (!args[1].styles.startsWith('@layer')) {
           // avoid nested @layer
