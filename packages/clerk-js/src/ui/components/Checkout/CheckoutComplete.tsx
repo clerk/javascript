@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useCheckoutContext } from '../../contexts';
-import { Box, Button, descriptors, Heading, localizationKeys, Span, Text } from '../../customizables';
+import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
 import { Drawer, LineItems, useDrawerContext } from '../../elements';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
+import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
-import { animations } from '../../styledSystem';
 import { formatDate } from '../../utils';
 import { useCheckoutContextRoot } from './CheckoutPage';
 
@@ -15,10 +15,15 @@ const lerp = (start: number, end: number, amt: number) => start + (end - start) 
 export const CheckoutComplete = () => {
   const router = useRouter();
   const { setIsOpen } = useDrawerContext();
-  const { newSubscriptionRedirectUrl, isMotionSafe } = useCheckoutContext();
+  const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckoutContextRoot();
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
+  const [currentPosition, setCurrentPosition] = useState({ x: 256, y: 256 });
+
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+
   const animationRef = useRef<number | null>(null);
   const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);
   const canHover =
@@ -28,10 +33,19 @@ export const CheckoutComplete = () => {
     if (!canHover) return;
     if (checkoutSuccessRootRef.current) {
       const rect = checkoutSuccessRootRef.current.getBoundingClientRect();
-      setMousePosition({
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      });
+      const domX = event.clientX - rect.left;
+      const domY = event.clientY - rect.top;
+      const domWidth = rect.width;
+
+      const svgViewBoxWidth = 512;
+
+      if (domWidth > 0) {
+        const svgX = (domX / domWidth) * svgViewBoxWidth;
+        const svgY = (domY / domWidth) * svgViewBoxWidth;
+        setMousePosition({ x: svgX, y: svgY });
+      } else {
+        setMousePosition({ x: 256, y: 256 });
+      }
     }
   };
 
@@ -71,6 +85,8 @@ export const CheckoutComplete = () => {
         <Span
           elementDescriptor={descriptors.checkoutSuccessRoot}
           sx={t => ({
+            '--ring-fill': t.colors.$neutralAlpha200,
+            '--ring-highlight': t.colors.$success500,
             margin: 'auto',
             position: 'relative',
             aspectRatio: '1/1',
@@ -106,39 +122,78 @@ export const CheckoutComplete = () => {
           ref={checkoutSuccessRootRef}
           onMouseMove={handleMouseMove}
         >
-          {[1, 0.75, 0.5].map((scale, index, array) => {
-            return (
-              <Ring
-                key={scale}
-                scale={scale}
-                index={array.length - 1 - index}
-                isMotionSafe={isMotionSafe}
-              />
-            );
-          })}
           <Box
-            elementDescriptor={descriptors.checkoutSuccessHighlight}
-            sx={t => ({
+            elementDescriptor={descriptors.checkoutSuccessRings}
+            as='svg'
+            // @ts-ignore - viewBox is a valid prop for svg
+            viewBox='0 0 512 512'
+            sx={{
               position: 'absolute',
-              width: t.sizes.$56,
-              height: t.sizes.$56,
-              transform: 'translate(-50%, -50%)',
-              borderRadius: '50%',
-              backgroundColor: t.colors.$success500,
-              mixBlendMode: 'color',
-              filter: 'blur(20px)',
-              opacity: 0.5,
-              zIndex: 1,
+              inset: 0,
               pointerEvents: 'none',
-              ...(!canHover && {
-                display: 'none',
-              }),
-            })}
-            style={{
-              left: currentPosition.x,
-              top: currentPosition.y,
             }}
-          />
+            aria-hidden
+          >
+            <defs>
+              <radialGradient id='clerk-checkout-success-gradient'>
+                <stop
+                  offset='0%'
+                  style={{
+                    stopColor: 'var(--ring-highlight)',
+                  }}
+                />
+                <stop
+                  offset='100%'
+                  stopOpacity='0'
+                  style={{
+                    stopColor: 'var(--ring-highlight)',
+                  }}
+                />
+              </radialGradient>
+              <filter id='clerk-checkout-success-blur-effect'>
+                <feGaussianBlur stdDeviation='10' />
+              </filter>
+              <mask id='clerk-checkout-success-mask'>
+                {[
+                  { r: 225, maskStart: 10, maskEnd: 90 },
+                  { r: 162.5, maskStart: 15, maskEnd: 85 },
+                  { r: 100, maskStart: 20, maskEnd: 80 },
+                ].map(({ r, maskStart, maskEnd }) => (
+                  <circle
+                    key={r}
+                    cx='256'
+                    cy='256'
+                    r={r}
+                    stroke='white'
+                    fill='none'
+                    style={{
+                      maskImage: `linear-gradient(to bottom, transparent ${maskStart}%, black, transparent ${maskEnd}%)`,
+                    }}
+                  />
+                ))}
+              </mask>
+            </defs>
+            <g mask='url(#clerk-checkout-success-mask)'>
+              <rect
+                width='512'
+                height='512'
+                style={{
+                  fill: 'var(--ring-fill)',
+                }}
+              />
+              {canHover && (
+                <rect
+                  id='movingGradientHighlight'
+                  width='256'
+                  height='256'
+                  x={currentPosition.x - 128}
+                  y={currentPosition.y - 128}
+                  fill='url(#clerk-checkout-success-gradient)'
+                  filter='url(#clerk-checkout-success-blur-effect)'
+                />
+              )}
+            </g>
+          </Box>
           <Box
             elementDescriptor={descriptors.checkoutSuccessBadge}
             sx={t => ({
@@ -337,46 +392,3 @@ export const CheckoutComplete = () => {
     </>
   );
 };
-
-function Ring({
-  scale,
-  index,
-  isMotionSafe,
-}: {
-  /**
-   * Number between 0-1
-   */
-  scale: number;
-  /**
-   * Index of the ring (0-2)
-   */
-  index: number;
-  isMotionSafe: boolean;
-}) {
-  return (
-    <Span
-      elementDescriptor={descriptors.checkoutSuccessRing}
-      sx={t => ({
-        margin: 'auto',
-        gridArea: '1/1',
-        width: `${scale * 100}%`,
-        height: `${scale * 100}%`,
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: t.colors.$neutralAlpha200,
-        borderRadius: t.radii.$circle,
-        maskImage: `linear-gradient(to bottom, transparent 15%, black, transparent 85%)`,
-        opacity: 0,
-        animationName: animations.fadeIn,
-        animationDuration: `${transitionDurationValues.slow}ms`,
-        animationTimingFunction: transitionTiming.bezier,
-        animationFillMode: 'forwards',
-        animationDelay: `${index * transitionDurationValues.slow}ms`,
-        ...(!isMotionSafe && {
-          animation: 'none',
-          opacity: 1,
-        }),
-      })}
-    />
-  );
-}

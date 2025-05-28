@@ -71,6 +71,7 @@ export const hrHR: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const hrHR: LocalizationResource = {
     sameDay: "Danas u {{ date | timeString('hr-HR') }}",
   },
   dividerText: 'ili',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Koristite drugu metodu',
   footerPageLink__help: 'Pomoć',
   footerPageLink__privacy: 'Privatnost',

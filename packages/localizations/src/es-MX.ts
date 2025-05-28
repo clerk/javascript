@@ -71,6 +71,7 @@ export const esMX: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const esMX: LocalizationResource = {
     sameDay: "Hoy a las {{ date | timeString('es-ES') }}",
   },
   dividerText: 'o',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Usar otro método',
   footerPageLink__help: 'Ayuda',
   footerPageLink__privacy: 'Privacidad',

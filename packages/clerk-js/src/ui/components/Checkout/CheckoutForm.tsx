@@ -41,6 +41,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
+  const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
   return (
@@ -77,6 +78,12 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
+            </LineItems.Group>
+          )}
+          {showPastDue && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('commerce.pastDue')} />
+              <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
           <LineItems.Group borderTop>

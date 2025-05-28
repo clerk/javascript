@@ -1,5 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import { useUser } from '@clerk/shared/react/index';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { ClerkAPIError, CommerceCheckoutResource, CommercePlanResource } from '@clerk/types';
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
@@ -109,7 +108,7 @@ const Root = ({ children }: { children: React.ReactNode }) => {
     const invalidChangeCode = 'invalid_plan_change';
     if (errors?.[0]?.code === invalidChangeCode && plan) return invalidChangeCode;
     return 'error';
-  }, [isLoading, errors, checkout, plan?.id]);
+  }, [isLoading, errors, checkout, plan?.id, checkout?.status]);
 
   return (
     <CheckoutContextRoot.Provider

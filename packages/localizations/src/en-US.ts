@@ -62,6 +62,7 @@ export const enUS: LocalizationResource = {
     manageSubscription: 'Manage subscription',
     month: 'Month',
     monthly: 'Monthly',
+    pastDue: 'Past due',
     pay: 'Pay {{amount}}',
     paymentMethods: 'Payment Methods',
     paymentSource: {
@@ -110,8 +111,8 @@ export const enUS: LocalizationResource = {
     sameDay: "Today at {{ date | timeString('en-US') }}",
   },
   dividerText: 'or',
-  footerActionLink__useAnotherMethod: 'Use another method',
   footerActionLink__alternativePhoneCodeProvider: 'Send code via SMS instead',
+  footerActionLink__useAnotherMethod: 'Use another method',
   footerPageLink__help: 'Help',
   footerPageLink__privacy: 'Privacy',
   footerPageLink__terms: 'Terms',

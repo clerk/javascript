@@ -48,7 +48,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   organization: OrganizationResource;
   permissions: OrganizationPermissionKey[];
   publicMetadata: OrganizationMembershipPublicMetadata;
-  publicUserData: PublicUserData;
+  publicUserData?: PublicUserData;
   role: OrganizationCustomRoleKey;
   createdAt: Date;
   updatedAt: Date;
