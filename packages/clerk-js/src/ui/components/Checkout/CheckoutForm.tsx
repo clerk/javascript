@@ -10,29 +10,37 @@ import type {
 import type { SetupIntent } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 
-import { useCheckoutContext } from '../../contexts';
+import { useCheckoutContext, usePaymentSources } from '../../contexts';
 import { Box, Button, Col, descriptors, Form, localizationKeys, Text } from '../../customizables';
 import { Alert, Drawer, LineItems, SegmentedControl, Select, SelectButton, SelectOptionList } from '../../elements';
-import { useFetch } from '../../hooks';
 import { ChevronUpDown } from '../../icons';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddPaymentSource, PaymentSourceRow } from '../PaymentSources';
+import { useCheckoutContextRoot } from './CheckoutPage';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-export const CheckoutForm = ({
-  checkout,
-  onCheckoutComplete,
-}: {
-  checkout: CommerceCheckoutResource;
-  onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
-}) => {
+export const CheckoutForm = () => {
+  const ctx = useCheckoutContextRoot();
+  const { onSubscriptionComplete } = useCheckoutContext();
+  const { checkout, updateCheckout } = ctx;
+
+  if (!checkout) {
+    return null;
+  }
+
   const { plan, planPeriod, totals, isImmediatePlanChange } = checkout;
   const showCredits = !!totals.credit?.amount && totals.credit.amount > 0;
+  const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
+
+  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
+    void updateCheckout(newCheckout);
+    onSubscriptionComplete?.();
+  };
 
   return (
     <Drawer.Body>
@@ -51,7 +59,6 @@ export const CheckoutForm = ({
               title={plan.name}
               description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
             />
-            {/* TODO(@Commerce): needs localization */}
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
               text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
@@ -62,28 +69,28 @@ export const CheckoutForm = ({
             borderTop
             variant='tertiary'
           >
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title='Subtotal' />
+            <LineItems.Title title={localizationKeys('commerce.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           {showCredits && (
             <LineItems.Group variant='tertiary'>
-              {/* TODO(@Commerce): needs localization */}
-              <LineItems.Title title={'Credit for the remainder of your current subscription.'} />
-              {/* TODO(@Commerce): needs localization */}
-              {/* TODO(@Commerce): Replace client-side calculation with server-side calculation once data are available in the response */}
+              <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
             </LineItems.Group>
           )}
+          {showPastDue && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('commerce.pastDue')} />
+              <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
+            </LineItems.Group>
+          )}
           <LineItems.Group borderTop>
-            {/* TODO(@Commerce): needs localization */}
-            <LineItems.Title title={`Total Due Today`} />
+            <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
 
-      {/* TODO(@Commerce): needs localization */}
       {showDowngradeInfo && (
         <Box
           elementDescriptor={descriptors.checkoutFormLineItemsRoot}
@@ -116,17 +123,12 @@ const CheckoutFormElements = ({
   onCheckoutComplete: (checkout: CommerceCheckoutResource) => void;
 }) => {
   const { organization } = useOrganization();
-  const { subscriber, subscriberType } = useCheckoutContext();
+  const { subscriberType } = useCheckoutContext();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
 
-  const { data, revalidate: revalidatePaymentSources } = useFetch(
-    subscriber().getPaymentSources,
-    {},
-    undefined,
-    `commerce-payment-sources-${subscriber().id}`,
-  );
+  const { data } = usePaymentSources();
   const { data: paymentSources } = data || { data: [] };
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -140,7 +142,6 @@ const CheckoutFormElements = ({
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
       onCheckoutComplete(newCheckout);
-      void revalidatePaymentSources();
     } catch (error) {
       handleError(error, [], setSubmitError);
     }
@@ -177,7 +178,6 @@ const CheckoutFormElements = ({
         useTestCard: true,
         ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
       });
-      void revalidatePaymentSources();
       onCheckoutComplete(newCheckout);
     } catch (error) {
       handleError(error, [], setSubmitError);
@@ -201,13 +201,11 @@ const CheckoutFormElements = ({
         >
           <SegmentedControl.Button
             value='existing'
-            // TODO(@Commerce): needs localization
-            text='Payment Methods'
+            text={localizationKeys('commerce.paymentMethods')}
           />
           <SegmentedControl.Button
             value='new'
-            // TODO(@Commerce): needs localization
-            text='Add payment method'
+            text={localizationKeys('commerce.addPaymentMethod')}
           />
         </SegmentedControl.Root>
       )}
@@ -228,13 +226,12 @@ const CheckoutFormElements = ({
           checkout={checkout}
           onSuccess={onAddPaymentSourceSuccess}
           onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
-          // @ts-ignore TODO(@COMMERCE): needs localization
           submitLabel={
             checkout.totals.totalDueNow.amount > 0
               ? localizationKeys('userProfile.billingPage.paymentSourcesSection.formButtonPrimary__pay', {
                   amount: `${checkout.totals.totalDueNow.currencySymbol}${checkout.totals.totalDueNow.amountFormatted}`,
                 })
-              : 'Subscribe'
+              : localizationKeys('commerce.subscribe')
           }
           submitError={submitError}
           setSubmitError={setSubmitError}
@@ -351,15 +348,15 @@ const ExistingPaymentSourceForm = ({
         }}
         isLoading={isSubmitting}
       >
-        {totalDueNow.amount > 0 ? (
-          <>
-            {/* TODO(@COMMERCE): needs localization */}
-            Pay {totalDueNow.currencySymbol}
-            {totalDueNow.amountFormatted}
-          </>
-        ) : (
-          'Subscribe'
-        )}
+        <Text
+          localizationKey={
+            totalDueNow.amount > 0
+              ? localizationKeys('commerce.pay', {
+                  amount: `${totalDueNow.currencySymbol}${totalDueNow.amountFormatted}`,
+                })
+              : localizationKeys('commerce.subscribe')
+          }
+        />
       </Button>
     </Form>
   );

@@ -46,6 +46,7 @@ function SignUpContinueInternal() {
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive),
   );
+  const ctx = useSignUpContext();
 
   // TODO: This form should be shared between SignUpStart and SignUpContinue
   const formState = {
@@ -179,6 +180,7 @@ function SignUpContinueInternal() {
           verifyPhonePath: './verify-phone-number',
           handleComplete: () => clerk.setActive({ session: res.createdSessionId, redirectUrl: afterSignUpUrl }),
           navigate,
+          oidcPrompt: ctx.oidcPrompt,
         }),
       )
       .catch(err => handleError(err, fieldsToSubmit, card.setError))

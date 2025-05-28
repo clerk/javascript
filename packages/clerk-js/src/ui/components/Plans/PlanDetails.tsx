@@ -11,17 +11,15 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useProtect } from '../../common';
-import { PlansContextProvider, SubscriberTypeContext, usePlansContext, useSubscriberTypeContext } from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
 import { Badge, Box, Button, Col, descriptors, Flex, Heading, localizationKeys, Span, Text } from '../../customizables';
 import { Alert, Avatar, Drawer, Switch, useDrawerContext } from '../../elements';
-import { formatDate, handleError } from '../../utils';
+import { handleError } from '../../utils';
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-      <PlansContextProvider>
-        <PlanDetailsInternal {...props} />
-      </PlansContextProvider>
+      <PlanDetailsInternal {...props} />
     </SubscriberTypeContext.Provider>
   );
 };
@@ -42,7 +40,7 @@ const PlanDetailsInternal = ({
   const { setIsOpen } = useDrawerContext();
   const {
     activeOrUpcomingSubscriptionBasedOnPlanPeriod,
-    revalidate,
+    revalidateAll,
     buttonPropsForPlan,
     isDefaultPlanImplicitlyActiveOrUpcoming,
   } = usePlansContext();
@@ -108,7 +106,7 @@ const PlanDetailsInternal = ({
       planPeriod: _planPeriod,
       subscriberType: subscriberType,
       onSubscriptionComplete: () => {
-        revalidate();
+        void revalidateAll();
       },
       portalRoot,
     });
@@ -207,7 +205,7 @@ const PlanDetailsInternal = ({
         </Drawer.Body>
       ) : null}
 
-      {!plan.isDefault || !isDefaultPlanImplicitlyActiveOrUpcoming ? (
+      {(!plan.isDefault && !isDefaultPlanImplicitlyActiveOrUpcoming) || !subscription ? (
         <Drawer.Footer>
           {subscription ? (
             subscription.canceledAt ? (
@@ -306,27 +304,23 @@ const PlanDetailsInternal = ({
             elementDescriptor={descriptors.drawerConfirmationTitle}
             as='h2'
             textVariant='h3'
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            Cancel {subscription.status === 'upcoming' ? 'upcoming ' : ''}
-            {subscription.plan.name} Subscription?
-          </Heading>
+            localizationKey={localizationKeys('commerce.cancelSubscriptionTitle', {
+              plan: `${subscription.status === 'upcoming' ? 'upcoming ' : ''}${subscription.plan.name}`,
+            })}
+          />
           <Text
             elementDescriptor={descriptors.drawerConfirmationDescription}
             colorScheme='secondary'
-          >
-            {/* TODO(@COMMERCE): needs localization */}
-            {subscription.status === 'upcoming' ? (
-              <>You will not be charged for this subscription.</>
-            ) : (
-              <>
-                You can keep using &ldquo;{subscription.plan.name}&rdquo; features until{' '}
-                {formatDate(new Date(subscription.periodEnd))}, after which you will no longer have access.
-              </>
-            )}
-          </Text>
+            localizationKey={
+              subscription.status === 'upcoming'
+                ? localizationKeys('commerce.cancelSubscriptionNoCharge')
+                : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                    plan: subscription.plan.name,
+                    date: subscription.periodEnd,
+                  })
+            }
+          />
           {cancelError && (
-            // TODO(@COMMERCE): needs localization
             <Alert colorScheme='danger'>{typeof cancelError === 'string' ? cancelError : cancelError.message}</Alert>
           )}
         </Drawer.Confirmation>
@@ -350,7 +344,8 @@ interface HeaderProps {
 const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, subscription, closeSlot, planPeriod, setPlanPeriod } = props;
 
-  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming, subscriptions } = usePlansContext();
+  const { captionForSubscription, isDefaultPlanImplicitlyActiveOrUpcoming } = usePlansContext();
+  const { data: subscriptions } = useSubscriptions();
 
   const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 

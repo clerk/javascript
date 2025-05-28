@@ -1,4 +1,4 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useSafeLayoutEffect } from '@clerk/shared/react/index';
 import type { UseDismissProps, UseFloatingOptions, UseRoleProps } from '@floating-ui/react';
 import {
   FloatingFocusManager,
@@ -16,8 +16,7 @@ import * as React from 'react';
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
-import { useDirection, usePrefersReducedMotion } from '../hooks';
-import { useScrollLock } from '../hooks/useScrollLock';
+import { useDirection, usePrefersReducedMotion, useScrollLock } from '../hooks';
 import { Close as CloseIcon } from '../icons';
 import type { ThemableCssProp } from '../styledSystem';
 import { common } from '../styledSystem';
@@ -131,15 +130,18 @@ export const FloatingOverlay = React.forwardRef(function FloatingOverlay(
   props: React.ComponentPropsWithoutRef<typeof Box>,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { strategy } = useDrawerContext();
   const { disableScrollLock, enableScrollLock } = useScrollLock();
 
   useSafeLayoutEffect(() => {
+    if (strategy !== 'fixed') {
+      return;
+    }
     enableScrollLock();
-
     return () => {
       disableScrollLock();
     };
-  }, []);
+  }, [strategy, disableScrollLock, enableScrollLock]);
 
   return (
     <Box

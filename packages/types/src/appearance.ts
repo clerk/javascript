@@ -209,7 +209,7 @@ export type ElementsConfig = {
   checkoutFormElementsRoot: WithOptions;
 
   checkoutSuccessRoot: WithOptions;
-  checkoutSuccessRing: WithOptions;
+  checkoutSuccessRings: WithOptions;
   checkoutSuccessBadge: WithOptions;
   checkoutSuccessTitle: WithOptions;
   checkoutSuccessDescription: WithOptions;

@@ -1,164 +1,135 @@
-import type { __internal_CheckoutProps, ClerkAPIError, CommerceCheckoutResource } from '@clerk/types';
-import { useEffect } from 'react';
+import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import type { ClerkAPIError, CommerceCheckoutResource, CommercePlanResource } from '@clerk/types';
+import { createContext, useContext, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { usePlans } from '../../contexts';
-import {
-  Box,
-  descriptors,
-  Flex,
-  localizationKeys,
-  Spinner,
-  useAppearance,
-  useLocalizations,
-} from '../../customizables';
-import { Alert, Drawer, LineItems, useDrawerContext } from '../../elements';
-import { usePrefersReducedMotion } from '../../hooks';
-import { EmailForm } from '../UserProfile/EmailForm';
-import { CheckoutComplete } from './CheckoutComplete';
-import { CheckoutForm } from './CheckoutForm';
-import { useCheckout } from './useCheckout';
+import { useCheckoutContext, usePlans } from '../../contexts';
 
-export const CheckoutPage = (props: __internal_CheckoutProps) => {
-  const { translateError } = useLocalizations();
-  const { planId, planPeriod, subscriberType, onSubscriptionComplete } = props;
-  const { setIsOpen, isOpen } = useDrawerContext();
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
-  const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
+type CheckoutStatus = 'pending' | 'ready' | 'completed' | 'missing_payer_email' | 'invalid_plan_change' | 'error';
+
+const CheckoutContextRoot = createContext<{
+  checkout: CommerceCheckoutResource | undefined;
+  isLoading: boolean;
+  updateCheckout: (checkout: CommerceCheckoutResource) => void;
+  errors: ClerkAPIError[];
+  startCheckout: () => void;
+  plan: CommercePlanResource | undefined;
+  status: CheckoutStatus;
+} | null>(null);
+
+export const useCheckoutContextRoot = () => {
+  const ctx = useContext(CheckoutContextRoot);
+  if (!ctx) {
+    throw new Error('CheckoutContextRoot not found');
+  }
+  return ctx;
+};
+
+const useCheckoutCreator = () => {
+  const { planId, planPeriod, subscriberType = 'user' } = useCheckoutContext();
+  const clerk = useClerk();
+  const { organization } = useOrganization();
+
+  const { user } = useUser();
+
+  const cacheKey = {
+    key: `commerce-checkout`,
+    userId: user?.id,
+    arguments: {
+      ...(subscriberType === 'org' ? { orgId: organization?.id } : {}),
+      planId,
+      planPeriod,
+    },
+  };
+
+  // Manually handle the cache
+  const { data, mutate } = useSWR<CommerceCheckoutResource | undefined>(cacheKey);
+
+  // Use `useSWRMutation` to avoid revalidations on stale-data/focus etc.
+  const {
+    trigger: startCheckout,
+    isMutating,
+    error,
+  } = useSWRMutation(
+    cacheKey,
+    key =>
+      clerk.billing?.startCheckout(
+        // @ts-expect-error things are typed as optional
+        key.arguments,
+      ),
+    {
+      // Never throw on error, we want to handle it during rendering
+      throwOnError: false,
+      onSuccess: data => {
+        mutate(data, false);
+      },
+    },
+  );
+
+  useEffect(() => {
+    void startCheckout();
+    return () => {
+      // Clear the cache on unmount
+      mutate(undefined, false);
+    };
+  }, []);
+
+  return {
+    checkout: data,
+    startCheckout,
+    updateCheckout: (checkout: CommerceCheckoutResource) => mutate(checkout, false),
+    isMutating,
+    errors: error?.errors,
+  };
+};
+
+const Root = ({ children }: { children: React.ReactNode }) => {
+  const { planId } = useCheckoutContext();
   const { data: plans, isLoading: plansLoading } = usePlans();
-
-  const { checkout, isLoading, invalidate, revalidate, updateCheckout, errors } = useCheckout({
-    planId,
-    planPeriod,
-    subscriberType,
-  });
-
-  const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === 'missing_payer_email');
+  const { checkout, isMutating, updateCheckout, errors, startCheckout } = useCheckoutCreator();
 
   const plan = plans?.find(p => p.id === planId);
 
-  const onCheckoutComplete = (newCheckout: CommerceCheckoutResource) => {
-    invalidate(); // invalidate the initial checkout on complete
-    updateCheckout(newCheckout);
-    onSubscriptionComplete?.();
-  };
+  const isLoading = isMutating || plansLoading;
 
-  useEffect(() => {
-    if (isOpen) {
-      revalidate();
-    }
-  }, [isOpen]);
+  const status = useMemo(() => {
+    if (isLoading) return 'pending';
+    const completedCode = 'completed';
+    if (checkout?.status === completedCode) return completedCode;
+    if (checkout) return 'ready';
 
-  if (isLoading || plansLoading) {
-    return (
-      <Spinner
-        sx={{
-          margin: 'auto',
-        }}
-      />
-    );
-  }
-
-  if (checkout) {
-    if (checkout?.status === 'completed') {
-      return (
-        <CheckoutComplete
-          checkout={checkout}
-          isMotionSafe={isMotionSafe}
-        />
-      );
-    }
-
-    return (
-      <CheckoutForm
-        checkout={checkout}
-        onCheckoutComplete={onCheckoutComplete}
-      />
-    );
-  }
-
-  if (isMissingPayerEmail) {
-    return (
-      <Drawer.Body>
-        <Box
-          sx={t => ({
-            padding: t.space.$4,
-          })}
-        >
-          <EmailForm
-            title={localizationKeys('commerce.checkout.emailForm.title')}
-            subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
-            onSuccess={revalidate}
-            onReset={() => setIsOpen(false)}
-            disableAutoFocus
-          />
-        </Box>
-      </Drawer.Body>
-    );
-  }
-
-  const error = errors?.[0];
-  if (error?.code === 'invalid_plan_change' && plan) {
-    return (
-      <Drawer.Body>
-        <Flex
-          gap={4}
-          direction='col'
-        >
-          <Box
-            elementDescriptor={descriptors.checkoutFormLineItemsRoot}
-            sx={t => ({
-              padding: t.space.$4,
-              borderBottomWidth: t.borderWidths.$normal,
-              borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$neutralAlpha100,
-            })}
-          >
-            <LineItems.Root>
-              <LineItems.Group>
-                <LineItems.Title
-                  title={plan.name}
-                  description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
-                />
-                <LineItems.Description
-                  prefix={planPeriod === 'annual' ? 'x12' : undefined}
-                  text={`${plan.currencySymbol}${planPeriod === 'month' ? plan.amountFormatted : plan.annualMonthlyAmountFormatted}`}
-                  suffix={localizationKeys('commerce.checkout.perMonth')}
-                />
-              </LineItems.Group>
-            </LineItems.Root>
-          </Box>
-          <Box sx={t => ({ padding: t.space.$4 })}>
-            {/* TODO(@Commerce): needs localization */}
-            <Alert
-              variant='info'
-              colorScheme='info'
-              title={`You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.`}
-            />
-          </Box>
-        </Flex>
-      </Drawer.Body>
-    );
-  }
+    const missingCode = 'missing_payer_email';
+    const isMissingPayerEmail = !!errors?.some((e: ClerkAPIError) => e.code === missingCode);
+    if (isMissingPayerEmail) return missingCode;
+    const invalidChangeCode = 'invalid_plan_change';
+    if (errors?.[0]?.code === invalidChangeCode && plan) return invalidChangeCode;
+    return 'error';
+  }, [isLoading, errors, checkout, plan?.id, checkout?.status]);
 
   return (
-    <Drawer.Body>
-      <Flex
-        align={'center'}
-        justify={'center'}
-        sx={t => ({
-          height: '100%',
-          padding: t.space.$4,
-          fontSize: t.fontSizes.$md,
-        })}
-      >
-        <Alert
-          variant='danger'
-          colorScheme='danger'
-        >
-          {errors ? translateError(errors[0]) : 'There was a problem, please try again later.'}
-        </Alert>
-      </Flex>
-    </Drawer.Body>
+    <CheckoutContextRoot.Provider
+      value={{
+        checkout,
+        isLoading,
+        updateCheckout,
+        errors,
+        startCheckout,
+        plan,
+        status,
+      }}
+    >
+      {children}
+    </CheckoutContextRoot.Provider>
   );
 };
+
+const Stage = ({ children, name }: { children: React.ReactNode; name: CheckoutStatus }) => {
+  const ctx = useCheckoutContextRoot();
+  if (ctx.status !== name) {
+    return null;
+  }
+  return children;
+};
+
+export { Root, Stage };

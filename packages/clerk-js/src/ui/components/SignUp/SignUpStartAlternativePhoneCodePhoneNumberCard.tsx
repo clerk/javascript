@@ -15,7 +15,7 @@ type SignUpFormProps = {
   phoneCodeProvider: PhoneCodeChannelData;
 };
 
-export const SignUpAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps) => {
+export const SignUpStartAlternativePhoneCodePhoneNumberCard = (props: SignUpFormProps) => {
   const { handleSubmit, fields, formState, onUseAnotherMethod, phoneCodeProvider } = props;
   const { providerToDisplayData, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const provider = phoneCodeProvider.name;

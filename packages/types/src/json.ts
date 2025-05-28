@@ -305,6 +305,7 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   single_session_mode: boolean;
   claimed_at: number | null;
   reverification: boolean;
+  preferred_channels?: Record<string, PhoneCodeChannel>;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -389,7 +390,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   organization: OrganizationJSON;
   permissions: OrganizationPermissionKey[];
   public_metadata: OrganizationMembershipPublicMetadata;
-  public_user_data: PublicUserDataJSON;
+  public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
   created_at: number;
   updated_at: number;

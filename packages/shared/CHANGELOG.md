@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+
+## 3.9.3
+
+### Patch Changes
+
+- Updated `isLoaded` comments for useOrganizationList. ([#5970](https://github.com/clerk/javascript/pull/5970)) by [@royanger](https://github.com/royanger)
+
+## 3.9.2
+
+### Patch Changes
+
+- Use domain in AuthenticateRequest only for satellite domains ([#5919](https://github.com/clerk/javascript/pull/5919)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`c305b31`](https://github.com/clerk/javascript/commit/c305b310e351e9ce2012f805b35e464c3e43e310)]:
+  - @clerk/types@4.59.1
+
+## 3.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`b1337df`](https://github.com/clerk/javascript/commit/b1337dfeae8ccf8622efcf095e3201f9bbf1cefa), [`65f0878`](https://github.com/clerk/javascript/commit/65f08788ee5e56242eee2194c73ba90965c75c97), [`df6fefd`](https://github.com/clerk/javascript/commit/df6fefd05fd2df93f5286d97e546b48911adea7c), [`4282bfa`](https://github.com/clerk/javascript/commit/4282bfa09491225bde7d619fe9a3561062703f69), [`5491491`](https://github.com/clerk/javascript/commit/5491491711e0a8ee37828451c1f603a409de32cf)]:
+  - @clerk/types@4.59.0
+
 ## 3.9.0
 
 ### Minor Changes

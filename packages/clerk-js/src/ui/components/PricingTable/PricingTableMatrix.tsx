@@ -14,6 +14,7 @@ import {
   Span,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../../customizables';
 import { Avatar, SegmentedControl } from '../../elements';
 import { usePrefersReducedMotion } from '../../hooks';
@@ -22,7 +23,7 @@ import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../
 import { colors } from '../../utils';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[];
+  plans: CommercePlanResource[] | undefined;
   highlightedPlan?: CommercePlanResource['slug'];
   planPeriod: CommerceSubscriptionPlanPeriod;
   setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
@@ -43,6 +44,7 @@ export function PricingTableMatrix({
   const segmentedControlId = `${pricingTableMatrixId}-segmented-control`;
 
   const { buttonPropsForPlan } = usePlansContext();
+  const { t } = useLocalizations();
 
   const feePeriodNoticeAnimation: ThemableCssProp = t => ({
     transition: isMotionSafe
@@ -129,6 +131,7 @@ export function PricingTableMatrix({
                       id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
+                      localizationKey={localizationKeys('commerce.pricingTable.billingCycle')}
                     >
                       Billing cycle
                     </Text>
@@ -139,13 +142,11 @@ export function PricingTableMatrix({
                     >
                       <SegmentedControl.Button
                         value='month'
-                        // TODO(@Commerce): needs localization
-                        text='Monthly'
+                        text={localizationKeys('commerce.monthly')}
                       />
                       <SegmentedControl.Button
                         value='annual'
-                        // TODO(@Commerce): needs localization
-                        text='Annually'
+                        text={localizationKeys('commerce.annually')}
                       />
                     </SegmentedControl.Root>
                   </>
@@ -204,14 +205,12 @@ export function PricingTableMatrix({
                               imageUrl={plan.avatarUrl}
                             />
                           ) : null}
-                          {/* TODO(@Commerce): needs localization */}
                           {highlight ? (
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                            >
-                              Popular
-                            </Badge>
+                              localizationKey={localizationKeys('commerce.popular')}
+                            />
                           ) : null}
                         </Span>
                       ) : null}
@@ -397,7 +396,7 @@ export function PricingTableMatrix({
                             icon={Check}
                             colorScheme='neutral'
                             size='sm'
-                            aria-label='Included'
+                            aria-label={t(localizationKeys('commerce.pricingTable.included'))}
                           />
                         )}
                       </Box>

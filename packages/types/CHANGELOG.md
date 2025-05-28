@@ -1,5 +1,50 @@
 # Change Log
 
+## 4.59.2
+
+### Patch Changes
+
+- Replaces `useFetch` with `useSWR` or `useSWRMutation` in all commerce related components. ([#5939](https://github.com/clerk/javascript/pull/5939)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.59.1
+
+### Patch Changes
+
+- Add support for country-specific alternative phone code channels ([#5937](https://github.com/clerk/javascript/pull/5937)) by [@anagstef](https://github.com/anagstef)
+
+## 4.59.0
+
+### Minor Changes
+
+- Introduce `__experimental_startPath` option for `openOrganizationProfile`. ([#5926](https://github.com/clerk/javascript/pull/5926)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Example usage:
+
+  ```ts
+  clerk.openOrganizationProfile({
+    __experimental_startPath: '/billing',
+  });
+  ```
+
+- Add `onClose` to `__internal_CheckoutProps`. ([#5916](https://github.com/clerk/javascript/pull/5916)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replaces strings with localizations throughout billing components. ([#5922](https://github.com/clerk/javascript/pull/5922)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Add `oidcPrompt` prop to `SignIn` and `SignUp` components and `authenticateWithRedirect` method to control the OIDC authentication prompt behavior during Enterprise SSO flows ([#5925](https://github.com/clerk/javascript/pull/5925)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  ```tsx
+  <SignUp oidcPrompt='select_account' />
+  <SignIn oidcPrompt='select_account' />
+  ```
+
+  ```ts
+  signUp.authenticateWithRedirect({ redirectUrl: '/sso-callback', oidcPrompt: 'select_account' });
+  ```
+
+- Add `drawerRoot` descriptor and adjust z-index approach. ([#5924](https://github.com/clerk/javascript/pull/5924)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.58.1
 
 ### Patch Changes

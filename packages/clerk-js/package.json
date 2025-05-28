@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.66.0",
+  "version": "5.67.4",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -75,7 +75,8 @@
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.13.11"
+    "regenerator-runtime": "0.13.11",
+    "swr": "2.3.3"
   },
   "devDependencies": {
     "@rsdoctor/rspack-plugin": "^0.4.13",
@@ -83,6 +84,7 @@
     "@rspack/core": "^1.2.8",
     "@rspack/plugin-react-refresh": "^1.0.1",
     "@svgr/webpack": "^6.5.1",
+    "@types/cloudflare-turnstile": "^0.2.2",
     "@types/webpack-env": "^1.18.8",
     "webpack-merge": "^5.10.0"
   },

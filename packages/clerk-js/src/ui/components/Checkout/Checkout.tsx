@@ -1,9 +1,12 @@
 import type { __internal_CheckoutProps } from '@clerk/types';
 
 import { CheckoutContext, SubscriberTypeContext } from '../../contexts';
-import { Flow } from '../../customizables';
+import { Flow, localizationKeys, Spinner } from '../../customizables';
 import { Drawer } from '../../elements';
-import { CheckoutPage } from './CheckoutPage';
+import { CheckoutComplete } from './CheckoutComplete';
+import { CheckoutForm } from './CheckoutForm';
+import * as CheckoutPage from './CheckoutPage';
+import { AddEmailForm, GenericError, InvalidPlanError } from './parts';
 
 export const Checkout = (props: __internal_CheckoutProps) => {
   return (
@@ -17,8 +20,36 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             }}
           >
             <Drawer.Content>
-              <Drawer.Header title='Checkout' />
-              <CheckoutPage {...props} />
+              <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
+              <CheckoutPage.Root>
+                <CheckoutPage.Stage name='pending'>
+                  <Spinner
+                    sx={{
+                      margin: 'auto',
+                    }}
+                  />
+                </CheckoutPage.Stage>
+
+                <CheckoutPage.Stage name='completed'>
+                  <CheckoutComplete />
+                </CheckoutPage.Stage>
+
+                <CheckoutPage.Stage name='error'>
+                  <GenericError />
+                </CheckoutPage.Stage>
+
+                <CheckoutPage.Stage name='invalid_plan_change'>
+                  <InvalidPlanError />
+                </CheckoutPage.Stage>
+
+                <CheckoutPage.Stage name='missing_payer_email'>
+                  <AddEmailForm />
+                </CheckoutPage.Stage>
+
+                <CheckoutPage.Stage name='ready'>
+                  <CheckoutForm />
+                </CheckoutPage.Stage>
+              </CheckoutPage.Root>
             </Drawer.Content>
           </CheckoutContext.Provider>
         </SubscriberTypeContext.Provider>

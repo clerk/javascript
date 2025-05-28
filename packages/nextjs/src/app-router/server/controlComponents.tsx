@@ -1,17 +1,22 @@
 import type { ProtectProps } from '@clerk/clerk-react';
+import type { PendingSessionOptions } from '@clerk/types';
 import React from 'react';
 
 import { auth } from './auth';
 
-export async function SignedIn(props: React.PropsWithChildren): Promise<React.JSX.Element | null> {
+export async function SignedIn(
+  props: React.PropsWithChildren<PendingSessionOptions>,
+): Promise<React.JSX.Element | null> {
   const { children } = props;
-  const { userId } = await auth();
+  const { userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
   return userId ? <>{children}</> : null;
 }
 
-export async function SignedOut(props: React.PropsWithChildren): Promise<React.JSX.Element | null> {
+export async function SignedOut(
+  props: React.PropsWithChildren<PendingSessionOptions>,
+): Promise<React.JSX.Element | null> {
   const { children } = props;
-  const { userId } = await auth();
+  const { userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
   return userId ? null : <>{children}</>;
 }
 
@@ -29,7 +34,7 @@ export async function SignedOut(props: React.PropsWithChildren): Promise<React.J
  */
 export async function Protect(props: ProtectProps): Promise<React.JSX.Element | null> {
   const { children, fallback, ...restAuthorizedParams } = props;
-  const { has, userId } = await auth();
+  const { has, userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   /**
    * Fallback to UI provided by user or `null` if authorization checks failed

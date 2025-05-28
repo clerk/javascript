@@ -71,10 +71,30 @@ describe('parsePublishableKey(key)', () => {
     });
   });
 
-  it('applies the domain if provided for production keys', () => {
-    expect(parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { domain: 'example.com' })).toEqual({
+  it('applies the domain if provided for production keys and isSatellite is true', () => {
+    expect(
+      parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { domain: 'example.com', isSatellite: true }),
+    ).toEqual({
       frontendApi: 'clerk.example.com',
       instanceType: 'production',
+    });
+  });
+
+  it('ignores domain for production keys when isSatellite is false', () => {
+    expect(
+      parsePublishableKey('pk_live_Y2xlcmsuY2xlcmsuZGV2JA==', { domain: 'example.com', isSatellite: false }),
+    ).toEqual({
+      frontendApi: 'clerk.clerk.dev',
+      instanceType: 'production',
+    });
+  });
+
+  it('ignores domain for development keys even when isSatellite is true', () => {
+    expect(
+      parsePublishableKey('pk_test_Y2xlcmsuY2xlcmsuZGV2JA==', { domain: 'example.com', isSatellite: true }),
+    ).toEqual({
+      frontendApi: 'clerk.clerk.dev',
+      instanceType: 'development',
     });
   });
 });
