@@ -136,6 +136,14 @@ type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   createdAtAfter?: number;
 }>;
 
+type GetInstanceOrganizationMembershipListParams = ClerkPaginationRequest<{
+  /**
+   * Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
+  orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
+}>;
+
 type CreateOrganizationMembershipParams = {
   organizationId: string;
   userId: string;
@@ -300,6 +308,14 @@ export class OrganizationAPI extends AbstractAPI {
       method: 'GET',
       path: joinPaths(basePath, organizationId, 'memberships'),
       queryParams,
+    });
+  }
+
+  public async getInstanceOrganizationMembershipList(params: GetInstanceOrganizationMembershipListParams) {
+    return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
+      method: 'GET',
+      path: '/organization_memberships',
+      queryParams: params,
     });
   }
 
