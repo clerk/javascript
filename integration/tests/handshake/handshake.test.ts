@@ -1,6 +1,6 @@
 import type { Server, ServerOptions } from 'node:https';
 
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { constants } from '../../constants';
 import { fs } from '../../scripts';
@@ -50,12 +50,28 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
 
       await u.po.signIn.goTo();
       // TODO: need to fix the type here
-      await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
+      await u.po.signIn.signInWithEmailAndInstantPassword(<any>fakeUser);
       await u.po.expect.toBeSignedIn();
       await u.page.pause();
 
-      // go to the protected page
       // delete the client uat cookie etc..
+      const cookies = await u.page.context().cookies();
+      // console.log('cookies', cookies);
+      const clientUatCookies = cookies.filter(c => c.name.startsWith('__client_uat'));
+      expect(clientUatCookies.length).toBeGreaterThan(0);
+      await context.clearCookies({ name: /__client_uat.*/ });
+      await u.page.pause();
+
+      // debug: verify that the cookies are deleted
+      const cookies2 = await u.page.context().cookies();
+      // console.log('cookies2', cookies2);
+      const clientUatCookies2 = cookies2.filter(c => c.name.startsWith('__client_uat'));
+      expect(clientUatCookies2.length).toBe(0);
+
+      // go to the protected page
+      await u.page.goToRelative('/protected');
+      await u.po.expect.toBeSignedIn();
+      await u.page.pause();
     });
   });
 });
