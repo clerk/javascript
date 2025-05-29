@@ -27,7 +27,7 @@ export function OAuthConsentInternal() {
               marginBlockStart: `calc(${t.space.$8} * -1)`,
               marginInline: `calc(${t.space.$10} * -1)`,
               backgroundImage: `linear-gradient(to bottom, ${t.colors.$warningAlpha200}, transparent)`,
-              paddingBlock: t.space.$4,
+              paddingBlockStart: t.space.$4,
               paddingInline: t.space.$10,
             })}
           >
@@ -175,7 +175,7 @@ export function OAuthConsentInternal() {
                       height: t.space.$1,
                       background: t.colors.$colorTextSecondary,
                       borderRadius: t.radii.$circle,
-                      transform: 'translateY(-0.125rem)',
+                      transform: 'translateY(-0.1875rem)',
                       marginRight: t.space.$2,
                       flexShrink: 0,
                     },
