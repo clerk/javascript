@@ -891,10 +891,6 @@ export type ClerkOptions = PendingSessionOptions &
      */
     waitlistUrl?: string;
     /**
-     * Specifies the name of the CSS layer for Clerk component styles. This is useful for advanced CSS customization, allowing you to control the cascade and prevent style conflicts by isolating Clerk's styles within a specific layer. For more information on CSS layers, see the [MDN documentation on @layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
-     */
-    cssLayerName?: string;
-    /**
      * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
      */
     experimental?: Autocomplete<
