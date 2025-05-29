@@ -117,7 +117,7 @@ function Card(props: CardProps) {
     clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
-      planPeriod,
+      initialPlanPeriod: planPeriod,
       portalRoot,
     });
   };

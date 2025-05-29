@@ -8,7 +8,7 @@ import type {
   CommerceSubscriptionResource,
 } from '@clerk/types';
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useProtect } from '../../common';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
@@ -19,7 +19,9 @@ import { handleError } from '../../utils';
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-      <PlanDetailsInternal {...props} />
+      <Drawer.Content>
+        <PlanDetailsInternal {...props} />
+      </Drawer.Content>
     </SubscriberTypeContext.Provider>
   );
 };
@@ -28,14 +30,14 @@ const PlanDetailsInternal = ({
   plan,
   onSubscriptionCancel,
   portalRoot,
-  planPeriod: _planPeriod = 'month',
+  initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(_planPeriod);
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
   const { setIsOpen } = useDrawerContext();
   const {
@@ -48,10 +50,6 @@ const PlanDetailsInternal = ({
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
   );
-
-  useEffect(() => {
-    setPlanPeriod(_planPeriod);
-  }, [_planPeriod]);
 
   if (!plan) {
     return null;
@@ -113,7 +111,7 @@ const PlanDetailsInternal = ({
   };
 
   return (
-    <Drawer.Content>
+    <>
       <Drawer.Header
         sx={t =>
           !hasFeatures
@@ -325,7 +323,7 @@ const PlanDetailsInternal = ({
           )}
         </Drawer.Confirmation>
       ) : null}
-    </Drawer.Content>
+    </>
   );
 };
 

@@ -346,7 +346,7 @@ export const usePlansContext = () => {
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
-          planPeriod,
+          initialPlanPeriod: planPeriod,
           subscriberType,
           onSubscriptionCancel: () => {
             revalidateAll();
