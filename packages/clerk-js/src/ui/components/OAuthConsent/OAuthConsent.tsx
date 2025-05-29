@@ -162,7 +162,7 @@ export function OAuthConsentInternal() {
                   key={item.scope}
                   sx={t => ({
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'baseline',
                     paddingInline: t.space.$3,
                     paddingBlock: t.space.$2,
                     borderTopWidth: t.borderWidths.$normal,
@@ -175,7 +175,9 @@ export function OAuthConsentInternal() {
                       height: t.space.$1,
                       background: t.colors.$colorTextSecondary,
                       borderRadius: t.radii.$circle,
+                      transform: 'translateY(-0.125rem)',
                       marginRight: t.space.$2,
+                      flexShrink: 0,
                     },
                   })}
                   as='li'
