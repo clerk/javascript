@@ -892,18 +892,6 @@ export type ClerkOptions = PendingSessionOptions &
     waitlistUrl?: string;
     /**
      * Specifies the name of the CSS layer for Clerk component styles. This is useful for advanced CSS customization, allowing you to control the cascade and prevent style conflicts by isolating Clerk's styles within a specific layer. For more information on CSS layers, see the [MDN documentation on @layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
-     * @example
-     * ```tsx
-     * <ClerkProvider cssLayerName='clerk'>
-     *   <App />
-     * </ClerkProvider>
-     * ```
-     * This will wrap all Clerk styles in a `clerk` CSS layer to work with tools like Tailwind CSS V4.
-     *```css
-     * @layer clerk {
-     *   ... clerk styles ...
-     * }
-     *```
      */
     cssLayerName?: string;
     /**
