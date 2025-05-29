@@ -3,7 +3,7 @@
 '@clerk/types': minor
 ---
 
-Introduce experimental `cssLayerName` option to allow users to opt into CSS layers.
+Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer.
 
 Enable CSS layer name on `ClerkProvider`
 
