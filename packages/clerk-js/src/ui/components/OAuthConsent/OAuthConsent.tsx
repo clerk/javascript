@@ -1,7 +1,6 @@
 import { useUser } from '@clerk/shared/react';
-import type { __internal_OAuthConsentProps } from 'ui/types';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
 import { ApplicationLogo, Avatar, Card, Header, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
@@ -9,8 +8,8 @@ import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
-export function OAuthConsentInternal(props: __internal_OAuthConsentProps) {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, onDeny, onAllow } = props;
+export function OAuthConsentInternal() {
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, onDeny, onAllow } = useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
 
