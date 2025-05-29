@@ -53,7 +53,11 @@ export function OAuthConsentInternal() {
                     position: 'relative',
                   }}
                 >
-                  <ApplicationLogo />
+                  <Avatar
+                    imageUrl={oAuthApplicationLogoUrl}
+                    size={t => t.space.$12}
+                    rounded={false}
+                  />
                   <ConnectionIcon
                     size='sm'
                     sx={t => ({
