@@ -32,7 +32,10 @@ type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
-    <StyleCacheProvider nonce={props.options.nonce}>
+    <StyleCacheProvider
+      nonce={props.options.nonce}
+      cssLayerName={props.options.appearance?.cssLayerName}
+    >
       <CoreClerkContextWrapper clerk={props.clerk}>
         <EnvironmentProvider value={props.environment}>
           <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
