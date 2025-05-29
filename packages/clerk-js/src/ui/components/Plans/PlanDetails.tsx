@@ -380,7 +380,10 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </Box>
       ) : null}
 
-      <Col gap={3}>
+      <Col
+        gap={3}
+        elementDescriptor={descriptors.planDetailBadgeAvatarTitleDescriptionContainer}
+      >
         {showBadge ? (
           <Flex
             align='center'
@@ -426,7 +429,10 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             })}
           />
         ) : null}
-        <Col gap={1}>
+        <Col
+          gap={1}
+          elementDescriptor={descriptors.planDetailTitleDescriptionContainer}
+        >
           <Heading
             elementDescriptor={descriptors.planDetailTitle}
             as='h2'
