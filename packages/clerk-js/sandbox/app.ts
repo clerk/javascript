@@ -313,28 +313,16 @@ void (async () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/oauth-consent': () => {
+      const searchParams = new URLSearchParams(window.location.search);
+      const scopes = (searchParams.get('scopes')?.split(',') ?? []).map(scope => ({
+        scope,
+        description: `Grants access to your ${scope}`,
+      }));
       Clerk.__internal_mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {
-          scopes: [
-            {
-              scope: 'email',
-              description: 'Grants access to your email address',
-              requires_consent: true,
-            },
-            {
-              scope: 'profile',
-              description: 'Grants access to your basic profile information',
-              requires_consent: true,
-            },
-          ],
-          applicationName: 'Awesome App',
-          onAllow() {
-            console.log('allowed');
-          },
-          onDeny() {
-            console.log('denied');
-          },
+          scopes,
+          oAuthApplicationName: searchParams.get('oauth-application-name'),
         },
       );
     },

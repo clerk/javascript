@@ -70,7 +70,6 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
     >
       <Portal
         node={props.node}
-        // @ts-expect-error: TODO: Fix type mismatch with componentName
         component={ClerkComponents[props.componentName as ClerkComponentName]}
         props={props.componentProps}
         componentName={props.componentName}

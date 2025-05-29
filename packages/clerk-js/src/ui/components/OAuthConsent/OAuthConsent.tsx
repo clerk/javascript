@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import type { __internal_OAuthConsentProps } from 'ui/types';
 
+import { useEnvironment } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
 import { ApplicationLogo, Avatar, Card, Header, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
@@ -9,8 +10,9 @@ import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
 export function OAuthConsentInternal(props: __internal_OAuthConsentProps) {
-  const { scopes, applicationName, onDeny, onAllow } = props;
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, onDeny, onAllow } = props;
   const { user } = useUser();
+  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -28,65 +30,73 @@ export function OAuthConsentInternal(props: __internal_OAuthConsentProps) {
             <Text
               colorScheme='warning'
               variant='caption'
-              localizationKey={`Make sure that you trust ${applicationName} {url}. You may be sharing sensitive data with this site or app.`}
+              localizationKey={`Make sure that you trust ${oAuthApplicationName} {url}. You may be sharing sensitive data with this site or app.`}
             />
           </Box>
           <Header.Root>
             {/* both have avatars */}
-            <ConnectionHeader>
-              <Avatar
-                imageUrl='https://placehold.co/64x64'
-                size={t => t.space.$12}
-                rounded={false}
-              />
-              <ConnectionSeparator />
-              <ApplicationLogo />
-            </ConnectionHeader>
-            {/* only OAuth app has an avatar */}
-            <ConnectionHeader>
-              <Box
-                sx={{
-                  position: 'relative',
-                }}
-              >
-                <ApplicationLogo />
-                <ConnectionIcon
-                  size='sm'
-                  sx={t => ({
-                    position: 'absolute',
-                    bottom: `calc(${t.space.$3} * -1)`,
-                    right: `calc(${t.space.$3} * -1)`,
-                  })}
+            {oAuthApplicationLogoUrl && logoImageUrl && (
+              <ConnectionHeader>
+                <Avatar
+                  imageUrl={oAuthApplicationLogoUrl}
+                  size={t => t.space.$12}
+                  rounded={false}
                 />
-              </Box>
-            </ConnectionHeader>
+                <ConnectionSeparator />
+                <ApplicationLogo />
+              </ConnectionHeader>
+            )}
+            {/* only OAuth app has an avatar */}
+            {oAuthApplicationLogoUrl && !logoImageUrl && (
+              <ConnectionHeader>
+                <Box
+                  sx={{
+                    position: 'relative',
+                  }}
+                >
+                  <ApplicationLogo />
+                  <ConnectionIcon
+                    size='sm'
+                    sx={t => ({
+                      position: 'absolute',
+                      bottom: `calc(${t.space.$3} * -1)`,
+                      right: `calc(${t.space.$3} * -1)`,
+                    })}
+                  />
+                </Box>
+              </ConnectionHeader>
+            )}
             {/* only Clerk application has an avatar */}
-            <Flex
-              justify='center'
-              align='center'
-              gap={4}
-              sx={t => ({
-                marginBlockEnd: t.space.$6,
-              })}
-            >
-              <ConnectionIcon />
-              <ConnectionSeparator />
-              <ApplicationLogo />
-            </Flex>
+            {!oAuthApplicationLogoUrl && logoImageUrl && (
+              <Flex
+                justify='center'
+                align='center'
+                gap={4}
+                sx={t => ({
+                  marginBlockEnd: t.space.$6,
+                })}
+              >
+                <ConnectionIcon />
+                <ConnectionSeparator />
+                <ApplicationLogo />
+              </Flex>
+            )}
             {/* no avatars */}
-            <Flex
-              justify='center'
-              align='center'
-              gap={4}
-              sx={t => ({
-                marginBlockEnd: t.space.$6,
-              })}
-            >
-              <ConnectionIcon />
-            </Flex>
-            <Header.Title localizationKey={applicationName} />
+            {!oAuthApplicationLogoUrl && !logoImageUrl && (
+              <Flex
+                justify='center'
+                align='center'
+                gap={4}
+                sx={t => ({
+                  marginBlockEnd: t.space.$6,
+                })}
+              >
+                <ConnectionIcon />
+              </Flex>
+            )}
+            <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle
-              localizationKey={`wants to access to {yourApp} on behalf of ${user?.emailAddresses[0]?.emailAddress}`}
+              localizationKey={`wants to access to ${applicationName} on behalf of ${user?.emailAddresses[0]?.emailAddress}`}
             />
           </Header.Root>
           <Box
