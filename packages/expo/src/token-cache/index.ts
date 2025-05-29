@@ -7,18 +7,28 @@ import { isNative } from '../utils';
  * Create a token cache using Expo's SecureStore
  */
 const createTokenCache = (): TokenCache => {
+  const secureStoreOpts: SecureStore.SecureStoreOptions = {
+    /**
+     * The data in the keychain item cannot be accessed after a restart until the
+     * device has been unlocked once by the user.
+     *
+     * This may be useful if you need to access the item when the phone is locked.
+     */
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+  };
+
   return {
     getToken: async (key: string) => {
       try {
-        const item = await SecureStore.getItemAsync(key);
+        const item = await SecureStore.getItemAsync(key, secureStoreOpts);
         return item;
       } catch {
-        await SecureStore.deleteItemAsync(key);
+        await SecureStore.deleteItemAsync(key, secureStoreOpts);
         return null;
       }
     },
     saveToken: (key: string, token: string) => {
-      return SecureStore.setItemAsync(key, token);
+      return SecureStore.setItemAsync(key, token, secureStoreOpts);
     },
   };
 };

@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.59.3
+
+### Patch Changes
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Handle missing `publicUserData` in `OrganizationMembership` ([#6016](https://github.com/clerk/javascript/pull/6016)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.59.2
 
 ### Patch Changes
