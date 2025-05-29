@@ -20,7 +20,11 @@
     "sourceMap": false,
     "strict": true,
     "target": "ES2019",
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "paths": {
+      // paths will resolve files relative to baseUrl, so we can omit the src/ prefix.
+      "@/*": ["./*"]
+    }
   },
   "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts"]
 }
