@@ -150,10 +150,11 @@ function useClerkJSLoadingState() {
  * Enhanced ClerkJS Script component with bulletproof load detection.
  *
  * This component renders TWO script tags:
- * 1. A render-blocking inline script that sets up the coordinator BEFORE any ClerkJS scripts
+ * 1. A render-blocking inline script that sets up the coordinator globally
  * 2. The actual ClerkJS script tag (which the coordinator will manage)
  *
- * The blocking script intercepts script creation and prevents duplicates at the browser level.
+ * The coordinator uses comprehensive DOM interception to catch scripts regardless
+ * of where they're placed (head, body, or injected dynamically).
  */
 function ClerkJSScript(props: ClerkJSScriptProps) {
   const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce } = useClerkNextOptions();
@@ -210,6 +211,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
 
   if (props.router === 'app') {
     // For App Router, use regular script tags
+    // The coordinator will catch these regardless of placement
     return (
       <>
         {/* Blocking coordinator script - MUST run first */}
@@ -222,7 +224,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
         <script
           ref={scriptRef}
           src={scriptUrl}
-          data-clerk-js-script
+          data-clerk-js-script='true'
           async
           crossOrigin='anonymous'
           {...scriptAttributes}
@@ -230,7 +232,8 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
       </>
     );
   } else {
-    // For Pages Router, use Next.js Script components
+    // For Pages Router, use Next.js Script components with beforeInteractive
+    // This ensures both scripts are placed in head and execute early
     return (
       <>
         {/* Blocking coordinator script - MUST run first and block */}
@@ -243,7 +246,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
         {/* Actual ClerkJS script - managed by the coordinator */}
         <NextScript
           src={scriptUrl}
-          data-clerk-js-script
+          data-clerk-js-script='true'
           async
           defer={false}
           crossOrigin='anonymous'

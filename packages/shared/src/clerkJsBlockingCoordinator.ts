@@ -32,7 +32,7 @@ interface BlockingCoordinator {
 
 /**
  * Returns the inline script content that should be injected as a blocking script.
- * This script sets up the global coordinator immediately.
+ * This script sets up the global coordinator immediately and intercepts all script loading.
  */
 export function getBlockingCoordinatorScript(): string {
   return `
@@ -86,30 +86,36 @@ export function getBlockingCoordinatorScript(): string {
       
       var self = this;
       
-      // Set up load monitoring
-      var originalOnLoad = scriptElement.onload;
-      var originalOnError = scriptElement.onerror;
-      
-      scriptElement.onload = function(event) {
+      // Set up load monitoring with multiple methods for better compatibility
+      var handleLoad = function() {
         scriptElement.setAttribute('data-clerk-loaded', 'true');
         self.setState('loaded');
-        if (originalOnLoad) originalOnLoad.call(this, event);
       };
       
-      scriptElement.onerror = function(event) {
+      var handleError = function() {
         self.setState('error', new Error('ClerkJS failed to load'));
-        if (originalOnError) originalOnError.call(this, event);
       };
+      
+      // Use multiple approaches to catch load events
+      if (scriptElement.onload !== undefined) {
+        var originalOnLoad = scriptElement.onload;
+        scriptElement.onload = function(event) {
+          handleLoad();
+          if (originalOnLoad) originalOnLoad.call(this, event);
+        };
+      }
+      
+      if (scriptElement.onerror !== undefined) {
+        var originalOnError = scriptElement.onerror;
+        scriptElement.onerror = function(event) {
+          handleError();
+          if (originalOnError) originalOnError.call(this, event);
+        };
+      }
       
       // Also use addEventListener for better compatibility
-      scriptElement.addEventListener('load', function() {
-        scriptElement.setAttribute('data-clerk-loaded', 'true');
-        self.setState('loaded');
-      });
-      
-      scriptElement.addEventListener('error', function() {
-        self.setState('error', new Error('ClerkJS failed to load'));
-      });
+      scriptElement.addEventListener('load', handleLoad);
+      scriptElement.addEventListener('error', handleError);
     },
     
     registerCallback: function(callback) {
@@ -151,53 +157,95 @@ export function getBlockingCoordinatorScript(): string {
     }
   };
   
-  // Intercept script creation to catch ClerkJS scripts before they load
-  var originalCreateElement = document.createElement;
-  document.createElement = function(tagName) {
-    var element = originalCreateElement.apply(this, arguments);
-    
-    if (tagName.toLowerCase() === 'script') {
-      // Set up a property setter to intercept src assignment
-      var originalSrc = element.src;
-      var srcSet = false;
-      
-      Object.defineProperty(element, 'src', {
-        get: function() {
-          return originalSrc;
-        },
-        set: function(value) {
-          originalSrc = value;
-          srcSet = true;
-          
-          // Check if this should be allowed after src is set
-          // (need to wait for src to be set to make decision)
-          setTimeout(function() {
-            if (!coordinator.shouldAllowScript(element)) {
-              // Prevent the script from loading by clearing its src
-              element.src = '';
-              element.remove();
-            }
-          }, 0);
-        },
-        configurable: true
-      });
+  // Function to check and potentially intercept a script
+  function interceptScript(scriptElement) {
+    if (scriptElement && scriptElement.tagName === 'SCRIPT') {
+      if (scriptElement.hasAttribute('data-clerk-js-script')) {
+        return coordinator.shouldAllowScript(scriptElement);
+      }
     }
-    
-    return element;
-  };
+    return true;
+  }
   
-  // Also intercept appendChild to catch scripts added directly
+  // Intercept appendChild on all nodes
   var originalAppendChild = Node.prototype.appendChild;
   Node.prototype.appendChild = function(child) {
-    if (child.tagName === 'SCRIPT' && child.hasAttribute('data-clerk-js-script')) {
-      if (!coordinator.shouldAllowScript(child)) {
-        // Return a dummy element to prevent errors
-        return child;
-      }
+    if (!interceptScript(child)) {
+      // Create a dummy script element to return
+      var dummy = document.createElement('script');
+      dummy.src = child.src;
+      Object.keys(child.attributes || {}).forEach(function(key) {
+        var attr = child.attributes[key];
+        if (attr && attr.name && attr.value) {
+          dummy.setAttribute(attr.name, attr.value);
+        }
+      });
+      return dummy;
     }
     
     return originalAppendChild.call(this, child);
   };
+  
+  // Intercept insertBefore
+  var originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function(newNode, referenceNode) {
+    if (!interceptScript(newNode)) {
+      var dummy = document.createElement('script');
+      dummy.src = newNode.src;
+      return dummy;
+    }
+    
+    return originalInsertBefore.call(this, newNode, referenceNode);
+  };
+  
+  // Also watch for scripts being set via innerHTML or similar
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        Array.prototype.slice.call(mutation.addedNodes).forEach(function(node) {
+          if (node.nodeType === 1) { // Element node
+            if (node.tagName === 'SCRIPT' && node.hasAttribute('data-clerk-js-script')) {
+              if (!coordinator.shouldAllowScript(node)) {
+                node.remove();
+              }
+            }
+            
+            // Also check children in case scripts are added in bulk
+            var scripts = node.querySelectorAll ? node.querySelectorAll('script[data-clerk-js-script]') : [];
+            for (var i = 0; i < scripts.length; i++) {
+              if (!coordinator.shouldAllowScript(scripts[i])) {
+                scripts[i].remove();
+              }
+            }
+          }
+        });
+      }
+    });
+  });
+  
+  // Start observing
+  if (document.body) {
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  } else {
+    // If body doesn't exist yet, wait for it
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    });
+  }
+  
+  // Also observe head if it exists
+  if (document.head) {
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true
+    });
+  }
   
   // Expose the coordinator globally
   window.__clerkJSBlockingCoordinator = coordinator;
