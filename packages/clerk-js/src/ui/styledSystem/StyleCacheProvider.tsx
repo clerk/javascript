@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache from '@emotion/cache';
 // eslint-disable-next-line no-restricted-imports
-import { CacheProvider } from '@emotion/react';
+import { CacheProvider, type SerializedStyles } from '@emotion/react';
 import React, { useMemo } from 'react';
 
 const el = document.querySelector('style#cl-style-insertion-point');
@@ -24,12 +24,13 @@ export const StyleCacheProvider = (props: StyleCacheProviderProps) => {
 
     if (props.cssLayerName) {
       const prevInsert = emotionCache.insert.bind(emotionCache);
-      emotionCache.insert = (...args) => {
-        if (!args[1].styles.startsWith('@layer')) {
-          // avoid nested @layer
-          args[1].styles = `@layer ${props.cssLayerName} {${args[1].styles}}`;
+      emotionCache.insert = (selector: string, serialized: SerializedStyles, sheet: any, shouldCache: boolean) => {
+        if (serialized && typeof serialized.styles === 'string' && !serialized.styles.startsWith('@layer')) {
+          const newSerialized = { ...serialized };
+          newSerialized.styles = `@layer ${props.cssLayerName} {${serialized.styles}}`;
+          return prevInsert(selector, newSerialized, sheet, shouldCache);
         }
-        return prevInsert(...args);
+        return prevInsert(selector, serialized, sheet, shouldCache);
       };
     }
     return emotionCache;
