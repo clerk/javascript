@@ -46,6 +46,7 @@ export function OAuthConsentInternal() {
                       textDecorationStyle: 'dotted',
                       cursor: 'pointer',
                       outline: 'none',
+                      display: 'inline-block',
                     }}
                   >
                     {redirectUrlHostname}
@@ -222,6 +223,7 @@ export function OAuthConsentInternal() {
                       textDecorationStyle: 'dotted',
                       cursor: 'pointer',
                       outline: 'none',
+                      display: 'inline-block',
                     }}
                   >
                     {redirectUrlHostname}
