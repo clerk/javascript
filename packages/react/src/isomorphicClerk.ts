@@ -188,10 +188,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       // Allow hot swapping PKs on the client
       this.#instance.publishableKey !== options.publishableKey
     ) {
-      console.log('----creating new instance');
       this.#instance = new IsomorphicClerk(options);
-    } else {
-      console.log('----using existing instance');
     }
     return this.#instance;
   }
