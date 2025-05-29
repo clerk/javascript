@@ -37,3 +37,4 @@ export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL
 export { getEnvVariable } from './getEnvVariable';
 export * from './pathMatcher';
 export * from './netlifyCacheHandler';
+export * from './clerkJsBlockingCoordinator';

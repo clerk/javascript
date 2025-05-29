@@ -1,7 +1,9 @@
 import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
 
+import { isClerkJSLoadedBlocking, registerWithBlockingCoordinator } from './clerkJsBlockingCoordinator';
 import { buildErrorThrower } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
+import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
@@ -34,94 +36,71 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
 };
 
 /**
- * Hotloads the Clerk JS script.
+ * Hotloads the Clerk JS script using the blocking coordinator.
  *
- * Checks for an existing Clerk JS script and handles various loading states:
- * - If script already loaded successfully: resolves immediately
- * - If script is currently loading: waits for completion
- * - If script failed to load: attempts to load again
- * - If no script exists: loads the script.
+ * This function integrates with the render-blocking coordinator that must be
+ * set up before any ClerkJS scripts are rendered. The coordinator handles:
+ * - Script already loaded successfully: resolves immediately
+ * - Script is currently loading: waits for completion
+ * - Script failed to load: attempts to load again
+ * - No script exists: loads the script.
+ *
+ * The blocking coordinator ensures no duplicate network requests and proper
+ * state management at the browser DOM level, preventing race conditions.
  *
  * @param opts - The options used to build the Clerk JS script URL and load the script.
- *               Must include a `publishableKey` if no existing script is found.
+ *               Must include a `publishableKey`.
  *
  * @example
  * loadClerkJsScript({ publishableKey: 'pk_' });
  */
 const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
-
-  if (existingScript) {
-    if (existingScript.getAttribute('data-clerk-loaded') === 'true') {
-      return Promise.resolve(existingScript);
-    }
-
-    return new Promise((resolve, reject) => {
-      const handleLoad = () => {
-        cleanup();
-        existingScript.setAttribute('data-clerk-loaded', 'true');
-        resolve(existingScript);
-      };
-
-      const handleError = () => {
-        cleanup();
-        existingScript.remove();
-        reject(new Error(FAILED_TO_LOAD_ERROR));
-      };
-
-      const cleanup = () => {
-        existingScript.removeEventListener('load', handleLoad);
-        existingScript.removeEventListener('error', handleError);
-      };
-
-      existingScript.addEventListener('load', handleLoad);
-      existingScript.addEventListener('error', handleError);
-
-      if (existingScript.getAttribute('data-clerk-loaded') === 'true') {
-        cleanup();
-        resolve(existingScript);
-      }
-    });
-  }
-
   if (!opts?.publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
     return;
   }
 
-  return new Promise<HTMLScriptElement>((resolve, reject) => {
-    if (!document || !document.body) {
-      reject(new Error('loadClerkJsScript cannot be called when document does not exist'));
-      return;
+  try {
+    const scriptUrl = clerkJsScriptUrl(opts);
+    const attributes = buildClerkJsScriptAttributes(opts);
+
+    // Check if blocking coordinator has already handled this
+    if (isClerkJSLoadedBlocking()) {
+      // ClerkJS is already loaded, return existing script element
+      const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+      if (existingScript) {
+        return existingScript;
+      }
     }
 
-    const script = document.createElement('script');
-    script.async = true;
-    script.setAttribute('crossorigin', 'anonymous');
-    if (opts.nonce) {
-      script.nonce = opts.nonce;
+    // Use blocking coordinator if available, otherwise fall back to loadScript
+    if (typeof window !== 'undefined' && (window as any).__clerkJSBlockingCoordinator) {
+      return new Promise<HTMLScriptElement>((resolve, reject) => {
+        registerWithBlockingCoordinator({
+          onLoad: () => {
+            const script = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+            if (script) {
+              resolve(script);
+            } else {
+              reject(new Error('ClerkJS loaded but script element not found'));
+            }
+          },
+          onError: error => {
+            reject(error);
+          },
+        });
+      });
+    } else {
+      // Fallback to traditional loading if blocking coordinator is not available
+      return await loadScript(scriptUrl, {
+        ...attributes,
+        async: true,
+        crossOrigin: 'anonymous',
+      });
     }
-
-    const handleLoad = () => {
-      script.setAttribute('data-clerk-loaded', 'true');
-      resolve(script);
-    };
-
-    const handleError = () => {
-      script.remove();
-      reject(new Error(FAILED_TO_LOAD_ERROR));
-    };
-
-    script.addEventListener('load', handleLoad);
-    script.addEventListener('error', handleError);
-
-    applyClerkJsScriptAttributes(opts)(script);
-
-    script.src = clerkJsScriptUrl(opts);
-    document.body.appendChild(script);
-  }).catch(() => {
+  } catch {
     throw new Error(FAILED_TO_LOAD_ERROR);
-  });
+  }
 };
 
 /**
@@ -179,12 +158,10 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
   return obj;
 };
 
-const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
-  const attributes = buildClerkJsScriptAttributes(options);
-  for (const attribute in attributes) {
-    script.setAttribute(attribute, attributes[attribute]);
-  }
-};
-
 export { loadClerkJsScript, buildClerkJsScriptAttributes, clerkJsScriptUrl };
+export {
+  getBlockingCoordinatorState as getClerkJSState,
+  isClerkJSLoadedBlocking as isClerkJSLoaded,
+  registerWithBlockingCoordinator as onClerkJSStateChange,
+} from './clerkJsBlockingCoordinator';
 export type { LoadClerkJsScriptOptions };
