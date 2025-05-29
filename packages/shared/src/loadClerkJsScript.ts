@@ -2,7 +2,6 @@ import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
 
 import { buildErrorThrower } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
-import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
@@ -37,9 +36,11 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
 /**
  * Hotloads the Clerk JS script.
  *
- * Checks for an existing Clerk JS script. If found, it returns a promise
- * that resolves when the script loads. If not found, it uses the provided options to
- * build the Clerk JS script URL and load the script.
+ * Checks for an existing Clerk JS script and handles various loading states:
+ * - If script already loaded successfully: resolves immediately
+ * - If script is currently loading: waits for completion
+ * - If script failed to load: attempts to load again
+ * - If no script exists: loads the script.
  *
  * @param opts - The options used to build the Clerk JS script URL and load the script.
  *               Must include a `publishableKey` if no existing script is found.
@@ -51,14 +52,35 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   if (existingScript) {
-    return new Promise((resolve, reject) => {
-      existingScript.addEventListener('load', () => {
-        resolve(existingScript);
-      });
+    if (existingScript.getAttribute('data-clerk-loaded') === 'true') {
+      return Promise.resolve(existingScript);
+    }
 
-      existingScript.addEventListener('error', () => {
-        reject(FAILED_TO_LOAD_ERROR);
-      });
+    return new Promise((resolve, reject) => {
+      const handleLoad = () => {
+        cleanup();
+        existingScript.setAttribute('data-clerk-loaded', 'true');
+        resolve(existingScript);
+      };
+
+      const handleError = () => {
+        cleanup();
+        existingScript.remove();
+        reject(new Error(FAILED_TO_LOAD_ERROR));
+      };
+
+      const cleanup = () => {
+        existingScript.removeEventListener('load', handleLoad);
+        existingScript.removeEventListener('error', handleError);
+      };
+
+      existingScript.addEventListener('load', handleLoad);
+      existingScript.addEventListener('error', handleError);
+
+      if (existingScript.getAttribute('data-clerk-loaded') === 'true') {
+        cleanup();
+        resolve(existingScript);
+      }
     });
   }
 
@@ -67,11 +89,36 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
     return;
   }
 
-  return loadScript(clerkJsScriptUrl(opts), {
-    async: true,
-    crossOrigin: 'anonymous',
-    nonce: opts.nonce,
-    beforeLoad: applyClerkJsScriptAttributes(opts),
+  return new Promise<HTMLScriptElement>((resolve, reject) => {
+    if (!document || !document.body) {
+      reject(new Error('loadClerkJsScript cannot be called when document does not exist'));
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.setAttribute('crossorigin', 'anonymous');
+    if (opts.nonce) {
+      script.nonce = opts.nonce;
+    }
+
+    const handleLoad = () => {
+      script.setAttribute('data-clerk-loaded', 'true');
+      resolve(script);
+    };
+
+    const handleError = () => {
+      script.remove();
+      reject(new Error(FAILED_TO_LOAD_ERROR));
+    };
+
+    script.addEventListener('load', handleLoad);
+    script.addEventListener('error', handleError);
+
+    applyClerkJsScriptAttributes(opts)(script);
+
+    script.src = clerkJsScriptUrl(opts);
+    document.body.appendChild(script);
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
   });
@@ -81,7 +128,6 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
  * Generates a Clerk JS script URL.
  *
  * @param opts - The options to use when building the Clerk JS script URL.
- *
  * @example
  * clerkJsScriptUrl({ publishableKey: 'pk_' });
  */
@@ -111,6 +157,8 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
  */
 const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
   const obj: Record<string, string> = {};
+
+  obj['data-clerk-js-script'] = '';
 
   if (options.publishableKey) {
     obj['data-clerk-publishable-key'] = options.publishableKey;
