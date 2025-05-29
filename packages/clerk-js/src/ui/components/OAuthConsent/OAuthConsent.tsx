@@ -2,16 +2,21 @@ import { useUser } from '@clerk/shared/react';
 
 import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
-import { ApplicationLogo, Avatar, Card, Header, withCardStateProvider } from '../../elements';
+import { ApplicationLogo, Avatar, Card, Header, Tooltip, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import { colors } from '../../utils';
 
 export function OAuthConsentInternal() {
-  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, onDeny, onAllow } = useOAuthConsentContext();
+  const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
+    useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
+
+  const { hostname: redirectUrlHostname } = new URL(redirectUrl);
+
+  const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -29,8 +34,30 @@ export function OAuthConsentInternal() {
             <Text
               colorScheme='warning'
               variant='caption'
-              localizationKey={`Make sure that you trust ${oAuthApplicationName} {url}. You may be sharing sensitive data with this site or app.`}
-            />
+            >
+              Make sure that you trust {oAuthApplicationName} {''}
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Text
+                    as='span'
+                    variant='caption'
+                    sx={{
+                      textDecoration: 'underline',
+                      textDecorationStyle: 'dotted',
+                      cursor: 'pointer',
+                      outline: 'none',
+                    }}
+                  >
+                    {redirectUrlHostname}
+                  </Text>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  text={redirectUrl}
+                  sx={{ wordBreak: 'break-all' }}
+                />
+              </Tooltip.Root>
+              {''}. You may be sharing sensitive data with this site or app.
+            </Text>
           </Box>
           <Header.Root>
             {/* both have avatars */}
@@ -99,7 +126,7 @@ export function OAuthConsentInternal() {
             )}
             <Header.Title localizationKey={oAuthApplicationName} />
             <Header.Subtitle
-              localizationKey={`wants to access to ${applicationName} on behalf of ${user?.emailAddresses[0]?.emailAddress}`}
+              localizationKey={`wants to access to ${applicationName} on behalf of ${primaryEmailAddress}`}
             />
           </Header.Root>
           <Box
@@ -181,8 +208,29 @@ export function OAuthConsentInternal() {
               }}
               colorScheme='secondary'
               variant='caption'
-              localizationKey='If you allow access, this app will redirect you to {url}'
-            />
+            >
+              If you allow access, this app will redirect you to{' '}
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  <Text
+                    as='span'
+                    variant='caption'
+                    sx={{
+                      textDecoration: 'underline',
+                      textDecorationStyle: 'dotted',
+                      cursor: 'pointer',
+                      outline: 'none',
+                    }}
+                  >
+                    {redirectUrlHostname}
+                  </Text>
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  text={redirectUrl}
+                  sx={{ wordBreak: 'break-all' }}
+                />
+              </Tooltip.Root>
+            </Text>
           </Grid>
         </Card.Content>
         <Card.Footer />

@@ -1680,6 +1680,10 @@ export type __internal_OAuthConsentProps = {
     requires_consent: boolean;
   }[];
   /**
+   * Full URL or path to navigate to after the user allows access.
+   */
+  redirectUrl: string;
+  /**
    * Called when user allows access.
    */
   onAllow: () => void;
