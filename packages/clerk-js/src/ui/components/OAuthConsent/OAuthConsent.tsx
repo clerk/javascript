@@ -14,9 +14,12 @@ export function OAuthConsentInternal() {
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
 
-  const { hostname: redirectUrlHostname } = new URL(redirectUrl);
-
   const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
+
+  function getRootDomain(): string {
+    const { hostname } = new URL(redirectUrl);
+    return hostname.split('.').slice(-2).join('.');
+  }
 
   return (
     <Flow.Root flow='oauthConsent'>
@@ -49,7 +52,7 @@ export function OAuthConsentInternal() {
                       display: 'inline-block',
                     }}
                   >
-                    {redirectUrlHostname}
+                    {getRootDomain()}
                   </Text>
                 </Tooltip.Trigger>
                 <Tooltip.Content
@@ -226,13 +229,10 @@ export function OAuthConsentInternal() {
                       display: 'inline-block',
                     }}
                   >
-                    {redirectUrlHostname}
+                    {getRootDomain()}
                   </Text>
                 </Tooltip.Trigger>
-                <Tooltip.Content
-                  text={redirectUrl}
-                  sx={{ wordBreak: 'break-all' }}
-                />
+                <Tooltip.Content text={`View full URL`} />
               </Tooltip.Root>
             </Text>
           </Grid>
