@@ -21,6 +21,7 @@ export class OrganizationMembership extends BaseResource implements Organization
   organization!: Organization;
   permissions: OrganizationPermissionKey[] = [];
   role!: OrganizationCustomRoleKey;
+  roleName!: string;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -77,6 +78,7 @@ export class OrganizationMembership extends BaseResource implements Organization
     }
     this.permissions = Array.isArray(data.permissions) ? [...data.permissions] : [];
     this.role = data.role;
+    this.roleName = data.role_name;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
     return this;
