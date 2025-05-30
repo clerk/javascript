@@ -71,6 +71,7 @@ export const itIT: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const itIT: LocalizationResource = {
     sameDay: "Oggi alle {{ date | timeString('it-IT') }}",
   },
   dividerText: 'oppure',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Utilizzo un altro metodo',
   footerPageLink__help: 'Aiuto',
   footerPageLink__privacy: 'Privacy',

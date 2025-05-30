@@ -71,6 +71,7 @@ export const ruRU: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const ruRU: LocalizationResource = {
     sameDay: "Сегодня в {{ date | timeString('ru-RU') }}",
   },
   dividerText: 'или',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'Использовать другой метод',
   footerPageLink__help: 'Помощь',
   footerPageLink__privacy: 'Приватность',

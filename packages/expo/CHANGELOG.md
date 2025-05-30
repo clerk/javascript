@@ -1,5 +1,29 @@
 # Change Log
 
+## 2.12.0
+
+### Minor Changes
+
+- Default token cache `SecureStore` implementation `keychainAccessible` to `AFTER_FIRST_UNLOCK` - The data in the keychain item cannot be accessed after a restart until the device has been unlocked once by the user. This may be useful if you need to access the item when the device is locked. ([#6025](https://github.com/clerk/javascript/pull/6025)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`694ff23`](https://github.com/clerk/javascript/commit/694ff2335c9d2d6e80247747c29f0f1293dddea9), [`68bd90f`](https://github.com/clerk/javascript/commit/68bd90fa1e1daadd24c064385c009905388c032e), [`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`ac4f31c`](https://github.com/clerk/javascript/commit/ac4f31c8aecf394b5b5d56b3dbe1ea8bad3a1614), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb), [`f357d8a`](https://github.com/clerk/javascript/commit/f357d8a8b2691eec4232d77f9e4f9158ee9babce)]:
+  - @clerk/clerk-js@5.67.5
+  - @clerk/shared@3.9.5
+  - @clerk/types@4.59.3
+  - @clerk/clerk-react@5.31.8
+
+## 2.11.9
+
+### Patch Changes
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`d437e81`](https://github.com/clerk/javascript/commit/d437e8190436084a22db0f5fc78c6a4445c855b6), [`75dc84b`](https://github.com/clerk/javascript/commit/75dc84b16e5056257ca470d15bd14b23070ea7e4), [`9c64f43`](https://github.com/clerk/javascript/commit/9c64f438f5ab5c8dd189eca7bd38d78b47147ebc), [`4db99ca`](https://github.com/clerk/javascript/commit/4db99ca4f765754c0379f2c72184ff6e18bda3a3)]:
+  - @clerk/clerk-js@5.67.4
+  - @clerk/types@4.59.2
+  - @clerk/clerk-react@5.31.7
+  - @clerk/shared@3.9.4
+
 ## 2.11.8
 
 ### Patch Changes

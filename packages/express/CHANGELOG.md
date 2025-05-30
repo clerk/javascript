@@ -1,5 +1,25 @@
 # Change Log
 
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`5421421`](https://github.com/clerk/javascript/commit/5421421644b5c017d58ee6583c12d6c253e29c33), [`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`1c97fd0`](https://github.com/clerk/javascript/commit/1c97fd06b28db9fde6c14dbeb0935e13696be539), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/backend@1.34.0
+  - @clerk/shared@3.9.5
+  - @clerk/types@4.59.3
+
+## 1.5.1
+
+### Patch Changes
+
+- Allow property access on `req.auth` to get `AuthObject` for backward compatibility. ([#5995](https://github.com/clerk/javascript/pull/5995)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7), [`22c3363`](https://github.com/clerk/javascript/commit/22c33631f7f54b4f2179bf16f548fee1a237976e), [`ac6b231`](https://github.com/clerk/javascript/commit/ac6b23147e5e0aa21690cc20a109ed9a8c8f6e5b)]:
+  - @clerk/types@4.59.2
+  - @clerk/backend@1.33.1
+  - @clerk/shared@3.9.4
+
 ## 1.5.0
 
 ### Minor Changes

@@ -1,5 +1,39 @@
 # Change Log
 
+## 3.9.5
+
+### Patch Changes
+
+- Bug fix: In `createCheckAuthorization` allow for old `org_role` format in JWT v1 where `org:` is missing. ([#5988](https://github.com/clerk/javascript/pull/5988)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example session claims:
+
+  ```json
+  {
+    "org_id": "org_xxxx",
+    "org_permissions": [],
+    "org_role": "admin",
+    "org_slug": "test"
+  }
+  ```
+
+  Code
+
+  ```ts
+  authObject.has({ role: 'org:admin' }); // -> true
+  authObject.has({ role: 'admin' }); // -> true
+  ```
+
+- Updated dependencies [[`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/types@4.59.3
+
+## 3.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`6ed3dfc`](https://github.com/clerk/javascript/commit/6ed3dfc1bc742ac9d9a2307fe8e4733411cbc0d7)]:
+  - @clerk/types@4.59.2
+
 ## 3.9.3
 
 ### Patch Changes

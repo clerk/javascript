@@ -71,6 +71,7 @@ export const thTH: LocalizationResource = {
     manageSubscription: undefined,
     month: undefined,
     monthly: undefined,
+    pastDue: undefined,
     pay: undefined,
     paymentMethods: undefined,
     paymentSource: {
@@ -119,6 +120,7 @@ export const thTH: LocalizationResource = {
     sameDay: "วันนี้ เวลา {{ date | timeString('th-TH') }} น.",
   },
   dividerText: 'หรือ',
+  footerActionLink__alternativePhoneCodeProvider: undefined,
   footerActionLink__useAnotherMethod: 'ใช้วิธีอื่น',
   footerPageLink__help: 'ช่วยเหลือ',
   footerPageLink__privacy: 'ความเป็นส่วนตัว',

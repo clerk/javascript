@@ -25,6 +25,7 @@ import {
   PhoneNumber,
   ProxyCheck,
   RedirectUrl,
+  SamlConnection,
   Session,
   SignInToken,
   SignUpAttempt,
@@ -134,6 +135,8 @@ function jsonToObject(item: any): any {
       return ProxyCheck.fromJSON(item);
     case ObjectType.RedirectUrl:
       return RedirectUrl.fromJSON(item);
+    case ObjectType.SamlConnection:
+      return SamlConnection.fromJSON(item);
     case ObjectType.SignInToken:
       return SignInToken.fromJSON(item);
     case ObjectType.SignUpAttempt:
