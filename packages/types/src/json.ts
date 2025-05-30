@@ -638,6 +638,7 @@ export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   payment_method: string;
   card_type: string;
   is_default: boolean;
+  is_removable: boolean;
   status: CommercePaymentSourceStatus;
   wallet_type: string | null;
 }
