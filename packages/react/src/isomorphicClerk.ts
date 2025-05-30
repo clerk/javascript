@@ -37,7 +37,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
-  RevokeApiKeyParams,
+  RevokeAPIKeyParams,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -1339,7 +1339,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  revokeApiKey = async (params: RevokeApiKeyParams): Promise<APIKeyResource | void> => {
+  revokeApiKey = async (params: RevokeAPIKeyParams): Promise<APIKeyResource | void> => {
     const callback = () => this.clerkjs?.revokeApiKey(params);
     if (this.clerkjs && this.loaded) {
       return callback() as Promise<APIKeyResource>;
