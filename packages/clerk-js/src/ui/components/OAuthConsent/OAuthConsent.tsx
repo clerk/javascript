@@ -62,10 +62,7 @@ export function OAuthConsentInternal() {
                     {getRootDomain()}
                   </Text>
                 </Tooltip.Trigger>
-                <Tooltip.Content
-                  text={`View full URL`}
-                  sx={{ wordBreak: 'break-all' }}
-                />
+                <Tooltip.Content text={`View full URL`} />
               </Tooltip.Root>
               {''}. You may be sharing sensitive data with this site or app.
             </Text>
