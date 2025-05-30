@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
   CommercePaymentChargeType,
   CommercePaymentSourceStatus,
@@ -70,6 +71,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   auth_config: AuthConfigJSON;
+  api_keys_settings: APIKeysSettingsJSON;
   commerce_settings: CommerceSettingsJSON;
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;

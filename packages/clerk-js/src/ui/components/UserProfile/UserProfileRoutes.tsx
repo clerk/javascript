@@ -23,7 +23,7 @@ const APIKeysPage = lazy(() =>
 
 export const UserProfileRoutes = () => {
   const { pages } = useUserProfileContext();
-  const { commerceSettings } = useEnvironment();
+  const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const isAccountPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT;
   const isSecurityPageRoot = pages.routes[0].id === USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
@@ -87,15 +87,17 @@ export const UserProfileRoutes = () => {
             </Switch>
           </Route>
         )}
-        <Route path={isApiKeysPageRoot ? undefined : 'api-keys'}>
-          <Switch>
-            <Route index>
-              <Suspense fallback={''}>
-                <APIKeysPage />
-              </Suspense>
-            </Route>
-          </Switch>
-        </Route>
+        {apiKeysSettings.enabled && (
+          <Route path={isApiKeysPageRoot ? undefined : 'api-keys'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <APIKeysPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        )}
       </Route>
     </Switch>
   );
