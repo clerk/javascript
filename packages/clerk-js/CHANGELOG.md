@@ -1,5 +1,27 @@
 # Change Log
 
+## 5.68.0
+
+### Minor Changes
+
+- Introduce `cssLayerName` option to allow users to opt Clerk styles into a native CSS layer. ([#5552](https://github.com/clerk/javascript/pull/5552)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Use the `is_removable` flag on a payment source to determine if it can be removed. ([#6033](https://github.com/clerk/javascript/pull/6033)) by [@aeliox](https://github.com/aeliox)
+
+- Clean up layout and logic of the `PlanDetails` drawer ([#5928](https://github.com/clerk/javascript/pull/5928)) by [@aeliox](https://github.com/aeliox)
+
+- feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
+  - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
+
+- Updated dependencies [[`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/localizations@3.16.4
+  - @clerk/shared@3.9.6
+
 ## 5.67.5
 
 ### Patch Changes

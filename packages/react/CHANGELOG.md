@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.31.9
+
+### Patch Changes
+
+- Initialize isomorphic clerk with `useRef`. Avoid memoizing the singleton, instead use a reference to store it, and then destroy it. ([#6024](https://github.com/clerk/javascript/pull/6024)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
 ## 5.31.8
 
 ### Patch Changes
