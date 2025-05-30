@@ -35,6 +35,7 @@ type AddPaymentSourceProps = {
   setSubmitError?: (submitError: ClerkRuntimeError | ClerkAPIError | string | undefined) => void;
   onPayWithTestPaymentSourceSuccess?: () => void;
   showPayWithTestCardSection?: boolean;
+  paymentMethodOrder?: string[];
 };
 
 export const AddPaymentSource = (props: AddPaymentSourceProps) => {
@@ -94,6 +95,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
 
   const externalGatewayId = initializedPaymentSource?.externalGatewayId;
   const externalClientSecret = initializedPaymentSource?.externalClientSecret;
+  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
 
   const stripePublishableKey = commerceSettings.billing.stripePublishableKey;
 
@@ -152,6 +154,7 @@ export const AddPaymentSource = (props: AddPaymentSourceProps) => {
         setSubmitError={setSubmitError}
         onPayWithTestPaymentSourceSuccess={onPayWithTestPaymentSourceSuccess}
         showPayWithTestCardSection={showPayWithTestCardSection}
+        paymentMethodOrder={paymentMethodOrder}
       />
     </Elements>
   );
@@ -168,6 +171,7 @@ const AddPaymentSourceForm = withCardStateProvider(
     setSubmitError,
     onPayWithTestPaymentSourceSuccess,
     showPayWithTestCardSection,
+    paymentMethodOrder,
   }: AddPaymentSourceProps) => {
     const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
     const clerk = useClerk();
@@ -290,8 +294,7 @@ const AddPaymentSourceForm = withCardStateProvider(
                 type: 'tabs',
                 defaultCollapsed: false,
               },
-              // TODO(@COMMERCE): Should this be fetched from the fapi?
-              paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+              paymentMethodOrder: paymentMethodOrder || ['card'],
               applePay: checkout
                 ? {
                     recurringPaymentRequest: {
