@@ -323,7 +323,7 @@ void (async () => {
         componentControls.oauthConsent.getProps() ?? {
           scopes,
           oAuthApplicationName: searchParams.get('oauth-application-name'),
-          redirectUrl: searchParams.get('redirect_url'),
+          redirectUrl: searchParams.get('redirect_uri'),
         },
       );
     },
