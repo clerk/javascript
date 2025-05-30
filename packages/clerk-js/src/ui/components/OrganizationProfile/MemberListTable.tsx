@@ -212,7 +212,7 @@ export const RoleSelect = (props: {
             )}
             <Text
               as='span'
-              sx={t => ({ color: t.colors.$colorText })}
+              colorScheme='body'
             >
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>
@@ -220,7 +220,7 @@ export const RoleSelect = (props: {
         ) : fallbackLabel ? (
           <Text
             as='span'
-            sx={t => ({ color: t.colors.$colorText })}
+            colorScheme='body'
           >
             {fallbackLabel}
           </Text>
