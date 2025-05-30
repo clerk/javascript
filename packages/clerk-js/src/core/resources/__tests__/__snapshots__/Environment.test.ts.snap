@@ -2,6 +2,9 @@
 
 exports[`Environment __internal_toSnapshot() 1`] = `
 {
+  "api_keys_settings": {
+    "enabled": false,
+  },
   "auth_config": {
     "claimed_at": null,
     "id": "",
@@ -275,6 +278,10 @@ exports[`Environment __internal_toSnapshot() 1`] = `
 
 exports[`Environment defaults values when instantiated without arguments 1`] = `
 Environment {
+  "apiKeysSettings": APIKeySettings {
+    "enabled": false,
+    "pathRoot": "",
+  },
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
@@ -507,6 +514,10 @@ Environment {
 
 exports[`Environment has the same initial properties 1`] = `
 Environment {
+  "apiKeysSettings": APIKeySettings {
+    "enabled": false,
+    "pathRoot": "",
+  },
   "authConfig": AuthConfig {
     "claimedAt": null,
     "pathRoot": "",
