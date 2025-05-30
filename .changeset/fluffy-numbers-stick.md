@@ -1,6 +1,6 @@
 ---
-'@clerk/localizations': major
-'@clerk/types': major
+'@clerk/localizations': patch
+'@clerk/types': patch
 ---
 
 Introduce types and locales for `<APIKeys />` component
