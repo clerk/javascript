@@ -258,19 +258,15 @@ export function OAuthConsentInternal() {
   );
 }
 
-function RedirectUriModal({
-  onOpen,
-  onClose,
-  isOpen,
-  redirectUri,
-  oAuthApplicationName,
-}: {
+type RedirectUriModalProps = {
   onOpen: () => void;
   onClose: () => void;
   isOpen: boolean;
   redirectUri: string;
   oAuthApplicationName: string;
-}) {
+};
+
+function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicationName }: RedirectUriModalProps) {
   if (!isOpen) {
     return null;
   }
