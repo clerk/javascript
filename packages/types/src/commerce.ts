@@ -105,6 +105,7 @@ export interface CommercePaymentSourceResource extends ClerkResource {
 export interface CommerceInitializedPaymentSourceResource extends ClerkResource {
   externalClientSecret: string;
   externalGatewayId: string;
+  paymentMethodOrder: string[];
 }
 
 export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
