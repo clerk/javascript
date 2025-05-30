@@ -50,6 +50,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
   });
 
+  test('when signed in, shows free plan as active', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.page.goToRelative('/pricing-table');
+
+    await u.po.pricingTable.waitForMounted();
+    await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+    await u.po.pricingTable.waitToBeActive({ planSlug: 'free_user' });
+    await expect(u.po.pricingTable.getPlanCardCTA({ planSlug: 'free_user' })).toBeHidden();
+    await u.po.checkout.waitForMounted();
+    await expect(u.po.page.getByText('Checkout')).toBeVisible();
+  });
+
   test('can subscribe to a plan', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
@@ -204,6 +218,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.po.userProfile.waitForMounted();
       await u.po.userProfile.switchToBillingTab();
+      await expect(u.po.page.getByText(/Free/i)).toBeVisible();
       await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
       await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
       await u.po.checkout.waitForMounted();

@@ -14,6 +14,17 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
     clickResubscribe: async () => {
       await page.getByText('Re-subscribe').click();
     },
+    waitToBeActive: async ({ planSlug }: { planSlug: string }) => {
+      return page
+        .locator(`.cl-pricingTableCard__${planSlug} .cl-badge`)
+        .getByText('Active')
+        .waitFor({ state: 'visible' });
+    },
+    getPlanCardCTA: ({ planSlug }: { planSlug: string }) => {
+      return page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`).getByRole('button', {
+        name: /get|switch|subscribe/i,
+      });
+    },
     startCheckout: async ({
       planSlug,
       shouldSwitch,
@@ -23,8 +34,9 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
       shouldSwitch?: boolean;
       period?: 'monthly' | 'annually';
     }) => {
-      const targetButtonName =
-        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
+      // const targetButtonName =
+      //   shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
+      console.log('shouldSwitch', shouldSwitch);
 
       if (period) {
         await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
@@ -38,12 +50,7 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
         }
       }
 
-      await page
-        .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`)
-        .getByRole('button', {
-          name: targetButtonName,
-        })
-        .click();
+      await self.getPlanCardCTA({ planSlug }).click();
     },
   };
   return self;
