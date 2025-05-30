@@ -4,10 +4,7 @@ import {
   loadClerkJsScript,
   setClerkJsLoadingErrorPackageName,
 } from '../loadClerkJsScript';
-import { loadScript } from '../loadScript';
 import { getMajorVersion } from '../versionSelector';
-
-jest.mock('../loadScript');
 
 setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
@@ -17,8 +14,12 @@ describe('loadClerkJsScript(options)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (loadScript as jest.Mock).mockResolvedValue(undefined);
     document.querySelector = jest.fn().mockReturnValue(null);
+    // Mock document.body for script creation
+    Object.defineProperty(document, 'body', {
+      value: document.createElement('body'),
+      writable: true,
+    });
   });
 
   test('throws error when publishableKey is missing', async () => {
@@ -28,48 +29,111 @@ describe('loadClerkJsScript(options)', () => {
   });
 
   test('loads script when no existing script is found', async () => {
-    await loadClerkJsScript({ publishableKey: mockPublishableKey });
+    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
 
-    expect(loadScript).toHaveBeenCalledWith(
-      expect.stringContaining(
-        `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
-      ),
-      expect.objectContaining({
-        async: true,
-        crossOrigin: 'anonymous',
-        beforeLoad: expect.any(Function),
-      }),
+    // Find the script that was added to the DOM
+    const addedScript = document.body.querySelector('script[data-clerk-js-script]') as HTMLScriptElement;
+    expect(addedScript).toBeTruthy();
+    expect(addedScript.src).toContain(
+      `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
     );
+    expect(addedScript.async).toBe(true);
+    expect(addedScript.getAttribute('crossorigin')).toBe('anonymous');
+
+    // Simulate successful load
+    addedScript.dispatchEvent(new Event('load'));
+
+    const result = await loadPromise;
+    expect(result).toBe(addedScript);
+    expect(addedScript.getAttribute('data-clerk-loaded')).toBe('true');
   });
 
-  test('uses existing script when found', async () => {
+  test('resolves immediately when script is already loaded', async () => {
     const mockExistingScript = document.createElement('script');
+    mockExistingScript.setAttribute('data-clerk-loaded', 'true');
+    document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
+
+    const result = await loadClerkJsScript({ publishableKey: mockPublishableKey });
+
+    expect(result).toBe(mockExistingScript);
+    // Should not create a new script
+    expect(document.body.querySelector('script[data-clerk-js-script]')).toBeNull();
+  });
+
+  test('waits for existing loading script to complete', async () => {
+    const mockExistingScript = document.createElement('script');
+    // Script exists but is not marked as loaded yet
     document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
 
     const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
-    mockExistingScript.dispatchEvent(new Event('load'));
 
-    await expect(loadPromise).resolves.toBe(mockExistingScript);
-    expect(loadScript).not.toHaveBeenCalled();
+    // Simulate the existing script finishing loading
+    setTimeout(() => {
+      mockExistingScript.dispatchEvent(new Event('load'));
+    }, 10);
+
+    const result = await loadPromise;
+    expect(result).toBe(mockExistingScript);
+    expect(mockExistingScript.getAttribute('data-clerk-loaded')).toBe('true');
   });
 
-  test('rejects when existing script fails to load', async () => {
+  test('removes failed script and rejects when existing script fails to load', async () => {
     const mockExistingScript = document.createElement('script');
     document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
+    const removeSpy = jest.spyOn(mockExistingScript, 'remove');
 
     const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
     mockExistingScript.dispatchEvent(new Event('error'));
 
-    await expect(loadPromise).rejects.toBe('Clerk: Failed to load Clerk');
-    expect(loadScript).not.toHaveBeenCalled();
+    await expect(loadPromise).rejects.toThrow('Clerk: Failed to load Clerk');
+    expect(removeSpy).toHaveBeenCalled();
   });
 
-  test('throws error when loadScript fails', async () => {
-    (loadScript as jest.Mock).mockRejectedValue(new Error('Script load failed'));
+  test('handles race condition when script loads while setting up listeners', async () => {
+    const mockExistingScript = document.createElement('script');
+    document.querySelector = jest.fn().mockReturnValue(mockExistingScript);
 
-    await expect(loadClerkJsScript({ publishableKey: mockPublishableKey })).rejects.toThrow(
-      'Clerk: Failed to load Clerk',
-    );
+    // Simulate script loading between the initial check and listener setup
+    setTimeout(() => {
+      mockExistingScript.setAttribute('data-clerk-loaded', 'true');
+    }, 1);
+
+    const result = await loadClerkJsScript({ publishableKey: mockPublishableKey });
+    expect(result).toBe(mockExistingScript);
+  });
+
+  test('creates script with correct attributes', async () => {
+    const options = {
+      publishableKey: mockPublishableKey,
+      proxyUrl: 'https://proxy.clerk.com',
+      domain: 'custom.com',
+      nonce: 'test-nonce',
+    };
+
+    const loadPromise = loadClerkJsScript(options);
+
+    const addedScript = document.body.querySelector('script[data-clerk-js-script]') as HTMLScriptElement;
+    expect(addedScript.getAttribute('data-clerk-publishable-key')).toBe(mockPublishableKey);
+    expect(addedScript.getAttribute('data-clerk-proxy-url')).toBe('https://proxy.clerk.com');
+    expect(addedScript.getAttribute('data-clerk-domain')).toBe('custom.com');
+    expect(addedScript.nonce).toBe('test-nonce');
+
+    // Complete the load
+    addedScript.dispatchEvent(new Event('load'));
+    await loadPromise;
+  });
+
+  test('rejects and removes script when new script fails to load', async () => {
+    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
+
+    const addedScript = document.body.querySelector('script[data-clerk-js-script]') as HTMLScriptElement;
+    const removeSpy = jest.spyOn(addedScript, 'remove');
+
+    // Simulate script load failure
+    addedScript.dispatchEvent(new Event('error'));
+
+    await expect(loadPromise).rejects.toThrow('Clerk: Failed to load Clerk');
+    expect(removeSpy).toHaveBeenCalled();
   });
 });
 
@@ -120,6 +184,7 @@ describe('buildClerkJsScriptAttributes()', () => {
       'all options',
       { publishableKey: mockPublishableKey, proxyUrl: mockProxyUrl, domain: mockDomain },
       {
+        'data-clerk-js-script': '',
         'data-clerk-publishable-key': mockPublishableKey,
         'data-clerk-proxy-url': mockProxyUrl,
         'data-clerk-domain': mockDomain,
@@ -128,14 +193,21 @@ describe('buildClerkJsScriptAttributes()', () => {
     [
       'only publishableKey',
       { publishableKey: mockPublishableKey },
-      { 'data-clerk-publishable-key': mockPublishableKey },
+      {
+        'data-clerk-js-script': '',
+        'data-clerk-publishable-key': mockPublishableKey,
+      },
     ],
     [
       'publishableKey and proxyUrl',
       { publishableKey: mockPublishableKey, proxyUrl: mockProxyUrl },
-      { 'data-clerk-publishable-key': mockPublishableKey, 'data-clerk-proxy-url': mockProxyUrl },
+      {
+        'data-clerk-js-script': '',
+        'data-clerk-publishable-key': mockPublishableKey,
+        'data-clerk-proxy-url': mockProxyUrl,
+      },
     ],
-    ['no options', {}, {}],
+    ['no options', {}, { 'data-clerk-js-script': '' }],
   ])('returns correct attributes with %s', (_, input, expected) => {
     // @ts-ignore input loses correct type because of empty object
     expect(buildClerkJsScriptAttributes(input)).toEqual(expected);
