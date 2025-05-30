@@ -290,8 +290,8 @@ function RedirectUriModal({
           </Header.Root>
           <Textarea
             style={{ maxHeight: 'none' }}
-            cols={40}
-            rows={5}
+            cols={50}
+            rows={6}
             defaultValue={redirectUri}
             readOnly
           />
