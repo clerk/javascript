@@ -11,7 +11,7 @@ export const UserProfileNavbar = (
   const { pages } = useUserProfileContext();
 
   return (
-    <NavbarContextProvider>
+    <NavbarContextProvider contentRef={props.contentRef}>
       <NavBar
         title={localizationKeys('userProfile.navbar.title')}
         description={localizationKeys('userProfile.navbar.description')}

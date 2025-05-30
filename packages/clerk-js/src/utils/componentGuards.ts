@@ -33,3 +33,7 @@ export const hasPaidOrgPlans: ComponentGuard = (_, environment) => {
 export const hasPaidUserPlans: ComponentGuard = (_, environment) => {
   return environment?.commerceSettings.billing.hasPaidUserPlans || false;
 };
+
+export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings.enabled;
+};

@@ -86,7 +86,8 @@ export type FlowMetadata = {
     | 'waitlist'
     | 'checkout'
     | 'planDetails'
-    | 'pricingTable';
+    | 'pricingTable'
+    | 'apiKeys';
   part?:
     | 'start'
     | 'emailCode'

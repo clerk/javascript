@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Nazad',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const srRS: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'Link za verifikaciju je istekao. Molimo zatražite novi link.',
   formFieldHintText__optional: 'Opciono',
   formFieldHintText__slug: 'Slug je lako čitljivi ID koji mora biti jedinstven. Često se koristi u URL-ovima.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Obriši nalog',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -147,6 +164,10 @@ export const srRS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovaj domen',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -191,6 +212,9 @@ export const srRS: LocalizationResource = {
     titleWithoutPersonal: 'Izaberi organizaciju',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatske pozivnice',
     badge__automaticSuggestion: 'Automatski predlozi',
     badge__manualInvitation: 'Bez automatskog uključivanja',
@@ -288,6 +312,7 @@ export const srRS: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljaj svojom organizacijom.',
       general: 'Opšte',
@@ -804,6 +829,9 @@ export const srRS: LocalizationResource = {
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopirano!',
       actionLabel__copy: 'Kopiraj sve',
@@ -962,6 +990,7 @@ export const srRS: LocalizationResource = {
     mobileButton__menu: 'Meni',
     navbar: {
       account: 'Profil',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Upravljaj informacijama svog naloga.',
       security: 'Sigurnost',

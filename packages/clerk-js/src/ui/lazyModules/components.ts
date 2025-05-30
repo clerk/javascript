@@ -21,6 +21,7 @@ const componentImportPaths = {
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans'),
+  APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -96,6 +97,8 @@ export const PricingTable = lazy(() =>
   componentImportPaths.PricingTable().then(module => ({ default: module.PricingTable })),
 );
 
+export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => ({ default: module.APIKeys })));
+
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
 
 export const PlanDetails = lazy(() =>
@@ -133,6 +136,7 @@ export const ClerkComponents = {
   PricingTable,
   Checkout,
   PlanDetails,
+  APIKeys,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

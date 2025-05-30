@@ -14,6 +14,20 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  apiKeys: {
+    action__add: undefined,
+    action__search: undefined,
+    detailsTitle__emptyRow: undefined,
+    formButtonPrimary__add: undefined,
+    formHint: undefined,
+    formTitle: undefined,
+    menuAction__revoke: undefined,
+    revokeConfirmation: {
+      formButtonPrimary__revoke: undefined,
+      formHint: undefined,
+      formTitle: undefined,
+    },
+  },
   backButton: 'Quay lại',
   badge__activePlan: undefined,
   badge__canceledEndsAt: undefined,
@@ -133,6 +147,9 @@ export const viVN: LocalizationResource = {
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Tùy chọn',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldInputPlaceholder__apiKeyDescription: undefined,
+  formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
+  formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: undefined,
@@ -148,6 +165,10 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyExpirationDate: undefined,
+  formFieldLabel__apiKeyName: undefined,
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Mã sao lưu',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -192,6 +213,9 @@ export const viVN: LocalizationResource = {
     titleWithoutPersonal: 'Choose an organization',
   },
   organizationProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
     badge__manualInvitation: 'No automatic enrollment',
@@ -288,6 +312,7 @@ export const viVN: LocalizationResource = {
       },
     },
     navbar: {
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your organization.',
       general: 'General',
@@ -802,6 +827,9 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
+    apiKeysPage: {
+      title: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -961,6 +989,7 @@ export const viVN: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
+      apiKeys: undefined,
       billing: undefined,
       description: 'Manage your account info.',
       security: 'Security',
