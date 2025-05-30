@@ -5,7 +5,7 @@ import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
 import { ApplicationLogo, Avatar, Card, Header, Modal, Tooltip, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
-import { TextareaInput } from '../../primitives';
+import { Textarea } from '../../primitives';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
 import * as utils from '../../utils';
@@ -252,6 +252,7 @@ export function OAuthConsentInternal() {
         onOpen={() => setIsUriModalOpen(true)}
         onClose={() => setIsUriModalOpen(false)}
         redirectUri={redirectUrl}
+        oAuthApplicationName={oAuthApplicationName}
       />
     </Flow.Root>
   );
@@ -262,11 +263,13 @@ function RedirectUriModal({
   onClose,
   isOpen,
   redirectUri,
+  oAuthApplicationName,
 }: {
   onOpen: () => void;
   onClose: () => void;
-  isOpen?: boolean;
-  redirectUri?: string;
+  isOpen: boolean;
+  redirectUri: string;
+  oAuthApplicationName: string;
 }) {
   if (!isOpen) {
     return null;
@@ -279,10 +282,16 @@ function RedirectUriModal({
     >
       <Card.Root>
         <Card.Content>
-          <TextareaInput
+          <Header.Root>
+            <Header.Title localizationKey={`Redirect URL`} />
+            <Header.Subtitle
+              localizationKey={`Make sure you trust ${oAuthApplicationName} and that this url belongs to ${oAuthApplicationName}.`}
+            />
+          </Header.Root>
+          <Textarea
             style={{ maxHeight: 'none' }}
-            cols={60}
-            rows={8}
+            cols={40}
+            rows={5}
             defaultValue={redirectUri}
             readOnly
           />
