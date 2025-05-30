@@ -59,7 +59,7 @@ export function OAuthConsentInternal() {
                     }}
                     onClick={() => setIsUriModalOpen(true)}
                   >
-                    {getRootDomain()}
+                    ({getRootDomain()})
                   </Text>
                 </Tooltip.Trigger>
                 <Tooltip.Content text={`View full URL`} />
