@@ -196,7 +196,7 @@ export const RoleSelect = (props: {
             textWrap: 'nowrap',
           }))
         }
-        isDisabled={isDisabled || !selectedRole}
+        isDisabled={isDisabled || (!!value && fetchedRoles.length > 0 && !selectedRole)}
       >
         {selectedRole?.label || selectedRole?.value ? (
           <Flex
