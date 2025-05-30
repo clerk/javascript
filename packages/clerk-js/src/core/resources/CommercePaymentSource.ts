@@ -36,7 +36,7 @@ export class CommercePaymentSource extends BaseResource implements CommercePayme
     this.paymentMethod = data.payment_method;
     this.cardType = data.card_type;
     this.isDefault = data.is_default;
-    this.isRemovable = data.is_removable ?? false;
+    this.isRemovable = data.is_removable;
     this.status = data.status;
     this.walletType = data.wallet_type ?? undefined;
 
