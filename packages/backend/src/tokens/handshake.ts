@@ -9,6 +9,7 @@ import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { OrganizationMatcher } from './organizationMatcher';
+import { TokenType } from './tokenTypes';
 import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
 import type { VerifyTokenOptions } from './verify';
 import { verifyToken } from './verify';
@@ -220,12 +221,24 @@ export class HandshakeService {
     }
 
     if (sessionToken === '') {
-      return signedOut(this.authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext: this.authenticateContext,
+        reason: AuthErrorReason.SessionTokenMissing,
+        message: '',
+        headers,
+      });
     }
 
     const { data, errors: [error] = [] } = await verifyToken(sessionToken, this.authenticateContext);
     if (data) {
-      return signedIn(this.authenticateContext, data, headers, sessionToken);
+      return signedIn({
+        tokenType: TokenType.SessionToken,
+        authenticateContext: this.authenticateContext,
+        sessionClaims: data,
+        headers,
+        token: sessionToken,
+      });
     }
 
     if (
@@ -258,7 +271,13 @@ ${developmentError.getFullMessage()}`,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(this.authenticateContext, retryResult, headers, sessionToken);
+        return signedIn({
+          tokenType: TokenType.SessionToken,
+          authenticateContext: this.authenticateContext,
+          sessionClaims: retryResult,
+          headers,
+          token: sessionToken,
+        });
       }
 
       throw new Error(retryError?.message || 'Clerk: Handshake retry failed.');
