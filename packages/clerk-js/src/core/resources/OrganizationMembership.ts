@@ -93,6 +93,7 @@ export class OrganizationMembership extends BaseResource implements Organization
       public_user_data: this.publicUserData?.__internal_toSnapshot(),
       permissions: this.permissions,
       role: this.role,
+      role_name: this.roleName,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };
