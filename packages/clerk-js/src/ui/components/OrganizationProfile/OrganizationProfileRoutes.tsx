@@ -24,7 +24,7 @@ const OrganizationAPIKeysPage = lazy(() =>
 export const OrganizationProfileRoutes = () => {
   const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot } =
     useOrganizationProfileContext();
-  const { commerceSettings } = useEnvironment();
+  const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -96,15 +96,17 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         )}
-        <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
-          <Switch>
-            <Route index>
-              <Suspense fallback={''}>
-                <OrganizationAPIKeysPage />
-              </Suspense>
-            </Route>
-          </Switch>
-        </Route>
+        {apiKeysSettings.enabled && (
+          <Route path={isApiKeysPageRoot ? undefined : 'organization-api-keys'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationAPIKeysPage />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        )}
       </Route>
     </Switch>
   );
