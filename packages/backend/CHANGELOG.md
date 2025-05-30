@@ -1,5 +1,52 @@
 # Change Log
 
+## 2.0.0
+
+### Major Changes
+
+- Introduces machine authentication, supporting four token types: `api_key`, `oauth_token`, `machine_token`, and `session_token`. For backwards compatibility, `session_token` remains the default when no token type is specified. This enables machine-to-machine authentication and use cases such as API keys and OAuth integrations. Existing applications continue to work without modification. ([#5689](https://github.com/clerk/javascript/pull/5689)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  You can specify which token types are allowed by using the `acceptsToken` option in the `authenticateRequest()` function. This option can be set to a specific type, an array of types, or `'any'` to accept all supported tokens.
+
+  Example usage:
+
+  ```ts
+  import express from 'express';
+  import { clerkClient } from '@clerk/backend';
+
+  const app = express();
+
+  app.use(async (req, res, next) => {
+    const requestState = await clerkClient.authenticateRequest(req, {
+      acceptsToken: 'any',
+    });
+
+    if (!requestState.isAuthenticated) {
+      // do something for unauthenticated requests
+    }
+
+    const authObject = requestState.toAuth();
+
+    if (authObject.tokenType === 'session_token') {
+      console.log('this is session token from a user');
+    } else {
+      console.log('this is some other type of machine token');
+      console.log('more specifically, a ' + authObject.tokenType);
+    }
+
+    // Attach the auth object to locals so downstream handlers
+    // and middleware can access it
+    res.locals.auth = authObject;
+    next();
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`be2e89c`](https://github.com/clerk/javascript/commit/be2e89ca11aa43d48f74c57a5a34e20d85b4003c), [`5644d94`](https://github.com/clerk/javascript/commit/5644d94f711a0733e4970c3f15c24d56cafc8743), [`8838120`](https://github.com/clerk/javascript/commit/8838120596830b88fec1c6c853371dabfec74a0d)]:
+  - @clerk/types@4.60.0
+  - @clerk/shared@3.9.6
+
 ## 1.34.0
 
 ### Minor Changes
