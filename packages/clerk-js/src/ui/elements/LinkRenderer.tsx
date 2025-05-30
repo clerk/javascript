@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 
-import { Link } from '../customizables';
-import type { PropsOfComponent } from '../styledSystem';
+import { Link } from '@/ui/customizables';
+import type { PropsOfComponent } from '@/ui/styledSystem';
 
 interface LinkRendererProps extends Omit<PropsOfComponent<typeof Link>, 'href' | 'children'> {
   text: string;

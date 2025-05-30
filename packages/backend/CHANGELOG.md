@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.34.0
+
+### Minor Changes
+
+- Adds `clerkClient.organizations.getInstanceOrganizationMembershipList` ([#6022](https://github.com/clerk/javascript/pull/6022)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Add `notifyPrimaryEmailAddressChanged` to `client.users.updateUser(...)` ([#6023](https://github.com/clerk/javascript/pull/6023)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`f897773`](https://github.com/clerk/javascript/commit/f89777379da63cf45039c1570b51ba10a400817c), [`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/shared@3.9.5
+  - @clerk/types@4.59.3
+
 ## 1.33.1
 
 ### Patch Changes

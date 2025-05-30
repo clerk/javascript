@@ -2,21 +2,22 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
-import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
-import { normalizeRoutingOptions } from '../../../utils/normalizeRoutingOptions';
-import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
+import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/ui/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,
   SignUpContext,
   useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
-} from '../../contexts';
-import { Flow } from '../../customizables';
-import { useFetch } from '../../hooks';
-import { usePreloadTasks } from '../../hooks/usePreloadTasks';
-import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import type { SignUpCtx } from '../../types';
+} from '@/ui/contexts';
+import { Flow } from '@/ui/customizables';
+import { useFetch } from '@/ui/hooks';
+import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
+import { SessionTasks as LazySessionTasks } from '@/ui/lazyModules/components';
+import { Route, Switch, useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
+import type { SignUpCtx } from '@/ui/types';
+import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
+
 import {
   LazySignUpContinue,
   LazySignUpSSOCallback,

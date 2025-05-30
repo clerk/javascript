@@ -194,6 +194,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.CAPTCHA_INVALID:
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
             card.setError(error);
             break;
           default:

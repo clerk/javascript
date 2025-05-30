@@ -20,7 +20,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha'
+  'baseTheme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
