@@ -134,7 +134,7 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
 export const RoleSelect = (props: {
   roles: { label: string; value: string }[] | undefined;
   value: string;
-  fallbackLabel: string;
+  fallbackLabel?: string;
   onChange: (params: string) => unknown;
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
@@ -217,14 +217,14 @@ export const RoleSelect = (props: {
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>
           </Flex>
-        ) : (
+        ) : fallbackLabel ? (
           <Text
             as='span'
             sx={t => ({ color: t.colors.$colorText })}
           >
             {fallbackLabel}
           </Text>
-        )}
+        ) : null}
       </SelectButton>
       <SelectOptionList sx={optionListSx} />
     </Select>
