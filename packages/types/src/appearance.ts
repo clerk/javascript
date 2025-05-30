@@ -421,11 +421,12 @@ export type ElementsConfig = {
   pricingTableMatrixFooter: WithOptions;
 
   planDetailHeader: WithOptions;
-  planDetailAvatarBadgeContainer: WithOptions;
   planDetailAvatar: WithOptions;
+  planDetailBadgeAvatarTitleDescriptionContainer: WithOptions;
   planDetailBadgeContainer: WithOptions;
   planDetailBadge: WithOptions;
   planDetailTitle: WithOptions;
+  planDetailTitleDescriptionContainer: WithOptions;
   planDetailDescription: WithOptions;
   planDetailAction: WithOptions;
   planDetailFeeContainer: WithOptions;
