@@ -7,8 +7,8 @@ import type {
   __internal_PlanDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
-  ApiKeyResource,
-  ApiKeysProps,
+  APIKeyResource,
+  APIKeysProps,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -19,11 +19,11 @@ import type {
   ClerkStatus,
   ClientResource,
   CommerceBillingNamespace,
-  CreateApiKeyParams,
+  CreateAPIKeyParams,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
-  GetApiKeysParams,
+  GetAPIKeysParams,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -136,7 +136,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountApiKeysNodes = new Map<HTMLDivElement, ApiKeysProps | undefined>();
+  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -1060,7 +1060,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountApiKeys = (node: HTMLDivElement, props?: ApiKeysProps): void => {
+  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountApiKeys(node, props);
     } else {
@@ -1312,10 +1312,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  getApiKeys = async (params?: GetApiKeysParams): Promise<ApiKeyResource[] | void> => {
+  getApiKeys = async (params?: GetAPIKeysParams): Promise<APIKeyResource[] | void> => {
     const callback = () => this.clerkjs?.getApiKeys(params);
     if (this.clerkjs && this.loaded) {
-      return callback() as Promise<ApiKeyResource[]>;
+      return callback() as Promise<APIKeyResource[]>;
     } else {
       this.premountMethodCalls.set('getApiKeys', callback);
     }
@@ -1330,19 +1330,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  createApiKey = async (params: CreateApiKeyParams): Promise<ApiKeyResource | void> => {
+  createApiKey = async (params: CreateAPIKeyParams): Promise<APIKeyResource | void> => {
     const callback = () => this.clerkjs?.createApiKey(params);
     if (this.clerkjs && this.loaded) {
-      return callback() as Promise<ApiKeyResource>;
+      return callback() as Promise<APIKeyResource>;
     } else {
       this.premountMethodCalls.set('createApiKey', callback);
     }
   };
 
-  revokeApiKey = async (params: RevokeApiKeyParams): Promise<ApiKeyResource | void> => {
+  revokeApiKey = async (params: RevokeApiKeyParams): Promise<APIKeyResource | void> => {
     const callback = () => this.clerkjs?.revokeApiKey(params);
     if (this.clerkjs && this.loaded) {
-      return callback() as Promise<ApiKeyResource>;
+      return callback() as Promise<APIKeyResource>;
     } else {
       this.premountMethodCalls.set('revokeApiKey', callback);
     }
