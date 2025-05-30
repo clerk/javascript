@@ -1,4 +1,4 @@
-import type { APIKeyResource } from './apiKey';
+import type { APIKeyResource } from './apiKeys';
 import type {
   APIKeysTheme,
   Appearance,
@@ -762,15 +762,13 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
-   * @experimental
-   * EARLY ACCESS: This API is in early access and may change in future releases.
+   * This API is in early access and may change in future releases.
    *
    * Retrieves all API keys for the current user or organization.
    */
   getApiKeys: (params?: GetAPIKeysParams) => Promise<APIKeyResource[]>;
 
   /**
-   * @experimental
    * This API is in early access and may change in future releases.
    *
    * Retrieves the secret for a given API key ID.
@@ -778,7 +776,6 @@ export interface Clerk {
   getApiKeySecret: (apiKeyID: string) => Promise<string>;
 
   /**
-   * @experimental
    * This API is in early access and may change in future releases.
    *
    * Creates a new API key.
@@ -786,7 +783,6 @@ export interface Clerk {
   createApiKey: (params: CreateAPIKeyParams) => Promise<APIKeyResource>;
 
   /**
-   * @experimental
    * This API is in early access and may change in future releases.
    *
    * Revokes a given API key by ID.
