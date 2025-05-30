@@ -50,6 +50,7 @@ export interface OrganizationMembershipResource extends ClerkResource {
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData?: PublicUserData;
   role: OrganizationCustomRoleKey;
+  roleName: string;
   createdAt: Date;
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
