@@ -134,3 +134,27 @@ export const RadioInput = React.forwardRef<HTMLInputElement, InputProps>((props,
     />
   );
 });
+
+export type TextareaInputProps = PrimitiveProps<'textarea'> &
+  StyleVariants<typeof applyVariants> &
+  OwnProps &
+  RequiredProp;
+
+export const TextareaInput = React.forwardRef<HTMLTextAreaElement, TextareaInputProps>((props, ref) => {
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = props;
+  const _disabled = isDisabled || props.isDisabled;
+  const _required = isRequired || props.isRequired;
+  const _hasError = hasError || props.hasError;
+
+  return (
+    <textarea
+      {...rest}
+      ref={ref}
+      disabled={_disabled}
+      required={_required}
+      aria-invalid={_hasError}
+      aria-required={_required}
+      css={applyVariants(props)}
+    />
+  );
+});

@@ -1,18 +1,21 @@
 import { useUser } from '@clerk/shared/react';
+import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '../../contexts';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '../../customizables';
-import { ApplicationLogo, Avatar, Card, Header, Tooltip, withCardStateProvider } from '../../elements';
+import { ApplicationLogo, Avatar, Card, Header, Modal, Tooltip, withCardStateProvider } from '../../elements';
 import { Connections } from '../../icons';
+import { TextareaInput } from '../../primitives';
 import type { ThemableCssProp } from '../../styledSystem';
 import { common } from '../../styledSystem';
-import { colors } from '../../utils';
+import * as utils from '../../utils';
 
 export function OAuthConsentInternal() {
   const { scopes, oAuthApplicationName, oAuthApplicationLogoUrl, redirectUrl, onDeny, onAllow } =
     useOAuthConsentContext();
   const { user } = useUser();
   const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
+  const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
   const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
 
@@ -43,6 +46,9 @@ export function OAuthConsentInternal() {
                 <Tooltip.Trigger>
                   <Text
                     as='span'
+                    role='button'
+                    tabIndex={0}
+                    aria-label='View full URL'
                     variant='caption'
                     sx={{
                       textDecoration: 'underline',
@@ -51,12 +57,13 @@ export function OAuthConsentInternal() {
                       outline: 'none',
                       display: 'inline-block',
                     }}
+                    onClick={() => setIsUriModalOpen(true)}
                   >
                     {getRootDomain()}
                   </Text>
                 </Tooltip.Trigger>
                 <Tooltip.Content
-                  text={redirectUrl}
+                  text={`View full URL`}
                   sx={{ wordBreak: 'break-all' }}
                 />
               </Tooltip.Root>
@@ -147,7 +154,7 @@ export function OAuthConsentInternal() {
               sx={t => ({
                 padding: t.space.$3,
                 background: common.mergedColorsBackground(
-                  colors.setAlpha(t.colors.$colorBackground, 1),
+                  utils.colors.setAlpha(t.colors.$colorBackground, 1),
                   t.colors.$neutralAlpha50,
                 ),
               })}
@@ -220,6 +227,9 @@ export function OAuthConsentInternal() {
                 <Tooltip.Trigger>
                   <Text
                     as='span'
+                    role='button'
+                    tabIndex={0}
+                    aria-label='View full URL'
                     variant='caption'
                     sx={{
                       textDecoration: 'underline',
@@ -228,6 +238,7 @@ export function OAuthConsentInternal() {
                       outline: 'none',
                       display: 'inline-block',
                     }}
+                    onClick={() => setIsUriModalOpen(true)}
                   >
                     {getRootDomain()}
                   </Text>
@@ -239,7 +250,48 @@ export function OAuthConsentInternal() {
         </Card.Content>
         <Card.Footer />
       </Card.Root>
+      <RedirectUriModal
+        isOpen={isUriModalOpen}
+        onOpen={() => setIsUriModalOpen(true)}
+        onClose={() => setIsUriModalOpen(false)}
+        redirectUri={redirectUrl}
+      />
     </Flow.Root>
+  );
+}
+
+function RedirectUriModal({
+  onOpen,
+  onClose,
+  isOpen,
+  redirectUri,
+}: {
+  onOpen: () => void;
+  onClose: () => void;
+  isOpen?: boolean;
+  redirectUri?: string;
+}) {
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <Modal
+      handleOpen={onOpen}
+      handleClose={onClose}
+    >
+      <Card.Root>
+        <Card.Content>
+          <TextareaInput
+            style={{ maxHeight: 'none' }}
+            cols={60}
+            rows={8}
+            defaultValue={redirectUri}
+            readOnly
+          />
+        </Card.Content>
+      </Card.Root>
+    </Modal>
   );
 }
 
@@ -272,7 +324,7 @@ function ConnectionIcon({ size = 'md', sx }: { size?: 'sm' | 'md'; sx?: Themable
       sx={t => [
         {
           background: common.mergedColorsBackground(
-            colors.setAlpha(t.colors.$colorBackground, 1),
+            utils.colors.setAlpha(t.colors.$colorBackground, 1),
             t.colors.$neutralAlpha50,
           ),
           borderRadius: t.radii.$circle,
