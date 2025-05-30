@@ -20,8 +20,12 @@ export function OAuthConsentInternal() {
   const primaryEmailAddress = user?.emailAddresses.find(email => email.id === user.primaryEmailAddress?.id);
 
   function getRootDomain(): string {
-    const { hostname } = new URL(redirectUrl);
-    return hostname.split('.').slice(-2).join('.');
+    try {
+      const { hostname } = new URL(redirectUrl);
+      return hostname.split('.').slice(-2).join('.');
+    } catch {
+      return '';
+    }
   }
 
   return (
