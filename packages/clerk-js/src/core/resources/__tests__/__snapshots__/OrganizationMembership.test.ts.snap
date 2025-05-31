@@ -55,6 +55,7 @@ OrganizationMembership {
     "userId": undefined,
   },
   "role": "admin",
+  "roleName": undefined,
   "update": [Function],
   "updatedAt": 1970-01-01T00:00:05.678Z,
 }
