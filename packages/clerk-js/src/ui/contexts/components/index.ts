@@ -15,3 +15,4 @@ export * from './PricingTable';
 export * from './Checkout';
 export * from './Statements';
 export * from './Plans';
+export * from './OAuthConsent';

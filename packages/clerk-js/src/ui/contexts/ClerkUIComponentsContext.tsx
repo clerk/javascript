@@ -1,10 +1,11 @@
-import type { PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
+import type { __internal_OAuthConsentProps, PricingTableProps, UserButtonProps, WaitlistProps } from '@clerk/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   CreateOrganizationContext,
   GoogleOneTapContext,
+  OAuthConsentContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
@@ -87,6 +88,12 @@ export function ComponentContextProvider({
             {children}
           </PricingTableContext.Provider>
         </SubscriberTypeContext.Provider>
+      );
+    case 'OAuthConsent':
+      return (
+        <OAuthConsentContext.Provider value={{ componentName, ...(props as __internal_OAuthConsentProps) }}>
+          {children}
+        </OAuthConsentContext.Provider>
       );
 
     default:
