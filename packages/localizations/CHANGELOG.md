@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.16.3
+
+### Patch Changes
+
+- Add "Past Due" amount on checkout flow when applicable ([#6014](https://github.com/clerk/javascript/pull/6014)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`2c6a0cc`](https://github.com/clerk/javascript/commit/2c6a0cca6e824bafc6b0d0501784517a5b1f75ea), [`71e6a1f`](https://github.com/clerk/javascript/commit/71e6a1f1024d65b7a09cdc8fa81ce0164e0a34cb)]:
+  - @clerk/types@4.59.3
+
 ## 3.16.2
 
 ### Patch Changes

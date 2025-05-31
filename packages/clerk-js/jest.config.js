@@ -37,6 +37,9 @@ const config = {
   // ],
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\](?!(@formkit/auto-animate/react)).+\\.(js|jsx|mjs|cjs|ts|tsx)$'],
   moduleDirectories: ['node_modules', '<rootDir>/src'],
+  moduleNameMapper: {
+    '@/(.*)': '<rootDir>/src/$1',
+  },
   transform: {
     '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
     // '^.+\\.m?tsx?$': ['@swc/jest'],

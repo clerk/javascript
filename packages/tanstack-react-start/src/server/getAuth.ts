@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { stripPrivateDataFromObject } from '@clerk/backend/internal';
 
 import { errorThrower } from '../utils';
@@ -7,7 +7,7 @@ import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 
-type GetAuthReturn = Promise<AuthObject>;
+type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
 
 type GetAuthOptions = Pick<LoaderOptions, 'secretKey'>;
 

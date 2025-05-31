@@ -8,7 +8,7 @@ import type {
   CommerceSubscriptionResource,
 } from '@clerk/types';
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useProtect } from '../../common';
 import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
@@ -19,7 +19,9 @@ import { handleError } from '../../utils';
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <SubscriberTypeContext.Provider value={props.subscriberType || 'user'}>
-      <PlanDetailsInternal {...props} />
+      <Drawer.Content>
+        <PlanDetailsInternal {...props} />
+      </Drawer.Content>
     </SubscriberTypeContext.Provider>
   );
 };
@@ -28,18 +30,22 @@ const PlanDetailsInternal = ({
   plan,
   onSubscriptionCancel,
   portalRoot,
-  planPeriod: _planPeriod = 'month',
+  initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
   const { organization } = useOrganization();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<ClerkRuntimeError | ClerkAPIError | string | undefined>();
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(_planPeriod);
+  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
 
   const { setIsOpen } = useDrawerContext();
-  const { activeOrUpcomingSubscription, revalidateAll, buttonPropsForPlan, isDefaultPlanImplicitlyActiveOrUpcoming } =
-    usePlansContext();
+  const {
+    activeOrUpcomingSubscriptionBasedOnPlanPeriod,
+    revalidateAll,
+    buttonPropsForPlan,
+    isDefaultPlanImplicitlyActiveOrUpcoming,
+  } = usePlansContext();
   const subscriberType = useSubscriberTypeContext();
   const canManageBilling = useProtect(
     has => has({ permission: 'org:sys_billing:manage' }) || subscriberType === 'user',
@@ -49,7 +55,7 @@ const PlanDetailsInternal = ({
     return null;
   }
 
-  const subscription = activeOrUpcomingSubscription(plan);
+  const subscription = activeOrUpcomingSubscriptionBasedOnPlanPeriod(plan, planPeriod);
 
   const handleClose = () => {
     if (setIsOpen) {
@@ -105,7 +111,7 @@ const PlanDetailsInternal = ({
   };
 
   return (
-    <Drawer.Content>
+    <>
       <Drawer.Header
         sx={t =>
           !hasFeatures
@@ -209,7 +215,10 @@ const PlanDetailsInternal = ({
               />
             ) : (
               <Col gap={4}>
-                {!!subscription && subscription.planPeriod === 'month' && plan.annualMonthlyAmount > 0 ? (
+                {!!subscription &&
+                subscription.planPeriod === 'month' &&
+                plan.annualMonthlyAmount > 0 &&
+                planPeriod === 'annual' ? (
                   <Button
                     block
                     variant='bordered'
@@ -220,7 +229,7 @@ const PlanDetailsInternal = ({
                     localizationKey={localizationKeys('commerce.switchToAnnual')}
                   />
                 ) : null}
-                {!!subscription && subscription.planPeriod === 'annual' ? (
+                {!!subscription && subscription.planPeriod === 'annual' && planPeriod === 'month' ? (
                   <Button
                     block
                     variant='bordered'
@@ -314,7 +323,7 @@ const PlanDetailsInternal = ({
           )}
         </Drawer.Confirmation>
       ) : null}
-    </Drawer.Content>
+    </>
   );
 };
 
@@ -338,7 +347,14 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
 
   const isImplicitlyActiveOrUpcoming = isDefaultPlanImplicitlyActiveOrUpcoming && plan.isDefault;
 
-  const showBadge = !!subscription || isImplicitlyActiveOrUpcoming;
+  const showBadge = !!subscription;
+
+  const getPlanFee = useMemo(() => {
+    if (plan.annualMonthlyAmount <= 0) {
+      return plan.amountFormatted;
+    }
+    return planPeriod === 'annual' ? plan.annualMonthlyAmountFormatted : plan.amountFormatted;
+  }, [plan, planPeriod]);
 
   return (
     <Box
@@ -362,27 +378,58 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </Box>
       ) : null}
 
-      {plan.avatarUrl ? (
-        <Avatar
-          boxElementDescriptor={descriptors.planDetailAvatar}
-          size={_ => 40}
-          title={plan.name}
-          initials={plan.name[0]}
-          rounded={false}
-          imageUrl={plan.avatarUrl}
-          sx={t => ({
-            marginBlockEnd: t.space.$3,
-          })}
-        />
-      ) : null}
-      <Box
-        sx={t => ({
-          paddingInlineEnd: t.space.$10,
-        })}
+      <Col
+        gap={3}
+        elementDescriptor={descriptors.planDetailBadgeAvatarTitleDescriptionContainer}
       >
-        <Flex
-          gap={2}
-          align='center'
+        {showBadge ? (
+          <Flex
+            align='center'
+            gap={3}
+            elementDescriptor={descriptors.planDetailBadgeContainer}
+            sx={t => ({
+              paddingInlineEnd: t.space.$10,
+            })}
+          >
+            {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
+              <Badge
+                elementDescriptor={descriptors.planDetailBadge}
+                localizationKey={localizationKeys('badge__activePlan')}
+                colorScheme={'secondary'}
+              />
+            ) : (
+              <Badge
+                elementDescriptor={descriptors.planDetailBadge}
+                localizationKey={localizationKeys('badge__upcomingPlan')}
+                colorScheme={'primary'}
+              />
+            )}
+            {!!subscription && (
+              <Text
+                elementDescriptor={descriptors.planDetailCaption}
+                variant={'caption'}
+                localizationKey={captionForSubscription(subscription)}
+                colorScheme='secondary'
+              />
+            )}
+          </Flex>
+        ) : null}
+        {plan.avatarUrl ? (
+          <Avatar
+            boxElementDescriptor={descriptors.planDetailAvatar}
+            size={_ => 40}
+            title={plan.name}
+            initials={plan.name[0]}
+            rounded={false}
+            imageUrl={plan.avatarUrl}
+            sx={t => ({
+              marginBlockEnd: t.space.$3,
+            })}
+          />
+        ) : null}
+        <Col
+          gap={1}
+          elementDescriptor={descriptors.planDetailTitleDescriptionContainer}
         >
           <Heading
             elementDescriptor={descriptors.planDetailTitle}
@@ -391,37 +438,17 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           >
             {plan.name}
           </Heading>
-          {showBadge ? (
-            <Flex elementDescriptor={descriptors.planDetailBadgeContainer}>
-              {subscription?.status === 'active' || (isImplicitlyActiveOrUpcoming && subscriptions.length === 0) ? (
-                <Badge
-                  elementDescriptor={descriptors.planDetailBadge}
-                  localizationKey={localizationKeys('badge__activePlan')}
-                  colorScheme={'secondary'}
-                />
-              ) : (
-                <Badge
-                  elementDescriptor={descriptors.planDetailBadge}
-                  localizationKey={localizationKeys('badge__upcomingPlan')}
-                  colorScheme={'primary'}
-                />
-              )}
-            </Flex>
+          {plan.description ? (
+            <Text
+              elementDescriptor={descriptors.planDetailDescription}
+              variant='subtitle'
+              colorScheme='secondary'
+            >
+              {plan.description}
+            </Text>
           ) : null}
-        </Flex>
-        {plan.description ? (
-          <Text
-            elementDescriptor={descriptors.planDetailDescription}
-            variant='subtitle'
-            colorScheme='secondary'
-            sx={t => ({
-              marginTop: t.space.$1,
-            })}
-          >
-            {plan.description}
-          </Text>
-        ) : null}
-      </Box>
+        </Col>
+      </Col>
 
       <Flex
         elementDescriptor={descriptors.planDetailFeeContainer}
@@ -439,9 +466,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             colorScheme='body'
           >
             {plan.currencySymbol}
-            {(subscription && subscription.planPeriod === 'annual') || planPeriod === 'annual'
-              ? plan.annualMonthlyAmountFormatted
-              : plan.amountFormatted}
+            {getPlanFee}
           </Text>
           <Text
             elementDescriptor={descriptors.planDetailFeePeriod}
@@ -459,7 +484,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {!subscription || (subscription.planPeriod === 'month' && plan.annualMonthlyAmount > 0) ? (
+      {plan.annualMonthlyAmount > 0 ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({
@@ -473,15 +498,17 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
             label={localizationKeys('commerce.billedAnnually')}
           />
         </Box>
-      ) : null}
-
-      {!!subscription && (
+      ) : (
         <Text
-          elementDescriptor={descriptors.planDetailCaption}
-          variant={'caption'}
-          localizationKey={captionForSubscription(subscription)}
+          elementDescriptor={descriptors.pricingTableCardFeePeriodNotice}
+          variant='caption'
           colorScheme='secondary'
+          localizationKey={
+            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+          }
           sx={t => ({
+            justifySelf: 'flex-start',
+            alignSelf: 'center',
             marginTop: t.space.$3,
           })}
         />
