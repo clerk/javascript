@@ -206,7 +206,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.page.getByRole('heading', { name: 'Pro' })).toBeVisible();
     });
 
-    test('can subscribe to a plan and revalidate payment sources', async ({ page, context }) => {
+    test('can subscribe to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+      page,
+      context,
+    }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -232,6 +235,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(
         page.locator('.cl-checkout-root').getByRole('button', { name: /^pay with test card$/i }),
       ).toBeHidden();
+
+      await u.po.checkout.waitForMounted();
+      await u.po.checkout.clickPayOrSubscribe();
+      await u.po.checkout.confirmAndContinue();
+
+      await u.po.page.locator('.cl-headerBackLink').getByText('Plans').click();
+
+      // Verify the Free plan with Upcoming status exists
+      await expect(
+        u.po.page
+          .locator('.cl-profileSectionContent__subscriptionsList')
+          .getByText('Free')
+          .locator('xpath=..')
+          .getByText('Upcoming'),
+      ).toBeVisible();
 
       await fakeUser.deleteIfExists();
     });

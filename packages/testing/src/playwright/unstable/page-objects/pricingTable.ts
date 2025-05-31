@@ -34,9 +34,8 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
       shouldSwitch?: boolean;
       period?: 'monthly' | 'annually';
     }) => {
-      // const targetButtonName =
-      //   shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
-      console.log('shouldSwitch', shouldSwitch);
+      const targetButtonName =
+        shouldSwitch === true ? 'Switch to this plan' : shouldSwitch === false ? /subscribe/i : /get|switch|subscribe/i;
 
       if (period) {
         await page.locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardPeriodToggle`).click();
@@ -50,7 +49,12 @@ export const createPricingTablePageObject = (testArgs: { page: EnhancedPage }) =
         }
       }
 
-      await self.getPlanCardCTA({ planSlug }).click();
+      await page
+        .locator(`.cl-pricingTableCard__${planSlug} .cl-pricingTableCardFooter`)
+        .getByRole('button', {
+          name: targetButtonName,
+        })
+        .click();
     },
   };
   return self;
