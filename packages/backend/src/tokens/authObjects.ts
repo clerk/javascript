@@ -35,9 +35,12 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
 };
 
 /**
- * @interface
+ * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  /**
+   * The allowed token type.
+   */
   tokenType: SessionTokenType;
   /**
    * A function that gets the current user's [session token](https://clerk.com/docs/backend-requests/resources/session-tokens) or a [custom JWT template](https://clerk.com/docs/backend-requests/jwt-templates).
@@ -54,7 +57,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
 };
 
 /**
- * @interface
+ * @internal
  */
 export type SignedOutAuthObject = {
   sessionClaims: null;
@@ -122,6 +125,9 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
   tokenType: T;
 } & MachineObjectExtendedProperties<false>[T];
 
+/**
+ * @interface
+ */
 export type AuthObject =
   | SignedInAuthObject
   | SignedOutAuthObject

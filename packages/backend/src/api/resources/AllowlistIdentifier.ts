@@ -26,6 +26,9 @@ export class AllowlistIdentifier {
      * The date when the allowlist identifier was last updated.
      */
     readonly updatedAt: number,
+    /**
+     * The ID of the instance that this allowlist identifier belongs to.
+     */
     readonly instanceId?: string,
     /**
      * The ID of the invitation sent to the identifier.

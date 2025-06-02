@@ -379,7 +379,8 @@ export const authenticateRequest: AuthenticateRequest = (async (
     const { tokenInHeader } = authenticateContext;
 
     try {
-      const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const { data, errors } = await verifyToken(tokenInHeader!, authenticateContext);
       if (errors) {
         throw errors[0];
       }
