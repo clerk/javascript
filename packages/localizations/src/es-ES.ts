@@ -756,7 +756,7 @@ export const esES: LocalizationResource = {
       requireSpecialCharacter: 'Al menos un carácter especial',
       requireUppercase: 'Al menos una letra mayúscula',
       sentencePrefix: 'Tu contraseña debe contener:',
-    }
+    },
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, inténtelo con otro.',
     session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: undefined,
