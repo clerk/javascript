@@ -1655,7 +1655,7 @@ export type __internal_PlanDetailsProps = {
   appearance?: PlanDetailTheme;
   plan?: CommercePlanResource;
   subscriberType?: CommerceSubscriberType;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
