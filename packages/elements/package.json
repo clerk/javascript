@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.30",
+  "version": "0.23.31",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -74,8 +74,8 @@
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "@radix-ui/primitive": "^1.1.2",
-    "@radix-ui/react-form": "^0.1.6",
-    "@radix-ui/react-slot": "^1.2.2",
+    "@radix-ui/react-form": "^0.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@xstate/react": "^5.0.4",
     "client-only": "^0.0.1",
     "tslib": "catalog:repo",

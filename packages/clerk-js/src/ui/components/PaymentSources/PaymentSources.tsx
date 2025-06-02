@@ -4,7 +4,7 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { usePaymentSources, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -174,14 +174,13 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
-  const { data: subscriptions } = useSubscriptions();
 
   const actions = [
     {
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault && subscriptions.some(s => !s.plan.isDefault),
+      isDisabled: !paymentSource.isRemovable,
     },
   ];
 
