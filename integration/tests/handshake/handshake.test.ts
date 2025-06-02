@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
 import { constants } from '../../constants';
 import { fs } from '../../scripts';
 import { createProxyServer } from '../../scripts/proxyServer';
-import type { FakeUser } from '../../testUtils';
+import type { FakeUserWithEmail } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('handshake flow @handshake', ({ app }) => {
@@ -15,7 +15,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
     // TODO: change host name
     const host = 'multiple-apps-e2e.clerk.app:8443';
 
-    let fakeUser: FakeUser;
+    let fakeUser: FakeUserWithEmail;
     let server: Server;
 
     test.afterAll(async () => {
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
 
       const u = createTestUtils({ app, useTestingToken: false });
       // AND an existing user in the instance
-      fakeUser = u.services.users.createFakeUser();
+      fakeUser = u.services.users.createFakeUser({ withEmail: true }) as FakeUserWithEmail;
       await u.services.users.createBapiUser(fakeUser);
     });
 
@@ -51,8 +51,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
       // GIVEN the user is signed into the app on the app homepage
       await u.page.goto(`https://${host}`);
       await u.po.signIn.goTo();
-      // TODO: need to fix the type here
-      await u.po.signIn.signInWithEmailAndInstantPassword(<any>fakeUser);
+      await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u.po.expect.toBeSignedIn();
 
       // AND the user has no client uat cookies
