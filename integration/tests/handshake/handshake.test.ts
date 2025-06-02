@@ -1,6 +1,6 @@
 import type { Server, ServerOptions } from 'node:https';
 
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { constants } from '../../constants';
 import { fs } from '../../scripts';
@@ -24,6 +24,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
     });
 
     test.beforeAll(async () => {
+      // GIVEN a Production App and Clerk instance
       // TODO: Factor out proxy server creation to helper
       const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
         cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
@@ -38,6 +39,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
       });
 
       const u = createTestUtils({ app, useTestingToken: false });
+      // AND an existing user in the instance
       fakeUser = u.services.users.createFakeUser();
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -46,23 +48,35 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
       const page = await context.newPage();
       const u = createTestUtils({ app, page, context, useTestingToken: false });
 
+      // GIVEN the user is signed into the app on the app homepage
       await u.page.goto(`https://${host}`);
-
       await u.po.signIn.goTo();
       // TODO: need to fix the type here
       await u.po.signIn.signInWithEmailAndInstantPassword(<any>fakeUser);
       await u.po.expect.toBeSignedIn();
 
-      // delete the client uat cookies to force a handshake flow
+      // AND the user has no client uat cookies
+      // (which forces a handshake flow)
       await context.clearCookies({ name: /__client_uat.*/ });
 
-      // go to the protected page (the handshake should happen here)
+      // WHEN the user goes to the protected page
+      // (the handshake should happen here)
       await u.page.goToRelative('/protected');
 
+      // THEN the user is signed in
       await u.po.expect.toBeSignedIn();
-      // TODO: expect to be on the protected page
-      // TODO: expect to have valid cookies (session, client_uat, etc)
-      // TODO: expect not to have temporary cookies (e.g. handshake nonce)
+      // AND the user is on the protected page
+      expect(u.page.url()).toBe(`https://${host}/protected`);
+      // AND the user has valid cookies (session, client_uat, etc)
+      const cookies = await u.page.context().cookies();
+      const clientUatCookies = cookies.filter(c => c.name.startsWith('__client_uat'));
+      // TODO: should we be more specific about the number of cookies?
+      expect(clientUatCookies.length).toBeGreaterThan(0);
+      const sessionCookies = cookies.filter(c => c.name.startsWith('__session'));
+      expect(sessionCookies.length).toBeGreaterThan(0);
+      // AND the user does not have temporary cookies (e.g. __clerk_handshake, __clerk_handshake_nonce)
+      const handshakeCookies = cookies.filter(c => c.name.includes('handshake'));
+      expect(handshakeCookies.length).toBe(0);
     });
   });
 });
