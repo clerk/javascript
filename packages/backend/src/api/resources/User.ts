@@ -69,7 +69,7 @@ export class User {
      */
     readonly primaryPhoneNumberId: string | null,
     /**
-     * The ID for the [`Web3Wallet`](https://clerk.com/docs/references/javascript/web3-wallet/web3-wallet) that the user signed up with.
+     * The ID for the [`Web3Wallet`](https://clerk.com/docs/references/backend/types/backend-web3-wallet) that the user signed up with.
      */
     readonly primaryWeb3WalletId: string | null,
     /**

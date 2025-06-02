@@ -40,9 +40,18 @@ const LINK_REPLACEMENTS = [
   ['organization-domain-resource', '/docs/references/javascript/types/organization-domain'],
   ['organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/references/javascript/types/organization-membership-request'],
-  ['session', '/docs/references/javascript/session'],
+  ['session', '/docs/references/backend/types/backend-session'],
+  ['session-activity', '/docs/references/backend/types/backend-session-activity'],
+  ['organization', '/docs/references/backend/types/backend-organization'],
   ['public-organization-data-json', '#public-organization-data-json'],
   ['organization-membership-public-user-data', '#organization-membership-public-user-data'],
+  ['identification-link', '/docs/references/backend/types/backend-identification-link'],
+  ['verification', '/docs/references/backend/types/backend-verification'],
+  ['email-address', '/docs/references/backend/types/backend-email-address'],
+  ['external-account', '/docs/references/backend/types/backend-external-account'],
+  ['phone-number', '/docs/references/backend/types/backend-phone-number'],
+  ['saml-account', '/docs/references/backend/types/backend-saml-account'],
+  ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
 ];
 
 /**
@@ -109,10 +118,6 @@ function getCatchAllReplacements() {
       pattern: /`OrganizationInvitationPublicMetadata`/g,
       replace:
         '[`OrganizationInvitationPublicMetadata`](/docs/references/javascript/types/metadata#organization-invitation-public-metadata)',
-    },
-    {
-      pattern: /`SessionActivity`/g,
-      replace: '[`SessionActivity`](/docs/references/javascript/types/session-with-activities#session-activity)',
     },
     {
       /**

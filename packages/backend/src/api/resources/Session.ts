@@ -1,5 +1,8 @@
 import type { SessionActivityJSON, SessionJSON } from './JSON';
 
+/**
+ * The Backend `SessionActivity` object models the activity of a user session, capturing details such as the device type, browser information, and geographical location.
+ */
 export class SessionActivity {
   constructor(
     /**

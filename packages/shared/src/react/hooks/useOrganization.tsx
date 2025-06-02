@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-description-complete-sentence */
 import type {
   ClerkPaginatedResponse,
   CommerceSubscriptionResource,
@@ -34,7 +35,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/organizations/verified-domains#enrollment-mode).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>.
+   * </ul>
    */
   domains?: true | PaginatedHookConfig<GetDomainsParams>;
   /**
@@ -43,7 +44,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`status`: A string that filters the membership requests by the provided status.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>.
+   * </ul>
    */
   membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
   /**
@@ -53,7 +54,7 @@ export type UseOrganizationParams = {
    *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/references/javascript/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>.
+   * </ul>
    */
   memberships?: true | PaginatedHookConfig<GetMembersParams>;
   /**
@@ -62,7 +63,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`status`: A string that filters the invitations by the provided status.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>.
+   * </ul>
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
   /**
@@ -71,7 +72,7 @@ export type UseOrganizationParams = {
    * <ul>
    *  <li>`orgId`: A string that filters the subscriptions by the provided organization ID.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
-   * </ul>.
+   * </ul>
    */
   subscriptions?: true | PaginatedHookConfig<GetSubscriptionsParams>;
 };

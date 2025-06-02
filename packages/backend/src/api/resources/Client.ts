@@ -11,11 +11,11 @@ export class Client {
      */
     readonly id: string,
     /**
-     * An array of [Session](https://clerk.com/docs/references/javascript/session){{ target: '_blank' }} IDs associated with the `Client`.
+     * An array of [Session](https://clerk.com/docs/references/backend/types/backend-session){{ target: '_blank' }} IDs associated with the `Client`.
      */
     readonly sessionIds: string[],
     /**
-     * An array of [Session](https://clerk.com/docs/references/javascript/session){{ target: '_blank' }} objects associated with the `Client`.
+     * An array of [Session](https://clerk.com/docs/references/backend/types/backend-session){{ target: '_blank' }} objects associated with the `Client`.
      */
     readonly sessions: Session[],
     /**
@@ -27,7 +27,7 @@ export class Client {
      */
     readonly signUpId: string | null,
     /**
-     * The ID of the last active [Session](https://clerk.com/docs/references/javascript/session).
+     * The ID of the last active [Session](https://clerk.com/docs/references/backend/types/backend-session).
      */
     readonly lastActiveSessionId: string | null,
     /**
