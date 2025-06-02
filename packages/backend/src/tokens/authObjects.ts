@@ -2,7 +2,9 @@ import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
   CheckAuthorizationFromSessionClaims,
+  Jwt,
   JwtPayload,
+  PendingSessionOptions,
   ServerGetToken,
   ServerGetTokenOptions,
   SessionStatusClaim,
@@ -131,7 +133,7 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
  * @internal
  */
 export function signedInAuthObject(
-  authenticateContext: AuthenticateContext,
+  authenticateContext: Partial<AuthenticateContext>,
   sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
@@ -325,4 +327,20 @@ const createGetToken: CreateGetToken = params => {
 
     return sessionToken;
   };
+};
+
+/**
+ * @internal
+ */
+export const getAuthObjectFromJwt = (
+  jwt: Jwt,
+  { treatPendingAsSignedOut, ...options }: PendingSessionOptions & Partial<AuthenticateContext>,
+) => {
+  const authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
+
+  if (treatPendingAsSignedOut && authObject.sessionStatus === 'pending') {
+    return signedOutAuthObject(options);
+  }
+
+  return authObject;
 };
