@@ -117,7 +117,7 @@ function Card(props: CardProps) {
     clerk.__internal_openPlanDetails({
       plan,
       subscriberType,
-      planPeriod,
+      initialPlanPeriod: planPeriod,
       portalRoot,
     });
   };
@@ -414,10 +414,11 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           localizationKey={
             plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
           }
-          sx={{
+          sx={t => ({
             justifySelf: 'flex-start',
             alignSelf: 'center',
-          }}
+            marginTop: t.space.$1,
+          })}
         />
       )}
     </Box>
