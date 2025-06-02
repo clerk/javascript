@@ -96,6 +96,7 @@ export interface CommercePaymentSourceResource extends ClerkResource {
   paymentMethod: string;
   cardType: string;
   isDefault: boolean;
+  isRemovable: boolean;
   status: CommercePaymentSourceStatus;
   walletType: string | undefined;
   remove: (params?: RemovePaymentSourceParams) => Promise<DeletedObjectResource>;
@@ -105,6 +106,7 @@ export interface CommercePaymentSourceResource extends ClerkResource {
 export interface CommerceInitializedPaymentSourceResource extends ClerkResource {
   externalClientSecret: string;
   externalGatewayId: string;
+  paymentMethodOrder: string[];
 }
 
 export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;

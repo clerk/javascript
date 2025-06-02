@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/react';
 
 import { act, render } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { OrganizationSwitcher } from '../OrganizationSwitcher';
+import { OrganizationSwitcher } from '../';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,

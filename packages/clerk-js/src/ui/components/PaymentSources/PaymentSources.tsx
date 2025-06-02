@@ -4,16 +4,18 @@ import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
 import { RemoveResourceForm } from '../../common';
-import { usePaymentSources, useSubscriberTypeContext, useSubscriptions } from '../../contexts';
+import { DevOnly } from '../../common/DevOnly';
+import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';
-import { AddPaymentSource } from './AddPaymentSource';
+import * as AddPaymentSource from './AddPaymentSource';
 import { PaymentSourceRow } from './PaymentSourceRow';
+import { TestPaymentSource } from './TestPaymentSource';
 
-const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
+const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -30,12 +32,20 @@ const AddScreen = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <AddPaymentSource
+    <AddPaymentSource.Root
       onSuccess={onAddPaymentSourceSuccess}
       cancelAction={close}
-    />
+    >
+      <AddPaymentSource.FormHeader text={localizationKeys('userProfile.billingPage.paymentSourcesSection.add')} />
+      <AddPaymentSource.FormSubtitle
+        text={localizationKeys('userProfile.billingPage.paymentSourcesSection.addSubtitle')}
+      />
+      <DevOnly>
+        <TestPaymentSource />
+      </DevOnly>
+    </AddPaymentSource.Root>
   );
-};
+});
 
 const RemoveScreen = ({
   paymentSource,
@@ -174,14 +184,13 @@ const PaymentSourceMenu = ({
   const card = useCardState();
   const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
-  const { data: subscriptions } = useSubscriptions();
 
   const actions = [
     {
       label: localizationKeys('userProfile.billingPage.paymentSourcesSection.actionLabel__remove'),
       isDestructive: true,
       onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: paymentSource.isDefault && subscriptions.some(s => !s.plan.isDefault),
+      isDisabled: !paymentSource.isRemovable,
     },
   ];
 
