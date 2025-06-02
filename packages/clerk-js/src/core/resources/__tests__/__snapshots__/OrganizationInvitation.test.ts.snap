@@ -12,6 +12,7 @@ OrganizationInvitation {
   },
   "revoke": [Function],
   "role": "basic_member",
+  "roleName": undefined,
   "status": "pending",
   "updatedAt": 1970-01-01T00:00:05.678Z,
 }

@@ -339,13 +339,14 @@ export const usePlansContext = () => {
       appearance,
       newSubscriptionRedirectUrl,
     }: HandleSelectPlanProps) => {
-      const subscription = activeOrUpcomingSubscription(plan);
+      const subscription = activeOrUpcomingSubscriptionWithPlanPeriod(plan, planPeriod);
 
       const portalRoot = getClosestProfileScrollBox(mode, event);
 
       if (subscription && subscription.planPeriod === planPeriod && !subscription.canceledAt) {
         clerk.__internal_openPlanDetails({
           plan,
+          initialPlanPeriod: planPeriod,
           subscriberType,
           onSubscriptionCancel: () => {
             revalidateAll();

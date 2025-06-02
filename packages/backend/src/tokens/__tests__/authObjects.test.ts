@@ -1,8 +1,15 @@
 import type { JwtPayload } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
+import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
 import type { AuthenticateContext } from '../authenticateContext';
-import { makeAuthObjectSerializable, signedInAuthObject, signedOutAuthObject } from '../authObjects';
+import {
+  authenticatedMachineObject,
+  makeAuthObjectSerializable,
+  signedInAuthObject,
+  signedOutAuthObject,
+  unauthenticatedMachineObject,
+} from '../authObjects';
 
 describe('makeAuthObjectSerializable', () => {
   it('removes non-serializable props', () => {
@@ -252,5 +259,106 @@ describe('signedInAuthObject', () => {
       expect(authObject.has({ plan: 'pro' })).toBe(true); // because the user has it.
       expect(authObject.has({ plan: 'business' })).toBe(true); // because the org has it.
     });
+  });
+});
+
+describe('authenticatedMachineObject', () => {
+  const debugData = { foo: 'bar' };
+
+  describe('API Key authentication', () => {
+    const token = mockTokens.api_key;
+    const verificationResult = mockVerificationResults.api_key;
+
+    it('getToken returns the token passed in', async () => {
+      const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
+      const retrievedToken = await authObject.getToken();
+      expect(retrievedToken).toBe(token);
+    });
+
+    it('has() always returns false', () => {
+      const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
+      expect(authObject.has({})).toBe(false);
+    });
+
+    it('properly initializes properties', () => {
+      const authObject = authenticatedMachineObject('api_key', token, verificationResult, debugData);
+      expect(authObject.tokenType).toBe('api_key');
+      expect(authObject.name).toBe('my-api-key');
+      expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.claims).toEqual({ foo: 'bar' });
+    });
+  });
+
+  describe('OAuth Access Token authentication', () => {
+    const token = mockTokens.oauth_token;
+    const verificationResult = mockVerificationResults.oauth_token;
+
+    it('getToken returns the token passed in', async () => {
+      const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
+      const retrievedToken = await authObject.getToken();
+      expect(retrievedToken).toBe(token);
+    });
+
+    it('has() always returns false', () => {
+      const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
+      expect(authObject.has({})).toBe(false);
+    });
+
+    it('properly initializes properties', () => {
+      const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
+      expect(authObject.tokenType).toBe('oauth_token');
+      expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+    });
+  });
+
+  describe('Machine Token authentication', () => {
+    const debugData = { foo: 'bar' };
+    const token = mockTokens.machine_token;
+    const verificationResult = mockVerificationResults.machine_token;
+
+    it('getToken returns the token passed in', async () => {
+      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
+      const retrievedToken = await authObject.getToken();
+      expect(retrievedToken).toBe(token);
+    });
+
+    it('has() always returns false', () => {
+      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
+      expect(authObject.has({})).toBe(false);
+    });
+
+    it('properly initializes properties', () => {
+      const authObject = authenticatedMachineObject('machine_token', token, verificationResult, debugData);
+      expect(authObject.tokenType).toBe('machine_token');
+      expect(authObject.name).toBe('my-machine-token');
+      expect(authObject.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(authObject.claims).toEqual({ foo: 'bar' });
+    });
+  });
+});
+
+describe('unauthenticatedMachineObject', () => {
+  it('properly initializes properties', () => {
+    const authObject = unauthenticatedMachineObject('machine_token');
+    expect(authObject.tokenType).toBe('machine_token');
+    expect(authObject.id).toBeNull();
+    expect(authObject.name).toBeNull();
+    expect(authObject.subject).toBeNull();
+    expect(authObject.scopes).toBeNull();
+    expect(authObject.claims).toBeNull();
+  });
+
+  it('has() always returns false', () => {
+    const authObject = unauthenticatedMachineObject('machine_token');
+    expect(authObject.has({})).toBe(false);
+  });
+
+  it('getToken always returns null ', async () => {
+    const authObject = unauthenticatedMachineObject('machine_token');
+    const retrievedToken = await authObject.getToken();
+    expect(retrievedToken).toBeNull();
   });
 });

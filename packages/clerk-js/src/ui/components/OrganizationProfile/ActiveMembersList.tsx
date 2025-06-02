@@ -110,6 +110,7 @@ const MemberRow = (props: {
           <RoleSelect
             isDisabled={card.isLoading || !onRoleChange}
             value={membership.role}
+            fallbackLabel={membership.roleName}
             onChange={onRoleChange}
             roles={options}
           />

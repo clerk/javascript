@@ -134,19 +134,20 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
 export const RoleSelect = (props: {
   roles: { label: string; value: string }[] | undefined;
   value: string;
+  fallbackLabel?: string;
   onChange: (params: string) => unknown;
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
   optionListSx?: ThemableCssProp;
   prefixLocalizationKey?: LocalizationKey | string;
 }) => {
-  const { value, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
+  const { value, fallbackLabel, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
   const fetchedRoles = useMemo(() => [...(roles || [])], [roles]);
 
-  const selectedRole = useMemo(() => fetchedRoles.find(r => r.value === value), [fetchedRoles]);
+  const selectedRole = useMemo(() => fetchedRoles.find(r => r.value === value), [fetchedRoles, value]);
   const { t } = useLocalizations();
 
   const localizedOptions = useMemo(
@@ -195,9 +196,9 @@ export const RoleSelect = (props: {
             textWrap: 'nowrap',
           }))
         }
-        isDisabled={isDisabled}
+        isDisabled={isDisabled || (!!value && fetchedRoles.length > 0 && !selectedRole)}
       >
-        {(selectedRole?.label || selectedRole?.value) && (
+        {selectedRole?.label || selectedRole?.value ? (
           <Flex
             as='span'
             gap={1}
@@ -211,12 +212,19 @@ export const RoleSelect = (props: {
             )}
             <Text
               as='span'
-              sx={t => ({ color: t.colors.$colorText })}
+              colorScheme='body'
             >
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>
           </Flex>
-        )}
+        ) : fallbackLabel ? (
+          <Text
+            as='span'
+            colorScheme='body'
+          >
+            {fallbackLabel}
+          </Text>
+        ) : null}
       </SelectButton>
       <SelectOptionList sx={optionListSx} />
     </Select>
