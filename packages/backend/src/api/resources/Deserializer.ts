@@ -1,6 +1,7 @@
 import {
   ActorToken,
   AllowlistIdentifier,
+  APIKey,
   BlocklistIdentifier,
   Client,
   Cookies,
@@ -8,11 +9,13 @@ import {
   Domain,
   Email,
   EmailAddress,
+  IdPOAuthAccessToken,
   Instance,
   InstanceRestrictions,
   InstanceSettings,
   Invitation,
   JwtTemplate,
+  MachineToken,
   OauthAccessToken,
   OAuthApplication,
   Organization,
@@ -103,6 +106,8 @@ function jsonToObject(item: any): any {
       return ActorToken.fromJSON(item);
     case ObjectType.AllowlistIdentifier:
       return AllowlistIdentifier.fromJSON(item);
+    case ObjectType.ApiKey:
+      return APIKey.fromJSON(item);
     case ObjectType.BlocklistIdentifier:
       return BlocklistIdentifier.fromJSON(item);
     case ObjectType.Client:
@@ -115,6 +120,8 @@ function jsonToObject(item: any): any {
       return EmailAddress.fromJSON(item);
     case ObjectType.Email:
       return Email.fromJSON(item);
+    case ObjectType.IdpOAuthAccessToken:
+      return IdPOAuthAccessToken.fromJSON(item);
     case ObjectType.Instance:
       return Instance.fromJSON(item);
     case ObjectType.InstanceRestrictions:
@@ -125,6 +132,8 @@ function jsonToObject(item: any): any {
       return Invitation.fromJSON(item);
     case ObjectType.JwtTemplate:
       return JwtTemplate.fromJSON(item);
+    case ObjectType.MachineToken:
+      return MachineToken.fromJSON(item);
     case ObjectType.OauthAccessToken:
       return OauthAccessToken.fromJSON(item);
     case ObjectType.OAuthApplication:

@@ -2,15 +2,18 @@ import {
   AccountlessApplicationAPI,
   ActorTokenAPI,
   AllowlistIdentifierAPI,
+  APIKeysAPI,
   BetaFeaturesAPI,
   BlocklistIdentifierAPI,
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
+  IdPOAuthAccessTokenApi,
   InstanceAPI,
   InvitationAPI,
   JwksAPI,
   JwtTemplatesApi,
+  MachineTokensApi,
   OAuthApplicationsApi,
   OrganizationAPI,
   PhoneNumberAPI,
@@ -47,6 +50,27 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     emailAddresses: new EmailAddressAPI(request),
     instance: new InstanceAPI(request),
     invitations: new InvitationAPI(request),
+    // Using "/" instead of an actual version since they're bapi-proxy endpoints.
+    // bapi-proxy connects directly to C1 without URL versioning,
+    // while API versioning is handled through the Clerk-API-Version header.
+    machineTokens: new MachineTokensApi(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
+    idPOAuthAccessToken: new IdPOAuthAccessTokenApi(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
+    apiKeys: new APIKeysAPI(
+      buildRequest({
+        ...options,
+        apiVersion: '/',
+      }),
+    ),
     jwks: new JwksAPI(request),
     jwtTemplates: new JwtTemplatesApi(request),
     oauthApplications: new OAuthApplicationsApi(request),

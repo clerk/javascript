@@ -20,6 +20,7 @@ export const ObjectType = {
   AccountlessApplication: 'accountless_application',
   ActorToken: 'actor_token',
   AllowlistIdentifier: 'allowlist_identifier',
+  ApiKey: 'api_key',
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
@@ -33,8 +34,10 @@ export const ObjectType = {
   InstanceRestrictions: 'instance_restrictions',
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
+  MachineToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
+  IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
   OAuthApplication: 'oauth_application',
   Organization: 'organization',
   OrganizationDomain: 'organization_domain',
@@ -691,6 +694,54 @@ export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
   disable_additional_identifications: boolean;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface MachineTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.MachineToken;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  creation_reason: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface APIKeyJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.ApiKey;
+  type: string;
+  name: string;
+  subject: string;
+  scopes: string[];
+  claims: Record<string, any> | null;
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
+  created_by: string | null;
+  description: string | null;
+  last_used_at: number | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.IdpOAuthAccessToken;
+  client_id: string;
+  type: string;
+  subject: string;
+  scopes: string[];
+  revoked: boolean;
+  revocation_reason: string | null;
+  expired: boolean;
+  expiration: number | null;
   created_at: number;
   updated_at: number;
 }

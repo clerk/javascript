@@ -16,6 +16,7 @@ type FakeMemberParams = {
   id: string;
   orgId: string;
   role?: OrganizationCustomRoleKey;
+  roleName?: string;
   identifier?: string;
   firstName?: string;
   lastName?: string;
@@ -30,6 +31,7 @@ export const createFakeMember = (params: FakeMemberParams): OrganizationMembersh
     organization: { id: params.orgId } as any as OrganizationResource,
     id: params.id,
     role: params?.role || 'admin',
+    roleName: params?.roleName || 'Admin',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
     publicMetadata: {},
@@ -79,6 +81,7 @@ export const createFakeDomain = (params: FakeDomainParams): OrganizationDomainRe
 type FakeInvitationParams = {
   id: string;
   role?: OrganizationCustomRoleKey;
+  roleName?: string;
   status?: OrganizationInvitationStatus;
   emailAddress: string;
   organizationId: string;
@@ -93,6 +96,7 @@ export const createFakeOrganizationInvitation = (params: FakeInvitationParams): 
     organizationId: params.organizationId,
     publicMetadata: {} as any,
     role: params.role || 'basic_member',
+    roleName: params.roleName || 'Basic Member',
     status: params.status || 'pending',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),

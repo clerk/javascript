@@ -421,11 +421,12 @@ export type ElementsConfig = {
   pricingTableMatrixFooter: WithOptions;
 
   planDetailHeader: WithOptions;
-  planDetailAvatarBadgeContainer: WithOptions;
   planDetailAvatar: WithOptions;
+  planDetailBadgeAvatarTitleDescriptionContainer: WithOptions;
   planDetailBadgeContainer: WithOptions;
   planDetailBadge: WithOptions;
   planDetailTitle: WithOptions;
+  planDetailTitleDescriptionContainer: WithOptions;
   planDetailDescription: WithOptions;
   planDetailAction: WithOptions;
   planDetailFeeContainer: WithOptions;
@@ -833,57 +834,67 @@ export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 
-export type Appearance<T = Theme> = T & {
+type GlobalAppearanceOptions = {
   /**
-   * Theme overrides that only apply to the `<SignIn/>` component
+   * The name of the CSS layer for Clerk component styles.
+   * This is useful for advanced CSS customization, allowing you to control the cascade and prevent style conflicts by isolating Clerk's styles within a specific layer.
+   * For more information on CSS layers, see the [MDN documentation on @layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
    */
-  signIn?: T;
-  /**
-   * Theme overrides that only apply to the `<SignUp/>` component
-   */
-  signUp?: T;
-  /**
-   * Theme overrides that only apply to the `<UserButton/>` component
-   */
-  userButton?: T;
-  /**
-   * Theme overrides that only apply to the `<UserProfile/>` component
-   */
-  userProfile?: T;
-  /**
-   * Theme overrides that only apply to the `<UserVerification/>` component
-   */
-  userVerification?: T;
-  /**
-   * Theme overrides that only apply to the `<OrganizationSwitcher/>` component
-   */
-  organizationSwitcher?: T;
-  /**
-   * Theme overrides that only apply to the `<OrganizationList/>` component
-   */
-  organizationList?: T;
-  /**
-   * Theme overrides that only apply to the `<OrganizationProfile/>` component
-   */
-  organizationProfile?: T;
-  /**
-   * Theme overrides that only apply to the `<CreateOrganization />` component
-   */
-  createOrganization?: T;
-  /**
-   * Theme overrides that only apply to the `<CreateOrganization />` component
-   */
-  oneTap?: T;
-  /**
-   * Theme overrides that only apply to the `<Waitlist />` component
-   */
-  waitlist?: T;
-  /**
-   * Theme overrides that only apply to the `<PricingTable />` component
-   */
-  pricingTable?: T;
-  /**
-   * Theme overrides that only apply to the `<Checkout />` component
-   */
-  checkout?: T;
+  cssLayerName?: string;
 };
+
+export type Appearance<T = Theme> = T &
+  GlobalAppearanceOptions & {
+    /**
+     * Theme overrides that only apply to the `<SignIn/>` component
+     */
+    signIn?: T;
+    /**
+     * Theme overrides that only apply to the `<SignUp/>` component
+     */
+    signUp?: T;
+    /**
+     * Theme overrides that only apply to the `<UserButton/>` component
+     */
+    userButton?: T;
+    /**
+     * Theme overrides that only apply to the `<UserProfile/>` component
+     */
+    userProfile?: T;
+    /**
+     * Theme overrides that only apply to the `<UserVerification/>` component
+     */
+    userVerification?: T;
+    /**
+     * Theme overrides that only apply to the `<OrganizationSwitcher/>` component
+     */
+    organizationSwitcher?: T;
+    /**
+     * Theme overrides that only apply to the `<OrganizationList/>` component
+     */
+    organizationList?: T;
+    /**
+     * Theme overrides that only apply to the `<OrganizationProfile/>` component
+     */
+    organizationProfile?: T;
+    /**
+     * Theme overrides that only apply to the `<CreateOrganization />` component
+     */
+    createOrganization?: T;
+    /**
+     * Theme overrides that only apply to the `<CreateOrganization />` component
+     */
+    oneTap?: T;
+    /**
+     * Theme overrides that only apply to the `<Waitlist />` component
+     */
+    waitlist?: T;
+    /**
+     * Theme overrides that only apply to the `<PricingTable />` component
+     */
+    pricingTable?: T;
+    /**
+     * Theme overrides that only apply to the `<Checkout />` component
+     */
+    checkout?: T;
+  };

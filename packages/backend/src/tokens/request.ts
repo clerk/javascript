@@ -2,21 +2,24 @@ import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
-import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
+import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject } from './authObjects';
-import type { HandshakeState, RequestState, SignedInState, SignedOutState } from './authStatus';
+import type { HandshakeState, RequestState, SignedInState, SignedOutState, UnauthenticatedState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
+import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
+import type { MachineTokenType, SessionTokenType } from './tokenTypes';
+import { TokenType } from './tokenTypes';
 import type { AuthenticateRequestOptions } from './types';
-import { verifyToken } from './verify';
+import { verifyMachineAuthToken, verifyToken } from './verify';
 
 export const RefreshTokenErrorReason = {
   NonEligibleNoCookie: 'non-eligible-no-refresh-cookie',
@@ -69,72 +72,63 @@ function isRequestEligibleForRefresh(
   );
 }
 
-/**
- * Authenticates a token passed from the frontend. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
- *
- * @param request - `Request` object.
- * @param options - Optional options to configure the authentication.
- *
- * @example
- * ### Backend SDK on its own
- *
- * If you are using the [JavaScript Backend SDK](https://clerk.com/docs/references/backend/overview) on its own, you need to provide the `secretKey` and `publishableKey` to `createClerkClient()` so that it is passed to `authenticateRequest()`. You can set these values as [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#clerk-publishable-and-secret-keys) and then pass them to the function.
- *
- * ```tsx
- * import { createClerkClient } from '@clerk/backend'
- *
- * export async function GET(req: Request) {
- *   const clerkClient = createClerkClient({
- *     secretKey: process.env.CLERK_SECRET_KEY,
- *     publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
- *   })
- *
- *   const { isSignedIn } = await clerkClient.authenticateRequest(req, {
- *     authorizedParties: ['https://example.com'],
- *   })
- *
- *   if (!isSignedIn) {
- *     return Response.json({ status: 401 })
- *   }
- *
- *   // Add logic to perform protected actions
- *
- *   return Response.json({ message: 'This is a reply' })
- * }
- * ```
- *
- * @example
- * ### With other Clerk SDKs
- *
- * `authenticateRequest()` requires `publishableKey` to be set. If you are importing `clerkClient` from a higher-level SDK, such as Next.js, then `clerkClient` infers the `publishableKey` from your [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#clerk-publishable-and-secret-keys). The following example uses Next.js, but the same logic applies for other frameworks.
- *
- * ```tsx
- * import { clerkClient } from '@clerk/nextjs/server'
- *
- * const client = await clerkClient()
- *
- * export async function GET(req: Request) {
- *   const { isSignedIn } = await client.authenticateRequest(req, {
- *     authorizedParties: ['https://example.com'],
- *   })
- *
- *   if (!isSignedIn) {
- *     return Response.json({ status: 401 })
- *   }
- *
- *   // Perform protected actions
- *   // Add logic to perform protected actions
- *
- *   return Response.json({ message: 'This is a reply' })
- * }
- * ```
- */
-export async function authenticateRequest(
+function checkTokenTypeMismatch(
+  parsedTokenType: MachineTokenType,
+  acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
+  authenticateContext: AuthenticateContext,
+): UnauthenticatedState<MachineTokenType> | null {
+  const mismatch = !isTokenTypeAccepted(parsedTokenType, acceptsToken);
+  if (mismatch) {
+    return signedOut({
+      tokenType: parsedTokenType,
+      authenticateContext,
+      reason: AuthErrorReason.TokenTypeMismatch,
+    });
+  }
+  return null;
+}
+
+export interface AuthenticateRequest {
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: ['session_token', 'api_key'] });
+   */
+  <T extends readonly TokenType[]>(
+    request: Request,
+    options: AuthenticateRequestOptions & { acceptsToken: T },
+  ): Promise<RequestState<T[number]>>;
+
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: 'session_token' });
+   */
+  <T extends TokenType>(
+    request: Request,
+    options: AuthenticateRequestOptions & { acceptsToken: T },
+  ): Promise<RequestState<T>>;
+
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request, { acceptsToken: 'any' });
+   */
+  (request: Request, options: AuthenticateRequestOptions & { acceptsToken: 'any' }): Promise<RequestState<TokenType>>;
+
+  /**
+   * @example
+   * clerkClient.authenticateRequest(request);
+   */
+  (request: Request, options?: AuthenticateRequestOptions): Promise<RequestState<SessionTokenType>>;
+}
+
+export const authenticateRequest: AuthenticateRequest = (async (
   request: Request,
   options: AuthenticateRequestOptions,
-): Promise<RequestState> {
+): Promise<RequestState<TokenType>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
+
+  // Default tokenType is session_token for backwards compatibility.
+  const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
@@ -288,7 +282,12 @@ export async function authenticateRequest(
     headers?: Headers,
   ): SignedInState | SignedOutState | HandshakeState {
     if (!handshakeService.isRequestEligibleForHandshake()) {
-      return signedOut(authenticateContext, reason, message);
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason,
+        message,
+      });
     }
 
     // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
@@ -308,7 +307,12 @@ export async function authenticateRequest(
     if (isRedirectLoop) {
       const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
       console.log(msg);
-      return signedOut(authenticateContext, reason, message);
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason,
+        message,
+      });
     }
 
     return handshake(authenticateContext, reason, message, handshakeHeaders);
@@ -372,19 +376,24 @@ export async function authenticateRequest(
   }
 
   async function authenticateRequestWithTokenInHeader() {
-    const { sessionTokenInHeader } = authenticateContext;
+    const { tokenInHeader } = authenticateContext;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
       if (errors) {
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
+      return signedIn({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        sessionClaims: data,
+        headers: new Headers(),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        token: tokenInHeader!,
+      });
     } catch (err) {
-      return handleError(err, 'header');
+      return handleSessionTokenError(err, 'header');
     }
   }
 
@@ -486,7 +495,11 @@ export async function authenticateRequest(
     }
 
     if (!hasActiveClient && !hasSessionToken) {
-      return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '');
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.SessionTokenAndUATMissing,
+      });
     }
 
     // This can eagerly run handshake since client_uat is SameSite=Strict in dev
@@ -502,7 +515,7 @@ export async function authenticateRequest(
     const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
 
     if (decodedErrors) {
-      return handleError(decodedErrors[0], 'cookie');
+      return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
@@ -515,13 +528,15 @@ export async function authenticateRequest(
       if (errors) {
         throw errors[0];
       }
-      const signedInRequestState = signedIn(
+
+      const signedInRequestState = signedIn({
+        tokenType: TokenType.SessionToken,
         authenticateContext,
-        data,
-        undefined,
+        sessionClaims: data,
+        headers: new Headers(),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        authenticateContext.sessionTokenInCookie!,
-      );
+        token: authenticateContext.sessionTokenInCookie!,
+      });
 
       const authObject = signedInRequestState.toAuth();
       // Org sync if necessary
@@ -534,18 +549,27 @@ export async function authenticateRequest(
 
       return signedInRequestState;
     } catch (err) {
-      return handleError(err, 'cookie');
+      return handleSessionTokenError(err, 'cookie');
     }
 
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+    // Unreachable
+    return signedOut({
+      tokenType: TokenType.SessionToken,
+      authenticateContext,
+      reason: AuthErrorReason.UnexpectedError,
+    });
   }
 
-  async function handleError(
+  async function handleSessionTokenError(
     err: unknown,
     tokenCarrier: TokenCarrier,
   ): Promise<SignedInState | SignedOutState | HandshakeState> {
     if (!(err instanceof TokenVerificationError)) {
-      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.UnexpectedError,
+      });
     }
 
     let refreshError: string | null;
@@ -553,7 +577,13 @@ export async function authenticateRequest(
     if (isRequestEligibleForRefresh(err, authenticateContext, request)) {
       const { data, error } = await attemptRefresh(authenticateContext);
       if (data) {
-        return signedIn(authenticateContext, data.jwtPayload, data.headers, data.sessionToken);
+        return signedIn({
+          tokenType: TokenType.SessionToken,
+          authenticateContext,
+          sessionClaims: data.jwtPayload,
+          headers: data.headers,
+          token: data.sessionToken,
+        });
       }
 
       // If there's any error, simply fallback to the handshake flow including the reason as a query parameter.
@@ -589,22 +619,142 @@ export async function authenticateRequest(
       );
     }
 
-    return signedOut(authenticateContext, err.reason, err.getFullMessage());
+    return signedOut({
+      tokenType: TokenType.SessionToken,
+      authenticateContext,
+      reason: err.reason,
+      message: err.getFullMessage(),
+    });
   }
 
-  if (authenticateContext.sessionTokenInHeader) {
-    return authenticateRequestWithTokenInHeader();
+  function handleMachineError(tokenType: MachineTokenType, err: unknown): UnauthenticatedState<MachineTokenType> {
+    if (!(err instanceof MachineTokenVerificationError)) {
+      return signedOut({
+        tokenType,
+        authenticateContext,
+        reason: AuthErrorReason.UnexpectedError,
+      });
+    }
+
+    return signedOut({
+      tokenType,
+      authenticateContext,
+      reason: err.code,
+      message: err.getFullMessage(),
+    });
+  }
+
+  async function authenticateMachineRequestWithTokenInHeader() {
+    const { tokenInHeader } = authenticateContext;
+    // Use session token error handling if no token in header (default behavior)
+    if (!tokenInHeader) {
+      return handleSessionTokenError(new Error('Missing token in header'), 'header');
+    }
+
+    // Handle case where tokenType is any and the token is not a machine token
+    if (!isMachineToken(tokenInHeader)) {
+      return signedOut({
+        tokenType: acceptsToken as MachineTokenType,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
+    const parsedTokenType = getMachineTokenType(tokenInHeader);
+    const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+    if (mismatchState) {
+      return mismatchState;
+    }
+
+    const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
+    if (errors) {
+      return handleMachineError(tokenType, errors[0]);
+    }
+    return signedIn({
+      tokenType,
+      authenticateContext,
+      machineData: data,
+      token: tokenInHeader,
+    });
+  }
+
+  async function authenticateAnyRequestWithTokenInHeader() {
+    const { tokenInHeader } = authenticateContext;
+    // Use session token error handling if no token in header (default behavior)
+    if (!tokenInHeader) {
+      return handleSessionTokenError(new Error('Missing token in header'), 'header');
+    }
+
+    // Handle as a machine token
+    if (isMachineToken(tokenInHeader)) {
+      const parsedTokenType = getMachineTokenType(tokenInHeader);
+      const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+      if (mismatchState) {
+        return mismatchState;
+      }
+
+      const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
+      if (errors) {
+        return handleMachineError(tokenType, errors[0]);
+      }
+
+      return signedIn({
+        tokenType,
+        authenticateContext,
+        machineData: data,
+        token: tokenInHeader,
+      });
+    }
+
+    // Handle as a regular session token
+    const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
+    if (errors) {
+      return handleSessionTokenError(errors[0], 'header');
+    }
+
+    return signedIn({
+      tokenType: TokenType.SessionToken,
+      authenticateContext,
+      sessionClaims: data,
+      token: tokenInHeader,
+    });
+  }
+
+  if (authenticateContext.tokenInHeader) {
+    if (acceptsToken === 'any') {
+      return authenticateAnyRequestWithTokenInHeader();
+    }
+
+    if (acceptsToken === TokenType.SessionToken) {
+      return authenticateRequestWithTokenInHeader();
+    }
+
+    return authenticateMachineRequestWithTokenInHeader();
+  }
+
+  // Machine requests cannot have the token in the cookie, it must be in header.
+  if (
+    acceptsToken === TokenType.OAuthToken ||
+    acceptsToken === TokenType.ApiKey ||
+    acceptsToken === TokenType.MachineToken
+  ) {
+    return signedOut({
+      tokenType: acceptsToken,
+      authenticateContext,
+      reason: 'No token in header',
+    });
   }
 
   return authenticateRequestWithTokenInCookie();
-}
+}) as AuthenticateRequest;
 
 /**
  * @internal
  */
 export const debugRequestState = (params: RequestState) => {
-  const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
-  return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
+  const { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
+  return { isSignedIn, isAuthenticated, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
 
 const convertTokenVerificationErrorReasonToAuthErrorReason = ({
