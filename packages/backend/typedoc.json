@@ -7,6 +7,7 @@
     "./src/tokens/request.ts",
     "./src/tokens/types.ts",
     "./src/tokens/authOjbects.ts",
-    "./src/api/resources/index.ts"
+    "./src/api/resources/index.ts",
+    "./src/api/resources/Deserializer.ts"
   ]
 }

@@ -67,12 +67,6 @@ export type SignedOutAuthObject = {
 };
 
 /**
- * The `Auth` object contains important information like the current user's session ID, user ID, and organization ID. It also contains methods to check for permissions and retrieve the current user's session token.
- *
- * ## How to access the `Auth` object
- *
- * <Include src="_partials/auth-object-table" />
- *
  * @interface
  */
 export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
