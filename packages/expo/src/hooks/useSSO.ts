@@ -16,6 +16,9 @@ export type StartSSOFlowParams = {
       strategy: EnterpriseSSOStrategy;
       identifier: string;
     }
+  | {
+      showInRecents: boolean;
+    }
 );
 
 export type StartSSOFlowReturnType = {
@@ -69,6 +72,7 @@ export function useSSO() {
     const authSessionResult = await WebBrowser.openAuthSessionAsync(
       externalVerificationRedirectURL.toString(),
       redirectUrl,
+      { showInRecents: unsafeMetadata.showInRecents ?? false }
     );
     if (authSessionResult.type !== 'success' || !authSessionResult.url) {
       return {
