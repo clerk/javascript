@@ -392,6 +392,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data?: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -404,6 +405,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   public_metadata: OrganizationInvitationPublicMetadata;
   status: OrganizationInvitationStatus;
   role: OrganizationCustomRoleKey;
+  role_name: string;
   created_at: number;
   updated_at: number;
 }
@@ -638,6 +640,7 @@ export interface CommercePaymentSourceJSON extends ClerkResourceJSON {
   payment_method: string;
   card_type: string;
   is_default: boolean;
+  is_removable: boolean;
   status: CommercePaymentSourceStatus;
   wallet_type: string | null;
 }
