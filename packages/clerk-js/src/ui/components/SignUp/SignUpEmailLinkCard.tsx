@@ -2,10 +2,11 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/types';
 import React from 'react';
 
+import { VerificationLinkCard } from '@/ui/elements/VerificationLinkCard';
+
 import { EmailLinkStatusCard } from '../../common';
 import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
-import { VerificationLinkCard } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 import { useRouter } from '../../router';

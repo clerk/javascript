@@ -1,7 +1,9 @@
 import React from 'react';
 
+import { Form } from '@/ui/elements/Form';
+import { LegalCheckbox } from '@/ui/elements/LegalConsentCheckbox';
+
 import { Col, localizationKeys, useAppearance } from '../../customizables';
-import { Form, LegalCheckbox } from '../../elements';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';

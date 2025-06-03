@@ -1,13 +1,16 @@
 import { useClerk } from '@clerk/shared/react';
 
+import { Card } from '@/ui/elements/Card';
+import { Header } from '@/ui/elements/Header';
+
 import { SIGN_UP_MODES } from '../../../core/constants';
 import { useEnvironment, useSignUpContext } from '../../contexts';
 import { Button, Flex, Icon, localizationKeys } from '../../customizables';
-import { Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { Block } from '../../icons';
 import { useRouter } from '../../router';
+
 export const SignUpRestrictedAccess = () => {
   const clerk = useClerk();
   const card = useCardState();

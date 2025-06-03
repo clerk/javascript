@@ -6,10 +6,14 @@ import type {
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 
+import { Actions } from '@/ui/elements/Actions';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
+import { PreviewButton } from '@/ui/elements/PreviewButton';
+
 import { InfiniteListSpinner } from '../../common';
 import { useAcceptedInvitations } from '../../contexts';
 import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { Actions, OrganizationPreview, PreviewButton, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { SwitchArrowRight } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';

@@ -3,10 +3,14 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/types';
 import React from 'react';
 
+import { Card } from '@/ui/elements/Card';
+import { useCardState } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { Header } from '@/ui/elements/Header';
+
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';

@@ -3,11 +3,15 @@ import type { CommercePaymentSourceResource } from '@clerk/types';
 import type { SetupIntent } from '@stripe/stripe-js';
 import { Fragment, useCallback, useMemo, useRef } from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
+import { ProfileSection } from '@/ui/elements/Section';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+
 import { RemoveResourceForm } from '../../common';
 import { DevOnly } from '../../common/DevOnly';
 import { usePaymentSources, useSubscriberTypeContext } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import { FullHeightLoader, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { handleError } from '../../utils';

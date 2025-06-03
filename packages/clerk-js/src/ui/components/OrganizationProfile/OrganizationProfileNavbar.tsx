@@ -1,10 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
+import { NavBar, NavbarContextProvider } from '@/ui/elements/Navbar';
+
 import { useProtect } from '../../common';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
-import { NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 

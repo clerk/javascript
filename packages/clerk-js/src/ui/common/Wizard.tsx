@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Animated } from '../elements';
+import { Animated } from '../elements/Animated';
 
 type WizardProps = React.PropsWithChildren<{
   step: number;
