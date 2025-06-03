@@ -1,9 +1,12 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { ErrorCard } from '@/ui/elements/ErrorCard';
+import { LoadingCard } from '@/ui/elements/LoadingCard';
+
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
-import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';

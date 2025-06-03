@@ -2,10 +2,12 @@ import { useUser } from '@clerk/shared/react';
 import type { VerificationStrategy } from '@clerk/types';
 import React from 'react';
 
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import type { FormProps } from '@/ui/elements/FormContainer';
+import { FormContainer } from '@/ui/elements/FormContainer';
+
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
-import type { FormProps } from '../../elements';
-import { FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { MfaBackupCodeScreen } from './MfaBackupCodeScreen';
 import { MfaPhoneCodeScreen } from './MfaPhoneCodeScreen';
 import { MfaTOTPScreen } from './MfaTOTPScreen';

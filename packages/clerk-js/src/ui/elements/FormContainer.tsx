@@ -1,7 +1,9 @@
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { Card, Header, useCardState } from './index';
+import { Card } from './Card';
+import { useCardState } from './contexts';
+import { Header } from './Header';
 
 export type FormProps = {
   onSuccess: () => void;

@@ -1,5 +1,6 @@
+import { LineItems } from '@/ui/elements/LineItems';
+
 import { Box, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { LineItems } from '../../elements';
 
 export const TestPaymentSource = () => {
   const { t } = useLocalizations();

@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { NavBar, NavbarContextProvider } from '@/ui/elements/Navbar';
+
 import { useUserProfileContext } from '../../contexts';
-import { NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
