@@ -901,5 +901,5 @@ export type Appearance<T = Theme> = T &
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
-    oauthConsent?: T;
+    __internal_oauthConsent?: T;
   };

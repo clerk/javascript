@@ -1043,7 +1043,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted({ preloadHint: 'OAuthConsent' }).then(controls =>
       controls.mountComponent({
         name: 'OAuthConsent',
-        appearanceKey: 'oauthConsent',
+        appearanceKey: '__internal_oauthConsent',
         node,
         props,
       }),
