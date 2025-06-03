@@ -4,12 +4,15 @@ import type { CreateAPIKeyParams } from '@clerk/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
-import { useApiKeysContext, withCoreUserGuard } from '../../contexts';
-import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '../../customizables';
-import { InputWithIcon, Pagination, useCardState, withCardStateProvider } from '../../elements';
-import { Action } from '../../elements/Action';
-import { MagnifyingGlass } from '../../icons';
-import { mqu } from '../../styledSystem';
+import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
+import { Box, Button, Col, Flex, Flow, Icon, localizationKeys, useLocalizations } from '@/ui/customizables';
+import { Action } from '@/ui/elements/Action';
+import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { InputWithIcon } from '@/ui/elements/InputWithIcon';
+import { Pagination } from '@/ui/elements/Pagination';
+import { MagnifyingGlass } from '@/ui/icons';
+import { mqu } from '@/ui/styledSystem';
+
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';

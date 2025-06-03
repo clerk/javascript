@@ -3,7 +3,6 @@ import type { APIKeyResource } from '@clerk/types';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
-import { timeAgo } from '../../../utils/date';
 import {
   Box,
   Button,
@@ -20,11 +19,12 @@ import {
   Th,
   Thead,
   Tr,
-} from '../../customizables';
-import { ThreeDotsMenu } from '../../elements';
-import { useClipboard } from '../../hooks';
-import { Check, ClipboardOutline, Eye, EyeSlash } from '../../icons';
-import { common, mqu } from '../../styledSystem';
+} from '@/ui/customizables';
+import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { useClipboard } from '@/ui/hooks';
+import { Check, ClipboardOutline, Eye, EyeSlash } from '@/ui/icons';
+import { common, mqu } from '@/ui/styledSystem';
+import { timeAgo } from '@/utils/date';
 
 const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
   const clerk = useClerk();

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 
-import { Box, Button, Col, Flex, FormLabel, localizationKeys, Text } from '../../customizables';
-import { Form, FormButtons, FormContainer, SegmentedControl } from '../../elements';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { mqu } from '../../styledSystem';
-import { useFormControl } from '../../utils';
+import { Box, Button, Col, Flex, FormLabel, localizationKeys, Text } from '@/ui/customizables';
+import { useActionContext } from '@/ui/elements/Action/ActionRoot';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { mqu } from '@/ui/styledSystem';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 export type OnCreateParams = { name: string; description?: string; expiration: number | undefined };
 

@@ -1,9 +1,13 @@
 import { useClerk } from '@clerk/shared/react';
 import { useSWRConfig } from 'swr';
 
-import { Card, Form, FormButtons, FormContainer, Modal } from '../../elements';
-import { localizationKeys } from '../../localization';
-import { useFormControl } from '../../utils';
+import { Card } from '@/ui/elements/Card';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
+import { Modal } from '@/ui/elements/Modal';
+import { localizationKeys } from '@/ui/localization';
+import { useFormControl } from '@/ui/utils';
 
 type RevokeAPIKeyConfirmationModalProps = {
   isOpen: boolean;

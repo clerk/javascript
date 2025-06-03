@@ -1,9 +1,11 @@
 import { useUser } from '@clerk/shared/react';
 
-import { ApiKeysContext } from '../../contexts';
-import { Col, localizationKeys } from '../../customizables';
-import { Header, useUnsafeNavbarContext } from '../../elements';
-import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys';
+import { ApiKeysContext } from '@/ui/contexts';
+import { Col, localizationKeys } from '@/ui/customizables';
+import { Header } from '@/ui/elements/Header';
+import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
+
+import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys/ApiKeys';
 
 export const APIKeysPage = () => {
   const { user } = useUser();

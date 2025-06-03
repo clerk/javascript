@@ -833,7 +833,7 @@ export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
-export type ApiKeysTheme = Theme;
+export type APIKeysTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -899,7 +899,7 @@ export type Appearance<T = Theme> = T &
      */
     checkout?: T;
     /**
-     * Theme overrides that only apply to the `<ApiKeys />` component
+     * Theme overrides that only apply to the `<APIKeys />` component
      */
     apiKeys?: T;
   };
