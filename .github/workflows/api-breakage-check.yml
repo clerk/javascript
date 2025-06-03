@@ -1,0 +1,138 @@
+name: API Breakage Detection
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'tools/api-breakage-detector/**'
+      - '.api-breakage.config.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  detect-api-changes:
+    name: Detect API Breaking Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history for proper comparison
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build API breakage detector
+        run: |
+          cd tools/api-breakage-detector
+          pnpm build
+
+      - name: Build packages for API extraction
+        run: pnpm build:declarations
+        
+      - name: Run API breakage detection
+        id: api-check
+        run: |
+          cd tools/api-breakage-detector
+          
+          # Run the detection and capture output
+          pnpm run detect \
+            --workspace ../../ \
+            --main-branch origin/main \
+            --format markdown \
+            --output /tmp/api-report.md \
+            --fail-on-breaking
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Read API report
+        id: read-report
+        if: always()
+        run: |
+          if [ -f /tmp/api-report.md ]; then
+            echo "report-exists=true" >> $GITHUB_OUTPUT
+            # Read the report content (truncate if too long for GitHub)
+            REPORT_CONTENT=$(cat /tmp/api-report.md | head -c 60000)
+            echo "report-content<<EOF" >> $GITHUB_OUTPUT
+            echo "$REPORT_CONTENT" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "report-exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Find existing API report comment
+        if: always() && steps.read-report.outputs.report-exists == 'true'
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'API Breakage Detection'
+
+      - name: Post or update API report comment
+        if: always() && steps.read-report.outputs.report-exists == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.read-report.outputs.report-content }}
+          edit-mode: replace
+
+      - name: Upload API report artifact
+        if: always() && steps.read-report.outputs.report-exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-breakage-report
+          path: /tmp/api-report.md
+          retention-days: 30
+
+      - name: Set status check
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const sha = context.payload.pull_request.head.sha;
+            
+            // Determine status based on API check results
+            const apiCheckResult = '${{ steps.api-check.outcome }}';
+            const state = apiCheckResult === 'success' ? 'success' : 'failure';
+            const description = apiCheckResult === 'success' 
+              ? 'No breaking API changes detected'
+              : 'Breaking API changes detected or version bumps required';
+            
+            await github.rest.repos.createCommitStatus({
+              owner,
+              repo,
+              sha,
+              state,
+              target_url: `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`,
+              description,
+              context: 'api-breakage-detector'
+            });
+
+      - name: Fail workflow if breaking changes require attention
+        if: steps.api-check.outcome == 'failure'
+        run: |
+          echo "::error::API breaking changes detected that require attention"
+          echo "Please check the API report comment for details"
+          exit 1 

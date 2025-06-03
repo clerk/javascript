@@ -1,0 +1,9 @@
+{
+  "excludePackages": [],
+  "snapshotsDir": ".api-snapshots",
+  "mainBranch": "main",
+  "checkVersionBump": true,
+  "suppressedChanges": [],
+  "enableLLMAnalysis": false,
+  "llmProvider": "openai"
+}
