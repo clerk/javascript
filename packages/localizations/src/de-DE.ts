@@ -1015,7 +1015,7 @@ export const deDE: LocalizationResource = {
     mobileButton__menu: 'Menü',
     navbar: {
       account: 'Profil',
-      apiKeys: undefined,
+      apiKeys: 'API-Keys',
       billing: 'Abrechnung',
       description: 'Verwalten Sie Ihre Kontoinformationen.',
       security: 'Sicherheit',
