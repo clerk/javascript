@@ -169,10 +169,10 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyExpirationDate: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKeyDescription: 'Beschreibung',
+  formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
+  formFieldLabel__apiKeyExpirationDate: 'Datum auswählen',
+  formFieldLabel__apiKeyName: 'Name',
   formFieldLabel__automaticInvitations: 'Aktivieren Sie automatische Einladungen für diese Domain',
   formFieldLabel__backupCode: 'Sicherungscode',
   formFieldLabel__confirmDeletion: 'Bestätigung',
@@ -219,7 +219,7 @@ export const deDE: LocalizationResource = {
   },
   organizationProfile: {
     apiKeysPage: {
-      title: undefined,
+      title: 'API-Keys',
     },
     badge__automaticInvitation: 'Automatische Einladungen',
     badge__automaticSuggestion: 'Automatische Vorschläge',
