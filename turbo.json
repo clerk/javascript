@@ -58,7 +58,7 @@
         "!node_modules/**"
       ],
       "outputLogs": "new-only",
-      "outputs": ["*/package.json", "dist/**", "scripts/**"]
+      "outputs": ["*/package.json", "dist/**", "scripts/**", ".next/**", "!.next/cache/**"]
     },
     "build:declarations": {
       "dependsOn": ["build"],
@@ -297,6 +297,26 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "api:snapshot": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "package.json",
+        "tsconfig.json",
+        "api-extractor.json",
+        "../../.api-breakage.config.json"
+      ],
+      "outputs": ["../../.api-snapshots/current/**"],
+      "cache": true,
+      "persistent": false
+    },
+    "api:check": {
+      "dependsOn": ["api:snapshot"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "package.json", ".api-snapshots/baseline/**"],
+      "outputs": ["api-changes-report.md", ".api-snapshots/current/**"],
+      "cache": false
     }
   }
 }

@@ -79,7 +79,8 @@ program
   .option('-c, --config <path>', 'Path to configuration file', '.api-breakage.config.json')
   .option('-o, --output <path>', 'Output directory for snapshots')
   .option('--workspace <path>', 'Workspace root path', process.cwd())
-  .action(async (options: { config: string; output?: string; workspace: string }) => {
+  .option('--no-cleanup', 'Skip cleanup of temporary files (useful for caching)')
+  .action(async (options: { config: string; output?: string; workspace: string; cleanup?: boolean }) => {
     try {
       const config = await loadConfig(options.config, {});
 
@@ -91,6 +92,7 @@ program
       const detector = new BreakingChangesDetector({
         workspaceRoot: options.workspace,
         config,
+        skipCleanup: !options.cleanup,
       });
 
       console.log(chalk.blue('📸 Starting API snapshot generation...'));
@@ -102,8 +104,16 @@ program
       // Generate snapshots only
       const snapshots = await detector.generateCurrentSnapshots(packages);
 
-      // Clean up temporary files
-      await detector.cleanup();
+      console.log(`DEBUG: options.cleanup = ${options.cleanup}`);
+      console.log(`DEBUG: !options.cleanup = ${!options.cleanup}`);
+
+      // Clean up temporary files unless --no-cleanup is specified
+      if (options.cleanup) {
+        console.log('DEBUG: Calling cleanup because options.cleanup is true');
+        await detector.cleanup();
+      } else {
+        console.log('DEBUG: Skipping cleanup because options.cleanup is false (--no-cleanup was used)');
+      }
 
       console.log(chalk.green(`✅ Generated ${snapshots.size} API snapshots`));
 

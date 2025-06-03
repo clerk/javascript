@@ -21,6 +21,33 @@ export const ConfigSchema = z.object({
   enableLLMAnalysis: z.boolean().default(false),
   llmProvider: z.enum(['openai', 'anthropic']).default('openai'),
   llmApiKey: z.string().optional(),
+  ci: z
+    .object({
+      enableStatusChecks: z.boolean().default(true),
+      failOnBreakingChanges: z.boolean().default(true),
+      baselineStorage: z.enum(['git', 'cache', 'artifacts', 'turborepo']).default('cache'),
+      baselinePath: z.string().optional(),
+      artifactRetentionDays: z.number().default(7),
+    })
+    .optional(),
+  turborepo: z
+    .object({
+      enabled: z.boolean().default(false),
+      remoteCache: z
+        .object({
+          enabled: z.boolean().default(false),
+          teamId: z.string().optional(),
+          token: z.string().optional(),
+        })
+        .optional(),
+      tasks: z
+        .object({
+          snapshot: z.string().default('api:snapshot'),
+          check: z.string().default('api:check'),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

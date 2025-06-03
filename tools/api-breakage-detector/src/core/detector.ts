@@ -14,6 +14,7 @@ export interface DetectorOptions {
   config: Config;
   prBranch?: string;
   baseBranch?: string;
+  skipCleanup?: boolean;
 }
 
 /**
@@ -103,16 +104,21 @@ export class BreakingChangesDetector {
   }
 
   private async getBaselineSnapshots(packages: PackageInfo[]): Promise<Map<string, string>> {
-    const snapshots = new Map<string, string>();
-    const baselineDir = path.join(this.snapshotsDir, 'baseline');
+    // Check if we should use Git-stored baselines (for CI)
+    if (this.options.config.ci?.baselineStorage === 'git') {
+      return this.loadGitStoredBaseline(packages);
+    }
 
-    // Check if we have cached baseline snapshots
-    const cacheValid = await this.isBaselineCacheValid();
-
-    if (cacheValid) {
-      console.log('  Using cached baseline snapshots');
+    // Check if cache is valid first
+    if (await this.isBaselineCacheValid()) {
+      console.log('  📦 Using cached baseline snapshots...');
       return this.loadCachedBaseline(packages);
     }
+
+    console.log(`  🔄 Generating fresh baseline snapshots from ${this.options.config.mainBranch}...`);
+
+    const snapshots = new Map<string, string>();
+    const baselineDir = path.join(this.snapshotsDir, 'baseline');
 
     // Generate fresh baseline snapshots from main branch
     console.log(`  Checking out ${this.options.config.mainBranch} branch...`);
@@ -144,6 +150,24 @@ export class BreakingChangesDetector {
     } finally {
       // Switch back to original branch
       await this.gitManager.checkoutBranch(currentBranch);
+    }
+
+    return snapshots;
+  }
+
+  private async loadGitStoredBaseline(packages: PackageInfo[]): Promise<Map<string, string>> {
+    console.log('  📦 Loading Git-stored baseline snapshots...');
+    const snapshots = new Map<string, string>();
+    const baselineDir = this.options.config.ci?.baselinePath || path.join(this.snapshotsDir, 'baseline');
+
+    for (const pkg of packages) {
+      const snapshotPath = path.join(baselineDir, `${pkg.name.replace('/', '__')}.api.json`);
+      if (await fs.pathExists(snapshotPath)) {
+        snapshots.set(pkg.name, snapshotPath);
+        console.log(`    ✅ Found baseline for ${pkg.name}`);
+      } else {
+        console.log(`    ⚠️ No baseline found for ${pkg.name} (new package?)`);
+      }
     }
 
     return snapshots;
@@ -323,12 +347,24 @@ export class BreakingChangesDetector {
   }
 
   async cleanup(): Promise<void> {
+    if (this.options.skipCleanup) {
+      console.log('🧹 Cleanup skipped due to --no-cleanup flag');
+      return;
+    }
+
     try {
+      console.log('🧹 Starting cleanup...');
       await this.apiExtractor.cleanup();
+      console.log('  API extractor cleanup completed');
+
       // Clean up current snapshots (keep baseline for caching)
       const currentDir = path.join(this.snapshotsDir, 'current');
       if (await fs.pathExists(currentDir)) {
+        console.log(`  Removing current snapshots directory: ${currentDir}`);
         await fs.remove(currentDir);
+        console.log('  Current snapshots directory removed');
+      } else {
+        console.log('  No current snapshots directory to clean up');
       }
     } catch (error) {
       console.warn('⚠️ Cleanup failed:', error);

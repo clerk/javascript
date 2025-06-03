@@ -50,8 +50,21 @@ export class ApiExtractorRunner {
       // Move the generated .api.json to our desired location
       const generatedApiJsonPath = path.join(packageInfo.path, 'temp', `${path.basename(packageInfo.name)}.api.json`);
 
+      console.log(`  Looking for generated file at: ${generatedApiJsonPath}`);
       if (await fs.pathExists(generatedApiJsonPath)) {
+        console.log(`  Moving file to: ${apiJsonPath}`);
+        await fs.ensureDir(path.dirname(apiJsonPath));
         await fs.move(generatedApiJsonPath, apiJsonPath, { overwrite: true });
+        console.log(`  File moved successfully`);
+
+        // Verify the file exists after move
+        if (await fs.pathExists(apiJsonPath)) {
+          console.log(`  ✅ File verified at destination: ${apiJsonPath}`);
+        } else {
+          console.error(`  ❌ File missing after move: ${apiJsonPath}`);
+        }
+      } else {
+        console.warn(`  Generated API file not found at: ${generatedApiJsonPath}`);
       }
 
       return {
